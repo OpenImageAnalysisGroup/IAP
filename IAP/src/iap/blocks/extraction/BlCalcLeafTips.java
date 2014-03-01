@@ -143,7 +143,7 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		borderimg.show("border_img", debugValues);
 		
 		// get border list
-		int[][] borderMap = io.getImageAs2dArray();
+		int[][] borderMap = io.getAs2D();
 		ArrayList<int[]> borderListList;
 		
 		try {

@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operation;
+package de.ipk.ag_ba.image.operation.segmentation;
 
 import java.awt.geom.Rectangle2D;
 

@@ -23,7 +23,7 @@ public class ImageCalculation {
 		int x = 0;
 		int y = 0;
 		int w = imageOperation.getWidth();
-		for (int p : imageOperation.getImageAs1dArray()) {
+		for (int p : imageOperation.getAs1D()) {
 			x++;
 			if (x == w) {
 				y++;

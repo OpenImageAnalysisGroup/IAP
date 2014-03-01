@@ -29,7 +29,7 @@ import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 
-import de.ipk.ag_ba.image.operation.ImageCanvas;
+import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;

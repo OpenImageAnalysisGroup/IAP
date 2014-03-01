@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.operation.ImageCanvas;
+import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 

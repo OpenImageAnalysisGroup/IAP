@@ -1,14 +1,16 @@
-package de.ipk.ag_ba.image.operation;
+package de.ipk.ag_ba.image.operation.binarymask;
 
 import iap.blocks.segmentation.BlMorphologicalOperations;
 import ij.ImagePlus;
 import ij.process.BinaryProcessor;
 import ij.process.Blitter;
 import ij.process.ByteProcessor;
+import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
 import java.awt.Color;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
@@ -35,7 +37,7 @@ public class ImageJOperation {
 			}
 		}
 		
-		this.image = ImageConverter.convert1AtoIJ(w, h, image);
+		this.image = new ImagePlus("from 1d array", new ColorProcessor(w, h, image));
 		this.w = w;
 		this.h = h;
 	}
@@ -182,13 +184,17 @@ public class ImageJOperation {
 	public int countFilledPixels() {
 		int res = 0;
 		int background = -1;
-		int[] img1d = ImageConverter.convertIJto1A(image);
+		int[] img1d = getAs1A();
 		
 		for (int c : img1d) {
 			if (c != background)
 				res++;
 		}
 		return res;
+	}
+	
+	public int[] getAs1A() {
+		return (int[]) image.getProcessor().getPixels();
 	}
 	
 	public ImageJOperation skeletonize() {

@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operation;
+package de.ipk.ag_ba.image.operation.volume;
 
 import info.StopWatch;
 
@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.ThreeDmodelGenerator;

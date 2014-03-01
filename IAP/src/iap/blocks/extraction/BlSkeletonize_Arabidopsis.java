@@ -14,8 +14,8 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
-import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;

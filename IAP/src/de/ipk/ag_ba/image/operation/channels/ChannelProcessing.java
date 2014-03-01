@@ -1,6 +1,8 @@
-package de.ipk.ag_ba.image.operation;
+package de.ipk.ag_ba.image.operation.channels;
 
 import java.awt.Color;
+
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /**
  * Provides easy to use channel splitting operations.

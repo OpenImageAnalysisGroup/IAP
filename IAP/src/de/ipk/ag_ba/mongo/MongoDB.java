@@ -66,7 +66,7 @@ import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
-import de.ipk.ag_ba.image.operation.ImageConverter;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
@@ -1598,7 +1598,7 @@ public class MongoDB {
 			return img;
 		} catch (Exception e) {
 			status.setCurrentStatusText1(" // ERROR: " + e.getMessage());
-			return ImageConverter.convertImage2BufferedImage(IAPimages.getImage(IAPimages.getComputerOffline()));
+			return Image.getBufferedImageFromImage(IAPimages.getImage(IAPimages.getComputerOffline()));
 		}
 	}
 	

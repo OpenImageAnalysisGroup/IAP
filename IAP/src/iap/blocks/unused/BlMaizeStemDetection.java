@@ -59,7 +59,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 		rt.addValue(prefix4 + ".part.count", clusters);
 		img = skeletonizeImage("", background, img, rt);
 		
-		int[] unchangedSkeletonPixels = img.getImageAs1dArray();
+		int[] unchangedSkeletonPixels = img.getAs1D();
 		
 		ImageOperation ioClusteredSkeltonImage = new Image(
 				inDilatedForSectionDetection.getWidth(),
@@ -71,7 +71,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 			ioClusteredSkeltonImage = ioClusteredSkeltonImage.replaceColor(i, cols.get(i).getRGB());
 		}
 		
-		int[] clusterIDsPixels = ioClusteredSkeltonImage.getImageAs1dArray();
+		int[] clusterIDsPixels = ioClusteredSkeltonImage.getAs1D();
 		
 		boolean thinClusterSkel = true;
 		if (thinClusterSkel) {
@@ -230,7 +230,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 							ImageOperation si = image.copy().bm().dilate().io().skeletonize(true);// .resize(0.5d);
 							graphAnalysis(getClusterIDarray(image),
 									new Image(si.getWidth(), si.getHeight(),
-											si.getImageAs1dArray())
+											si.getAs1D())
 											.show("input for graph analysis", debug).io(), rt, prefix);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -285,7 +285,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 				cd.getImageClusterIdMask()).io();
 		
 		ArrayList<Color> cols = Colors.get(clusters + 1);
-		int[] source = ioClusteredSkeltonImage.getImageAs1dArray();
+		int[] source = ioClusteredSkeltonImage.getAs1D();
 		int[] target = new int[source.length];
 		for (int i = 1; i < cols.size(); i++) {
 			int search = i;

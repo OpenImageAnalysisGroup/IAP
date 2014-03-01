@@ -59,6 +59,14 @@ import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
+import de.ipk.ag_ba.image.operation.binarymask.ImageJOperation;
+import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
+import de.ipk.ag_ba.image.operation.channels.Channel;
+import de.ipk.ag_ba.image.operation.channels.ChannelCalculation;
+import de.ipk.ag_ba.image.operation.channels.ChannelProcessing;
+import de.ipk.ag_ba.image.operation.fluoop.FluoAnalysis;
+import de.ipk.ag_ba.image.operation.segmentation.LargeCluster;
+import de.ipk.ag_ba.image.operation.skeleton.SkeletonizeProcessor;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
 import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
@@ -104,7 +112,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation(BufferedImage image) {
-		this(ImageConverter.convertBItoIJ(image));
+		this(new ImagePlus("from bufferedimage", image));
 	}
 	
 	public ImageOperation(Image image) {
@@ -118,11 +126,17 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation(int[] image, int width, int height) {
-		this(ImageConverter.convert1AtoIJ(width, height, image));
+		this(new ImagePlus("from 1d array", new ColorProcessor(width, height, image)));
 	}
 	
 	public ImageOperation(int[][] image) {
-		this(ImageConverter.convert2AtoIJ(image));
+		this(getIJ(image));
+	}
+	
+	private static ImagePlus getIJ(int[][] img) {
+		int width = img[0].length;
+		int height = img.length;
+		return new ImagePlus("from 1d array", new ColorProcessor(width, height, ArrayUtil.get1d(img)));
 	}
 	
 	public ImageOperation(BufferedImage bufferedImage, ResultsTableWithUnits rt) {
@@ -144,10 +158,6 @@ public class ImageOperation implements MemoryHogInterface {
 		return cameraType;
 	}
 	
-	public MorphologicalOperation mo() {
-		return new MorphologicalOperation(this);
-	}
-	
 	/**
 	 * Moves the image content. New clear regions are recolored to the
 	 * background color.
@@ -167,7 +177,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation replaceColor(int search, int replace) {
-		int[] source = getImageAs1dArray();
+		int[] source = getAs1D();
 		int[] target = new int[source.length];
 		
 		int idx = 0;
@@ -182,8 +192,8 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation replaceColorsScanLine(int search, int replace) {
-		int[][] source2d = getImageAs2dArray();
-		int[][] target = getImageAs2dArray();
+		int[][] source2d = getAs2D();
+		int[][] target = getAs2D();
 		
 		int w = getWidth(), h = getHeight();
 		for (int y = 0; y < h; y++) {
@@ -207,7 +217,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation replaceColors(int search, Image replace) {
-		int[] source = getImageAs1dArray();
+		int[] source = getAs1D();
 		int[] target = new int[source.length];
 		
 		int[] replaceColors = replace.getAs1A();
@@ -320,7 +330,7 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		if (minimumIntensity < 0)
 			minimumIntensity = 150;
-		int[] in = getImageAs1dArray(); // gamma(0.1) // 99999999999999999999999999999999
+		int[] in = getAs1D(); // gamma(0.1) // 99999999999999999999999999999999
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int idx = 0;
@@ -395,7 +405,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation convertFluo2intensityOldRGBbased() {
 		int background = ImageOperation.BACKGROUND_COLORint;
-		int[] in = getImageAs1dArray();
+		int[] in = getAs1D();
 		int idx = 0;
 		for (int c : in) {
 			if (c == background) {
@@ -471,7 +481,7 @@ public class ImageOperation implements MemoryHogInterface {
 		}
 		
 		int[] maskPixels = mask.getAs1A();
-		int[] originalImage = getImageAs1dArray();
+		int[] originalImage = getAs1D();
 		
 		int idx = 0;
 		for (int maskPixel : maskPixels) {
@@ -506,7 +516,7 @@ public class ImageOperation implements MemoryHogInterface {
 		// copy().crossfade(mask.copy(), 2, 4, 3).show("OVERLAY");
 		
 		int[][] maskPixels = mask.getAs2A();
-		int[][] originalImage = getImageAs2dArray();
+		int[][] originalImage = getAs2D();
 		int mW = mask.getWidth();
 		int mH = mask.getHeight();
 		for (int x = 0; x < mW; x++) {
@@ -554,7 +564,7 @@ public class ImageOperation implements MemoryHogInterface {
 		}
 		
 		int[] maskPixels = mask.getAs1A();
-		int[] originalImage = ImageConverter.convertIJto1A(image);
+		int[] originalImage = getAs1D();
 		
 		int idx = 0;
 		for (int maskPixel : maskPixels) {
@@ -594,7 +604,7 @@ public class ImageOperation implements MemoryHogInterface {
 		}
 		
 		int[] maskPixels = mask;
-		int[] originalImage = io.getImageAs1dArray();
+		int[] originalImage = io.getAs1D();
 		
 		int idx = 0;
 		for (int maskPixel : maskPixels) {
@@ -632,7 +642,7 @@ public class ImageOperation implements MemoryHogInterface {
 		}
 		
 		int[] maskPixels = mask.getAs1A();
-		int[] originalImage = io.getImageAs1dArray();
+		int[] originalImage = io.getAs1D();
 		
 		int idx = 0;
 		for (int maskPixel : maskPixels) {
@@ -645,7 +655,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation erodeRetainingLines() {
-		int[][] img = getImageAs2dArray();
+		int[][] img = getAs2D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] res = new int[w][h];
@@ -679,7 +689,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 */
 	public ImageOperation dilateHor(int n) {
 		if (n == Integer.MAX_VALUE) {
-			int[][] img = getImageAs2dArray();
+			int[][] img = getAs2D();
 			int w = image.getWidth();
 			int h = image.getHeight();
 			boolean foundFilled = false;
@@ -712,7 +722,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @author pape, klukas
 	 */
 	public ImageOperation dilatationColorImage() {
-		int[][] src_image = getImageAs2dArray();
+		int[][] src_image = getAs2D();
 		int w = src_image.length;
 		int h = src_image[0].length;
 		int[][] image_result = new int[w][h];
@@ -729,7 +739,7 @@ public class ImageOperation implements MemoryHogInterface {
 				}
 			}
 		}
-		return new ImageOperation(getImageAs2dArray());
+		return new ImageOperation(getAs2D());
 	}
 	
 	/**
@@ -762,7 +772,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 */
 	@Deprecated
 	public ImageOperation dilateNG(int n) {
-		int[] imagePixels = getImageAs1dArray();
+		int[] imagePixels = getAs1D();
 		int back = ImageOperation.BACKGROUND_COLORint;
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -841,7 +851,7 @@ public class ImageOperation implements MemoryHogInterface {
 	// }
 	
 	public ImageOperation gamma(double gamma) {
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		int width = getImage().getWidth();
 		int height = getImage().getHeight();
 		float rf, gf, bf;
@@ -898,7 +908,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int width = fillValue.length;
 		int height = fillValue[0].length;
 		
-		int[] bigImage = ImageConverter.convertIJto1A(image);
+		int[] bigImage = getAs1D();
 		
 		int ww = image.getWidth();
 		
@@ -934,7 +944,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public Roi getBoundingBox() {
 		// public void boundingBox(int background){
 		
-		int[][] img = ImageConverter.convertIJto2A(image);
+		int[][] img = getAs2D();
 		int top = img.length, left = img[0].length, right = -1, down = -1;
 		
 		double background = image.getProcessor().getBackgroundValue();
@@ -1078,16 +1088,16 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	// ################## get... ###################
 	
-	public int[] getImageAs1dArray() {
-		return ImageConverter.convertIJto1A(image);
+	public int[] getAs1D() {
+		return (int[]) image.getProcessor().getPixels();
 	}
 	
-	public int[][] getImageAs2dArray() {
-		return ImageConverter.convertIJto2A(image);
+	public int[][] getAs2D() {
+		return ArrayUtil.get2d(getWidth(), getHeight(), getAs1D());
 	}
 	
 	public BufferedImage getAsBufferedImage() {
-		return ImageConverter.convertIJtoBI(image);
+		return image.getBufferedImage();
 	}
 	
 	public ImagePlus getImageAsImagePlus() {
@@ -1131,7 +1141,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public Image draw(Image fi, int background) {
-		int[] img = getImageAs1dArray();
+		int[] img = getAs1D();
 		int[] over = fi.getAs1A();
 		int idx = 0;
 		for (int o : over)
@@ -1155,7 +1165,7 @@ public class ImageOperation implements MemoryHogInterface {
 			int sidePixels = (int) (radius * 2d);
 			if (sidePixels < 3)
 				sidePixels = 3;
-			int[] img = getImageAs1dArray();
+			int[] img = getAs1D();
 			int[] imgR = new int[img.length];
 			int[] imgG = new int[img.length];
 			int[] imgB = new int[img.length];
@@ -1363,7 +1373,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int smallestY = Integer.MAX_VALUE;
 		int largestY = 0;
 		
-		int[] img = getImageAs1dArray();
+		int[] img = getAs1D();
 		int x = 0;
 		int y = 0;
 		for (int c : img) {
@@ -1463,7 +1473,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int smallestY = (int) (h * pTop);
 		int largestY = (int) (h * (1 - pBottom)) - 1;
 		
-		int[] img = getImageAs1dArray();
+		int[] img = getAs1D();
 		
 		int wn = largestX - smallestX + 1;
 		int hn = largestY - smallestY + 1;
@@ -1478,7 +1488,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation filterByHSV_hue(double minHue, int clearColor) {
-		int[] pixels = getImageAs1dArray();
+		int[] pixels = getAs1D();
 		float[] hsb = new float[3];
 		for (int index = 0; index < pixels.length; index++) {
 			int rgb = pixels[index];
@@ -1497,7 +1507,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation filterByHSV_value(double t, int clearColor) {
-		int[] pixels = getImageAs1dArray();
+		int[] pixels = getAs1D();
 		float[] hsb = new float[3];
 		for (int index = 0; index < pixels.length; index++) {
 			int rgb = pixels[index];
@@ -1520,7 +1530,7 @@ public class ImageOperation implements MemoryHogInterface {
 		float[] hsb = new float[3];
 		int r, g, b, rgb;
 		
-		int[] pixels = getImageAs1dArray();
+		int[] pixels = getAs1D();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
 			r = ((rgb >> 16) & 0xff);
@@ -1542,7 +1552,7 @@ public class ImageOperation implements MemoryHogInterface {
 		float[] hsb = new float[3];
 		int r, g, b, rgb;
 		
-		int[] pixels = getImageAs1dArray();
+		int[] pixels = getAs1D();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
 			r = ((rgb >> 16) & 0xff);
@@ -1566,7 +1576,7 @@ public class ImageOperation implements MemoryHogInterface {
 		float[] hsb = new float[3];
 		int r, g, b, rgb;
 		
-		int[] pixels = getImageAs1dArray();
+		int[] pixels = getAs1D();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
 			// int a = ((rgb >> 24) & 0xff);
@@ -1596,7 +1606,7 @@ public class ImageOperation implements MemoryHogInterface {
 		float[] hsb = new float[3];
 		int r, g, b, rgb;
 		
-		int[] pixels = getImageAs1dArray();
+		int[] pixels = getAs1D();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
 			// int a = ((rgb >> 24) & 0xff);
@@ -1629,7 +1639,7 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		float t = hsb[0];
 		
-		int[] pixels = getImageAs1dArray();
+		int[] pixels = getAs1D();
 		for (int index = 0; index < pixels.length; index++) {
 			rgb = pixels[index];
 			// int a = ((rgb >> 24) & 0xff);
@@ -1671,7 +1681,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int height = image.getProcessor().getHeight();
 		
 		int[] resultImage = new int[width * height];
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		
 		thresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB, background, typ, maize, getRemoved);
@@ -1686,7 +1696,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int height = image.getProcessor().getHeight();
 		
 		int[] resultImage = new int[width * height];
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		
 		thresholdLAB(width, height, img2d, resultImage, lowerValueOfL, upperValueOfL, lowerValueOfA, upperValueOfA,
 				lowerValueOfB, upperValueOfB, background, typ, maize, false);
@@ -1870,7 +1880,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int width = getWidth();
 		int height = getHeight();
 		
-		int[] imagePixels = getImageAs1dArray();
+		int[] imagePixels = getAs1D();
 		
 		int[] resultImage = new int[imagePixels.length];
 		float[][][] lab = ImageOperation.getLabCubeInstance();
@@ -1926,7 +1936,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int w = getWidth();
 		int h = getHeight();
 		
-		int[] imagePixels = getImageAs1dArray();
+		int[] imagePixels = getAs1D();
 		
 		int[] resultImage = new int[imagePixels.length];
 		float[][][] lab = ImageOperation.getLabCubeInstance();
@@ -2205,7 +2215,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return
 	 */
 	public ImageOperation convertRGB2Grayscale(GrayscaleMode mode, boolean scale) {
-		int[] img1d = getImageAs1dArray().clone();
+		int[] img1d = getAs1D().clone();
 		int c, r, g, b, y, min = 0, max = 0;
 		float[] hsv = new float[3];
 		
@@ -2373,7 +2383,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return A binary mask, valid for ImageJ-operations, is created and returned.
 	 */
 	public ImageJOperation bm() {
-		return new ImageJOperation(getImageAs1dArray(), getWidth(), getHeight());
+		return new ImageJOperation(getAs1D(), getWidth(), getHeight());
 	}
 	
 	/**
@@ -2396,9 +2406,9 @@ public class ImageOperation implements MemoryHogInterface {
 		pr.setRoi(getCropRectangle());
 		pr.setAutoThreshold(Method.Yen, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
 		ImageOperation ioRED = new ImageOperation(new TypeConverter(pr, false).convertToRGB().getBufferedImage()).show("Auto-Threshold Mask Result", debug);
-		int[] res = getImageAs1dArray();
+		int[] res = getAs1D();
 		int idx = 0;
-		for (int i : ioRED.getImageAs1dArray()) {
+		for (int i : ioRED.getAs1D()) {
 			if (i == -1)
 				res[idx] = BACKGROUND_COLORint;
 			idx++;
@@ -2414,7 +2424,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int smallestY = Integer.MAX_VALUE;
 		int largestY = 0;
 		
-		int[] img = getImageAs1dArray();
+		int[] img = getAs1D();
 		int x = 0;
 		int y = 0;
 		for (int c : img) {
@@ -2441,7 +2451,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation thresholdBlueHigherThan(int threshold) {
-		int[] res = getImageAs1dArray();
+		int[] res = getAs1D();
 		int b;
 		int back = ImageOperation.BACKGROUND_COLORint;
 		int idx = 0;
@@ -2463,7 +2473,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation thresholdGrayClearLowerThan(int threshold, int back) {
-		int[] res = getImageAs1dArray();
+		int[] res = getAs1D();
 		int b;
 		int idx = 0;
 		for (int c : res) {
@@ -2480,7 +2490,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation thresholdLabBrightness(int threshold, int back, boolean lowerThanThreshold) {
-		int[] res = getImageAs1dArray();
+		int[] res = getAs1D();
 		int idx = 0;
 		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (int c : res) {
@@ -2508,7 +2518,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation thresholdClearBlueBetween(int thresholdStart, int thresholdEnd) {
-		int[] res = getImageAs1dArray();
+		int[] res = getAs1D();
 		int b;
 		int back = ImageOperation.BACKGROUND_COLORint;
 		int idx = 0;
@@ -2532,16 +2542,11 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(image);
 	}
 	
-	public ImageOperation convertBinary2rgb() {
-		int[] bi = ImageConverter.convertBIto1A(image.getProcessor().getBufferedImage());
-		return new ImageOperation(new Image(image.getWidth(), image.getHeight(), bi));
-	}
-	
 	/**
 	 * If a pixel value (only RGB-Blue!) is below the threshold, the background color is applied, otherwise the foreground color.
 	 */
 	public ImageOperation threshold(int threshold, int background, int foreground) {
-		int[] pixels = getImageAs1dArray();
+		int[] pixels = getAs1D();
 		for (int index = 0; index < pixels.length; index++) {
 			int rgb = pixels[index];
 			// int a = ((rgb >> 24) & 0xff);
@@ -2611,7 +2616,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public MainAxisCalculationResult calculateTopMainAxis(Vector2d centroid, int step, int background) {
 		
-		int[][] img = getImageAs2dArray();
+		int[][] img = getAs2D();
 		
 		DistanceSumAndPixelCount minResult = new DistanceSumAndPixelCount(java.lang.Double.MAX_VALUE, 0);
 		
@@ -2668,7 +2673,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int[][] image2d = getImageAs2dArray();
+		int[][] image2d = getAs2D();
 		
 		int black = backgroundColor;
 		
@@ -2719,7 +2724,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation getOriginalImageFromMask(Image imageInput, int background) {
 		int[] originalArray = imageInput.getAs1A();
-		int[] resultMask = getImageAs1dArray();
+		int[] resultMask = getAs1D();
 		int w = imageInput.getWidth();
 		int h = imageInput.getHeight();
 		int idx = 0;
@@ -2758,7 +2763,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int[][] img2d = getImageAs2dArray();
+		int[][] img2d = getAs2D();
 		int nw = width + (2 * bordersize);
 		int nh = height + (2 * bordersize);
 		int[][] result = new int[nw][nh];
@@ -2792,7 +2797,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int[][] img2d = getImageAs2dArray();
+		int[][] img2d = getAs2D();
 		int nw = width + (2 * bordersizeSides);
 		int nh = height + (2 * borderSizeTopBottom);
 		int[][] result = new int[nw][nh];
@@ -2832,7 +2837,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return top, bottom, left, right
 	 */
 	public TopBottomLeftRight getExtremePoints(int background) {
-		int[] img1d = getImageAs1dArray();
+		int[] img1d = getAs1D();
 		
 		int top = Integer.MAX_VALUE;
 		int bottom = 0;
@@ -2887,7 +2892,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public int countFilledPixels(int back) {
 		int res = 0;
 		int background = back;
-		int[] img1d = getImageAs1dArray();
+		int[] img1d = getAs1D();
 		
 		for (int c : img1d) {
 			if (c != background)
@@ -2912,11 +2917,11 @@ public class ImageOperation implements MemoryHogInterface {
 			ArrayList<java.lang.Double> optValues) {
 		double res = 0;
 		int background = ImageOperation.BACKGROUND_COLORint;
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		
 		int[] grayScaledIfNeeded;
 		if (performGrayScale)
-			grayScaledIfNeeded = grayscale().getImageAs1dArray();
+			grayScaledIfNeeded = grayscale().getAs1D();
 		else
 			grayScaledIfNeeded = img2d;
 		
@@ -2985,7 +2990,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation clearImageLeft(double cutoff, int background) {
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int threshold = (int) cutoff;
@@ -3004,7 +3009,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation clearImageRight(double threshold, int background) {
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		if (threshold < 0)
@@ -3025,7 +3030,7 @@ public class ImageOperation implements MemoryHogInterface {
 		if (Math.abs(percent) < 0.0001)
 			return this;
 		
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		
@@ -3072,7 +3077,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation clearImageAbove(double thresholdY, int background) {
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		int w = image.getWidth();
 		int endY = w * (int) thresholdY;
 		int idx = 0;
@@ -3084,7 +3089,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation clearImageBottom(double threshold, int background) {
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		for (int y = (int) threshold; y < h; y++) {
@@ -3101,7 +3106,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * lines may be specified using the parameter bb.
 	 */
 	public ImageOperation border(int bb) {
-		int[] in = getImageAs1dArray();
+		int[] in = getAs1D();
 		
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
@@ -3131,7 +3136,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation border_left_right(int bb, int color) {
-		int[] in = getImageAs1dArray();
+		int[] in = getAs1D();
 		
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
@@ -3167,7 +3172,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return
 	 */
 	public ImageOperation multiplicateImageChannelsWithFactors(double[] factorsTop, double[] factorsBottom) {
-		int[][] img2d = getImageAs2dArray();
+		int[][] img2d = getAs2D();
 		int width = getImage().getWidth();
 		int height = getImage().getHeight();
 		double rf, gf, bf;
@@ -3210,7 +3215,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return
 	 */
 	public ImageOperation multiplicateImageChannelsWithFactors(double[] factors) {
-		int[] img2d = getImageAs1dArray();
+		int[] img2d = getAs1D();
 		int width = getImage().getWidth();
 		int height = getImage().getHeight();
 		double rf, gf, bf;
@@ -3287,7 +3292,7 @@ public class ImageOperation implements MemoryHogInterface {
 			int imgw = getImage().getWidth();
 			int imgh = getImage().getHeight();
 			
-			int[] img2d = getImageAs1dArray();
+			int[] img2d = getAs1D();
 			float[] p;
 			float[][][] lab = ImageOperation.getLabCubeInstance();
 			if (LThresh < 0) {
@@ -3433,7 +3438,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int imgw = getImage().getWidth();
 		int imgh = getImage().getHeight();
 		
-		int[] img1d = getImageAs1dArray();
+		int[] img1d = getAs1D();
 		TreeSet<DistanceAndColor> result = new TreeSet<DistanceAndColor>();
 		for (int x = x1; x < x1 + w; x++) {
 			for (int y = y1; y < y1 + h; y++) {
@@ -3561,8 +3566,8 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation imageBalancing(int brightness, double[] rgbInfoLEFT, double[] rgbInfoRIGHT) {
 		ImageOperation left = copy().imageBalancing(brightness, rgbInfoLEFT);
 		ImageOperation right = copy().imageBalancing(brightness, rgbInfoRIGHT);
-		int pixL[][] = left.getImageAs2dArray();
-		int pixR[][] = right.getImageAs2dArray();
+		int pixL[][] = left.getAs2D();
+		int pixR[][] = right.getAs2D();
 		int w = getWidth();
 		int h = getHeight();
 		for (int x = w / 2; x < w; x++) {
@@ -3592,7 +3597,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return A gray image composed from the R channel.
 	 */
 	public ImageOperation getR() {
-		int[] img = copy().getImageAs1dArray();
+		int[] img = copy().getAs1D();
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
 			c = img[i];
@@ -3614,7 +3619,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return A gray image composed from the G channel.
 	 */
 	public ImageOperation getG() {
-		int[] img = copy().getImageAs1dArray();
+		int[] img = copy().getAs1D();
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
 			c = img[i];
@@ -3636,7 +3641,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return A gray image composed from the B channel.
 	 */
 	public ImageOperation getB() {
-		int[] img = copy().getImageAs1dArray();
+		int[] img = copy().getAs1D();
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
 			c = img[i];
@@ -3665,7 +3670,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps, boolean debug,
 			double s0, double ss) {
 		
-		int[] img = getImageAs1dArray();
+		int[] img = getAs1D();
 		int w = getWidth();
 		int h = getHeight();
 		int cx = w / 2;
@@ -3731,7 +3736,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	private ImageOperation rmCircleShade(double[] factorsTopRight, double[] factorsBottomLeft, double[] factorsCenter) {
-		int[][] img = getImageAs2dArray();
+		int[][] img = getAs2D();
 		int w = img.length;
 		int h = img[0].length;
 		int cx = w / 2;
@@ -3768,7 +3773,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	private ImageOperation multiplyHSV(double hf, double sf, double vf) {
-		int[] image = getImageAs1dArray();
+		int[] image = getAs1D();
 		int width = getImage().getWidth();
 		int height = getImage().getHeight();
 		float[] hsbvals = new float[3];
@@ -3842,40 +3847,10 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(new Image(w, h, channelR, channelG, channelB));
 	}
 	
-	/**
-	 * Substracts the given image2 from the stored image. Processing is based on the LAB colorspace. The
-	 * difference is divided by 2 and then "visualized".
-	 * 
-	 * @param image2
-	 * @return Difference image (differences (half of it) are stored inside the LAB color space).
-	 */
-	public ImageOperation subtractImages(Image image2) {
-		int w = getImage().getWidth();
-		int h = getImage().getHeight();
-		float[][] labImage1 = getImage().getLab(false);
-		float[][] labImage2 = image2.getLab(false);
-		for (int idx = 0; idx < w * h; idx++) {
-			float lDiff = labImage1[0][idx] - labImage2[0][idx];
-			float aDiff = labImage1[1][idx] - labImage2[1][idx];
-			float bDiff = labImage1[2][idx] - labImage2[2][idx];
-			// if (lDiff < 0)
-			// lDiff = 255 - lDiff;
-			if (aDiff < 0)
-				aDiff = -aDiff;
-			if (bDiff < 0)
-				bDiff = -bDiff;
-			
-			labImage1[0][idx] = 80 + lDiff; // 80 * (labImage1[0][idx] + labImage2[0][idx]) / 2 / 255d +
-			labImage1[1][idx] = aDiff / 255f + 1;
-			labImage1[2][idx] = bDiff / 255f + 1;
-		}
-		return new Image(w, h, labImage1).io();
-	}
-	
 	public ImageOperation subtractGrayImages(Image image2) {
 		int w = getImage().getWidth();
 		int h = getImage().getHeight();
-		int[] img1 = getImageAs1dArray();
+		int[] img1 = getAs1D();
 		int[] img2 = image2.getAs1A();
 		int[] res = new int[img1.length];
 		
@@ -3901,7 +3876,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation copyImagesParts(double factorH, double factorW) {
 		int w = image.getWidth();
 		int h = image.getHeight();
-		int[][] img2a = getImageAs2dArray();
+		int[][] img2a = getAs2D();
 		int[][] res = img2a;
 		
 		for (int x = (int) (w * factorW); x < w - (w * factorW); x++) {
@@ -3954,7 +3929,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 */
 	private double getLabAverage(int x, int y, int colorMode) {
 		double average = 0;
-		int[] img2a = getImageAs1dArray();
+		int[] img2a = getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		if (x > 1 && y > 1 && x < w - 1 && y < h - 1) {
@@ -4014,7 +3989,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation dilateHorizontal(int maskWidth) {
-		int[] img = getImageAs1dArray();
+		int[] img = getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[] out = new int[img.length];
@@ -4050,7 +4025,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation drawSkeleton2(Image image2, int size, boolean doItReally, int background) {
-		int[][] res = getImageAs2dArray();
+		int[][] res = getAs2D();
 		int[][] skelImg = image2.getAs2A();
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -4098,7 +4073,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 */
 	public ImageOperation adaptiveThresholdForGrayscaleImage(int sizeOfRegion,
 			int assumedBackground, int newForeground, double K) {
-		int[][] img = getImageAs2dArray();
+		int[][] img = getAs2D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] out = new int[w][h];
@@ -4172,7 +4147,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return
 	 */
 	public ImageOperation removePixel(Image inp, int background) {
-		int[] img = getImageAs1dArray();
+		int[] img = getAs1D();
 		int[] mask = inp.getAs1A();
 		int[] res = new int[img.length];
 		
@@ -4193,7 +4168,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return
 	 */
 	public ImageOperation removePixel(Image inp, int background, int l, int a, int b) {
-		int[] img = getImageAs1dArray();
+		int[] img = getAs1D();
 		int[] mask = inp.getAs1A();
 		int width = inp.getWidth();
 		int lenght = img.length;
@@ -4255,7 +4230,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation binary() {
-		int[] res = getImageAs1dArray();
+		int[] res = getAs1D();
 		int i = 0;
 		for (int c : res)
 			res[i++] = c != BACKGROUND_COLORint ? 1 : 0;
@@ -4263,7 +4238,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation binary(int foreground, int background) {
-		int[] res = getImageAs1dArray();
+		int[] res = getAs1D();
 		int i = 0;
 		for (int c : res)
 			res[i++] = c != BACKGROUND_COLORint ? foreground : background;
@@ -4271,7 +4246,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation binary(int currentBackground, int foreground, int background) {
-		int[] res = getImageAs1dArray();
+		int[] res = getAs1D();
 		int i = 0;
 		for (int c : res)
 			res[i++] = c != currentBackground ? foreground : background;
@@ -4284,7 +4259,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation or(Image b) {
 		if (b == null)
 			return this;
-		int[][] aa = getImageAs2dArray();
+		int[][] aa = getAs2D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] ba = b.resize(w, h).getAs2A();
@@ -4307,7 +4282,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation crossfade(Image b, int f1, int f2, int f3) {
 		if (b == null)
 			return this;
-		int[][] aa = getImageAs2dArray();
+		int[][] aa = getAs2D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] ba = b.getAs2A();
@@ -4338,7 +4313,7 @@ public class ImageOperation implements MemoryHogInterface {
 			return crossfade(b);
 		if (b == null || c == null)
 			return this;
-		int[][] aa = getImageAs2dArray();
+		int[][] aa = getAs2D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] ba = b.getAs2A();
@@ -4374,7 +4349,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation and(Image b) {
 		if (b == null)
 			return this;
-		int[] aa = getImageAs1dArray();
+		int[] aa = getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[] ba = b.resize(w, h).getAs1A();
@@ -4394,7 +4369,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation xor(Image b) {
 		if (b == null)
 			return this;
-		int[][] aa = getImageAs2dArray();
+		int[][] aa = getAs2D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] ba = b.resize(w, h).getAs2A();
@@ -4415,7 +4390,7 @@ public class ImageOperation implements MemoryHogInterface {
 		float[][] lab = getImage().getLab(true);
 		int w = getWidth();
 		int h = getHeight();
-		int[] in = getImageAs1dArray();
+		int[] in = getAs1D();
 		int res[] = new int[w * h];
 		for (int i = 0; i < w * h; i++) {
 			float l = lab[0][i];
@@ -4460,7 +4435,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation filterRGB(int rMax, int gMax, int bMax) {
-		int[] res = getImageAs1dArray();
+		int[] res = getAs1D();
 		int r, g, b;
 		for (int i = 0; i < res.length; i++) {
 			r = ((res[i] & 0xff0000) >> 16);
@@ -4491,7 +4466,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation clearOutsideCircle(int cx, int cy, int radius) {
 		if (radius <= 0)
 			return this;
-		int[][] res = getImageAs2dArray();
+		int[][] res = getAs2D();
 		int w = getWidth();
 		int h = getHeight();
 		int rsq = radius * radius;
@@ -4604,7 +4579,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @author Christian Klukas
 	 */
 	public ImageOperation rotate90() {
-		int[][] in = getImageAs2dArray();
+		int[][] in = getAs2D();
 		int w = getWidth();
 		int h = getHeight();
 		int[][] res = new int[h][w];
@@ -4614,10 +4589,6 @@ public class ImageOperation implements MemoryHogInterface {
 			}
 		}
 		return new Image(res).io();
-	}
-	
-	public TranslationMatch prepareTranslationMatch(boolean debug) {
-		return new TranslationMatch(this, debug);
 	}
 	
 	public static ImageOperation median(ArrayList<Image> images) {
@@ -4694,7 +4665,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return horizontal stripe of an image (pixels below or above the current region are cleared).
 	 */
 	public ImageOperation getBottom(int idx, int parts) {
-		int[][] pix = getImageAs2dArray();
+		int[][] pix = getAs2D();
 		int pixels = countFilledPixels();
 		int from = (idx * pixels) / parts;
 		int to = from + pixels / parts;
@@ -4727,7 +4698,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation getInnerCircle(int idx_res, int parts) {
 		// make list of foreground pixels and their distances to the center
 		ArrayList<DoublePixel> distances = new ArrayList<DoublePixel>();
-		int[] pix = getImageAs1dArray();
+		int[] pix = getAs1D();
 		
 		int n = 0;
 		long wSum = 0, hSum = 0;
@@ -4790,7 +4761,7 @@ public class ImageOperation implements MemoryHogInterface {
 		if (pixelProcessor == null)
 			return this;
 		else {
-			int[][] pix = getImageAs2dArray();
+			int[][] pix = getAs2D();
 			int w = getWidth();
 			int h = getHeight();
 			for (int x = 0; x < w; x++) {
@@ -4806,7 +4777,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation mirrorLeftToRight() {
-		final int pix[][] = getImageAs2dArray();
+		final int pix[][] = getAs2D();
 		return adjustPixelValues(new PixelProcessor() {
 			@Override
 			public int processPixelForegroundValue(int x, int y, int rgb, int w, int h) {
@@ -4845,7 +4816,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public Integer getPixel(int x, int y) {
-		return getImageAs1dArray()[x + y * getWidth()];
+		return getAs1D()[x + y * getWidth()];
 	}
 	
 	public double calculateAverageDistanceTo(Vector2d p) {
@@ -4855,7 +4826,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int[][] image2d = getImageAs2dArray();
+		int[][] image2d = getAs2D();
 		
 		int black = BACKGROUND_COLORint;
 		
@@ -4881,7 +4852,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 */
 	public ImageOperation cropAbs(int leftX, int rightX, int topY, int bottomY) {
 		int background = ImageOperation.BACKGROUND_COLORint;
-		int[][] img = getImageAs2dArray();
+		int[][] img = getAs2D();
 		
 		if (leftX < 0 || rightX < 0 || topY < 0 || bottomY < 0) {
 			TopBottomLeftRight ext = getExtremePoints(background);
@@ -4943,12 +4914,12 @@ public class ImageOperation implements MemoryHogInterface {
 		int borderColor = Color.CYAN.getRGB();
 		int w = image.getWidth();
 		int h = image.getHeight();
-		int[][] img = getImageAs2dArray();
-		ImageOperation ioBorderPixels = new ImageOperation(getImageAs2dArray()).border().borderDetection(background,
+		int[][] img = getAs2D();
+		ImageOperation ioBorderPixels = new ImageOperation(getAs2D()).border().borderDetection(background,
 				mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION ? Integer.MAX_VALUE : borderColor,
 				false);// .show("BORDER PIXELS");
 		int borderLength = (int) ioBorderPixels.getResultsTable().getValue("border", 0);
-		int[][] borderMap = ioBorderPixels.getImageAs2dArray();
+		int[][] borderMap = ioBorderPixels.getAs2D();
 		int[] borderList = getBorderList(borderMap, borderLength);
 		int[][] distMap = new int[w][h];
 		int dist = Integer.MAX_VALUE;
@@ -5019,7 +4990,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation debugIntToGrayScale() {
-		int[][] img = getImageAs2dArray();
+		int[][] img = getAs2D();
 		for (int x = 0; x < getWidth(); x++)
 			for (int y = 0; y < getHeight(); y++) {
 				int val = img[x][y];
@@ -5032,7 +5003,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation debugPrintValueSetToConsole() {
-		int[][] img = getImageAs2dArray();
+		int[][] img = getAs2D();
 		HashSet<Integer> printed = new HashSet<Integer>();
 		for (int y = 0; y < getHeight(); y++) {
 			for (int x = 0; x < getWidth(); x++) {
@@ -5048,7 +5019,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ArrayList<Vector2i> getForegroundPixels() {
 		ArrayList<Vector2i> res = new ArrayList<Vector2i>();
-		int[][] img = getImageAs2dArray();
+		int[][] img = getAs2D();
 		for (int y = 0; y < getHeight(); y++) {
 			for (int x = 0; x < getWidth(); x++) {
 				int val = img[x][y];
@@ -5104,7 +5075,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return Calculated binary mask, ready for ImageJ operations, which require binary images.
 	 */
 	public ImageOperation getBinaryMask() {
-		int[] px = getImageAs1dArray();
+		int[] px = getAs1D();
 		int[] res = new int[px.length];
 		for (int i = 0; i < px.length; i++)
 			if (px[i] == BACKGROUND_COLORint)
@@ -5115,7 +5086,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ChannelProcessing channels() {
-		return new ChannelProcessing(getImageAs1dArray(), getWidth(), getHeight());
+		return new ChannelProcessing(getAs1D(), getWidth(), getHeight());
 	}
 	
 	public ImageCalculation stat() {
@@ -5124,5 +5095,9 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ChannelCalculation calc() {
 		return new ChannelCalculation(this);
+	}
+	
+	public ImagePlus ip() {
+		return image;
 	}
 }
