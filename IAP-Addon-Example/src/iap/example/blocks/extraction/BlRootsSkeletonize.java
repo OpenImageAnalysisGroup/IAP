@@ -228,7 +228,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 				calculateWidthHistogram(rt, image, nonBinaryImage, postProcessing);
 		}
 		
-		inp = binary.skeletonize(true).show("INPUT FOR BRANCH DETECTION", debug);
+		inp = binary.skeletonize().show("INPUT FOR BRANCH DETECTION", debug);
 		
 		int len = inp.countFilledPixels();
 		
@@ -264,7 +264,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		image = image.resize(scale);
 		nonBinaryImage = nonBinaryImage.resize(scale);
 		do {
-			ImageOperation sk = image.copy().skeletonize(false);
+			ImageOperation sk = image.copy().skeletonize();
 			
 			pixelCnt = sk.countFilledPixels();
 			if (pixelCnt > 0) {
@@ -277,7 +277,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 						try {
 							ImageOperation tobeSkeletonized = image.copy().bm().dilate().io();
 							int[][] distanceMap = null;
-							ImageOperation skeletonImage = tobeSkeletonized.skeletonize(true);// .resize(0.5d);
+							ImageOperation skeletonImage = tobeSkeletonized.skeletonize();// .resize(0.5d);
 							if (width < 2) {
 								// first image, not thinned
 								
