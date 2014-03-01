@@ -57,7 +57,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 	protected Image processVISmask() {
 		if (input().masks().vis() != null) {
 			
-			ImageOperation io = new ImageOperation(input().masks().vis().copy()).show("BEFORE TRIMM", debug).ij().erode(getInt("Erode-Cnt-Vis", 2)).io();
+			ImageOperation io = new ImageOperation(input().masks().vis().copy()).show("BEFORE TRIMM", debug).bm().erode(getInt("Erode-Cnt-Vis", 2)).io();
 			io = input().masks().vis().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
 					.show("AFTER ERODE", debug);
 			
@@ -142,7 +142,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			}
 			
-			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).show("BEFORE TRIMM", debug).ij().
+			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).show("BEFORE TRIMM", debug).bm().
 					erode(getInt("Erode-Cnt-Fluo", 2)).io();
 			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
 					.show("AFTER ERODE", debug);

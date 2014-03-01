@@ -53,7 +53,7 @@ public class BlClosing extends AbstractSnapshotAnalysisBlock {
 		
 		ImageOperation op = flMask.io();
 		
-		op = op.ij().closing(BlMorphologicalOperations.getRoundMask(closingRepeat)).io();
+		op = op.bm().closing(BlMorphologicalOperations.getRoundMask(closingRepeat)).io();
 		return flImage.copy().io().and(op.getImage()).getImage();
 	}
 	

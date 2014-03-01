@@ -35,13 +35,13 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			input().masks().fluo().show("inp fluo");
 		}
 		
-		if (getBoolean("Store Unchanged Fluo for Color Analysis", true))
-			getResultSet().setImage("inp_fluo", input().masks().fluo());
-		
 		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(), optionsAndResults.getBackground());
 		
 		Image resClassic, resChlorophyll, resPhenol;
 		if (!auto_tune) {
+			if (getBoolean("Store Unchanged Fluo for Color Analysis", true))
+				getResultSet().setImage("inp_fluo", input().masks().fluo()); // here the filtered result (apply mask from below) should be saved instead
+				
 			double min = 220;
 			double p1 = getDouble("minimum-intensity-classic", min);
 			double p2 = getDouble("minimum-intensity-chloro", min);
@@ -56,11 +56,15 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			else
 				filterInp = filterInp.convertFluo2intensity(FluoAnalysis.CLASSIC, 255);
 			ImageOperation filter = filterInp;
-			filter = filter.replaceColor(ImageOperation.BACKGROUND_COLORint, Color.BLACK.getRGB()).show("Input For Auto-Threshold", debugValues);
+			filter = filter.replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).show("Input For Auto-Threshold", debugValues);
 			filter = filter.autoThresholdingColorImageByUsingBrightnessMaxEntropy(auto_tune_process_red_by_green, debugValues).getImage()
 					.show("Result Filter", debugValues).io();
 			
 			io = io.applyMask(filter.getImage()).show("USED FOR CALC", debugValues);
+			
+			if (getBoolean("Store Unchanged Fluo for Color Analysis", true))
+				getResultSet().setImage("inp_fluo", io.copy().getImage());
+			
 			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, 255).getImage();
 			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, 255).getImage();
 			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, 255).getImage();

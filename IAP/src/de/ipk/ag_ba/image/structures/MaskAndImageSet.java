@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 
 import org.SystemOptions;
 
-import de.ipk.ag_ba.image.operation.ImageDisplay;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 
 public class MaskAndImageSet {
@@ -39,9 +38,7 @@ public class MaskAndImageSet {
 	
 	public void print(String title, int width) {
 		Image overview = getOverviewImage(width);
-		
-		ImageDisplay.show(overview, title);
-		
+		overview.show(title);
 	}
 	
 	public Image getOverviewImage(int width) {

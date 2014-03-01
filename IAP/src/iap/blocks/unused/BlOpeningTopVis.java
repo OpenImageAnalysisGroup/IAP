@@ -18,7 +18,7 @@ public class BlOpeningTopVis extends AbstractSnapshotAnalysisBlock {
 			return null;
 		
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-			Image mask = new ImageOperation(input().masks().vis()).ij().opening(1).getImage();
+			Image mask = new ImageOperation(input().masks().vis()).bm().opening(1).getImage();
 			return new ImageOperation(input().masks().vis()).applyMask_ResizeMaskIfNeeded(mask, optionsAndResults.getBackground()).getImage();
 		} else
 			return input().masks().vis();

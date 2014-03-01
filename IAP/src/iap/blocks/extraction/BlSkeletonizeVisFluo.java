@@ -76,7 +76,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				}
 		}
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
-			Image viswork = vis.copy().io().ij()// .medianFilter32Bit()
+			Image viswork = vis.copy().io().bm()// .medianFilter32Bit()
 					.dilate(getInt("Dilate", 2)).io()
 					.blur(getInt("Blur", 1))
 					.getImage().show("vis", debug);
@@ -105,7 +105,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			return fluo;
 		Image res = fluo.copy();
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
-			Image fluowork = fluo.copy().io().ij()// .medianFilter32Bit()
+			Image fluowork = fluo.copy().io().bm()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Fluo", 0))
 					.dilate(getInt("Dilate-Cnt-Fluo", 0)).io()
 					.blur(getDouble("Blur-Fluo", 0.0))
@@ -125,7 +125,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				}
 		}
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
-			Image viswork = fluo.copy().io().ij()// .filterRGB(150, 255, 255)
+			Image viswork = fluo.copy().io().bm()// .filterRGB(150, 255, 255)
 					// .erode(1)
 					.dilate(getInt("Dilate-Cnt-Fluo", 4))
 					// .blur(1)
@@ -181,7 +181,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						getDouble("bloom sat min", 0), getDouble("bloom sat max", 1),
 						getDouble("bloom val min", 0), getDouble("bloom val max", 1)
 						).show("bloom filtered by HSV", getBoolean("debug bloom detection HSV filter", false))
-						.ij()
+						.bm()
 						.erode(getInt("bloom-erode-cnt", 0))
 						// .invert()
 						// .removeSmallClusters(true, null).invert().invert()
@@ -194,7 +194,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						thresholdGrayClearLowerThan(getInt("bloom-max-brightness", 255), Color.BLACK.getRGB()).getImage();
 				
 				probablyBloomFluo = probablyBloomFluo.io().show("probably bloom area unfiltered", false).invert()
-						.removeSmallClusters(true, null).ij().
+						.removeSmallClusters(true, null).bm().
 						erode(getInt("bloom-erode-cnt", 4)).io().invert().
 						getImage();
 			}
@@ -246,7 +246,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				temp = new Image(ttt).io().show("FINAL", debug).getImage();
 				leafWidthInPixels = 0d;
 				int filled;
-				ImageJOperation tio = temp.io().ij();
+				ImageJOperation tio = temp.io().bm();
 				temp = null;
 				do {
 					filled = tio.countFilledPixels();
@@ -302,7 +302,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			Double leafWidthInPixels2 = 0d;
 			int filled;
 			ImageStack fis = debug ? new ImageStack() : null;
-			ImageJOperation ioo = inputImage.io().ij();
+			ImageJOperation ioo = inputImage.io().bm();
 			do {
 				filled = ioo.countFilledPixels();
 				if (filled > 0)

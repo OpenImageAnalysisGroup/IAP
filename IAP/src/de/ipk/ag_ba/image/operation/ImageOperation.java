@@ -32,7 +32,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +46,6 @@ import javax.vecmath.Point2d;
 
 import org.ErrorMsg;
 import org.ObjectRef;
-import org.ReleaseInfo;
 import org.SystemAnalysis;
 import org.Vector2d;
 import org.Vector2i;
@@ -66,7 +64,6 @@ import de.ipk.ag_ba.image.operations.complex_hull.ConvexHullCalculator;
 import de.ipk.ag_ba.image.operations.intensity.IntensityAnalysis;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
-import de.ipk.ag_ba.image.operations.segmentation.PixelSegmentation;
 import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -705,7 +702,7 @@ public class ImageOperation implements MemoryHogInterface {
 			int[][] mask = new int[1][n];
 			for (int i = 0; i < n; i++)
 				mask[0][i] = 1;
-			return ij().dilate(mask).io();
+			return bm().dilate(mask).io();
 		}
 	}
 	
@@ -1049,25 +1046,25 @@ public class ImageOperation implements MemoryHogInterface {
 			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn) {
 		boolean considerArea = false;
-		return removeSmallClusters(nextGeneration, cutOffPercentageOfImage, cutOffVertHorOfImage, nb, typ, optClusterSizeReturn, considerArea);
+		return removeSmallClusters(cutOffPercentageOfImage, cutOffVertHorOfImage, nb, typ, optClusterSizeReturn, considerArea);
 	}
 	
-	public ImageOperation removeSmallClusters(boolean nextGeneration, double cutOffPercentageOfImage, int cutOffVertHorOfImage,
+	public ImageOperation removeSmallClusters(double cutOffPercentageOfImage, int cutOffVertHorOfImage,
 			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn, boolean considerArea) {
 		Image workImage = new Image(image);
-		workImage = removeSmallPartsOfImage(nextGeneration, workImage,
+		workImage = removeSmallPartsOfImage(workImage,
 				ImageOperation.BACKGROUND_COLORint,
 				(int) (image.getWidth() * image.getHeight() * cutOffPercentageOfImage), cutOffVertHorOfImage, nb, typ,
 				optClusterSizeReturn, considerArea);
 		return new ImageOperation(workImage);
 	}
 	
-	public ImageOperation removeSmallClusters(boolean nextGeneration, int cutOffAreaSizeOfImage, int cutOffVertHorOfImage, double boundingBoxIncreaseFactor_top,
+	public ImageOperation removeSmallClusters(int cutOffAreaSizeOfImage, int cutOffVertHorOfImage, double boundingBoxIncreaseFactor_top,
 			NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn, boolean considerArea) {
 		Image workImage = new Image(image);
-		workImage = removeSmallPartsOfImage(nextGeneration, workImage,
+		workImage = removeSmallPartsOfImage(workImage,
 				ImageOperation.BACKGROUND_COLORint,
 				cutOffAreaSizeOfImage, cutOffVertHorOfImage, nb, typ,
 				optClusterSizeReturn, considerArea, null, boundingBoxIncreaseFactor_top);
@@ -1109,96 +1106,8 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	// ############# save ######################
 	
-	/**
-	 * Saves the file on the users desktop.
-	 */
-	public ImageOperation saveImageOnDesktop(String fileName) {
-		return saveImage(ReleaseInfo.getDesktopFolder() + File.separator + fileName);
-	}
-	
-	/**
-	 * Saves the image as an PNG.
-	 * 
-	 * @param fileName
-	 *           (path)
-	 * @return
-	 */
-	public ImageOperation saveImage(String fileName) {
-		saveImage(fileName, ImageSaveFormat.PNG);
-		return this;
-	}
-	
-	public void saveImage(String pfad, ImageSaveFormat type) {
-		
-		switch (type) {
-			case TIFF:
-				new FileSaver(image).saveAsTiff(pfad);
-				break;
-			case TIFF_STACK:
-				new FileSaver(image).saveAsTiffStack(pfad);
-				break;
-			case PNG:
-				new FileSaver(image).saveAsPng(pfad);
-				break;
-			case JPG:
-				new FileSaver(image).saveAsJpeg(pfad);
-				break;
-			case GIF:
-				new FileSaver(image).saveAsGif(pfad);
-				break;
-			default:
-				new FileSaver(image).saveAsPng(pfad);
-				break;
-		}
-		
-	}
-	
-	public static void showTwoImagesAsOne_resize(BufferedImage imgF2,
-			BufferedImage imgV2, boolean saveImage) {
-		ImageOperation resizeImage1 = new ImageOperation(imgF2);
-		resizeImage1.resize(0.7);
-		imgF2 = resizeImage1.getAsBufferedImage();
-		
-		ImageOperation resizeImage2 = new ImageOperation(imgV2);
-		resizeImage2.resize(0.7);
-		imgV2 = resizeImage2.getAsBufferedImage();
-		showTwoImagesAsOne(imgF2, imgV2, saveImage);
-	}
-	
-	public static void showTwoImagesAsOne(BufferedImage imgF2,
-			BufferedImage imgV2, boolean saveImage) {
-		
-		// imgF2 = ImageConverter.convert1AtoBI(imgF2.getWidth(),
-		// imgF2.getHeight(), ImageConverter.convertBIto1A(imgF2));
-		// imgV2 = ImageConverter.convert1AtoBI(imgV2.getWidth(),
-		// imgV2.getHeight(), ImageConverter.convertBIto1A(imgV2));
-		
-		for (int x = 0; x < imgV2.getWidth(); x++) {
-			for (int y = 0; y < imgV2.getHeight(); y++) {
-				boolean twoInOne = false;
-				if (twoInOne) {
-					Color f = new Color(imgV2.getRGB(x, y));
-					Color f2 = new Color(imgF2.getRGB(x, y));
-					Color f3 = new Color(f2.getRed(), 0, f.getBlue());
-					
-					imgF2.setRGB(x, y, f3.getRGB());
-				} else {
-					if ((y / 3) % 2 == 0)
-						imgF2.setRGB(x, y, imgV2.getRGB(x, y));
-					else
-						imgF2.setRGB(x, y, imgF2.getRGB(x, y));
-				}
-			}
-		}
-		if (saveImage) {
-			ImageOperation save = new ImageOperation(imgF2);
-			save.saveImage("/Users/" + System.getProperty("user.name")
-					+ "/Desktop/overlayImage.png");
-		}
-		
-		GravistoService.showImage(imgF2, "Vergleich");
-		// waitTime(1, TimeUnit.SECONDS);
-		
+	public FileSaver saveImage(String pfad) {
+		return new FileSaver(image);
 	}
 	
 	public static void waitTime(int sleepTime, TimeUnit typ) {
@@ -1290,16 +1199,6 @@ public class ImageOperation implements MemoryHogInterface {
 		}
 	}
 	
-	public static Image removeSmallPartsOfImage(
-			boolean nextGeneration,
-			Image workImage, int iBackgroundFill,
-			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
-			ObjectRef optClusterSizeReturn) {
-		boolean considerArea = false;
-		return removeSmallPartsOfImage(nextGeneration, workImage, iBackgroundFill, cutOffMinimumArea, cutOffMinimumDimension, nb, typ, optClusterSizeReturn,
-				considerArea);
-	}
-	
 	/**
 	 * @param workImage
 	 * @param iBackgroundFill
@@ -1313,18 +1212,16 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return
 	 */
 	public static Image removeSmallPartsOfImage(
-			boolean nextGeneration,
 			Image workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn,
 			boolean considerArea) {
-		return removeSmallPartsOfImage(nextGeneration, workImage, iBackgroundFill, cutOffMinimumArea, cutOffMinimumDimension, nb, typ, optClusterSizeReturn,
+		return removeSmallPartsOfImage(workImage, iBackgroundFill, cutOffMinimumArea, cutOffMinimumDimension, nb, typ, optClusterSizeReturn,
 				considerArea, null, -1);
 	}
 	
 	@SuppressWarnings("deprecation")
 	public static Image removeSmallPartsOfImage(
-			boolean nextGeneration,
 			Image workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn,
@@ -1344,22 +1241,8 @@ public class ImageOperation implements MemoryHogInterface {
 			cutOffMinimumArea = 0;
 		}
 		
-		Segmentation ps;
-		
-		if (nextGeneration)
-			ps = new ClusterDetection(workImage, ImageOperation.BACKGROUND_COLORint);
-		else
-			ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
-		try {
-			ps.detectClusters();
-		} catch (ArrayIndexOutOfBoundsException er) {
-			if (nextGeneration) {
-				System.out.println("WARNING/ERROR: NEXT GENERATION CLUSTER DETECTION: ARRAY-INDEX-OUT-OF-BOUNDS EXCEPTION - retry with older code");
-				ps = new PixelSegmentation(workImage, NeighbourhoodSetting.NB4);
-				ps.detectClusters();
-			} else
-				throw er;
-		}
+		Segmentation ps = new ClusterDetection(workImage, ImageOperation.BACKGROUND_COLORint);
+		ps.detectClusters();
 		
 		int[] clusterSizes = null;
 		int[] clusterDimensionMinWH = null;
@@ -2486,12 +2369,17 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(image);
 	}
 	
-	public ImageJOperation ij() {
+	/**
+	 * @return A binary mask, valid for ImageJ-operations, is created and returned.
+	 */
+	public ImageJOperation bm() {
 		return new ImageJOperation(getImageAs1dArray(), getWidth(), getHeight());
 	}
 	
 	/**
 	 * Maximum entropy thresholding on Lab (brightness). Uses ImageJ functions.
+	 * 
+	 * @return The result mask, to be applied to the input image, for filtering.
 	 */
 	public ImageOperation autoThresholdingColorImageByUsingBrightnessMaxEntropy(boolean darkBackground, boolean debug) {
 		
@@ -2511,7 +2399,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int[] res = getImageAs1dArray();
 		int idx = 0;
 		for (int i : ioRED.getImageAs1dArray()) {
-			if (i == BACKGROUND_COLORint)
+			if (i == -1)
 				res[idx] = BACKGROUND_COLORint;
 			idx++;
 		}
@@ -4586,7 +4474,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation removeSmallElements(int cutOffMinimumArea, int cutOffMinimumDimension) {
 		return ImageOperation.removeSmallPartsOfImage(
-				true, getImage(), BACKGROUND_COLORint, cutOffMinimumArea, cutOffMinimumDimension,
+				getImage(), BACKGROUND_COLORint, cutOffMinimumArea, cutOffMinimumDimension,
 				NeighbourhoodSetting.NB4, CameraPosition.TOP, null, false).io();
 	}
 	

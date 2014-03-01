@@ -11,7 +11,6 @@ import ij.ImagePlus;
 import ij.io.Opener;
 import ij.process.ColorProcessor;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +18,6 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import org.SystemAnalysis;
-import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -28,7 +26,6 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operation.Channel;
 import de.ipk.ag_ba.image.operation.ImageConverter;
-import de.ipk.ag_ba.image.operation.ImageDisplay;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /**
@@ -195,13 +192,22 @@ public class Image {
 		this.image = ImageConverter.convert1AtoIJ(w, h, img1d);
 	}
 	
+	/**
+	 * @return Composed rgb image from the three input gray images.
+	 *         If any input pixel is background, the output will also be a background pixel.
+	 */
 	private static int[] getImgFromRGB(Image grayR, Image grayG, Image grayB) {
 		int[] r = grayR.getAs1A();
 		int[] g = grayG.getAs1A();
 		int[] b = grayB.getAs1A();
 		int[] res = new int[r.length];
+		int back = ImageOperation.BACKGROUND_COLORint;
 		for (int i = 0; i < r.length; i++) {
 			int ci, ri, gi, bi;
+			if (r[i] == back || g[i] == back || b[i] == back) {
+				res[i] = back;
+				continue;
+			}
 			ri = r[i] & 0xFF;
 			gi = g[i] & 0xFF;
 			bi = b[i] & 0xFF;
@@ -237,14 +243,8 @@ public class Image {
 	
 	public Image show(String title) {
 		if (!SystemAnalysis.isHeadless()) {
-			debugOutputview = ImageDisplay.show(
-					copy().io()
-							.replaceColor(
-									ImageOperation.BACKGROUND_COLORint,
-									SystemOptions.getInstance().getColor("Pipeline-Debugging", "Replacement-Color for Pure White Background", new Color(115, 115, 145))
-											.getRGB())
-							.getImage(),
-					title);
+			image.show(title);
+			debugOutputview = image;
 			IAPservice.showImageJ();
 		}
 		return this;
