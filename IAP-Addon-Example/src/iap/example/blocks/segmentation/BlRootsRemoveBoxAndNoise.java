@@ -31,7 +31,7 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 		ImageOperation io = img.copy().io().invert().thresholdBlueHigherThan(getInt("minimum blue intensity level", 6))
 				.show("result of blue threshold", debug);
 		// remove pure white area inside the box
-		io = io.ij().erode().io()
+		io = io.bm().erode().io()
 				.removeSmallElements(
 						getInt("Remove-Pure-White_Noise-Size-Area", 50),
 						getInt("Remove-Pure-White_Noise-Size-Dimension", 50))
@@ -40,9 +40,9 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 		io = io.threshold(getInt("minimum brightness", 10), optionsAndResults.getBackground(), blue)
 				.show("minimum brightness filtered", debug);
 		ImageOperation removeBlack = img.copy().io().blur(20).thresholdGrayClearLowerThan(150).show("large black area", debug);
-		io = io.ij().erode(getInt("Reduce-area-ignore-border of box_erode-cnt", 70)).io()
+		io = io.bm().erode(getInt("Reduce-area-ignore-border of box_erode-cnt", 70)).io()
 				.show("reduced area to ignore box border", debug);
-		io = io.ij().erode().io().removeSmallElements(
+		io = io.bm().erode().io().removeSmallElements(
 				getInt("Remove-All-Outside-Box_Noise-Size-Area", 800 * 800),
 				getInt("Remove-All-Outside-Box_Noise-Size-Dimension", 800))
 				.show("REMOVED NOISE OUTSIDE THE BOX ", debug);
