@@ -35,7 +35,6 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.images.IAPimages;
-import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -378,9 +377,10 @@ public class BlockPipeline {
 							@Override
 							public void actionPerformed(ActionEvent arg0) {
 								IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
-								NavigationAction ac = new ActionSettings(null, er.getIniIoProvider(),
+								ActionSettings ac = new ActionSettings(null, er.getIniIoProvider(),
 										"Change analysis settings (experiment " + er.getExperimentName()
 												+ ")", "Modify settings");
+								ac.setInitialNavigationPath(analysisTaskFinal.getDebugLastSystemOptionStorageGroup());
 								mnp.getNewWindowListener(ac).actionPerformed(arg0);
 							}
 						});

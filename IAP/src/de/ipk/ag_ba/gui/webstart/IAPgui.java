@@ -216,9 +216,9 @@ public class IAPgui {
 			// nextTarget = IAPnavigationPanel.replaceBadChars(nextTarget);
 			NavigationButton button = knownEntities.get(thisTarget);
 			if (button == null && (thisTarget.contains("_") || thisTarget.contains("("))) {
-				String tt = thisTarget.substring(0, thisTarget.indexOf("(")).trim();
+				String tt = thisTarget.contains("(") ? thisTarget.substring(0, thisTarget.indexOf("(")).trim() : thisTarget.trim();
 				button = knownEntities.get(tt);
-				tt = StringManipulationTools.stringReplace(thisTarget.substring(0, thisTarget.lastIndexOf("(")).trim(), "_", ".");
+				tt = StringManipulationTools.stringReplace(tt, "_", ".");
 				if (button == null)
 					button = knownEntities.get(tt);
 			}

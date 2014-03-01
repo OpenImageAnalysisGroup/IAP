@@ -16,6 +16,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class ActionSettings extends AbstractNavigationAction {
 	
@@ -24,6 +25,9 @@ public class ActionSettings extends AbstractNavigationAction {
 	private final String title;
 	private NavigationButton src;
 	private final IniIoProvider iniIO;
+	private String debugLastSystemOptionStorageGroup;
+	
+	private boolean clickedOnce = false;
 	
 	public ActionSettings(String iniFileName, IniIoProvider iniIO, String tooltip, String title) {
 		super(tooltip);
@@ -74,8 +78,19 @@ public class ActionSettings extends AbstractNavigationAction {
 		ArrayList<String> ss = SystemOptions.getInstance(iniFileName, iniIO).getSectionTitles();
 		Collections.sort(ss);
 		for (String s : ss) {
-			res.add(new NavigationButton(new ActionSettingsEditor(iniFileName, iniIO,
-					"Change settings of section " + s, s), src.getGUIsetting()));
+			final NavigationButton nb = new NavigationButton(new ActionSettingsEditor(iniFileName, iniIO,
+					"Change settings of section " + s, s), src.getGUIsetting());
+			res.add(nb);
+			
+			if (!clickedOnce)
+				if (s != null && debugLastSystemOptionStorageGroup != null && !s.isEmpty() && s.equals(debugLastSystemOptionStorageGroup)) {
+					BackgroundTaskHelper.executeLaterOnSwingTask(100, new Runnable() {
+						@Override
+						public void run() {
+							nb.performAction();
+						}
+					});
+				}
 		}
 		
 		if (iniIO == null)
@@ -86,6 +101,8 @@ public class ActionSettings extends AbstractNavigationAction {
 									"Change settings of " + StringManipulationTools.removeHTMLtags(pd.getName()) + " analysis pipeline",
 									"Settings of " + StringManipulationTools.removeHTMLtags(pd.getName()) + " template"),
 							src.getGUIsetting()));
+		
+		clickedOnce = true;
 	}
 	
 	@Override
@@ -120,5 +137,9 @@ public class ActionSettings extends AbstractNavigationAction {
 			return IAPimages.getToolbox();
 		else
 			return "img/ext/gpl2/Gnome-Applications-Science-64.png";
+	}
+	
+	public void setInitialNavigationPath(String debugLastSystemOptionStorageGroup) {
+		this.debugLastSystemOptionStorageGroup = debugLastSystemOptionStorageGroup;
 	}
 }

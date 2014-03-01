@@ -65,11 +65,11 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 			}
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
 			ImageOperation in = fluo.copy().io();
-			Image viswork = in.blur(getDouble("blur fluo", 0d)).getImage().show("blur fluo res", debug);
+			Image inWork = in.blur(getDouble("blur fluo", 0d)).getImage().show("blur fluo res", debug);
 			
-			if (viswork != null)
+			if (inWork != null)
 				if (vis != null && fluo != null) {
-					Image sk = calcSkeleton(viswork, vis, fluo, fluo.copy());
+					Image sk = calcSkeleton(inWork, vis, fluo, fluo.copy());
 					if (sk != null) {
 						boolean drawSkeleton = getBoolean("Calculate Skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
@@ -83,10 +83,10 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 	
 	public Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged) {
 		// ***skeleton calculations***
-		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize(false).show("input", debug).getImage()));
+		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize().show("input", debug).getImage()));
 		skel2d.findEndpointsAndBranches2();
 		
-		skel2d.print("endpoints and branches", debug);
+		skel2d.show("endpoints and branches", debug);
 		
 		double xf = fluo.getWidth() / (double) vis.getWidth();
 		double yf = fluo.getHeight() / (double) vis.getHeight();
@@ -134,7 +134,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 				leafWidthInPixels = 0d;
 				int skeletonLength;
 				do {
-					skeletonLength = temp.io().skeletonize(false).show("SKELETON", false).countFilledPixels();
+					skeletonLength = temp.io().skeletonize().show("SKELETON", false).countFilledPixels();
 					if (skeletonLength > 0)
 						leafWidthInPixels++;
 					temp = temp.io().bm().erode().getImage();
@@ -187,7 +187,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 			ImageStack fis = debug ? new ImageStack() : null;
 			ImageOperation ioo = inputImage.io();
 			do {
-				ioo = ioo.skeletonize(false).show("SKELETON2", false);
+				ioo = ioo.skeletonize().show("SKELETON2", false);
 				skeletonLength = ioo.countFilledPixels();
 				if (skeletonLength > 0)
 					leafWidthInPixels2++;

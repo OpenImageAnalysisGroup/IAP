@@ -90,6 +90,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private int unit_test_steps;
 	private int[] debugValidTrays;
 	private final PipelineDesc pd;
+	private String debugLastSystemOptionStorageGroup;
 	
 	public AbstractPhenotypingTask(PipelineDesc pd) {
 		this.pd = pd;
@@ -1058,6 +1059,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			options.setCustomNullBlockPrefix(null);
 		}
 		
+		if (forceDebugStack) {
+			this.setDebugLastSystemOptionStorageGroup(options.getSystemOptionStorageGroup());
+		}
+		
 		HashMap<Integer, ImageStack> debugImageStack = null;
 		boolean addDebugImages = IAPmain
 				.isSettingEnabled(IAPfeature.SAVE_DEBUG_STACK);
@@ -1229,6 +1234,14 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	public void debugSetValidTrays(int[] debugValidTrays) {
 		this.debugValidTrays = debugValidTrays;
+	}
+
+	public String getDebugLastSystemOptionStorageGroup() {
+		return debugLastSystemOptionStorageGroup;
+	}
+
+	public void setDebugLastSystemOptionStorageGroup(String debugLastSystemOptionStorageGroup) {
+		this.debugLastSystemOptionStorageGroup = debugLastSystemOptionStorageGroup;
 	}
 	
 }

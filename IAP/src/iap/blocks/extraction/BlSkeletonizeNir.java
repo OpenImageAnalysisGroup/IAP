@@ -23,7 +23,7 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlock {
 		if (nirMask != null) {
 			input().masks().setNir(nirMask);
 			if (useNirSkeleton) {
-				Image sk = nirMask.io().skeletonize(false).getImage();
+				Image sk = nirMask.io().skeletonize().getImage();
 				if (sk != null) {
 					sk = mapOriginalOnSkel(sk, nirMask, optionsAndResults.getBackground());
 					getResultSet().setImage("nir_skeleton", sk.show("SKELETON", debug));

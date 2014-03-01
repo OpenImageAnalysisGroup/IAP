@@ -589,7 +589,7 @@ public class SkeletonProcessor2d {
 		return true;
 	}
 	
-	public void print(String title, boolean show) {
+	public void show(String title, boolean show) {
 		new Image(this.skelImg).show(title, show);
 	}
 	

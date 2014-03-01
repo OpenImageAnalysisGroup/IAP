@@ -51,7 +51,7 @@ public class ActionAnalysis extends AbstractNavigationAction implements ActionDa
 		
 		if (experimentReference.getHeader().getSettings() != null &&
 				!experimentReference.getHeader().getSettings().isEmpty()) {
-			NavigationAction ac = new ActionSettings(null, ioStringProvider,
+			ActionSettings ac = new ActionSettings(null, ioStringProvider,
 					"Change analysis settings", "Export/Modify settings");
 			SystemOptions so = SystemOptions.getInstance(null, ioStringProvider);
 			String pipeLineName = so.getString("DESCRIPTION", "pipeline_name", null);

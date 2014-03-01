@@ -64,7 +64,10 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 				autoTune ? true : getBoolean("Use Vis Area Parameter", true)).getImage();
 		if (res != null) {
 			if (getInt("dilation vis", 0) > 0)
-				res = input().images().vis().io().applyMask(res.io().bm().erode(getInt("dilation vis", 0)).getImage()).getImage();
+				res = res.io().bm().erode(getInt("dilation vis", 0)).getImage();
+			
+			res = input().masks().vis().io().applyMask(res).getImage();
+			
 			res.show("vis result", debugValues);
 		}
 		return res;
@@ -84,7 +87,9 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 						autoTune ? true : getBoolean("Use Fluo Area Parameter", true)).show("result fluo", debugValues)
 				.getImage();
 		if (getInt("dilation fluo", 0) > 0)
-			res = input().images().fluo().io().applyMask(res.io().bm().erode(getInt("dilation fluo", 0)).getImage()).getImage();
+			res = res.io().bm().erode(getInt("dilation fluo", 0)).getImage();
+		
+		res = input().masks().fluo().io().applyMask(res).getImage();
 		
 		return res;
 	}

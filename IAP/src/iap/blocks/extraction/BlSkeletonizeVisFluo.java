@@ -150,9 +150,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	public synchronized Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged,
 			boolean specialLeafWidthCalculations, boolean specialSkeletonBasedLeafWidthCalculation) {
 		// ***skeleton calculations***
-		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize(false).getImage()));
+		SkeletonProcessor2d skel2d = inp.io().skeletonize().skel2d();
 		skel2d.findEndpointsAndBranches2();
-		skel2d.print("endpoints and branches", debug);
+		skel2d.show("endpoints and branches", debug);
 		
 		double xf = fluo.getWidth() / (double) vis.getWidth();
 		double yf = fluo.getHeight() / (double) vis.getHeight();
@@ -558,7 +558,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Skeletonize VIS and FLUO";
+		return "Skeletonize";
 	}
 	
 	@Override

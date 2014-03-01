@@ -189,7 +189,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 				widthHistogram(rt, image);
 		}
 		
-		inp = binary.skeletonize(false).show("INPUT FOR BRANCH DETECTION", debug);
+		inp = binary.skeletonize().show("INPUT FOR BRANCH DETECTION", debug);
 		
 		if (rt != null)
 			rt.addValue(pre + prefix2 + ".skeleton.length", inp.countFilledPixels());
@@ -218,7 +218,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 		String prefix3 = "prefix3";
 		boolean graphAnalysed = false;
 		do {
-			pixelCnt = image.copy().skeletonize(false).countFilledPixels();
+			pixelCnt = image.copy().skeletonize().countFilledPixels();
 			if (pixelCnt > 0) {
 				if (width < 4) {
 					String prefix = "";
@@ -227,7 +227,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 					if (getBoolean("Calculate Graph Diameters", true) && !graphAnalysed) {
 						try {
 							graphAnalysed = true;
-							ImageOperation si = image.copy().bm().dilate().io().skeletonize(true);// .resize(0.5d);
+							ImageOperation si = image.copy().bm().dilate().io().skeletonize();// .resize(0.5d);
 							graphAnalysis(getClusterIDarray(image),
 									new Image(si.getWidth(), si.getHeight(),
 											si.getAs1D())
