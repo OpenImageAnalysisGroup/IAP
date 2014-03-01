@@ -1,8 +1,9 @@
-package de.ipk.ag_ba.image.operation;
+package de.ipk.ag_ba.image.operation.skeleton;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
@@ -25,7 +26,7 @@ public class SkeletonizeProcessor {
 	public ImageOperation calculateDistanceToBorder(
 			boolean calcDistanceTrueOrNormalColoredSkeletonFalse, int back) {
 		
-		int[][] img = image.getImageAs2dArray();
+		int[][] img = image.getAs2D();
 		
 		int fire = back;
 		HashMap<Integer, HashMap<Integer, Integer>> x2y2colorSkeleton = new HashMap<Integer, HashMap<Integer, Integer>>();
@@ -153,7 +154,7 @@ public class SkeletonizeProcessor {
 	public ImageOperation skeletonize(int bgColor) {
 		int pass = 0;
 		int pixelsRemoved;
-		int[] pixels2 = image.getImageAs1dArray();
+		int[] pixels2 = image.getAs1D();
 		do {
 			pixelsRemoved = thin(pass++, table, pixels2, bgColor);
 			pixelsRemoved = thin(pass++, table, pixels2, bgColor);

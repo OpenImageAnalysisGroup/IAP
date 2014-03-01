@@ -47,7 +47,7 @@ import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPimages;
-import de.ipk.ag_ba.image.operation.ImageConverter;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.SaveAsCsvDataProcessor;
 import de.ipk.ag_ba.mongo.SaveInDatabaseDataProcessor;
@@ -553,7 +553,7 @@ public class IAPmain extends JApplet {
 		if (ni != null)
 			return ni;
 		NavigationImage res = new NavigationImage(
-				ImageConverter.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()), name);
+				Image.getBufferedImageFromImage(GravistoService.loadIcon(IAPmain.class, name).getImage()), name);
 		cachedImages.put(name, res);
 		return res;
 	}

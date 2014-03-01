@@ -1,5 +1,6 @@
-package de.ipk.ag_ba.image.operation;
+package de.ipk.ag_ba.image.operation.channels;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
@@ -17,7 +18,7 @@ public class ChannelCalculation {
 	 * @return (r,g,b) = (r-g, r-g, r-g)
 	 */
 	public ChannelCalculation redMinusGreen() {
-		int[] p = imageOperation.getImageAs1dArray();
+		int[] p = imageOperation.getAs1D();
 		int r, g, b;
 		for (int i = 0; i < p.length; i++) {
 			int c = p[i];
@@ -49,7 +50,7 @@ public class ChannelCalculation {
 	 * @return (r,g,b) = (r/g*255, r/g*255, r/g*255)
 	 */
 	public ChannelCalculation redDividedByGreen() {
-		int[] p = imageOperation.getImageAs1dArray();
+		int[] p = imageOperation.getAs1D();
 		int r, g, b;
 		imageOperation.copy().show("FFF");
 		for (int i = 0; i < p.length; i++) {
@@ -81,7 +82,7 @@ public class ChannelCalculation {
 	}
 	
 	public ChannelCalculation labA() {
-		int[] p = imageOperation.getImageAs1dArray();
+		int[] p = imageOperation.getAs1D();
 		int r, g, b;
 		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (int i = 0; i < p.length; i++) {

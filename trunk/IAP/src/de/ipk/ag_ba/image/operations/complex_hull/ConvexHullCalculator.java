@@ -10,8 +10,8 @@ import java.awt.image.BufferedImage;
 
 import org.Vector2i;
 
-import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.Image;
@@ -48,7 +48,7 @@ public class ConvexHullCalculator {
 	}
 	
 	private void calculate(int borderColor) {
-		int[][] in = io.getImageAs2dArray();
+		int[][] in = io.getAs2D();
 		
 		int w = io.getImage().getWidth();
 		int h = io.getImage().getHeight();
@@ -165,7 +165,7 @@ public class ConvexHullCalculator {
 		if (drawInputimage) {
 			ImageOperation inDrawing = customImage != null ? customImage.io() : io;
 			// FlexibleImage border = new FlexibleImage(borderImage).copy();
-			overDrawBorderImage(w, h, inDrawing.getImageAs2dArray(), borderImage,
+			overDrawBorderImage(w, h, inDrawing.getAs2D(), borderImage,
 					borderColor, drawBorder);
 		}
 		ImageOperation res = new ImageOperation(borderImage);

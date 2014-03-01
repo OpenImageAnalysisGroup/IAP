@@ -1,4 +1,4 @@
-package de.ipk.ag_ba.image.operation;
+package de.ipk.ag_ba.image.operation.canvas;
 
 import iap.blocks.data_structures.RunnableOnImage;
 
@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.complex_hull.Line;
 import de.ipk.ag_ba.image.operations.complex_hull.Point;
 import de.ipk.ag_ba.image.operations.skeleton.RunnableWithBooleanResult;
@@ -332,16 +333,16 @@ public class ImageCanvas {
 	}
 	
 	public ImageCanvas text(int x, int y, String text, Color color) {
-		image.io().image.getProcessor().setColor(color);
-		image.io().image.getProcessor().drawString(text, x, y);
+		image.io().ip().getProcessor().setColor(color);
+		image.io().ip().getProcessor().drawString(text, x, y);
 		return this;
 	}
 	
 	public ImageCanvas text(int x, int y, String text, Color color, int size) {
-		image.io().image.getProcessor().setColor(color);
-		image.io().image.getProcessor().setFont(new Font("", Font.BOLD, size));
-		image.io().image.getProcessor().drawString(text, x, y);
-		image.io().image.getProcessor().reset();
+		image.io().ip().getProcessor().setColor(color);
+		image.io().ip().getProcessor().setFont(new Font("", Font.BOLD, size));
+		image.io().ip().getProcessor().drawString(text, x, y);
+		image.io().ip().getProcessor().reset();
 		return this;
 	}
 	

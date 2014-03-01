@@ -11,7 +11,7 @@ import java.util.Vector;
 import qmwi.kseg.som.CSV_SOM_dataEntry;
 import qmwi.kseg.som.DataSet;
 import qmwi.kseg.som.SOMdataEntry;
-import de.ipk.ag_ba.image.operation.ChannelProcessing;
+import de.ipk.ag_ba.image.operation.channels.ChannelProcessing;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 

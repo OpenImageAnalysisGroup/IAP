@@ -5,8 +5,8 @@ import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.operation.FluoAnalysis;
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.fluoop.FluoAnalysis;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;

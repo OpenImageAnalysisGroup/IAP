@@ -11,11 +11,19 @@ import ij.ImagePlus;
 import ij.io.Opener;
 import ij.process.ColorProcessor;
 
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.awt.image.PixelGrabber;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -24,9 +32,9 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.ColorUtil;
-import de.ipk.ag_ba.image.operation.Channel;
-import de.ipk.ag_ba.image.operation.ImageConverter;
+import de.ipk.ag_ba.image.operation.ArrayUtil;
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.channels.Channel;
 
 /**
  * @author klukas
@@ -45,11 +53,11 @@ public class Image {
 	}
 	
 	public Image(BufferedImage bufferedImage) {
-		this(ImageConverter.convertBItoIJ(bufferedImage));
+		this(new ImagePlus("from bufferedimage", bufferedImage));
 	}
 	
 	public Image(BufferedImage bufferedImage, CameraType type) {
-		this(ImageConverter.convertBItoIJ(bufferedImage));
+		this(new ImagePlus(type + "", bufferedImage));
 		this.cameraType = type;
 	}
 	
@@ -78,8 +86,7 @@ public class Image {
 		}
 		if (inpimg == null)
 			throw new Exception("Image could not be read: " + url);
-		image = new ImagePlus(url.getFileName(),
-				new ColorProcessor(inpimg.getWidth(), inpimg.getHeight(), ImageConverter.convertBIto1A(inpimg)));
+		image = new ImagePlus(url.getFileName(), new ColorProcessor(inpimg));
 		// }
 		// synchronized (url2image) {
 		w = image.getWidth();
@@ -101,11 +108,12 @@ public class Image {
 	}
 	
 	public Image(int w, int h, int[] image) {
-		this(ImageConverter.convert1AtoIJ(w, h, image));
+		this(new ImagePlus("from 1d array", new ColorProcessor(w, h, image)));
 	}
 	
 	public Image(int[][] img) {
-		this(ImageConverter.convert2AtoIJ(img));
+		this(new ImagePlus("from 1d array",
+				new ColorProcessor(img[0].length, img.length, ArrayUtil.get1d(img))));
 	}
 	
 	public Image(java.awt.Image image) {
@@ -129,7 +137,7 @@ public class Image {
 					((b & 0xFF) << 0);
 			img[idx] = c;
 		}
-		image = ImageConverter.convert1AtoIJ(w, h, img);
+		image = new ImagePlus("from 1d array", new ColorProcessor(w, h, img));
 	}
 	
 	public Image(int w, int h, int[] channelR, int[] channelG, int[] channelB) {
@@ -149,15 +157,7 @@ public class Image {
 					((b & 0xFF) << 0);
 			img[idx] = c;
 		}
-		image = ImageConverter.convert1AtoIJ(w, h, img);
-	}
-	
-	public Image(int w, int h, double[][] labImage) {
-		this(w, h, ImageConverter.convertLABto1A(labImage));
-	}
-	
-	public Image(int w, int h, float[][] labImage) {
-		this(w, h, ImageConverter.convertLABto1A(labImage));
+		image = new ImagePlus("from 1d array", new ColorProcessor(w, h, img));
 	}
 	
 	public Image(Image grayR, Image grayG, Image grayB) {
@@ -175,7 +175,7 @@ public class Image {
 		} finally {
 			is.close();
 		}
-		this.image = ImageConverter.convertBItoIJ(img);
+		this.image = new ImagePlus("from inputstream", img);
 		this.w = image.getWidth();
 		this.h = image.getHeight();
 		
@@ -189,7 +189,7 @@ public class Image {
 		
 		this.w = w;
 		this.h = h;
-		this.image = ImageConverter.convert1AtoIJ(w, h, img1d);
+		this.image = new ImagePlus("from 1d array", new ColorProcessor(w, h, img1d));
 	}
 	
 	/**
@@ -256,17 +256,8 @@ public class Image {
 		return result;
 	}
 	
-	int[] cache = null;
-	
 	public int[] getAs1A() {
-		boolean useCache = true;
-		if (!useCache)
-			return ImageConverter.convertIJto1A(image);
-		if (cache == null)
-			cache = ImageConverter.convertIJto1A(image);
-		// else
-		// System.out.println("CACHED 1A");
-		return cache;
+		return (int[]) image.getProcessor().getPixels();
 	}
 	
 	public int[] getAs1Ar() {
@@ -325,7 +316,7 @@ public class Image {
 	}
 	
 	public int[][] getAs2A() {
-		return ImageConverter.convertIJto2A(image);
+		return ArrayUtil.get2d(getWidth(), getHeight(), getAs1A());
 	}
 	
 	public CameraType getCameraType() {
@@ -423,4 +414,75 @@ public class Image {
 	public int getNumberOfPixels() {
 		return getWidth() * getHeight();
 	}
+	
+	private static boolean hasAlpha(java.awt.Image image) {
+		// If buffered image, the color model is readily available
+		if (image instanceof BufferedImage) {
+			return ((BufferedImage) image).getColorModel().hasAlpha();
+		}
+		
+		// Use a pixel grabber to retrieve the image's color model;
+		// grabbing a single pixel is usually sufficient
+		PixelGrabber pg = new PixelGrabber(image, 0, 0, 1, 1, false);
+		try {
+			pg.grabPixels();
+		} catch (InterruptedException e) {
+		}
+		
+		// Get the image's color model
+		return pg.getColorModel().hasAlpha();
+	}
+	
+	public static BufferedImage getBufferedImageFromImage(java.awt.Image image) {
+		// source: http://www.dreamincode.net/code/snippet1076.htm
+		if (image instanceof BufferedImage) {
+			return (BufferedImage) image;
+		}
+		
+		// This code ensures that all the pixels in the image are loaded
+		image = new ImageIcon(image).getImage();
+		
+		// Determine if the image has transparent pixels
+		boolean hasAlpha = hasAlpha(image);
+		
+		// Create a buffered image with a format that's compatible with the
+		// screen
+		BufferedImage bimage = null;
+		GraphicsEnvironment ge = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		try {
+			// Determine the type of transparency of the new buffered image
+			int transparency = Transparency.OPAQUE;
+			if (hasAlpha == true) {
+				transparency = Transparency.BITMASK;
+			}
+			
+			// Create the buffered image
+			GraphicsDevice gs = ge.getDefaultScreenDevice();
+			GraphicsConfiguration gc = gs.getDefaultConfiguration();
+			bimage = gc.createCompatibleImage(image.getWidth(null),
+					image.getHeight(null), transparency);
+		} catch (HeadlessException e) {
+		} // No screen
+		
+		if (bimage == null) {
+			// Create a buffered image using the default color model
+			int type = BufferedImage.TYPE_INT_RGB;
+			if (hasAlpha == true) {
+				type = BufferedImage.TYPE_INT_ARGB;
+			}
+			bimage = new BufferedImage(image.getWidth(null),
+					image.getHeight(null), type);
+		}
+		
+		// Copy image to buffered image
+		Graphics g = bimage.createGraphics();
+		
+		// Paint the image onto the buffered image
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+		
+		return bimage;
+	}
+	
 }
