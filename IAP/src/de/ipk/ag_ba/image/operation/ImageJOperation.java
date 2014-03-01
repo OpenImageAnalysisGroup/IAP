@@ -2,7 +2,9 @@ package de.ipk.ag_ba.image.operation;
 
 import iap.blocks.segmentation.BlMorphologicalOperations;
 import ij.ImagePlus;
+import ij.process.BinaryProcessor;
 import ij.process.Blitter;
+import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
 import java.awt.Color;
@@ -187,5 +189,19 @@ public class ImageJOperation {
 				res++;
 		}
 		return res;
+	}
+	
+	public ImageJOperation skeletonize() {
+		ImageProcessor processor2 = image.getProcessor().convertToByte(false);
+		ByteProcessor byteProcessor = new BinaryProcessor(
+				(ByteProcessor) processor2);
+		byteProcessor.skeletonize();
+		image.setProcessor(byteProcessor.convertToRGB());
+		return this;
+	}
+	
+	public ImageJOperation medianFilter() {
+		image.getProcessor().medianFilter();
+		return this;
 	}
 }

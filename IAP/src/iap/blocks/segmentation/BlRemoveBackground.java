@@ -111,10 +111,8 @@ public class BlRemoveBackground extends AbstractSnapshotAnalysisBlock {
 			
 			Image result = new ImageOperation(fluo.io().copy()
 					.blur(getDouble("Clear-background-fluo-blur", 1.0)).show("Blurred fluo image", false)
-					.medianFilter32Bit()
 					.getImage()).compare()
 					.compareImages("fluo", input().masks().fluo().io()
-							.medianFilter32Bit()
 							.getImage(),
 							getInt("Clear-background-fluo-l-diff", 7),
 							getInt("Clear-background-fluo-l-diff", 7),

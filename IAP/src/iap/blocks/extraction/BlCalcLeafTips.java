@@ -120,9 +120,6 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		// blur
 		mask = mask.io().blur(numofblur).getImage();
-		// mask = mask.io().dilate((int) numofblur).getImage();
-		// median
-		mask = mask.io().medianFilter32Bit(true).getImage();
 		
 		// enlarge 1 px lines
 		ImageConvolution ic = new ImageConvolution(mask);

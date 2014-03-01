@@ -3,7 +3,6 @@ package iap.blocks.segmentation;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
-import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -41,7 +40,6 @@ public class BlClosing extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private static Image closing(Image flMask, Image flImage, int iBackgroundFill, int closingRepeat) {
-		int[] rgbArray = flMask.getAs1A();
 		int h = flMask.getHeight();
 		int w = flMask.getWidth();
 		
@@ -53,22 +51,7 @@ public class BlClosing extends AbstractSnapshotAnalysisBlock {
 		if (wImage != w)
 			flImage.resize(w, h);
 		
-		// int[] rgbNonModifiedArray = flImage.getAs1A();
-		int white = new Color(255, 255, 255).getRGB();
-		int[][] image = new int[w][h];
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				int off = x + y * w;
-				int color = rgbArray[off];
-				if (color != iBackgroundFill) {
-					image[x][y] = 0;
-				} else {
-					image[x][y] = white;
-				}
-			}
-		}
-		
-		ImageOperation op = new ImageOperation(image);
+		ImageOperation op = flMask.io();
 		
 		op = op.ij().closing(BlMorphologicalOperations.getRoundMask(closingRepeat)).io();
 		return flImage.copy().io().and(op.getImage()).getImage();
