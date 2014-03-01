@@ -32,12 +32,15 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 		if (!autoTune)
 			averageLeafWidthEstimationFluo = Double.NaN;
 		else
-			if (input().masks().fluo() != null)
+			if (input().masks().fluo() != null) {
+				ImageOperation nn = null;
+				if (autoTune)
+					nn = input().masks().fluo().copy().io().ij().skeletonize().io();
 				this.averageLeafWidthEstimationFluo = !autoTune ?
 						Double.NaN :
 						input().masks().fluo().io().countFilledPixels() /
-								(double) input().masks().fluo().copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
-			else
+								(double) nn.countFilledPixels();
+			} else
 				this.averageLeafWidthEstimationFluo = Double.NaN;
 	}
 	

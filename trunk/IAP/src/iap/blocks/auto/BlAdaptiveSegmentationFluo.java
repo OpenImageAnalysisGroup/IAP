@@ -3,13 +3,13 @@ package iap.blocks.auto;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
+import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.FluoAnalysis;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.image.structures.ImageSet;
 
 /**
  * @author klukas
@@ -55,7 +55,8 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 				filterInp = filterInp.getR();
 			else
 				filterInp = filterInp.convertFluo2intensity(FluoAnalysis.CLASSIC, 255);
-			ImageOperation filter = filterInp.show("Input For Auto-Threshold", false);
+			ImageOperation filter = filterInp;
+			filter = filter.replaceColor(ImageOperation.BACKGROUND_COLORint, Color.BLACK.getRGB()).show("Input For Auto-Threshold", debugValues);
 			filter = filter.autoThresholdingColorImageByUsingBrightnessMaxEntropy(auto_tune_process_red_by_green, debugValues).getImage()
 					.show("Result Filter", debugValues).io();
 			
@@ -72,14 +73,6 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 					.show("AFTER HUE", false).getImage();
 		}
 		return r;
-	}
-	
-	@Override
-	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
-		super.postProcess(processedImages, processedMasks);
-		processedImages.setFluo(processedMasks.fluo());
-		if (processedMasks.fluo() != null)
-			processedMasks.setFluo(processedMasks.fluo().io().medianFilter32Bit().getImage());
 	}
 	
 	@Override

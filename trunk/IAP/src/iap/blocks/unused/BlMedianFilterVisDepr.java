@@ -23,7 +23,7 @@ public class BlMedianFilterVisDepr extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().vis() == null)
 			return null;
 		
-		Image medianMask = new ImageOperation(input().masks().vis()).medianFilter32Bit()
+		Image medianMask = new ImageOperation(input().masks().vis())
 				.ij().dilate(getInt("dilate-cnt", 4)).io()
 				.border(2).getImage();
 		

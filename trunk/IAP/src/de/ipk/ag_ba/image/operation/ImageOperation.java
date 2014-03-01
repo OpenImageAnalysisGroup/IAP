@@ -78,14 +78,14 @@ import de.ipk.ag_ba.labcube.ImageOperationLabCubeInterface;
 /**
  * A number of commonly used image operation commands.
  * 
- * @author Klukas, Pape, Entzian
+ * @author Klukas, Pape
  */
 
 public class ImageOperation implements MemoryHogInterface {
 	protected final ImagePlus image;
 	protected ResultsTableWithUnits rt;
 	private CameraType cameraType;
-	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 0); // new Color(155, 155, 255, 255); //
+	public static final Color BACKGROUND_COLOR = new Color(250, 200, 100, 255); // new Color(155, 155, 255, 255); //
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
 	/**
@@ -323,7 +323,6 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		if (minimumIntensity < 0)
 			minimumIntensity = 150;
-		
 		int[] in = getImageAs1dArray(); // gamma(0.1) // 99999999999999999999999999999999
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -2291,184 +2290,6 @@ public class ImageOperation implements MemoryHogInterface {
 		return new Lab(sumL / count, sumA / count, sumB / count);
 	}
 	
-	public ImageOperation medianFilter32Bit() {
-		return medianFilter32Bit(true);
-	}
-	
-	public ImageOperation medianFilter32Bit(boolean performanceOptimized) {
-		if (performanceOptimized) {
-			int[] img = getImageAs1dArray();
-			int w = getWidth();
-			int h = getHeight();
-			int[] out = new int[img.length];
-			int last = img.length - w;
-			int[] p = new int[5];
-			for (int i = 0; i < img.length; i++) {
-				if (i > w && i < last) {
-					p[0] = img[i];
-					p[1] = img[i - w];
-					p[2] = img[i - 1];
-					p[3] = img[i + 1];
-					p[4] = img[i + w];
-					int t;
-					if (p[0] > p[1]) {
-						t = p[0];
-						p[0] = p[1];
-						p[1] = t;
-					}
-					if (p[3] > p[4]) {
-						t = p[3];
-						p[3] = p[4];
-						p[4] = t;
-					}
-					if (p[0] > p[3]) {
-						t = p[0];
-						p[0] = p[3];
-						p[3] = t;
-					}
-					if (p[1] > p[4]) {
-						t = p[1];
-						p[1] = p[4];
-						p[4] = t;
-					}
-					if (p[1] > p[2]) {
-						t = p[1];
-						p[1] = p[2];
-						p[2] = t;
-					}
-					if (p[2] > p[3]) {
-						t = p[2];
-						p[2] = p[3];
-						p[3] = t;
-					}
-					if (p[1] > p[2]) {
-						t = p[1];
-						p[1] = p[2];
-						p[2] = t;
-					}
-					out[i] = p[2];
-				} else
-					out[i] = img[i];
-			}
-			return new ImageOperation(out, w, h);
-		} else {
-			image.getProcessor().medianFilter();
-			return new ImageOperation(getImage());
-		}
-	}
-	
-	private int median5(int[] p) {
-		int t;
-		if (p[0] > p[1]) {
-			t = p[0];
-			p[0] = p[1];
-			p[1] = t;
-		}
-		if (p[3] > p[4]) {
-			t = p[3];
-			p[3] = p[4];
-			p[4] = t;
-		}
-		if (p[0] > p[3]) {
-			t = p[0];
-			p[0] = p[3];
-			p[3] = t;
-		}
-		if (p[1] > p[4]) {
-			t = p[1];
-			p[1] = p[4];
-			p[4] = t;
-		}
-		if (p[1] > p[2]) {
-			t = p[1];
-			p[1] = p[2];
-			p[2] = t;
-		}
-		if (p[2] > p[3]) {
-			t = p[2];
-			p[2] = p[3];
-			p[3] = t;
-		}
-		if (p[1] > p[2]) {
-			t = p[1];
-			p[1] = p[2];
-			p[2] = t;
-		}
-		return p[2];
-	}
-	
-	public ImageOperation medianFilter32BitvariableMask(int n) {
-		int[] img = getImageAs1dArray();
-		int w = image.getWidth();
-		int h = image.getHeight();
-		int[] out = new int[img.length];
-		int[] mask = new int[(2 * n + 1) * (2 * n + 1)];
-		for (int i = 0; i < img.length; i++) {
-			int filled = 0;
-			for (int x = -n; x < n; x++)
-				for (int y = -n; y < n; y++) {
-					int xCurrent = i % w;
-					int yCurrent = i / w;
-					int ii = i;
-					if (xCurrent <= n)
-						ii += n - xCurrent;
-					if (xCurrent >= w - n)
-						ii -= xCurrent - w + n;
-					if (yCurrent <= n)
-						ii += w * n - yCurrent;
-					if (yCurrent >= h - n)
-						ii -= (yCurrent - h + n) * w;
-					int index = ii + x + y * w;
-					if (index < 0)
-						index = 0;
-					if (index >= img.length)
-						index = img.length - 1;
-					int pixel = img[index];
-					mask[filled++] = pixel;
-				}
-			out[i] = median(mask);
-		}
-		return new ImageOperation(out, w, h);
-	}
-	
-	private final int findMedianOf9(int[] values) {
-		// Finds the 5th largest of 9 values
-		for (int i = 1; i <= 4; i++) {
-			int max = 0;
-			int mj = 1;
-			for (int j = 1; j <= 9; j++)
-				if (values[j] > max) {
-					max = values[j];
-					mj = j;
-				}
-			values[mj] = 0;
-		}
-		int max = 0;
-		for (int j = 1; j <= 9; j++)
-			if (values[j] > max)
-				max = values[j];
-		return max;
-	}
-	
-	private int median(int center, int above, int left, int right, int below) {
-		int[] temp = { center, above, left, right, below };
-		java.util.Arrays.sort(temp);
-		return temp[2];
-	}
-	
-	private int median(int[] temp) {
-		java.util.Arrays.sort(temp);
-		return temp[(temp.length + 1) / 2 - 1];
-	}
-	
-	public ImageOperation medianFilter8Bit() {
-		ByteProcessor byteProcessor = new BinaryProcessor(
-				(ByteProcessor) image.getProcessor().convertToByte(false));
-		byteProcessor.medianFilter();
-		
-		return new ImageOperation(getImage());
-	}
-	
 	/**
 	 * Warning: makes something strange, does not create a RGB gray scale image.
 	 * 
@@ -3887,6 +3708,8 @@ public class ImageOperation implements MemoryHogInterface {
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
 			c = img[i];
+			if (c == BACKGROUND_COLORint)
+				continue;
 			r = (c & 0xff0000) >> 16;
 			g = (c & 0x00ff00) >> 8;
 			b = c & 0x0000ff;
@@ -3907,6 +3730,8 @@ public class ImageOperation implements MemoryHogInterface {
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
 			c = img[i];
+			if (c == BACKGROUND_COLORint)
+				continue;
 			r = (c & 0xff0000) >> 16;
 			g = (c & 0x00ff00) >> 8;
 			b = c & 0x0000ff;
@@ -3927,6 +3752,8 @@ public class ImageOperation implements MemoryHogInterface {
 		int c, r, g, b;
 		for (int i = 0; i < img.length; i++) {
 			c = img[i];
+			if (c == BACKGROUND_COLORint)
+				continue;
 			r = (c & 0xff0000) >> 16;
 			g = (c & 0x00ff00) >> 8;
 			b = c & 0x0000ff;

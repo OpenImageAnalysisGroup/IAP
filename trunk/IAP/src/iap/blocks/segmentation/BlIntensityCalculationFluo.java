@@ -67,7 +67,7 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 		super.postProcess(processedImages, processedMasks);
 		processedImages.setFluo(processedMasks.fluo());
 		if (processedMasks.fluo() != null)
-			processedMasks.setFluo(processedMasks.fluo().io().medianFilter32Bit().getImage());
+			processedMasks.setFluo(processedMasks.fluo());
 	}
 	
 	@Override

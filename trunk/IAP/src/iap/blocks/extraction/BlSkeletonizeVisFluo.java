@@ -181,7 +181,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						getDouble("bloom sat min", 0), getDouble("bloom sat max", 1),
 						getDouble("bloom val min", 0), getDouble("bloom val max", 1)
 						).show("bloom filtered by HSV", getBoolean("debug bloom detection HSV filter", false))
-						.medianFilter32Bit().ij()
+						.ij()
 						.erode(getInt("bloom-erode-cnt", 0))
 						// .invert()
 						// .removeSmallClusters(true, null).invert().invert()
@@ -193,7 +193,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						getDouble("bloom hue", 0.075f)).io().// blur(3).
 						thresholdGrayClearLowerThan(getInt("bloom-max-brightness", 255), Color.BLACK.getRGB()).getImage();
 				
-				probablyBloomFluo = probablyBloomFluo.io().show("probably bloom area unfiltered", false).medianFilter32Bit().invert()
+				probablyBloomFluo = probablyBloomFluo.io().show("probably bloom area unfiltered", false).invert()
 						.removeSmallClusters(true, null).ij().
 						erode(getInt("bloom-erode-cnt", 4)).io().invert().
 						getImage();
