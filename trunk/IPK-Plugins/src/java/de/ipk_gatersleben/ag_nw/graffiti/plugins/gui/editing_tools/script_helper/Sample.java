@@ -96,7 +96,7 @@ public class Sample implements SampleInterface {
 	
 	@Override
 	public SampleAverageInterface getSampleAverage() {
-		if (sampleAverage == null)
+		if (sampleAverage == null || Double.isNaN(sampleAverage.getValue()))
 			recalculateSampleAverage(false);
 		return sampleAverage;
 	}
