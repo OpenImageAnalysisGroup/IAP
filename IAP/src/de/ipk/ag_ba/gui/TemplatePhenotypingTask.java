@@ -12,6 +12,7 @@ import org.ErrorMsg;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 public class TemplatePhenotypingTask extends AbstractPhenotypingTask {
 	private final AnalysisPipelineTemplate template;
@@ -44,7 +45,7 @@ public class TemplatePhenotypingTask extends AbstractPhenotypingTask {
 					
 					return getPipelineFromBlockList(options.getOptSystemOptions(), defaultBlockList.toArray(new String[] {}));
 				} catch (Error e) {
-					ErrorMsg.addErrorMessage("Could not process template " + getName() + ": " + e.getMessage());
+					System.out.println(SystemAnalysis.getCurrentTime()+">INFO: Found invalid pipeline definition '"+getName()+"' (Error: "+e.getMessage()+")!");
 					return null;
 				}
 			}
