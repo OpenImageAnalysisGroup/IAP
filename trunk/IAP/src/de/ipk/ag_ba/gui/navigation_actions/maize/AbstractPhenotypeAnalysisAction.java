@@ -98,20 +98,19 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			sw.printTime();
 			if (status != null)
 				status.setCurrentStatusText2("Load time: " + sw.getTimeString());
-			if (m == null || !dbID.startsWith("mongo_")) {
-				if (status != null)
-					status.setCurrentStatusText2("Clone data set and set title...");
-				sw.setDescription("Experiment cloning");
-				sw.reset();
-				experimentToBeAnalysed = experimentToBeAnalysed.clone();
-				experimentToBeAnalysed.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
-				experimentToBeAnalysed.getHeader().setExperimentname(getImageAnalysisTask().getName() + " of " +
-						experiment.getExperimentName());
-				experimentToBeAnalysed.setHeader(experimentToBeAnalysed.getHeader());
-				sw.printTime();
-				if (status != null)
-					status.setCurrentStatusText2("Cloning time: " + sw.getTimeString());
-			}
+			
+			if (status != null)
+				status.setCurrentStatusText2("Clone data set and set title...");
+			sw.setDescription("Experiment cloning");
+			sw.reset();
+			experimentToBeAnalysed = experimentToBeAnalysed.clone();
+			experimentToBeAnalysed.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+			experimentToBeAnalysed.getHeader().setExperimentname(getImageAnalysisTask().getName() + " of " +
+					experiment.getExperimentName());
+			experimentToBeAnalysed.setHeader(experimentToBeAnalysed.getHeader());
+			sw.printTime();
+			if (status != null)
+				status.setCurrentStatusText2("Cloning time: " + sw.getTimeString());
 			
 			ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 			
@@ -176,7 +175,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			} else {
 				if (status != null)
 					status.setCurrentStatusText1("Create result dataset");
-				statisticsResult.setHeader(statisticsResult.getHeader().clone());
+				statisticsResult.setHeader(experimentToBeAnalysed.getHeader().clone());
 				statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
 				statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
 				for (SubstanceInterface s : statisticsResult) {
