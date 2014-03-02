@@ -29,6 +29,7 @@ import org.HomeFolder;
 import org.ObjectRef;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.UpdateInfoResult;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.managers.pluginmgr.PluginDescription;
@@ -167,7 +168,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 			if (fff != null && fff.length == 0)
 				updateAddonDir.delete();
 			
-			System.out.println("Trying to load Add-ons... ");
+			System.out.println(SystemAnalysis.getCurrentTime()+">Initialize Add-ons... ");
 			
 			for (File toBeActivatedAddon : getJarFileList(addonDirFile))
 				addAddon(toBeActivatedAddon, true);
@@ -297,7 +298,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 					icon = getInactiveIcon();
 				}
 				
-				System.out.println("Add-on " + f.getName() + " processed");
+				System.out.println(SystemAnalysis.getCurrentTime()+">INFO: Add-on '" + f.getName() + "' processed");
 				// add all information to lists
 				if (!addonAlreadyInList(f)) {
 					Addon a = new Addon(f, xmlURL, pd, isactive, icon);
@@ -320,7 +321,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 			} else
 				return AddOnInstallResult.NotAnAddon;
 		} catch (Exception e) {
-			System.out.println("Add-on " + f.getName() + " could not be loaded into VANTED!");
+			System.out.println(SystemAnalysis.getCurrentTime()+">WARNING: Add-on '" + f.getName() + "' could not be loaded into VANTED!");
 			return AddOnInstallResult.Error;
 		}
 	}
