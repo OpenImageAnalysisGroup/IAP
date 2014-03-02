@@ -68,20 +68,24 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	
 	@Override
 	public String toString() {
+		String sd = "";
+		if (getParentSample().getSampleAverage() != null && !Double.isNaN(getParentSample().getSampleAverage().getStdDev()))
+			sd = "  +/-" + (getParentSample().getSampleAverage().getStdDev());
+		
 		if (getQualityAnnotation() != null && getQualityAnnotation().length() > 0) {
 			if (position != null && positionUnit != null)
-				return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + (getUnit() != null ? " " + getUnit() : "") + " (" + position
+				return getValue() + sd + (getUnit() != null ? " " + getUnit() : "") + " (" + position
 						+ " " + positionUnit + ", "
 						+ getQualityAnnotation() + ")";
 			else
-				return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + (getUnit() != null ? " " + getUnit() : "") + " ("
+				return getValue() + sd + (getUnit() != null ? " " + getUnit() : "") + " ("
 						+ getQualityAnnotation() + ")";
 		} else {
 			if (position != null && positionUnit != null)
-				return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + (getUnit() != null ? " " + getUnit() : "") + " (" + position
+				return getValue() + sd + (getUnit() != null ? " " + getUnit() : "") + " (" + position
 						+ " " + positionUnit + ")";
 			else
-				return getValue() + "  +/-" + (getParentSample().getSampleAverage().getStdDev()) + (getUnit() != null ? " " + getUnit() : "");
+				return getValue() + sd + (getUnit() != null ? " " + getUnit() : "");
 		}
 	}
 	
