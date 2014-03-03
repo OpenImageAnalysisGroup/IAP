@@ -2190,14 +2190,14 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
-	 * Conversion to grayscale image done by differnt methods used by gimp (explaination on http://home.arcor.de/ulile/node54.html).
+	 * Conversion to grayscale image done by different methods used by gimp (explanation on http://home.arcor.de/ulile/node54.html).
 	 * formulas:
 	 * BT709 Greyscale: Red: 0.2125 Green: 0.7154 Blue: 0.0721
 	 * RMY Greyscale: Red: 0.5 Green: 0.419 Blue: 0.081
 	 * Y-Greyscale (YIQ/NTSC): Red: 0.299 Green: 0.587 Blue: 0.114
 	 * +++
-	 * 1. for every pixel I first check if blue component is greater than green and red
-	 * 2. if it IS I use Lightness method (or Average – both are good) … if NOT I use Luminosity method for current pixel.
+	 * 1. for every pixel first check if blue component is greater than green and red
+	 * 2. if it is, use Lightness method (or Average – both are good) … if NOT I use Luminosity method for current pixel.
 	 * 
 	 * @param mode
 	 *           0 - hsv, saturation to zero l = [h, 0, v]
