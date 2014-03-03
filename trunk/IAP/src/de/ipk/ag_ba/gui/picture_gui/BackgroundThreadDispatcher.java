@@ -62,7 +62,7 @@ public class BackgroundThreadDispatcher {
 	 * @return Number of scheduled+number of running tasks;
 	 */
 	public static int getWorkLoad() {
-		return -1;
+		return ThreadManager.getInstance().getNumberOfEnquedOrRunningTasks();
 	}
 	
 	public BackgroundThreadDispatcher() {
@@ -185,58 +185,15 @@ public class BackgroundThreadDispatcher {
 		}
 	}
 	
-	// private static final ThreadSafeOptions tso = new ThreadSafeOptions();
-	//
-	// private static ExecutorService execSvc = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs(), new ThreadFactory() {
-	// @Override
-	// public Thread newThread(Runnable arg0) {
-	// Thread t = new Thread(arg0);
-	// t.setName("BackgroundThread " + tso.getNextLong());
-	// return t;
-	// }
-	// });
-	//
-	// public static ExecutorService getExecutorService() {
-	// return execSvc;
-	// }
-	//
-	// @SuppressWarnings("unchecked")
-	// public static List<Future<FlexibleImage>> invokeAll(Collection jobs) throws InterruptedException {
-	// return invokeAll(execSvc, jobs);
-	// }
-	//
-	// private static <T> List<Future<T>> invokeAll(
-	// ExecutorService threadPool, Collection<Callable<T>> tasks)
-	// throws InterruptedException {
-	// if (tasks == null)
-	// throw new NullPointerException();
-	// List<Future<T>> futures = new ArrayList<Future<T>>(tasks.size());
-	// boolean done = false;
-	// try {
-	// for (Callable<T> t : tasks) {
-	// FutureTask<T> f = new FutureTask<T>(t);
-	// futures.add(f);
-	// threadPool.execute(f);
-	// }
-	// // force unstarted futures to execute using the current thread
-	// for (Future<T> f : futures)
-	// ((FutureTask) f).run();
-	// for (Future<T> f : futures) {
-	// if (!f.isDone()) {
-	// try {
-	// f.get();
-	// } catch (CancellationException ignore) {
-	// } catch (ExecutionException ignore) {
-	// }
-	// }
-	// }
-	// done = true;
-	// return futures;
-	// } finally {
-	// if (!done)
-	// for (Future<T> f : futures)
-	// f.cancel(true);
-	// }
-	// }
-	//
+	public static void waitFor(ArrayList<LocalComputeJob> wait, Runnable runnable) throws InterruptedException {
+		Thread t = new Thread(runnable);
+		t.setName("Waiting for threads, idle task");
+		t.start();
+		waitFor(wait);
+		t.interrupt();
+	}
+	
+	public static int getBackgroundThreadCount() {
+		return ThreadManager.getInstance().getNumberOfRunningBackgroundTasks();
+	}
 }

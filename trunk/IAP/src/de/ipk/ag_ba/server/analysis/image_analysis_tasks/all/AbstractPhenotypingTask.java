@@ -237,21 +237,19 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					+ ">INFO: Workload Top/Side: " + top + "/" + side);
 			final int workloadEqualAngleSnapshotSets = top + side;
 			
-			int nn = SystemAnalysis.getNumberOfCPUs();
-			// nn = modifyConcurrencyDependingOnMemoryStatus(nn);
-			
-			// final Semaphore maxCon = BackgroundTaskHelper.lockGetSemaphore(null, nn);
 			final ThreadSafeOptions freed = new ThreadSafeOptions();
 			
 			int numberOfPlants = workload_imageSetsWithSpecificAngles.keySet().size();
 			int progress = 0;
-			ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
+			
+			LinkedList<Runnable> workLoad = new LinkedList<Runnable>();
+			LinkedList<String> workLoad_desc = new LinkedList<String>();
+			
 			for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 				if (status.wantsToStop())
 					continue;
 				final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
 				final String plantIDf = plantID;
-				// maxCon.acquire(1);
 				try {
 					progress++;
 					final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID + ")";
@@ -275,23 +273,48 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							}
 						}
 					};
-					// if (imageSetWithSpecificAngle_f.keySet().size() > SystemAnalysis.getNumberOfCPUs()
-					// && SystemOptions.getInstance().getBoolean("IAP", "Process Plants Sequentially", true))
-					// t.run();
-					// else {
-					wait.add(BackgroundThreadDispatcher.addTask(t, preThreadName, true));
+					workLoad.add(t);
+					workLoad_desc.add(preThreadName);
 					Thread.sleep(50);
-					// }
-					
 				} catch (Exception eeee) {
-					// if (!freed.getBval(0, false))
-					// maxCon.release(1);
 					throw new RuntimeException(eeee);
 				}
 			}
-			BackgroundThreadDispatcher.waitFor(wait);
-			// maxCon.acquire(nn);
-			// maxCon.release(nn);
+			status.setCurrentStatusText1("Enqueue Analysis Tasks");
+			ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
+			final int todo = workLoad.size();
+			final ThreadSafeOptions progr = new ThreadSafeOptions();
+			while (!workLoad.isEmpty()) {
+				Runnable t = workLoad.poll();
+				String d = workLoad_desc.poll();
+				wait.add(BackgroundThreadDispatcher.addTask(t, d, true));
+				progr.addInt(1);
+				String plantName = d;
+				if (plantName.contains(";"))
+					plantName = plantName.split(";", 2)[1];
+				do {
+					Thread.sleep(100);
+					status.setCurrentStatusText1("Plant " + progr.getInt() + "/" + todo + " Enqued<br>("
+							+ BackgroundThreadDispatcher.getWorkLoad() + " Tasks, "
+							+ (BackgroundThreadDispatcher.getBackgroundThreadCount() + 1) + " Threads)");
+				} while (BackgroundThreadDispatcher.getWorkLoad() >= SystemAnalysis.getNumberOfCPUs());
+			}
+			BackgroundThreadDispatcher.waitFor(wait, new Runnable() {
+				@Override
+				public void run() {
+					while (!Thread.interrupted()) {
+						status.setCurrentStatusText1("Plant " + progr.getInt() + "/" + todo
+								+ " Enqued<br>(" + BackgroundThreadDispatcher.getWorkLoad() + " Tasks, "
+								+ (BackgroundThreadDispatcher.getBackgroundThreadCount() + 1) + " Threads)");
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							// empty
+						}
+					}
+				}
+				
+			});
 		} finally {
 			maxInst.release();
 		}
@@ -1235,11 +1258,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	public void debugSetValidTrays(int[] debugValidTrays) {
 		this.debugValidTrays = debugValidTrays;
 	}
-
+	
 	public String getDebugLastSystemOptionStorageGroup() {
 		return debugLastSystemOptionStorageGroup;
 	}
-
+	
 	public void setDebugLastSystemOptionStorageGroup(String debugLastSystemOptionStorageGroup) {
 		this.debugLastSystemOptionStorageGroup = debugLastSystemOptionStorageGroup;
 	}
