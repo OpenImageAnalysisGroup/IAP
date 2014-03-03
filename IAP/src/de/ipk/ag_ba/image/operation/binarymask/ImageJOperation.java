@@ -210,4 +210,9 @@ public class ImageJOperation {
 		image.getProcessor().medianFilter();
 		return this;
 	}
+	
+	public ImageJOperation show(String title) {
+		getImage().show(title);
+		return this;
+	}
 }

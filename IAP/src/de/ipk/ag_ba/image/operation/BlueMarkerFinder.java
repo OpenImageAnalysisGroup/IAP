@@ -48,14 +48,14 @@ public class BlueMarkerFinder {
 				.bm().opening((int) (8 * scaleFactor), (int) (4 * scaleFactor)).io()
 				.show("nach opening", debug)
 				.grayscale().show("nach gray", debug)
-				.threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).show("nach thresh", debug);
+				.invert();
+		// .threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).show("nach thresh", true);
 		
-		io1.show("Input für Marker Search", debug);
-		
+		markerPositionsImage.show("inp bmf", debug);
 		resultTable = markerPositionsImage
-				.findMax(10.0, MaximumFinder.LIST).show("Markers enlarged (a)", debug).bm().opening(10, 0).io().show("Markers enlarged (b)", debug)
+				.findMax(10.0, MaximumFinder.LIST).show("Markers enlarged (a)", debug).replaceColor(Color.WHITE.getRGB(), ImageOperation.BACKGROUND_COLORint).bm()
+				.opening(10, 0).io().show("Markers enlarged (b)", debug)
 				.getResultsTable();
-		
 	}
 	
 	private ArrayList<Vector2d> getCoordinates() {

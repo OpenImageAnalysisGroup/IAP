@@ -6,7 +6,6 @@ import ij.Prefs;
 import ij.gui.Roi;
 import ij.io.FileSaver;
 import ij.measure.Calibration;
-import ij.measure.ResultsTable;
 import ij.plugin.ContrastEnhancer;
 import ij.plugin.ImageCalculator;
 import ij.plugin.filter.GaussianBlur;
@@ -536,7 +535,7 @@ public class ImageOperation implements MemoryHogInterface {
 				}
 			}
 		}
-		
+		// new Image(originalImage).show("sasa");
 		return new ImageOperation(originalImage).setCameraType(getCameraType());
 	}
 	
@@ -2182,7 +2181,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return 8Bit grayscale image
 	 */
 	public ImageOperation grayscale() {
-		ImagePlus img = image.duplicate();
+		ImagePlus img = replaceColor(BACKGROUND_COLORint, Color.WHITE.getRGB()).image;
 		ij.process.ImageConverter co = new ij.process.ImageConverter(img);
 		co.convertToGray8();
 		
@@ -2312,13 +2311,13 @@ public class ImageOperation implements MemoryHogInterface {
 			int outputType, boolean excludeOnEdges, boolean isEDM) {
 		
 		MaximumFinder find = new MaximumFinder();
-		ResultsTable rt = new ResultsTableWithUnits();
+		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		find.findMaxima(image.getProcessor(), tolerance,
 				threshold, outputType, excludeOnEdges, isEDM, rt);
 		if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
-			return new ImageOperation(image, (ResultsTableWithUnits) rt);
+			return new ImageOperation(image, rt);
 		} else {
-			setResultsTable((ResultsTableWithUnits) rt);
+			setResultsTable(rt);
 			return this;
 		}
 	}
@@ -3296,6 +3295,8 @@ public class ImageOperation implements MemoryHogInterface {
 						if (x < 0 || y < 0 || x >= imgw || y >= imgh)
 							continue;
 						c = img2d[x + y * w];
+						if (c == BACKGROUND_COLORint)
+							continue;
 						r = (c & 0xff0000) >> 16;
 						g = (c & 0x00ff00) >> 8;
 						b = c & 0x0000ff;
@@ -3334,6 +3335,8 @@ public class ImageOperation implements MemoryHogInterface {
 					if (x < 0 || y < 0 || x >= imgw || y >= imgh)
 						continue;
 					c = img2d[x + y * w];
+					if (c == BACKGROUND_COLORint)
+						continue;
 					r = (c & 0xff0000) >> 16;
 					g = (c & 0x00ff00) >> 8;
 					b = c & 0x0000ff;
@@ -5067,6 +5070,7 @@ public class ImageOperation implements MemoryHogInterface {
 	/**
 	 * @return Calculated binary mask, ready for ImageJ operations, which require binary images.
 	 */
+	@Deprecated
 	public ImageOperation getBinaryMask() {
 		int[] px = getAs1D();
 		int[] res = new int[px.length];
