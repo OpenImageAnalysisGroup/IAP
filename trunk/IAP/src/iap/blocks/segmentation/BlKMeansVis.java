@@ -10,6 +10,7 @@ import java.util.HashSet;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.image.color.ColorUtil;
+import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -41,14 +42,14 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 				setBoolean(getSettingsNameForLoop(), false);
 			
 			Color[] initColor = new Color[] {
-					Color.getHSBColor(0.0f, 1f, 0.5f),
-					Color.getHSBColor(0.1f, 1f, 0.5f),
-					Color.getHSBColor(0.2f, 1f, 0.5f),
-					Color.getHSBColor(0.3f, 1f, 0.5f),
-					Color.getHSBColor(0.4f, 1f, 0.5f),
-					Color.getHSBColor(0.6f, 1f, 0.5f),
-					Color.getHSBColor(0.8f, 1f, 0.5f),
-					Color.getHSBColor(1.0f, 1f, 0.5f)
+					Color.getHSBColor(0.0f, 0.0f, 0.0f),
+					Color.getHSBColor(1.0f, 0.0f, 0.0f),
+					Color.getHSBColor(1.0f, 1.0f, 0.0f),
+					Color.getHSBColor(1.0f, 1.0f, 1.0f),
+					Color.getHSBColor(0.0f, 1.0f, 0.0f),
+					Color.getHSBColor(0.0f, 1.0f, 1.0f),
+					Color.getHSBColor(0.0f, 0.0f, 1.0f),
+					Color.getHSBColor(1.0f, 1.0f, 1.0f)
 			};
 			
 			if (initClusters) {
@@ -73,7 +74,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			res = kMeans(inp.copy().io().blur(getDouble("Blur", 0)).getImage(), seedColors, clusterColors, epsilon, initClusters);
 			
-			// res.show("segres", true);
+			res.show("segres", debug);
 			
 			if (!getBoolean("Inspect Segmentation Result", false))
 				res = inp.io().applyMask(res).getImage();
@@ -152,13 +153,13 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 				int minidx = -1;
 				
 				for (int idx_cp = 0; idx_cp < centerPoints_a.length; idx_cp++) {
-					// double cp_l = centerPoints_l[idx_cp] - img_l;
-					// double cp_a = centerPoints_a[idx_cp] - img_a;
-					// double cp_b = centerPoints_b[idx_cp] - img_b;
+					double cp_l = centerPoints_l[idx_cp] - img_l;
+					double cp_a = centerPoints_a[idx_cp] - img_a;
+					double cp_b = centerPoints_b[idx_cp] - img_b;
 					
-					double tempdist = ColorUtil.deltaE2000(centerPoints_l[idx_cp], centerPoints_a[idx_cp], centerPoints_b[idx_cp],
-							img_l, img_a, img_b);
-					// double tempdist = (1 - Math.abs(127 - cp_l) / 127) * cp_l + (Math.abs(127 - cp_l) / 127) * (cp_a * cp_a + cp_b * cp_b);
+					// double tempdist = ColorUtil.deltaE2000(centerPoints_l[idx_cp] / 2.55, centerPoints_a[idx_cp] - 127, centerPoints_b[idx_cp] - 127,
+					// img_l / 2.55, img_a - 127, img_b - 127);
+					double tempdist = (1 - Math.abs(127 - cp_l) / 127) * cp_l + (Math.abs(127 - cp_l) / 127) * (cp_a * cp_a + cp_b * cp_b);
 					
 					if (tempdist < mindist) {
 						mindist = tempdist;
@@ -229,8 +230,10 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			for (int i = 0; i < centerPoints_a.length; i++) {
 				if (Double.isNaN(centerPoints_a[i]) || Double.isNaN(centerPoints_b[i]))
 					cl.add(ImageOperation.BACKGROUND_COLOR);
-				else
-					cl.add(clusterColors.get(i));
+				else {
+					Color r = new Color_CIE_Lab(centerPoints_l[i] / 2.55, centerPoints_a[i] - 127, centerPoints_b[i] - 127).getColor();
+					cl.add(r);
+				}
 			}
 			for (int i = 0; i < centerPoints_a.length; i++) {
 				setColor(getSettingsNameForSeedColor(i), cl.get(i));
