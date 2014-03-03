@@ -294,7 +294,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					plantName = plantName.split(";", 2)[1];
 				do {
 					Thread.sleep(100);
-					status.setCurrentStatusText1("Enqueued " + progr.getInt() + "/" + todo + " plants<br>("
+					status.setCurrentStatusText1("Enqueued " + progr.getInt() + "/" + todo + " plants ("
 							+ BackgroundThreadDispatcher.getWorkLoad() + " tasks, "
 							+ (BackgroundThreadDispatcher.getBackgroundThreadCount() + 1) + " threads)");
 				} while (BackgroundThreadDispatcher.getWorkLoad() >= SystemAnalysis.getNumberOfCPUs());
@@ -304,7 +304,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				public void run() {
 					while (!Thread.interrupted()) {
 						status.setCurrentStatusText1("Enqueued " + progr.getInt() + "/" + todo
-								+ " plants<br>(" + BackgroundThreadDispatcher.getWorkLoad() + " tasks, "
+								+ " plants (" + BackgroundThreadDispatcher.getWorkLoad() + " tasks, "
 								+ (BackgroundThreadDispatcher.getBackgroundThreadCount() + 1) + " threads)");
 						try {
 							Thread.sleep(1000);
