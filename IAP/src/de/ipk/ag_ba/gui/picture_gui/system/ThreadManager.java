@@ -8,6 +8,7 @@ import java.util.concurrent.Semaphore;
 
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 
@@ -22,6 +23,8 @@ public class ThreadManager {
 	private final LinkedList<LocalComputeJob> jobs = new LinkedList<LocalComputeJob>();
 	private final Semaphore jobModification = new Semaphore(1, true);
 	
+	private final ThreadSafeOptions runningTasks = new ThreadSafeOptions();
+	
 	private ThreadManager() {
 		Timer res = new Timer("Background Thread Management", true);
 		res.scheduleAtFixedRate(new TimerTask() {
@@ -29,6 +32,15 @@ public class ThreadManager {
 			
 			@Override
 			public void run() {
+				runningTasks.setInt(getRunningCount());
+				if (started.length != SystemAnalysis.getRealNumberOfCPUs() * 2) {
+					boolean[] new_started = new boolean[SystemAnalysis.getRealNumberOfCPUs() * 2];
+					for (int i = 0; i < started.length; i++) {
+						if (i < new_started.length)
+							new_started[i] = started[i];
+					}
+					started = new_started;
+				}
 				if (jobs.size() > 0) {
 					ArrayList<LocalComputeJob> remove = new ArrayList<LocalComputeJob>();
 					jobModification.acquireUninterruptibly();
@@ -199,5 +211,25 @@ public class ThreadManager {
 		jobModification.acquireUninterruptibly();
 		jobs.remove(localComputeJob);
 		jobModification.release();
+	}
+	
+	public int getNumberOfEnquedOrRunningTasks() {
+		int cnt2;
+		jobModification.acquireUninterruptibly();
+		cnt2 = jobs.size();
+		jobModification.release();
+		int cnt = runningTasks.getInt();
+		// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Current Workload=" + cnt + ";" + cnt2 + ", CPU_CNT=" + SystemAnalysis.getNumberOfCPUs());
+		return cnt + cnt2;
+		// int cnt;
+		// jobModification.acquireUninterruptibly();
+		// cnt = jobs.size();
+		// jobModification.release();
+		// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Current Workload=" + cnt + ", CPU_CNT=" + SystemAnalysis.getNumberOfCPUs());
+		// return cnt;
+	}
+	
+	public int getNumberOfRunningBackgroundTasks() {
+		return runningTasks.getInt();
 	}
 }
