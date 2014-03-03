@@ -35,7 +35,7 @@ public class BlueMarkerFinder {
 	}
 	
 	public void findCoordinates(int background) {
-		ImageOperation io1 = new ImageOperation(input).copy();
+		ImageOperation io1 = input.io().copy();
 		double scaleFactor = 1 / 1.2d;
 		int w = io1.getImage().getWidth();
 		int h = io1.getImage().getHeight();
@@ -47,15 +47,22 @@ public class BlueMarkerFinder {
 				.border((int) (8 * scaleFactor + 1))
 				.bm().opening((int) (8 * scaleFactor), (int) (4 * scaleFactor)).io()
 				.show("nach opening", debug)
-				.grayscale().show("nach gray", debug)
-				.invert();
-		// .threshold(254, Color.WHITE.getRGB(), Color.BLACK.getRGB()).show("nach thresh", true);
+				.replaceColor(Color.BLACK.getRGB(), Color.WHITE.getRGB())
+				.replaceColor(background, Color.BLACK.getRGB())
+				.grayscale();// .show("nach gray", debug);
 		
-		markerPositionsImage.show("inp bmf", debug);
-		resultTable = markerPositionsImage
-				.findMax(10.0, MaximumFinder.LIST).show("Markers enlarged (a)", debug).replaceColor(Color.WHITE.getRGB(), ImageOperation.BACKGROUND_COLORint).bm()
-				.opening(10, 0).io().show("Markers enlarged (b)", debug)
-				.getResultsTable();
+		markerPositionsImage = markerPositionsImage
+				.findMax(10.0, MaximumFinder.LIST).show("Markers enlarged (a)", debug).replaceColor(Color.WHITE.getRGB(), ImageOperation.BACKGROUND_COLORint);
+		resultTable = markerPositionsImage.getResultsTable();
+		markerPositionsImage = markerPositionsImage.bm()
+				.opening(10, 0).io()
+				.replaceColor(background, Color.BLUE.getRGB())
+				.replaceColor(Color.BLACK.getRGB(), background)
+				.replaceColor(Color.BLUE.getRGB(), Color.BLACK.getRGB())
+				.show("Markers enlarged (b)", debug);
+		
+		markerPositionsImage = input.io().applyMaskInversed_ResizeMaskIfNeeded(markerPositionsImage.getImage());
+		
 	}
 	
 	private ArrayList<Vector2d> getCoordinates() {
