@@ -343,7 +343,7 @@ public class ExperimentSaver implements RunnableOnDB {
 				
 				toBeSaved.add(condition);
 				
-				if (toBeSaved.size() >= 100) {
+				if (toBeSaved.size() >= 50) {
 					conditions.insert(new ArrayList<DBObject>(toBeSaved));
 					for (DBObject ci : toBeSaved)
 						conditionIDs.add(((BasicDBObject) ci).getString("_id"));
