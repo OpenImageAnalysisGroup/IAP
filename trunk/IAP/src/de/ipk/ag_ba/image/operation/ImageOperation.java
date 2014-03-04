@@ -3288,7 +3288,7 @@ public class ImageOperation implements MemoryHogInterface {
 			int imgw = getImage().getWidth();
 			int imgh = getImage().getHeight();
 			
-			int[] img2d = getAs1D();
+			int[] img1d = getAs1D();
 			float[] p;
 			float[][][] lab = ImageOperation.getLabCubeInstance();
 			if (LThresh < 0) {
@@ -3298,7 +3298,7 @@ public class ImageOperation implements MemoryHogInterface {
 					for (int y = y1; y < y1 + h; y++) {
 						if (x < 0 || y < 0 || x >= imgw || y >= imgh)
 							continue;
-						c = img2d[x + y * w];
+						c = img1d[x + y * w];
 						if (c == BACKGROUND_COLORint)
 							continue;
 						r = (c & 0xff0000) >> 16;
@@ -3334,11 +3334,12 @@ public class ImageOperation implements MemoryHogInterface {
 				}
 				
 			}
-			for (int x = x1; x < x1 + w; x++) {
-				for (int y = y1; y < y1 + h; y++) {
+			
+			for (int y = y1; y < y1 + h; y++) {
+				for (int x = x1; x < x1 + w; x++) {
 					if (x < 0 || y < 0 || x >= imgw || y >= imgh)
 						continue;
-					c = img2d[x + y * w];
+					c = img1d[x + y * imgw];
 					if (c == BACKGROUND_COLORint)
 						continue;
 					r = (c & 0xff0000) >> 16;
@@ -3348,8 +3349,6 @@ public class ImageOperation implements MemoryHogInterface {
 					Li = p[b];
 					ai = p[b + 256];
 					bi = p[b + 512];
-					// if (Li < 200 && debug)
-					// System.out.println("li: " + Li + " r: " + r + " b: " + b + " g: " + g);
 					// sum under following conditions
 					if (searchWhiteTrue) {
 						if (Li > LThresh && (ai - 127 < ABThresh || -ai + 127 < ABThresh) && (bi - 127 < ABThresh || -bi + 127 < ABThresh)) {
@@ -3376,7 +3375,7 @@ public class ImageOperation implements MemoryHogInterface {
 			}
 			if (debug)
 				canvas.getImage().show("region scan for white balance", debug);
-			img2d = null;
+			img1d = null;
 			p = null;
 			lab = null;
 			canvas = null;
@@ -5109,5 +5108,38 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImagePlus ip() {
 		return image;
+	}
+	
+	public ImageOperation add(int[] addRGB) {
+		int[] img = getAs1D();
+		for (int i = 0; i < img.length; i++) {
+			int p = img[i];
+			int r = (p & 0xff0000) >> 16;
+			int g = (p & 0x00ff00) >> 8;
+			int b = (p & 0x0000ff);
+			
+			r += addRGB[0];
+			g += addRGB[1];
+			b += addRGB[2];
+			
+			if (r > 255)
+				r = 255;
+			else
+				if (r < 0)
+					r = 0;
+			if (g > 255)
+				g = 255;
+			else
+				if (g < 0)
+					g = 0;
+			if (b > 255)
+				b = 255;
+			else
+				if (b < 0)
+					b = 0;
+			
+			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return this;
 	}
 }

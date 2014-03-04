@@ -71,6 +71,7 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 				if (vis != null && fluo != null) {
 					Image sk = calcSkeleton(inWork, vis, fluo, fluo.copy());
 					if (sk != null) {
+						sk.show("Calculated skeleton (fluo)", debug);
 						boolean drawSkeleton = getBoolean("Calculate Skeleton", true);
 						res = res.io().drawSkeleton(sk, drawSkeleton, SkeletonProcessor2d.getDefaultBackground()).getImage();
 						if (res != null)
@@ -83,7 +84,8 @@ public class BlSkeletonize_Arabidopsis extends AbstractSnapshotAnalysisBlock {
 	
 	public Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged) {
 		// ***skeleton calculations***
-		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(getInvert(inp.io().skeletonize().show("input", debug).getImage()));
+		SkeletonProcessor2d skel2d = new SkeletonProcessor2d(
+				getInvert(inp.io().skeletonize().replaceColor(Color.BLACK.getRGB(), Color.WHITE.getRGB()).show("input", debug).getImage()));
 		skel2d.findEndpointsAndBranches2();
 		
 		skel2d.show("endpoints and branches", debug);

@@ -13,7 +13,6 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.image.structures.ImageSet;
 
 /**
  * Calculates the relative temperature (as a gray image) from the IR image (difference of plant temperature and background temperature).
@@ -80,7 +79,7 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlock {
 		for (int i = 0; i < res.length; i++)
 			res[i] = IAPservice.getIRintensityDifferenceColor(
 					IAPservice.getIRintenstityFromRGB(res[i], optionsAndResults.getBackground()) - warmBackground,
-					optionsAndResults.getBackground(), getDouble("temperature scaling", 10));
+					optionsAndResults.getBackground(), getDouble("temperature scaling", 5));
 		Image gray = new Image(warmBack.getWidth(), warmBack.getHeight(), res);
 		if (getBoolean("Adaptive Thresholding", false))
 			gray = gray.io().show("ADAPT IN", debug).
@@ -91,11 +90,6 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlock {
 							getDouble("Adaptive_Threshold_K", 0.001)
 					).getImage().show("ADAPT OUT", debug);
 		return gray;
-	}
-	
-	@Override
-	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
-		super.postProcess(processedImages, processedMasks);
 	}
 	
 	@Override

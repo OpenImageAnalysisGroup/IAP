@@ -41,12 +41,9 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 						getInt("Noise-Size-Vis-Dimension-Absolute", 20),
 						optionsAndResults.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
 						optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", true)).getImage();
-		if (res != null) {
-			if (getInt("dilation vis", 0) > 0)
-				res = input().images().vis().io().applyMask(res.io().bm().erode(BlMorphologicalOperations.getRoundMask(getInt("dilation vis", 0))).getImage())
-						.getImage();
-			res.show("vis result", debugValues);
-		}
+		res = input().images().vis().io().applyMask(res.io().bm().erode(getInt("dilation vis", 0)).getImage()).getImage();
+		res.show("vis result", debugValues);
+		
 		return res;
 	}
 	
@@ -64,9 +61,9 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 						optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
 						getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debugValues)
 				.getImage();
-		if (getInt("dilation fluo", 0) > 0)
-			res = input().images().fluo().io().applyMask(res.io().bm().erode(BlMorphologicalOperations.getRoundMask(getInt("dilation fluo", 0))).getImage())
-					.getImage();
+		
+		res = input().images().fluo().io().applyMask(res.io().bm().erode(getInt("dilation fluo", 0)).getImage())
+				.getImage();
 		
 		return res;
 	}
