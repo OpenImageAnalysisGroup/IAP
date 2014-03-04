@@ -3253,15 +3253,15 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @param ABThresh
 	 *           minimal A and B value
 	 */
-	public float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, boolean debug) {
+	public float[] getRGBAverage(int x1, int y1, int w, int h, float LThresh, int ABThresh, boolean searchWhiteTrue, boolean debug) {
 		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, searchWhiteTrue, 0, debug);
 	}
 	
-	public float[] getRGBAverageNir(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, boolean debug) {
+	public float[] getRGBAverageNir(int x1, int y1, int w, int h, float LThresh, int ABThresh, boolean searchWhiteTrue, boolean debug) {
 		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, searchWhiteTrue, 0, debug);
 	}
 	
-	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, int recursion) {
+	private float[] getRGBAverage(int x1, int y1, int w, int h, float LThresh, int ABThresh, boolean searchWhiteTrue, int recursion) {
 		return getRGBAverage(x1, y1, w, h, LThresh, ABThresh, searchWhiteTrue, recursion, false);
 	}
 	
@@ -3269,7 +3269,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @param LThresh
 	 *           if > 0 then Lthreshold else variable threshold (-50 = median)
 	 */
-	private float[] getRGBAverage(int x1, int y1, int w, int h, int LThresh, int ABThresh, boolean searchWhiteTrue, int recursion, boolean debug) {
+	private float[] getRGBAverage(int x1, int y1, int w, int h, float LThresh, int ABThresh, boolean searchWhiteTrue, int recursion, boolean debug) {
 		int r, g, b, c;
 		float Li, ai, bi;
 		// sums of RGB
@@ -3293,7 +3293,7 @@ public class ImageOperation implements MemoryHogInterface {
 			float[][][] lab = ImageOperation.getLabCubeInstance();
 			if (LThresh < 0) {
 				int lArrayFilled = 0;
-				Float[] lArray = new Float[w * h];
+				float[] lArray = new float[w * h];
 				for (int x = x1; x < x1 + w; x++) {
 					for (int y = y1; y < y1 + h; y++) {
 						if (x < 0 || y < 0 || x >= imgw || y >= imgh)
@@ -3330,7 +3330,7 @@ public class ImageOperation implements MemoryHogInterface {
 						index = 0;
 					if (index >= lArrayFilled)
 						index = lArrayFilled - 1;
-					LThresh = lArray[index].intValue() - 1;
+					LThresh = lArray[index] - 1;
 				}
 				
 			}
@@ -3385,7 +3385,7 @@ public class ImageOperation implements MemoryHogInterface {
 			if (searchWhiteTrue)
 				return getRGBAverage(x1, y1, w, h, (int) (LThresh * 0.8), (int) (ABThresh * 1.1), searchWhiteTrue, recursion + 1);
 			else
-				return getRGBAverage(x1, y1, w, h, LThresh * 2, (int) (ABThresh * 1.1), searchWhiteTrue, recursion + 1);
+				return getRGBAverage(x1, y1, w, h, LThresh * 2f, (ABThresh), searchWhiteTrue, recursion + 1);
 		}
 		
 		if (count > 0) {
@@ -3597,10 +3597,11 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return A gray image composed from the R channel.
 	 */
 	public ImageOperation getR() {
-		int[] img = copy().getAs1D();
+		int[] in = getAs1D();
+		int[] out = new int[in.length];
 		int c, r, g, b;
-		for (int i = 0; i < img.length; i++) {
-			c = img[i];
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
 			if (c == BACKGROUND_COLORint)
 				continue;
 			r = (c & 0xff0000) >> 16;
@@ -3610,19 +3611,20 @@ public class ImageOperation implements MemoryHogInterface {
 			g = r;
 			b = r;
 			
-			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		return new Image(getWidth(), getHeight(), img).io();
+		return new Image(getWidth(), getHeight(), out).io();
 	}
 	
 	/**
 	 * @return A gray image composed from the G channel.
 	 */
 	public ImageOperation getG() {
-		int[] img = copy().getAs1D();
+		int[] in = getAs1D();
+		int[] out = new int[in.length];
 		int c, r, g, b;
-		for (int i = 0; i < img.length; i++) {
-			c = img[i];
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
 			if (c == BACKGROUND_COLORint)
 				continue;
 			r = (c & 0xff0000) >> 16;
@@ -3632,19 +3634,20 @@ public class ImageOperation implements MemoryHogInterface {
 			r = g;
 			b = g;
 			
-			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		return new Image(getWidth(), getHeight(), img).io();
+		return new Image(getWidth(), getHeight(), out).io();
 	}
 	
 	/**
 	 * @return A gray image composed from the B channel.
 	 */
 	public ImageOperation getB() {
-		int[] img = copy().getAs1D();
+		int[] in = getAs1D();
+		int[] out = new int[in.length];
 		int c, r, g, b;
-		for (int i = 0; i < img.length; i++) {
-			c = img[i];
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
 			if (c == BACKGROUND_COLORint)
 				continue;
 			r = (c & 0xff0000) >> 16;
@@ -3654,9 +3657,9 @@ public class ImageOperation implements MemoryHogInterface {
 			r = b;
 			g = b;
 			
-			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		return new Image(getWidth(), getHeight(), img).io();
+		return new Image(getWidth(), getHeight(), out).io();
 	}
 	
 	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps, boolean debug) {
