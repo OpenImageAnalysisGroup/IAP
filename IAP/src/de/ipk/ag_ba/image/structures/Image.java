@@ -212,10 +212,7 @@ public class Image {
 			ri = r[i] & 0xFF;
 			gi = g[i] & 0xFF;
 			bi = b[i] & 0xFF;
-			if (ri == 255 && gi == 255 && bi == 255)
-				ci = ImageOperation.BACKGROUND_COLORint;
-			else
-				ci = (0xFF << 24 | ri << 16) | (gi << 8) | (bi << 0);
+			ci = (0xFF << 24 | ri << 16) | (gi << 8) | (bi << 0);
 			res[i] = ci;
 		}
 		return res;

@@ -437,14 +437,15 @@ public class SkeletonProcessor2d {
 		int width = skelImg.length;
 		int height = skelImg[0].length;
 		
-		int[][] imgbin = skelImg;
-		skelImg = binaryArrayToRgb(imgbin);
+		int[][] imgbin = new Image(skelImg).copy().getAs2A();
+		// new Image(imgbin).show("bin");
+		// skelImg = binaryArrayToRgb(imgbin);
 		
 		int back = ImageOperation.BACKGROUND_COLORint;
 		
 		for (int x = 1; x < width - 1; x++) {
 			for (int y = 1; y < height - 1; y++) {
-				if (imgbin[x][y] != 0) {
+				if (imgbin[x][y] != back) {
 					int numOfNeigbours = 0;
 					if (imgbin[x - 1][y - 1] != back)
 						numOfNeigbours++;
@@ -463,7 +464,7 @@ public class SkeletonProcessor2d {
 					if (imgbin[x + 1][y + 1] != back)
 						numOfNeigbours++;
 					if (numOfNeigbours < 1)
-						skelImg[x][y] = background;
+						skelImg[x][y] = back;
 					if (numOfNeigbours == 1)
 						skelImg[x][y] = colorEndpoints;
 					if (numOfNeigbours > 2)
@@ -897,7 +898,7 @@ public class SkeletonProcessor2d {
 	}
 	
 	public static int getDefaultBackground() {
-		return Color.BLACK.getRGB();
+		return ImageOperation.BACKGROUND_COLORint;// Color.BLACK.getRGB();
 	}
 	
 	public ImageOperation getImageOperation() {
