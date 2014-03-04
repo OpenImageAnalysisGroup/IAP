@@ -1,11 +1,15 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
-public class BlockResultObject extends BlockResultValue {
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
+
+public class BlockResultObject extends BlockResult {
 	
 	private final Object value;
+	private final String name;
 	
-	public BlockResultObject(String name, Object value) {
-		super(name, null, null);
+	public BlockResultObject(String name, Object value, int blockPositionInPipeline) {
+		super(Double.NaN, blockPositionInPipeline);
+		this.name = name;
 		this.value = value;
 	}
 	
@@ -14,12 +18,7 @@ public class BlockResultObject extends BlockResultValue {
 	}
 	
 	@Override
-	public String getString() {
-		return getName() + ";" + value;
-	}
-	
-	@Override
 	public String toString() {
-		return getString();
+		return name + "=" + value;
 	}
 }
