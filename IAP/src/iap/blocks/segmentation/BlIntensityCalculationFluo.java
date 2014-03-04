@@ -1,5 +1,6 @@
 package iap.blocks.segmentation;
 
+import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
@@ -20,7 +21,6 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected synchronized Image processFLUOmask() {
 		
-		// getInput().getMasks().getFluo().copy().saveToFile(ReleaseInfo.getDesktopFolder() + File.separator + "MaizeFLUOMask2.png");
 		if (input().masks().fluo() == null) {
 			return null;
 		}
@@ -34,12 +34,10 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 		ImageStack fis = debug ? new ImageStack() : null;
 		if (debug)
 			fis.addImage("FLUO", io.copy().getImage(), null);
-		double min = 220;
-		Image resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, getDouble("minimum-intensity-classic", min)).getImage();
-		Image resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, getDouble("minimum-intensity-chloro", min)).getImage();
-		min = getDouble("minimum-intensity-phenol", 240);
+		Image resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, getDouble("minimum-intensity-classic", 220)).getImage();
+		Image resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, getDouble("minimum-intensity-chloro", 220)).getImage();
+		Image resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, getDouble("minimum-intensity-phenol", 240)).getImage();
 		
-		Image resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, min).getImage();
 		Image r = new Image(resClassic, resChlorophyll, resPhenol);
 		
 		if (debug) {
@@ -51,13 +49,9 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 			 * @see IntensityAnalysis: r_intensityClassic, g_.., b_...
 			 */
 			fis.show("Fluorescence Segmentation Results");
-			// r.getIO().saveImageOnDesktop("FLUO_C_P_C.png");
 		}
 		
-		// the proper 3 channel image is required by BlIntensityAnalysis
-		// if (!getBoolean("show conversion", false)) {
-		// r = io.copy().applyMask(r, options.getBackground()).getImage();
-		// }
+		getResultSet().setImage(BlAdaptiveSegmentationFluo.RESULT_OF_FLUO_INTENSITY, r);
 		
 		return r;
 	}

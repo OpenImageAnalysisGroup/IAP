@@ -1,5 +1,6 @@
 package iap.blocks.extraction;
 
+import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
@@ -132,25 +133,30 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 	protected Image processFLUOmask() {
 		
 		if (input().masks().fluo() != null) {
-			Image of = getResultSet().getImage("inp_fluo");
-			if (of != null) {
-				of = of.io().applyMask(input().masks().fluo()).getImage();
-				ResultsTableWithUnits rt = of.io().intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
+			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).show("BEFORE TRIMM", debug).bm().
+					erode(getInt("Erode-Cnt-Fluo", 2)).io();
+			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
+					.show("AFTER ERODE // Red Color Fluo Image", debug);
+			
+			{ // red color fluo image
+				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
 						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_HUE_VIS_ANALYSIS,
 						getBoolean("Add Fluo Color Bins", false));
 				if (rt != null)
 					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			}
 			
-			ImageOperation io = new ImageOperation(input().masks().fluo().copy()).show("BEFORE TRIMM", debug).bm().
-					erode(getInt("Erode-Cnt-Fluo", 2)).io();
-			io = input().masks().fluo().copy().io().applyMask_ResizeSourceIfNeeded(io.getImage(), ImageOperation.BACKGROUND_COLORint)
-					.show("AFTER ERODE", debug);
-			ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
-					optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS,
-					addHistogramValues); // markerDistanceHorizontally
-			if (rt != null)
-				getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
+			{ // blue color fluo image
+				Image of = getResultSet().getImage(BlAdaptiveSegmentationFluo.RESULT_OF_FLUO_INTENSITY);
+				if (of != null) {
+					of = of.io().applyMask(input().masks().fluo()).getImage().show("Blue Color Fluo Image", debug);
+					ResultsTableWithUnits rt = of.io().intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
+							optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS,
+							addHistogramValues); // markerDistanceHorizontally
+					if (rt != null)
+						getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
+				}
+			}
 			return input().masks().fluo();// io.getImage();
 		} else
 			return null;

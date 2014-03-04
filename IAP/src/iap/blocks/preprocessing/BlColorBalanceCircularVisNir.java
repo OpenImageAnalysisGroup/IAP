@@ -107,6 +107,6 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	@Override
 	public String getDescription() {
 		return "Detect background pixels from bottom left to the center of the image and " +
-				"correct for gradual circular changes in the intensity.";
+				"correct for gradual circular changes in the intensity. By default only side-images are processed.";
 	}
 }
