@@ -4822,7 +4822,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int[][] image2d = getAs2D();
+		int[] image1d = getAs1D();
 		
 		int black = BACKGROUND_COLORint;
 		
@@ -4831,7 +4831,7 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				if (image2d[x][y] != black) {
+				if (image1d[x + y * width] != black) {
 					distanceSum += Math.sqrt((p.x - x) * (p.x - x) + (p.y - y) * (p.y - y));
 					area++;
 				}
