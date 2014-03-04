@@ -3602,8 +3602,10 @@ public class ImageOperation implements MemoryHogInterface {
 		int c, r, g, b;
 		for (int i = 0; i < in.length; i++) {
 			c = in[i];
-			if (c == BACKGROUND_COLORint)
+			if (c == BACKGROUND_COLORint) {
+				out[i] = BACKGROUND_COLORint;
 				continue;
+			}
 			r = (c & 0xff0000) >> 16;
 			g = (c & 0x00ff00) >> 8;
 			b = c & 0x0000ff;
@@ -3625,8 +3627,10 @@ public class ImageOperation implements MemoryHogInterface {
 		int c, r, g, b;
 		for (int i = 0; i < in.length; i++) {
 			c = in[i];
-			if (c == BACKGROUND_COLORint)
+			if (c == BACKGROUND_COLORint) {
+				out[i] = BACKGROUND_COLORint;
 				continue;
+			}
 			r = (c & 0xff0000) >> 16;
 			g = (c & 0x00ff00) >> 8;
 			b = c & 0x0000ff;
@@ -3648,8 +3652,10 @@ public class ImageOperation implements MemoryHogInterface {
 		int c, r, g, b;
 		for (int i = 0; i < in.length; i++) {
 			c = in[i];
-			if (c == BACKGROUND_COLORint)
+			if (c == BACKGROUND_COLORint) {
+				out[i] = BACKGROUND_COLORint;
 				continue;
+			}
 			r = (c & 0xff0000) >> 16;
 			g = (c & 0x00ff00) >> 8;
 			b = c & 0x0000ff;

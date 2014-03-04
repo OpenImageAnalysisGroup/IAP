@@ -40,12 +40,8 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 		
 		Image resClassic, resChlorophyll, resPhenol;
 		if (!auto_tune) {
-			if (getBoolean("Store Unchanged Fluo for Color Analysis", true))
-				getResultSet().setImage("inp_fluo", input().masks().fluo()); // here the filtered result (apply mask from below) should be saved instead
-				
-			double min = 220;
-			double p1 = getDouble("minimum-intensity-classic", min);
-			double p2 = getDouble("minimum-intensity-chloro", min);
+			double p1 = getDouble("minimum-intensity-classic", 220);
+			double p2 = getDouble("minimum-intensity-chloro", 220);
 			double p3 = getDouble("minimum-intensity-phenol", 170);
 			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, p1).getImage();
 			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, p2).getImage();
@@ -75,7 +71,7 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 					.show("AFTER HUE", false).getImage();
 		}
 		getResultSet().setImage(RESULT_OF_FLUO_INTENSITY, r);
-		return r;
+		return input().images().fluo().io().applyMask(r).getImage();
 	}
 	
 	@Override
