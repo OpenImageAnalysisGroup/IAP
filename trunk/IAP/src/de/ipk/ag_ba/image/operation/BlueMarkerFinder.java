@@ -54,15 +54,14 @@ public class BlueMarkerFinder {
 		markerPositionsImage = markerPositionsImage
 				.findMax(10.0, MaximumFinder.LIST).show("Markers enlarged (a)", debug).replaceColor(Color.WHITE.getRGB(), ImageOperation.BACKGROUND_COLORint);
 		resultTable = markerPositionsImage.getResultsTable();
+		markerPositionsImage.show("mpi", debug);
+		markerPositionsImage = markerPositionsImage.copy().replaceColor(Color.BLACK.getRGB(), background).show("repl", debug);
 		markerPositionsImage = markerPositionsImage.bm()
-				.opening(10, 0).io()
+				.dilate(15).io()
 				.replaceColor(background, Color.BLUE.getRGB())
 				.replaceColor(Color.BLACK.getRGB(), background)
 				.replaceColor(Color.BLUE.getRGB(), Color.BLACK.getRGB())
 				.show("Markers enlarged (b)", debug);
-		
-		markerPositionsImage = input.io().applyMaskInversed_ResizeMaskIfNeeded(markerPositionsImage.getImage());
-		
 	}
 	
 	private ArrayList<Vector2d> getCoordinates() {

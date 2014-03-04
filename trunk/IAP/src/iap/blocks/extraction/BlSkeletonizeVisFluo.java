@@ -150,7 +150,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	public synchronized Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged,
 			boolean specialLeafWidthCalculations, boolean specialSkeletonBasedLeafWidthCalculation) {
 		// ***skeleton calculations***
-		SkeletonProcessor2d skel2d = inp.io().skeletonize().skel2d();
+		SkeletonProcessor2d skel2d = inp.io().skeletonize().
+				show("out sk", debug).skel2d();
 		skel2d.findEndpointsAndBranches2();
 		skel2d.show("endpoints and branches", debug);
 		

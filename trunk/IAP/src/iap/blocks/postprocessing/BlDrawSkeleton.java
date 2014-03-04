@@ -16,7 +16,7 @@ public class BlDrawSkeleton extends AbstractSnapshotAnalysisBlock {
 		if (input() == null || input().masks() == null)
 			return null;
 		Image plantImg = input().masks().vis();
-		boolean drawSkeleton = getBoolean("draw_skeleton", true);
+		boolean drawSkeleton = getBoolean("draw_skeleton", false);
 		boolean debug = getBoolean("debug", false);
 		Image skel = getResultSet().getImage("skeleton");
 		if (skel != null && plantImg != null && plantImg.getWidth() >= 50 && plantImg.getHeight() >= 50) {

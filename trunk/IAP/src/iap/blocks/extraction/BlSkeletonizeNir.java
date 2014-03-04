@@ -21,9 +21,8 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlock {
 		boolean useNirSkeleton = getBoolean("Calculate_Skeleton", true);
 		Image nirMask = input().masks().nir();
 		if (nirMask != null) {
-			input().masks().setNir(nirMask);
 			if (useNirSkeleton) {
-				Image sk = nirMask.io().skeletonize().getImage();
+				Image sk = nirMask.copy().io().skeletonize().getImage();
 				if (sk != null) {
 					sk = mapOriginalOnSkel(sk, nirMask, optionsAndResults.getBackground());
 					getResultSet().setImage("nir_skeleton", sk.show("SKELETON", debug));
@@ -36,15 +35,15 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlock {
 	private Image mapOriginalOnSkel(Image skeleton, Image original, int back) {
 		int w = skeleton.getWidth();
 		int h = skeleton.getHeight();
-		int[] img = skeleton.getAs1A();// .clone();
-		int[] oi = original.getAs1A();// .clone();
-		for (int i = 0; i < img.length; i++) {
-			if (img[i] != back) {
-				img[i] = oi[i];
+		int[] sk = skeleton.getAs1A();// .clone();
+		int[] orig = original.getAs1A();// .clone();
+		for (int i = 0; i < sk.length; i++) {
+			if (sk[i] != back) {
+				sk[i] = orig[i];
 			} else
-				img[i] = img[i];
+				sk[i] = sk[i];
 		}
-		return new Image(w, h, img);
+		return new Image(w, h, sk);
 	}
 	
 	@Override
