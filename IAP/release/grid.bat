@@ -16,7 +16,7 @@ echo JAR Release Info:
 dir iap.jar
 echo One moment, start grid job execution ...
 :start
-java -Xmx12g -jar iap.jar close
+java -Xmx24g -jar iap.jar close
 echo Grid client closed
 IF %ERRORLEVEL% NEQ 0 GOTO morework 
 echo Return value indicates no more work needs to be done. Waiting 1 minute for restart.
