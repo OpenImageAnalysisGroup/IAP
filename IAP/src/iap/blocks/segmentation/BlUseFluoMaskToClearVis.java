@@ -42,7 +42,7 @@ public class BlUseFluoMaskToClearVis extends AbstractSnapshotAnalysisBlock {
 					processedMasks.setVis(
 							processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy().resize(f, f)
-											.blur(getDouble("blur fluo mask on vis", 1.5d)).getImage(),
+											.blur(getDouble("blur fluo mask on vis", 0d)).getImage(),
 									back).show("FILTERED VIS IMAGE", debug).getImage());
 				}
 				if (getBoolean("Apply Filtered VIS back to FLUO", false))

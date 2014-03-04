@@ -37,7 +37,6 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		Image res;
 		boolean invert = true;
 		if (input != null) {
-			input = input.copy();
 			res = balance(input, input.io().getImage(), 255, invert);
 		} else
 			res = input;
@@ -50,7 +49,6 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		Image res;
 		boolean invert = true;
 		if (input != null) {
-			input = input.copy();
 			res = balance(input, input, 255, invert);
 		} else
 			res = input;
@@ -88,8 +86,8 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 			int scanHeight = (right - left) / 4;
 			int scanWidth = right - left;
 			int startHTop = (int) (height * 0.1 - scanHeight / 2);
-			
-			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, false, debug);
+			// debug = true;
+			valuesTop = io.getRGBAverage(left, startHTop, scanWidth, scanHeight, lThres, abThres, true, debug);
 			valuesBottom = io.getRGBAverage(left, height - (startHTop + scanHeight), scanWidth, scanHeight, lThres, 50, true, debug);
 			
 			values = new float[6];
@@ -143,11 +141,10 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 				// White Balancing
 				double[] pix;
 				if (invert) {
-					// NIR
-					ImageOperation io = new ImageOperation(input);
+					// FLUO
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(),
 							getDouble("balance-size-width-top-invert", 0.08), bpleft, bpright);
-					return io.invert().imageBalancing(whitePoint, pix).invert().getImage();
+					return input.io().invert().imageBalancing(whitePoint, pix).getImage();
 				} else {
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, getDouble("balance-size-width-top", 0.3), null, null);
 					res = new ImageOperation(nir).imageBalancing(whitePoint, pix).getImage();
