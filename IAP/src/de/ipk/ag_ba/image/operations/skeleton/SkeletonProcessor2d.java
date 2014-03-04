@@ -434,20 +434,34 @@ public class SkeletonProcessor2d {
 	 * Not Mask based
 	 */
 	public void findEndpointsAndBranches2() {
-		new Image(skelImg).copy().show("TTTT", false);
 		int width = skelImg.length;
 		int height = skelImg[0].length;
 		
-		int[][] imgbin = rgbToBinaryArray(skelImg);
+		int[][] imgbin = skelImg;
 		skelImg = binaryArrayToRgb(imgbin);
+		
+		int back = ImageOperation.BACKGROUND_COLORint;
 		
 		for (int x = 1; x < width - 1; x++) {
 			for (int y = 1; y < height - 1; y++) {
 				if (imgbin[x][y] != 0) {
-					int[][] area = new int[][] { { imgbin[x - 1][y - 1], imgbin[x][y - 1], imgbin[x + 1][y - 1] },
-							{ imgbin[x - 1][y], imgbin[x][y], imgbin[x + 1][y] },
-							{ imgbin[x - 1][y + 1], imgbin[x][y + 1], imgbin[x + 1][y + 1] } };
-					int numOfNeigbours = getNumberOfNeighbours(area);
+					int numOfNeigbours = 0;
+					if (imgbin[x - 1][y - 1] != back)
+						numOfNeigbours++;
+					if (imgbin[x][y - 1] != back)
+						numOfNeigbours++;
+					if (imgbin[x + 1][y - 1] != back)
+						numOfNeigbours++;
+					if (imgbin[x - 1][y] != back)
+						numOfNeigbours++;
+					if (imgbin[x + 1][y] != back)
+						numOfNeigbours++;
+					if (imgbin[x - 1][y + 1] != back)
+						numOfNeigbours++;
+					if (imgbin[x][y + 1] != back)
+						numOfNeigbours++;
+					if (imgbin[x + 1][y + 1] != back)
+						numOfNeigbours++;
 					if (numOfNeigbours < 1)
 						skelImg[x][y] = background;
 					if (numOfNeigbours == 1)

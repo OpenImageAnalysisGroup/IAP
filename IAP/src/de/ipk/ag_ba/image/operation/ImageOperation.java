@@ -179,9 +179,13 @@ public class ImageOperation implements MemoryHogInterface {
 				.replaceColor(Color.BLACK.getRGB(), foreground);
 	}
 	
+	/**
+	 * Changes the color of the image (directly), and returns the same
+	 * imageoperation object.
+	 */
 	public ImageOperation replaceColor(int search, int replace) {
 		int[] source = getAs1D();
-		int[] target = new int[source.length];
+		int[] target = source;// new int[source.length];
 		
 		int idx = 0;
 		for (int v : source) {
@@ -190,8 +194,8 @@ public class ImageOperation implements MemoryHogInterface {
 			else
 				target[idx++] = replace;
 		}
-		return new ImageOperation(target, getImage().getWidth(), getImage()
-				.getHeight());
+		return this;// new ImageOperation(target, getImage().getWidth(), getImage()
+		// .getHeight());
 	}
 	
 	public ImageOperation replaceColorsScanLine(int search, int replace) {
