@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import de.ipk.ag_ba.image.operations.blocks.BlockResultObject;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -38,7 +39,7 @@ public interface BlockResultSet {
 	
 	public int getBlockPosition();
 	
-	public int getNumberOfBlocksWithResults();
+	public int getNumberOfBlocksWithNumericResults();
 	
 	public int getNumberOfBlocksWithGivenName(String pName);
 	
@@ -95,5 +96,9 @@ public interface BlockResultSet {
 	public void setImages(HashMap<String, Image> storedImages);
 	
 	public void addImagePostProcessor(ImageConfiguration imgConfig, RunnableOnImage roi, RunnableOnImage runnableOnMask);
+	
+	BlockResultObject searchObjectResult(int currentPositionInPipeline, int searchIndex, String pName);
+	
+	void setObjectResult(int position, String name, Object value);
 	
 }
