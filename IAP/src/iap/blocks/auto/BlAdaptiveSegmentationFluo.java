@@ -49,14 +49,13 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 		} else {
 			ImageOperation filterInp = io.copy();
 			if (auto_tune_process_red_by_green)
-				filterInp = filterInp.getR();
+				filterInp = filterInp.replaceColor(optionsAndResults.getBackground(), Color.BLACK.getRGB()).getR();
 			else
 				filterInp = filterInp.convertFluo2intensity(FluoAnalysis.CLASSIC, 255);
 			ImageOperation filter = filterInp;
 			filter = filter.replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).show("Input For Auto-Threshold", debugValues);
 			filter = filter.autoThresholdingColorImageByUsingBrightnessMaxEntropy(auto_tune_process_red_by_green, debugValues).getImage()
 					.show("Result Filter", debugValues).io();
-			
 			io = io.applyMask(filter.getImage()).show("USED FOR CALC", debugValues);
 			
 			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, 256).getImage();
