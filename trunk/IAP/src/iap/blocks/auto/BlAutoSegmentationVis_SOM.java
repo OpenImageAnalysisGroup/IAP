@@ -22,7 +22,8 @@ import de.ipk.ag_ba.image.structures.Image;
  */
 public class BlAutoSegmentationVis_SOM extends AbstractSnapshotAnalysisBlock {
 	
-	private boolean auto_tune, useLAB;
+	private boolean auto_tune;
+	private final boolean useLAB = true;
 	private final ArrayList<Color> colors = new ArrayList<Color>();
 	private final ArrayList<Boolean> foreground = new ArrayList<Boolean>();
 	
@@ -36,7 +37,7 @@ public class BlAutoSegmentationVis_SOM extends AbstractSnapshotAnalysisBlock {
 		foreground.add(true);
 		colors.add(Color.YELLOW);
 		foreground.add(true);
-		colors.add(Color.BLACK);
+		colors.add(Color.DARK_GRAY);
 		foreground.add(false);
 		colors.add(Color.WHITE);
 		foreground.add(false);
@@ -111,18 +112,23 @@ public class BlAutoSegmentationVis_SOM extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		data.setBetaAndGamma(0.1, 2);
-		data.trainOrUseSOM(true, 1, new String[] { "C1", "C2", "C3" }, 1000, null, channels[0].length / 1000);
+		data.trainOrUseSOM(true, 1, new String[] { "C1", "C2", "C3" }, 1000, null, channels[0].length / 5);
 		Vector<SOMdataEntry> classes[] =
 				data.trainOrUseSOM(false, 1, new String[] { "C1", "C2", "C3" }, 100, null, 0);
-		
+		data.getSOMmap().printMatrix();
 		int[] resImgData = new int[channels[0].length];
 		
 		for (int classIdx = 0; classIdx < classes.length; classIdx++) {
+			int cnt = 0;
+			Color cc = colors.get(classIdx);
+			int ci = cc.getRGB();
 			Vector<SOMdataEntry> val = classes[classIdx];
 			for (SOMdataEntry sde : val) {
 				Integer px = (Integer) sde.getUserData();
-				resImgData[px] = colors.get(classIdx).getRGB();
+				resImgData[px] = ci;
+				cnt++;
 			}
+			System.out.println("CLASS=" + classIdx + ", CNT=" + cnt + ", Color=" + cc);
 		}
 		return new Image(w, h, resImgData);
 	}
