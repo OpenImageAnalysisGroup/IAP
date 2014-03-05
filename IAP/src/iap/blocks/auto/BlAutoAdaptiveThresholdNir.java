@@ -28,7 +28,7 @@ public class BlAutoAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 		}
 		boolean autoTune = getBoolean("Auto-tune", true);
 		Image origNirMask = optionsAndResults.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
-		int average = autoTune ? 180 : getInt("Replace color value", 180);
+		int average = autoTune ? nirMask.io().histogram(true).getMostCommonValueB() : getInt("Replace color value", 180);
 		if (nirMask != null) {
 			double f;
 			int regionSize;
@@ -62,7 +62,7 @@ public class BlAutoAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 			}
 			nirMask = nirMask.io().show("ADAPT IN", debug).
 					adaptiveThresholdForGrayscaleImage(regionSize, average,
-							optionsAndResults.getBackground(), f).getImage().show("ADAPT OUT", debug);
+							optionsAndResults.getBackground(), f).getImage().show("ADAPT OUT", debug).copy();
 			input().masks().setNir(nirMask);
 			if (origNirMask != null) {
 				nirMask = nirMask.io().and(origNirMask).getImage();
