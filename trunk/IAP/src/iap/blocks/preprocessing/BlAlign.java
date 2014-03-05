@@ -79,9 +79,9 @@ public class BlAlign extends AbstractBlock {
 					int f1 = options.getIntSetting(inst, "Debug-Crossfade-F1_5", 5);
 					int f2 = options.getIntSetting(inst, "Debug-Crossfade-F2_2", 2);
 					int f3 = options.getIntSetting(inst, "Debug-Crossfade-F3_1", 1);
-					vis = vis.io().enhanceContrast().getImage();
+					vis = vis.io().histogramEqualisation().getImage();
 					ImageOperation visFluo = vis.io().crossfade(
-							in.fluo().copy().io().enhanceContrast().getImage().resize(vis.getWidth(), vis.getHeight()),
+							in.fluo().copy().io().histogramEqualisation().getImage().resize(vis.getWidth(), vis.getHeight()),
 							f1, f2, f3);
 					
 					ic.setImage(visFluo.getAsBufferedImage());

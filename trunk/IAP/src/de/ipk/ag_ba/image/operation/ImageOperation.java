@@ -2532,7 +2532,7 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
 	
-	public ImageOperation enhanceContrast() {
+	public ImageOperation histogramEqualisation() {
 		ContrastEnhancer ce = new ContrastEnhancer();
 		ce.equalize(image);
 		
@@ -3374,8 +3374,8 @@ public class ImageOperation implements MemoryHogInterface {
 					}
 				}
 			}
-			// if (debug)
-			// canvas.getImage().show("region scan for white balance", debug && recursion < 1);
+			if (debug)
+				canvas.getImage().show("region scan for white balance", debug && recursion < 1);
 			img1d = null;
 			p = null;
 			lab = null;
@@ -5154,5 +5154,24 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageHistogram histogram(boolean grayScaleHistogramBlueOnly) {
 		return new ImageHistogram(this, grayScaleHistogramBlueOnly);
+	}
+	
+	public ImageOperation add(Image image) {
+		// TODO fix imagej
+		// ImageCalculator ic = new ImageCalculator();
+		// ic.run("Add", this.image, image.getAsImagePlus());
+		int[] a = getAs1D();
+		int[] b = image.getAs1A();
+		for (int x = 0; x < a.length; x++) {
+			if (a[x] != BACKGROUND_COLORint && b[x] != BACKGROUND_COLORint) {
+				int apix = (a[x] & 0x0000ff);
+				int bpix = (b[x] & 0x0000ff);
+				int newRGB = apix + bpix;
+				if (newRGB > 255)
+					newRGB = 255;
+				a[x] = new Color(newRGB, newRGB, newRGB).getRGB();
+			}
+		}
+		return new ImageOperation(a, image.getWidth(), image.getHeight());
 	}
 }
