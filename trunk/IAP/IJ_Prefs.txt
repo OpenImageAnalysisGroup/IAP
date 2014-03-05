@@ -1,20 +1,19 @@
 #ImageJ 1.45g Preferences
-#Tue Jul 09 16:50:39 CEST 2013
+#Thu Jul 25 15:16:53 CEST 2013
 menu.size=14
 fps=7.0
 new.type=0
+dir.image=C\:\\Users\\pape\\Desktop\\
 new.width=400
-fcolor=\#9F6445
+fcolor=\#000000
 div-by-zero=Infinity
 pp.options=1
 prefs.options2=0
 raw.type=0
 ij.y=0
 roicolor=\#FFFF00
-ij.x=579
-.results.width=400
+ij.x=1603
 noise.sd=25.0
-.results.loc=440,193
 prefs.options=20480
 new.slices=1
 raw.width=512
@@ -31,5 +30,4 @@ raw.options=0
 showcolor=\#00FFFF
 raw.n=1
 jpeg=75
-.results.height=250
 raw.offset=0

@@ -12,7 +12,6 @@ import iap.blocks.extraction.BlLeafCurlingAnalysis;
 import iap.blocks.extraction.BlSkeletonizeNir;
 import iap.blocks.extraction.BlSkeletonizeVisFluo;
 import iap.blocks.postprocessing.BlCrop;
-import iap.blocks.postprocessing.BlDrawSkeleton;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
@@ -95,7 +94,6 @@ public class BarleyPipeline extends AbstractPipelineTemplate {
 				new BlCalcConvexHull(),
 				
 				// postprocessing
-				new BlDrawSkeleton(),
 				new BlRunPostProcessors(),
 				new BlMoveMasksToImageSet(),
 				new BlCrop(),

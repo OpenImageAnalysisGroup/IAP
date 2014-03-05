@@ -42,7 +42,7 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock {
 		ImageOperation result = dist.applyMask(skel.getImage(), ImageOperation.BACKGROUND_COLORint).show("Result", debug);
 		SkeletonProcessor2d skel2d = result.skel2d();
 		skel2d.background = ImageOperation.BACKGROUND_COLORint;
-		skel2d.findEndpointsAndBranches(null);
+		skel2d.createEndpointsAndBranchesLists(null);
 		skel2d.calculateEndlimbsRecursive();
 		ArrayList<Limb> limbs = skel2d.getEndlimbs();
 		DescriptiveStatistics statsFFTfrequency = new DescriptiveStatistics();

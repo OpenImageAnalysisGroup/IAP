@@ -7,9 +7,8 @@ import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
-import iap.blocks.extraction.BlSkeletonize_Arabidopsis;
+import iap.blocks.extraction.BlSkeletonizeVisFluo;
 import iap.blocks.postprocessing.BlCrop;
-import iap.blocks.postprocessing.BlDrawSkeleton;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
@@ -69,14 +68,13 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 				new BlIRdiff(),
 				new BlUseFluoMaskToClearIr(),
 				
-				new BlSkeletonize_Arabidopsis(),
+				new BlSkeletonizeVisFluo(),
 				new BlCalcWidthAndHeight(),
 				new BlCalcAreas(),
 				new BlCalcColorHistograms(),
 				new BlCalcConvexHull(),
 				// postprocessing
 				new BlRunPostProcessors(),
-				new BlDrawSkeleton(),
 				new BlMoveMasksToImageSet(),
 				new BlCrop(),
 				new BlHighlightNullResults()
