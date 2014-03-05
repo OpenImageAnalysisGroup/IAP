@@ -23,7 +23,7 @@ public class SkeletonProcessor2d {
 	public static final int colorEndpoints = Color.PINK.getRGB();
 	public static final int colorBranches = Color.RED.getRGB();
 	public static final int colorMarkedEndLimbs = Color.BLUE.getRGB();
-	public static final int foreground = Color.orange.getRGB();
+	public static final int foreground = Color.MAGENTA.getRGB();
 	public int background = getDefaultBackground();
 	public static final int colorDebug = Color.GREEN.getRGB();
 	
@@ -321,6 +321,10 @@ public class SkeletonProcessor2d {
 		return res;
 	}
 	
+	public void createEndpointsAndBranchesLists() {
+		createEndpointsAndBranchesLists(null);
+	}
+	
 	/**
 	 * Do this at first!
 	 * Search and mark Endpoints and Branches, therefore the image will be converted to an binary image and checked with masks.
@@ -328,7 +332,7 @@ public class SkeletonProcessor2d {
 	 * 
 	 * @param postProcessing
 	 */
-	public void findEndpointsAndBranches(ArrayList<RunnableOnImage> postProcessing) {
+	public void createEndpointsAndBranchesLists(ArrayList<RunnableOnImage> postProcessing) {
 		int[][][] listEndpointMasks = new int[13][3][3];
 		int[][][] listBranchMasks = new int[18][3][3];
 		
@@ -416,24 +420,23 @@ public class SkeletonProcessor2d {
 					}
 				}
 			}
-		}
-		
-		if (postProcessing != null) {
-			final int[][] unchangedSkeleton = new Image(skelImg).getAs2A();
-			postProcessing.add(new RunnableOnImage() {
-				@Override
-				public Image postProcess(Image in) {
-					return new ImageOperation(unchangedSkeleton).replaceColor(Color.black.getRGB(), ImageOperation.BACKGROUND_COLORint).or(in)
-							.getImage();
-				}
-			});
+			if (postProcessing != null) {
+				final int[][] unchangedSkeleton = new Image(skelImg).getAs2A();
+				postProcessing.add(new RunnableOnImage() {
+					@Override
+					public Image postProcess(Image in) {
+						return new ImageOperation(unchangedSkeleton).replaceColor(Color.black.getRGB(), ImageOperation.BACKGROUND_COLORint).or(in)
+								.getImage();
+					}
+				});
+			}
 		}
 	}
 	
 	/**
 	 * Not Mask based
 	 */
-	public void findEndpointsAndBranches2() {
+	public void markEndpointsAndBranches() {
 		int width = skelImg.length;
 		int height = skelImg[0].length;
 		
@@ -576,7 +579,7 @@ public class SkeletonProcessor2d {
 		forRemove.clear();
 		endpoints.clear();
 		branches.clear();
-		findEndpointsAndBranches(null);
+		createEndpointsAndBranchesLists();
 	}
 	
 	/**
@@ -907,7 +910,7 @@ public class SkeletonProcessor2d {
 	
 	public static int countEndPoints(Image skeletonImage) {
 		SkeletonProcessor2d s = new SkeletonProcessor2d(skeletonImage);
-		s.findEndpointsAndBranches(null);
+		s.createEndpointsAndBranchesLists();
 		return s.endpoints.size();
 	}
 }

@@ -46,6 +46,7 @@ import javax.vecmath.Point2d;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.Vector2d;
 import org.Vector2i;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
@@ -89,7 +90,7 @@ public class ImageOperation implements MemoryHogInterface {
 	protected final ImagePlus image;
 	protected ResultsTableWithUnits rt;
 	private CameraType cameraType;
-	public static final Color BACKGROUND_COLOR = new Color(250, 200, 100, 255); // new Color(155, 155, 255, 255); //
+	public static final Color BACKGROUND_COLOR = SystemOptions.getInstance().getColor("Pipeline-Debugging", "Background-Color", new Color(150, 50, 200, 255));
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
 	/**

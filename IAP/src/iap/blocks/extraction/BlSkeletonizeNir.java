@@ -2,9 +2,12 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.RunnableOnImageSet;
 
+import java.awt.Color;
 import java.util.HashSet;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -26,10 +29,42 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlock {
 				if (sk != null) {
 					sk = mapOriginalOnSkel(sk, nirMask, optionsAndResults.getBackground());
 					getResultSet().setImage("nir_skeleton", sk.show("SKELETON", debug));
+					if (getBoolean("draw_skeleton", true)) {
+						addPostprocessor(nirMask, sk, CameraType.NIR);
+					}
 				}
 			}
 		}
 		return nirMask;
+	}
+	
+	private void addPostprocessor(Image nirMask, Image sk, CameraType ct) {
+		final CameraType ct_fin = ct;
+		final Image sk_fin = sk;
+		final Image nirMask_fin = nirMask;
+		getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
+			
+			@Override
+			public Image postProcessImage(Image image) {
+				return image;
+			}
+			
+			private Image markSkelOnMask(Image nirMask_fin, Image sk_fin) {
+				return nirMask_fin.io().draw(
+						sk_fin.io().replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).invert()
+								.replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint).getImage(), ImageOperation.BACKGROUND_COLORint);
+			}
+			
+			@Override
+			public Image postProcessMask(Image mask) {
+				return markSkelOnMask(nirMask_fin, sk_fin);
+			}
+			
+			@Override
+			public CameraType getConfig() {
+				return ct_fin;
+			}
+		});
 	}
 	
 	private Image mapOriginalOnSkel(Image skeleton, Image original, int back) {
@@ -71,6 +106,6 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Skeletonize NIR images and extract according skeleton features.";
+		return "Skeletonize NIR images and extract according skeleton features. If enabled, the skeleton is drawn in the Post-processing phase.";
 	}
 }

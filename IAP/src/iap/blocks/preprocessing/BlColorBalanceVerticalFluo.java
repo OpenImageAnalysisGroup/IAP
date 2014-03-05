@@ -37,7 +37,7 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		Image res;
 		boolean invert = true;
 		if (input != null) {
-			res = balance(input, input.io().getImage(), 255, invert);
+			res = balance(input, input, 255, invert);
 		} else
 			res = input;
 		return res;
@@ -144,7 +144,8 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 					// FLUO
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(),
 							getDouble("balance-size-width-top-invert", 0.08), bpleft, bpright);
-					return input.io().invert().imageBalancing(whitePoint, pix).getImage();
+					Image bal = input.io().invert().imageBalancing(whitePoint, pix).invert().getImage();
+					return bal;
 				} else {
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, getDouble("balance-size-width-top", 0.3), null, null);
 					res = new ImageOperation(nir).imageBalancing(whitePoint, pix).getImage();

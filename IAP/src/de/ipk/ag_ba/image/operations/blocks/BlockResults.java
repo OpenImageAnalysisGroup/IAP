@@ -40,13 +40,13 @@ public class BlockResults implements BlockResultSet {
 	@Override
 	public synchronized BlockResult searchNumericResult(
 			int currentPositionInPipeline, int searchIndex, String pName) {
-		return searchNumericResult(currentPositionInPipeline, searchIndex, pName, false);
+		return searchNumericResult(currentPositionInPipeline, searchIndex, pName, true);
 	}
 	
 	@Override
 	public synchronized BlockResultObject searchObjectResult(
 			int currentPositionInPipeline, int searchIndex, String pName) {
-		return (BlockResultObject) searchNumericResult(currentPositionInPipeline, searchIndex, pName, true);
+		return (BlockResultObject) searchNumericResult(currentPositionInPipeline, searchIndex, pName, false);
 	}
 	
 	public synchronized BlockResult searchNumericResult(

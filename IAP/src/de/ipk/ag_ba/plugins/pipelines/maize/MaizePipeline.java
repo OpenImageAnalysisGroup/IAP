@@ -18,7 +18,6 @@ import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.extraction.BlSkeletonizeNir;
 import iap.blocks.extraction.BlSkeletonizeVisFluo;
 import iap.blocks.postprocessing.BlCrop;
-import iap.blocks.postprocessing.BlDrawSkeleton;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
@@ -97,7 +96,6 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlCalcVolumes(),
 				
 				// postprocessing
-				new BlDrawSkeleton(),
 				new BlRunPostProcessors(),
 				new BlMoveMasksToImageSet(),
 				new BlCrop(),

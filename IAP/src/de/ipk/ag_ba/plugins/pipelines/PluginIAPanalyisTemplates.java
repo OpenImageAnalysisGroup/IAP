@@ -21,9 +21,7 @@ import iap.blocks.extraction.BlCalcWidthAndHeightLR;
 import iap.blocks.extraction.BlLeafCurlingAnalysis;
 import iap.blocks.extraction.BlSkeletonizeNir;
 import iap.blocks.extraction.BlSkeletonizeVisFluo;
-import iap.blocks.extraction.BlSkeletonize_Arabidopsis;
 import iap.blocks.postprocessing.BlCrop;
-import iap.blocks.postprocessing.BlDrawSkeleton;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlOverlayMasksOnImages;
@@ -110,7 +108,6 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlCreateDummyReferenceIfNeeded(),
 				new BlCrop(),
 				new BlDetectBlueMarkers(),
-				new BlDrawSkeleton(),
 				new BlFilterByHSV(),
 				new BlIntensityCalculationFluo(),
 				new BlIRdiff(),
@@ -123,9 +120,8 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlRemoveMaizeBambooStick(),
 				new BlRemoveSmallObjectsVisFluo(),
 				new BlRunPostProcessors(),
-				new BlSkeletonize_Arabidopsis(),
-				new BlSkeletonizeNir(),
 				new BlSkeletonizeVisFluo(),
+				new BlSkeletonizeNir(),
 				new BlUseFluoMaskToClearIr(),
 				new BlUseFluoMaskToClearNir(),
 				new BlUseFluoMaskToClearOther(),
