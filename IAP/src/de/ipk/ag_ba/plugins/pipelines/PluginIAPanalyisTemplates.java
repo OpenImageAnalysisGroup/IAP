@@ -33,6 +33,7 @@ import iap.blocks.preprocessing.BlColorBalanceCircularVisNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
+import iap.blocks.preprocessing.BlColorCorrectionNir;
 import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
@@ -104,6 +105,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlColorBalanceVerticalFluo(),
 				new BlColorBalanceVerticalNir(),
 				new BlColorBalanceVerticalVis(),
+				new BlColorCorrectionNir(),
 				new BlCopyImagesApplyMask(),
 				new BlCreateDummyReferenceIfNeeded(),
 				new BlCrop(),
