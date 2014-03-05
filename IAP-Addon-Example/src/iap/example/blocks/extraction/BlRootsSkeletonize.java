@@ -129,7 +129,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		if (graphAnalysis) {
 			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
 			skel.background = SkeletonProcessor2d.getDefaultBackground();
-			skel.findEndpointsAndBranches(null);
+			skel.createEndpointsAndBranchesLists();
 			// skel.getAsFlexibleImage().show("BOBOBO");
 			// int nEndLimbs = skel.endlimbs.size();
 			// rt.addValue("roots" + resultPrefix + ".skeleton.endlimbs", nEndLimbs);
@@ -236,7 +236,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			rt.addValue(pre + "roots.skeleton.length", len);
 		
 		SkeletonProcessor2d skel = new SkeletonProcessor2d(inp.show("INPUT FOR SKEL", debug).getImage()); // getInvert(
-		skel.findEndpointsAndBranches(postProcessing);
+		skel.createEndpointsAndBranchesLists(postProcessing);
 		
 		img = skel.getImageOperation().show("THE SKELETON", debug);
 		
