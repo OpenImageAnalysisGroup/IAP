@@ -106,7 +106,7 @@ public class Map {
 			// System.out.println("Centroid "+(j+1));
 			for (int i = 0; i < inputv.length; i++) {
 				if (!new Double(inputv[i]).isNaN()) {
-					sumEuDist += Math.pow(inputv[i] - weights[i][j], 2);
+					sumEuDist += (inputv[i] - weights[i][j]) * (inputv[i] - weights[i][j]);
 				}
 			}
 			eudist[j] = sumEuDist;
