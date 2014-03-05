@@ -1,6 +1,7 @@
 package iap.blocks.data_structures;
 
 import iap.pipelines.ImageProcessorOptionsAndResults;
+import ij.WindowManager;
 import info.StopWatch;
 import info.clearthought.layout.TableLayout;
 
@@ -9,12 +10,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -429,11 +433,57 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			}
 		});
 		
+		Action action2 = new AbstractAction("<html>Close Additional<br>"
+				+ "Image Windows (" + WindowManager.getImageCount() + ")") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				WindowManager.closeAllWindows();
+			}
+			
+			@Override
+			public boolean isEnabled() {
+				return WindowManager.getImageCount() > 0;
+			}
+			
+		};
+		final JButton closeWindows = new JButton(action2);
+		closeWindows.setEnabled(WindowManager.getImageCount() > 0);
+		closeWindows.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				closeWindows.setText("<html>Close Additional<br>"
+						+ "Image Windows (" + WindowManager.getImageCount() + ")");
+				closeWindows.setEnabled(WindowManager.getImageCount() > 0);
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				closeWindows.setText("<html>Close Additional<br>"
+						+ "Image Windows (" + WindowManager.getImageCount() + ")");
+				closeWindows.setEnabled(WindowManager.getImageCount() > 0);
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+			}
+		});
+		
 		JComponent editAndUpdate = TableLayout.get3Split(
 				null,
 				null,
 				TableLayout.get3Split(
-						ic.getZoomSlider(), null, okButton, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
+						ic.getZoomSlider(), null,
+						TableLayout.get3Split(okButton, null, closeWindows, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
+						TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
 				TableLayout.FILL, 5, TableLayout.PREFERRED);
 		JComponent v = TableLayout.get3SplitVertical(
 				jsp, null, editAndUpdate, TableLayout.FILL, 5, TableLayout.PREFERRED);
