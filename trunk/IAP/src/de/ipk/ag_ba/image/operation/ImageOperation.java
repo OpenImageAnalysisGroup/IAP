@@ -2248,26 +2248,26 @@ public class ImageOperation implements MemoryHogInterface {
 			
 			switch (mode) {
 			// use hsv, saturation to zero
-				case MODE_1:
+				case ZERO_SATURATION:
 					Color.RGBtoHSB(r, g, b, hsv);
 					hsv[1] = 0;
 					res[idx] = Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]);
 					break;
 				
 				// use common formula (here from gimp), y is here luminosity
-				case MODE_2:
+				case LUMINOSITY:
 					y = (int) (0.3 * r + 0.59 * g + 0.11 * b);
 					res[idx] = new Color(y, y, y).getRGB();
 					break;
 				
 				// use max value of RGB
-				case MODE_3:
+				case MAX:
 					y = Math.max(r, Math.max(g, b));
 					res[idx] = new Color(y, y, y).getRGB();
 					break;
 				
 				// lightness http://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
-				case MODE_4:
+				case LIGHTNESS:
 					y = (Math.max(r, Math.max(g, b)) + Math.min(r, Math.min(g, b))) / 2;
 					res[idx] = new Color(y, y, y).getRGB();
 					break;
