@@ -59,9 +59,9 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			
 			io = io.applyMask(filter.getImage()).show("USED FOR CALC", debugValues);
 			
-			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, 255).getImage();
-			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, 255).getImage();
-			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, 255).getImage();
+			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, 256).getImage();
+			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, 256).getImage();
+			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, 256).getImage();
 			Image res = new Image(resClassic, resChlorophyll, resPhenol);
 			res.show("res", debugValues);
 		}
