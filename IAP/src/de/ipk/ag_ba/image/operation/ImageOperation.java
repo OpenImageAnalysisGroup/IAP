@@ -389,7 +389,7 @@ public class ImageOperation implements MemoryHogInterface {
 			int i = (int) (intensity * 255d);
 			if (i > minimumIntensity)
 				i = 255;
-			int val = i == 255 ? BACKGROUND_COLORint : (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
+			int val = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
 			in[idx++] = val;
 		}
 		return new ImageOperation(in, w, h); // new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
@@ -1103,7 +1103,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation show(String title, boolean doIt) {
 		if (doIt)
-			new Image(image).show(title);
+			new Image(image).copy().show(title);
 		return this;
 	}
 	
@@ -3373,8 +3373,8 @@ public class ImageOperation implements MemoryHogInterface {
 					}
 				}
 			}
-			if (debug)
-				canvas.getImage().show("region scan for white balance", debug);
+			// if (debug)
+			// canvas.getImage().show("region scan for white balance", debug && recursion < 1);
 			img1d = null;
 			p = null;
 			lab = null;
