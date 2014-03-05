@@ -4091,11 +4091,18 @@ public class ImageOperation implements MemoryHogInterface {
 		for (int j = 0; j < h; j++) {
 			for (int i = 0; i < w; i++) {
 				// Check the local neighbourhood
+				temp = img[i][j] & 0x0000ff;
+				if (Math.abs(temp - assumedBackground) <= 2) {
+					out[i][j] = BACKGROUND_COLORint;
+					continue;
+				}
 				for (int k = 0; k < sizeOfRegion; k++) {
 					for (int l = 0; l < sizeOfRegion; l++) {
 						x = i - ((sizeOfRegion / 2)) + k;
 						y = j - ((sizeOfRegion / 2)) + l;
 						if (x > 0 && x < w && y > 0 && y < h) {
+							if (img[x][y] == BACKGROUND_COLORint)
+								continue;
 							temp = img[x][y] & 0x0000ff;
 							valuesMask[k * sizeOfRegion + l] = temp;
 							if (temp > max)
@@ -4103,14 +4110,15 @@ public class ImageOperation implements MemoryHogInterface {
 							if (temp < min)
 								min = temp;
 						} else
-							valuesMask[k * sizeOfRegion + l] = assumedBackground;
+							valuesMask[k * sizeOfRegion + l] = BACKGROUND_COLORint;
 					}
 				}
 				// Find the threshold value
 				// thresh = median(mean);
 				mean = mean(valuesMask);
+				double sd = standardDerivation(valuesMask, mean);
 				double maxStandardDerivation = 128.; // for grayscale image with intensity g(x,y) in [0-255]
-				thresh = (int) (mean * (1 + K * (standardDerivation(valuesMask, mean) / maxStandardDerivation - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
+				thresh = (int) (mean * (1 + K * (sd / maxStandardDerivation - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
 				
 				pix = img[i][j] & 0x0000ff;
 				if (pix > thresh) {
@@ -5141,5 +5149,9 @@ public class ImageOperation implements MemoryHogInterface {
 			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
 		return this;
+	}
+	
+	public ImageHistogram histogram(boolean grayScaleHistogramBlueOnly) {
+		return new ImageHistogram(this, grayScaleHistogramBlueOnly);
 	}
 }
