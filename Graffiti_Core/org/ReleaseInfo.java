@@ -333,6 +333,7 @@ public class ReleaseInfo implements HelperClass {
 	
 	private static boolean updateCheckRun = false;
 	private static String lastVersion = null;
+	private static boolean preventSystemExit;
 	
 	public static UpdateInfoResult isUpdated() {
 		if (!updateCheckRun)
@@ -435,5 +436,13 @@ public class ReleaseInfo implements HelperClass {
 	public static String getDesktopFolder() {
 		String home = System.getProperty("user.home");
 		return home + File.separator + "Desktop";
+	}
+	
+	public static void setPreventSystemExitUponWindowClose(boolean preventSystemExit) {
+		ReleaseInfo.preventSystemExit = preventSystemExit;
+	}
+	
+	public static boolean isPreventSystemExit() {
+		return ReleaseInfo.preventSystemExit;
 	}
 }
