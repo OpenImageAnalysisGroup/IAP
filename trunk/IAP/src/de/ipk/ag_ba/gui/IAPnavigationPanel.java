@@ -57,6 +57,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.util.PopupListener;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
@@ -132,6 +133,18 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					IAPmain.showVANTED(false);
+				}
+			});
+			popup.add(menuItem);
+		}
+		{
+			popup.addSeparator();
+			JMenuItem menuItem = new JMenuItem("Show ImageJ");
+			menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, "img/ext/ij.png", 16, 16, false));
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					IAPservice.showImageJ();
 				}
 			});
 			popup.add(menuItem);
