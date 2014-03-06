@@ -3,9 +3,9 @@ package de.ipk.ag_ba.gui.picture_gui;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import ij.ImagePlus;
 import ij.WindowManager;
-import ij.io.FileInfoXYZ;
+//import ij.io.FileInfoXYZ;
 import ij.io.Opener;
-import ij.io.TiffDecoderExtended;
+//import ij.io.TiffDecoderExtended;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
@@ -873,14 +873,14 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				}
 				if (fi == null || fi.getWidth() == 0) {
 					try {
-						TiffDecoderExtended tid = new TiffDecoderExtended(
-								myImage.fileURLlabel.getInputStream(),
-								myImage.fileURLlabel.getFileName());
-						FileInfoXYZ[] info = tid.getTiffInfo();
+//						TiffDecoderExtended tid = new TiffDecoderExtended(
+//								myImage.fileURLlabel.getInputStream(),
+//								myImage.fileURLlabel.getFileName());
+//						FileInfoXYZ[] info = tid.getTiffInfo();
 						Opener o = new Opener();
-						ImagePlus imp = o.openTiffStack(info);
-						imp.show("Image Label View - "
-								+ myImage.fileURLlabel.getFileNameDecoded());
+//						ImagePlus imp = o.openTiffStack(info);
+//						imp.show("Image Label View - "
+//								+ myImage.fileURLlabel.getFileNameDecoded());
 						IAPservice.showImageJ();
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(null,
