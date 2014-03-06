@@ -2314,17 +2314,17 @@ public class ImageOperation implements MemoryHogInterface {
 	 */
 	public ImageOperation findMax(double tolerance, double threshold,
 			int outputType, boolean excludeOnEdges, boolean isEDM) {
-		
-		MaximumFinder find = new MaximumFinder();
-		ResultsTableWithUnits rt = new ResultsTableWithUnits();
-		find.findMaxima(image.getProcessor(), tolerance,
-				threshold, outputType, excludeOnEdges, isEDM, rt);
-		if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
-			return new ImageOperation(image, rt);
-		} else {
-			setResultsTable(rt);
-			return this;
-		}
+		throw new UnsupportedOperationException("TODO");
+//		MaximumFinder find = new MaximumFinder();
+//		ResultsTableWithUnits rt = new ResultsTableWithUnits();
+//		find.findMaxima(image.getProcessor(), tolerance,
+//				threshold, outputType, excludeOnEdges, isEDM, rt);
+//		if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
+//			return new ImageOperation(image, rt);
+//		} else {
+//			setResultsTable(rt);
+//			return this;
+//		}
 	}
 	
 	public ImageOperation findMax() {
