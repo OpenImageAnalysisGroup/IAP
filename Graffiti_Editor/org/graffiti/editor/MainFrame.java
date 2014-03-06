@@ -3398,7 +3398,8 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 			}
 		} else {
 			// HomeFolder.deleteTemporaryFolder();
-			if (!ReleaseInfo.isRunningAsApplet())
+			ReleaseInfo.setPreventSystemExitUponWindowClose(true);
+			if (!ReleaseInfo.isRunningAsApplet() && !ReleaseInfo.isPreventSystemExit())
 				System.exit(0);
 			else
 				setVisible(false);
