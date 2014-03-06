@@ -60,5 +60,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
 	<classpathentry kind="lib" path="/IAP/lib/platform.jar"/>
 	<classpathentry kind="lib" path="/IAP/lib/jna.jar"/>
+	<classpathentry kind="lib" path="/IAP/lib/ij-1.48r.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
