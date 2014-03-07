@@ -5,6 +5,7 @@ import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -20,23 +21,30 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processNIRimage() {
-		Image nir = input().images().nir();
-		double blurRadius = getDouble("Blur Radius", 10.0);
-		return process(nir, blurRadius);
+		if (input().images().nir() != null) {
+			Image nir = input().images().nir();
+			double blurRadius = getDouble("Blur Radius", 10.0);
+			return process(nir, blurRadius);
+		} else
+			return input().images().nir();
 	}
 	
 	@Override
 	protected Image processNIRmask() {
-		Image nir = input().masks().nir();
-		double blurRadius = getDouble("Blur Radius", 10.0);
-		return process(nir, blurRadius);
+		if (input().masks().nir() != null) {
+			Image nir = input().masks().nir();
+			double blurRadius = getDouble("Blur Radius", 10.0);
+			return process(nir, blurRadius);
+		} else
+			return input().masks().nir();
 	}
 	
 	private Image process(Image image, double blurRadius) {
-		Image blured = image.copy();
-		blured = blured.io().histogramEqualisation().blur(blurRadius).invert().getImage();
-		image = image.io().histogramEqualisation().getImage();
-		return blured.io().add(image).histogramEqualisation().getImage();
+		ImageOperation image_io = image.io().histogramEqualisation();
+		ImageOperation blured = image_io.copy();
+		double avgValBlured = blured.getMedian();
+		blured = blured.blur(blurRadius).subtract(avgValBlured).invert();
+		return blured.add(image_io.getImage()).histogramEqualisation().getImage();
 	}
 	
 	@Override

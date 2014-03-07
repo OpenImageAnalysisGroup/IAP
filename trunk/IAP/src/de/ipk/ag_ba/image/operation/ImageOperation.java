@@ -5156,10 +5156,13 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageHistogram(this, grayScaleHistogramBlueOnly);
 	}
 	
+	public ImageOperation diff(Image image) {
+		ImageCalculator ic = new ImageCalculator();
+		ImagePlus ip = ic.run("diff, 32", this.image, image.getAsImagePlus());
+		return new ImageOperation(ip);
+	}
+	
 	public ImageOperation add(Image image) {
-		// TODO fix imagej
-		// ImageCalculator ic = new ImageCalculator();
-		// ic.run("Add", this.image, image.getAsImagePlus());
 		int[] a = getAs1D();
 		int[] b = image.getAs1A();
 		for (int x = 0; x < a.length; x++) {
@@ -5173,5 +5176,33 @@ public class ImageOperation implements MemoryHogInterface {
 			}
 		}
 		return new ImageOperation(a, image.getWidth(), image.getHeight());
+	}
+	
+	public double getMedian() {
+		ImageProcessor ip = image.getProcessor();
+		return ip.getStatistics().median;
+	}
+	
+	public ImageOperation subtract(double value) {
+		ImageProcessor ip = image.getProcessor();
+		ip.subtract(value);
+		return this;
+	}
+	
+	public ImageOperation thresholdImageJ(String methodName, boolean darkBackground) {
+		Method[] methods = Method.values();
+		Method method = null;
+		for (Method m : methods)
+			if (methodName.matches(m.name()))
+				method = m;
+		// this.image.show();
+		ByteProcessor pr = new ByteProcessor(this.image.getBufferedImage());
+		// pr.setRoi(getCropRectangle());
+		pr.setAutoThreshold(method, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
+		BufferedImage buf = new TypeConverter(pr, false).convertToRGB().getBufferedImage();
+		buf.getRaster();
+		ImageOperation io = new ImageOperation(buf).show("Auto-Threshold Result" + method.name(),
+				true);
+		return io;
 	}
 }
