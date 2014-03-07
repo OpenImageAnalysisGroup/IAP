@@ -40,11 +40,11 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private Image process(Image image, double blurRadius) {
-		ImageOperation image_io = image.io().histogramEqualisation();
+		ImageOperation image_io = image.io().histogramEqualisation(true);
 		ImageOperation blured = image_io.copy();
 		double avgValBlured = blured.getMedian();
 		blured = blured.blur(blurRadius).subtract(avgValBlured).invert();
-		return blured.add(image_io.getImage()).histogramEqualisation().getImage();
+		return blured.add(image_io.getImage()).histogramEqualisation(true).getImage();
 	}
 	
 	@Override

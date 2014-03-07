@@ -2315,16 +2315,16 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation findMax(double tolerance, double threshold,
 			int outputType, boolean excludeOnEdges, boolean isEDM) {
 		throw new UnsupportedOperationException("TODO");
-//		MaximumFinder find = new MaximumFinder();
-//		ResultsTableWithUnits rt = new ResultsTableWithUnits();
-//		find.findMaxima(image.getProcessor(), tolerance,
-//				threshold, outputType, excludeOnEdges, isEDM, rt);
-//		if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
-//			return new ImageOperation(image, rt);
-//		} else {
-//			setResultsTable(rt);
-//			return this;
-//		}
+		// MaximumFinder find = new MaximumFinder();
+		// ResultsTableWithUnits rt = new ResultsTableWithUnits();
+		// find.findMaxima(image.getProcessor(), tolerance,
+		// threshold, outputType, excludeOnEdges, isEDM, rt);
+		// if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
+		// return new ImageOperation(image, rt);
+		// } else {
+		// setResultsTable(rt);
+		// return this;
+		// }
 	}
 	
 	public ImageOperation findMax() {
@@ -2532,9 +2532,16 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(res, image.getWidth(), image.getHeight());
 	}
 	
-	public ImageOperation histogramEqualisation() {
+	/**
+	 * If normalize is true, the histrogram bins are distributed equally otherwise a histogram equalization is performed.
+	 */
+	public ImageOperation histogramEqualisation(boolean normalize) {
 		ContrastEnhancer ce = new ContrastEnhancer();
-		ce.equalize(image);
+		if (normalize) {
+			ce.setNormalize(normalize);
+			ce.stretchHistogram(image.getProcessor(), 0.35);
+		} else
+			ce.equalize(image);
 		
 		return new ImageOperation(image);
 	}
@@ -5196,11 +5203,12 @@ public class ImageOperation implements MemoryHogInterface {
 			if (methodName.matches(m.name()))
 				method = m;
 		// this.image.show();
-		ByteProcessor pr = new ByteProcessor(this.image.getBufferedImage());
+		ImageProcessor ip = this.image.getProcessor();
+		ByteProcessor pr = (ByteProcessor) ip.convertToByte(false);
 		// pr.setRoi(getCropRectangle());
 		pr.setAutoThreshold(method, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
 		BufferedImage buf = new TypeConverter(pr, false).convertToRGB().getBufferedImage();
-		buf.getRaster();
+		// buf.getRaster();
 		ImageOperation io = new ImageOperation(buf).show("Auto-Threshold Result" + method.name(),
 				true);
 		return io;

@@ -241,6 +241,7 @@ public class Image {
 	
 	public Image show(String title) {
 		if (!SystemAnalysis.isHeadless()) {
+			image.setTitle(title);
 			image.show(title);
 			debugOutputview = image;
 			IAPservice.showImageJ();
