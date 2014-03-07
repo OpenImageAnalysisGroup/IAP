@@ -21,6 +21,8 @@ public class BlAutoAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processNIRmask() {
 		boolean debug = getBoolean("debug", false);
+		if (input().masks().nir() == null)
+			return null;
 		Image nirMask = input().masks().nir();
 		
 		if (!getBoolean("enabled", true)) {
