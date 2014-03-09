@@ -95,6 +95,9 @@ public class SystemOptions {
 						updateCheckTasks.remove(this);
 						return;
 					}
+					if (!iniIO.isAbleToSaveData())
+						return; // no need to update from source in this case (normally read-only sources are not updated regularily
+					   // or interactively
 					Long mt;
 					try {
 						mt = iniIO.lastModified();
