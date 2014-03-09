@@ -59,6 +59,8 @@ public class IAPgui {
 		final IAPnavigationPanel navigationPanel = new IAPnavigationPanel(PanelTarget.NAVIGATION, graphPanel, null);
 		navigationPanel.setOpaque(false);
 		
+		navigationPanel.setDisallowBookmarkCreation(optCustomHomeAction!=null);
+		
 		JPanel actionPanelRight = new JPanel();
 		final IAPnavigationPanel actionPanel = new IAPnavigationPanel(PanelTarget.ACTION, graphPanel, actionPanelRight);
 		actionPanel.setNavigationButtonFilter(optNavigationButtonFilter);
