@@ -291,25 +291,17 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		setOpaque(false);
 		
 		final boolean editPossible = true;
-		// experimentHeader.getExcelfileid() != null
-		// && experimentHeader.getExcelfileid().length() > 0 &&
-		// experimentHeader.getImportusername() != null
-		// && experimentHeader.getImportusername().equals(login);
 		
 		if (!editPossible)
 			startEnabled = true;
 		
 		FolderPanel fp = new FolderPanel("Experiment " + experimentHeader.getExperimentName(), hasCorrelationTableData, true, false, null);
-		// Color c = new Color(220, 220, 220);
-		// fp.setFrameColor(c, Color.BLACK, 4, 8);
 		fp.addCollapseListenerDialogSizeUpdate();
 		
 		editName = new JTextField(experimentHeader.getExperimentName());
 		editDBid = new JTextField(experimentHeader.getDatabaseId() + "");
 		coordinator = new JTextField(experimentHeader.getCoordinator());
 		groupVisibility = new JTextField(experimentHeader.getImportusergroup());
-		// getGroups(login, pass, experimentHeader.getImportusergroup(),
-		// editPossible);
 		experimentTypeSelection = getExperimentTypes(experimentHeader.getExperimentType(), editPossible);
 		expStart = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getStartdate() : new Date(0l));
 		expEnd = new JDateChooser(experimentHeader.getStartdate() != null ? experimentHeader.getImportdate() : new Date(0l));
@@ -373,14 +365,15 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					false);
 		fp.addGuiComponentRow(new JLabel("History"), disable(new JTextField(getVersionString(experimentHeader))), false);
 		try {
-			fp.addGuiComponentRow(
+		String so = SystemOptions.getInstance(null,
+					new ExperimentAnalysisSettingsIOprovder(experimentHeader, m)).getString("DESCRIPTION",
+					"pipeline_name", "(unnamed)", false);
+		fp.addGuiComponentRow(
 					new JLabel("Analysis Settings"),
 					disable(new JTextField(
 							experimentHeader == null || experimentHeader.getSettings() == null || experimentHeader.getSettings().isEmpty() ? "(not assigned)" :
 									""
-											+ SystemOptions.getInstance(null,
-													new ExperimentAnalysisSettingsIOprovder(experimentHeader, m)).getString("DESCRIPTION",
-													"pipeline_name", "(unnamed)", false) + " ("
+											+ so + " ("
 											+ (StringManipulationTools.count(experimentHeader.getSettings(), "\n") + (experimentHeader.getSettings().isEmpty() ? 0 : 1))
 											+ " lines)")), false);
 		} catch (Exception err) {
