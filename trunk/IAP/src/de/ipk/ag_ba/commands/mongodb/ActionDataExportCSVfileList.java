@@ -103,12 +103,7 @@ public class ActionDataExportCSVfileList extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
+
 	@Override
 	public String getDefaultTitle() {
 		return "Save analysis results (" + n + ") as CSV/XLSX";

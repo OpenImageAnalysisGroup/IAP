@@ -361,11 +361,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		}
 		return null;
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return true;
-	}
+
 	
 	@Override
 	public boolean requestTitleUpdates() {

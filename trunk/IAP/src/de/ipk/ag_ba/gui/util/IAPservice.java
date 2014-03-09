@@ -255,13 +255,7 @@ public class IAPservice {
 								i.showGraph(g, null, LoadSetting.VIEW_CHOOSER_NEVER);
 						}
 						return gui != null ? new MainPanelComponent(gui) : null;
-					}
-					
-					@Override
-					public boolean isProvidingActions() {
-						return false;
-					}
-					
+					}					
 				};
 				
 				NavigationButton editInVanted = new NavigationButton(editInVantedAction, "Edit", "img/vanted1_0.png",

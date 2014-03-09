@@ -79,12 +79,7 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return status;
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return true;
-	}
-	
+
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();

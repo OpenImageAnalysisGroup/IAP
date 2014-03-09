@@ -213,12 +213,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 		res.add(src);
 		return res;
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return true;
-	}
-	
+
 	@Override
 	public boolean requestTitleUpdates() {
 		return true;

@@ -50,30 +50,7 @@ final class ActionNumericExportCommands extends AbstractNavigationAction {
 						true,
 						null, null, null, null, null, null, ExportSetting.ALL),
 				guiSetting));
-		// res.add(new NavigationButton(
-		// new ActionPdfCreation3(
-		// experiment,
-		// toggles,
-		// false,
-		// true,
-		// null, null, null, null, null, "no histogram, no sections", ExportSetting.NO_HIST_NO_SECTIONS),
-		// guiSetting));
-		// res.add(new NavigationButton(
-		// new ActionPdfCreation3(
-		// experiment,
-		// toggles,
-		// false,
-		// true,
-		// null, null, null, null, null, "histograms", ExportSetting.ONLY_MAIN_HISTO),
-		// guiSetting));
-		// res.add(new NavigationButton(
-		// new ActionPdfCreation3(
-		// experiment,
-		// toggles,
-		// false,
-		// true,
-		// null, null, null, null, null, "sections", ExportSetting.ONLY_SECTIONS),
-		// guiSetting));
+	
 		res.add(new NavigationButton(
 				new ActionPdfCreation3(
 						experiment,

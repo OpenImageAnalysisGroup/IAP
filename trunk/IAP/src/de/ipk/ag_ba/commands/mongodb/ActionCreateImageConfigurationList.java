@@ -175,11 +175,6 @@ public class ActionCreateImageConfigurationList extends AbstractNavigationAction
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return true;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		return "Create Image Unit Configuration List";
 	}

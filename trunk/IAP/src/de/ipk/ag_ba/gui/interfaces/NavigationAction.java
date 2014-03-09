@@ -50,8 +50,6 @@ public interface NavigationAction {
 	
 	public String getDefaultImage();
 	
-	public boolean isProvidingActions();
-	
 	public NavigationImage getImageIconInactive();
 	
 	public NavigationImage getImageIconActive();

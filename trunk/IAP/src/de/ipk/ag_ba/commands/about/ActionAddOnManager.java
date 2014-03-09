@@ -63,10 +63,6 @@ public class ActionAddOnManager extends AbstractNavigationAction {
 		return "img/addon-icon2.png";
 	}
 	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {

@@ -85,11 +85,6 @@ public class ActionViewExportData extends AbstractNavigationAction implements Ac
 											}
 											
 											@Override
-											public boolean isProvidingActions() {
-												return true;
-											}
-											
-											@Override
 											public boolean requestTitleUpdates() {
 												return false;
 											}

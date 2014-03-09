@@ -65,11 +65,6 @@ public class ActionShowVANTED extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return showInline;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		return "IAP-Data-Navigator";
 	}

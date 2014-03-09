@@ -81,9 +81,4 @@ public class ActionMetaDataInfo extends AbstractNavigationAction {
 	public String getDefaultImage() {
 		return IAPimages.getAdressBookClearFront();
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
 }

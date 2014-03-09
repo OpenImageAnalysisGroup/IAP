@@ -29,11 +29,6 @@ public class ActionToggleSettingDefaultIsTrue extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		// if (SystemAnalysis.isHeadless())
 		// return (option.getBval(0, true) ? "Include " : "Exclude ") + pretty(setting);

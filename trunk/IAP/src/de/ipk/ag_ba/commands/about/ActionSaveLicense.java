@@ -46,12 +46,7 @@ public class ActionSaveLicense extends AbstractNavigationAction {
 	public String getDefaultImage() {
 		return "img/ext/gpl2/Gnome-Document-Save-64.png";
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
+
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();

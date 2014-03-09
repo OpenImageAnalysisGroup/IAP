@@ -75,10 +75,6 @@ public class ActionArchiveAnalysisJobs extends AbstractNavigationAction {
 		return new MainPanelComponent(commandResult);
 	}
 	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
 	
 	private boolean doArchiveLastResult = false;
 	private long doArchiveLastCountCheck = 0;
