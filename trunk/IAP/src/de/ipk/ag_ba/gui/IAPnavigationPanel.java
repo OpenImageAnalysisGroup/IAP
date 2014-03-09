@@ -83,6 +83,8 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	private int maxYY;
 	private GUIsetting guiSettting;
 	
+	private boolean disallowBookmarkCreation = false;
+	
 	public IAPnavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
 		this.target = target;
 		this.graphPanel = graphPanel;
@@ -170,6 +172,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	public ActionListener getNewWindowListener(final NavigationAction optCustomStartAction) {
+		
 		ActionListener res = new ActionListener() {
 			
 			@Override
@@ -326,8 +329,10 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 							lbl.setToolTipText("Remove " + title + " bookmark");
 							lbl.addMouseListener(getDeleteBookmarkActionListener(lbl, next, ne.getAction(), buttonStyle));
 						} else {
-							lbl.addMouseListener(getAddBookmarkActionListener(lbl, next, ne, buttonStyle));
-							lbl.setToolTipText("Add bookmark");
+							if (!disallowBookmarkCreation) {
+								lbl.addMouseListener(getAddBookmarkActionListener(lbl, next, ne, buttonStyle));
+								lbl.setToolTipText("Add bookmark");
+							}
 						}
 						// lbl.setForeground(Color.GRAY);
 						lbl.setForeground(Color.BLACK);
@@ -732,6 +737,10 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	
 	public void setNavigationButtonFilter(NavigationButtonFilter optNavigationButtonFilter) {
 		this.optNavigationButtonFilter = optNavigationButtonFilter;
+	}
+
+	public void setDisallowBookmarkCreation(boolean b) {
+		this.disallowBookmarkCreation = b;
 	}
 	
 }
