@@ -23,13 +23,13 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 /**
  * @author klukas
  */
-public class ActionViewExportData extends AbstractNavigationAction implements ActionDataProcessing {
+public class ActionViewData extends AbstractNavigationAction implements ActionDataProcessing {
 	private ExperimentReference experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
 	
-	public ActionViewExportData() {
-		super("Show or export numeric or image data");
+	public ActionViewData() {
+		super("Show image data or plot numeric data");
 	}
 	
 	@Override
@@ -121,14 +121,7 @@ public class ActionViewExportData extends AbstractNavigationAction implements Ac
 				}
 			}
 		}
-		final ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
-		res.add(new NavigationButton(new ActionNumericExportCommands(
-				"Export Numeric Data", toggles, experiment), src.getGUIsetting()));
-		
-		res.add(new NavigationButton(new ActionDataExportZIP(experiment), src.getGUIsetting()));
-		res.add(new NavigationButton(new ActionDataExportTar(experiment), src.getGUIsetting()));
-		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
-		
+			
 		return res;
 	}
 	
@@ -143,7 +136,7 @@ public class ActionViewExportData extends AbstractNavigationAction implements Ac
 	
 	@Override
 	public String getDefaultTitle() {
-		return "View/Export Data";
+		return "View Images";
 	}
 	
 	@Override

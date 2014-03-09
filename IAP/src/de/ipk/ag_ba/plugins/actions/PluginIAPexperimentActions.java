@@ -2,16 +2,21 @@ package de.ipk.ag_ba.plugins.actions;
 
 import java.util.ArrayList;
 
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+
 import de.ipk.ag_ba.commands.experiment.ActionAnalysis;
 import de.ipk.ag_ba.commands.experiment.ActionCmdLineTools;
 import de.ipk.ag_ba.commands.experiment.ActionCopyExperiment;
+import de.ipk.ag_ba.commands.experiment.ActionNumericExportCommands;
 import de.ipk.ag_ba.commands.experiment.ActionPdfReport;
 import de.ipk.ag_ba.commands.experiment.ActionShowDataWithinVANTED;
 import de.ipk.ag_ba.commands.experiment.ActionToolList;
-import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
+import de.ipk.ag_ba.commands.experiment.ActionViewData;
 import de.ipk.ag_ba.commands.experiment.clipboard.ActionCopyToClipboard;
 import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReport;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
+import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -35,10 +40,15 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 	public ActionDataProcessing[] getDataProcessingActions(ExperimentReference experimentReference) {
 		ArrayList<ActionDataProcessing> actions = new ArrayList<ActionDataProcessing>();
 		
-		actions.add(new ActionViewExportData());
+		actions.add(new ActionViewData());
+		
+		final ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
+		actions.add(new ActionNumericExportCommands(
+				"Export Numeric Data", toggles));
+		
 		if (experimentReference.getIniIoProvider() != null && experimentReference.getIniIoProvider().isAbleToSaveData())
 			actions.add(new ActionAnalysis("Analysis Tasks"));
-		actions.add(new ActionPdfReport("Automated diagram creation and report generation"));
+	
 		
 		if (IAPmain.getRunMode() == IAPrunMode.WEB) {
 			actions.add(new ActionNumericDataReport());
@@ -49,8 +59,12 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		actions.add(new ActionCmdLineTools("Script-commands for data evaluation and filtering"));
 		actions.add(new ActionCopyToClipboard());
 		
-		ActionDataProcessing action = new ActionShowDataWithinVANTED("Show in IAP-Data-Navigator", new PutIntoSidePanel(false));
-		actions.add(action);
+		
+		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", false);
+		if (vanted) {
+			ActionDataProcessing action = new ActionShowDataWithinVANTED("Show in IAP-Data-Navigator", new PutIntoSidePanel(false));
+			actions.add(action);
+		}
 		
 		if (false)
 			for (ActionDataProcessing ne : getProcessExperimentDataWithVantedEntities()) {

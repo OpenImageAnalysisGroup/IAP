@@ -6,27 +6,28 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportTar;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 
 /**
  * @author klukas
  */
-final class ActionNumericExportCommands extends AbstractNavigationAction {
+public final class ActionNumericExportCommands extends AbstractNavigationAction implements ActionDataProcessing {
 	private final ArrayList<ThreadSafeOptions> toggles;
-	private final ExperimentReference experiment;
+	private ExperimentReference experiment;
 	
-	ActionNumericExportCommands(
-			String tooltip, ArrayList<ThreadSafeOptions> toggles,
-			ExperimentReference experiment) {
+	public ActionNumericExportCommands(
+			String tooltip, ArrayList<ThreadSafeOptions> toggles) {
 		super(tooltip);
 		this.toggles = toggles;
-		this.experiment = experiment;
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Export Numeric Data";
+		return "Export";
 	}
 	
 	@Override
@@ -59,6 +60,21 @@ final class ActionNumericExportCommands extends AbstractNavigationAction {
 						false,
 						null, null, null, null, null),
 				guiSetting));
+		
+		res.add(new NavigationButton(new ActionDataExportZIP(experiment),guiSetting));
+		res.add(new NavigationButton(new ActionDataExportTar(experiment), guiSetting));
+		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
+	
 		return res;
+	}
+
+	@Override
+	public boolean isImageAnalysisCommand() {
+		return false;
+	}
+
+	@Override
+	public void setExperimentReference(ExperimentReference experimentReference) {
+		this.experiment = experimentReference;
 	}
 }
