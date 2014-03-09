@@ -279,17 +279,17 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		if (set != null) {
 			ButtonDrawStyle buttonStyleToUse = buttonStyle;
 			if (target == PanelTarget.ACTION) {
-				if (theOther != null && getEntitySet(true).size() == 0 && theOther.buttonStyle != ButtonDrawStyle.COMPACT_LIST_2) {
-					theOther.buttonStyle = ButtonDrawStyle.COMPACT_LIST;
-					theOther.updateGUI();
-					theOther.disableContextMenu();
-				} else {
+//				if (theOther != null && getEntitySet(true).size() == 0 && theOther.buttonStyle != ButtonDrawStyle.COMPACT_LIST_2) {
+//					theOther.buttonStyle = ButtonDrawStyle.COMPACT_LIST;
+//					theOther.updateGUI();
+//					theOther.disableContextMenu();
+//				} else {
 					if (theOther.buttonStyle != buttonStyle) {
 						theOther.buttonStyle = buttonStyle;
 						theOther.updateGUI();
 						theOther.enableContextMenu();
 					}
-				}
+//				}
 			}
 			ArrayList<JComponent> right = new ArrayList<JComponent>();
 			boolean first = true;

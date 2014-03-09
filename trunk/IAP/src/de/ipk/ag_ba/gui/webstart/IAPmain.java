@@ -220,7 +220,6 @@ public class IAPmain extends JApplet {
 		
 		try {
 			mainFrame1.setIconImage(IAPimages.getImage("img/vanted1_0.png"));
-			// AbstractIAPplugin.getIAPicon().getImage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
