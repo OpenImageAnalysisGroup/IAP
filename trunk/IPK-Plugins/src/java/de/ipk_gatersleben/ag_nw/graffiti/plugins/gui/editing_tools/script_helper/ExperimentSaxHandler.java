@@ -59,8 +59,7 @@ public class ExperimentSaxHandler extends DefaultHandler {
 				optStatus.setCurrentStatusValueFine(100d * readCnt / inputStreamLength);
 				optStatus
 						.setCurrentStatusText1("Receive data (" +
-								readCnt / 1024 / 1024
-								+ " MB, " + SystemAnalysis.getDataTransferSpeedString(readCnt, startTime, System.currentTimeMillis()) + ")");
+								SystemAnalysis.getDataTransferSpeedString(readCnt, startTime, System.currentTimeMillis()) + ")");
 			}
 			int l = is.read(b, off, len);
 			readCnt += l;
