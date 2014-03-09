@@ -53,9 +53,9 @@ public class HomeFolder implements HelperClass {
 		
 	}
 	
-	public static String WIN_MAC_HOMEFOLDER = "IAP";
-	public static String LINUX_HOMEFOLDER = ".iap";
-	public static String WIN_MAC_HOMEFOLDER_OLD = ".iap";
+	public static String WIN_MAC_HOMEFOLDER = "IAP_1.2";
+	public static String LINUX_HOMEFOLDER = ".iap_1.2";
+	public static String WIN_MAC_HOMEFOLDER_OLD = ".iap_1.2";
 	
 	public static void copyFile(File oldfile, File newfile) throws IOException {
 		if (oldfile.compareTo(newfile) != 0) {
