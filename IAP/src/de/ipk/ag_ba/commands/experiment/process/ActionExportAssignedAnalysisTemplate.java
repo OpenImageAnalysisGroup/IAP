@@ -69,11 +69,6 @@ public class ActionExportAssignedAnalysisTemplate extends AbstractNavigationActi
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		return title;
 	}

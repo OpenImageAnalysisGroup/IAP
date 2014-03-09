@@ -34,10 +34,6 @@ public class ActionBooleanInverter extends AbstractNavigationAction {
 		return "Invert Selection";
 	}
 	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {

@@ -117,11 +117,7 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 		return tooltip;
 	}
 	
-	@Override
-	public boolean isProvidingActions() {
-		return true;
-	}
-	
+
 	@Override
 	public NavigationImage getImageIconInactive() {
 		return null;

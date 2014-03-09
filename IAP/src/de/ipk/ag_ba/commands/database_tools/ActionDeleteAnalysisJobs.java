@@ -99,12 +99,7 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 				+ (global ? "<br><br>" +
 						"Removed " + deletedTempDatasets + " intermediate result experiment data sets." : ""));
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
+
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;

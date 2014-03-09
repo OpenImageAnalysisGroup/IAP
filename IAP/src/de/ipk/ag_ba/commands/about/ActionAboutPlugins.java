@@ -46,11 +46,6 @@ public class ActionAboutPlugins extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;
 	}

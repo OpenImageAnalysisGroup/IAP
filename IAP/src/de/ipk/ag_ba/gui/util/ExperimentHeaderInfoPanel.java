@@ -585,11 +585,6 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 			}
 			
 			@Override
-			public boolean isProvidingActions() {
-				return true;
-			}
-			
-			@Override
 			public boolean requestTitleUpdates() {
 				return false;
 			}

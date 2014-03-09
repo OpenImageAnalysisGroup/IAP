@@ -41,11 +41,6 @@ public class ActionSaveHTMLfile extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		return "Save Result Table";
 	}

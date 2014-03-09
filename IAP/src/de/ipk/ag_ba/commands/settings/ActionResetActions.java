@@ -37,12 +37,7 @@ public class ActionResetActions extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return new ArrayList<NavigationButton>();
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
+
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return new MainPanelComponent(

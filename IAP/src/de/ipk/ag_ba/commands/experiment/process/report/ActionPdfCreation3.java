@@ -250,12 +250,15 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			return null;
 	}
 	
+
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-		if (ratioCalc)
-			res.add(src);
-		return res;
+			if (ratioCalc && ratioExperiment != null) {
+				res.add(src);
+			return res;
+		} else
+			return currentSet;
 	}
 	
 	@Override
@@ -424,17 +427,15 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					cola.put(indexInfo.get(val), val);
 				for (String val : cola.values())
 					indexHeader.append(separator + val);
-				csvHeader = getCSVheader();
-				csvHeader = StringManipulationTools.stringReplace(csvHeader, "\r\n", "");
-				csvHeader = StringManipulationTools.stringReplace(csvHeader, "\n", "");
-				csv.appendLine(csvHeader + indexHeader.toString(), written);
+				csvHeader = getCSVheader(false);
+				csv.appendLine(csvHeader + indexHeader.toString()+"\r\n", written);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter, status, optCustomSubsetDef);
-				csvHeader = getCSVheader();
-				csv.appendLine(csvHeader + indexHeader.toString(), written);
+				csvHeader = getCSVheader(false);
+				csv.appendLine(csvHeader + indexHeader.toString()+"\r\n", written);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues(csvHeader.split(separator)));
 			}
@@ -948,7 +949,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		return experimentReference;
 	}
 	
-	public static String getCSVheader() {
+	public static String getCSVheader(boolean addLineFeed) {
 		return "Angle" + separator + "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype" + separator + "Variety" + separator
 				+ "GrowthCondition"
 				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int)"
@@ -956,7 +957,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				+ separator + "Weight A (g)" + separator + "Weight B (g)" + separator +
 				"Water (weight-diff)" +
 				separator + "Water (sum of day)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "OTHER" +
-				"\r\n";
+		(		addLineFeed ? "\r\n" : "");
 	}
 	
 	long startTime;

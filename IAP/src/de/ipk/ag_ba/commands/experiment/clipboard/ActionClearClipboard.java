@@ -51,9 +51,4 @@ public class ActionClearClipboard extends AbstractNavigationAction {
 	public String getDefaultImage() {
 		return IAPimages.getFileCleaner();
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
 }

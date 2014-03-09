@@ -131,11 +131,6 @@ public class ActionSaveWebCamImages extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
 	}

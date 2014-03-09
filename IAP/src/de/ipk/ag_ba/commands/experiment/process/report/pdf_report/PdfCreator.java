@@ -56,7 +56,7 @@ public class PdfCreator {
 		if (optTargetDirectoryOrTargetFile != null) {
 			this.tempDirectory = optTargetDirectoryOrTargetFile;
 		} else {
-			String fn = ReleaseInfo.getAppFolderWithFinalSep() + System.nanoTime();
+			String fn = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch", "file_export_"+System.nanoTime());
 			this.tempDirectory = new File(fn);
 			boolean res = tempDirectory.mkdir();
 			if (!res)

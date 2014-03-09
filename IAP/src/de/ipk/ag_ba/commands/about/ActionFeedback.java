@@ -44,11 +44,7 @@ public class ActionFeedback extends AbstractNavigationAction {
 		return "img/ext/gpl2/Gnome-Emblem-Mail-64.png";
 	}
 	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
+
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;

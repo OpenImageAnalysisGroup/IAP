@@ -76,11 +76,6 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		return title;
 	}

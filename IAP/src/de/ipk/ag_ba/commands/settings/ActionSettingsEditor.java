@@ -180,11 +180,6 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 				return "img/ext/gpl2/Gnome-Emblem-Package-64.png";// "Gnome-Accessories-Text-Editor-64.png";
 	}
 	
-	@Override
-	public boolean isProvidingActions() {
-		return true;
-	}
-	
 	public void setDesiredSettingsBlock(String debugDesiredSettingsBlock) {
 		this.debugDesiredSettingsBlock = debugDesiredSettingsBlock;
 	}

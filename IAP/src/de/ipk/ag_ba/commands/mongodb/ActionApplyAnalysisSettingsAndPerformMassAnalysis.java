@@ -315,11 +315,6 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		return "Copy Analysis Settings";
 	}

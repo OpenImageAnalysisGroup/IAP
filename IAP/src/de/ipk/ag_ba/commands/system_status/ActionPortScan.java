@@ -56,11 +56,6 @@ public class ActionPortScan extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		return hostname;
 	}

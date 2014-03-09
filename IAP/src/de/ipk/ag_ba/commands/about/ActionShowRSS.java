@@ -56,11 +56,6 @@ public class ActionShowRSS extends AbstractNavigationAction {
 			}
 			
 			@Override
-			public boolean isProvidingActions() {
-				return false;
-			}
-			
-			@Override
 			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 				return currentSet;
 			}
@@ -90,11 +85,6 @@ public class ActionShowRSS extends AbstractNavigationAction {
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return null;
-	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
 	}
 	
 	@Override

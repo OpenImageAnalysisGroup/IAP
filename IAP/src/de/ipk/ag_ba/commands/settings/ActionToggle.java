@@ -35,11 +35,6 @@ public class ActionToggle extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		if (setting2 != null) {
 			if (option.getBval(0, true))

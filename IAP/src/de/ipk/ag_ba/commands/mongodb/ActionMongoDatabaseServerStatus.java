@@ -118,11 +118,5 @@ public class ActionMongoDatabaseServerStatus extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
-	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
+	}	
 }

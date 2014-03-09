@@ -53,11 +53,7 @@ public class ActionCopyToClipboard extends AbstractNavigationAction implements A
 		return IAPimages.getCopyToClipboard();
 	}
 	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
+
 	@Override
 	public boolean isImageAnalysisCommand() {
 		return false;

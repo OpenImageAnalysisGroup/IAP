@@ -46,9 +46,4 @@ public class ActionResetBlockTimings extends AbstractNavigationAction {
 		return "img/ext/gpl2/Gnome-Edit-Clear-64.png";
 	}
 	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
 }

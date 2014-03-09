@@ -228,11 +228,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	public String getDefaultTooltip() {
 		return "<html>" + super.getDefaultTooltip() + postFix;
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return true;
-	}
+
 	
 	@Override
 	public boolean requestTitleUpdates() {

@@ -83,11 +83,6 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction i
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public boolean isImageAnalysisCommand() {
 		return true;
 	}

@@ -190,11 +190,6 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 					}
 					
 					@Override
-					public boolean isProvidingActions() {
-						return false;
-					}
-					
-					@Override
 					public String getDefaultTitle() {
 						int n = tsoBootstrapN.getInt();
 						if (n > 0)

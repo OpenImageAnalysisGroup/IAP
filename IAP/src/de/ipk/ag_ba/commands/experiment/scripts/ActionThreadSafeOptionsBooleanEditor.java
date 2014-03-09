@@ -57,10 +57,4 @@ public class ActionThreadSafeOptionsBooleanEditor extends AbstractNavigationActi
 		else
 			return "img/ext/gpl2/gtcd.png";
 	}
-	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
 }

@@ -366,10 +366,6 @@ public class NavigationButton implements StyleAware {
 		return icon;
 	}
 	
-	public boolean willProvideActions() {
-		return action != null ? action.isProvidingActions() : false;
-	}
-	
 	public void performAction() {
 		if (execution != null)
 			execution.run();

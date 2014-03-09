@@ -59,10 +59,6 @@ public class ActionDeleteSelectedAnalysisSplitResults extends AbstractNavigation
 				+ " intermediate result experiment data sets.");
 	}
 	
-	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {

@@ -35,11 +35,6 @@ public class ActionToggleSettingDefaultIsFalse extends AbstractNavigationAction 
 	}
 	
 	@Override
-	public boolean isProvidingActions() {
-		return false;
-	}
-	
-	@Override
 	public String getDefaultTitle() {
 		boolean enabled = new SettingsHelperDefaultIsFalse().isEnabled(settingDefaultIsFalse);
 		if (optStatusProvider != null)
