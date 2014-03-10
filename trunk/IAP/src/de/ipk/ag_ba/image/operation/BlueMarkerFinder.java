@@ -75,6 +75,8 @@ public class BlueMarkerFinder {
 	}
 	
 	public ArrayList<MarkerPair> getResultCoordinates(int verticalToleranceToDetectPairs) {
+		if (regionPositions.length == 0)
+			return null;
 		
 		ArrayList<Vector2d> coordinatesUnfiltered = getCoordinates();
 		

@@ -8,6 +8,7 @@ import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -52,8 +53,8 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlock {
 						currentlyBlack = 0;
 					}
 				}
-				int g = 180;
-				int gray = (0xFF << 24 | (g & 0xFF) << 16) | ((g & 0xFF) << 8) | ((g & 0xFF) << 0);
+				int gray = ImageOperation.BACKGROUND_COLORint;
+				// int gray = (0xFF << 24 | (g & 0xFF) << 16) | ((g & 0xFF) << 8) | ((g & 0xFF) << 0);
 				double co = getDouble("co", 0.1);
 				if (maxContinousBlack > co * w) {
 					for (int x = 0; x < w; x++) {
