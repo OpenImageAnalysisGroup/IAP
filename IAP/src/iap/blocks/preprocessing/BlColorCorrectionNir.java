@@ -5,6 +5,8 @@ import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -40,11 +42,14 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private Image process(Image image, double blurRadius) {
-		ImageOperation image_io = image.io().histogramEqualisation(true);
+		String nm = optionsAndResults.getStringSettingRadio(this, "Mode", "Normalization",
+				StringManipulationTools.getStringListFromArray(new String[] { "Normalization", "Equalization" }));
+		ImageOperation image_io = image.io().histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35));
 		ImageOperation blured = image_io.copy();
 		double avgValBlured = blured.getMedian();
 		blured = blured.blur(blurRadius).subtract(avgValBlured).invert();
-		return blured.add(image_io.getImage()).histogramEqualisation(true).getImage();
+		return blured.add(image_io.getImage()).histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35))
+				.getImage();
 	}
 	
 	@Override

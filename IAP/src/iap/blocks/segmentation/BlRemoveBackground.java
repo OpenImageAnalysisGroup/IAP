@@ -5,9 +5,14 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
+import ij.process.AutoThresholder;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -22,18 +27,20 @@ public class BlRemoveBackground extends AbstractBlock {
 	@Override
 	protected Image processMask(Image mask) {
 		boolean debug = debugValues;
-		debug = false;
 		CameraType ct = mask.getCameraType();
 		if (input().images().getImage(ct) != null) {
+			ArrayList<String> possibleValues = new ArrayList<String>(Arrays.asList(AutoThresholder.getMethods()));
+			String Value = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", "Otsu", possibleValues);
 			Image image = input().images().getImage(ct).show("inp", debug);
-			image = image.io().histogramEqualisation(true).getImage().show("img_he", debug);
-			mask = mask.io().histogramEqualisation(true).getImage().show("mask_he", debug);
+			// image = image.io().histogramEqualisation(true).getImage().show("img_he", debug);
+			// mask = mask.io().histogramEqualisation(true).getImage().show("mask_he", debug);
 			Image diff_image = mask.io().diff(image).getImage().show("diff", debug);
-			Image thresh_image = diff_image.io().thresholdImageJ("yen", false).getImage().show("thresh");
-			// return image.io()
-			// .applyMask(thresh_image)
-			// .getImage();
-			return null;
+			Image thresh_image = diff_image.io().thresholdImageJ(Value, false).replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint).getImage()
+					.show("thresh", debug);
+			Image res = image.io()
+					.applyMask(thresh_image)
+					.getImage();
+			return res;
 		} else
 			return null;
 	}

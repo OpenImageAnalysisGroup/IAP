@@ -12,6 +12,7 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * @author klukas
  */
+@Deprecated
 public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock {
 	
 	private boolean debug = false;

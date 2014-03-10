@@ -3,15 +3,12 @@ package de.ipk.ag_ba.plugins.pipelines.maize;
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
-import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
-import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
-import iap.blocks.extraction.BlCalcLeafTips;
 import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
@@ -22,14 +19,12 @@ import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
-import iap.blocks.preprocessing.BlColorBalanceCircularVisNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
-import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
+import iap.blocks.preprocessing.BlColorCorrectionNir;
 import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlRotate;
-import iap.blocks.segmentation.BlClosing;
 import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlMedianFilterFluo;
 import iap.blocks.segmentation.BlRemoveBackground;
@@ -69,19 +64,16 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				
 				new BlColorBalanceVerticalVis(),
 				new BlColorBalanceVerticalFluo(),
-				new BlColorBalanceVerticalNir(),
-				new BlColorBalanceCircularVisNir(),
+				new BlColorCorrectionNir(),
 				
 				// segmentation
 				new BlRemoveBackground(),
-				new BlAdaptiveSegmentationFluo(),
-				new BlKMeansVis(), // new BlLabFilter(),
-				new BlAdaptiveRemoveSmallObjectsVisFluo(), // new BlRemoveSmallObjectsVisFluo(),
-				new BlAutoAdaptiveThresholdNir(), // new BlAdaptiveThresholdNir(),
-				new BlClosing(),
-				// new BlClosingForMaizeBloom(),
+				// new BlAdaptiveSegmentationFluo(),
+				new BlKMeansVis(),
+				new BlAdaptiveRemoveSmallObjectsVisFluo(),
+				// new BlAutoAdaptiveThresholdNir(),
 				new BlMedianFilterFluo(),
-				new BlAdaptiveUseFluoMaskToClearOther(), // new BlUseFluoMaskToClearOther(),
+				new BlAdaptiveUseFluoMaskToClearOther(),
 				
 				// feature extraction
 				new BlSkeletonizeVisFluo(),
@@ -89,7 +81,6 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlCalcWidthAndHeight(),
 				new BlCalcCOG(),
 				new BlCalcMainAxis(),
-				new BlCalcLeafTips(),
 				new BlCalcColorHistograms(),
 				new BlCalcConvexHull(),
 				new BlCalcAreas(),

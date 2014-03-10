@@ -9,7 +9,6 @@ import ij.measure.Calibration;
 import ij.plugin.ContrastEnhancer;
 import ij.plugin.ImageCalculator;
 import ij.plugin.filter.GaussianBlur;
-import ij.plugin.filter.MaximumFinder;
 import ij.plugin.filter.UnsharpMask;
 import ij.process.AutoThresholder.Method;
 import ij.process.BinaryProcessor;
@@ -2290,72 +2289,21 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
-	 * (Source of javadoc: ImageJ java doc)
-	 * Here the processing is done: Find the maxima of an image (does not find minima).
 	 * 
-	 * @param ip
-	 *           The input image
-	 * @param tolerance
-	 *           Height tolerance: maxima are accepted only if protruding more than this value
-	 *           from the ridge to a higher maximum
-	 * @param threshold
-	 *           minimum height of a maximum (uncalibrated); for no minimum height set it to
-	 *           ImageProcessor.NO_THRESHOLD
-	 * @param outputType
-	 *           What to mark in output image: SINGLE_POINTS, IN_TOLERANCE or SEGMENTED.
-	 *           No output image is created for output types POINT_SELECTION, LIST and COUNT.
-	 * @param excludeOnEdges
-	 *           Whether to exclude edge maxima
-	 * @param isEDM
-	 *           Whether the image is a float Euclidian Distance Map
-	 * @return A new byteProcessor with a normal (uninverted) LUT where the marked points
-	 *         are set to 255 (Background 0). Pixels outside of the roi of the input ip are not set.
-	 *         Returns null if outputType does not require an output or if cancelled by escape
 	 */
-	public ImageOperation findMax(double tolerance, double threshold,
-			int outputType, boolean excludeOnEdges, boolean isEDM) {
-		throw new UnsupportedOperationException("TODO");
-		// MaximumFinder find = new MaximumFinder();
-		// ResultsTableWithUnits rt = new ResultsTableWithUnits();
-		// find.findMaxima(image.getProcessor(), tolerance,
-		// threshold, outputType, excludeOnEdges, isEDM, rt);
-		// if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
-		// return new ImageOperation(image, rt);
-		// } else {
-		// setResultsTable(rt);
-		// return this;
-		// }
-	}
-	
-	public ImageOperation findMax() {
-		return findMax(255 / 2);
-	}
-	
-	/**
-	 * (Source of javadoc: ImageJ java doc)
-	 * Here the processing is done: Find the maxima of an image (does not find minima).
-	 * 
-	 * @param tolerance
-	 *           Height tolerance: maxima are accepted only if protruding more than this value
-	 *           from the ridge to a higher maximum
-	 */
-	public ImageOperation findMax(double tolerance) {
-		return findMax(tolerance, MaximumFinder.COUNT);
-	}
-	
-	/**
-	 * (Source of javadoc: ImageJ java doc)
-	 * Here the processing is done: Find the maxima of an image (does not find minima).
-	 * 
-	 * @param tolerance
-	 *           Height tolerance: maxima are accepted only if protruding more than this value
-	 *           from the ridge to a higher maximum
-	 * @param outputType
-	 *           What to mark in output image: SINGLE_POINTS, IN_TOLERANCE or SEGMENTED.
-	 *           No output image is created for output types POINT_SELECTION, LIST and COUNT.
-	 */
-	public ImageOperation findMax(double tolerance, int outputType) {
-		return findMax(tolerance, ImageProcessor.NO_THRESHOLD, outputType, false, false);
+	public Vector2i[] findRegions(boolean debug) {
+		Image workImage = new Image(this.image.getImage());
+		Segmentation ps = new ClusterDetection(workImage, ImageOperation.BACKGROUND_COLORint);
+		ps.detectClusters();
+		Vector2i[] regionPositions = ps.getClusterCenterPoints();
+		if (debug) {
+			ImageCanvas ic = workImage.io().canvas();
+			for (Vector2i vec : regionPositions) {
+				ic.drawCircle(vec.x, vec.y, 20, Color.RED.getRGB(), 0.5, 2);
+			}
+			ic.getImage().show("findRegions (debug)", debug);
+		}
+		return regionPositions;
 	}
 	
 	/**
@@ -2535,11 +2483,11 @@ public class ImageOperation implements MemoryHogInterface {
 	/**
 	 * If normalize is true, the histrogram bins are distributed equally otherwise a histogram equalization is performed.
 	 */
-	public ImageOperation histogramEqualisation(boolean normalize) {
+	public ImageOperation histogramEqualisation(boolean normalize, double normalize_saturated) {
 		ContrastEnhancer ce = new ContrastEnhancer();
 		if (normalize) {
 			ce.setNormalize(normalize);
-			ce.stretchHistogram(image.getProcessor(), 0.35);
+			ce.stretchHistogram(image.getProcessor(), normalize_saturated);
 		} else
 			ce.equalize(image);
 		
@@ -5200,17 +5148,15 @@ public class ImageOperation implements MemoryHogInterface {
 		Method[] methods = Method.values();
 		Method method = null;
 		for (Method m : methods)
-			if (methodName.matches(m.name()))
+			if (methodName.equalsIgnoreCase(m.name()))
 				method = m;
-		// this.image.show();
 		ImageProcessor ip = this.image.getProcessor();
 		ByteProcessor pr = (ByteProcessor) ip.convertToByte(false);
-		// pr.setRoi(getCropRectangle());
 		pr.setAutoThreshold(method, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
 		BufferedImage buf = new TypeConverter(pr, false).convertToRGB().getBufferedImage();
-		// buf.getRaster();
+		buf.getRaster();
 		ImageOperation io = new ImageOperation(buf).show("Auto-Threshold Result" + method.name(),
-				true);
+				false);
 		return io;
 	}
 }
