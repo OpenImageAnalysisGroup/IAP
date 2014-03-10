@@ -377,7 +377,11 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 										iniIO.getInstance().getInteger("Parameters", desc, Integer.parseInt(defaultValue)));
 								knownSettings.put(paramSpec, desc);
 							}
-							
+							if (type.equalsIgnoreCase("float")) {
+								iniIO.getInstance().setDouble("Parameters", desc,
+										iniIO.getInstance().getDouble("Parameters", desc, Double.parseDouble(defaultValue)));
+								knownSettings.put(paramSpec, desc);
+							}
 						}
 					}
 				} catch (Exception e) {

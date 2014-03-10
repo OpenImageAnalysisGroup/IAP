@@ -18,9 +18,9 @@ public interface ActionScriptBasedDataProcessing {
 	String getCommand();
 	
 	/**
-	 * Currently only integer-parameters are supported (see format example).
+	 * Currently only integer- and float parameters are supported (see format example).
 	 * 
-	 * @return Examples: "--version", "[int|bootstrap sample size|1000]"
+	 * @return Examples: "--version", "[int|bootstrap sample size|1000]", "[float|alpha value|0.05]"
 	 */
 	String[] getParams();
 	
