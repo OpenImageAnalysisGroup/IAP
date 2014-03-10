@@ -28,7 +28,7 @@ public class ConvexHullCalculator {
 	
 	private final ImageOperation io;
 	
-	int[][] borderImage;
+	int[] borderImage;
 	int numberOfHullPoints = 0;
 	
 	private Polygon polygon;
@@ -48,7 +48,7 @@ public class ConvexHullCalculator {
 	}
 	
 	private void calculate(int borderColor) {
-		int[][] in = io.getAs2D();
+		int[] in = io.getAs1D();
 		
 		int w = io.getImage().getWidth();
 		int h = io.getImage().getHeight();
@@ -56,16 +56,16 @@ public class ConvexHullCalculator {
 		int backgroundColor = ImageOperation.BACKGROUND_COLORint;
 		
 		for (int x = 0; x < w; x++) {
-			in[x][0] = backgroundColor;
-			in[x][h - 1] = backgroundColor;
+			in[x] = backgroundColor;
+			in[x + w * (h - 1)] = backgroundColor;
 		}
 		
 		for (int y = 0; y < h; y++) {
-			in[0][y] = backgroundColor;
-			in[w - 1][y] = backgroundColor;
+			in[w * y] = backgroundColor;
+			in[(w - 1) + w * y] = backgroundColor;
 		}
 		
-		borderImage = new int[w][h];
+		borderImage = new int[w * h];
 		
 		int b = borderColor;
 		
@@ -75,7 +75,7 @@ public class ConvexHullCalculator {
 		int n = 0;
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
-				if (borderImage[x][y] == b)
+				if (borderImage[x + w * y] == b)
 					n++;
 			}
 		
@@ -84,7 +84,7 @@ public class ConvexHullCalculator {
 		this.hullLength = Double.NaN;
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
-				if (borderImage[x][y] == b)
+				if (borderImage[x + w * y] == b)
 					points[n++] = new Point(x, y);
 			}
 		
@@ -165,10 +165,10 @@ public class ConvexHullCalculator {
 		if (drawInputimage) {
 			ImageOperation inDrawing = customImage != null ? customImage.io() : io;
 			// FlexibleImage border = new FlexibleImage(borderImage).copy();
-			overDrawBorderImage(w, h, inDrawing.getAs2D(), borderImage,
+			overDrawBorderImage(w, h, inDrawing.getAs1D(), borderImage,
 					borderColor, drawBorder);
 		}
-		ImageOperation res = new ImageOperation(borderImage);
+		ImageOperation res = new ImageOperation(borderImage, w, h);
 		ResultsTableWithUnits rt = io.getResultsTable();
 		if (rt == null)
 			rt = new ResultsTableWithUnits();
@@ -366,19 +366,19 @@ public class ConvexHullCalculator {
 				(int) (pos.y + lineLength / 2));
 	}
 	
-	private static void overDrawBorderImage(int w, int h, int[][] image,
-			int[][] borderImage, int borderColor, boolean drawBorder) {
+	private static void overDrawBorderImage(int w, int h, int[] image,
+			int[] borderImage, int borderColor, boolean drawBorder) {
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
-				int p_image = image[x][y];
+				int p_image = image[x + w * y];
 				if (drawBorder) {
-					int p_border = image[x][y];
+					int p_border = image[x + w * y];
 					if (p_border != borderColor)
-						borderImage[x][y] = p_image;
+						borderImage[x + w * y] = p_image;
 					else
-						borderImage[x][y] = borderColor;
+						borderImage[x + w * y] = borderColor;
 				} else {
-					borderImage[x][y] = p_image;
+					borderImage[x + w * y] = p_image;
 				}
 			}
 	}
