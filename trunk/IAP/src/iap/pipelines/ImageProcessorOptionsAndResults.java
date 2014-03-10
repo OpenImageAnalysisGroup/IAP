@@ -212,6 +212,14 @@ public class ImageProcessorOptionsAndResults {
 					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
 	}
 	
+	public String getStringSettingRadio(ImageAnalysisBlock block, String title, String defaultValue, ArrayList<String> possibleValues) {
+		if (optSystemOptionStorage == null)
+			return defaultValue;
+		else
+			return optSystemOptionStorage.getStringRadioSelection(
+					getSystemOptionStorageGroup(), getSettingName(block, title), possibleValues, defaultValue, true);
+	}
+	
 	public Color getColorSetting(ImageAnalysisBlock block, String title, Color defaultValue) {
 		if (optSystemOptionStorage == null)
 			return defaultValue;

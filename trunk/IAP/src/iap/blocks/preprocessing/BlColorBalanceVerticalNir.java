@@ -11,6 +11,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
+@Deprecated
 public class BlColorBalanceVerticalNir extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug;

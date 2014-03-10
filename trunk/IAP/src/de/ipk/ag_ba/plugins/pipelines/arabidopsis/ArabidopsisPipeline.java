@@ -16,6 +16,7 @@ import iap.blocks.preprocessing.BlAlign;
 import iap.blocks.preprocessing.BlClearMasks_WellProcessing;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
+import iap.blocks.preprocessing.BlColorCorrectionNir;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.segmentation.BlIRdiff;
@@ -51,8 +52,9 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptionsAndResults options) {
 		return new ImageAnalysisBlock[] {
 				new BlLoadImagesIfNeeded(),
-				new BlColorBalanceVerticalFluo(),
 				new BlColorBalanceVerticalVis(),
+				new BlColorBalanceVerticalFluo(),
+				new BlColorCorrectionNir(),
 				new BlRotate(),
 				new BlAlign(),
 				new BlClearMasks_WellProcessing(),

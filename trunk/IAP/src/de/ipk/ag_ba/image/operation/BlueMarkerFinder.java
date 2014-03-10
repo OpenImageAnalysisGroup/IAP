@@ -2,7 +2,6 @@ package de.ipk.ag_ba.image.operation;
 
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import ij.measure.ResultsTable;
-import ij.plugin.filter.MaximumFinder;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import org.Vector2d;
+import org.Vector2i;
 
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -25,6 +25,7 @@ public class BlueMarkerFinder {
 	private final boolean maize;
 	private final int inputImageWidth;
 	private ImageOperation markerPositionsImage;
+	private Vector2i[] regionPositions;
 	
 	public BlueMarkerFinder(Image image, CameraPosition typ, boolean maize, boolean debug) {
 		this.input = image;
@@ -46,16 +47,10 @@ public class BlueMarkerFinder {
 				.thresholdLAB(0, 255, 110, 140, 0, 110, ImageOperation.BACKGROUND_COLORint, typ, maize).show("nach lab", debug)
 				.border((int) (8 * scaleFactor + 1))
 				.bm().opening((int) (8 * scaleFactor), (int) (4 * scaleFactor)).io()
-				.show("nach opening", debug)
-				.replaceColor(Color.BLACK.getRGB(), Color.WHITE.getRGB())
-				.replaceColor(background, Color.BLACK.getRGB())
-				.grayscale();// .show("nach gray", debug);
+				.show("nach opening", debug);
 		
-		markerPositionsImage = markerPositionsImage
-				.findMax(10.0, MaximumFinder.LIST).show("Markers enlarged (a)", debug).replaceColor(Color.WHITE.getRGB(), ImageOperation.BACKGROUND_COLORint);
-		resultTable = markerPositionsImage.getResultsTable();
-		markerPositionsImage.show("mpi", debug);
-		markerPositionsImage = markerPositionsImage.copy().replaceColor(Color.BLACK.getRGB(), background).show("repl", debug);
+		regionPositions = markerPositionsImage.findRegions(debug);
+		
 		markerPositionsImage = markerPositionsImage.bm()
 				.dilate(15).io()
 				.replaceColor(background, Color.BLUE.getRGB())
@@ -67,15 +62,15 @@ public class BlueMarkerFinder {
 	private ArrayList<Vector2d> getCoordinates() {
 		ArrayList<Vector2d> result = new ArrayList<Vector2d>();
 		
-		if (resultTable != null)
-			for (int i = 0; i < resultTable.getCounter(); i++) {
-				int x = (int) resultTable.getValueAsDouble(0, i);
-				int y = (int) resultTable.getValueAsDouble(1, i);
+		if (regionPositions != null)
+			for (Vector2i vec : regionPositions) {
+				int x = vec.x;
+				int y = vec.y;
 				
 				Vector2d temp = new Vector2d(x, y);
 				result.add(temp);
 			}
-		
+		result.remove(0); // remove first marker, this is the background
 		return result;
 	}
 	

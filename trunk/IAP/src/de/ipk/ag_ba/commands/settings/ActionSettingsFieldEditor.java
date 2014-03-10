@@ -332,7 +332,8 @@ public class ActionSettingsFieldEditor extends AbstractNavigationAction {
 		s = WordUtils.capitalizeFully(s, '-', ' ');
 		if (isRadioSelection) {
 			String s2 = setting.substring(0, setting.length() - "-radio-selection".length());
-			String sel = SystemOptions.getInstance().getStringRadioSelection(
+			String sel = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+					this.actionSettingsEditor.iniIO).getStringRadioSelection(
 					this.actionSettingsEditor.section, s2, null, null, false);
 			s = s.substring(0, s.length() - "-radio-selection".length());
 			return "<html><center>" + s + "<br>" +
