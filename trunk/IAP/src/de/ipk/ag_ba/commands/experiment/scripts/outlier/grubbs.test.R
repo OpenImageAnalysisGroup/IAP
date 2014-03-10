@@ -5,6 +5,7 @@
 #############################################
 
 cat(">>> Outlier detection and removal based on Grubbs tests\n")
+require(outliers)
 infile <- "report.csv"
 outfile <- "report_without_outliers.csv"
 col.day <- "Day (Int)"
@@ -16,7 +17,6 @@ removed <<- 0
 ## Function for outlier removal best on Grubbs tests
 grubbs.test.rm.outliers <- function(x, set.na=TRUE, threshold=0.01){
 	if (is.null(x)) return(x)
-	require(outliers)
 	if (is.matrix(x)){
 		apply(x, 2, grubbs.test.rm.outliers)
 	} else if (is.data.frame(x)){
