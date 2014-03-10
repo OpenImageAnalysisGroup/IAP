@@ -41,14 +41,14 @@ public class BorderImageOperation {
 	 * @author klukas
 	 */
 	public ImageOperation borderDetection(int backgroundColor, int borderColor, boolean removeInnerBorders) {
-		int[][] in = new ImageOperation(image, rt).getAs2D();
+		int[] in = new ImageOperation(image, rt).getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
-		int[][] out = new int[w][h];
+		int[] out = new int[w * h];
 		
 		int border = borderDetection(backgroundColor, borderColor, removeInnerBorders, in, w, h, out);
 		
-		ImageOperation res = new ImageOperation(new Image(out));
+		ImageOperation res = new ImageOperation(new Image(w, h, out));
 		
 		if (rt == null)
 			rt = new ResultsTableWithUnits();
@@ -87,22 +87,24 @@ public class BorderImageOperation {
 	 * @return Number of border pixels.
 	 * @author klukas
 	 */
-	public int borderDetection(int backgroundColor, int borderColor, boolean removeInnerBorders, int[][] in, int w, int h, int[][] out) {
+	public int borderDetection(int backgroundColor, int borderColor, boolean removeInnerBorders,
+			int[] in, int w, int h, int[] out) {
 		int bc = removeInnerBorders ? bc = Color.CYAN.getRGB() : borderColor;
-		int[][] tempOut = removeInnerBorders ? new int[w][h] : out;
+		int[] tempOut = removeInnerBorders ? new int[w * h] : out;
 		int res = 0;
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
-				tempOut[x][y] = backgroundColor;
-				if (in[x][y] != backgroundColor) {
+				int w_y = w * y;
+				tempOut[x + w_y] = backgroundColor;
+				if (in[x + w_y] != backgroundColor) {
 					// pixels at the border of the image are ignored
 					if (x < w - 1 && y < h - 1 && x > 0 && y > 0) {
-						int above = in[x][y - 1];
-						int left = in[x - 1][y];
-						int right = in[x + 1][y];
-						int below = in[x][y + 1];
+						int above = in[x + w * (y - 1)];
+						int left = in[x - 1 + w_y];
+						int right = in[x + 1 + w_y];
+						int below = in[x + w * (y + 1)];
 						if (above == backgroundColor || left == backgroundColor || right == backgroundColor || below == backgroundColor) {
-							tempOut[x][y] = borderColor != Integer.MAX_VALUE ? bc : in[x][y];
+							tempOut[x + w_y] = borderColor != Integer.MAX_VALUE ? bc : in[x + w_y];
 							res++;
 						}
 					}
@@ -135,11 +137,11 @@ public class BorderImageOperation {
 	 * @return number of filled pixels
 	 * @author klukas
 	 */
-	private int floodFill(int[][] image, int w, int h, int background, int fill, Integer startX, Integer startY) {
+	private int floodFill(int[] image, int w, int h, int background, int fill, Integer startX, Integer startY) {
 		if (background == fill)
 			throw new UnsupportedOperationException("Fill-color needs to differ from background-color.");
 		int res = 0;
-		if (image[startX][startY] == background) {
+		if (image[startX + w * startY] == background) {
 			Stack<Vector2i> toDo = new Stack<Vector2i>();
 			toDo.add(new Vector2i(startX, startY));
 			int x, y;
@@ -147,23 +149,23 @@ public class BorderImageOperation {
 				Vector2i p = toDo.pop();
 				x = p.x;
 				y = p.y;
-				image[x][y] = fill;
+				image[x + w * y] = fill;
 				res++;
 				
 				// check right
-				if (x < w - 1 && image[x + 1][y] == background) {
+				if (x < w - 1 && image[x + 1 + w * y] == background) {
 					toDo.push(new Vector2i(x + 1, y));
 				}
 				// check above
-				if (y > 0 && image[x][y - 1] == background) {
+				if (y > 0 && image[x + w * (y - 1)] == background) {
 					toDo.add(new Vector2i(x, y - 1));
 				}
 				// check left
-				if (x > 0 && image[x - 1][y] == background) {
+				if (x > 0 && image[x - 1 + w * y] == background) {
 					toDo.push(new Vector2i(x - 1, y));
 				}
 				// check below
-				if (y < h - 1 && image[x][y + 1] == background) {
+				if (y < h - 1 && image[x + w * (y + 1)] == background) {
 					toDo.push(new Vector2i(x, y + 1));
 				}
 			}
@@ -185,7 +187,7 @@ public class BorderImageOperation {
 	 */
 	public ImageOperation floodFillFromOutside(int background, int fill) {
 		
-		int[][] out = new ImageOperation(image, rt).getAs2D();
+		int[] out = new ImageOperation(image, rt).getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int filled = 0;
@@ -199,7 +201,7 @@ public class BorderImageOperation {
 			filled += floodFill(out, w, h, background, fill, w - 1, y);
 		}
 		// sw.printTime(0);
-		ImageOperation res = new ImageOperation(new Image(out));
+		ImageOperation res = new ImageOperation(new Image(w, h, out));
 		if (rt == null)
 			rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
