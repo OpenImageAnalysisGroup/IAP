@@ -2301,7 +2301,8 @@ public class ImageOperation implements MemoryHogInterface {
 			for (Vector2i vec : regionPositions) {
 				ic.drawCircle(vec.x, vec.y, 20, Color.RED.getRGB(), 0.5, 2);
 			}
-			ic.getImage().show("findRegions (debug)", debug);
+			if (debug)
+				ic.getImage().show("findRegions (debug)", debug);
 		}
 		return regionPositions;
 	}
