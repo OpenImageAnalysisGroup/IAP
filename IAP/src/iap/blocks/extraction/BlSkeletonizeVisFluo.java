@@ -405,10 +405,56 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		return new Image(w, h, img);
 	}
 	
-	private int median(int center, int above, int left, int right, int below) {
-		int[] temp = { center, above, left, right, below };
-		java.util.Arrays.sort(temp);
-		return temp[2];
+	private int median(int a0, int a1, int a2, int a3, int a4) {
+		// int center, int above, int left, int right, int below) {
+		if (a0 < a1) {
+			// swap(a, 0, 1); // a[0]>a[1]
+			int t = a0;
+			a0 = a1;
+			a1 = a0;
+		}
+		if (a2 < a3) {
+			// swap(a, 2, 3); // a[2]>a[3]
+			int t = a2;
+			a2 = a3;
+			a3 = t;
+		}
+		if (a0 < a2)
+		{
+			// swap(a, 0, 2);
+			int t = a0;
+			a0 = a2;
+			a2 = t;
+			// swap(a, 1, 3);
+			t = a1;
+			a1 = a3;
+			a3 = t;
+		}
+		// we don't require a[0] any more.
+		
+		if (a1 < a4) {
+			// swap(a, 1, 4);
+			int t = a1;
+			a1 = a4;
+			a4 = t;
+		}
+		if (a1 > a2)
+		{
+			if (a2 > a4)
+				return a2;
+			else
+				return a4;
+		}
+		else
+		{
+			if (a1 > a3)
+				return a1;
+			else
+				return a3;
+		}
+		// int[] temp = { center, above, left, right, below };
+		// java.util.Arrays.sort(temp);
+		// return temp[2];
 	}
 	
 	@Override

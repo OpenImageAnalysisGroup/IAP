@@ -2626,7 +2626,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		int[][] image2d = getAs2D();
+		int[] image2d = getAs1D();
 		
 		int black = backgroundColor;
 		
@@ -2636,7 +2636,7 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				if (image2d[x][y] != black) {
+				if (image2d[x + width * y] != black) {
 					positionx += x;
 					positiony += y;
 					area++;
