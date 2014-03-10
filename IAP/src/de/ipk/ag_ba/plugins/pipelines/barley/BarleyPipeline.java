@@ -16,14 +16,12 @@ import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
-import iap.blocks.preprocessing.BlColorBalanceCircularVisNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
-import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
+import iap.blocks.preprocessing.BlColorCorrectionNir;
 import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.segmentation.BlAdaptiveThresholdNir;
-import iap.blocks.segmentation.BlClosing;
 import iap.blocks.segmentation.BlCopyImagesApplyMask;
 import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
@@ -64,15 +62,13 @@ public class BarleyPipeline extends AbstractPipelineTemplate {
 				new BlColorBalanceVerticalFluo(),
 				new BlCreateDummyReferenceIfNeeded(),
 				new BlColorBalanceVerticalVis(),
-				new BlColorBalanceVerticalNir(),
-				new BlColorBalanceCircularVisNir(),
-				new BlColorBalanceVerticalNir(),
+				new BlColorCorrectionNir(),
+				
 				// segmentation
 				new BlRemoveBackground(),
 				new BlDetectBlueMarkers(),
 				new BlMedianFilter(),
 				new BlLabFilter(),
-				new BlClosing(),
 				new BlIRdiff(),
 				new BlIntensityCalculationFluo(),
 				new BlockClearNirPotFromNir(),
