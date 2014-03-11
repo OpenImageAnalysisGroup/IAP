@@ -36,19 +36,17 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 		debug = getBoolean("debug", false);
 		numericResult = new ArrayList<MarkerPair>();
 		markerMask = null;
-	}
-	
-	@Override
-	protected boolean isChangingImages() {
-		return true;
-	}
-	
-	@Override
-	protected Image processVISmask() {
+		
 		numericResult.clear();
-		Image vis = input().masks().vis();
-		if (vis == null)
-			vis = input().images().vis();
+		
+		boolean replaceImage = false, replaceMask = false;
+		Image vis = input().images().vis();
+		replaceImage = true;
+		if (vis == null) {
+			vis = input().masks().vis();
+			replaceImage = false;
+			replaceMask = true;
+		}
 		
 		if (vis != null) {
 			if (!getBoolean("Use fixed marker distance", optionsAndResults.getCameraPosition() == CameraPosition.TOP))
@@ -82,11 +80,16 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 						break;
 				}
 			calculateDistanceBetweenMarkers(numericResult, w, input().masks().getVisInfo().getParentSample().getParentCondition().getParentSubstance().getInfo());
+			if (replaceImage)
+				input().images().setVis(vis);
+			if (replaceMask)
+				input().masks().setVis(vis);
 		}
-		if (input().masks().vis() != null)
-			return vis;
-		else
-			return null;
+	}
+	
+	@Override
+	protected boolean isChangingImages() {
+		return true;
 	}
 	
 	private void calculateDistanceBetweenMarkers(ArrayList<MarkerPair> numericResult, int imageWidth, String cameraConfig) {
@@ -160,7 +163,8 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 	
 	private Image getMarkers(Image image, ArrayList<MarkerPair> result) {
 		boolean clearBlueMarkers = getBoolean("Remove blue markers from image", true);
-		ImageOperation io = image.io().searchBlueMarkers(result, optionsAndResults.getCameraPosition(), true, clearBlueMarkers, debug);
+		ImageOperation io = image.io().searchBlueMarkers(result, optionsAndResults.getCameraPosition(), true, clearBlueMarkers, getInt("Erode", 12),
+				getInt("Dilate", 12), debug);
 		return io != null ? io.getImage() : null;
 	}
 	

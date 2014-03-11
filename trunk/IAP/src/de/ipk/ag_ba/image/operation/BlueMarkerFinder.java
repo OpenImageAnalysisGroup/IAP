@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.image.operation;
 
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-import ij.measure.ResultsTable;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ public class BlueMarkerFinder {
 	boolean debug = false;
 	
 	private final Image input;
-	private ResultsTable resultTable;
 	private final CameraPosition typ;
 	private final boolean maize;
 	private final int inputImageWidth;
@@ -35,9 +33,8 @@ public class BlueMarkerFinder {
 		this.debug = debug;
 	}
 	
-	public void findCoordinates(int background) {
+	public void findCoordinates(int background, int erode, int dilate) {
 		ImageOperation io1 = input.io().copy();
-		double scaleFactor = 1 / 1.2d;
 		int w = io1.getImage().getWidth();
 		int h = io1.getImage().getHeight();
 		io1 = io1.canvas().fillRect((int) (w * 0.35d), 0, (int) ((1 - 2 * 0.35) * w), h, background).getImage()
@@ -45,8 +42,7 @@ public class BlueMarkerFinder {
 		
 		markerPositionsImage = io1
 				.thresholdLAB(0, 255, 110, 140, 0, 110, background, typ, maize).show("nach lab", debug)
-				// .border((int) (8 * scaleFactor + 1))
-				.bm().opening((int) (8 * scaleFactor), (int) (15 + 4 * scaleFactor)).io()
+				.bm().opening((erode), (dilate)).io()
 				.show("nach opening", debug);
 		
 		regionPositions = markerPositionsImage.findRegions(debug);

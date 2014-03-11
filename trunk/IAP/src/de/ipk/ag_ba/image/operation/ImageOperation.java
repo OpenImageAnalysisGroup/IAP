@@ -2552,10 +2552,10 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation searchBlueMarkers(
 			ArrayList<MarkerPair> result, CameraPosition typ, boolean maize,
-			boolean clearBlueMarkers, boolean debug) {
+			boolean clearBlueMarkers, int erode, int dilate, boolean debug) {
 		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), typ, maize, debug);
 		
-		bmf.findCoordinates(ImageOperation.BACKGROUND_COLORint);
+		bmf.findCoordinates(ImageOperation.BACKGROUND_COLORint, erode, dilate);
 		
 		ArrayList<MarkerPair> mergedCoordinates = bmf.getResultCoordinates((int) (getImage().getHeight() * 0.05d));
 		
@@ -4002,11 +4002,11 @@ public class ImageOperation implements MemoryHogInterface {
 						int v = skelImg[x][y];
 						int r = size;
 						if (v == SkeletonProcessor2d.colorEndpoints)
-							r = 10;
-						if (v == SkeletonProcessor2d.colorBranches)
-							r = 7;
-						if (v == SkeletonProcessor2d.colorBloomEndpoint)
 							r = 12;
+						if (v == SkeletonProcessor2d.colorBranches)
+							r = 4;
+						if (v == SkeletonProcessor2d.colorBloomEndpoint)
+							r = 14;
 						for (int diffX = -r; diffX < r; diffX++)
 							for (int diffY = -r; diffY < r; diffY++) {
 								if (!(x - diffX >= 0 && y - diffY >= 0 && x - diffX < w && y - diffY < h))

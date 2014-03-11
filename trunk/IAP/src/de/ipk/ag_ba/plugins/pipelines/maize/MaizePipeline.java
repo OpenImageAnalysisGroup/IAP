@@ -3,6 +3,7 @@ package de.ipk.ag_ba.plugins.pipelines.maize;
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
+import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
@@ -27,6 +28,7 @@ import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlMedianFilterFluo;
+import iap.blocks.segmentation.BlMorphologicalOperations;
 import iap.blocks.segmentation.BlRemoveBackground;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import de.ipk.ag_ba.plugins.pipelines.AbstractPipelineTemplate;
@@ -68,11 +70,12 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				
 				// segmentation
 				new BlRemoveBackground(),
-				// new BlAdaptiveSegmentationFluo(),
+				new BlMorphologicalOperations(),
 				new BlKMeansVis(),
+				new BlAdaptiveSegmentationFluo(),
+				new BlMedianFilterFluo(),
 				new BlAdaptiveRemoveSmallObjectsVisFluo(),
 				// new BlAutoAdaptiveThresholdNir(),
-				new BlMedianFilterFluo(),
 				new BlAdaptiveUseFluoMaskToClearOther(),
 				
 				// feature extraction

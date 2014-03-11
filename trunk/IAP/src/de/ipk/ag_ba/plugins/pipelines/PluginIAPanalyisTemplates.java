@@ -13,7 +13,6 @@ import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
-import iap.blocks.extraction.BlCalcLeafTips;
 import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
@@ -29,9 +28,7 @@ import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
 import iap.blocks.preprocessing.BlClearMasks_WellProcessing;
 import iap.blocks.preprocessing.BlClearRectangle;
-import iap.blocks.preprocessing.BlColorBalanceCircularVisNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
-import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlColorCorrectionNir;
 import iap.blocks.preprocessing.BlCutFromSide;
@@ -39,7 +36,6 @@ import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlObjectSeparator;
 import iap.blocks.segmentation.BlAdaptiveThresholdNir;
-import iap.blocks.segmentation.BlClosing;
 import iap.blocks.segmentation.BlCopyImagesApplyMask;
 import iap.blocks.segmentation.BlFilterByHSV;
 import iap.blocks.segmentation.BlIRdiff;
@@ -47,6 +43,7 @@ import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlLabFilter;
 import iap.blocks.segmentation.BlMedianFilter;
+import iap.blocks.segmentation.BlMorphologicalOperations;
 import iap.blocks.segmentation.BlRemoveLevitatingObjects;
 import iap.blocks.segmentation.BlRemoveMaizeBambooStick;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
@@ -100,16 +97,17 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlCalcWidthAndHeight(),
 				new BlCalcWidthAndHeightLR(),
 				new BlClearMasks_WellProcessing(),
-				new BlClosing(),
-				new BlColorBalanceCircularVisNir(),
+				// new BlClosing(),
+				// new BlColorBalanceCircularVisNir(),
 				new BlColorBalanceVerticalFluo(),
-				new BlColorBalanceVerticalNir(),
+				// new BlColorBalanceVerticalNir(),
 				new BlColorBalanceVerticalVis(),
 				new BlColorCorrectionNir(),
 				new BlCopyImagesApplyMask(),
 				new BlCreateDummyReferenceIfNeeded(),
 				new BlCrop(),
 				new BlDetectBlueMarkers(),
+				new BlMorphologicalOperations(),
 				new BlFilterByHSV(),
 				new BlIntensityCalculationFluo(),
 				new BlIRdiff(),
@@ -138,7 +136,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlObjectSeparator(),
 				new BlSmoothShape(),
 				new BlThreeDreconstruction(),
-				new BlCalcLeafTips(),
+				// new BlCalcLeafTips(),
 				new BlRemoveLevitatingObjects(),
 				new BlFilterImagesByAngle()
 		};
