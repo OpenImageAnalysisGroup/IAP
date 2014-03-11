@@ -40,22 +40,20 @@ public class BlueMarkerFinder {
 		double scaleFactor = 1 / 1.2d;
 		int w = io1.getImage().getWidth();
 		int h = io1.getImage().getHeight();
-		io1 = io1.canvas().fillRect((int) (w * 0.35d), 0, (int) ((1 - 2 * 0.35) * w), h, ImageOperation.BACKGROUND_COLORint).getImage()
+		io1 = io1.canvas().fillRect((int) (w * 0.35d), 0, (int) ((1 - 2 * 0.35) * w), h, background).getImage()
 				.io();
 		
 		markerPositionsImage = io1
-				.thresholdLAB(0, 255, 110, 140, 0, 110, ImageOperation.BACKGROUND_COLORint, typ, maize).show("nach lab", debug)
-				.border((int) (8 * scaleFactor + 1))
-				.bm().opening((int) (8 * scaleFactor), (int) (4 * scaleFactor)).io()
+				.thresholdLAB(0, 255, 110, 140, 0, 110, background, typ, maize).show("nach lab", debug)
+				// .border((int) (8 * scaleFactor + 1))
+				.bm().opening((int) (8 * scaleFactor), (int) (15 + 4 * scaleFactor)).io()
 				.show("nach opening", debug);
 		
 		regionPositions = markerPositionsImage.findRegions(debug);
 		
-		markerPositionsImage = markerPositionsImage.bm()
-				.dilate(15).io()
-				.replaceColor(background, Color.BLUE.getRGB())
-				.replaceColor(Color.BLACK.getRGB(), background)
-				.replaceColor(Color.BLUE.getRGB(), Color.BLACK.getRGB())
+		markerPositionsImage = markerPositionsImage
+				.invert()
+				.replaceColor(Color.WHITE.getRGB(), background)
 				.show("Markers enlarged (b)", debug);
 	}
 	
