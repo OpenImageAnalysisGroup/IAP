@@ -91,6 +91,7 @@ public class Image {
 		try {
 			byte[] bp = ((ByteInterleavedRaster) inpimg.getRaster()).getDataStorage();
 			int[] pixels = new int[inpimg.getWidth() * inpimg.getHeight()];
+			boolean noAlpha = pixels.length != bp.length / 4;
 			int idx = 0;
 			int out_idx = 0;
 			int b1 = 0, b2 = 0, b3 = 0, b4;
@@ -109,10 +110,17 @@ public class Image {
 						} else { // 3
 							// b
 							b4 = b;
-							pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b4) << 16) | ((0xFF & b3) << 8) | (0xFF & b2);
+							if (noAlpha)
+								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b3) << 16) | ((0xFF & b2) << 8) | (0xFF & b4);
+							else
+								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b2) << 16) | ((0xFF & b3) << 8) | (0xFF & b4);
 							out_idx++;
 						}
 				idx++;
+				if (noAlpha && idx % 4 == 0) {
+					b1 = 0xFF;
+					idx++;
+				}
 			}
 			image = new ImagePlus(url.getFileName(), new ColorProcessor(inpimg.getWidth(), inpimg.getHeight(), pixels));
 		} catch (Exception e) {
