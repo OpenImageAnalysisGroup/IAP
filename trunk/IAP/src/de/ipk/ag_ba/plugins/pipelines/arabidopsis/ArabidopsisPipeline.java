@@ -75,7 +75,7 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 				new BlCalcAreas(),
 				new BlCalcColorHistograms(),
 				new BlCalcConvexHull(),
-				// postprocessing
+				
 				new BlRunPostProcessors(),
 				new BlMoveMasksToImageSet(),
 				new BlCrop(),
