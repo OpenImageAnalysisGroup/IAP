@@ -113,7 +113,7 @@ public class Image {
 							if (noAlpha)
 								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b3) << 16) | ((0xFF & b2) << 8) | (0xFF & b4);
 							else
-								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b2) << 16) | ((0xFF & b3) << 8) | (0xFF & b4);
+								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b4) << 16) | ((0xFF & b3) << 8) | (0xFF & b2);
 							out_idx++;
 						}
 				idx++;
