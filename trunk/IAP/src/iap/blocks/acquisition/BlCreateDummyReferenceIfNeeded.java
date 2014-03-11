@@ -2,12 +2,10 @@ package iap.blocks.acquisition;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
 
-import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
@@ -29,46 +27,50 @@ public class BlCreateDummyReferenceIfNeeded extends AbstractSnapshotAnalysisBloc
 	
 	@Override
 	protected Image processVISmask() {
+		int c = getColor("Visible Replacement Color", Color.WHITE).getRGB();
 		if (input().images().vis() != null && input().masks().vis() == null) {
 			Image n = input().images().vis();
 			int w = n.getWidth();
 			int h = n.getHeight();
-			return n.copy().io().canvas().fillRect(0, 0, w, h, new Color(
-					getInt("dummy-vis-background-color", 180),
-					getInt("dummy-vis-background-color", 180),
-					getInt("dummy-vis-background-color", 180)).getRGB()).getImage();
-		}
-		return super.processVISmask();
+			return n.copy().io().canvas().fillRect(0, 0, w, h, c).getImage();
+		} else
+			return super.processVISmask();
 	}
 	
 	@Override
 	protected Image processFLUOmask() {
-		if (input().images().fluo() != null && input().masks().fluo() == null)
-			return input().images().fluo().copy().io().
-					blur(getInt("dummy-fluo-blur", 2)).
-					thresholdLAB(
-							getInt("dummy-fluo-minL", 0), getInt("dummy-fluo-maxL", 50),
-							getInt("dummy-fluo-minA", 0), getInt("dummy-fluo-maxA", 500),
-							getInt("dummy-fluo-minB", 0), getInt("dummy-fluo-maxB", 155),
-							ImageOperation.BACKGROUND_COLORint, CameraPosition.SIDE, false, false).
-					blur(getInt("dummy-fluo-blur", 2)).
-					getImage();
-		else
+		int c = getColor("Fluo Replacement Color", Color.BLACK).getRGB();
+		if (input().images().fluo() != null && input().masks().fluo() == null) {
+			Image n = input().images().fluo();
+			int w = n.getWidth();
+			int h = n.getHeight();
+			return n.copy().io().canvas().fillRect(0, 0, w, h, c).getImage();
+		} else
 			return super.processFLUOmask();
 	}
 	
 	@Override
 	protected Image processNIRmask() {
-		Image n = input().images().nir();
-		if (n != null && input().masks().nir() == null) {
+		int c = getColor("Nir Replacement Color", new Color(180, 180, 180)).getRGB();
+		if (input().images().nir() != null && input().masks().nir() == null) {
+			Image n = input().images().nir();
 			int w = n.getWidth();
 			int h = n.getHeight();
-			return n.copy().io().canvas().fillRect(0, 0, w, h, new Color(
-					getInt("dummy-nir-background-color", 180),
-					getInt("dummy-nir-background-color", 180),
-					getInt("dummy-nir-background-color", 180)).getRGB()).getImage();
+			return n.copy().io().canvas().fillRect(0, 0, w, h, c).getImage();
 		} else
 			return super.processNIRmask();
+	}
+	
+	@Override
+	protected Image processIRmask() {
+		int c = getColor("Ir Replacement Color", Color.BLACK).getRGB();
+		if (input().images().ir() != null && input().masks().ir() == null) {
+			Image n = input().images().ir();
+			int w = n.getWidth();
+			int h = n.getHeight();
+			return n.copy().io().canvas().fillRect(0, 0, w, h, c).getImage();
+		} else
+			return super.processIRmask();
 	}
 	
 	@Override

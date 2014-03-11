@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.plugins.pipelines.arabidopsis;
 
-import iap.blocks.acquisition.BlLoadImagesIfNeeded;
+import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
@@ -51,7 +51,7 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 	@Override
 	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptionsAndResults options) {
 		return new ImageAnalysisBlock[] {
-				new BlLoadImagesIfNeeded(),
+				new BlLoadImages(),
 				new BlColorBalanceVerticalVis(),
 				new BlColorBalanceVerticalFluo(),
 				new BlColorCorrectionNir(),
