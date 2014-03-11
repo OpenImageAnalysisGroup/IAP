@@ -166,69 +166,6 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 				}
 			}
 		}
-		
-		checkForStrangeTVtestImageAndReplaceWithNull();
-	}
-	
-	private void checkForStrangeTVtestImageAndReplaceWithNull() {
-		if (input().images().vis() != null) {
-			Image i = input().images().vis();
-			if (i.getWidth() < 200)
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS RES: " + i);
-			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">ERROR: WARNING: VISIBLE IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				input().images().setVis(null);
-			}
-		}
-		if (input().images().fluo() != null) {
-			Image i = input().images().fluo();
-			if (i.getWidth() < 200)
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW FLUO RES: " + i);
-			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">ERROR: WARNING: FLUO IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				input().images().setFluo(null);
-			}
-		}
-		if (input().images().nir() != null) {
-			Image i = input().images().nir();
-			if (i.getWidth() < 200)
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW NIR RES: " + i);
-			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">ERROR: WARNING: NIR IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				input().images().setNir(null);
-			}
-		}
-		if (input().masks().vis() != null) {
-			Image i = input().masks().vis();
-			if (i.getWidth() < 200)
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS MASK RES: " + i);
-			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">ERROR: WARNING: VISIBLE REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				input().masks().setVis(null);
-			}
-		}
-		if (input().masks().fluo() != null) {
-			Image i = input().masks().fluo();
-			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">ERROR: WARNING: FLUO REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				input().masks().setFluo(null);
-			}
-		}
-		if (input().masks().nir() != null) {
-			Image i = input().masks().nir();
-			if (i.getWidth() < 200)
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW NIR MASK RES: " + i);
-			if (i.getWidth() == getInt("TV-test-image-width", 768) && i.getHeight() == getInt("TV-test-image-height", 576)) {
-				System.out.println(SystemAnalysis.getCurrentTime()
-						+ ">ERROR: WARNING: NIR REF-IMAGE IS TV-TEST-IMAGE (set to null) !!!");
-				input().masks().setNir(null);
-			}
-		}
 	}
 	
 	@Override

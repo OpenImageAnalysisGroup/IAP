@@ -3,7 +3,6 @@ package de.ipk.ag_ba.plugins.pipelines;
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlFilterImagesByAngle;
 import iap.blocks.acquisition.BlLoadImages;
-import iap.blocks.acquisition.BlLoadImagesIfNeeded;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
@@ -116,7 +115,6 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlLabFilter(),
 				new BlLeafCurlingAnalysis(),
 				new BlLoadImages(),
-				new BlLoadImagesIfNeeded(),
 				new BlRemoveMaizeBambooStick(),
 				new BlRemoveSmallObjectsVisFluo(),
 				new BlRunPostProcessors(),
