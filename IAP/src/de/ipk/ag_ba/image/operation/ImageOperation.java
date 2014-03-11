@@ -2559,7 +2559,8 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		ArrayList<MarkerPair> mergedCoordinates = bmf.getResultCoordinates((int) (getImage().getHeight() * 0.05d));
 		
-		result.addAll(mergedCoordinates);
+		if (mergedCoordinates != null)
+			result.addAll(mergedCoordinates);
 		
 		if (clearBlueMarkers)
 			return bmf.getClearedImage();
