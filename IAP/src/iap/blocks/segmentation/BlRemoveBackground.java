@@ -32,12 +32,13 @@ public class BlRemoveBackground extends AbstractBlock {
 			ArrayList<String> possibleValues = new ArrayList<String>(Arrays.asList(AutoThresholder.getMethods()));
 			String Value = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", "Otsu", possibleValues);
 			Image image = input().images().getImage(ct).show("inp", debug);
-			// image = image.io().histogramEqualisation(true).getImage().show("img_he", debug);
-			// mask = mask.io().histogramEqualisation(true).getImage().show("mask_he", debug);
+			if (getBoolean("Normalize " + ct + " Image", ct == CameraType.FLUO))
+				image = image.io().copy().histogramEqualisation(true, 0.35).getImage().show("img_he", debug);
+			// mask = mask.io().histogramEqualisation(true, 0.35).getImage().show("mask_he", debug);
 			Image diff_image = mask.io().diff(image).getImage().show("diff", debug);
 			Image thresh_image = diff_image.io().thresholdImageJ(Value, false).replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint).getImage()
 					.show("thresh", debug);
-			Image res = image.io()
+			Image res = input().images().getImage(ct).io()
 					.applyMask(thresh_image)
 					.getImage();
 			return res;

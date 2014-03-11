@@ -25,7 +25,7 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 	protected Image processNIRimage() {
 		if (input().images().nir() != null) {
 			Image nir = input().images().nir();
-			double blurRadius = getDouble("Blur Radius", 10.0);
+			double blurRadius = getDouble("Blur Radius", 100.0);
 			return process(nir, blurRadius);
 		} else
 			return input().images().nir();
@@ -35,7 +35,7 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 	protected Image processNIRmask() {
 		if (input().masks().nir() != null) {
 			Image nir = input().masks().nir();
-			double blurRadius = getDouble("Blur Radius", 10.0);
+			double blurRadius = getDouble("Blur Radius", 100.0);
 			return process(nir, blurRadius);
 		} else
 			return input().masks().nir();
@@ -46,8 +46,8 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 				StringManipulationTools.getStringListFromArray(new String[] { "Normalization", "Equalization" }));
 		ImageOperation image_io = image.io().histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35));
 		ImageOperation blured = image_io.copy();
-		double avgValBlured = blured.getMedian();
-		blured = blured.blur(blurRadius).subtract(avgValBlured).invert();
+		// double avgValBlured = blured.getMedian();
+		blured = blured.blur(blurRadius).invert();
 		return blured.add(image_io.getImage()).histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35))
 				.getImage();
 	}
