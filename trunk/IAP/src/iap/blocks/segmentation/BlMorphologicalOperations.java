@@ -46,7 +46,7 @@ public class BlMorphologicalOperations extends AbstractBlock {
 					.dilate(getRoundMask(getInt(mask.getCameraType() + " Step 2 Dilate Count", 10)))
 					.erode(getRoundMask(getInt(mask.getCameraType() + " Step 3 Erode Count", 10))).io();
 			Image orig = input().images().vis();
-			Image img = orig.io().applyMask(binaryMask.getImage(), ImageOperation.BACKGROUND_COLORint).getImage();
+			Image img = orig.copy().io().applyMask(binaryMask.getImage(), ImageOperation.BACKGROUND_COLORint).getImage();
 			return img;
 		} else
 			return mask;

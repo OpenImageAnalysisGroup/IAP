@@ -38,7 +38,7 @@ public class BlRemoveBackground extends AbstractBlock {
 			Image diff_image = mask.io().diff(image).getImage().show("diff", debug);
 			Image thresh_image = diff_image.io().thresholdImageJ(Value, false).replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint).getImage()
 					.show("thresh", debug);
-			Image res = input().images().getImage(ct).io()
+			Image res = input().images().copy().getImage(ct).io()
 					.applyMask(thresh_image)
 					.getImage();
 			return res;
