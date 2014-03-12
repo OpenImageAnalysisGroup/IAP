@@ -21,7 +21,7 @@ public class IntensityAnalysis {
 	}
 	
 	public ResultsTableWithUnits calculateHistorgram(Double optDistHorizontal, Double optRealMarkerDistance,
-			Histogram.Mode mode, boolean addHistogramValues) {
+			Histogram.Mode mode, boolean addHistogramValues, boolean calcCurtosis) {
 		
 		ResultsTableWithUnits result = new ResultsTableWithUnits();
 		
@@ -256,9 +256,11 @@ public class IntensityAnalysis {
 				result.addValue("hsv.s.skewness", statsSatValuesOverall.getSkewness());
 				result.addValue("hsv.v.skewness", statsValValuesOverall.getSkewness());
 				
-				result.addValue("hsv.h.kurtosis", statsHueValuesOverall.getKurtosis());
-				result.addValue("hsv.s.kurtosis", statsSatValuesOverall.getKurtosis());
-				result.addValue("hsv.v.kurtosis", statsValValuesOverall.getKurtosis());
+				if (calcCurtosis) {
+					result.addValue("hsv.h.kurtosis", statsHueValuesOverall.getKurtosis());
+					result.addValue("hsv.s.kurtosis", statsSatValuesOverall.getKurtosis());
+					result.addValue("hsv.v.kurtosis", statsValValuesOverall.getKurtosis());
+				}
 				
 				result.addValue("lab.l.mean", statsLabL.getMean());
 				result.addValue("lab.a.mean", statsLabA.getMean());
@@ -272,9 +274,11 @@ public class IntensityAnalysis {
 				result.addValue("lab.a.skewness", statsLabA.getSkewness());
 				result.addValue("lab.b.skewness", statsLabB.getSkewness());
 				
-				result.addValue("lab.l.kurtosis", statsLabL.getKurtosis());
-				result.addValue("lab.a.kurtosis", statsLabA.getKurtosis());
-				result.addValue("lab.b.kurtosis", statsLabB.getKurtosis());
+				if (calcCurtosis) {
+					result.addValue("lab.l.kurtosis", statsLabL.getKurtosis());
+					result.addValue("lab.a.kurtosis", statsLabA.getKurtosis());
+					result.addValue("lab.b.kurtosis", statsLabB.getKurtosis());
+				}
 			}
 		} else {
 			if (mode == Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS) {
@@ -289,7 +293,8 @@ public class IntensityAnalysis {
 				if (statsHueValuesOverall.getN() > 0) {
 					result.addValue("intensity.stddev", statsHueValuesOverall.getStandardDeviation());
 					result.addValue("intensity.skewness", statsHueValuesOverall.getSkewness());
-					result.addValue("intensity.kurtosis", statsHueValuesOverall.getKurtosis());
+					if (calcCurtosis)
+						result.addValue("intensity.kurtosis", statsHueValuesOverall.getKurtosis());
 				}
 			}
 			if (mode == Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS) {

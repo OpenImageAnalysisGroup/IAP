@@ -107,7 +107,8 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 		ResultsTableWithUnits rt1 = io.intensity(getInt("Bin-Cnt-Vis", 20)).calculateHistorgram(
 				markerDistanceHorizontally,
 				optionsAndResults.getREAL_MARKER_DISTANCE(), Histogram.Mode.MODE_HUE_VIS_ANALYSIS,
-				isSection ? addHistogramValuesForSections : addHistogramValues);
+				isSection ? addHistogramValuesForSections : addHistogramValues,
+				getBoolean("Calculate Kurtosis Values", false));
 		getResultSet().storeResults(resultPrefix + "vis.", rt1, getBlockPosition());
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
@@ -141,7 +142,8 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 			{ // red color fluo image
 				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
 						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_HUE_VIS_ANALYSIS,
-						getBoolean("Add Fluo Color Bins", false));
+						getBoolean("Add Fluo Color Bins", false),
+						getBoolean("Calculate Kurtosis Values", false));
 				if (rt != null)
 					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 			}
@@ -152,7 +154,8 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 					of = of.io().applyMask(input().masks().fluo()).getImage().show("Blue Color Fluo Image", debug);
 					ResultsTableWithUnits rt = of.io().intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
 							optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS,
-							addHistogramValues); // markerDistanceHorizontally
+							addHistogramValues,
+							getBoolean("Calculate Kurtosis Values", false)); // markerDistanceHorizontally
 					if (rt != null)
 						getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
 				}
@@ -220,7 +223,8 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 						getResultSet().setNumericResult(getBlockPosition(), "RESULT_" + optionsAndResults.getCameraPosition() + ".nir.wetness.average", 0d, null);
 				}
 				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-NIR", 20)).calculateHistorgram(markerDistanceHorizontally,
-						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_GRAY_NIR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
+						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_GRAY_NIR_ANALYSIS, addHistogramValues,
+						getBoolean("Calculate Kurtosis Values", false)); // markerDistanceHorizontally
 				
 				if (optionsAndResults == null)
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
@@ -256,7 +260,8 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 				getResultSet().setNumericResult(getBlockPosition(),
 						"RESULT_" + optionsAndResults.getCameraPosition() + ".ir.intensity.average", avgIr, null);
 				ResultsTableWithUnits rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
-						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_IR_ANALYSIS, addHistogramValues); // markerDistanceHorizontally
+						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_IR_ANALYSIS, addHistogramValues,
+						getBoolean("Calculate Kurtosis Values", false)); // markerDistanceHorizontally
 				
 				if (optionsAndResults == null)
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");

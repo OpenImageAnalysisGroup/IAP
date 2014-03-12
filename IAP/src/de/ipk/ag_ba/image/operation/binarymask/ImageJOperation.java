@@ -25,16 +25,8 @@ public class ImageJOperation {
 	
 	public ImageJOperation(int[] image, int w, int h) {
 		int white = new Color(255, 255, 255).getRGB();
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				int off = x + y * w;
-				int color = image[off];
-				if (color != ImageOperation.BACKGROUND_COLORint) {
-					image[x + w * y] = 0;
-				} else {
-					image[x + w * y] = white;
-				}
-			}
+		for (int i = 0; i < w * h; i++) {
+			image[i] = image[i] != ImageOperation.BACKGROUND_COLORint ? 0 : white;
 		}
 		
 		this.image = new ImagePlus("from 1d array", new ColorProcessor(w, h, image));
@@ -68,22 +60,6 @@ public class ImageJOperation {
 	public ImageJOperation opening(int[][] mask1, int[][] mask2) {
 		erode(mask1);
 		dilate(mask2);
-		return this;
-	}
-	
-	public ImageJOperation opening(int[][] mask, int n) {
-		for (int i = 0; i < n; i++)
-			erode(mask);
-		for (int i = 0; i < n; i++)
-			dilate(mask);
-		return this;
-	}
-	
-	public ImageJOperation opening(int[][] mask, int n1, int n2) {
-		for (int i = 0; i < n1; i++)
-			erode(mask);
-		for (int i = 0; i < n2; i++)
-			dilate(mask);
 		return this;
 	}
 	
@@ -136,6 +112,15 @@ public class ImageJOperation {
 				if (mask[j][i] != -1)
 					tempImage.copyBits(p, i - iM, j - jM, Blitter.MAX);
 		
+		// ColorBlitter cb = new ColorBlitter((ColorProcessor) tempImage);
+		// int jl = mask.length;
+		// int il = mask[0].length;
+		// for (int j = 0; j < jl; j++)
+		// for (int i = 0; i < il; i++)
+		// if (mask[j][i] != -1) {
+		// cb.copyBits(p, i - iM, j - jM, Blitter.MAX);
+		// }
+		//
 		image.getProcessor().copyBits(tempImage, 0, 0, Blitter.COPY);
 		return this;
 	}

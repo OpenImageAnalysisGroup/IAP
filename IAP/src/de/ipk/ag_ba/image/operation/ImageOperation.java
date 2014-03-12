@@ -519,28 +519,29 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation applyMask(Image mask, int background) {
-		
-		// copy().crossfade(mask.copy(), 2, 4, 3).show("OVERLAY");
-		
-		int[][] maskPixels = mask.getAs2A();
-		int[][] originalImage = getAs2D();
+		int[] maskPixels = mask.getAs1A();
+		int[] originalImage = getAs1D();
 		int mW = mask.getWidth();
 		int mH = mask.getHeight();
-		for (int x = 0; x < mW; x++) {
-			for (int y = 0; y < mH; y++) {
-				int maskPixel;
-				if (x >= 0 && y >= 0 && x < mW && y < mH)
-					maskPixel = maskPixels[x][y];
-				else
-					maskPixel = background;
-				
-				if (maskPixel == background) {
-					originalImage[x][y] = ImageOperation.BACKGROUND_COLORint;
-				}
+		int oW = getWidth();
+		int x = 0, y = 0;
+		for (int idx = 0; idx < mW * mH; idx++) {
+			int maskPixel;
+			if (x >= 0 && y >= 0 && x < mW && y < mH)
+				maskPixel = maskPixels[idx];
+			else
+				maskPixel = background;
+			
+			if (maskPixel == background) {
+				originalImage[x + oW * y] = ImageOperation.BACKGROUND_COLORint;
+			}
+			x++;
+			if (x == mW) {
+				x = 0;
+				y++;
 			}
 		}
-		// new Image(originalImage).show("sasa");
-		return new ImageOperation(originalImage).setCameraType(getCameraType());
+		return new ImageOperation(originalImage, mW, mH).setCameraType(getCameraType());
 	}
 	
 	/**
@@ -1686,8 +1687,8 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(resultImage, width, height);
 	}
 	
-	public ImageOperation thresholdLAB(int lowerValueOfL, int upperValueOfL, int lowerValueOfA, int upperValueOfA, int lowerValueOfB,
-			int upperValueOfB, int background, CameraPosition typ, boolean maize) {
+	public ImageOperation thresholdLAB(float lowerValueOfL, float upperValueOfL, float lowerValueOfA, float upperValueOfA, float lowerValueOfB,
+			float upperValueOfB, int background, CameraPosition typ, boolean maize) {
 		
 		int width = image.getProcessor().getWidth();
 		int height = image.getProcessor().getHeight();
@@ -1702,9 +1703,9 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public static void thresholdLAB(int width, int height, int[] img2d, int[] resultImage,
-			int lowerValueOfL, int upperValueOfL,
-			int lowerValueOfA, int upperValueOfA,
-			int lowerValueOfB, int upperValueOfB,
+			float lowerValueOfL, float upperValueOfL,
+			float lowerValueOfA, float upperValueOfA,
+			float lowerValueOfB, float upperValueOfB,
 			int background, CameraPosition typ,
 			boolean maize) {
 		
@@ -1715,9 +1716,9 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public static void thresholdLAB(int width, int height, int[] img2d, int[] resultImage,
-			int lowerValueOfL, int upperValueOfL,
-			int lowerValueOfA, int upperValueOfA,
-			int lowerValueOfB, int upperValueOfB,
+			float lowerValueOfL, float upperValueOfL,
+			float lowerValueOfA, float upperValueOfA,
+			float lowerValueOfB, float upperValueOfB,
 			int background, CameraPosition typ,
 			boolean maize, boolean getRemoved) {
 		
@@ -1735,14 +1736,14 @@ public class ImageOperation implements MemoryHogInterface {
 	 */
 	public static Image thresholdLAB3(int width, int height,
 			int[] imagePixels, int[] resultImage,
-			int lowerValueOfL, int upperValueOfL,
-			int lowerValueOfA, int upperValueOfA,
-			int lowerValueOfB, int upperValueOfB,
+			float lowerValueOfL, float upperValueOfL,
+			float lowerValueOfA, float upperValueOfA,
+			float lowerValueOfB, float upperValueOfB,
 			int background, CameraPosition typ, boolean maize,
 			boolean replaceBlueStick, int[][] oi, boolean getRemovedPixel) {
 		int c, x, y = 0;
 		int r, g, b;
-		int Li, ai, bi;
+		float Li, ai, bi;
 		int maxDiffAleftBright, maxDiffArightBleft;
 		
 		if (typ == CameraPosition.SIDE) {
@@ -1763,9 +1764,11 @@ public class ImageOperation implements MemoryHogInterface {
 				g = ((c & 0x00ff00) >> 8);
 				b = (c & 0x0000ff);
 				
-				Li = (int) lab[r][g][b];
-				ai = (int) lab[r][g][b + 256];
-				bi = (int) lab[r][g][b + 512];
+				float[] lrg = lab[r][g];
+				
+				Li = (int) lrg[b];
+				ai = (int) lrg[b + 256];
+				bi = (int) lrg[b + 512];
 				
 				if (resultImage[off] != background && (((Li > lowerValueOfL) && (Li < upperValueOfL)
 						&& (ai > lowerValueOfA) && (ai < upperValueOfA)
@@ -1795,9 +1798,9 @@ public class ImageOperation implements MemoryHogInterface {
 								g = ((c & 0x00ff00) >> 8);
 								b = (c & 0x0000ff);
 								
-								Li = (int) ImageOperation.getLabCubeInstance()[r][g][b];
-								ai = (int) ImageOperation.getLabCubeInstance()[r][g][b + 256];
-								bi = (int) ImageOperation.getLabCubeInstance()[r][g][b + 512];
+								Li = lab[r][g][b];
+								ai = lab[r][g][b + 256];
+								bi = lab[r][g][b + 512];
 								
 								if (ai < 120 && Math.abs(bi - 127) < 10) {
 									greenFound = true;
@@ -1823,9 +1826,9 @@ public class ImageOperation implements MemoryHogInterface {
 								g = ((c & 0x00ff00) >> 8);
 								b = (c & 0x0000ff);
 								
-								Li = (int) ImageOperation.getLabCubeInstance()[r][g][b];
-								ai = (int) ImageOperation.getLabCubeInstance()[r][g][b + 256];
-								bi = (int) ImageOperation.getLabCubeInstance()[r][g][b + 512];
+								Li = lab[r][g][b];
+								ai = lab[r][g][b + 256];
+								bi = lab[r][g][b + 512];
 								
 								if (ai < 120 && Math.abs(bi - 127) < 10) {
 									greenFoundL = true;
@@ -2124,7 +2127,7 @@ public class ImageOperation implements MemoryHogInterface {
 				+ bmi + "," + bma + "]");
 	}
 	
-	private static boolean isGray(int li, int ai, int bi, int maxDiffAleftBright, int maxDiffArightBleft) {
+	private static boolean isGray(float li, float ai, float bi, float maxDiffAleftBright, float maxDiffArightBleft) {
 		ai = ai - 127;
 		boolean aNoColor, bNoColor;
 		
