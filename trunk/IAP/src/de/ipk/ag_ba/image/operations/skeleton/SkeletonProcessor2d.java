@@ -611,7 +611,7 @@ public class SkeletonProcessor2d {
 		new Image(this.skelImg).show(title, show);
 	}
 	
-	public Image getAsFlexibleImage() {
+	public Image getAsImage() {
 		return new Image(this.skelImg);
 	}
 	

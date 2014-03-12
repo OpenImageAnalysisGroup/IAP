@@ -5,11 +5,7 @@ import ij.ImagePlus;
 import ij.process.BinaryProcessor;
 import ij.process.Blitter;
 import ij.process.ByteProcessor;
-import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
-
-import java.awt.Color;
-
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -24,18 +20,18 @@ public class ImageJOperation {
 	private final int h;
 	
 	public ImageJOperation(int[] image, int w, int h) {
-		int white = new Color(255, 255, 255).getRGB();
+		byte[] bi = new byte[w * h];
 		for (int i = 0; i < w * h; i++) {
-			image[i] = image[i] != ImageOperation.BACKGROUND_COLORint ? 0 : white;
+			bi[i] = image[i] != ImageOperation.BACKGROUND_COLORint ? (byte) 0 : (byte) -1;
 		}
 		
-		this.image = new ImagePlus("from 1d array", new ColorProcessor(w, h, image));
+		this.image = new ImagePlus("from 1d array", new ByteProcessor(w, h, bi));
 		this.w = w;
 		this.h = h;
 	}
 	
 	public ImageOperation io() {
-		return new ImageOperation(image).replaceColor(-1, ImageOperation.BACKGROUND_COLORint);
+		return new ImageOperation(new ImagePlus("from binary mask", image.getProcessor().convertToRGB())).replaceColor(-1, ImageOperation.BACKGROUND_COLORint);
 	}
 	
 	public Image getImage() {
