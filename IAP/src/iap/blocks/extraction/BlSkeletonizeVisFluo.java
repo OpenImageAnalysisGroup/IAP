@@ -29,7 +29,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * Calculates the skeleton to detect the leafs and the tassel.
+ * Calculates the skeleton to detect the leaves and the tassel.
  * Requires the FLUO image for bloom detection.
  * 
  * @author pape, klukas
@@ -249,7 +249,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		
 		leafcount = skel2d.endlimbs.size();
 		// System.out.println("C Leaf count: " + leafcount);
-		Image skelres = skel2d.getAsFlexibleImage();
+		Image skelres = skel2d.getAsImage();
 		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.getDefaultBackground());
 		leafcount -= bloomLimbCount;
 		
@@ -314,6 +314,11 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			// System.out.print("Leaf width: " + leafWidthInPixels + " // " + leafWidthInPixels2);
 		}
 		
+		if (skelres != null) {
+			skelres.show("Result Skeleton", debug);
+			getResultSet().setImage("skeleton_" + CameraType.FLUO.toString(), skelres);
+		}
+		
 		rt.addValue("bloom.count", bloomLimbCount);
 		rt.addValue("leaf.count", leafcount);
 		if (leafcount > 0) {
@@ -357,7 +362,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 					getBlockPosition());
 		
 		if (addPostProcessor) {
-			final Image skel2d_fin = skel2d.getAsFlexibleImage();
+			final Image skel2d_fin = skel2d.getAsImage();
 			final CameraType cameraType_fin = cameraType;
 			getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
 				
@@ -379,7 +384,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			});
 		}
 		
-		return skel2d.getAsFlexibleImage();
+		return skel2d.getAsImage();
 	}
 	
 	private synchronized Image MapOriginalOnSkelUseingMedian(Image skeleton, Image original, int back) {
