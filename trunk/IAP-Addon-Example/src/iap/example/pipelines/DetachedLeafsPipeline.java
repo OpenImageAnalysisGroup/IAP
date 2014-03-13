@@ -1,6 +1,6 @@
 package iap.example.pipelines;
 
-import iap.blocks.acquisition.BlLoadImagesIfNeeded;
+import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
@@ -65,7 +65,7 @@ public class DetachedLeafsPipeline extends AbstractPipelineTemplate {
 			}
 		}
 		return new ImageAnalysisBlock[] {
-				new BlLoadImagesIfNeeded(),
+				new BlLoadImages(),
 				new BlMoveImagesToMasks(),
 				new BlKMeansVis(),
 				new BlMorphologicalOperations(),

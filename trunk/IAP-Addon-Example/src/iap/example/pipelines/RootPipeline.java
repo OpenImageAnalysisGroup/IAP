@@ -1,6 +1,6 @@
 package iap.example.pipelines;
 
-import iap.blocks.acquisition.BlLoadImagesIfNeeded;
+import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
@@ -56,7 +56,7 @@ public class RootPipeline extends AbstractPipelineTemplate {
 			}
 		}
 		return new ImageAnalysisBlock[] {
-				new BlLoadImagesIfNeeded(),
+				new BlLoadImages(),
 				new BlCutFromSide(),
 				new BlMoveImagesToMasks(),
 				km,
