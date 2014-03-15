@@ -295,8 +295,8 @@ public class XmlDataChartComponent extends JComponent {
 				return createLegendChart(co);
 			case HIDDEN:
 				return null;
-		default:
-			break;
+			default:
+				break;
 		}
 		ErrorMsg.addErrorMessage("Unknown chart type: " + chartType);
 		return null;
@@ -316,19 +316,33 @@ public class XmlDataChartComponent extends JComponent {
 	
 	private JComponent createHeatmap(ChartOptions co, HeatMapOptions hmo) {
 		Color[][] colors = new Color[co.dataset.getRowCount()][co.dataset.getColumnCount()];
+		Color[][] outline_colors = new Color[co.dataset.getRowCount()][co.dataset.getColumnCount()];
 		boolean opaque = true;
+		
+		ChartColorAttribute chartColorAttribute = (ChartColorAttribute) AttributeHelper.getAttributeValue(co.graph,
+				ChartColorAttribute.attributeFolder, ChartColorAttribute.attributeName, new ChartColorAttribute(),
+				new ChartColorAttribute());
+		
+		ArrayList<Color> colors2 = null;
+		
+		if (co.outlineBorderWidth >= 0)
+			colors2 = chartColorAttribute.getSeriesOutlineColors(co.dataset.getRowKeys());
+		
 		for (int col = 0; col < co.dataset.getColumnCount(); col++) {
 			for (int row = 0; row < co.dataset.getRowCount(); row++) {
 				Number value = co.dataset.getMeanValue(row, col);
 				if (value == null) {
 					opaque = false;
 					colors[row][col] = null;
+					outline_colors[row][col] = null;
 				} else {
 					colors[row][col] = hmo.getHeatmapColor(value.doubleValue());
+					if (colors2 != null)
+						outline_colors[row][col] = colors2.get(row);
 				}
 			}
 		}
-		JComponent res = new MyColorGrid(colors, co.orientation);
+		JComponent res = new MyColorGrid(colors, outline_colors, co.orientation, co.outlineBorderWidth);
 		res.setOpaque(opaque);
 		return res;
 	}
