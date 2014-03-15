@@ -1,5 +1,6 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawComponent;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -9,16 +10,24 @@ import javax.swing.JComponent;
 
 import org.jfree.chart.plot.PlotOrientation;
 
+/**
+ * @author klukas
+ */
 public class MyColorGrid extends JComponent {
 	private static final long serialVersionUID = 1L;
 	
 	Color[][] colors = null;
+	Color[][] outline_colors = null;
 	
 	PlotOrientation plotOrientation;
 	
-	public MyColorGrid(Color[][] colors, PlotOrientation plotOrientation) {
+	private final float outlineBorderWidth;
+	
+	public MyColorGrid(Color[][] colors, Color[][] outline_colors, PlotOrientation plotOrientation, float outlineBorderWidth) {
 		this.colors = colors;
+		this.outline_colors = outline_colors;
 		this.plotOrientation = plotOrientation;
+		this.outlineBorderWidth = outlineBorderWidth;
 	}
 	
 	@Override
@@ -37,8 +46,10 @@ public class MyColorGrid extends JComponent {
 			for (int row = 0; row < colors.length; row++) {
 				double xx = 0;
 				for (int col = 0; col < colors[row].length; col++) {
-					if (colors[row][col] == null)
+					if (colors[row][col] == null) {
+						xx += rW;
 						continue;
+					}
 					drawPoint(g, rW, rH, yy, row, xx, col);
 					xx += rW;
 				}
@@ -51,8 +62,10 @@ public class MyColorGrid extends JComponent {
 			for (int row = 0; row < colors.length; row++) {
 				double yy = 0;
 				for (int col = 0; col < colors[row].length; col++) {
-					if (colors[row][col] == null)
+					if (colors[row][col] == null) {
+						xx += rW;
 						continue;
+					}
 					drawPoint(g, rW, rH, yy, row, xx, col);
 					xx += rW;
 				}
@@ -72,6 +85,17 @@ public class MyColorGrid extends JComponent {
 		g.setColor(colors[row][col]);
 		Rectangle2D rr = new Rectangle2D.Double(xx + off, yy + off, rW - off2, rH - off2);
 		((Graphics2D) g).fill(rr);
+		
+		if (outline_colors[row][col] != null) {
+			Color c = outline_colors[row][col];
+			if (c.getRed() + c.getGreen() + c.getBlue() > 0) {
+				g.setColor(outline_colors[row][col]);
+				((Graphics2D) g).setStroke(new BasicStroke(outlineBorderWidth));
+				rr.setRect(rr.getX() + outlineBorderWidth / 2, rr.getY() + outlineBorderWidth / 2, rr.getWidth() - outlineBorderWidth / 2, rr.getHeight()
+						- outlineBorderWidth / 2);
+				((Graphics2D) g).draw(rr);
+			}
+		}
 	}
 	
 }
