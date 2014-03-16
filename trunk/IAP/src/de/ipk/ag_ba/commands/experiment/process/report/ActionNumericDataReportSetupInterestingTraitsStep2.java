@@ -121,9 +121,11 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 		actions.add(new NavigationButton(
 				new ActionPdfCreation3(
-						experimentReference, divideDatasetBy, false, false, toggles,
+						experimentReference, divideDatasetBy,
+						new ThreadSafeOptions() /* false */,
+						false, toggles,
 						togglesForInterestingProperties, tsoBootstrapN,
-						tsoSplitFirst, tsoSplitSecond),
+						tsoSplitFirst, tsoSplitSecond, false),
 				src.getGUIsetting()));
 		
 		ArrayList<String> factors = new ArrayList<String>();

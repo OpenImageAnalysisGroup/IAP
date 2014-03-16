@@ -177,11 +177,11 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 				ActionPdfCreation3 expCommand = new ActionPdfCreation3(
 						experimentReference,
 						togglesDivideDataSetBy,
-						false, // all side angles?
+						new ThreadSafeOptions() /* false */, // all side angles?
 						false, // xlsx?
 						togglesMetaDataFiltering,
 						togglesDataColumns,
-						null, null, null, "complete, high mem requ.", ExportSetting.ALL);
+						null, null, null, "complete, high mem requ.", ExportSetting.ALL, true);
 				
 				if (!createClusteringDataset) {
 					if (allowGroupColumnSelection) {

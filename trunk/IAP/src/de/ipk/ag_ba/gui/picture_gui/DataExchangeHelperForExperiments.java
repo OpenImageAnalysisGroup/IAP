@@ -459,8 +459,28 @@ public class DataExchangeHelperForExperiments {
 					if (fn != null) {
 						boolean xlsx = true;
 						ActionPdfCreation3 action = new ActionPdfCreation3(
-								null, null, false, xlsx, null, null,
-								null, null, null);
+								(ExperimentReference) null,
+								(ArrayList<ThreadSafeOptions>) null,
+								new ThreadSafeOptions() /* false */,
+								xlsx,
+								(ArrayList<ThreadSafeOptions>) null,
+								(ArrayList<ThreadSafeOptions>) null,
+								(ThreadSafeOptions) null,
+								(ThreadSafeOptions) null,
+								(ThreadSafeOptions) null,
+								true);
+						/*
+						 * ExperimentReference experimentReference,
+						 * ArrayList<ThreadSafeOptions> divideDatasetBy,
+						 * ThreadSafeOptions exportIndividualAngles,
+						 * boolean xlsx,
+						 * ArrayList<ThreadSafeOptions> togglesFiltering,
+						 * ArrayList<ThreadSafeOptions> togglesInterestingProperties,
+						 * ThreadSafeOptions tsoBootstrapN,
+						 * ThreadSafeOptions tsoSplitFirst,
+						 * ThreadSafeOptions tsoSplitSecond,
+						 * boolean exportCommand
+						 */
 						action.setExperimentReference(
 								new ExperimentReference(
 										Experiment.copyAndExtractSubtanceInclusiveData(sub)));
