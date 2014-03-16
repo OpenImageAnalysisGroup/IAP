@@ -61,7 +61,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	ArrayList<String> lastOutput = new ArrayList<String>();
 	
 	public static final String separator = ";";// "\t";// ";";// "\t";
-	private final boolean exportIndividualAngles;
+	private final ThreadSafeOptions exportIndividualAngles;
 	private final boolean xlsx;
 	
 	private String finalResultFileLocation = "";
@@ -82,45 +82,51 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	private NavigationButton src;
 	
+	private final boolean exportCommand;
+	
 	public ActionPdfCreation3(String tooltip,
-			boolean exportIndividualAngles,
-			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx) {
+			ThreadSafeOptions exportIndividualAngles,
+			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx, boolean exportCommand) {
 		super(tooltip);
 		this.exportIndividualAngles = exportIndividualAngles;
 		this.divideDatasetBy = divideDatasetBy;
 		this.xlsx = xlsx;
+		this.exportCommand = exportCommand;
 	}
 	
 	public ActionPdfCreation3(
 			ExperimentReference experimentReference,
 			ArrayList<ThreadSafeOptions> divideDatasetBy,
-			boolean exportIndividualAngles,
+			ThreadSafeOptions exportIndividualAngles,
 			boolean xlsx,
 			ArrayList<ThreadSafeOptions> togglesFiltering,
 			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
 			ThreadSafeOptions tsoBootstrapN,
-			ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond) {
+			ThreadSafeOptions tsoSplitFirst,
+			ThreadSafeOptions tsoSplitSecond,
+			boolean exportCommand) {
 		this(experimentReference, divideDatasetBy, exportIndividualAngles, xlsx,
 				togglesFiltering, togglesInterestingProperties,
 				tsoBootstrapN,
-				tsoSplitFirst, tsoSplitSecond, null, null);
+				tsoSplitFirst, tsoSplitSecond, null, null, exportCommand);
 	}
 	
 	public ActionPdfCreation3(
 			ExperimentReference experimentReference,
 			ArrayList<ThreadSafeOptions> divideDatasetBy,
-			boolean exportIndividualAngles,
+			ThreadSafeOptions exportIndividualAngles,
 			boolean xlsx,
 			ArrayList<ThreadSafeOptions> togglesFiltering,
 			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
 			ThreadSafeOptions tsoBootstrapN,
 			ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond,
 			String optCustomSubset,
-			ExportSetting optCustomSubsetDef) {
+			ExportSetting optCustomSubsetDef,
+			boolean exportCommand) {
 		this(getToolTipInfo(experimentReference, divideDatasetBy,
-				exportIndividualAngles, xlsx, tsoBootstrapN, tsoSplitFirst, tsoSplitSecond),
+				exportIndividualAngles.getBval(0, false), xlsx, tsoBootstrapN, tsoSplitFirst, tsoSplitSecond),
 				exportIndividualAngles,
-				divideDatasetBy, xlsx);
+				divideDatasetBy, xlsx, exportCommand);
 		this.experimentReference = experimentReference;
 		this.togglesFiltering = togglesFiltering;
 		this.togglesInterestingProperties = togglesInterestingProperties;
@@ -250,12 +256,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			return null;
 	}
 	
-
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-			if (ratioCalc && ratioExperiment != null) {
-				res.add(src);
+		if (ratioCalc && ratioExperiment != null) {
+			res.add(src);
 			return res;
 		} else
 			return currentSet;
@@ -299,7 +304,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		}
 		if (optCustomSubset != null)
 			add += "<br><small>(" + optCustomSubset + ")</small>";
-		if (exportIndividualAngles || xlsx) {
+		if (exportCommand) {
 			if (!xlsx)
 				return "Create CSV File" + add;
 			else
@@ -307,7 +312,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		}
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
-					+ (exportIndividualAngles ? " (side angles)" : " (avg) (" +
+					+ (exportIndividualAngles.getBval(0, false) ? " (side angles)" : " (avg) (" +
 							StringManipulationTools.getStringList(
 									getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence(),
 											tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false)),
@@ -337,7 +342,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	@Override
 	public String getDefaultImage() {
-		if (exportIndividualAngles)
+		if (!xlsx)
 			return "img/ext/gpl2/Gnome-Text-X-Generic-64.png";// IAPimages.getDownloadIcon();
 		else
 			return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";
@@ -418,7 +423,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						null, experiment, indexInfo, false,
-						exportIndividualAngles, xlsx, snFilter, status, optCustomSubsetDef);
+						exportIndividualAngles.getBval(0, false), xlsx, snFilter, status, optCustomSubsetDef);
 				if (snapshots != null && snaphotVisitor != null)
 					for (SnapshotDataIAP s : snapshots)
 						snaphotVisitor.visit(s);
@@ -428,14 +433,14 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				for (String val : cola.values())
 					indexHeader.append(separator + val);
 				csvHeader = getCSVheader(false);
-				csv.appendLine(csvHeader + indexHeader.toString()+"\r\n", written);
+				csv.appendLine(csvHeader + indexHeader.toString() + "\r\n", written);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
-						null, experiment, null, false, exportIndividualAngles, xlsx, snFilter, status, optCustomSubsetDef);
+						null, experiment, null, false, exportIndividualAngles.getBval(0, false), xlsx, snFilter, status, optCustomSubsetDef);
 				csvHeader = getCSVheader(false);
-				csv.appendLine(csvHeader + indexHeader.toString()+"\r\n", written);
+				csv.appendLine(csvHeader + indexHeader.toString() + "\r\n", written);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues(csvHeader.split(separator)));
 			}
@@ -647,7 +652,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				});
 			
 			if (tsoBootstrapN != null)
-				if (!exportIndividualAngles && !xlsx) {
+				if (!exportIndividualAngles.getBval(0, false) && !xlsx) {
 					if (status != null)
 						status.setCurrentStatusText2("Generate report images and PDF");
 					int timeoutMinutes = 30;
@@ -881,7 +886,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	@Override
 	public String getDefaultTooltip() {
-		String res = "<html>" + super.getDefaultTooltip();
+		String res = "<html>" + getToolTipInfo(experimentReference, divideDatasetBy,
+				exportIndividualAngles.getBval(0, false), xlsx, tsoBootstrapN, tsoSplitFirst, tsoSplitSecond);
 		synchronized (lastOutput) {
 			res += "<br>Last output:<br>" + StringManipulationTools.getStringList(lastOutput, "<br>");
 		}
@@ -957,7 +963,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				+ separator + "Weight A (g)" + separator + "Weight B (g)" + separator +
 				"Water (weight-diff)" +
 				separator + "Water (sum of day)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "OTHER" +
-		(		addLineFeed ? "\r\n" : "");
+				(addLineFeed ? "\r\n" : "");
 	}
 	
 	long startTime;

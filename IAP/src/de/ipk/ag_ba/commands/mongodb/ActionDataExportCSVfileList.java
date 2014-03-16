@@ -2,6 +2,8 @@ package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
 
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -56,8 +58,10 @@ public class ActionDataExportCSVfileList extends AbstractNavigationAction {
 		
 		boolean xlsx = false;
 		ActionPdfCreation3 action = new ActionPdfCreation3(
-				null, null, false, xlsx, null, null,
-				null, null, null);
+				null, null,
+				new ThreadSafeOptions() /* false */,
+				xlsx, null, null,
+				null, null, null, true);
 		for (ExperimentHeaderInterface eh : ExperimentHeaderService.filterNewest(experiments)) {
 			if (eh.getImportusergroup() != null && eh.getImportusergroup().equalsIgnoreCase("ANALYSIS RESULTS")
 					&& !eh.getExperimentName().startsWith("Unit Test")) {
@@ -103,7 +107,7 @@ public class ActionDataExportCSVfileList extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;
 	}
-
+	
 	@Override
 	public String getDefaultTitle() {
 		return "Save analysis results (" + n + ") as CSV/XLSX";
