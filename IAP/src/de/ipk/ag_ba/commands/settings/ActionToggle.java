@@ -51,7 +51,7 @@ public class ActionToggle extends AbstractNavigationAction {
 	}
 	
 	private String pretty(String s) {
-		if (s == null || s.length() < 50)
+		if (s == null || s.length() < 50 || s.contains("<html>"))
 			return s;
 		else
 			return s.substring(0, 47) + "...";

@@ -77,7 +77,9 @@ public class ActionDataExportTar extends AbstractNavigationAction implements Spe
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Create TAR file";
+		return "<html><center>"
+				+ "Create TAR file<br>"
+				+ "<small><font color='gray'>(image export)</font></small>";
 	}
 	
 	@Override

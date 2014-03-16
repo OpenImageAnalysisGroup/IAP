@@ -305,6 +305,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		if (optCustomSubset != null)
 			add += "<br><small>(" + optCustomSubset + ")</small>";
 		if (exportCommand) {
+			if (exportIndividualAngles.getBval(0, false))
+				add += "<br><small><font color='gray'>(separated for all camera angles)</font></small>";
+			else
+				add += "<br><small><font color='gray'>(summarized)</font></small>";
+			
 			if (!xlsx)
 				return "Create CSV File" + add;
 			else
