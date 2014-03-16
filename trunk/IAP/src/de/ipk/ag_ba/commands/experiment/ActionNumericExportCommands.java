@@ -47,11 +47,15 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 		ThreadSafeOptions exportIndividualAngles = new ThreadSafeOptions();
 		exportIndividualAngles.setBval(0, false);
 		
+		res.add(new NavigationButton(new ActionDataExportZIP(experiment), guiSetting));
+		res.add(new NavigationButton(new ActionDataExportTar(experiment), guiSetting));
+		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
+		
 		res.add(new NavigationButton(
 				new ActionToggle("Enable/disable export of data for individual (side) angles",
 						"<html>"
 								+ "<center>Export data for<br>"
-								+ "all cam. angles", exportIndividualAngles),
+								+ "all camera angles &#8594;", exportIndividualAngles),
 				guiSetting));
 		
 		res.add(new NavigationButton(
@@ -71,10 +75,6 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 						false,
 						null, null, null, null, null, true),
 				guiSetting));
-		
-		res.add(new NavigationButton(new ActionDataExportZIP(experiment), guiSetting));
-		res.add(new NavigationButton(new ActionDataExportTar(experiment), guiSetting));
-		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
 		
 		return res;
 	}
