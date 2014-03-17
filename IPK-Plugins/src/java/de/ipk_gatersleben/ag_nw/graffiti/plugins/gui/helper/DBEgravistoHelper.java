@@ -18,8 +18,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.pattern_springembedde
  * @author Christian Klukas
  */
 public class DBEgravistoHelper implements HelperClass {
-	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 4 // 01.2014"; // "DBE-Visualisation and Analysis V1.1";
-	public static String DBE_GRAVISTO_VERSION_CODE = "1.1"; // "DBE-Visualisation and Analysis V1.1";
+	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 5 // 03.2014"; // "DBE-Visualisation and Analysis V1.1";
+	public static String DBE_GRAVISTO_VERSION_CODE = "1.2"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_VERSION = "DBE-Gravisto V2014"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_NAME = "DBE-Gravisto";
 	public static String DBE_INFORMATIONSYSTEM_NAME = "DBE Information System";
