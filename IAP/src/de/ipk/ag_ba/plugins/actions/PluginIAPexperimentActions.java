@@ -8,7 +8,6 @@ import de.ipk.ag_ba.commands.experiment.ActionAnalysis;
 import de.ipk.ag_ba.commands.experiment.ActionCmdLineTools;
 import de.ipk.ag_ba.commands.experiment.ActionCopyExperiment;
 import de.ipk.ag_ba.commands.experiment.ActionNumericExportCommands;
-import de.ipk.ag_ba.commands.experiment.ActionPdfReport;
 import de.ipk.ag_ba.commands.experiment.ActionShowDataWithinVANTED;
 import de.ipk.ag_ba.commands.experiment.ActionToolList;
 import de.ipk.ag_ba.commands.experiment.ActionViewData;
@@ -16,7 +15,6 @@ import de.ipk.ag_ba.commands.experiment.clipboard.ActionCopyToClipboard;
 import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReport;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.IAPoptions;
-import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -48,7 +46,6 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		
 		if (experimentReference.getIniIoProvider() != null && experimentReference.getIniIoProvider().isAbleToSaveData())
 			actions.add(new ActionAnalysis("Analysis Tasks"));
-	
 		
 		if (IAPmain.getRunMode() == IAPrunMode.WEB) {
 			actions.add(new ActionNumericDataReport());
@@ -59,8 +56,7 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		actions.add(new ActionCmdLineTools("Script-commands for data evaluation and filtering"));
 		actions.add(new ActionCopyToClipboard());
 		
-		
-		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", false);
+		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", true);
 		if (vanted) {
 			ActionDataProcessing action = new ActionShowDataWithinVANTED("Show in IAP-Data-Navigator", new PutIntoSidePanel(false));
 			actions.add(action);
