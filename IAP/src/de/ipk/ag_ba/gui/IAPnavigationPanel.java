@@ -377,13 +377,13 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		}
 		
 		if (actionPanelRight != null) {
-			actionPanelRight.validate();
+			actionPanelRight.revalidate();
 			actionPanelRight.repaint();
 		}
 		if (getParent() != null)
-			getParent().validate();
+			getParent().revalidate();
 		else
-			validate();
+			revalidate();
 		repaint();
 	}
 	
