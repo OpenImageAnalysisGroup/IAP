@@ -255,7 +255,7 @@ public class IAPservice {
 								i.showGraph(g, null, LoadSetting.VIEW_CHOOSER_NEVER);
 						}
 						return gui != null ? new MainPanelComponent(gui) : null;
-					}					
+					}
 				};
 				
 				NavigationButton editInVanted = new NavigationButton(editInVantedAction, "Edit", "img/vanted1_0.png",
@@ -596,14 +596,14 @@ public class IAPservice {
 			ExperimentInterface experiment,
 			HashMap<String, Integer> optSubstanceIds,
 			boolean prepareTransportToBrowser,
-			boolean storeAllAngleValues,
+			boolean exportIndividualAngles,
 			boolean storeAllReplicates,
 			SnapshotFilter optSnapshotFilter,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ExportSetting optCustomSubsetDef) {
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set...");
 		System.out.println("Transport to browser? " + prepareTransportToBrowser);
-		System.out.println("Store all angles? " + storeAllAngleValues);
+		System.out.println("Store all angles? " + exportIndividualAngles);
 		System.out.println("Store all replicates? " + storeAllReplicates);
 		
 		StopWatch sw = new StopWatch("Create Snapshots");
@@ -720,7 +720,8 @@ public class IAPservice {
 					optStatus.setCurrentStatusText1("Process subset " + sidx + "/" + scnt);
 				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
 					continue;
-				processConditions(urlManager, optSubstanceIds, storeAllAngleValues, storeAllReplicates, optSnapshotFilter, optStatus, timestampAndQuality2snapshot,
+				processConditions(urlManager, optSubstanceIds, exportIndividualAngles, storeAllReplicates, optSnapshotFilter, optStatus,
+						timestampAndQuality2snapshot,
 						result, substance);
 				if (optStatus != null)
 					optStatus.setCurrentStatusValueFine(100d * sidx / scnt);
@@ -769,7 +770,7 @@ public class IAPservice {
 		return result;
 	}
 	
-	private static void processConditions(UrlCacheManager urlManager, HashMap<String, Integer> optSubstanceIds, boolean storeAllAngleValues,
+	private static void processConditions(UrlCacheManager urlManager, HashMap<String, Integer> optSubstanceIds, boolean exportIndividualAngles,
 			boolean storeAllReplicates, SnapshotFilter optSnapshotFilter, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot, Collection<SnapshotDataIAP> result, SubstanceInterface substance) {
 		for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
@@ -871,10 +872,11 @@ public class IAPservice {
 									}
 									sn.storeValue(idx, sum / n);
 								}
-								if (storeAllAngleValues) {
+								if (exportIndividualAngles) {
 									for (NumericMeasurementInterface nmi : sample) {
 										NumericMeasurement3D nmi3d = (NumericMeasurement3D) nmi;
-										sn.storeAngleValue(idx, nmi3d.getPosition(), nmi3d.getValue());
+										Double p = nmi3d.getPosition();
+										sn.storeAngleValue(idx, p, nmi3d.getValue());
 									}
 								}
 							}
