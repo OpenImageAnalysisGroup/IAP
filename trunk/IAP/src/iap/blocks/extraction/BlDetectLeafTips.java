@@ -20,6 +20,11 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
+/**
+ * Block for calculation of leaf-tips (position [x,y] and angle [0 => points down, 180 => points upward])
+ * 
+ * @author pape
+ */
 public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	boolean ignore = false;
@@ -48,7 +53,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			workimg.setCameraType(input().masks().vis().getCameraType());
 			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 2), getInt("Masksize Erode (Vis)", 4),
 					getInt("Masksize Dilate (Vis)", 8));
-			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
+			saveAndDrawPeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
 					searchRadius);
 		}
 		return input().masks().vis();
@@ -65,7 +70,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			workimg.setCameraType(CameraType.FLUO);
 			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 2), getInt("Masksize Erode (Fluo)", 2),
 					getInt("Masksize Dilate (Fluo)", 4));
-			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.FLUO, optionsAndResults.getCameraPosition(),
+			saveAndDrawPeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.FLUO, optionsAndResults.getCameraPosition(),
 					searchRadius);
 		}
 		return input().masks().fluo();
@@ -79,17 +84,18 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		if (getBoolean("Calculate on Near-infrared Image", false) && !ignore) {
 			int searchRadius = getInt("Search-radius (Nir)", 10);
 			double fillGradeInPercent = getDouble("Fillgrade", 0.35);
-			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.NIR, optionsAndResults.getCameraPosition(),
+			saveAndDrawPeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.NIR, optionsAndResults.getCameraPosition(),
 					searchRadius);
 		}
 		return input().masks().nir();
 	}
 	
-	private void savePeaksAndFeatures(LinkedList<BorderFeature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius) {
+	private void saveAndDrawPeaksAndFeatures(LinkedList<BorderFeature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius) {
 		int index = 1;
 		
 		for (BorderFeature bf : peakList) {
 			final Vector2D pos = bf.getPosition();
+			final double angle = (Double) bf.getFeature("angle");
 			final CameraType cameraType_fin = cameraType;
 			if (pos == null || cameraPosition == null || cameraType == null) {
 				continue;
@@ -100,6 +106,9 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			getResultSet().setNumericResult(0,
 					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".y",
 					pos.getY(), "px");
+			getResultSet().setNumericResult(0,
+					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".angle",
+					angle, "degree");
 			index++;
 			
 			if (searchRadius > 0) {

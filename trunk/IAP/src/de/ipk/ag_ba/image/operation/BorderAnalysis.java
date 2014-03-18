@@ -112,9 +112,20 @@ public class BorderAnalysis {
 					Point2d p4 = new Point2d((p1.getX() + p3.getX()) / 2, (p1.getY() + p3.getY()) / 2);
 					Vector2D v1 = new Vector2D((p2.getX() - p4.x) * 5 + p4.x, (p2.getY() - p4.y) * 5 + p4.y);
 					p.addFeature("direction", v1);
+					// calc angle
+					Vector2D trans1 = v1.subtract(p2);
+					Vector2D trans2 = new Vector2D(0.0, 1.0);
+					double angle = calcAngle(trans1, trans2);
+					p.addFeature("angle", angle);
 				}
 			}
 		}
+	}
+	
+	private double calcAngle(Vector2D v1, Vector2D v2) {
+		double val = (v1.getX() * v2.getX() + v1.getY() * v2.getY())
+				/ ((Math.sqrt(v1.getX() * v1.getX() + v1.getY() * v1.getY())) * (Math.sqrt(v2.getX() * v2.getX() + v2.getY() * v2.getY())));
+		return Math.acos(val) * 180d / Math.PI;
 	}
 	
 	// TODO adapt for multiple borders if needed.
