@@ -47,6 +47,7 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
+import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -359,6 +360,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		this.ratioCalc = false;
 		finalResultFileLocation = "";
 		ExperimentInterface experiment = experimentReference.getData(false, getStatusProvider());
+		
+		UrlCacheManager urlManager = new UrlCacheManager();
+		
 		if (SystemAnalysis.isHeadless() && !(targetDirectoryOrTargetFile != null)) {
 			
 		} else {
@@ -427,7 +431,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			if (!water) {
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
-						null, experiment, indexInfo, false,
+						urlManager, experiment, indexInfo, false,
 						exportIndividualAngles.getBval(0, false), xlsx, snFilter, status, optCustomSubsetDef);
 				if (snapshots != null && snaphotVisitor != null)
 					for (SnapshotDataIAP s : snapshots)
@@ -476,7 +480,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					status.setCurrentStatusText2(xlsx ? "Fill Excel Sheet" : "Prepare CSV content");
 				experiment = null;
 				
-				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status);
+				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status, urlManager);
 				snapshots = null;
 			} else {
 				if (status != null)
@@ -485,7 +489,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				boolean germanLanguage = false;
 				int row = 1; // header is added before at row 0
 				for (SnapshotDataIAP s : snapshots) {
-					String rowContent = s.getCSVvalue(germanLanguage, separator);
+					String rowContent = s.getCSVvalue(germanLanguage, separator, urlManager);
 					csv.appendLine(rowContent, written);
 					if (row2col2value != null) {
 						row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
@@ -769,7 +773,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			LinkedList<SnapshotDataIAP> snapshotsToBeProcessed,
 			Sheet sheet,
 			ArrayList<String> excelColumnHeaders,
-			BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status,
+			UrlCacheManager urlManager) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
 		int rowNum = 1;
 		Runtime r = Runtime.getRuntime();
@@ -806,7 +811,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
 			sidx++;
 			progressOutput(snapshotsToBeProcessed, status, r, scnt, sidx);
-			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects()) {
+			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager)) {
 				Row row = sheet.createRow(rowNum++);
 				int colNum = 0;
 				
@@ -967,7 +972,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				+ separator + "Day (Float)"
 				+ separator + "Weight A (g)" + separator + "Weight B (g)" + separator +
 				"Water (weight-diff)" +
-				separator + "Water (sum of day)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "OTHER" +
+				separator + "Water (sum of day)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "IR" + separator + "OTHER" +
 				(addLineFeed ? "\r\n" : "");
 	}
 	
