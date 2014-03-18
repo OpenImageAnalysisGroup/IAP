@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.experiment.process.report.DateDoubleString;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 
 public class SnapshotDataIAP {
@@ -65,23 +66,23 @@ public class SnapshotDataIAP {
 		return timePoint;
 	}
 	
-	public Long[] getRgbUrlArr() {
+	public long[] getRgbUrlArr() {
 		return getLongArray(rgbUrl);
 	}
 	
-	public Long[] getFluoUrlArr() {
+	public long[] getFluoUrlArr() {
 		return getLongArray(fluoUrl);
 	}
 	
-	public Long[] getNirUrlArr() {
+	public long[] getNirUrlArr() {
 		return getLongArray(nirUrl);
 	}
 	
-	public Long[] getIrUrlArr() {
+	public long[] getIrUrlArr() {
 		return getLongArray(irUrl);
 	}
 	
-	public Long[] getUnknownUrlArr() {
+	public long[] getUnknownUrlArr() {
 		return getLongArray(unknownUrl);
 	}
 	
@@ -178,39 +179,30 @@ public class SnapshotDataIAP {
 	}
 	
 	public void addRgb(long url, int angle) {
-		if (rgbUrl.length() > 0) {
-			rgbUrl.append(":");
-			rgbUrlAngle.append(":");
-		}
-		rgbUrl.append(url);
-		rgbUrlAngle.append(angle);
+		addTo(rgbUrl, rgbUrlAngle, url, angle);
 	}
 	
 	public void addFluo(long url, int angle) {
-		if (fluoUrl.length() > 0) {
-			fluoUrl.append(":");
-			fluoUrlAngle.append(":");
+		addTo(fluoUrl, fluoUrlAngle, url, angle);
+	}
+	
+	private void addTo(StringBuilder urlSB, StringBuilder urlAngle, long url, int angle) {
+		if (urlSB.length() > 0) {
+			urlSB.append(":");
+			urlAngle.append(":");
 		}
-		fluoUrl.append(url);
-		fluoUrlAngle.append(angle);
+		urlSB.append(url);
+		urlAngle.append(angle);
+		if (!storeAngleToValues.containsKey((double) angle))
+			storeAngleToValues.put((double) angle, new LinkedList<Double>());
 	}
 	
 	public void addNir(long url, int angle) {
-		if (nirUrl.length() > 0) {
-			nirUrl.append(":");
-			nirUrlAngle.append(":");
-		}
-		nirUrl.append(url);
-		nirUrlAngle.append(angle);
+		addTo(nirUrl, nirUrlAngle, url, angle);
 	}
 	
 	public void addIr(long url, int angle) {
-		if (irUrl.length() > 0) {
-			irUrl.append(":");
-			irUrlAngle.append(":");
-		}
-		irUrl.append(url);
-		irUrlAngle.append(angle);
+		addTo(irUrl, irUrlAngle, url, angle);
 	}
 	
 	public boolean hasImages() {
@@ -218,12 +210,7 @@ public class SnapshotDataIAP {
 	}
 	
 	public void addUnknown(long url, Integer angle) {
-		if (unknownUrl.length() > 0) {
-			unknownUrl.append(":");
-			unknownUrlAngle.append(":");
-		}
-		unknownUrl.append(url);
-		unknownUrlAngle.append(angle);
+		addTo(unknownUrl, unknownUrlAngle, url, angle);
 	}
 	
 	@Override
@@ -249,9 +236,9 @@ public class SnapshotDataIAP {
 	// nirUrlAngle.add(s);
 	// }
 	//
-	private Long[] getLongArray(StringBuilder urlString) {
+	private long[] getLongArray(StringBuilder urlString) {
 		String[] oo = urlString.length() > 0 ? urlString.toString().split(":") : new String[] {};
-		Long[] rl = new Long[oo.length];
+		long[] rl = new long[oo.length];
 		int i = 0;
 		for (String o : oo)
 			if (!o.isEmpty())
@@ -269,14 +256,74 @@ public class SnapshotDataIAP {
 		return rl;
 	}
 	
-	public int getRgbUrlCnt() {
+	public String getUrlList(UrlCacheManager urlManager, CameraType ct, double angle) {
+		StringBuilder s = getUrlFromType(ct);
+		if (s.length() == 0)
+			return null;
+		else {
+			StringBuilder sAngle = getUrlAngleFromType(ct);
+			
+			StringBuilder r = new StringBuilder();
+			
+			long[] urlArray = getLongArray(s);
+			int[] urlAngles = getIntArray(sAngle);
+			for (int i = 0; i < Math.min(urlArray.length, urlAngles.length); i++) {
+				String realUrl = urlManager.getUrl(urlArray[i]);
+				int urlAngle = urlAngles[i];
+				if (realUrl != null && Math.abs(urlAngle - angle) < 0.00001) {
+					if (r.length() > 0)
+						r.append("|");
+					r.append(realUrl);
+				}
+			}
+			return r.toString();
+		}
+	}
+	
+	private StringBuilder getUrlFromType(CameraType ct) {
+		switch (ct) {
+			case VIS:
+				return rgbUrl;
+			case FLUO:
+				return fluoUrl;
+			case NIR:
+				return nirUrl;
+			case IR:
+				return irUrl;
+			case UNKNOWN:
+				return unknownUrl;
+			default:
+				break;
+		}
+		return null;
+	}
+	
+	private StringBuilder getUrlAngleFromType(CameraType ct) {
+		switch (ct) {
+			case VIS:
+				return rgbUrlAngle;
+			case FLUO:
+				return fluoUrlAngle;
+			case NIR:
+				return nirUrlAngle;
+			case IR:
+				return irUrlAngle;
+			case UNKNOWN:
+				return unknownUrlAngle;
+			default:
+				break;
+		}
+		return null;
+	}
+	
+	public int getRgbUrlCount() {
 		if (rgbUrl.length() == 0)
 			return 0;
 		else
 			return 1 + (rgbUrl.length() - rgbUrl.toString().replace(":", "").length());
 	}
 	
-	public int getFluoUrlCnt() {
+	public int getFluoUrlCount() {
 		if (fluoUrl.length() == 0)
 			return 0;
 		else
@@ -284,47 +331,51 @@ public class SnapshotDataIAP {
 			return 1 + (fluoUrl.length() - fluoUrl.toString().replace(":", "").length());
 	}
 	
-	public int getNirUrlCnt() {
+	public int getNirUrlCount() {
 		if (nirUrl.length() == 0)
 			return 0;
 		else
 			return 1 + (nirUrl.length() - nirUrl.toString().replace(":", "").length());
 	}
 	
-	public int getUnknownUrlCnt() {
+	public int getUnknownUrlCount() {
 		if (unknownUrl.length() == 0)
 			return 0;
 		else
 			return 1 + (unknownUrl.length() - unknownUrl.toString().replace(":", "").length());
 	}
 	
-	public void setRgbUrl(StringBuilder rgbUrl) {
-		this.rgbUrl = rgbUrl;
-	}
-	
-	public void setFluoUrl(StringBuilder fluoUrl) {
-		this.fluoUrl = fluoUrl;
-	}
-	
-	public void setNirUrl(StringBuilder nirUrl) {
-		this.nirUrl = nirUrl;
-	}
-	
-	public void setUnknownUrl(StringBuilder unknownUrl) {
-		this.unknownUrl = unknownUrl;
-	}
-	
-	public void setRgbUrlAngle(StringBuilder rgbUrlAngle) {
-		this.rgbUrlAngle = rgbUrlAngle;
-	}
+	// public void setRgbUrl(StringBuilder rgbUrl) {
+	// this.rgbUrl = rgbUrl;
+	// }
+	//
+	// public void setFluoUrl(StringBuilder fluoUrl) {
+	// this.fluoUrl = fluoUrl;
+	// }
+	//
+	// public void setNirUrl(StringBuilder nirUrl) {
+	// this.nirUrl = nirUrl;
+	// }
+	//
+	// public void setUnknownUrl(StringBuilder unknownUrl) {
+	// this.unknownUrl = unknownUrl;
+	// }
+	//
+	// public void setRgbUrlAngle(StringBuilder rgbUrlAngle) {
+	// this.rgbUrlAngle = rgbUrlAngle;
+	// }
 	
 	public StringBuilder getRgbUrlAngle() {
 		return rgbUrlAngle;
 	}
 	
-	public void setFluoUrlAngle(StringBuilder fluoUrlAngle) {
-		this.fluoUrlAngle = fluoUrlAngle;
-	}
+	// public void setFluoUrlAngle(StringBuilder fluoUrlAngle) {
+	// this.fluoUrlAngle = fluoUrlAngle;
+	// }
+	
+	// public void setUnknownUrlAngle(StringBuilder unknownUrlAngle) {
+	// this.unknownUrlAngle = unknownUrlAngle;
+	// }
 	
 	public StringBuilder getFluoUrlAngle() {
 		return fluoUrlAngle;
@@ -340,10 +391,6 @@ public class SnapshotDataIAP {
 	
 	public StringBuilder getIrUrlAngle() {
 		return irUrlAngle;
-	}
-	
-	public void setUnknownUrlAngle(StringBuilder unknownUrlAngle) {
-		this.unknownUrlAngle = unknownUrlAngle;
 	}
 	
 	public StringBuilder getUnknownUrlAngle() {
@@ -416,7 +463,7 @@ public class SnapshotDataIAP {
 		}
 	}
 	
-	public String getCSVvalue(boolean numberFormat_deTrue_enFalse, String separator) {
+	public String getCSVvalue(boolean numberFormat_deTrue_enFalse, String separator, UrlCacheManager urlManager) {
 		SnapshotDataIAP s = this;
 		
 		String weightBeforeWatering = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null ? s.getWeightBefore() + "" : "");
@@ -457,10 +504,12 @@ public class SnapshotDataIAP {
 					+ weightBeforeWatering + separator
 					+ sumBA + separator
 					+ waterWeight + separator + waterAmount + separator
-					+ s.getRgbUrlCnt() + separator
-					+ s.getFluoUrlCnt() + separator
-					+ s.getNirUrlCnt() + separator
-					+ s.getUnknownUrlCnt() + "\r\n";
+					+ replaceNull(s.getUrlList(urlManager, CameraType.VIS, -720)) + separator
+					+ replaceNull(s.getUrlList(urlManager, CameraType.FLUO, -720)) + separator
+					+ replaceNull(s.getUrlList(urlManager, CameraType.NIR, -720)) + separator
+					+ replaceNull(s.getUrlList(urlManager, CameraType.IR, -720)) + separator
+					+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, -720))
+					+ "\r\n";
 		} else {
 			StringBuilder result = new StringBuilder();
 			int nmax = 0;
@@ -501,10 +550,11 @@ public class SnapshotDataIAP {
 						+ sumBA + separator
 						+ waterWeight + separator
 						+ waterAmount + separator
-						+ s.getRgbUrlCnt() + separator
-						+ s.getFluoUrlCnt() + separator
-						+ s.getNirUrlCnt() + separator
-						+ s.getUnknownUrlCnt()
+						+ replaceNull(s.getUrlList(urlManager, CameraType.VIS, angle)) + separator
+						+ replaceNull(s.getUrlList(urlManager, CameraType.FLUO, angle)) + separator
+						+ replaceNull(s.getUrlList(urlManager, CameraType.NIR, angle)) + separator
+						+ replaceNull(s.getUrlList(urlManager, CameraType.IR, angle)) + separator
+						+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, angle))
 						+ columnData + "\r\n";
 				result.append(res);
 			}
@@ -615,7 +665,7 @@ public class SnapshotDataIAP {
 		position2store.get(position).put(idx, value);
 	}
 	
-	public ArrayList<ArrayList<DateDoubleString>> getCSVobjects() {
+	public ArrayList<ArrayList<DateDoubleString>> getCSVobjects(UrlCacheManager urlManager) {
 		SnapshotDataIAP s = this;
 		
 		Double fineTime;
@@ -654,10 +704,11 @@ public class SnapshotDataIAP {
 			row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
 			row.add(new DateDoubleString(s.getWeightOfWatering()));
 			row.add(new DateDoubleString(s.getWholeDayWaterAmount()));
-			row.add(new DateDoubleString(s.getRgbUrlCnt()));
-			row.add(new DateDoubleString(s.getFluoUrlCnt()));
-			row.add(new DateDoubleString(s.getNirUrlCnt()));
-			row.add(new DateDoubleString(s.getUnknownUrlCnt()));
+			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.VIS, -720)));
+			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.FLUO, -720)));
+			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.NIR, -720)));
+			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.IR, -720)));
+			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.UNKNOWN, -720)));
 			result.add(row);
 		} else {
 			for (Double angle : storeAngleToValues.keySet()) {
@@ -679,10 +730,11 @@ public class SnapshotDataIAP {
 				row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
 				row.add(new DateDoubleString(s.getWeightOfWatering()));
 				row.add(new DateDoubleString(s.getWholeDayWaterAmount()));
-				row.add(new DateDoubleString(s.getRgbUrlCnt()));
-				row.add(new DateDoubleString(s.getFluoUrlCnt()));
-				row.add(new DateDoubleString(s.getNirUrlCnt()));
-				row.add(new DateDoubleString(s.getUnknownUrlCnt()));
+				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.VIS, angle)));
+				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.FLUO, angle)));
+				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.NIR, angle)));
+				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.IR, angle)));
+				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.UNKNOWN, angle)));
 				int n = storeAngleToValues.get(angle).size();
 				for (int i = 0; i < n; i++) {
 					Double v = storeAngleToValues.get(angle).get(i);
