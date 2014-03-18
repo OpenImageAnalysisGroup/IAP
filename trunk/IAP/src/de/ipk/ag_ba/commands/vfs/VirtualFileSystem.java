@@ -21,6 +21,7 @@ import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -28,6 +29,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk.vanted.plugin.VfsFileProtocol;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 /**
  * @author klukas
@@ -167,8 +169,23 @@ public abstract class VirtualFileSystem {
 				(VirtualFileSystemVFS2) this, ignoreOutliers, null);
 		if (statusProvider != null)
 			a.setStatusProvider(statusProvider);
-		a.performActionCalculateResults(null);
-		return a.getResultMainPanel();
+		
+		boolean execute = true;
+		ParameterOptions params = a.getParameters();
+		if (params != null && params.userRequestNeeded()) {
+			Object[] res = MyInputHelper.getInput(params.getDescription(), "Copy Dataset " + experimentReference.getExperimentName(),
+					params.getParameterField());
+			if (res == null) {
+				execute = false;
+			} else
+				a.setParameters(res);
+		}
+		
+		if (execute) {
+			a.performActionCalculateResults(null);
+			return a.getResultMainPanel();
+		} else
+			return new MainPanelComponent("Execution has been skipped according to user command input.");
 	}
 	
 	public String[] listFiles(String subdirectory, FilenameFilter optFilenameFilter) throws Exception {

@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPOutputStream;
 
 import javax.imageio.ImageIO;
 
@@ -69,15 +70,14 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
 public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private final MongoDB m;
 	private final ArrayList<ExperimentReference> experimentReferences;
-	private NavigationButton src;
 	private String mb;
 	private int files, knownFiles, errorCount;
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
-	private final boolean skipFilesAlreadyInStorageLocation = true;
-	private final boolean includeMainImages = true;
-	private final boolean includeReferenceImages = true;
-	private final boolean includeAnnotationImages = true;
+	private boolean skipFilesAlreadyInStorageLocation = true;
+	private boolean includeMainImages = true;
+	private boolean includeReferenceImages = true;
+	private boolean includeAnnotationImages = true;
 	private final VirtualFileSystemVFS2 vfs;
 	private boolean skipClone;
 	private final boolean ignoreOutliers;
@@ -114,30 +114,26 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	@Override
 	public ParameterOptions getParameters() {
-		return null; /*
-						 * new ParameterOptions(
-						 * "<html>"
-						 * + "This commands copies the experiment and its connected binary data to the<br>"
-						 * + "target server using the specified VfsFile transfer protocol.<br><br>", new Object[] {
-						 * "Don't copy again, if already in storage location", skipFilesAlreadyInStorageLocation,
-						 * "Copy images", includeMainImages,
-						 * "Copy reference images", includeReferenceImages,
-						 * "Copy annotation images", includeAnnotationImages });
-						 */
+		return new ParameterOptions(
+				"<html>"
+						+ "This commands copies the experiment and its connected binary data to the<br>"
+						+ "target server using the specified VfsFile transfer protocol.<br><br>", new Object[] {
+						"Don't copy again, if already in storage location", skipFilesAlreadyInStorageLocation,
+						"Copy images", includeMainImages,
+						"Copy reference images", includeReferenceImages,
+						"Copy annotation images", includeAnnotationImages });
+		
 	}
 	
 	@Override
 	public void setParameters(Object[] parameters) {
-		super.setParameters(parameters);
-		/*
-		 * if (parameters != null && parameters.length == 3) {
-		 * int idx = 0;
-		 * skipFilesAlreadyInStorageLocation = (Boolean) parameters[idx++];
-		 * includeMainImages = (Boolean) parameters[idx++];
-		 * includeReferenceImages = (Boolean) parameters[idx++];
-		 * includeAnnotationImages = (Boolean) parameters[idx++];
-		 * }
-		 */
+		if (parameters != null && parameters.length == 4) {
+			int idx = 0;
+			skipFilesAlreadyInStorageLocation = (Boolean) parameters[idx++];
+			includeMainImages = (Boolean) parameters[idx++];
+			includeReferenceImages = (Boolean) parameters[idx++];
+			includeAnnotationImages = (Boolean) parameters[idx++];
+		}
 	}
 	
 	@Override
@@ -145,7 +141,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(
 				currentSet);
-		// res.add(src);
 		return res;
 	}
 	
@@ -162,7 +157,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src)
 			throws Exception {
-		this.src = src;
 		this.errorMessage = null;
 		try {
 			for (ExperimentReference experimentReference : experimentReferences) {
@@ -685,7 +679,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			ExperimentInterface ei = experiment;
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Create XML File");
-			storeXMLdataset(experiment, hsmManager, tsave, eidx,
+			storeXMLdataset(SystemOptions.getInstance().getBoolean("VFS", "Compress Data File", true),
+					experiment, hsmManager, tsave, eidx,
 					tempFile2fileName, ei, optStatus);
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Create Condition File");
@@ -1028,7 +1023,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		// return resName;
 	}
 	
-	private void storeXMLdataset(final ExperimentInterface experiment,
+	private void storeXMLdataset(boolean compressed, final ExperimentInterface experiment,
 			final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
 			LinkedHashMap<VfsFileObject, String> tempFile2fileName,
 			ExperimentInterface ei,
@@ -1042,7 +1037,11 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		System.gc();
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Begin dumping data structure into XML file... (Memory Status: "
 				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
-		Experiment.write(ei, optStatus, f.getOutputStream()); // to temp file
+		Experiment.write(ei, optStatus,
+				compressed ?
+						new GZIPOutputStream(f.getOutputStream(), 128 * 1024)
+						: f.getOutputStream()
+				); // to temp file
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Finished dumping data structure into XML file. (Memory Status: "
 				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
 		// f.setExecutable(false);
