@@ -26,6 +26,7 @@ import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
+import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.AbstractExperimentDataProcessor;
@@ -88,8 +89,11 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 		boolean xlsx = true;
 		HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 		boolean exportIndividualAngles = false;
+		
+		UrlCacheManager urlManager = new UrlCacheManager();
+		
 		LinkedList<SnapshotDataIAP> snapshots = IAPservice.getSnapshotsFromExperiment(
-				null, mappingData, indexInfo, false,
+				urlManager, mappingData, indexInfo, false,
 				exportIndividualAngles, xlsx, null, status, null);
 		
 		TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
@@ -124,7 +128,7 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 			
 			mappingData = null;
 			ActionPdfCreation3.setExcelSheetValues(
-					snapshots, sheet, excelColumnHeaders, status);
+					snapshots, sheet, excelColumnHeaders, status, urlManager);
 			wb.write(new FileOutputStream(fn));
 			String tempDirectory = new File(fn).getParent();
 			AttributeHelper.showInFileBrowser(tempDirectory + "", new File(fn).getName());
