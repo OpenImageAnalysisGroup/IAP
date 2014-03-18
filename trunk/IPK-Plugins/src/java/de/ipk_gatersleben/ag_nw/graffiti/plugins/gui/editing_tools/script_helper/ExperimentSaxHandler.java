@@ -11,6 +11,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.jdom.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -116,8 +117,8 @@ public class ExperimentSaxHandler extends DefaultHandler {
 	private NumericMeasurementInterface currentMeasurement;
 	private final long inputStreamLength;
 	
-	public ExperimentSaxHandler(InputStream is, long inputStreamLength) {
-		this.is = is;
+	public ExperimentSaxHandler(InputStream is, long inputStreamLength) throws IOException {
+		this.is = ResourceIOManager.decompressStream(is);
 		this.inputStreamLength = inputStreamLength;
 		this.e = new Experiment();
 		this.e.setHeader(new ExperimentHeader());
