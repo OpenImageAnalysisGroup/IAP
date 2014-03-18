@@ -6,11 +6,8 @@
  */
 package de.ipk.ag_ba.mongo;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
 import java.util.HashMap;
-import java.util.zip.GZIPInputStream;
 
 import org.ErrorMsg;
 import org.ObjectRef;
@@ -145,17 +142,6 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 		if (err.getObject() != null)
 			throw (Exception) err.getObject();
 		return (InputStream) or.getObject();
-	}
-	
-	public static InputStream decompressStream(InputStream input) throws IOException {
-		PushbackInputStream pb = new PushbackInputStream(input, 2);
-		byte[] signature = new byte[2];
-		pb.read(signature); // read the signature
-		pb.unread(signature); // push back the signature to the stream
-		if (signature[0] == 0x1f && signature[1] == 0x8b) // check if matches standard gzip magic number
-			return new GZIPInputStream(pb);
-		else
-			return pb;
 	}
 	
 	@Override
