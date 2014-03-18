@@ -16,7 +16,7 @@ import de.ipk.vanted.plugin.VfsFileProtocol;
 
 public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavigationAction implements NavigationAction {
 	
-	private final ArrayList<ExperimentReference> experimentReference;
+	private final ArrayList<ExperimentReference> experimentReferences;
 	private final MongoDB m;
 	private final boolean ignoreOutliers;
 	private final ArrayList<MainPanelComponent> results = new ArrayList<MainPanelComponent>();
@@ -25,14 +25,14 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 			ArrayList<ExperimentReference> experimentReference, boolean ignoreOutliers) {
 		super(tooltip);
 		this.m = m;
-		this.experimentReference = experimentReference;
+		this.experimentReferences = experimentReference;
 		this.ignoreOutliers = ignoreOutliers;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		results.clear();
-		if (experimentReference == null)
+		if (experimentReferences == null)
 			return;
 		File currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
 		if (currentDirectory != null) {
@@ -47,7 +47,7 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 					false,
 					false,
 					null);
-			for (ExperimentReference er : experimentReference) {
+			for (ExperimentReference er : experimentReferences) {
 				results.add(vfs.saveExperiment(m, er, getStatusProvider(), ignoreOutliers));
 			}
 		}
