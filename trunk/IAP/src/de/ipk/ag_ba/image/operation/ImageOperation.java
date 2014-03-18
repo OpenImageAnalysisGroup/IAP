@@ -541,7 +541,7 @@ public class ImageOperation implements MemoryHogInterface {
 				y++;
 			}
 		}
-		return new ImageOperation(originalImage, mW, mH).setCameraType(getCameraType());
+		return new ImageOperation(originalImage, image.getWidth(), image.getHeight()).setCameraType(getCameraType());
 	}
 	
 	/**
