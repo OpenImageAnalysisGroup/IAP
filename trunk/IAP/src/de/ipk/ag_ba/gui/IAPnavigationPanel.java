@@ -377,10 +377,14 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		}
 		
 		if (actionPanelRight != null) {
-			actionPanelRight.invalidate();
-			// actionPanelRight.repaint();
+			actionPanelRight.validate();
+			actionPanelRight.repaint();
 		}
-		getParent().validate();
+		if (getParent() != null)
+			getParent().validate();
+		else
+			validate();
+		repaint();
 	}
 	
 	private void enableContextMenu() {
