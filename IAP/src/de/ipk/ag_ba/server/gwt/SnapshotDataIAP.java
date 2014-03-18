@@ -193,8 +193,6 @@ public class SnapshotDataIAP {
 		}
 		urlSB.append(url);
 		urlAngle.append(angle);
-		if (!storeAngleToValues.containsKey((double) angle))
-			storeAngleToValues.put((double) angle, new LinkedList<Double>());
 	}
 	
 	public void addNir(long url, int angle) {
@@ -424,6 +422,17 @@ public class SnapshotDataIAP {
 						storeAngleToValues.get(angle).add(null);
 					storeAngleToValues.get(angle).set(i, position2store.get(angle).get(i));
 				}
+		
+		for (CameraType ct : CameraType.values()) {
+			StringBuilder ar = getUrlAngleFromType(ct);
+			if (ar != null) {
+				int[] ia = getIntArray(ar);
+				for (int angle : ia) {
+					if (!storeAngleToValues.containsKey((double) angle))
+						storeAngleToValues.put((double) angle, new LinkedList<Double>());
+				}
+			}
+		}
 	}
 	
 	public void prepareFieldsForUsageAfterDataTransport() {
@@ -488,7 +497,7 @@ public class SnapshotDataIAP {
 		
 		if (position2store == null) {
 			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;
-			return "-720" + separator
+			return "" + separator + "" + separator
 					+ replaceNull(s.getPlantId()) + separator
 					+ replaceNull(s.getCondition()) + separator
 					+ replaceNull(s.getSpecies()) + separator
@@ -533,29 +542,34 @@ public class SnapshotDataIAP {
 						}
 					}
 				}
-				String res = enDe(numberFormat_deTrue_enFalse, angle + "") + separator +
-						replaceNull(s.getPlantId()) + separator
-						+ replaceNull(s.getCondition()) + separator
-						+ replaceNull(s.getSpecies()) + separator
-						+ replaceNull(s.getGenotype()) + separator
-						+ replaceNull(s.getVariety()) + separator
-						+ replaceNull(s.getGrowthCondition()) + separator
-						+ replaceNull(s.getTreatment()) + separator
-						+ replaceNull(s.getSequence()) + separator
-						+ s.getTimePoint() + separator
-						+ (s.getSnapshotTime() != null ? new Date(s.getSnapshotTime()).toString() : "") + separator
-						+ StringManipulationTools.getNumbersFromString(s.getTimePoint()) + separator
-						+ enDe(numberFormat_deTrue_enFalse, fineTime.toString()) + separator
-						+ weightBeforeWatering + separator
-						+ sumBA + separator
-						+ waterWeight + separator
-						+ waterAmount + separator
-						+ replaceNull(s.getUrlList(urlManager, CameraType.VIS, angle)) + separator
-						+ replaceNull(s.getUrlList(urlManager, CameraType.FLUO, angle)) + separator
-						+ replaceNull(s.getUrlList(urlManager, CameraType.NIR, angle)) + separator
-						+ replaceNull(s.getUrlList(urlManager, CameraType.IR, angle)) + separator
-						+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, angle))
-						+ columnData + "\r\n";
+				String res =
+						(angle >= 0 ? enDe(numberFormat_deTrue_enFalse, angle + "") : "")
+								+ separator
+								+
+								(angle < 0 ? enDe(numberFormat_deTrue_enFalse, (Math.abs(-angle - 1) < 0.00001 ? 0d : (Math.abs(-angle - 720) < 0.00001 ? "" : -angle))
+										+ "") : "") + separator +
+								replaceNull(s.getPlantId()) + separator
+								+ replaceNull(s.getCondition()) + separator
+								+ replaceNull(s.getSpecies()) + separator
+								+ replaceNull(s.getGenotype()) + separator
+								+ replaceNull(s.getVariety()) + separator
+								+ replaceNull(s.getGrowthCondition()) + separator
+								+ replaceNull(s.getTreatment()) + separator
+								+ replaceNull(s.getSequence()) + separator
+								+ s.getTimePoint() + separator
+								+ (s.getSnapshotTime() != null ? new Date(s.getSnapshotTime()).toString() : "") + separator
+								+ StringManipulationTools.getNumbersFromString(s.getTimePoint()) + separator
+								+ enDe(numberFormat_deTrue_enFalse, fineTime.toString()) + separator
+								+ weightBeforeWatering + separator
+								+ sumBA + separator
+								+ waterWeight + separator
+								+ waterAmount + separator
+								+ replaceNull(s.getUrlList(urlManager, CameraType.VIS, angle)) + separator
+								+ replaceNull(s.getUrlList(urlManager, CameraType.FLUO, angle)) + separator
+								+ replaceNull(s.getUrlList(urlManager, CameraType.NIR, angle)) + separator
+								+ replaceNull(s.getUrlList(urlManager, CameraType.IR, angle)) + separator
+								+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, angle))
+								+ columnData + "\r\n";
 				result.append(res);
 			}
 			return result.toString();
@@ -684,7 +698,8 @@ public class SnapshotDataIAP {
 		ArrayList<ArrayList<DateDoubleString>> result = new ArrayList<ArrayList<DateDoubleString>>();
 		if (position2store == null) {
 			ArrayList<DateDoubleString> row = new ArrayList<DateDoubleString>();
-			row.add(new DateDoubleString(-720d));
+			row.add(null);
+			row.add(null);
 			row.add(new DateDoubleString(s.getPlantId()));
 			row.add(new DateDoubleString(s.getCondition()));
 			row.add(new DateDoubleString(s.getSpecies()));
@@ -713,7 +728,22 @@ public class SnapshotDataIAP {
 		} else {
 			for (Double angle : storeAngleToValues.keySet()) {
 				ArrayList<DateDoubleString> row = new ArrayList<DateDoubleString>();
-				row.add(new DateDoubleString(angle));
+				if (angle >= 0)
+					row.add(new DateDoubleString(angle));
+				else
+					row.add(null);
+				
+				if (angle < 0) {
+					if (Math.abs(-angle - 1) < 0.00001)
+						row.add(new DateDoubleString(0));
+					else
+						if (Math.abs(-angle - 720) < 0.00001)
+							row.add(null);
+						else
+							row.add(new DateDoubleString(-angle));
+				} else
+					row.add(null);
+				
 				row.add(new DateDoubleString(s.getPlantId()));
 				row.add(new DateDoubleString(s.getCondition()));
 				row.add(new DateDoubleString(s.getSpecies()));
