@@ -10,6 +10,7 @@ import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
@@ -380,8 +381,16 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			actionPanelRight.revalidate();
 			actionPanelRight.repaint();
 		}
-		if (getParent() != null)
-			getParent().revalidate();
+		
+		Container parent = getParent();
+		while (parent != null) {
+			if (parent.getParent() != null)
+				parent = parent.getParent();
+			else
+				break;
+		}
+		if (parent != null)
+			parent.revalidate();
 		else
 			revalidate();
 		repaint();
