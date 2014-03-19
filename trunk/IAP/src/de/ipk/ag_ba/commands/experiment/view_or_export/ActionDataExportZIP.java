@@ -247,32 +247,11 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 								
 								status.setCurrentStatusValueFine(100d * (idx++) / files);
 								
-								Date t;
-								if (nm.getParentSample().getSampleFineTimeOrRowId() != null)
-									t = new Date(nm.getParentSample().getSampleFineTimeOrRowId());
-								else
-									t = nm.getParentSample().getParentCondition().getExperimentStorageDate();
-								if (t == null)
-									t = new Date();
-								gc.setTime(t);
-								
 								final String zefn;
 								final ImageData id = (ImageData) bm;
 								try {
 									if (bm instanceof ImageData) {
-										zefn =
-												(nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : nm.getReplicateID() + "") +
-														nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
-														nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
-														(id != null ? (id.getPosition() != null ?
-																StringManipulationTools.formatNumber(id.getPosition(), "000")
-																		+ "Grad " : "000Grad") : "") + " " +
-														gc.get(GregorianCalendar.YEAR) + "-" +
-														(gc.get(GregorianCalendar.MONTH) + 1) + "-" +
-														gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
-														gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
-														gc.get(GregorianCalendar.MINUTE) + "_" +
-														gc.get(GregorianCalendar.SECOND) + ".png";
+										zefn = getImageFileExportNameForZIPexport(gc, id);
 										
 									} else {
 										zefn = bm.getURL().getFileName();
@@ -355,6 +334,32 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 				new File(fn).delete();
 			this.errorMessage = e.getClass().getName() + ": " + e.getMessage();
 		}
+	}
+	
+	public static String getImageFileExportNameForZIPexport(GregorianCalendar gc, ImageData id) {
+		NumericMeasurementInterface nm = id;
+		
+		Date t;
+		if (nm.getParentSample().getSampleFineTimeOrRowId() != null)
+			t = new Date(nm.getParentSample().getSampleFineTimeOrRowId());
+		else
+			t = nm.getParentSample().getParentCondition().getExperimentStorageDate();
+		if (t == null)
+			t = new Date();
+		gc.setTime(t);
+		
+		return (nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : nm.getReplicateID() + "") +
+				nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
+				nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
+				(id != null ? (id.getPosition() != null ?
+						StringManipulationTools.formatNumber(id.getPosition(), "000")
+								+ "_deg " : "000_deg") : "") + " " +
+				gc.get(GregorianCalendar.YEAR) + "-" +
+				(gc.get(GregorianCalendar.MONTH) + 1) + "-" +
+				gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
+				gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
+				gc.get(GregorianCalendar.MINUTE) + "_" +
+				gc.get(GregorianCalendar.SECOND) + ".png";
 	}
 	
 	private void removeLostEntries() {

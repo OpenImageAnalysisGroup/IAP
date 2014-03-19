@@ -94,7 +94,7 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 		
 		LinkedList<SnapshotDataIAP> snapshots = IAPservice.getSnapshotsFromExperiment(
 				urlManager, mappingData, indexInfo, false,
-				exportIndividualAngles, xlsx, null, status, null);
+				exportIndividualAngles, xlsx, null, status, null, true);
 		
 		TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
 		for (String val : indexInfo.keySet())
