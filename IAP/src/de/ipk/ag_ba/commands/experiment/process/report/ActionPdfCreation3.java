@@ -966,7 +966,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	}
 	
 	public static String getCSVheader(boolean addLineFeed) {
-		return "Side Angle" + separator + "Top Angle" + separator + "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype"
+		return "Row Type" + separator + "Angle" + separator + "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype"
 				+ separator + "Variety" + separator
 				+ "GrowthCondition"
 				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int)"
