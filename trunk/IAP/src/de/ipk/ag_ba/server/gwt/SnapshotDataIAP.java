@@ -698,7 +698,7 @@ public class SnapshotDataIAP {
 		ArrayList<ArrayList<DateDoubleString>> result = new ArrayList<ArrayList<DateDoubleString>>();
 		if (position2store == null) {
 			ArrayList<DateDoubleString> row = new ArrayList<DateDoubleString>();
-			row.add(null);
+			row.add(new DateDoubleString("no imaging"));
 			row.add(null);
 			row.add(new DateDoubleString(s.getPlantId()));
 			row.add(new DateDoubleString(s.getCondition()));
@@ -728,21 +728,21 @@ public class SnapshotDataIAP {
 		} else {
 			for (Double angle : storeAngleToValues.keySet()) {
 				ArrayList<DateDoubleString> row = new ArrayList<DateDoubleString>();
-				if (angle >= 0)
+				if (angle >= 0) {
+					row.add(new DateDoubleString("side"));
 					row.add(new DateDoubleString(angle));
-				else
-					row.add(null);
-				
-				if (angle < 0) {
-					if (Math.abs(-angle - 1) < 0.00001)
-						row.add(new DateDoubleString(0));
-					else
-						if (Math.abs(-angle - 720) < 0.00001)
-							row.add(null);
-						else
-							row.add(new DateDoubleString(-angle));
 				} else
-					row.add(null);
+					if (Math.abs(-angle - 1) < 0.00001) {
+						row.add(new DateDoubleString("top"));
+						row.add(new DateDoubleString(0));
+					} else
+						if (Math.abs(-angle - 720) < 0.00001) {
+							row.add(new DateDoubleString("combined"));
+							row.add(null);
+						} else {
+							row.add(new DateDoubleString("top"));
+							row.add(new DateDoubleString(-angle));
+						}
 				
 				row.add(new DateDoubleString(s.getPlantId()));
 				row.add(new DateDoubleString(s.getCondition()));
