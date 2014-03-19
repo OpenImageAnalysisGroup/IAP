@@ -97,6 +97,7 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ExportSetting;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.commands.experiment.process.report.SnapshotFilter;
+import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -599,7 +600,7 @@ public class IAPservice {
 			boolean exportIndividualAngles,
 			boolean storeAllReplicates,
 			SnapshotFilter optSnapshotFilter,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ExportSetting optCustomSubsetDef) {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ExportSetting optCustomSubsetDef, boolean useZIPexportFileNames) {
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set...");
 		System.out.println("Transport to browser? " + prepareTransportToBrowser);
@@ -720,9 +721,10 @@ public class IAPservice {
 					optStatus.setCurrentStatusText1("Process subset " + sidx + "/" + scnt);
 				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
 					continue;
-				processConditions(urlManager, optSubstanceIds, exportIndividualAngles, storeAllReplicates, optSnapshotFilter, optStatus,
+				processConditions(urlManager, optSubstanceIds, exportIndividualAngles,
+						storeAllReplicates, optSnapshotFilter, optStatus,
 						timestampAndQuality2snapshot,
-						result, substance);
+						result, substance, useZIPexportFileNames);
 				if (optStatus != null)
 					optStatus.setCurrentStatusValueFine(100d * sidx / scnt);
 			}
@@ -772,7 +774,8 @@ public class IAPservice {
 	
 	private static void processConditions(UrlCacheManager urlManager, HashMap<String, Integer> optSubstanceIds, boolean exportIndividualAngles,
 			boolean storeAllReplicates, SnapshotFilter optSnapshotFilter, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-			HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot, Collection<SnapshotDataIAP> result, SubstanceInterface substance) {
+			HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot, Collection<SnapshotDataIAP> result, SubstanceInterface substance,
+			boolean useZIPexportFileNames) {
 		for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
 			for (SampleInterface sample : c) {
 				TreeSet<String> qualities = new TreeSet<String>();
@@ -916,6 +919,7 @@ public class IAPservice {
 						Collection<NumericMeasurementInterface> sl = sortImages(s3d.getMeasurements(MeasurementNodeType.IMAGE,
 								MeasurementNodeType.VOLUME));
 						int imageCount = 0;
+						GregorianCalendar gc = new GregorianCalendar();
 						for (NumericMeasurementInterface ii : sl) {
 							if (!isOKquality(qualityFilter, ii))
 								continue;
@@ -924,7 +928,8 @@ public class IAPservice {
 								ImageData i = (ImageData) ii;
 								String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
 								ImageConfiguration ic = ImageConfiguration.get(subn);
-								long urlId = urlManager != null ? urlManager.getId(i.getURL().toString()) : -1;
+								long urlId = urlManager != null ? urlManager.getId(useZIPexportFileNames ?
+										ActionDataExportZIP.getImageFileExportNameForZIPexport(gc, i) : i.getURL().toString()) : -1;
 								if (ic == ImageConfiguration.Unknown) {
 									ic = ImageConfiguration.get(i.getURL().getFileName());
 								}

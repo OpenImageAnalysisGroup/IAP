@@ -432,7 +432,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						urlManager, experiment, indexInfo, false,
-						exportIndividualAngles.getBval(0, false), xlsx, snFilter, status, optCustomSubsetDef);
+						exportIndividualAngles.getBval(0, false), xlsx, snFilter, status, optCustomSubsetDef,
+						exportCommand);
 				if (snapshots != null && snaphotVisitor != null)
 					for (SnapshotDataIAP s : snapshots)
 						snaphotVisitor.visit(s);
@@ -447,7 +448,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
 			} else {
 				snapshots = IAPservice.getSnapshotsFromExperiment(
-						null, experiment, null, false, exportIndividualAngles.getBval(0, false), xlsx, snFilter, status, optCustomSubsetDef);
+						null, experiment, null, false, exportIndividualAngles.getBval(0, false),
+						xlsx, snFilter, status, optCustomSubsetDef, exportCommand);
 				csvHeader = getCSVheader(false);
 				csv.appendLine(csvHeader + indexHeader.toString() + "\r\n", written);
 				if (row2col2value != null)
