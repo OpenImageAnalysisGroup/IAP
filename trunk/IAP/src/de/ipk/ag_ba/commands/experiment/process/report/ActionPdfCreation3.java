@@ -796,8 +796,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				percentColumns.add(i);
 		}
 		
-		// Freeze just one row
-		sheet.createFreezePane(2, 1, 2, 1);
+		// Freeze some rows and columns
+		sheet.createFreezePane(3, 1, 3, 1);
 		
 		// for (String s : BuiltinFormats.getAll())
 		// System.out.println("format: " + s);
