@@ -88,7 +88,7 @@ public class MyColorGrid extends JComponent {
 		
 		if (outline_colors[row][col] != null) {
 			Color c = outline_colors[row][col];
-			if (c.getRed() + c.getGreen() + c.getBlue() > 0) {
+			if (outlineBorderWidth > 0) {
 				g.setColor(outline_colors[row][col]);
 				((Graphics2D) g).setStroke(new BasicStroke(outlineBorderWidth));
 				rr.setRect(rr.getX() + outlineBorderWidth / 2, rr.getY() + outlineBorderWidth / 2, rr.getWidth() - outlineBorderWidth / 2, rr.getHeight()
