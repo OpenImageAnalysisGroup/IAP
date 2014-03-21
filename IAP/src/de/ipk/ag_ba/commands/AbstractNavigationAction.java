@@ -117,7 +117,6 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 		return tooltip;
 	}
 	
-
 	@Override
 	public NavigationImage getImageIconInactive() {
 		return null;
@@ -132,5 +131,10 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	public void setSource(NavigationAction src, GUIsetting guiSetting) {
 		this.srcAction = src;
 		this.guiSetting = guiSetting;
+	}
+	
+	@Override
+	public boolean requestRightAlign() {
+		return false;
 	}
 }
