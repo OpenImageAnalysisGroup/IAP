@@ -37,6 +37,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  */
 public class IAPgui {
 	
+	public static String optCustomIntroText = null;
+	
 	public static JComponent getMainGUIcontent(
 			final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
 			boolean secondWindow,
@@ -59,7 +61,7 @@ public class IAPgui {
 		final IAPnavigationPanel navigationPanel = new IAPnavigationPanel(PanelTarget.NAVIGATION, graphPanel, null);
 		navigationPanel.setOpaque(false);
 		
-		navigationPanel.setDisallowBookmarkCreation(optCustomHomeAction!=null);
+		navigationPanel.setDisallowBookmarkCreation(optCustomHomeAction != null);
 		
 		JPanel actionPanelRight = new JPanel();
 		final IAPnavigationPanel actionPanel = new IAPnavigationPanel(PanelTarget.ACTION, graphPanel, actionPanelRight);
@@ -143,6 +145,8 @@ public class IAPgui {
 	}
 	
 	public static String getIntroTxt() {
+		if (optCustomIntroText != null)
+			return optCustomIntroText;
 		try {
 			return "<html><h2><font face='Arial'>Welcome to IAP - the Integrated Analysis Platform! <small>V" + ReleaseInfo.IAP_VERSION_STRING
 					+ "</small></font></h2>"
