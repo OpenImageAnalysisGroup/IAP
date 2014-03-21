@@ -384,7 +384,7 @@ public class NavigationButton implements StyleAware {
 	}
 	
 	public boolean isRightAligned() {
-		return rightAligned;
+		return rightAligned || (getAction() != null && getAction().requestRightAlign());
 	}
 	
 	public void setTitle(String title) {
@@ -916,14 +916,16 @@ public class NavigationButton implements StyleAware {
 		return rr;
 	}
 	
+	public static int defaultButtonSize = 48;
+	
 	private static int getImageSize(ButtonDrawStyle style, final PanelTarget target) {
-		int imgS = 48;
+		int imgS = defaultButtonSize;
 		
 		if (style == ButtonDrawStyle.COMPACT_LIST || style == ButtonDrawStyle.COMPACT_LIST_2)
 			if (target == PanelTarget.NAVIGATION || style == ButtonDrawStyle.COMPACT_LIST_2)
 				imgS = 25;// 32;
 			else
-				imgS = 48;
+				imgS = defaultButtonSize;
 		return imgS;
 	}
 	
