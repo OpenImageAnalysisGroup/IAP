@@ -63,4 +63,6 @@ public interface NavigationAction {
 	public void setParameters(Object[] parameters);
 	
 	public void setSource(NavigationAction navigationAction, GUIsetting guiSetting);
+	
+	public boolean requestRightAlign();
 }
