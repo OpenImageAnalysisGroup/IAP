@@ -5,6 +5,8 @@ package de.ipk.ag_ba.gui.webstart;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -104,7 +106,7 @@ public class IAPmain extends JApplet {
 	
 	public static void main(String[] args, String[] addons) {
 		setRunMode(IAPrunMode.SWING_MAIN);
-		System.out.println(SystemAnalysis.getCurrentTime()+">Initialize IAP start... (run-mode: " + getRunMode() + ")");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		String title = IAPoptions.getInstance().getString("IAP", "window_title",
 				"IAP - The Integrated Analysis Platform") + "";
 		
@@ -157,7 +159,17 @@ public class IAPmain extends JApplet {
 			public void windowActivated(WindowEvent arg0) {
 			}
 		});
+		if (startMaximized) {
+			// jf.setExtendedState(jf.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+			jf.setBounds(0, 0, dim.width, dim.height);
+		}
 		jf.setVisible(true);
+		if (startMaximized) {
+			// jf.setExtendedState(jf.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+			jf.setBounds(0, 0, dim.width, dim.height);
+		}
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SystemOptions.getInstance().addChangeListener("IAP", "window_title", new Runnable() {
 			@Override
@@ -595,6 +607,8 @@ public class IAPmain extends JApplet {
 	
 	private static IAPrunMode currentGuiMode = IAPrunMode.UNKNOWN;
 	
+	private static boolean startMaximized;
+	
 	public static IAPrunMode getRunMode() {
 		return currentGuiMode;
 	}
@@ -663,6 +677,10 @@ public class IAPmain extends JApplet {
 			}
 			System.exit(errNum);
 		}
+	}
+	
+	public static void setStartMaximized(boolean startMaximized) {
+		IAPmain.startMaximized = startMaximized;
 	}
 }
 
