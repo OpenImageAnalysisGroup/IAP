@@ -86,10 +86,17 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	
 	private boolean disallowBookmarkCreation = false;
 	
+	private static ThreadSafeOptions nWindows = new ThreadSafeOptions();
+	private NavigationButtonFilter optNavigationButtonFilter;
+	
+	public static NavigationButtonFilter optStaticNavigationButtonFilter;
+	
 	public IAPnavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
 		this.target = target;
 		this.graphPanel = graphPanel;
 		this.actionPanelRight = actionPanelRight;
+		
+		this.optNavigationButtonFilter = optStaticNavigationButtonFilter;
 		
 		JPopupMenu popup = new JPopupMenu("Button Style");
 		{
@@ -164,9 +171,6 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		int hgap = 2 * b;
 		setLayout(new FlowLayoutImproved(FlowLayout.LEFT, hgap, vgap));
 	}
-	
-	private static ThreadSafeOptions nWindows = new ThreadSafeOptions();
-	private NavigationButtonFilter optNavigationButtonFilter;
 	
 	private ActionListener getNewWindowListener() {
 		return getNewWindowListener(null);
@@ -742,7 +746,10 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	public void setNavigationButtonFilter(NavigationButtonFilter optNavigationButtonFilter) {
-		this.optNavigationButtonFilter = optNavigationButtonFilter;
+		if (optStaticNavigationButtonFilter != null && optNavigationButtonFilter == null)
+			return;
+		else
+			this.optNavigationButtonFilter = optNavigationButtonFilter;
 	}
 	
 	public void setDisallowBookmarkCreation(boolean b) {
