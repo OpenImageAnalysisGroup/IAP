@@ -32,6 +32,10 @@ public class BorderAnalysis {
 	boolean debug = false;
 	boolean onlyBiggest = true;
 	
+	/**
+	 * @param img
+	 *           - should be a binary image
+	 */
 	public BorderAnalysis(Image img) throws InterruptedException {
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
 		borderLength = (int) borderIO.getResultsTable().getValue("border", 0);
@@ -68,8 +72,8 @@ public class BorderAnalysis {
 		}
 	}
 	
-	public void plot(int waitTime) throws InterruptedException {
-		Image img = new Image(image.getWidth(), image.getHeight(), ImageOperation.BACKGROUND_COLORint);
+	public void plot(int radius) throws InterruptedException {
+		Image img = image.copy();
 		
 		ImageCanvas ic = img.copy().io().canvas();
 		LinkedList<Point3d> normSUSANList = borderFeatureList.normalizeBorderFeatureList("susan");
@@ -83,26 +87,24 @@ public class BorderAnalysis {
 		for (BorderFeature p : peakList) {
 			Vector2D pos = p.getPosition();
 			Vector2D direction = (Vector2D) p.getFeature("direction");
-			ic.drawCircle((int) pos.getX(), (int) pos.getY(), 40, Color.MAGENTA.getRGB(), 0.5, 3);
+			ic.drawCircle((int) pos.getX(), (int) pos.getY(), radius, Color.MAGENTA.getRGB(), 0.5, 3);
 			if (direction != null)
 				ic.drawLine((int) pos.getX(), (int) pos.getY(), (int) direction.getX(), (int) direction.getY(), Color.BLUE.getRGB(), 0.5, 2);
 		}
 		
 		ic.getImage().show("susanImage");
-		Thread.sleep(waitTime);
 	}
 	
-	/*
-	 * Approximation of leaf tip direction.
+	/**
+	 * Approximation of curvature direction.
 	 */
 	public void approxDirection(int triangleSize) {
-		// LinkedList<Point3d> directionList = new LinkedList<Point3d>();
 		int listSize = borderFeatureList.size();
 		for (int idx = 0; idx < listSize; idx++) {
 			int back = (((idx - triangleSize) % listSize) + listSize) % listSize;
 			int ahead = (idx + triangleSize) % listSize;
 			
-			// is peak
+			// check if current point is peak
 			for (BorderFeature p : peakList) {
 				Vector2D pos = p.getPosition();
 				Vector2D p2 = borderFeatureList.get(idx).getPosition();
@@ -112,7 +114,7 @@ public class BorderAnalysis {
 					Point2d p4 = new Point2d((p1.getX() + p3.getX()) / 2, (p1.getY() + p3.getY()) / 2);
 					Vector2D v1 = new Vector2D((p2.getX() - p4.x) * 5 + p4.x, (p2.getY() - p4.y) * 5 + p4.y);
 					p.addFeature("direction", v1);
-					// calc angle
+					// calculation of angle
 					Vector2D trans1 = v1.subtract(p2);
 					Vector2D trans2 = new Vector2D(0.0, 1.0);
 					double angle = calcAngle(trans1, trans2);
@@ -218,7 +220,6 @@ public class BorderAnalysis {
 		boolean inside = false;
 		double dist = 0.0;
 		Image show = null;
-		boolean speedUpButLossResults = false;
 		if (debug) {
 			show = new Image(imgTemp);
 			show.show("debug");
@@ -307,7 +308,7 @@ public class BorderAnalysis {
 					// count++;
 					resultRegion.add(temp);
 					// current region bigger than geometricThresh
-					if (resultRegion.size() > geometricThresh - 1 && speedUpButLossResults)
+					if (resultRegion.size() > geometricThresh - 1)
 						return resultRegion;
 					visited.push(temp);
 					dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
@@ -516,7 +517,6 @@ public class BorderAnalysis {
 		}
 		if (debug && splitCount > 1) {
 			new Image(region2d).show("detect");
-			// Thread.sleep(10000);
 		}
 		return splitCount > 1 ? true : false;
 	}
