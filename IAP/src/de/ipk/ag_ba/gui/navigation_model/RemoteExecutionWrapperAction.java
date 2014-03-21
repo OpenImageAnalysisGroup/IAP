@@ -184,4 +184,9 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 		return false;
 	}
 	
+	@Override
+	public boolean requestRightAlign() {
+		return remoteAction!=null && remoteAction.requestRightAlign();
+	}
+	
 }
