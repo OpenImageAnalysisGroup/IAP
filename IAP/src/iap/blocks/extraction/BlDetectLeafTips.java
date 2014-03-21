@@ -95,7 +95,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		for (BorderFeature bf : peakList) {
 			final Vector2D pos = bf.getPosition();
-			final double angle = (Double) bf.getFeature("angle");
+			final Double angle = (Double) bf.getFeature("angle");
 			final CameraType cameraType_fin = cameraType;
 			if (pos == null || cameraPosition == null || cameraType == null) {
 				continue;
@@ -106,9 +106,11 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			getResultSet().setNumericResult(0,
 					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".y",
 					pos.getY(), "px");
-			getResultSet().setNumericResult(0,
-					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".angle",
-					angle, "degree");
+			
+			if (angle != null)
+				getResultSet().setNumericResult(0,
+						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".angle",
+						angle, "degree");
 			index++;
 			
 			if (searchRadius > 0) {
@@ -147,7 +149,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			ba.approxDirection(searchRadius * 2);
 			
 			if (debug_borderDetection)
-				ba.plot(0);
+				ba.plot(searchRadius);
 			
 			res = ba.getPeakList();
 		} catch (InterruptedException e) {

@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -427,5 +428,22 @@ public class BlockResults implements BlockResultSet {
 	@Override
 	public void addImagePostProcessor(ImageConfiguration imgConfig, RunnableOnImage runnableOnImage, RunnableOnImage runnableOnMask) {
 		addImagePostProcessor(imgConfig.getCameraType(), runnableOnImage, runnableOnMask);
+	}
+	
+	@Override
+	public void removeResultObject(BlockResultObject obj) {
+		
+		// TreeMap<Integer, TreeMap<String, ThreadSafeOptions>> storedObjects
+		for (Entry<Integer, TreeMap<String, ThreadSafeOptions>> u : storedObjects.entrySet()) {
+			TreeMap<String, ThreadSafeOptions> i = u.getValue();
+			for (Entry<String, ThreadSafeOptions> o : i.entrySet()) {
+				if (obj.equals(o.getValue().getParam(1, null))) {
+					i.remove(o);
+					break;
+				}
+				
+			}
+		}
+		
 	}
 }

@@ -101,4 +101,6 @@ public interface BlockResultSet {
 	
 	void setObjectResult(int position, String name, Object value);
 	
+	public void removeResultObject(BlockResultObject result1);
+	
 }
