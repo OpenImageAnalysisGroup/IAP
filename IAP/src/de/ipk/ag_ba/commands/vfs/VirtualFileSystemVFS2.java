@@ -313,6 +313,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			res = getPreviewInputStreamInnerCall(test, false);
 			if (res != null)
 				return res;
+			else
+				lastSuccessPNG = false;
 		}
 		if (ext != null && ext.equalsIgnoreCase(".png") && lastSuccessJPG) {
 			// try loading jpg
@@ -321,6 +323,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			res = getPreviewInputStreamInnerCall(test, false);
 			if (res != null)
 				return res;
+			else
+				lastSuccessJPG = false;
 		}
 		
 		if (res == null && ext != null && ext.equalsIgnoreCase(".jpg")) {
