@@ -297,10 +297,13 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	}
 	
 	private static boolean lastSuccessPNG = false;
+	private static boolean lastSuccessJPG = false;
 	
 	@Override
 	public InputStream getPreviewInputStream(IOurl url) throws Exception {
-		InputStream res = null;
+		InputStream res = !lastSuccessPNG && !lastSuccessJPG ? getPreviewInputStreamInnerCall(url, false) : null;
+		if (res != null)
+			return res;
 		
 		String ext = url.getFileNameExtension();
 		if (ext != null && ext.equalsIgnoreCase(".jpg") && lastSuccessPNG) {
@@ -308,20 +311,16 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			IOurl test = new IOurl(url);
 			test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".png"));
 			res = getPreviewInputStreamInnerCall(test, false);
-			if (res != null) {
-				lastSuccessPNG = true;
+			if (res != null)
 				return res;
-			}
 		}
-		if (ext != null && ext.equalsIgnoreCase(".png")) {
+		if (ext != null && ext.equalsIgnoreCase(".png") && lastSuccessJPG) {
 			// try loading jpg
 			IOurl test = new IOurl(url);
 			test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".jpg"));
 			res = getPreviewInputStreamInnerCall(test, false);
 			if (res != null)
 				return res;
-			else
-				res = getPreviewInputStreamInnerCall(url, false);
 		}
 		
 		if (res == null && ext != null && ext.equalsIgnoreCase(".jpg")) {
@@ -331,6 +330,15 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			res = getPreviewInputStreamInnerCall(test, false);
 			if (res != null)
 				lastSuccessPNG = true;
+		}
+		
+		if (res == null && ext != null && ext.equalsIgnoreCase(".png")) {
+			// try loading png
+			IOurl test = new IOurl(url);
+			test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".jpg"));
+			res = getPreviewInputStreamInnerCall(test, false);
+			if (res != null)
+				lastSuccessJPG = true;
 		}
 		
 		if (res == null)
