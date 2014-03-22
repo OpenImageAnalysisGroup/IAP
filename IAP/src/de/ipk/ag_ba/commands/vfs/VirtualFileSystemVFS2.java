@@ -3,6 +3,7 @@ package de.ipk.ag_ba.commands.vfs;
 import info.StopWatch;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -296,6 +298,26 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	
 	@Override
 	public InputStream getPreviewInputStream(IOurl url) throws Exception {
+		InputStream res = getPreviewInputStreamInnerCall(url, false);
+		if (res == null) {
+			String ext = url.getFileNameExtension();
+			if (ext != null && ext.equalsIgnoreCase(".jpg")) {
+				// try loading png
+				IOurl test = new IOurl(url);
+				test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".png"));
+				return getPreviewInputStreamInnerCall(test, true);
+			} else
+				if (ext != null && ext.equalsIgnoreCase(".png")) {
+					// try loading jpg
+					IOurl test = new IOurl(url);
+					test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".jpg"));
+					return getPreviewInputStreamInnerCall(test, true);
+				}
+		}
+		return res;
+	}
+	
+	private InputStream getPreviewInputStreamInnerCall(IOurl url, boolean allowSourceLoadingIfIconIsMissing) throws Exception, IOException {
 		String detail = url.getDetail();
 		if (detail != null && detail.startsWith("/"))
 			detail = detail.substring(1);
@@ -309,6 +331,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 					return is;
 			}
 		}
+		if (!allowSourceLoadingIfIconIsMissing)
+			return null;
 		VfsFileObject file = newVfsFile(url.getDetail() + "/" + url.getFileName());
 		if (file == null)
 			return null;
