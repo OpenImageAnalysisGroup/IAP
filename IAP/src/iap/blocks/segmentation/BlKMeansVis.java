@@ -9,8 +9,6 @@ import java.util.HashSet;
 
 import org.StringManipulationTools;
 
-import de.ipk.ag_ba.image.color.ColorUtil;
-import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -20,10 +18,19 @@ import de.ipk.ag_ba.image.structures.Image;
  */
 public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 	
+	private final boolean[] distanceEnabled = new boolean[6];
+	
 	@Override
 	protected Image processVISmask() {
 		Image res = null;
 		boolean debug = debugValues;
+		
+		distanceEnabled[0] = getBoolean("Lightness (L*a*b*)", true);
+		distanceEnabled[1] = getBoolean("Green-Magenta (L*a*b*)", true);
+		distanceEnabled[2] = getBoolean("Blue-Yellow (L*a*b*)", true);
+		distanceEnabled[3] = getBoolean("Hue (HSB)", true);
+		distanceEnabled[4] = getBoolean("Saturation (HSB)", true);
+		distanceEnabled[5] = getBoolean("Brightness (HSB)", true);
 		
 		// getProperties().getPropertiesExactMatch(false, true, "top.main.axis");
 		// HashMap<String, HashMap<Integer, ArrayList<BlockPropertyValue>>> previousResults = options
@@ -42,14 +49,14 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 				setBoolean(getSettingsNameForLoop(), false);
 			
 			Color[] initColor = new Color[] {
-					Color.getHSBColor(0.0f, 0.0f, 0.0f),
-					Color.getHSBColor(1.0f, 0.0f, 0.0f),
-					Color.getHSBColor(1.0f, 1.0f, 0.0f),
-					Color.getHSBColor(1.0f, 1.0f, 1.0f),
-					Color.getHSBColor(0.0f, 1.0f, 0.0f),
-					Color.getHSBColor(0.0f, 1.0f, 1.0f),
-					Color.getHSBColor(0.0f, 0.0f, 1.0f),
-					Color.getHSBColor(1.0f, 1.0f, 1.0f)
+					Color.getHSBColor(0.25f, 0.25f, 0.5f),
+					Color.getHSBColor(0.75f, 0.25f, 0.5f),
+					Color.getHSBColor(0.75f, 0.75f, 0.5f),
+					Color.getHSBColor(0.75f, 0.75f, 0.75f),
+					Color.getHSBColor(0.25f, 0.75f, 0.5f),
+					Color.getHSBColor(0.25f, 0.75f, 0.75f),
+					Color.getHSBColor(0.25f, 0.25f, 0.75f),
+					Color.getHSBColor(0.75f, 0.75f, 0.75f)
 			};
 			
 			if (initClusters) {
@@ -102,9 +109,9 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		
 		float[][][] lc = ImageOperation.getLabCubeInstance();
 		
-		double[] centerPoints_l = new double[seedColors.size()];
-		double[] centerPoints_a = new double[seedColors.size()];
-		double[] centerPoints_b = new double[seedColors.size()];
+		double[][] centerPoints = new double[seedColors.size()][6];
+		float[] hsb = new float[3];
+		
 		int seed_idx = 0;
 		for (Color c : seedColors) {
 			int rgb = c.getRGB();
@@ -112,30 +119,31 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			int green = ((rgb >> 8) & 0xff);
 			int blue = (rgb & 0xff);
 			
-			centerPoints_l[seed_idx] = lc[red][green][blue];
-			centerPoints_a[seed_idx] = lc[red][green][blue + 256];
-			centerPoints_b[seed_idx] = lc[red][green][blue + 512];
+			Color.RGBtoHSB(red, green, blue, hsb);
+			
+			float[] lci = lc[red][green];
+			centerPoints[seed_idx][0] = lci[blue];
+			centerPoints[seed_idx][1] = lci[blue + 256];
+			centerPoints[seed_idx][2] = lci[blue + 512];
+			centerPoints[seed_idx][3] = hsb[0];
+			centerPoints[seed_idx][4] = hsb[1];
+			centerPoints[seed_idx][5] = hsb[2];
 			
 			seed_idx++;
 		}
 		
-		double[] distclasses_l = new double[centerPoints_l.length];
-		double[] distclasses_a = new double[centerPoints_a.length];
-		double[] distclasses_b = new double[centerPoints_b.length];
+		double[][] distclasses = new double[centerPoints.length][6];
 		
 		boolean run = true;
-		double[] new_center_l = new double[centerPoints_a.length];
-		double[] new_center_a = new double[centerPoints_a.length];
-		double[] new_center_b = new double[centerPoints_b.length];
+		double[][] new_center = new double[centerPoints.length][6];
 		int[] measurements_acCluster = new int[w * h];
 		
 		while (run) {
-			for (int i = 0; i < distclasses_a.length; i++) {
-				distclasses_l[i] = 0f;
-				distclasses_a[i] = 0f;
-				distclasses_b[i] = 0f;
+			for (int i = 0; i < distclasses.length; i++) {
+				for (int off = 0; off < 6; off++)
+					distclasses[i][off] = 0;
 			}
-			int[] n_ab = new int[distclasses_a.length];
+			int[] n_ab = new int[centerPoints.length];
 			for (int pix_idx = 0; pix_idx < w * h; pix_idx++) {
 				int rgb = img1d[pix_idx];
 				if (rgb == ImageOperation.BACKGROUND_COLORint)
@@ -144,22 +152,32 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 				int green = ((rgb >> 8) & 0xff);
 				int blue = (rgb & 0xff);
 				
-				double img_l = lc[red][green][blue];
-				double img_a = lc[red][green][blue + 256];
-				double img_b = lc[red][green][blue + 512];
-				
+				float[] lci = lc[red][green];
+				double img_l = lci[blue];
+				double img_a = lci[blue + 256];
+				double img_b = lci[blue + 512];
+				Color.RGBtoHSB(red, green, blue, hsb);
+				double hue = hsb[0];
+				double sat = hsb[1];
+				double val = hsb[2];
 				double mindist = Double.MAX_VALUE;
 				
 				int minidx = -1;
-				
-				for (int idx_cp = 0; idx_cp < centerPoints_a.length; idx_cp++) {
-					double cp_l = centerPoints_l[idx_cp] - img_l;
-					double cp_a = centerPoints_a[idx_cp] - img_a;
-					double cp_b = centerPoints_b[idx_cp] - img_b;
+				double[] cp = new double[6];
+				for (int idx_cp = 0; idx_cp < centerPoints.length; idx_cp++) {
+					if (centerPoints[idx_cp][0] < 0)
+						continue;
+					cp[0] = centerPoints[idx_cp][0] - img_l;
+					cp[1] = centerPoints[idx_cp][1] - img_a;
+					cp[2] = centerPoints[idx_cp][2] - img_b;
+					cp[3] = centerPoints[idx_cp][3] - hue;
+					cp[4] = centerPoints[idx_cp][4] - sat;
+					cp[5] = centerPoints[idx_cp][5] - val;
 					
-					// double tempdist = ColorUtil.deltaE2000(centerPoints_l[idx_cp] / 2.55, centerPoints_a[idx_cp] - 127, centerPoints_b[idx_cp] - 127,
-					// img_l / 2.55, img_a - 127, img_b - 127);
-					double tempdist = (1 - Math.abs(127 - cp_l) / 127) * cp_l + (Math.abs(127 - cp_l) / 127) * (cp_a * cp_a + cp_b * cp_b);
+					double tempdist = 0d;
+					for (int off = 0; off < 6; off++)
+						if (distanceEnabled[off])
+							tempdist += cp[off] * cp[off];
 					
 					if (tempdist < mindist) {
 						mindist = tempdist;
@@ -167,49 +185,46 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 					}
 				}
 				measurements_acCluster[pix_idx] = minidx;
-				distclasses_l[minidx] += img_l;
-				distclasses_a[minidx] += img_a;
-				distclasses_b[minidx] += img_b;
+				distclasses[minidx][0] += img_l;
+				distclasses[minidx][1] += img_a;
+				distclasses[minidx][2] += img_b;
+				distclasses[minidx][3] += hue;
+				distclasses[minidx][4] += sat;
+				distclasses[minidx][5] += val;
 				n_ab[minidx]++;
 			}
 			
-			for (int i = 0; i < new_center_a.length; i++) {
+			for (int i = 0; i < new_center.length; i++) {
 				if (n_ab[i] == 0) {
-					new_center_l[i] = distclasses_l[i];
-					new_center_a[i] = distclasses_a[i];
-					new_center_b[i] = distclasses_b[i];
+					for (int off = 0; off < 6; off++)
+						new_center[i][off] = -1;
 				} else {
-					new_center_l[i] = distclasses_l[i] / n_ab[i];
-					new_center_a[i] = distclasses_a[i] / n_ab[i];
-					new_center_b[i] = distclasses_b[i] / n_ab[i];
+					for (int off = 0; off < 6; off++)
+						new_center[i][off] = distclasses[i][off] / n_ab[i];
 				}
 			}
 			
 			run = false;
 			
 			if (initClusters) {
-				for (int i = 0; i < new_center_a.length; i++) {
-					// double ncpd_l = new_center_l[i] - centerPoints_l[i];
-					// double ncpd_a = new_center_a[i] - centerPoints_a[i];
-					// double ncpd_b = new_center_b[i] - centerPoints_b[i];
-					//
-					// double dist = ncpd_l * ncpd_l + ncpd_a * ncpd_a + ncpd_b * ncpd_b;
+				for (int i = 0; i < new_center.length; i++) {
+					double dist = 0d;
+					for (int off = 0; off < 6; off++)
+						if (distanceEnabled[off])
+							dist += (new_center[i][off] - centerPoints[i][off]) * (new_center[i][off] - centerPoints[i][off]);
 					
-					double dist = ColorUtil.deltaE2000(new_center_l[i], new_center_a[i], new_center_b[i],
-							centerPoints_l[i], centerPoints_a[i], centerPoints_b[i]);
-					
-					if (true || debugValues)
+					if (debugValues)
 						System.out.print(StringManipulationTools.formatNumber(dist, "###.#####") + " ");
 					if (dist > epsilon) {
 						run = true;
 						break;
 					}
 				}
-				if (true || debugValues)
+				if (debugValues)
 					System.out.println();
-				centerPoints_l = new_center_l;
-				centerPoints_a = new_center_a;
-				centerPoints_b = new_center_b;
+				for (int cl = 0; cl < centerPoints.length; cl++)
+					for (int off = 0; off < 6; off++)
+						centerPoints[cl][off] = new_center[cl][off];
 			}
 		}
 		
@@ -227,15 +242,22 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		
 		if (initClusters) {
 			ArrayList<Color> cl = new ArrayList<Color>();
-			for (int i = 0; i < centerPoints_a.length; i++) {
-				if (Double.isNaN(centerPoints_a[i]) || Double.isNaN(centerPoints_b[i]))
+			for (int i = 0; i < centerPoints.length; i++) {
+				boolean noNaN = true;
+				for (int off = 0; off < 6; off++)
+					if (Double.isNaN(centerPoints[i][off])) {
+						noNaN = false;
+						break;
+					}
+				if (!noNaN)
 					cl.add(ImageOperation.BACKGROUND_COLOR);
 				else {
-					Color r = new Color_CIE_Lab(centerPoints_l[i] / 2.55, centerPoints_a[i] - 127, centerPoints_b[i] - 127).getColor();
-					cl.add(r);
+					// Color r = new Color_CIE_Lab(centerPoints_l[i] / 2.55, centerPoints_a[i] - 127, centerPoints_b[i] - 127).getColor();
+					// cl.add(r);
+					cl.add(Color.getHSBColor((float) centerPoints[i][3], (float) centerPoints[i][4], (float) centerPoints[i][5]));
 				}
 			}
-			for (int i = 0; i < centerPoints_a.length; i++) {
+			for (int i = 0; i < centerPoints.length; i++) {
 				setColor(getSettingsNameForSeedColor(i), cl.get(i));
 			}
 		}
