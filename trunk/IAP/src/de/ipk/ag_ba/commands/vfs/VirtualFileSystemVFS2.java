@@ -296,25 +296,47 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		}
 	}
 	
+	private static boolean lastSuccessPNG = false;
+	
 	@Override
 	public InputStream getPreviewInputStream(IOurl url) throws Exception {
-		InputStream res = getPreviewInputStreamInnerCall(url, false);
-		if (res == null) {
-			String ext = url.getFileNameExtension();
-			if (ext != null && ext.equalsIgnoreCase(".jpg")) {
-				// try loading png
-				IOurl test = new IOurl(url);
-				test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".png"));
-				return getPreviewInputStreamInnerCall(test, true);
-			} else
-				if (ext != null && ext.equalsIgnoreCase(".png")) {
-					// try loading jpg
-					IOurl test = new IOurl(url);
-					test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".jpg"));
-					return getPreviewInputStreamInnerCall(test, true);
-				}
+		InputStream res = null;
+		
+		String ext = url.getFileNameExtension();
+		if (ext != null && ext.equalsIgnoreCase(".jpg") && lastSuccessPNG) {
+			// try loading png
+			IOurl test = new IOurl(url);
+			test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".png"));
+			res = getPreviewInputStreamInnerCall(test, false);
+			if (res != null) {
+				lastSuccessPNG = true;
+				return res;
+			}
 		}
-		return res;
+		if (ext != null && ext.equalsIgnoreCase(".png")) {
+			// try loading jpg
+			IOurl test = new IOurl(url);
+			test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".jpg"));
+			res = getPreviewInputStreamInnerCall(test, false);
+			if (res != null)
+				return res;
+			else
+				res = getPreviewInputStreamInnerCall(url, false);
+		}
+		
+		if (res == null && ext != null && ext.equalsIgnoreCase(".jpg")) {
+			// try loading png
+			IOurl test = new IOurl(url);
+			test.setFileName(StringManipulationTools.stringReplace(test.getFileName(), ext, ".png"));
+			res = getPreviewInputStreamInnerCall(test, false);
+			if (res != null)
+				lastSuccessPNG = true;
+		}
+		
+		if (res == null)
+			return getPreviewInputStreamInnerCall(url, true);
+		else
+			return res;
 	}
 	
 	private InputStream getPreviewInputStreamInnerCall(IOurl url, boolean allowSourceLoadingIfIconIsMissing) throws Exception, IOException {
