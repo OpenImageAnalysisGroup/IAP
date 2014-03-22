@@ -10,7 +10,6 @@ import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
@@ -64,6 +63,7 @@ import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -386,17 +386,15 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			actionPanelRight.repaint();
 		}
 		
-		Container parent = getParent();
-		while (parent != null) {
-			if (parent.getParent() != null)
-				parent = parent.getParent();
-			else
-				break;
-		}
-		if (parent != null)
-			parent.revalidate();
-		else
-			revalidate();
+		revalidate();
+		final IAPnavigationPanel tc = this;
+		BackgroundTaskHelper.executeLaterOnSwingTask(1, new Runnable() {
+			@Override
+			public void run() {
+				tc.revalidate();
+				repaint();
+			}
+		});
 		repaint();
 	}
 	
