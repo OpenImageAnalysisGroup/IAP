@@ -13,6 +13,7 @@ import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
+import iap.blocks.extraction.BlDetectLeafTips;
 import iap.blocks.extraction.BlSkeletonizeNir;
 import iap.blocks.extraction.BlSkeletonizeVisFluo;
 import iap.blocks.postprocessing.BlCrop;
@@ -88,6 +89,7 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlCalcConvexHull(),
 				new BlCalcAreas(),
 				new BlCalcVolumes(),
+				new BlDetectLeafTips(),
 				
 				// postprocessing
 				new BlRunPostProcessors(),
