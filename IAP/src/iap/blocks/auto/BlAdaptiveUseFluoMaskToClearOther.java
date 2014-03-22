@@ -49,7 +49,7 @@ public class BlAdaptiveUseFluoMaskToClearOther extends AbstractSnapshotAnalysisB
 				
 				if (getDouble("Blur Leaf-width Factor Vis on Fluo", 3) > 0) {
 					double corr = processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
-					double visBlur = autoTune ? getDouble("Blur Leaf-width Factor Vis on Fluo", 3) * averageLeafWidthEstimation * corr : getDouble(
+					double visBlur = autoTune ? getDouble("Blur Leaf-width Factor Vis on Fluo", 1) * averageLeafWidthEstimation * corr : getDouble(
 							"blur vis mask on fluo",
 							40d);
 					// System.out.println("DEBUG: FOR MASKING FLUO BLUR VIS: " + visBlur);
