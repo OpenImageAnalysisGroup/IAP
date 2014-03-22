@@ -347,12 +347,14 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		if (storeInMongo)
 			return "Add files";
 		else
-			return "Create Dataset from Files (old)";
+			return "Create Dataset from Files";
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/user-desktop.png";
+		return "img/ext/gpl2/Gnome-Emblem-Photos-64.png";
+		//
+		// return "img/ext/user-desktop.png";
 	}
 	
 	public void setMongoDB(MongoDB m) {
