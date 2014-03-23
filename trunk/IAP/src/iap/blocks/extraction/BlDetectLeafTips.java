@@ -64,7 +64,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().fluo() == null)
 			return null;
 		Image workimg = input().masks().fluo().copy();
-		if (getBoolean("Calculate on Fluorescence Image", false) && !ignore) {
+		if (getBoolean("Calculate on Fluorescence Image", true) && !ignore) {
 			int searchRadius = getInt("Search-radius (Fluo)", 30);
 			double fillGradeInPercent = getDouble("Fillgrade", 0.3);
 			workimg.setCameraType(CameraType.FLUO);
