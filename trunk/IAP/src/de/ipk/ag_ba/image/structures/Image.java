@@ -291,7 +291,8 @@ public class Image {
 	
 	public ImagePlus getAsImagePlus() {
 		ImagePlus result = image.createImagePlus();
-		result.setProcessor(image.getProcessor());// .duplicate());
+		if (result != null)
+			result.setProcessor(image.getProcessor());// .duplicate());
 		return result;
 	}
 	
