@@ -14,12 +14,12 @@ public class IOurl {
 	private String filename;
 	
 	public IOurl(String url) {
-		if (url.indexOf("://") > 0) {
+		if (url != null && url.indexOf("://") > 0) {
 			prefix = url.substring(0, url.indexOf("://"));
 			url = url.substring(url.indexOf("://") + "://".length());
 		} else
 			prefix = FileSystemHandler.DEFAULT_PREFIX;
-		if (url.lastIndexOf("/") > 0) {
+		if (url != null && url.lastIndexOf("/") > 0) {
 			detail = url.substring(0, url.lastIndexOf(SEPERATOR));
 			url = url.substring(url.lastIndexOf(SEPERATOR) + SEPERATOR.length());
 		}
