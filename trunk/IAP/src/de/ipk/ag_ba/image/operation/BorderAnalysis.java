@@ -87,9 +87,12 @@ public class BorderAnalysis {
 		for (BorderFeature p : peakList) {
 			Vector2D pos = p.getPosition();
 			Vector2D direction = (Vector2D) p.getFeature("direction");
-			ic.drawCircle((int) pos.getX(), (int) pos.getY(), radius, Color.MAGENTA.getRGB(), 0.5, 3);
+			Double angle = (Double) p.getFeature("angle");
+			ic.drawCircle((int) pos.getX(), (int) pos.getY(), radius, Color.GREEN.getRGB(), 0.5, 3);
+			ic.text((int) pos.getX() + 10, (int) pos.getY() + 10, "x: " + (int) pos.getX() + " y: " + (int) pos.getY(), Color.GRAY);
 			if (direction != null)
-				ic.drawLine((int) pos.getX(), (int) pos.getY(), (int) direction.getX(), (int) direction.getY(), Color.BLUE.getRGB(), 0.5, 2);
+				ic.drawLine((int) pos.getX(), (int) pos.getY(), (int) direction.getX(), (int) direction.getY(), Color.BLUE.getRGB(), 0.5, 2)
+						.text((int) pos.getX() + 10, (int) pos.getY() + 25, "dir: " + angle, Color.GRAY);
 		}
 		
 		ic.getImage().show("susanImage");
