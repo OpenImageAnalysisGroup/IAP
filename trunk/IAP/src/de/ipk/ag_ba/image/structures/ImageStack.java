@@ -1,17 +1,12 @@
 package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
-import ij.gui.ImageWindow;
 import ij.gui.StackWindow;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -80,7 +75,7 @@ public class ImageStack {
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);
 		throw new UnsupportedOperationException("TODO NOT YET IMPLEMENTED");
-//		new MyFileSaver(image).saveAsTiffStack(os);
+		// new MyFileSaver(image).saveAsTiffStack(os);
 	}
 	
 	public void show(final String title) {
@@ -107,7 +102,8 @@ public class ImageStack {
 		show(title, actionCmd, buttonTitle, optSideComponent, null);
 	}
 	
-	public void show(String title, final Runnable actionCmd, String buttonTitle, final JComponent optSideComponent, final ThreadSafeOptions tsoCurrentImageDisplayPage) {
+	public void show(String title, final Runnable actionCmd, String buttonTitle, final JComponent optSideComponent,
+			final ThreadSafeOptions tsoCurrentImageDisplayPage) {
 		if (SystemAnalysis.isHeadless())
 			return;
 		ImagePlus image = new ImagePlus() {
@@ -154,13 +150,13 @@ public class ImageStack {
 					TableLayout.get3Split(jb, null, optSideComponent, TableLayout.PREFERRED, 5, TableLayout.PREFERRED), 5, 5, 5, 5);
 			
 			StackWindow win = new StackWindow(image) {
-
+				
 				@Override
 				public void paint(Graphics arg0) {
 					super.paint(arg0);
 					
-							jb.repaint();
-							optSideComponent.repaint();
+					jb.repaint();
+					optSideComponent.repaint();
 					
 				}
 			};

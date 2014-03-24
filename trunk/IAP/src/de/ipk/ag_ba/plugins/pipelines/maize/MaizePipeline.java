@@ -20,6 +20,7 @@ import iap.blocks.postprocessing.BlCrop;
 import iap.blocks.postprocessing.BlHighlightNullResults;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
+import iap.blocks.postprocessing.BlSaveResultImages;
 import iap.blocks.preprocessing.BlAlign;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
@@ -95,7 +96,8 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlRunPostProcessors(),
 				new BlMoveMasksToImageSet(),
 				new BlCrop(),
-				new BlHighlightNullResults()
+				new BlHighlightNullResults(),
+				new BlSaveResultImages()
 		};
 	}
 	

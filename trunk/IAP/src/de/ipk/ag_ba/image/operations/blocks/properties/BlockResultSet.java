@@ -4,8 +4,8 @@ import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.data_structures.RunnableOnImageSet;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
+import java.util.TreeMap;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockResultObject;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
@@ -13,8 +13,12 @@ import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
+/**
+ * @author klukas
+ */
 public interface BlockResultSet {
 	
 	/**
@@ -62,9 +66,11 @@ public interface BlockResultSet {
 	
 	public void printAnalysisResults();
 	
-	public void setImage(String id, Image image);
+	public void setImage(int position, String id, ImageData image);
 	
-	public Image getImage(String id);
+	public void setImage(int position, String id, Image image);
+	
+	public Image getImage(int position, String id);
 	
 	public void setVolume(String string, VolumeData volume);
 	
@@ -79,8 +85,6 @@ public interface BlockResultSet {
 	 */
 	public ArrayList<RunnableOnImageSet> getStoredPostProcessors(CameraType imageConfig);
 	
-	public void clearStore();
-	
 	public boolean isNumericStoreEmpty();
 	
 	/**
@@ -91,9 +95,9 @@ public interface BlockResultSet {
 	
 	public void clearStoredPostprocessors();
 	
-	public HashMap<String, Image> getImages();
+	public TreeMap<Integer, TreeMap<String, ImageData>> getImages();
 	
-	public void setImages(HashMap<String, Image> storedImages);
+	public void setImages(TreeMap<Integer, TreeMap<String, ImageData>> storedImages);
 	
 	public void addImagePostProcessor(ImageConfiguration imgConfig, RunnableOnImage roi, RunnableOnImage runnableOnMask);
 	
@@ -102,5 +106,7 @@ public interface BlockResultSet {
 	void setObjectResult(int position, String name, Object value);
 	
 	public void removeResultObject(BlockResultObject result1);
+	
+	Image getImage(String id);
 	
 }

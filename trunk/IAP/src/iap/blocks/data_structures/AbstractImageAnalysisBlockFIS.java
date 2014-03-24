@@ -46,6 +46,9 @@ import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
+/**
+ * @author klukas
+ */
 public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBlock {
 	
 	private ImageStack debugStack;
@@ -160,14 +163,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	protected void prepare() {
 		debugValues = !preventDebugValues && isChangingImages() && getBoolean("debug", false);
 		if (debugValues) {
-			if (input().images().vis() != null || input().masks().vis() != null)
-				debugPipelineBlock(this.getClass(), CameraType.VIS, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
-			if (input().images().fluo() != null || input().masks().fluo() != null)
-				debugPipelineBlock(this.getClass(), CameraType.FLUO, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
-			if (input().images().nir() != null || input().masks().nir() != null)
-				debugPipelineBlock(this.getClass(), CameraType.NIR, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
-			if (input().images().ir() != null || input().masks().ir() != null)
-				debugPipelineBlock(this.getClass(), CameraType.IR, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
+			for (CameraType ct : CameraType.values())
+				if (input().images().getImage(ct) != null || input().masks().getImage(ct) != null)
+					if ((getCameraInputTypes() != null && getCameraInputTypes().contains(ct)) ||
+							(getCameraOutputTypes() != null && getCameraOutputTypes().contains(ct)))
+						debugPipelineBlock(this.getClass(), ct, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
 		}
 	}
 	
@@ -183,7 +183,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected StopWatch debugStart(String task) {
 		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Stop-Block-Exection-Times", false)) {
-			return new StopWatch("phytochamberTopImageProcessor: " + task);
+			return new StopWatch("Processing '" + task + "'");
 		} else
 			return null;
 	}
@@ -198,16 +198,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		}
 		
 		if (res != null)
-			if (debugStack != null && isChangingImages())
+			if (optionsAndResults.forceDebugStack && debugStack != null && isChangingImages())
 				if (getBoolean("enabled", true))
 					debugStack.addImage("Result of " + task, res.getOverviewImage(
 							SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)
 							), null);
-		if (SystemOptions.getInstance().getBoolean("IAP", "Debug-Display-Each-Step", false))
-			if (res.masks() != null)
-				res.masks().fluo().show("Mask-Results for step: " + task);
-			else
-				res.images().fluo().show("Image-Results for step: " + task);
 	}
 	
 	public MaskAndImageSet input() {
@@ -383,7 +378,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
 		
 		final MaskAndImageSet inputSet = in.copy();
-		final HashMap<String, Image> storedImages = new HashMap<String, Image>(brs.getImages());
+		final TreeMap<Integer, TreeMap<String, ImageData>> storedImages = copy(brs.getImages());
 		
 		final ZoomedImage ic = new ZoomedImage(null);
 		final JScrollPane jsp = new JScrollPane(ic);
@@ -494,7 +489,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			public void actionPerformed(ActionEvent arg0) {
 				boolean changesDetected = false;
 				if (changesDetected) {
-					System.out.println(SystemAnalysis.getCurrentTime() + ">Detected settings change, updating view...");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Detected change of settings, updating view...");
 					okButton.doClick();
 				}
 			}
@@ -510,6 +505,17 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		});
 		timer.setRepeats(true);
 		timer.start();
+	}
+	
+	private TreeMap<Integer, TreeMap<String, ImageData>> copy(TreeMap<Integer, TreeMap<String, ImageData>> images) {
+		TreeMap<Integer, TreeMap<String, ImageData>> res = new TreeMap<Integer, TreeMap<String, ImageData>>();
+		for (Integer key : images.keySet()) {
+			res.put(key, new TreeMap<String, ImageData>());
+			for (String id : images.get(key).keySet()) {
+				res.get(key).put(id, images.get(key).get(id));
+			}
+		}
+		return res;
 	}
 	
 	@Override

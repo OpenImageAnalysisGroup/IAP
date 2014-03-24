@@ -20,6 +20,8 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
+import de.ipk.ag_ba.image.structures.ImageStack;
+import de.ipk.ag_ba.server.databases.DatabaseTarget;
 
 /**
  * @author klukas
@@ -276,6 +278,11 @@ public class ImageProcessorOptionsAndResults {
 	Double calculatedBlueMarkerDistance = null;
 	
 	private String configAndAngle;
+	
+	public boolean forceDebugStack;
+	public ArrayList<ImageStack> forcedDebugStacks;
+	
+	public DatabaseTarget databaseTarget;
 	
 	public Double getCalculatedBlueMarkerDistance() {
 		return calculatedBlueMarkerDistance;

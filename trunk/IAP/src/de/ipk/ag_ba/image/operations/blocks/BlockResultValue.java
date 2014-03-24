@@ -1,16 +1,26 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
+
 public class BlockResultValue {
 	
 	private final String name;
 	private final String unit;
 	private final Double value;
 	private Double position;
+	private NumericMeasurement3D binary;
 	
 	public BlockResultValue(String name, String unit, Double value) {
 		this.name = name;
 		this.unit = unit;
 		this.value = value;
+	}
+	
+	public BlockResultValue(String name, NumericMeasurement3D binary) {
+		this.name = name;
+		this.binary = binary;
+		this.unit = null;
+		this.value = null;
 	}
 	
 	public BlockResultValue(String fromString) {
@@ -35,6 +45,10 @@ public class BlockResultValue {
 	
 	public Double getValue() {
 		return value;
+	}
+	
+	public NumericMeasurement3D getBinary() {
+		return binary;
 	}
 	
 	public String getString() {
