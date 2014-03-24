@@ -576,8 +576,6 @@ public class IAPmain extends JApplet {
 			switch (feature) {
 				case REMOTE_EXECUTION:
 					return getOptions().getBoolean("IAP", "grid_remote_execution", true);
-				case SAVE_DEBUG_STACK:
-					return getOptions().getBoolean("IAP", "debug_image_analysis_save_stack", false);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
 					return getOptions().getBoolean("Watch-Service", "Automatic Copy to Archive//enabled", false)
 							&& getOptions().getBoolean("ARCHIVE", "enabled", false);
@@ -589,8 +587,6 @@ public class IAPmain extends JApplet {
 			switch (feature) {
 				case REMOTE_EXECUTION:
 					return getOptions().getBoolean("IAP", "grid_remote_execution", true);
-				case SAVE_DEBUG_STACK:
-					return getOptions().getBoolean("IAP", "debug_image_analysis_save_stack", false);
 				case TOMCAT_AUTOMATIC_HSM_BACKUP:
 					return getOptions().getBoolean("Watch-Service", "Automatic Copy to Archive//enabled", false)
 							&& getOptions().getBoolean("ARCHIVE", "enabled", false);
