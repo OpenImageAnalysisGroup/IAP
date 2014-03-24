@@ -48,11 +48,11 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			return null;
 		Image workimg = input().masks().vis().copy();
 		if (getBoolean("Calculate on Visible Image", false) && !ignore) {
-			int searchRadius = getInt("Search-radius (Vis)", 33);
+			int searchRadius = getInt("Search-radius (Vis)", 35);
 			double fillGradeInPercent = getDouble("Fillgrade (Vis)", 0.3);
 			workimg.setCameraType(input().masks().vis().getCameraType());
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 2), getInt("Masksize Erode (Vis)", 4),
-					getInt("Masksize Dilate (Vis)", 8));
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 1), getInt("Masksize Erode (Vis)", 12),
+					getInt("Masksize Dilate (Vis)", 14));
 			saveAndDrawPeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
 					searchRadius);
 		}
@@ -82,8 +82,11 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			return null;
 		Image workimg = input().masks().nir().copy();
 		if (getBoolean("Calculate on Near-infrared Image", false) && !ignore) {
-			int searchRadius = getInt("Search-radius (Nir)", 10);
+			int searchRadius = getInt("Search-radius (Nir)", 20);
 			double fillGradeInPercent = getDouble("Fillgrade", 0.35);
+			workimg.setCameraType(CameraType.FLUO);
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Nir)", 1), getInt("Masksize Erode (Nir)", 4),
+					getInt("Masksize Dilate (Nir)", 8));
 			saveAndDrawPeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.NIR, optionsAndResults.getCameraPosition(),
 					searchRadius);
 		}
@@ -182,9 +185,6 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		// enlarge 1 px lines
 		ImageConvolution ic = new ImageConvolution(img);
 		img = ic.enlargeLines().getImage().show("Enlarged Lines " + ct.toString(), debugValues);
-		
-		// add border around image
-		img = img.io().addBorder(searchRadius / 2, 0, 0, background).getImage();
 		
 		return img;
 	}
