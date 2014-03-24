@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.jdom.Element;
 
-public interface NumericMeasurementInterface extends MappingDataEntity, Measurement {
+public interface NumericMeasurementInterface extends Measurement {
 	
 	public abstract void getString(StringBuilder r);
 	
