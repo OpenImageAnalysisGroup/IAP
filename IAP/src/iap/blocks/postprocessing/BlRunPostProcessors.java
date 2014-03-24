@@ -34,7 +34,6 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
 		getResultSet().clearStoredPostprocessors();
-		getResultSet().clearStore();
 	}
 	
 	@Override

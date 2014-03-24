@@ -22,14 +22,16 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageInMemory;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class BlockResults implements BlockResultSet {
 	
 	private final TreeMap<Integer, TreeMap<String, Double>> storedNumerics = new TreeMap<Integer, TreeMap<String, Double>>();
 	private final TreeMap<Integer, TreeMap<String, ThreadSafeOptions>> storedObjects = new TreeMap<Integer, TreeMap<String, ThreadSafeOptions>>();
-	private HashMap<String, Image> storedImages = new HashMap<String, Image>();
+	private TreeMap<Integer, TreeMap<String, ImageData>> storedImages = new TreeMap<Integer, TreeMap<String, ImageData>>();
 	private final HashMap<String, VolumeData> storedVolumes = new HashMap<String, VolumeData>();
 	private final ArrayList<RunnableOnImageSet> storedPostProcessors = new ArrayList<RunnableOnImageSet>();
 	private final Double cameraAngle;
@@ -193,86 +195,76 @@ public class BlockResults implements BlockResultSet {
 	@Override
 	public synchronized ArrayList<BlockResultValue> searchResults(boolean exact,
 			String search) {
-		if (exact)
-			return getPropertiesExactMatch(search);
-		
 		ArrayList<BlockResultValue> result = new ArrayList<BlockResultValue>();
-		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
-		if (sv != null)
-			for (TreeMap<String, Double> tm : sv) {
-				Set<String> ks = tm.keySet();
-				if (ks != null)
-					for (String key : ks) {
-						if (key.startsWith(search)) {
-							PropertyNames pn = null;
-							try {
-								pn = PropertyNames.valueOf(key);
-							} catch (Exception e) {
-								// ignore, not a parameter which has an enum
-								// constant
-							}
-							if (pn == null) {
-								if (tm.get(key) != null) {
-									String name = key
-											.substring(search.length());
+		{
+			// analyse numeric store
+			Collection<TreeMap<String, Double>> sv = storedNumerics.values();
+			if (sv != null)
+				for (TreeMap<String, Double> tm : sv) {
+					Set<String> ks = tm.keySet();
+					if (ks != null)
+						for (String key : ks) {
+							if ((!exact && key.startsWith(search)) || (exact && key.equals(search))) {
+								PropertyNames pn = null;
+								try {
+									pn = PropertyNames.valueOf(key);
+								} catch (Exception e) {
+									// ignore, not a parameter which has an enum
+									// constant
+								}
+								if (pn == null) {
+									if (tm.get(key) != null) {
+										String name = key.substring(search.length());
+										BlockResultValue p = new BlockResultValue(
+												name, getUnitFromName(key),
+												tm.get(key), cameraAngle);
+										result.add(p);
+									}
+								} else {
 									BlockResultValue p = new BlockResultValue(
-											name, getUnitFromName(key),
-											tm.get(key), cameraAngle);
+											pn.getName(null), pn.getUnit(), tm.get(key), cameraAngle);
 									result.add(p);
 								}
-							} else {
-								BlockResultValue p = new BlockResultValue(
-										pn.getName(null), pn.getUnit(), tm.get(key), cameraAngle);
-								result.add(p);
 							}
 						}
-					}
-			}
+				}
+		}
+		{
+			// analyse image store
+			Collection<TreeMap<String, ImageData>> sv = storedImages.values();
+			if (sv != null)
+				for (TreeMap<String, ImageData> tm : sv) {
+					Set<String> ks = tm.keySet();
+					if (ks != null)
+						for (String key : ks) {
+							if ((!exact && key.startsWith(search)) || (exact && key.equals(search))) {
+								PropertyNames pn = null;
+								try {
+									pn = PropertyNames.valueOf(key);
+								} catch (Exception e) {
+									// ignore, not a parameter which has an enum
+									// constant
+								}
+								if (pn == null) {
+									if (tm.get(key) != null) {
+										String name = key.substring(search.length());
+										BlockResultValue p = new BlockResultValue(name, tm.get(key));
+										result.add(p);
+									}
+								} else {
+									BlockResultValue p = new BlockResultValue(pn.getName(null), tm.get(key));
+									result.add(p);
+								}
+							}
+						}
+				}
+		}
 		return result;
 	}
 	
 	@Override
 	public synchronized ArrayList<BlockResultValue> searchResults(String search) {
 		return searchResults(false, search);
-	}
-	
-	private synchronized ArrayList<BlockResultValue> getPropertiesExactMatch(
-			String match) {
-		ArrayList<BlockResultValue> result = new ArrayList<BlockResultValue>();
-		if (match == null || match.isEmpty())
-			return result;
-		Collection<TreeMap<String, Double>> sv = storedNumerics.values();
-		if (sv != null)
-			for (TreeMap<String, Double> tm : sv) {
-				String[] ks = tm.keySet().toArray(new String[] {});
-				if (ks != null)
-					for (String key : ks) {
-						if (key.equals(match)) {
-							PropertyNames pn = null;
-							try {
-								pn = PropertyNames.valueOfCached(key);
-							} catch (Exception e) {
-								// ignore, not a parameter which has an enum
-								// constant
-							}
-							if (pn == null) {
-								if (tm.get(key) != null) {
-									String name = key
-											.substring(match.length());
-									BlockResultValue p = new BlockResultValue(
-											name, getUnitFromName(name),
-											tm.get(key), cameraAngle);
-									result.add(p);
-								}
-							} else {
-								BlockResultValue p = new BlockResultValue(
-										pn.getName(null), pn.getUnit(), tm.get(key), cameraAngle);
-								result.add(p);
-							}
-						}
-					}
-			}
-		return result;
 	}
 	
 	TreeMap<String, String> name2unit = getUnits();
@@ -323,14 +315,42 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public void setImage(String id, Image image) {
-		storedImages.put(id, image);
+	public void setImage(int blockPosition, String id, ImageData image) {
+		if (!storedImages.containsKey(blockPosition))
+			storedImages.put(blockPosition, new TreeMap<String, ImageData>());
+		
+		storedImages.get(blockPosition).put(id, image);
+	}
+	
+	@Override
+	public void setImage(int position, String id, Image image) {
+		if (!storedImages.containsKey(position))
+			storedImages.put(position, new TreeMap<String, ImageData>());
+		
+		storedImages.get(position).put(id, new ImageInMemory(null, image));
+	}
+	
+	@Override
+	public Image getImage(int blockPosition, String id) {
+		if (!storedImages.containsKey(blockPosition))
+			return null;
+		ImageData res = storedImages.get(blockPosition).get(id);
+		if (res == null)
+			return null;
+		else
+			return ((ImageInMemory) res).getImageData();
 	}
 	
 	@Override
 	public Image getImage(String id) {
-		Image res = storedImages.get(id);
-		return res;
+		for (Integer blockPosition : storedImages.keySet()) {
+			ImageData res = storedImages.get(blockPosition).get(id);
+			if (res == null)
+				continue;
+			else
+				return ((ImageInMemory) res).getImageData();
+		}
+		return null;
 	}
 	
 	@Override
@@ -364,13 +384,6 @@ public class BlockResults implements BlockResultSet {
 			}
 		}
 		return res;
-	}
-	
-	@Override
-	public void clearStore() {
-		storedImages.clear();
-		storedVolumes.clear();
-		storedPostProcessors.clear();
 	}
 	
 	@Override
@@ -416,13 +429,8 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public HashMap<String, Image> getImages() {
+	public TreeMap<Integer, TreeMap<String, ImageData>> getImages() {
 		return storedImages;
-	}
-	
-	@Override
-	public void setImages(HashMap<String, Image> storedImages) {
-		this.storedImages = storedImages;
 	}
 	
 	@Override
@@ -432,8 +440,6 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public void removeResultObject(BlockResultObject obj) {
-		
-		// TreeMap<Integer, TreeMap<String, ThreadSafeOptions>> storedObjects
 		for (Entry<Integer, TreeMap<String, ThreadSafeOptions>> u : storedObjects.entrySet()) {
 			TreeMap<String, ThreadSafeOptions> i = u.getValue();
 			for (Entry<String, ThreadSafeOptions> o : i.entrySet()) {
@@ -444,6 +450,10 @@ public class BlockResults implements BlockResultSet {
 				
 			}
 		}
-		
+	}
+	
+	@Override
+	public void setImages(TreeMap<Integer, TreeMap<String, ImageData>> storedImages) {
+		this.storedImages = storedImages;
 	}
 }

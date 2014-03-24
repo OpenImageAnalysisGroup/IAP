@@ -403,4 +403,23 @@ public class ImageSet {
 				throw new UnsupportedOperationException("FlexibleImage-Type is not set!");
 		}
 	}
+	
+	public void setImageInfo(CameraType ct, ImageData info) {
+		switch (ct) {
+			case VIS:
+				setVisInfo(info);
+				break;
+			case FLUO:
+				setFluoInfo(info);
+				break;
+			case NIR:
+				setNirInfo(info);
+				break;
+			case IR:
+				setIrInfo(info);
+				break;
+			case UNKNOWN:
+				throw new UnsupportedOperationException("FlexibleImage-Type is not set!");
+		}
+	}
 }

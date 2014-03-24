@@ -26,7 +26,7 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		if (getBoolean("Store Unchanged Fluo for Color Analysis", true))
-			getResultSet().setImage("inp_fluo", input().masks().fluo());
+			getResultSet().setImage(getBlockPosition(), "inp_fluo", input().masks().fluo());
 		
 		boolean debug = getBoolean("debug", false);
 		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(),
@@ -51,7 +51,7 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 			fis.show("Fluorescence Segmentation Results");
 		}
 		
-		getResultSet().setImage(BlAdaptiveSegmentationFluo.RESULT_OF_FLUO_INTENSITY, r);
+		getResultSet().setImage(getBlockPosition(), BlAdaptiveSegmentationFluo.RESULT_OF_FLUO_INTENSITY, r);
 		
 		return r;
 	}

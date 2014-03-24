@@ -8,16 +8,14 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public interface ImageProcessor {
 	
-	public abstract HashMap<Integer, StringAndFlexibleMaskAndImageSet> execute(
+	public void execute(
 			ImageProcessorOptionsAndResults options,
-			ImageSet input, ImageSet optInputMasks, int maxThreadsPerImage,
-			HashMap<Integer, ImageStack> debugStack)
+			ImageSet input, ImageSet optInputMasks, int maxThreadsPerImage)
 			throws Exception;
 	
 	/**

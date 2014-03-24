@@ -3,7 +3,6 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks.all;
 import iap.pipelines.ImageProcessor;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;
 
 import java.util.ArrayList;
@@ -18,19 +17,15 @@ import java.util.concurrent.Semaphore;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.MeasurementFilter;
-import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
-import org.graffiti.plugin.io.resources.IOurl;
-import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemFolderStorage;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemHandler;
-import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
@@ -41,7 +36,6 @@ import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -49,7 +43,6 @@ import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
-import de.ipk.ag_ba.server.datastructures.LoadedImageStream;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -62,12 +55,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
@@ -392,6 +383,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					addPostprocessingResults(inSamples, postprocessingResults);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				ErrorMsg.addErrorMessage(e);
 			}
 		}
@@ -406,20 +398,20 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final TreeMap<Long, TreeMap<String, ImageData>> analysisInput, final Long time, final String configAndAngle) {
 		if (status.wantsToStop())
 			return;
-		if (imageSetWithSpecificAngle.get(time).get(configAndAngle) != null &&
-				imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() != null) {
-			Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo()
-					.getParentSample();
-			if (inSample != null) {
-				synchronized (inSamples) {
-					inSamples.put(time, inSample);
-				}
-			}
-		} else
-			return;
-		final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();
-		
 		try {
+			if (imageSetWithSpecificAngle.get(time).get(configAndAngle) != null &&
+					imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() != null) {
+				Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo()
+						.getParentSample();
+				if (inSample != null) {
+					synchronized (inSamples) {
+						inSamples.put(time, inSample);
+					}
+				}
+			} else
+				return;
+			final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();
+			
 			TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint;
 			synchronized (plantResults) {
 				if (!plantResults.containsKey(time))
@@ -449,6 +441,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
 		return;
@@ -545,18 +538,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						
 						is.setIsSide(imageConfiguration.isSide());
 						if ((imageConfiguration.isSide() && side) || (!imageConfiguration.isSide() && top)) {
-							if (imageConfiguration == ImageConfiguration.VisSide
-									|| imageConfiguration == ImageConfiguration.VisTop)
-								is.setVisInfo(id);
-							if (imageConfiguration == ImageConfiguration.FluoSide
-									|| imageConfiguration == ImageConfiguration.FluoTop)
-								is.setFluoInfo(id);
-							if (imageConfiguration == ImageConfiguration.NirSide
-									|| imageConfiguration == ImageConfiguration.NirTop)
-								is.setNirInfo(id);
-							if (imageConfiguration == ImageConfiguration.IrSide
-									|| imageConfiguration == ImageConfiguration.IrTop)
-								is.setIrInfo(id);
+							is.setImageInfo(imageConfiguration.getCameraType(), id);
 						}
 					}
 				}
@@ -667,124 +649,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	public abstract ImageProcessor getImageProcessor() throws Exception;
 	
-	private LocalComputeJob saveImage(
-			final int tray, final int tray_cnt,
-			final ImageData id, final Image image,
-			final byte[] optLabelImageContent, final String labelFileExtension)
-			throws InterruptedException {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				if (output == null) {
-					System.err.println("INTERNAL ERROR: OUTPUT IS NULL!!! 3");
-					return;
-				}
-				if (optLabelImageContent == null) {
-					if (image.getHeight() > 1) {
-						if (id != null && id.getParentSample() != null) {
-							LoadedImage loadedImage = new LoadedImage(id,
-									image.getAsBufferedImage());
-							// loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-							ImageData imageRef = saveImageAndUpdateURL(
-									loadedImage, databaseTarget, false,
-									tray, tray_cnt);
-							if (imageRef != null) {
-								if (output != null)
-									outputAdd(imageRef);
-							} else {
-								System.out.println(SystemAnalysis.getCurrentTime()
-										+ ">ERROR: SaveImageAndUpdateURL failed! (NULL Result)");
-								ErrorMsg.addErrorMessage("SaveImageAndUpdateURL failed! (NULL Result)");
-							}
-						}
-					}
-				} else {
-					if (image.getHeight() > 1) {
-						LoadedImageStream loadedImage = new LoadedImageStream(
-								id, image.getAsBufferedImage(),
-								optLabelImageContent);
-						loadedImage.setLabelURL(new IOurl(id.getURL()
-								.getPrefix(), null, "d_"
-								+ id.getURL().getFileName()
-								+ labelFileExtension));
-						ImageData imageRef = saveImageAndUpdateURL(
-								loadedImage,
-								databaseTarget, true, tray, tray_cnt);
-						if (imageRef == null) {
-							ErrorMsg.addErrorMessage("SaveImageAndUpdateURL failed! (ERROR #1)");
-							System.out.println("ERROR #1");
-						} else {
-							if (output != null)
-								outputAdd(imageRef);
-						}
-					}
-				}
-			}
-		};
-		r.run();
-		return null;
-		// return new LocalComputeJob(r, "Save Image");
-	}
-	
 	private void outputAdd(NumericMeasurementInterface meas) {
 		// MappingData3DPath mp = new MappingData3DPath(meas, true);
 		Substance3D.addAndMerge(output, meas, false, !(meas instanceof BinaryMeasurement));
 		// Substance3D.addAndMerge(output, mp.getSubstance(), false);
-	}
-	
-	protected ImageData saveImageAndUpdateURL(LoadedImage result,
-			DatabaseTarget storeResultInDatabase, boolean processLabelUrl,
-			int tray, int tray_cnt) {
-		result.getURL().setFileName(addTrayInfo(tray, tray_cnt, result.getURL().getFileName()));
-		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
-		
-		if (result.getLabelURL() != null && processLabelUrl) {
-			result.getLabelURL().setFileName(
-					addTrayInfo(tray, tray_cnt,
-							result.getLabelURL().getFileName()));
-			result.getLabelURL().setPrefix(LoadedDataHandler.PREFIX);
-		}
-		
-		try {
-			LoadedImage lib = result;
-			if (storeResultInDatabase != null) {
-				result = storeResultInDatabase.saveImage(new String[] { "", "label_" }, result, false, true);
-				// add processed image to result
-				if (result != null)
-					return new ImageData(result.getParentSample(), result);
-				else {
-					System.out.println(SystemAnalysis.getCurrentTime()
-							+ ">Could not save in DB: "
-							+ lib.getURL().toString());
-					ErrorMsg.addErrorMessage("Could not save in DB: "
-							+ lib.getURL().toString());
-				}
-			} else {
-				boolean clearmemory = true;
-				if (clearmemory) {
-					System.out.println(SystemAnalysis.getCurrentTime()
-							+ ">Image result not saved and removed from result set: " + lib.getURL().toString());
-					return null;
-				} else {
-					System.out.println(SystemAnalysis.getCurrentTime()
-							+ ">Image result kept in memory: " + lib.getURL().toString());
-					return result;
-				}
-			}
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		return null;
-	}
-	
-	private String addTrayInfo(int tray, int tray_cnt, String fileName) {
-		if (tray_cnt > 1) {
-			String extension = fileName.substring(fileName.lastIndexOf(".") + ".".length());
-			fileName = StringManipulationTools.stringReplace(fileName,
-					"." + extension, "." + tray + "." + tray_cnt + "."
-							+ extension);
-		}
-		return fileName;
 	}
 	
 	@Override
@@ -815,7 +683,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		return result;
 	}
 	
-	private void processNumericResults(ImageData copyFrom, HashMap<Integer, BlockResultSet> tray2analysisResults) {
+	private void processResults(ImageData copyFrom, HashMap<Integer, BlockResultSet> tray2analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
@@ -827,18 +695,19 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (bpv.getName() == null)
 					continue;
 				
-				NumericMeasurement3D m = new NumericMeasurement3D(copyFrom, bpv.getName(), null);
-				// m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-				m.setAnnotation(null);
-				m.setValue(bpv.getValue());
-				m.setUnit(bpv.getUnit());
-				if (multiTray)
-					m.setQualityAnnotation(m.getQualityAnnotation() + "_" + tray);
-				
-				if (output != null)
+				if (bpv.getBinary() != null) {
+					outputAdd(bpv.getBinary());
+				} else {
+					NumericMeasurement3D m = new NumericMeasurement3D(copyFrom, bpv.getName(), null);
+					// m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
+					m.setAnnotation(null);
+					m.setValue(bpv.getValue());
+					m.setUnit(bpv.getUnit());
+					if (multiTray)
+						m.setQualityAnnotation(m.getQualityAnnotation() + "_" + tray);
+					
 					outputAdd(m);
-				else
-					System.err.println("Internal Error: Output is NULL!!");
+				}
 			}
 		}
 	}
@@ -879,8 +748,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								VolumeData volumeInDatabase = new VolumeData(v.getParentSample(), v);
 								volumeInDatabase.getURL().setPrefix(
 										databaseTarget.getPrefix());
-								volumeInDatabase.getURL().setDetail(
-										v.getURL().getDetail());
+								volumeInDatabase.getURL().setDetail(v.getURL().getDetail());
 								outputAdd(volumeInDatabase);
 							} else {
 								System.out.println(SystemAnalysis.getCurrentTime()
@@ -933,90 +801,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 	}
 	
-	private ArrayList<LocalComputeJob> processAndOrSaveResultImages(
-			int tray, int tray_cnt,
-			ImageSet id,
-			ImageData inVis, ImageData inFluo, ImageData inNir, ImageData inIr,
-			ImageStack debugImageStack, Image resVis,
-			Image resFluo, Image resNir, Image resIr, int parentPriority)
-			throws InterruptedException {
-		// StopWatch s = new StopWatch(SystemAnalysisExt.getCurrentTime() +
-		// ">SAVE IMAGE RESULTS", false);
-		// ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
-		if (forceDebugStack) {
-			while (forcedDebugStacks.size() < tray_cnt)
-				forcedDebugStacks.add(null);
-			forcedDebugStacks.set(tray, debugImageStack);
-		} else {
-			byte[] buf = null;
-			if (debugImageStack != null) {
-				System.out.println("[s");
-				MyByteArrayOutputStream mos = new MyByteArrayOutputStream();
-				debugImageStack.saveAsLayeredTif(mos);
-				debugImageStack.show("Tray " + tray + "_" + tray_cnt);
-				buf = mos.getBuff();
-				System.out.println("f]");
-			} else {
-				if (inVis != null && inVis.getLabelURL() != null)
-					inVis.addAnnotationField("oldreference", inVis
-							.getLabelURL().toString());
-				if (inFluo != null && inFluo.getLabelURL() != null)
-					inFluo.addAnnotationField("oldreference", inFluo
-							.getLabelURL().toString());
-				if (inNir != null && inNir.getLabelURL() != null)
-					inNir.addAnnotationField("oldreference", inNir
-							.getLabelURL().toString());
-				if (inIr != null && inIr.getLabelURL() != null)
-					inIr.addAnnotationField("oldreference", inIr
-							.getLabelURL().toString());
-				
-				if (id.getVisInfo() != null && id.getVisInfo().getURL() != null)
-					inVis.setLabelURL(id.getVisInfo().getURL().copy());
-				
-				if (id.getFluoInfo() != null && id.getFluoInfo().getURL() != null)
-					inFluo.setLabelURL(id.getFluoInfo().getURL().copy());
-				if (inNir != null && id != null && id.getNirInfo() != null
-						&& id.getNirInfo().getURL() != null)
-					inNir.setLabelURL(id.getNirInfo().getURL().copy());
-				if (inIr != null && id != null && id.getIrInfo() != null
-						&& id.getIrInfo().getURL() != null)
-					inIr.setLabelURL(id.getIrInfo().getURL().copy());
-			}
-			LocalComputeJob ra = null, rb = null, rc = null, rd = null;
-			
-			if (resVis != null)
-				ra = saveImage(
-						tray, tray_cnt,
-						inVis, resVis, buf, "." + IAPservice.getTargetFileExtension(false, null));
-			if (resFluo != null)
-				rb = saveImage(
-						tray, tray_cnt,
-						inFluo, resFluo, buf, "." + IAPservice.getTargetFileExtension(false, null));
-			if (resNir != null)
-				rc = saveImage(
-						tray, tray_cnt,
-						inNir, resNir, buf, "." + IAPservice.getTargetFileExtension(false, null));
-			if (resIr != null)
-				rd = saveImage(
-						tray, tray_cnt,
-						inIr, resIr, buf, "." + IAPservice.getTargetFileExtension(false, null));
-			
-			// if (ra != null) {
-			// waitThreads.add(BackgroundThreadDispatcher.addTask(ra));
-			// }
-			// if (rb != null) {
-			// waitThreads.add(BackgroundThreadDispatcher.addTask(rb));
-			// }
-			// if (rc != null) {
-			// waitThreads.add(BackgroundThreadDispatcher.addTask(rc));
-			// }
-			// if (rd != null) {
-			// waitThreads.add(BackgroundThreadDispatcher.addTask(rd));
-			// }
-		}
-		return null;// waitThreads;
-	}
-	
 	@Override
 	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps) {
 		this.unit_test_idx = unit_test_idx;
@@ -1059,8 +843,13 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		options.setConfigAndAngle(configAndAngle);
 		options.setUnitTestInfo(unit_test_idx, unit_test_steps);
 		
+		options.forceDebugStack = forceDebugStack;
+		options.forcedDebugStacks = forcedDebugStacks;
+		
+		options.databaseTarget = databaseTarget;
+		options.setCustomNullBlockPrefix("Separate Settings");
+		
 		{
-			options.setCustomNullBlockPrefix("Separate Settings");
 			boolean processEarlyTimes = options.getBooleanSetting(null, "Early//Custom settings for early timepoints", false);
 			boolean processLateTimes = options.getBooleanSetting(null, "Late//Custom settings for late timepoints", false);
 			int earlyTimeUntilDayX = options.getIntSetting(null, "Early//Early time until time point", -1);
@@ -1086,13 +875,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			this.setDebugLastSystemOptionStorageGroup(options.getSystemOptionStorageGroup());
 		}
 		
-		HashMap<Integer, ImageStack> debugImageStack = null;
-		boolean addDebugImages = IAPmain
-				.isSettingEnabled(IAPfeature.SAVE_DEBUG_STACK);
-		if (addDebugImages || forceDebugStack) {
-			debugImageStack = new HashMap<Integer, ImageStack>();
-		}
-		
 		HashMap<Integer, BlockResultSet> well2analysisResults = null;
 		
 		{
@@ -1100,53 +882,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
 			imageProcessor.setValidTrays(debugValidTrays);
-			HashMap<Integer, StringAndFlexibleMaskAndImageSet> ret = imageProcessor.execute(options,
-					input, inputMasks, maximumThreadCountOnImageLevel,
-					debugImageStack);
+			imageProcessor.execute(options, input, inputMasks, maximumThreadCountOnImageLevel);
 			
-			for (Integer wellIdx : ret.keySet()) {
-				ImageSet pipelineResult = ret != null ? ret.get(wellIdx).getMaskAndImageSet().images() : null;
-				if (pipelineResult != null) {
-					Image resVis = null, resFluo = null, resNir = null, resIr = null;
-					resVis = pipelineResult.vis();
-					resFluo = pipelineResult.fluo();
-					resNir = pipelineResult.nir();
-					resIr = pipelineResult.ir();
-					
-					boolean manyWells = options.getWellCnt() > 1;
-					ImageData inVis2 = inVis == null ? null : (ImageData) inVis.clone(inVis.getParentSample());
-					ImageData inFluo2 = inFluo == null ? null : (ImageData) inFluo.clone(inFluo.getParentSample());
-					ImageData inNir2 = inNir == null ? null : (ImageData) inNir.clone(inNir.getParentSample());
-					ImageData inIr2 = inIr == null ? null : (ImageData) inIr.clone(inIr.getParentSample());
-					if (manyWells) {
-						for (ImageData img : new ImageData[] { inVis2, inFluo2, inNir2, inIr2 })
-							if (img != null)
-								img.setQualityAnnotation(img.getQualityAnnotation() + "_" + wellIdx);
-					}
-					
-					well2analysisResults = imageProcessor.getNumericResults();
-					// waitThreads.addAll(
-					processAndOrSaveResultImages(
-							wellIdx, options.getWellCnt(),
-							id, inVis2, inFluo2, inNir2, inIr2,
-							debugImageStack != null ? debugImageStack.get(wellIdx) : null, resVis, resFluo, resNir, resIr, parentPriority);
-					// );
-				}
-			}
-		}
-		// BackgroundThreadDispatcher.waitFor(waitThreads);
-		if (well2analysisResults != null) {
-			ImageData copyFrom = inVis;
-			if (copyFrom == null)
-				copyFrom = inFluo;
-			if (copyFrom == null)
-				copyFrom = inNir;
-			if (copyFrom == null)
-				copyFrom = inIr;
-			
-			processNumericResults(copyFrom, well2analysisResults);
+			well2analysisResults = imageProcessor.getNumericResults();
 			
 		}
+		
+		if (well2analysisResults != null)
+			processResults(input.getAnyInfo(), well2analysisResults);
+		
 		return new ResultsAndWaitThreads(well2analysisResults, new ArrayList<LocalComputeJob>());
 	}
 	

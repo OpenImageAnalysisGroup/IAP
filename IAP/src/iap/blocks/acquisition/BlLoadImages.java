@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 
 /**
- * @author entzian, klukas
+ * @author klukas
  */
 
 public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
