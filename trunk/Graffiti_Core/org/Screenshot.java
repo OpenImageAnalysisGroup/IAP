@@ -33,7 +33,7 @@ public class Screenshot {
 		Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
 		final BufferedImage capture = new Robot().createScreenCapture(screenRect);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageIO.write(capture, "png", baos);
+		ImageIO.write(capture, SystemOptions.getInstance().getString("IAP", "Screenshot File Type", "png"), baos);
 		MyByteArrayInputStream is = new MyByteArrayInputStream(baos.toByteArray());
 		return is;
 	}
@@ -44,7 +44,7 @@ public class Screenshot {
 			fileN = SystemAnalysis.getLocalHost().getCanonicalHostName() + " (" + SystemAnalysis.getCurrentTimeInclSec() + ").png";
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
-			fileN = "unknown host (" + SystemAnalysis.getCurrentTimeInclSec() + ").png";
+			fileN = "unknown host (" + SystemAnalysis.getCurrentTimeInclSec() + ")." + SystemOptions.getInstance().getString("IAP", "Preview File Type", "png");
 		}
 		if (fileN != null)
 			fileN = StringManipulationTools.getFileSystemName(fileN);
@@ -54,10 +54,11 @@ public class Screenshot {
 	private static String getStaticFileName() {
 		String fileN;
 		try {
-			fileN = SystemAnalysis.getLocalHost().getCanonicalHostName() + ".png";
+			fileN = SystemAnalysis.getLocalHost().getCanonicalHostName() + "." + SystemOptions.getInstance().getString("IAP", "Preview File Type", "png");
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
-			fileN = "unknown host (up " + SystemAnalysis.getCurrentTime(startTime) + ").png";
+			fileN = "unknown host (up " + SystemAnalysis.getCurrentTime(startTime) + ")."
+					+ SystemOptions.getInstance().getString("IAP", "Preview File Type", "png");
 		}
 		if (fileN != null)
 			fileN = StringManipulationTools.getFileSystemName(fileN);

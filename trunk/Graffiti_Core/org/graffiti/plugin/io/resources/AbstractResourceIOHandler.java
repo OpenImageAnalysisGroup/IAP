@@ -8,6 +8,8 @@ import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
+import org.SystemOptions;
+
 public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 	
 	@Override
@@ -44,7 +46,7 @@ public abstract class AbstractResourceIOHandler implements ResourceIOHandler {
 		i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
 		
 		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
-		ImageIO.write(i, "png", output);
+		ImageIO.write(i, SystemOptions.getInstance().getString("IAP", "Preview File Type", "png"), output);
 		
 		MyByteArrayInputStream result = new MyByteArrayInputStream(output.getBuff(), output.size());
 		
