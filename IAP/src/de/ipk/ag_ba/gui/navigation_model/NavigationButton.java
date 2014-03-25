@@ -46,6 +46,7 @@ import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
+import de.ipk.ag_ba.gui.navigation_actions.SideGuiComponent;
 import de.ipk.ag_ba.gui.util.MyUtility;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -104,6 +105,11 @@ public class NavigationButton implements StyleAware {
 			this.setTitle(navigationAction.getDefaultTitle());
 			this.navigationImage = null;
 			this.actionImage = null;
+			SideGuiComponent sgc = navigationAction.getButtonGuiAddition();
+			if (sgc != null) {
+				sgc.setButton(this);
+				setSideGUI(sgc.getSideGui(), sgc.getSideGuiSpace(), sgc.getSideGuiWidth());
+			}
 		}
 		// if (guiSetting == null)
 		// System.out.println("ERROR: GUI-SETTING VARIABLE NOT ASSIGNED (INTERNAL ERROR)");

@@ -102,7 +102,7 @@ public class BlAlign extends AbstractBlock {
 				textField,
 				null,
 				TableLayout.get3Split(
-						ic.getZoomSlider(), null, okButton, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
+						ic.getZoomSlider(-1), null, okButton, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
 				TableLayout.FILL, 5, TableLayout.PREFERRED);
 		JComponent v = TableLayout.get3SplitVertical(
 				jsp, null, editAndUpdate, TableLayout.FILL, 5, TableLayout.PREFERRED);

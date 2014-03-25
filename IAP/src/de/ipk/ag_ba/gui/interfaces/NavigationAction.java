@@ -13,6 +13,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
+import de.ipk.ag_ba.gui.navigation_actions.SideGuiComponent;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
@@ -65,4 +66,6 @@ public interface NavigationAction {
 	public void setSource(NavigationAction navigationAction, GUIsetting guiSetting);
 	
 	public boolean requestRightAlign();
+	
+	public SideGuiComponent getButtonGuiAddition();
 }
