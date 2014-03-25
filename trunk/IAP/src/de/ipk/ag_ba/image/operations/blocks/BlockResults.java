@@ -337,8 +337,10 @@ public class BlockResults implements BlockResultSet {
 		ImageData res = storedImages.get(blockPosition).get(id);
 		if (res == null)
 			return null;
-		else
+		else {
+			storedImages.get(blockPosition).remove(id);
 			return ((ImageInMemory) res).getImageData();
+		}
 	}
 	
 	@Override
@@ -347,8 +349,10 @@ public class BlockResults implements BlockResultSet {
 			ImageData res = storedImages.get(blockPosition).get(id);
 			if (res == null)
 				continue;
-			else
+			else {
+				storedImages.get(blockPosition).remove(id);
 				return ((ImageInMemory) res).getImageData();
+			}
 		}
 		return null;
 	}
