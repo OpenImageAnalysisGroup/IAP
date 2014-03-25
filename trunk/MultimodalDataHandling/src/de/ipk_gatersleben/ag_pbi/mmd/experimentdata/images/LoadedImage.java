@@ -112,6 +112,7 @@ public class LoadedImage extends ImageData implements LoadedData {
 	 * @return
 	 * @throws IOException
 	 */
+	@Override
 	public InputStream getInputStream() {
 		return getInputStreamFromImage(image);
 	}
@@ -195,5 +196,11 @@ public class LoadedImage extends ImageData implements LoadedData {
 			ErrorMsg.addErrorMessage(e);
 			return null;
 		}
+	}
+	
+	public ImageData getImageDataReference() {
+		ImageData res = new ImageData(getParentSample(), this);
+		res.setURL(getURL());
+		return res;
 	}
 }
