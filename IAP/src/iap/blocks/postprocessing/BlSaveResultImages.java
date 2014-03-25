@@ -32,9 +32,9 @@ public class BlSaveResultImages extends AbstractBlock {
 			if (manyWells)
 				outImageReference.setQualityAnnotation(outImageReference.getQualityAnnotation() + "_" + getWellIdx());
 			try {
-				ImageData res = processAndOrSaveResultImage(outImageReference, image);
+				LoadedImage res = processAndOrSaveResultImage(outImageReference, image);
 				if (res != null)
-					getResultSet().setImage(getBlockPosition(), "RESULT_" + res.getSubstanceName(), res);
+					getResultSet().setImage(getBlockPosition(), "RESULT_" + res.getSubstanceName(), res.getImageDataReference());
 			} catch (Exception e) {
 				throw new RuntimeException("Could not save result image", e);
 			}
@@ -47,7 +47,7 @@ public class BlSaveResultImages extends AbstractBlock {
 		return mask;
 	}
 	
-	private ImageData processAndOrSaveResultImage(ImageData outImageReference, Image resImage) throws Exception {
+	private LoadedImage processAndOrSaveResultImage(ImageData outImageReference, Image resImage) throws Exception {
 		int tray = getWellIdx();
 		int tray_cnt = optionsAndResults.getWellCnt();
 		
@@ -66,7 +66,7 @@ public class BlSaveResultImages extends AbstractBlock {
 		}
 	}
 	
-	private ImageData saveImage(
+	private LoadedImage saveImage(
 			final int tray, final int tray_cnt,
 			final ImageData id, final Image image, final String labelFileExtension) throws Exception {
 		if (id != null && id.getParentSample() != null) {
@@ -87,7 +87,7 @@ public class BlSaveResultImages extends AbstractBlock {
 		return fileName;
 	}
 	
-	protected ImageData saveImageAndUpdateURL(LoadedImage result,
+	protected LoadedImage saveImageAndUpdateURL(LoadedImage result,
 			DatabaseTarget databaseTarget, boolean processLabelUrl,
 			int tray, int tray_cnt) throws Exception {
 		if (result.getURL() == null)
