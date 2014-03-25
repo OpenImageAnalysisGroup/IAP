@@ -476,7 +476,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				null,
 				null,
 				TableLayout.get3Split(
-						ic.getZoomSlider(), null,
+						ic.getZoomSlider(-1), null,
 						TableLayout.get3Split(okButton, null, closeWindows, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
 						TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
 				TableLayout.FILL, 5, TableLayout.PREFERRED);

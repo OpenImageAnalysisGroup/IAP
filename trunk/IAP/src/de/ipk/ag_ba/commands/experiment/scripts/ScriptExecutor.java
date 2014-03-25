@@ -19,7 +19,7 @@ public class ScriptExecutor {
 	
 	public static TreeMap<Long, String> start(String name, final String cmd, String[] params,
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-			int timeoutMinutes, final File optCurrentDir) {
+			int timeoutMinutes, final File optCurrentDir, boolean monitorOutput) {
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		final String nameF = cmd;
 		final ArrayList<String> lastOutput = new ArrayList<String>();
@@ -112,7 +112,7 @@ public class ScriptExecutor {
 					if (optStatus != null)
 						optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 					if (optStatus != null)
-						optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": Finished PDF creation");
+						optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime());// + ": Finished command execution");
 				} catch (IOException e) {
 					output.put(System.nanoTime(), "ERROR: EXCEPTION: " + e.getMessage());
 					if (optStatus != null)
@@ -122,36 +122,37 @@ public class ScriptExecutor {
 					tso.setBval(1, true);
 				}
 				tso.setBval(0, true);
-				System.out.println(SystemAnalysis.getCurrentTime() + ">FINISHED PDF CREATION TASK");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">FINISHED TASK");
 			}
 		};
 		
 		Thread t = new Thread(r, "Execute " + name);
 		t.start();
 		
-		try {
-			long start = System.currentTimeMillis();
-			while (!tso.getBval(0, false)) {
-				Thread.sleep(20);
-				if (timeoutMinutes > 0) {
-					long now = System.currentTimeMillis();
-					if (now - start > 1000 * 60 * timeoutMinutes && myRef.getObject() != null) {
-						output.put(System.nanoTime(), "ERROR: TIME-OUT: " +
-								"Command execution took more than " +
-								timeoutMinutes + " minutes and has therefore been cancelled.");
-						tso.setBval(1, true);
-						if (myRef.getObject() != null) {
-							Process ls_proc = (Process) myRef.getObject();
-							ls_proc.destroy();
+		if (monitorOutput)
+			try {
+				long start = System.currentTimeMillis();
+				while (!tso.getBval(0, false)) {
+					Thread.sleep(20);
+					if (timeoutMinutes > 0) {
+						long now = System.currentTimeMillis();
+						if (now - start > 1000 * 60 * timeoutMinutes && myRef.getObject() != null) {
+							output.put(System.nanoTime(), "ERROR: TIME-OUT: " +
+									"Command execution took more than " +
+									timeoutMinutes + " minutes and has therefore been cancelled.");
+							tso.setBval(1, true);
+							if (myRef.getObject() != null) {
+								Process ls_proc = (Process) myRef.getObject();
+								ls_proc.destroy();
+							}
+							break;
 						}
-						break;
 					}
 				}
+			} catch (InterruptedException e) {
+				tso.setBval(1, true);
+				throw new UnsupportedOperationException(e);
 			}
-		} catch (InterruptedException e) {
-			tso.setBval(1, true);
-			throw new UnsupportedOperationException(e);
-		}
 		return output;
 	}
 	

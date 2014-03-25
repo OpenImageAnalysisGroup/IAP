@@ -56,7 +56,7 @@ public class PdfCreator {
 		if (optTargetDirectoryOrTargetFile != null) {
 			this.tempDirectory = optTargetDirectoryOrTargetFile;
 		} else {
-			String fn = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch", "file_export_"+System.nanoTime());
+			String fn = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch", "file_export_" + System.nanoTime());
 			this.tempDirectory = new File(fn);
 			boolean res = tempDirectory.mkdir();
 			if (!res)
@@ -229,7 +229,7 @@ public class PdfCreator {
 					if (optStatus != null)
 						optStatus.setCurrentStatusText1(optStatus.getCurrentStatusMessage2());
 					if (optStatus != null)
-						optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime() + ": Finished PDF creation");
+						optStatus.setCurrentStatusText2(SystemAnalysis.getCurrentTime()); // + ": Finished command execution"
 				} catch (IOException e) {
 					output.put(System.nanoTime(), "ERROR: EXCEPTION: " + e.getMessage());
 					if (optStatus != null)
@@ -239,7 +239,7 @@ public class PdfCreator {
 					tso.setBval(1, true);
 				}
 				tso.setBval(0, true);
-				System.out.println(SystemAnalysis.getCurrentTime() + ">FINISHED PDF CREATION TASK");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">FINISHED TASK");
 			}
 		};
 		

@@ -12,6 +12,7 @@ import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
+import de.ipk.ag_ba.gui.navigation_actions.SideGuiComponent;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
@@ -186,7 +187,11 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	
 	@Override
 	public boolean requestRightAlign() {
-		return remoteAction!=null && remoteAction.requestRightAlign();
+		return remoteAction != null && remoteAction.requestRightAlign();
 	}
 	
+	@Override
+	public SideGuiComponent getButtonGuiAddition() {
+		return remoteAction != null ? remoteAction.getButtonGuiAddition() : null;
+	}
 }

@@ -181,10 +181,10 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		
 	}
 	
-	public JComponent getZoomSlider() {
+	public JComponent getZoomSlider(Integer oldZoom) {
 		ArrayList<ZoomedImage> r = new ArrayList<ZoomedImage>();
 		r.add(this);
-		return getImageZoomSlider(r);
+		return getImageZoomSlider(r, oldZoom);
 	}
 	
 	public void setImage(BufferedImage image) {
@@ -192,15 +192,15 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		repaint();
 	}
 	
-	public static JComponent getImageZoomSlider(final ArrayList<ZoomedImage> zoomedImages) {
+	public static JComponent getImageZoomSlider(final ArrayList<ZoomedImage> zoomedImages, Integer oldZoom) {
 		
 		int FPS_MIN = 0;
-		int FPS_MAX = 400;
+		int FPS_MAX = oldZoom > 0 ? 200 : 400;
 		int FPS_INIT = 100;
 		
-		final JSlider sliderZoom = new JSlider(JSlider.HORIZONTAL, FPS_MIN, FPS_MAX, FPS_INIT);
+		final JSlider sliderZoom = new JSlider(JSlider.HORIZONTAL, FPS_MIN, FPS_MAX, oldZoom > 0 ? oldZoom : FPS_INIT);
 		
-		final JLabel lbl = new JLabel("Zoom (100%)");
+		final JLabel lbl = new JLabel("Zoom (" + (oldZoom > 0 ? oldZoom : FPS_INIT) + "%)");
 		
 		// Turn on labels at major tick marks.
 		sliderZoom.setMajorTickSpacing(100);
@@ -217,11 +217,11 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		});
 		
 		for (ZoomedImage zoomedImage : zoomedImages) {
-			if (zoomedImage.getInt() == 0)
+			if (zoomedImage.getInt() == 0 || oldZoom <= 0)
 				zoomedImage.setInt(100);
 			else {
-				updateZoom(zoomedImage, lbl, sliderZoom, zoomedImage.getInt());
-				sliderZoom.setValue(zoomedImage.getInt());
+				updateZoom(zoomedImage, lbl, sliderZoom, oldZoom > 0 ? oldZoom : zoomedImage.getInt());
+				sliderZoom.setValue(oldZoom > 0 ? oldZoom : zoomedImage.getInt());
 			}
 		}
 		
@@ -241,12 +241,17 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 			}
 		});
 		
-		return TableLayout.getSplitVertical(lbl, sliderZoom, TableLayout.PREFERRED, TableLayout.PREFERRED);
+		JPanel res = TableLayout.getSplitVertical(lbl, sliderZoom, TableLayout.PREFERRED, TableLayout.PREFERRED);
+		
+		res.putClientProperty("slider", sliderZoom);
+		
+		return res;
 	}
 	
 	private static void updateZoom(final ZoomedImage zoomedImage, final JLabel lbl, JSlider s, int val) {
 		lbl.setText("Zoom (" + val + "%)");
 		zoomedImage.setInt(val);
+		s.putClientProperty("zoomValue", val);
 	}
 	
 }

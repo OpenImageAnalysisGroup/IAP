@@ -241,7 +241,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 				params2 = null;
 			TreeMap<Long, String> ro = ScriptExecutor.start(
 					getDefaultTitle(), cmd, params2, getStatusProvider(), timeoutInMinutes,
-					expDir != null ? new File(expDir) : null
+					expDir != null ? new File(expDir) : null, true
 					);
 			res.add("<code>" + StringManipulationTools.getStringList(ro.values(), "<br>")
 					+ "</code>");
