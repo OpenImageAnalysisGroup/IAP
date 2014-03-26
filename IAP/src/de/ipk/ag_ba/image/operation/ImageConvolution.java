@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operation;
 
+import java.util.LinkedList;
+
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
@@ -37,8 +39,22 @@ public class ImageConvolution {
 		int[][] mask2 = { { 0, 1, 0 }, { 0, 1, 0 }, { 0, 1, 0 } };
 		int[][] mask3 = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 		int[][] mask4 = { { 0, 0, 1 }, { 0, 1, 0 }, { 1, 0, 0 } };
+		int[][] mask5 = { { 1, 0, 0 }, { 1, 1, 1 }, { 0, 0, 1 } };
+		int[][] mask6 = { { 0, 0, 1 }, { 1, 1, 1 }, { 1, 0, 0 } };
+		int[][] mask7 = { { 1, 1, 0 }, { 0, 1, 0 }, { 0, 1, 1 } };
+		int[][] mask8 = { { 0, 1, 1 }, { 0, 1, 0 }, { 1, 1, 0 } };
 		
-		boolean match1 = false, match2 = false, match3 = false, match4 = false;
+		LinkedList<int[][]> masks = new LinkedList<>();
+		masks.add(mask1);
+		masks.add(mask2);
+		masks.add(mask3);
+		masks.add(mask4);
+		masks.add(mask5);
+		masks.add(mask6);
+		masks.add(mask7);
+		masks.add(mask8);
+		
+		boolean match[] = new boolean[masks.size()];
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -48,13 +64,19 @@ public class ImageConvolution {
 							{ img2d[x - 1][y], img2d[x][y], img2d[x + 1][y] },
 							{ img2d[x - 1][y + 1], img2d[x][y + 1], img2d[x + 1][y + 1] } };
 					
-					match1 = match(mask1, area);
-					match2 = match(mask2, area);
-					match3 = match(mask3, area);
-					match4 = match(mask4, area);
+					int i = 0;
+					for (int[][] m : masks) {
+						match[i] = match(m, area);
+						i++;
+					}
 					
 					// fill mask in img
-					if (match1 || match2 || match3 || match4)
+					boolean isMatch = false;
+					for (boolean b : match) {
+						if (b)
+							isMatch = true;
+					}
+					if (isMatch)
 						img2d = fill8N(img2d, x, y);
 				}
 			}
