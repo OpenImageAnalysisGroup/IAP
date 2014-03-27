@@ -53,8 +53,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
 		ImageOperation origImage = img.copy();
-		img = img.binary(0, Color.WHITE.getRGB());
-		
+		img = img.binary(0, background);// Color.WHITE.getRGB());
 		ImageOperation inDilatedForSectionDetection = img.copy().bm().dilate(getInt("Dilate for section detection", 1)).io()
 				.show("Dilated image for section detection", debug);
 		
@@ -202,14 +201,15 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 			int background, ImageOperation img, ImageOperation nonBinaryImage,
 			ResultsTableWithUnits rt, ArrayList<RunnableOnImage> postProcessing) {
 		ImageOperation inp = img;
+		
 		int n = inp.countFilledPixels();
 		double sumGray = 0;
 		
 		if (rt != null) {
 			
 			rt.addValue(pre + "roots.filled.pixels", n);
-			
-			for (int p : nonBinaryImage.getAs1D()) {
+			int[] nb1d = nonBinaryImage.getAs1D();
+			for (int p : nb1d) {
 				if (p == ImageOperation.BACKGROUND_COLORint)
 					continue;
 				int bf = (p & 0x0000ff);
