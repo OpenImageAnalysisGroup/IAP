@@ -49,6 +49,17 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 				if (property2exectime.keySet().isEmpty()) {
 					setText("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>No analysis information available.</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>");
 				} else {
+					long overallExectime = 0;
+					if (!property2exectime.keySet().isEmpty()) {
+						for (String key : property2exectime.keySet()) {
+							if (!key.contains("//")) {
+								// statistics within the blocks (prepare/vis/fluo/nir/ir/postprocess)
+								ThreadSafeOptions o = property2exectime.get(key);
+								overallExectime += o.getLong();
+							}
+						}
+					}
+					
 					StringBuilder t = new StringBuilder();
 					t.append("<html><table>"
 							+ "<tr><th colspan=5 bgcolor='#EE9977'>" + WordUtils.capitalize("block-Processing function overview") + "</th></tr>"
@@ -73,8 +84,13 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 									+ "</tr>");
 							// type of stat | overall sum of execution time: x h y m (xx ms) | execution count: 5000 | average execution time: <1 s (200 ms)
 						}
-						
 					}
+					t.append("<tr><td bgcolor='#EEEEEE'>&sum; overall</td>"
+							+ "<td bgcolor='#EEEEEE'>" + SystemAnalysis.getWaitTime(overallExectime) + "</td>"
+							+ "<td bgcolor='#EEEEEE'/>"
+							+ "<td bgcolor='#EEEEEE'/>"
+							+ "<td bgcolor='#EEEEEE'/>"
+							+ "</tr>");
 					t.append("</table>");
 					String txt = t.toString();
 					setText(txt);
@@ -109,6 +125,18 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 						if (key.contains("//"))
 							blockStat.add(key);
 					}
+					
+					long overallExectime = 0;
+					if (!property2exectime.keySet().isEmpty()) {
+						for (String key : property2exectime.keySet()) {
+							if (!key.contains("//")) {
+								// statistics within the blocks (prepare/vis/fluo/nir/ir/postprocess)
+								ThreadSafeOptions o = property2exectime.get(key);
+								overallExectime += o.getLong();
+							}
+						}
+					}
+					
 					StringBuilder t = new StringBuilder();
 					TreeMap<BlockType, LinkedHashMap<String, ThreadSafeOptions>> blockType2block = new TreeMap<BlockType, LinkedHashMap<String, ThreadSafeOptions>>();
 					for (String key : blockStat) {
@@ -133,10 +161,23 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 					nn = nn.toLowerCase();
 					nn = WordUtils.capitalize(nn);
 					
+					long execSum = 0;
+					if (blockType2block.get(bt) != null)
+						for (String key : blockType2block.get(bt).keySet()) {
+							ThreadSafeOptions o = blockType2block.get(bt).get(key);
+							execSum += o.getLong();
+						}
+					
+					String perc = "";
+					if (execSum > 0 && overallExectime > 0) {
+						int percent = (int) (execSum * 100d / overallExectime);
+						perc = percent + "%";
+					}
+					
 					t.append("<html><table><tr><th colspan=5 bgcolor='"
 							+ bt.getColor()
 							+ "'><b>" + nn + "</b></th><tr>"
-							+ "<th bgcolor='#DDDDDD'>Property</th>"
+							+ "<th bgcolor='#DDDDDD'>Block</th>"
 							+ "<th bgcolor='#DDDDDD'>Execution Time&sup1;</th>"
 							+ "<th bgcolor='#DDDDDD'>Runs</th>"
 							+ "<th bgcolor='#DDDDDD'>Average</th>"
@@ -153,13 +194,35 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 							} catch (Exception e) {
 								title = title + " (name could not be determined)";
 							}
+							int pc = (int) (overallExectime > 0 ? o.getLong() * 100d / overallExectime : 0);
+							String ps = "";
+							if (pc > 1)
+								ps = " (" + pc + "%)";
+							String col = "FFFF";
+							if (pc >= 5)
+								col = "EEEE";
+							if (pc >= 10)
+								col = "DDDD";
+							if (pc >= 15)
+								col = "CCCC";
+							if (pc >= 20)
+								col = "BBBB";
+							if (pc >= 25)
+								col = "AAAA";
 							t.append("<tr><td bgcolor='#FFFFFF'>" + title + "</td>"
-									+ "<td bgcolor='#FFFFFF'>" /* + o.getLong() + " ms (" */+ SystemAnalysis.getWaitTime(o.getLong()) + "</td>"
+									+ "<td bgcolor='#FF" + col + "'>" + SystemAnalysis.getWaitTime(o.getLong()) + ps + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + o.getInt() + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + (o.getInt() > 0 ? o.getLong() / o.getInt() : "-") + " ms</td>"
 									+ "<td bgcolor='#FFFFFF'>" + ((int) o.getDouble() > 0 ? (int) o.getDouble() : "-") + "</td>"
 									+ "</tr>");
 						}
+					t.append("<tr><td bgcolor='#EEEEEE'>&sum; " + perc + " of overall time</td>"
+							+ "<td bgcolor='#EEEEEE'>" + SystemAnalysis.getWaitTime(execSum) + "</td>"
+							+ "<td bgcolor='#EEEEEE'/>"
+							+ "<td bgcolor='#EEEEEE'/>"
+							+ "<td bgcolor='#EEEEEE'/>"
+							+ "</tr>");
+					
 					t.append("</table>");
 					String txt = t.toString();
 					setText(txt);
