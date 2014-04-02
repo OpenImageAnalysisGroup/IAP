@@ -13,13 +13,19 @@ import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
 import java.awt.image.PixelGrabber;
+import java.awt.image.RGBImageFilter;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -112,8 +118,12 @@ public class Image {
 							b4 = b;
 							if (noAlpha)
 								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b3) << 16) | ((0xFF & b2) << 8) | (0xFF & b4);
-							else
-								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b4) << 16) | ((0xFF & b3) << 8) | (0xFF & b2);
+							else {
+								if ((0xFF & b1) < 0xFF)
+									pixels[out_idx] = ImageOperation.BACKGROUND_COLORint;
+								else
+									pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b4) << 16) | ((0xFF & b3) << 8) | (0xFF & b2);
+							}
 							out_idx++;
 						}
 				idx++;
@@ -258,8 +268,51 @@ public class Image {
 		return res;
 	}
 	
+	public static java.awt.Image makeColorTransparent(BufferedImage im) {
+		ImageFilter filter = new RGBImageFilter() {
+			
+			public int markerRGB = ImageOperation.BACKGROUND_COLOR.getRGB() | 0xFF000000;
+			
+			@Override
+			public final int filterRGB(int x, int y, int c) {
+				if ((c | 0xFF000000) == markerRGB) {
+					int r = ((c & 0xff0000) >> 16);
+					int g = ((c & 0x00ff00) >> 8);
+					int b = (c & 0x0000ff);
+					// Mark the alpha bits as zero - transparent
+					return (0x00 << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+				} else {
+					// nothing to do
+					return c;
+				}
+			}
+		};
+		
+		ImageProducer ip = new FilteredImageSource(im.getSource(), filter);
+		return Toolkit.getDefaultToolkit().createImage(ip);
+	}
+	
 	public BufferedImage getAsBufferedImage() {
-		return image.getBufferedImage();
+		return toBufferedImage(makeColorTransparent(image.getBufferedImage()));
+	}
+	
+	public static BufferedImage toBufferedImage(java.awt.Image img)
+	{
+		if (img instanceof BufferedImage)
+		{
+			return (BufferedImage) img;
+		}
+		
+		// Create a buffered image with transparency
+		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		
+		// Draw the image on to the buffered image
+		Graphics2D bGr = bimage.createGraphics();
+		bGr.drawImage(img, 0, 0, null);
+		bGr.dispose();
+		
+		// Return the buffered image
+		return bimage;
 	}
 	
 	public int getWidth() {

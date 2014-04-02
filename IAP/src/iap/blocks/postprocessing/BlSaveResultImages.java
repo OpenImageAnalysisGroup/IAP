@@ -60,7 +60,7 @@ public class BlSaveResultImages extends AbstractBlock {
 			if (outImageReference != null && outImageReference.getURL() != null)
 				outImageReference.setLabelURL(outImageReference.getURL().copy());
 			
-			outImageReference.setURL(null);
+			outImageReference.setURL(new IOurl(null, null, outImageReference.getURL().getFileName()));
 			
 			return saveImage(tray, tray_cnt, outImageReference, resImage, "." + IAPservice.getTargetFileExtension(false, null));
 		}
@@ -91,7 +91,8 @@ public class BlSaveResultImages extends AbstractBlock {
 			DatabaseTarget databaseTarget, boolean processLabelUrl,
 			int tray, int tray_cnt) throws Exception {
 		if (result.getURL() == null)
-			result.setURL(new IOurl(null, "dummy." + SystemOptions.getInstance().getString("IAP", "Result File Type", "png")));
+			result.setURL(new IOurl(null, StringManipulationTools.removeFileExtension(result.getURL().getFileName())
+					+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png")));
 		result.getURL().setFileName(addTrayInfo(tray, tray_cnt, result.getURL().getFileName()));
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
 		
