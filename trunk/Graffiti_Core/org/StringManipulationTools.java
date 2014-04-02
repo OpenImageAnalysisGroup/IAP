@@ -1003,4 +1003,10 @@ public class StringManipulationTools implements HelperClass {
 		else
 			return value;
 	}
+	
+	public static String removeFileExtension(String fileName) {
+		if (fileName != null && fileName.contains("."))
+			fileName = fileName.substring(0, fileName.lastIndexOf("."));
+		return fileName;
+	}
 }
