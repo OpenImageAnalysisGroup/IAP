@@ -34,7 +34,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		if (getBoolean("process VIS", true))
 			calculatePlantVolumeMeasures("vis", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, false);
@@ -61,7 +61,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 			String cameraType,
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData, TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages, TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult, boolean normalized) {
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult, boolean normalized) {
 		
 		String sideVisAreaTraitName = "RESULT_side." + cameraType + ".area" + (normalized ? ".norm" : "");
 		
@@ -80,7 +80,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 			if (allResultsForSnapshot == null)
 				continue;
 			if (!time2summaryResult.containsKey(time)) {
-				time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
+				time2summaryResult.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
 			}
 			TreeSet<String> ks;
 			synchronized (allResultsForSnapshot) {
@@ -90,10 +90,12 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 			for (String key : ks) {
 				allTrays.addAll(allResultsForSnapshot.get(key).keySet());
 			}
-			if (time2summaryResult.get(time).isEmpty())
+			if (!time2summaryResult.get(time).containsKey("-720"))
+				time2summaryResult.get(time).put("-720", new HashMap<Integer, BlockResultSet>());
+			if (time2summaryResult.get(time).get("-720").isEmpty())
 				for (Integer knownTray : allTrays)
-					time2summaryResult.get(time).put(knownTray, new BlockResults(null));
-			for (Integer tray : time2summaryResult.get(time).keySet()) {
+					time2summaryResult.get(time).get("-720").put(knownTray, new BlockResults(null));
+			for (Integer tray : time2summaryResult.get(time).get("-720").keySet()) {
 				double areaSum = 0;
 				double areaCnt = 0;
 				double sideArea_for_angleNearestTo0 = Double.NaN;
@@ -149,7 +151,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock {
 					}
 				}
 				
-				BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
+				BlockResultSet summaryResult = time2summaryResult.get(time).get("-720").get(tray);
 				
 				if (areaStat.getN() > 0) {
 					summaryResult.setNumericResult(getBlockPosition(),

@@ -88,13 +88,13 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 			ExperimentInterface mappingData) throws Exception {
 		boolean xlsx = true;
 		HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
-		boolean exportIndividualAngles = false;
-		
+		boolean exportIndividualAngles = true;
+		boolean exportIndividualReplicates = true;
 		UrlCacheManager urlManager = new UrlCacheManager();
 		
 		LinkedList<SnapshotDataIAP> snapshots = IAPservice.getSnapshotsFromExperiment(
 				urlManager, mappingData, indexInfo, false,
-				exportIndividualAngles, xlsx, null, status, null, true);
+				exportIndividualAngles, exportIndividualReplicates, null, status, null, true);
 		
 		TreeMap<Integer, String> cola = new TreeMap<Integer, String>();
 		for (String val : indexInfo.keySet())

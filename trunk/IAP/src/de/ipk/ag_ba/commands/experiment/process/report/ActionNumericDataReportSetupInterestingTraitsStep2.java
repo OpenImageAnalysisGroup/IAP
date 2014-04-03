@@ -123,6 +123,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 				new ActionPdfCreation3(
 						experimentReference, divideDatasetBy,
 						new ThreadSafeOptions() /* false */,
+						new ThreadSafeOptions() /* false */,
 						false, toggles,
 						togglesForInterestingProperties, tsoBootstrapN,
 						tsoSplitFirst, tsoSplitSecond, false),

@@ -848,6 +848,7 @@ public class IAPservice {
 							break;
 						}
 						String sub = sample.getParentCondition().getParentSubstance().getName();
+						boolean isTop = sub != null && sub.startsWith("top.");
 						if (optSubstanceIds != null &&
 								!sub.equals("water_sum") && !sub.equals("weight_before") && !sub.equals("water_weight")) {
 							sub = sample.getSubstanceNameWithUnit();
@@ -877,9 +878,11 @@ public class IAPservice {
 								}
 								if (exportIndividualAngles) {
 									for (NumericMeasurementInterface nmi : sample) {
+										if (qualityFilter != null && !isOKquality(qualityFilter, nmi))
+											continue;
 										NumericMeasurement3D nmi3d = (NumericMeasurement3D) nmi;
 										Double p = nmi3d.getPosition();
-										sn.storeAngleValue(idx, p, nmi3d.getValue());
+										sn.storeAngleValue(idx, p, nmi3d.getValue(), isTop);
 									}
 								}
 							}
@@ -887,7 +890,7 @@ public class IAPservice {
 							double mmSum = 0;
 							double mmLowest = Double.MAX_VALUE;
 							for (NumericMeasurementInterface mmm : sample) {
-								if (!isOKquality(qualityFilter, mmm))
+								if (qualityFilter != null && !isOKquality(qualityFilter, mmm))
 									continue;
 								double mmmValue = mmm.getValue();
 								if (!Double.isNaN(mmmValue) && !Double.isInfinite(mmmValue)) {
@@ -913,7 +916,7 @@ public class IAPservice {
 						}
 					}
 					
-					if (sample instanceof Sample3D) {
+					if (sample instanceof Sample3D && exportIndividualAngles) {
 						Sample3D s3d = (Sample3D) sample;
 						
 						Collection<NumericMeasurementInterface> sl = sortImages(s3d.getMeasurements(MeasurementNodeType.IMAGE,
@@ -921,15 +924,16 @@ public class IAPservice {
 						int imageCount = 0;
 						GregorianCalendar gc = new GregorianCalendar();
 						for (NumericMeasurementInterface ii : sl) {
-							if (!isOKquality(qualityFilter, ii))
+							if (qualityFilter != null && !isOKquality(qualityFilter, ii))
 								continue;
 							imageCount++;
 							if (ii instanceof ImageData) {
 								ImageData i = (ImageData) ii;
 								String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
 								ImageConfiguration ic = ImageConfiguration.get(subn);
+								String info = "+++" + substance.getInfo();
 								long urlId = urlManager != null ? urlManager.getId(useZIPexportFileNames ?
-										ActionDataExportZIP.getImageFileExportNameForZIPexport(gc, i) : i.getURL().toString()) : -1;
+										ActionDataExportZIP.getImageFileExportNameForZIPexport(gc, i) + info : i.getURL().toString() + info) : -1;
 								if (ic == ImageConfiguration.Unknown) {
 									ic = ImageConfiguration.get(i.getURL().getFileName());
 								}

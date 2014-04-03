@@ -82,7 +82,7 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
 		
 		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),

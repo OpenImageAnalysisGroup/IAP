@@ -47,6 +47,9 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 		ThreadSafeOptions exportIndividualAngles = new ThreadSafeOptions();
 		exportIndividualAngles.setBval(0, false);
 		
+		ThreadSafeOptions exportIndividualReplicates = new ThreadSafeOptions();
+		exportIndividualReplicates.setBval(0, true);
+		
 		res.add(new NavigationButton(new ActionDataExportZIP(experiment), guiSetting));
 		res.add(new NavigationButton(new ActionDataExportTar(experiment), guiSetting));
 		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
@@ -59,10 +62,18 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 				guiSetting));
 		
 		res.add(new NavigationButton(
+				new ActionToggle("Enable/disable export of data for replicates (export sample average, otherwise)",
+						"<html>"
+								+ "<center>Export individual<br>"
+								+ "replicate data &#8594;", exportIndividualReplicates),
+				guiSetting));
+		
+		res.add(new NavigationButton(
 				new ActionPdfCreation3(
 						experiment,
 						toggles,
 						exportIndividualAngles,
+						exportIndividualReplicates,
 						true,
 						null, null, null, null, null, null, ExportSetting.ALL, true),
 				guiSetting));
@@ -72,6 +83,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 						experiment,
 						toggles,
 						exportIndividualAngles,
+						exportIndividualReplicates,
 						false,
 						null, null, null, null, null, true),
 				guiSetting));

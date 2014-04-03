@@ -62,8 +62,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	ArrayList<String> lastOutput = new ArrayList<String>();
 	
 	public static final String separator = ";";// "\t";// ";";// "\t";
-	private final ThreadSafeOptions exportIndividualAngles;
-	private final boolean xlsx;
+	private final ThreadSafeOptions exportIndividualAngles, exportIndividualReplicates;
 	
 	private String finalResultFileLocation = "";
 	
@@ -81,17 +80,22 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	private boolean ratioCalc;
 	
+	private final boolean xlsx;
+	
 	private NavigationButton src;
 	
 	private final boolean exportCommand;
 	
 	public ActionPdfCreation3(String tooltip,
 			ThreadSafeOptions exportIndividualAngles,
-			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx, boolean exportCommand) {
+			ThreadSafeOptions exportIndividualReplicates,
+			boolean xlsx,
+			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean exportCommand) {
 		super(tooltip);
 		this.exportIndividualAngles = exportIndividualAngles;
-		this.divideDatasetBy = divideDatasetBy;
+		this.exportIndividualReplicates = exportIndividualReplicates;
 		this.xlsx = xlsx;
+		this.divideDatasetBy = divideDatasetBy;
 		this.exportCommand = exportCommand;
 	}
 	
@@ -99,6 +103,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			ExperimentReference experimentReference,
 			ArrayList<ThreadSafeOptions> divideDatasetBy,
 			ThreadSafeOptions exportIndividualAngles,
+			ThreadSafeOptions exportIndividualReplicates,
 			boolean xlsx,
 			ArrayList<ThreadSafeOptions> togglesFiltering,
 			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
@@ -106,7 +111,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			ThreadSafeOptions tsoSplitFirst,
 			ThreadSafeOptions tsoSplitSecond,
 			boolean exportCommand) {
-		this(experimentReference, divideDatasetBy, exportIndividualAngles, xlsx,
+		this(experimentReference, divideDatasetBy, exportIndividualAngles, exportIndividualReplicates, xlsx,
 				togglesFiltering, togglesInterestingProperties,
 				tsoBootstrapN,
 				tsoSplitFirst, tsoSplitSecond, null, null, exportCommand);
@@ -116,6 +121,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			ExperimentReference experimentReference,
 			ArrayList<ThreadSafeOptions> divideDatasetBy,
 			ThreadSafeOptions exportIndividualAngles,
+			ThreadSafeOptions exportIndividualReplicates,
 			boolean xlsx,
 			ArrayList<ThreadSafeOptions> togglesFiltering,
 			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
@@ -125,9 +131,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			ExportSetting optCustomSubsetDef,
 			boolean exportCommand) {
 		this(getToolTipInfo(experimentReference, divideDatasetBy,
-				exportIndividualAngles.getBval(0, false), xlsx, tsoBootstrapN, tsoSplitFirst, tsoSplitSecond),
-				exportIndividualAngles,
-				divideDatasetBy, xlsx, exportCommand);
+				exportIndividualAngles.getBval(0, false),
+				exportIndividualReplicates.getBval(0, false), xlsx,
+				tsoBootstrapN, tsoSplitFirst, tsoSplitSecond),
+				exportIndividualAngles, exportIndividualReplicates, xlsx,
+				divideDatasetBy, exportCommand);
 		this.experimentReference = experimentReference;
 		this.togglesFiltering = togglesFiltering;
 		this.togglesInterestingProperties = togglesInterestingProperties;
@@ -147,7 +155,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	}
 	
 	private static String getToolTipInfo(ExperimentReference experimentReference, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean exportIndividualAngles,
-			boolean xlsx, ThreadSafeOptions tsoBootstrapN, ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond) {
+			boolean exportIndividualReplicates, boolean xlsx, ThreadSafeOptions tsoBootstrapN, ThreadSafeOptions tsoSplitFirst, ThreadSafeOptions tsoSplitSecond) {
 		if (divideDatasetBy == null)
 			return null;
 		return "Create report" +
@@ -432,7 +440,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						urlManager, experiment, indexInfo, false,
-						exportIndividualAngles.getBval(0, false), xlsx, snFilter, status, optCustomSubsetDef,
+						exportIndividualAngles.getBval(0, false), exportIndividualReplicates.getBval(0, false), snFilter, status, optCustomSubsetDef,
 						exportCommand);
 				if (snapshots != null && snaphotVisitor != null)
 					for (SnapshotDataIAP s : snapshots)
@@ -899,7 +907,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	@Override
 	public String getDefaultTooltip() {
 		String res = "<html>" + getToolTipInfo(experimentReference, divideDatasetBy,
-				exportIndividualAngles.getBval(0, false), xlsx, tsoBootstrapN, tsoSplitFirst, tsoSplitSecond);
+				exportIndividualAngles.getBval(0, false), exportIndividualReplicates.getBval(0, false), xlsx, tsoBootstrapN, tsoSplitFirst, tsoSplitSecond);
 		synchronized (lastOutput) {
 			res += "<br>Last output:<br>" + StringManipulationTools.getStringList(lastOutput, "<br>");
 		}
@@ -976,6 +984,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				+ separator + "Weight A (g)" + separator + "Weight B (g)" + separator +
 				"Water (weight-diff)" +
 				separator + "Water (sum of day)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "IR" + separator + "OTHER" +
+				separator + "RGB Config" + separator + "FLUO Config" + separator + "NIR Config" + separator + "IR Config" + separator + "OTHER Config" +
 				(addLineFeed ? "\r\n" : "");
 	}
 	

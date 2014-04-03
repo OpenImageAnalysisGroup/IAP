@@ -76,7 +76,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("3D-Generation in progress, waiting");
@@ -88,21 +88,22 @@ public class BlThreeDreconstruction extends AbstractBlock {
 				Sample3D inSample = time2inSamples.get(time);
 				TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 				if (!time2summaryResult.containsKey(time)) {
-					time2summaryResult.put(time, new HashMap<Integer, BlockResultSet>());
+					time2summaryResult.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+					time2summaryResult.get(time).put("-720", new HashMap<Integer, BlockResultSet>());
 				}
 				TreeSet<Integer> allTrays = new TreeSet<Integer>();
 				for (String key : allResultsForSnapshot.keySet()) {
 					allTrays.addAll(allResultsForSnapshot.get(key).keySet());
 				}
-				if (time2summaryResult.get(time).isEmpty())
+				if (time2summaryResult.get(time).get("-720").isEmpty())
 					for (Integer knownTray : allTrays)
-						time2summaryResult.get(time).put(knownTray, new BlockResults(null));
-				for (Integer tray : time2summaryResult.get(time).keySet()) {
+						time2summaryResult.get(time).get("-720").put(knownTray, new BlockResults(null));
+				for (Integer tray : time2summaryResult.get(time).get("-720").keySet()) {
 					for (String key : allResultsForSnapshot.keySet()) {
 						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
 						if (rt == null || rt.isNumericStoreEmpty())
 							continue;
-						BlockResultSet summaryResult = time2summaryResult.get(time).get(tray);
+						BlockResultSet summaryResult = time2summaryResult.get(time).get("-720").get(tray);
 						
 						int voxelresolution = getInt("Voxel Resolution", 500);
 						int widthFactor = getInt("Content Width", 40);

@@ -255,11 +255,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										maximumThreadCountOnImageLevel,
 										status, tso, workloadSnapshots,
 										workloadEqualAngleSnapshotSets,
-										imageSetWithSpecificAngle_f);// , maxCon);
+										imageSetWithSpecificAngle_f);
 							} catch (Exception err) {
 								printError(imageSetWithSpecificAngle_f, err);
 							} finally {
-								// maxCon.release(1);
 								freed.setBval(0, true);
 							}
 						}
@@ -331,7 +330,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final ThreadSafeOptions tso, final int workloadSnapshots,
 			final int workloadEqualAngleSnapshotSets,
-			final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle) // , final Semaphore optMaxCon)
+			final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle)
 			throws InterruptedException {
 		
 		final TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
@@ -369,7 +368,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		} // if image data available
 		
 		if (!plantResults.isEmpty()) {
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> postprocessingResults;
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> postprocessingResults;
 			try {
 				synchronized (AbstractPhenotypingTask.class) {
 					ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(pd.getOptions(), null, plantResults);
@@ -714,88 +713,99 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void addPostprocessingResults(
 			TreeMap<Long, Sample3D> inSamples,
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> analysisResults) {
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 2");
 		}
 		
 		for (Long time : analysisResults.keySet())
-			for (Integer tray : analysisResults.get(time).keySet()) {
-				boolean multipleTrays = analysisResults.get(time).keySet().size() > 1;
-				for (String volumeID : analysisResults.get(time).get(tray).getVolumeNames()) {
-					VolumeData v = analysisResults.get(time).get(tray).getVolume(volumeID);
-					if (v != null) {
-						analysisResults.get(time).get(tray).setVolume(volumeID, null);
-						
-						try {
-							StopWatch s = new StopWatch(
-									SystemAnalysis.getCurrentTime() + ">SAVE VOLUME");
-							if (databaseTarget != null) {
-								SampleInterface oSample = v.getParentSample();
-								ConditionInterface oCond = v.getParentSample().getParentCondition();
-								SubstanceInterface oSubst = v.getParentSample().getParentCondition().getParentSubstance();
-								SubstanceInterface nSubst = oSubst.clone();
-								ConditionInterface nCond = oCond.clone(nSubst);
-								nSubst.setInfo(null); // remove information about source camera
-								nSubst.add(nCond);
-								SampleInterface nSamp = oSample.clone(nCond);
-								v.setParentSample(nSamp);
-								v.getParentSample().getParentCondition().getParentSubstance().setName("volume");
-								
-								databaseTarget.saveVolume((LoadedVolume) v, (Sample3D) v.getParentSample(),
-										m, null, null);
-								VolumeData volumeInDatabase = new VolumeData(v.getParentSample(), v);
-								volumeInDatabase.getURL().setPrefix(
-										databaseTarget.getPrefix());
-								volumeInDatabase.getURL().setDetail(v.getURL().getDetail());
-								outputAdd(volumeInDatabase);
-							} else {
+			for (String configName : analysisResults.get(time).keySet()) {
+				for (Integer tray : analysisResults.get(time).get(configName).keySet()) {
+					boolean multipleTrays = analysisResults.get(time).get(configName).keySet().size() > 1;
+					for (String volumeID : analysisResults.get(time).get(configName).get(tray).getVolumeNames()) {
+						VolumeData v = analysisResults.get(time).get(configName).get(tray).getVolume(volumeID);
+						if (v != null) {
+							analysisResults.get(time).get(configName).get(tray).setVolume(volumeID, null);
+							
+							try {
+								StopWatch s = new StopWatch(
+										SystemAnalysis.getCurrentTime() + ">SAVE VOLUME");
+								if (databaseTarget != null) {
+									SampleInterface oSample = v.getParentSample();
+									ConditionInterface oCond = v.getParentSample().getParentCondition();
+									SubstanceInterface oSubst = v.getParentSample().getParentCondition().getParentSubstance();
+									SubstanceInterface nSubst = oSubst.clone();
+									ConditionInterface nCond = oCond.clone(nSubst);
+									nSubst.setInfo(null); // remove information about source camera
+									nSubst.add(nCond);
+									SampleInterface nSamp = oSample.clone(nCond);
+									v.setParentSample(nSamp);
+									v.getParentSample().getParentCondition().getParentSubstance().setName("volume");
+									
+									databaseTarget.saveVolume((LoadedVolume) v, (Sample3D) v.getParentSample(),
+											m, null, null);
+									VolumeData volumeInDatabase = new VolumeData(v.getParentSample(), v);
+									volumeInDatabase.getURL().setPrefix(
+											databaseTarget.getPrefix());
+									volumeInDatabase.getURL().setDetail(v.getURL().getDetail());
+									outputAdd(volumeInDatabase);
+								} else {
+									System.out.println(SystemAnalysis.getCurrentTime()
+											+ ">Volume kept in memory: " + v);
+									outputAdd(v);
+								}
+								s.printTime();
+							} catch (Exception e) {
 								System.out.println(SystemAnalysis.getCurrentTime()
-										+ ">Volume kept in memory: " + v);
-								outputAdd(v);
+										+ ">ERROR: Could not save volume data: "
+										+ e.getMessage());
+								ErrorMsg.addErrorMessage(e);
 							}
-							s.printTime();
-						} catch (Exception e) {
-							System.out.println(SystemAnalysis.getCurrentTime()
-									+ ">ERROR: Could not save volume data: "
-									+ e.getMessage());
-							ErrorMsg.addErrorMessage(e);
 						}
 					}
-				}
-				for (BlockResultValue bpv : analysisResults.get(time).get(tray).searchResults("RESULT_")) {
-					if (bpv.getName() == null)
-						continue;
-					String name = bpv.getName();
-					if (name.contains("_cut.")) {
-						name = name.substring(0, name.indexOf("_cut."));
-					}
-					
-					NumericMeasurement3D m = new NumericMeasurement3D(
-							new NumericMeasurement(inSamples.get(time)), name, inSamples.get(time)
-									.getParentCondition().getExperimentName()
-									+ " ("
-									+ getName() + ")");
-					
-					if (bpv != null && m != null) {
-						m.setValue(bpv.getValue());
-						m.setUnit(bpv.getUnit());
-						if (inSamples.get(time).size() > 0) {
-							NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
-							m.setReplicateID(template.getReplicateID());
-							// if (multipleTrays) {
-							// m.setReplicateID(m.getReplicateID() * 100 + tray);
-							// }
-							m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-							m.setQualityAnnotation(template.getQualityAnnotation() + (multipleTrays ? "_" + tray : ""));
-							if (bpv.getPosition() != null)
-								m.setPosition(bpv.getPosition());
-							else
-								m.setPosition(template.getPosition());
-							m.setPositionUnit(template.getPositionUnit());
+					for (BlockResultValue bpv : analysisResults.get(time).get(configName).get(tray).searchResults("RESULT_")) {
+						if (bpv.getName() == null)
+							continue;
+						String name = bpv.getName();
+						if (name.contains("_cut.")) {
+							name = name.substring(0, name.indexOf("_cut."));
 						}
-						outputAdd(m);
+						
+						NumericMeasurement3D m = new NumericMeasurement3D(
+								new NumericMeasurement(inSamples.get(time)), name, inSamples.get(time)
+										.getParentCondition().getExperimentName()
+										+ " ("
+										+ getName() + ")");
+						
+						if (bpv != null && m != null) {
+							m.setValue(bpv.getValue());
+							m.setUnit(bpv.getUnit());
+							if (inSamples.get(time).size() > 0) {
+								NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
+								m.setReplicateID(template.getReplicateID());
+								m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
+								m.setQualityAnnotation(template.getQualityAnnotation() + (multipleTrays ? "_" + tray : ""));
+								// rotation angle needs to be determined from the config-name
+								if (bpv.getPosition() != null)
+									m.setPosition(bpv.getPosition());
+								else {
+									String angle = configName;
+									if (angle != null && angle.contains(";"))
+										angle = angle.split(";")[1];
+									try {
+										double ra = Double.parseDouble(angle);
+										m.setPosition(ra);
+									} catch (Exception e) {
+										System.out
+												.println(SystemAnalysis.getCurrentTime() + ">WARNING: Can't determine rotation angle from config '" + configName + "'!");
+										m.setPosition(null);// template.getPosition());
+									}
+								}
+								m.setPositionUnit(template.getPositionUnit());
+							}
+							outputAdd(m);
+						}
 					}
 				}
 			}

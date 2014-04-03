@@ -410,7 +410,7 @@ public class BlockPipeline {
 				true);
 	}
 	
-	public TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPipelineResultsForAllAngles(
+	public TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> postProcessPipelineResultsForAllAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
@@ -418,7 +418,8 @@ public class BlockPipeline {
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ImageProcessorOptionsAndResults options)
 			throws InstantiationException, IllegalAccessException,
 			InterruptedException {
-		TreeMap<Long, HashMap<Integer, BlockResultSet>> summaryResult = new TreeMap<Long, HashMap<Integer, BlockResultSet>>();
+		TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> summaryResult =
+				new TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>>();
 		int index = 0;
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			ImageAnalysisBlock block = blockClass.newInstance();

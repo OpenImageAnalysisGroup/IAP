@@ -29,7 +29,7 @@ public interface ImageProcessor {
 	
 	public abstract BackgroundTaskStatusProviderSupportingExternalCall getStatus();
 	
-	public abstract TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPlantResults(
+	public abstract TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> postProcessPlantResults(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,

@@ -59,7 +59,8 @@ public class ActionDataExportCSVfileList extends AbstractNavigationAction {
 		boolean xlsx = false;
 		ActionPdfCreation3 action = new ActionPdfCreation3(
 				null, null,
-				new ThreadSafeOptions() /* false */,
+				new ThreadSafeOptions(),
+				new ThreadSafeOptions(),
 				xlsx, null, null,
 				null, null, null, true);
 		for (ExperimentHeaderInterface eh : ExperimentHeaderService.filterNewest(experiments)) {
