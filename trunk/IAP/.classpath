@@ -29,6 +29,6 @@
 	<classpathentry kind="src" path="/IPK_lib"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.10-beta2-20130904.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/poi-3.10-beta2-20130904.jar"/>
-	<classpathentry kind="lib" path="lib/ij-1.48r.jar"/>
+	<classpathentry kind="lib" path="lib/ij-1.48r.jar" sourcepath="lib/ij-1.48r-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
