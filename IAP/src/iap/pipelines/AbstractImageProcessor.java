@@ -63,7 +63,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	public abstract BlockPipeline getPipeline(ImageProcessorOptionsAndResults options);
 	
 	@Override
-	public TreeMap<Long, HashMap<Integer, BlockResultSet>> postProcessPlantResults(
+	public TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> postProcessPlantResults(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,

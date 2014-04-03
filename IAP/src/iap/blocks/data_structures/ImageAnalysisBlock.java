@@ -17,7 +17,8 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	
-	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptionsAndResults options, BlockResultSet settings, int blockPositionInPipeline,
+	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptionsAndResults options, BlockResultSet settings,
+			int blockPositionInPipeline,
 			ImageStack debugStack);
 	
 	public MaskAndImageSet process() throws InterruptedException;
@@ -27,7 +28,7 @@ public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 			TreeMap<Long, Sample3D> inSample,
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> allResultsForSnapshot,
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws InterruptedException;
 	

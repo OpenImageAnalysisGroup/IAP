@@ -243,7 +243,7 @@ public class BlCalcWidthAndHeightLR extends
 			TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, HashMap<Integer, BlockResultSet>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
 		super.postProcessResultsForAllTimesAndAngles(plandID2time2waterData,
 				time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus);

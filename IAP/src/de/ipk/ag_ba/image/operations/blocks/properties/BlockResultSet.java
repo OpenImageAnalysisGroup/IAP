@@ -39,7 +39,7 @@ public interface BlockResultSet {
 	 * @param position
 	 *           0 == current block property
 	 */
-	public void setNumericResult(int position, String name, double value);
+	public void setNumericResult(int currentPositionInPipeline, String name, double value);
 	
 	public int getBlockPosition();
 	
@@ -54,7 +54,7 @@ public interface BlockResultSet {
 	
 	public ArrayList<BlockResultValue> searchResults(boolean exact, String search);
 	
-	void setNumericResult(int position, String name, double value, String unit);
+	void setNumericResult(int currentPositionInPipeline, String name, double value, String unit);
 	
 	void storeResults(String id_prefix,
 			ResultsTableWithUnits numericResults,
@@ -66,11 +66,11 @@ public interface BlockResultSet {
 	
 	public void printAnalysisResults();
 	
-	public void setImage(int position, String id, ImageData image);
+	public void setImage(int currentPositionInPipeline, String id, ImageData image);
 	
-	public void setImage(int position, String id, Image image);
+	public void setImage(int currentPositionInPipeline, String id, Image image);
 	
-	public Image getImage(int position, String id);
+	public Image getImage(int currentPositionInPipeline, String id);
 	
 	public void setVolume(String string, VolumeData volume);
 	
@@ -103,7 +103,7 @@ public interface BlockResultSet {
 	
 	BlockResultObject searchObjectResult(int currentPositionInPipeline, int searchIndex, String pName);
 	
-	void setObjectResult(int position, String name, Object value);
+	void setObjectResult(int currentPositionInPipeline, String name, Object value);
 	
 	public void removeResultObject(BlockResultObject result1);
 	
