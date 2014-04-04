@@ -2,9 +2,11 @@ package de.ipk.ag_ba.image.operation.binarymask;
 
 import iap.blocks.segmentation.BlMorphologicalOperations;
 import ij.ImagePlus;
+import ij.plugin.filter.EDM;
 import ij.process.BinaryProcessor;
 import ij.process.Blitter;
 import ij.process.ByteProcessor;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
@@ -195,5 +197,10 @@ public class ImageJOperation {
 	public ImageJOperation show(String title) {
 		getImage().show(title);
 		return this;
+	}
+	
+	public FloatProcessor edm() {
+		EDM edm = new EDM();
+		return edm.makeFloatEDM(image.getProcessor(), -1, false);
 	}
 }
