@@ -2114,6 +2114,10 @@ public class ImageOperation implements MemoryHogInterface {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: setGlobalCalibration for IJ");
 		ImagePlus ip = new ImagePlus();
 		ip.setGlobalCalibration(new Calibration());
+		
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: set thread count to 0 for IJ");
+		Prefs.setThreads(1);
+		
 		return result;
 	}
 	
