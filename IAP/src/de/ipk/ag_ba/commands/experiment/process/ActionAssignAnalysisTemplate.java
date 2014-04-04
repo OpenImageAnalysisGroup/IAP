@@ -2,6 +2,8 @@ package de.ipk.ag_ba.commands.experiment.process;
 
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -18,6 +20,7 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 	private String iniFileName;
 	private String title;
 	private ExperimentReference exp;
+	private boolean skipped;
 	
 	public ActionAssignAnalysisTemplate(String tooltip) {
 		super(tooltip);
@@ -33,6 +36,19 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		skipped = true;
+		if (exp.getHeader().getSettings() != null && exp.getHeader().getSettings().length() > 0) {
+			if (JOptionPane.showConfirmDialog(MainFrame.getInstance(),
+					"<html>Do you want to overwrite the existing analysis settings?<br><br>"
+							+ "<b>WARNING: Your existing customizations will be lost!</b><br></html>", "Overwrite Your Customized Settings?",
+					JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+				skipped = false;
+			} else {
+				skipped = true;
+				return;
+			}
+		}
+		skipped = false;
 		String ini = SystemOptions.getInstance(iniFileName, null).getIniValue();
 		ini = StringEscapeUtils.escapeXml(ini);
 		exp.getHeader().setSettings(ini);
@@ -66,8 +82,11 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("Data from '" + iniFileName + "' has been assigned to experiment '"
-				+ exp.getExperimentName() + "'.");
+		if (skipped)
+			return new MainPanelComponent("Template data has not been assigned. Existing analysis settings have not been modified.");
+		else
+			return new MainPanelComponent("Data from '" + iniFileName + "' has been assigned to experiment '"
+					+ exp.getExperimentName() + "'.");
 	}
 	
 	@Override
