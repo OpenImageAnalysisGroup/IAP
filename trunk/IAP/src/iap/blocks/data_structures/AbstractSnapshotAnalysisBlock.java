@@ -12,7 +12,6 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysisBlockFIS {
@@ -237,7 +236,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 	
 	public boolean isBestAngle() {
 		HashMap<String, ArrayList<BlockResultValue>> previousResults = optionsAndResults
-				.searchResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation", true, getWellIdx(), null);
+				.searchResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation", true, getWellIdx(), null, false, null);
 		
 		double sum = 0;
 		int count = 0;
@@ -250,8 +249,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 		}
 		
 		if (count == 0) {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Can´t calculate leaf tips, no main axis calculation available!");
-			return false;
+			return true;
 		}
 		
 		ImageData currentImage = input().images().getAnyInfo();

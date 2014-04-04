@@ -39,7 +39,7 @@ public abstract class AbstractPostProcessor implements PostProcessor {
 			if (angleConfigName != null && !key.equals(angleConfigName))
 				continue;
 			BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-			for (BlockResultValue v : rt.searchResults(exactSearch, name)) {
+			for (BlockResultValue v : rt.searchResults(exactSearch, name, false)) {
 				result.add(v);
 			}
 		}

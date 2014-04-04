@@ -117,6 +117,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			MySnapshotFilter sf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), experiment.getHeader().getGlobalOutlierInfo());
 			
 			boolean filterTop = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-ONLY-TOP", false); // process only top images?
+			boolean filterSide = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-ONLY-SIDE", false); // process only side images?
 			boolean filterTime = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-ONLY-ONE-DAY", false); // process only one day? (day 48, see
 																																									// below)
 			int DEBUG_SINGLE_DAY = SystemOptions.getInstance().getInteger("Pipeline-Debugging", "DEBUG-SINGLE-DAY", 48);
@@ -124,7 +125,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			String plantFilter = SystemOptions.getInstance().getString("Pipeline-Debugging", "DEBUG-SINGLE-PLANT-ID", "001447-D1"); // "1107BA1350"; //
 																																											// "1121KN063";
 			
-			filterOutliers(experimentToBeAnalysed, workload, sf, filterTop, filterTime, DEBUG_SINGLE_DAY, filterPlant, plantFilter);
+			filterOutliers(experimentToBeAnalysed, workload, sf, filterTop, filterSide, filterTime, DEBUG_SINGLE_DAY, filterPlant, plantFilter);
 			
 			if (status != null) {
 				status.setCurrentStatusText1("Experiment: " + workload.size() + " images (vis+fluo+nir)");
@@ -288,11 +289,16 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	}
 	
 	private void filterOutliers(ExperimentInterface experimentToBeAnalysed, ArrayList<Sample3D> workload, MySnapshotFilter sf, boolean filterTop,
+			boolean filterSide,
 			boolean filterTime, int DEBUG_SINGLE_DAY, boolean filterPlant, String plantFilter) {
 		for (SubstanceInterface m : experimentToBeAnalysed) {
 			Substance3D m3 = (Substance3D) m;
 			if (filterTop) {
-				if (!m3.getName().contains(".top"))
+				if (m3.getName().contains("side."))
+					continue;
+			}
+			if (filterSide) {
+				if (m3.getName().contains("top."))
 					continue;
 			}
 			// System.out.println("Substance-Name: " + m3.getName());

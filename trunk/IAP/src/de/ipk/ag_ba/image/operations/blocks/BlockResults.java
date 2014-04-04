@@ -138,7 +138,6 @@ public class BlockResults implements BlockResultSet {
 			Object value) {
 		if (!storedObjects.containsKey(position))
 			storedObjects.put(position, new TreeMap<String, ThreadSafeOptions>());
-		
 		ThreadSafeOptions tso = new ThreadSafeOptions();
 		tso.setParam(0, name);
 		tso.setParam(1, value);
@@ -195,13 +194,14 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized ArrayList<BlockResultValue> searchResults(boolean exact,
-			String search) {
+			String search, boolean removeReturnedValue) {
 		ArrayList<BlockResultValue> result = new ArrayList<BlockResultValue>();
 		{
 			// analyse numeric store
 			Collection<TreeMap<String, Double>> sv = storedNumerics.values();
 			if (sv != null)
 				for (TreeMap<String, Double> tm : sv) {
+					String toRemove = null;
 					Set<String> ks = tm.keySet();
 					if (ks != null)
 						for (String key : ks) {
@@ -220,14 +220,18 @@ public class BlockResults implements BlockResultSet {
 												name, getUnitFromName(key),
 												tm.get(key), cameraAngle);
 										result.add(p);
+										toRemove = key;
 									}
 								} else {
 									BlockResultValue p = new BlockResultValue(
 											pn.getName(null), pn.getUnit(), tm.get(key), cameraAngle);
 									result.add(p);
+									toRemove = key;
 								}
 							}
 						}
+					if (toRemove != null && removeReturnedValue)
+						tm.remove(toRemove);
 				}
 		}
 		{
@@ -235,6 +239,7 @@ public class BlockResults implements BlockResultSet {
 			Collection<TreeMap<String, ImageData>> sv = storedImages.values();
 			if (sv != null)
 				for (TreeMap<String, ImageData> tm : sv) {
+					String toRemove = null;
 					Set<String> ks = tm.keySet();
 					if (ks != null)
 						for (String key : ks) {
@@ -251,13 +256,52 @@ public class BlockResults implements BlockResultSet {
 										String name = key.substring(search.length());
 										BlockResultValue p = new BlockResultValue(name, tm.get(key));
 										result.add(p);
+										toRemove = key;
 									}
 								} else {
 									BlockResultValue p = new BlockResultValue(pn.getName(null), tm.get(key));
 									result.add(p);
+									toRemove = key;
 								}
 							}
 						}
+					if (toRemove != null && removeReturnedValue)
+						tm.remove(toRemove);
+				}
+		}
+		{
+			// analyse object store
+			Collection<TreeMap<String, ThreadSafeOptions>> sv = storedObjects.values();
+			if (sv != null)
+				for (TreeMap<String, ThreadSafeOptions> tm : sv) {
+					String toRemove = null;
+					Set<String> ks = tm.keySet();
+					if (ks != null)
+						for (String key : ks) {
+							if ((!exact && key.startsWith(search)) || (exact && key.equals(search))) {
+								PropertyNames pn = null;
+								try {
+									pn = PropertyNames.valueOf(key);
+								} catch (Exception e) {
+									// ignore, not a parameter which has an enum
+									// constant
+								}
+								if (pn == null) {
+									if (tm.get(key) != null) {
+										String name = key.substring(search.length());
+										BlockResultValue p = new BlockResultValue(name, tm.get(key).getParam(1, null));
+										result.add(p);
+										toRemove = key;
+									}
+								} else {
+									BlockResultValue p = new BlockResultValue(pn.getName(null), tm.get(key));
+									result.add(p);
+									toRemove = key;
+								}
+							}
+						}
+					if (toRemove != null && removeReturnedValue)
+						tm.remove(toRemove);
 				}
 		}
 		return result;
@@ -265,7 +309,7 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized ArrayList<BlockResultValue> searchResults(String search) {
-		return searchResults(false, search);
+		return searchResults(false, search, false);
 	}
 	
 	TreeMap<String, String> name2unit = getUnits();
@@ -462,13 +506,15 @@ public class BlockResults implements BlockResultSet {
 	public void removeResultObject(BlockResultObject obj) {
 		for (Entry<Integer, TreeMap<String, ThreadSafeOptions>> u : storedObjects.entrySet()) {
 			TreeMap<String, ThreadSafeOptions> i = u.getValue();
+			String toRemove = null;
 			for (Entry<String, ThreadSafeOptions> o : i.entrySet()) {
-				if (obj.equals(o.getValue().getParam(1, null))) {
-					i.remove(o);
+				if (obj.getObject() == o.getValue().getParam(1, null)) {
+					toRemove = o.getKey();
 					break;
 				}
-				
 			}
+			if (toRemove != null)
+				i.remove(toRemove);
 		}
 	}
 	

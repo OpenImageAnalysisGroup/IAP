@@ -221,7 +221,7 @@ public abstract class AbstractSnapshotAnalysisBlockFIS extends AbstractImageAnal
 	
 	public boolean isBestAngle() {
 		HashMap<String, ArrayList<BlockResultValue>> previousResults = optionsAndResults
-				.searchResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation", true, getWellIdx(), null);
+				.searchResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation", true, getWellIdx(), null, false, null);
 		
 		double sum = 0;
 		int count = 0;
