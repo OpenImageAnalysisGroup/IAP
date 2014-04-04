@@ -53,8 +53,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlock {
 		if (fluo == null)
 			return null;
 		ImageOperation io = new ImageOperation(fluo);
-		double[] pix = getProbablyWhitePixels(io.invert().getImage(), 0.08);
-		return io.imageBalancing(255, pix).invert().getImage();
+		double[] pix = getProbablyWhitePixels(io.invertImageJ().getImage(), 0.08);
+		return io.imageBalancing(255, pix).invertImageJ().getImage();
 		
 	}
 	
@@ -64,8 +64,8 @@ public class BlockColorBalancing extends AbstractSnapshotAnalysisBlock {
 		if (fluo == null)
 			return null;
 		ImageOperation io = new ImageOperation(fluo);
-		double[] pix = getProbablyWhitePixels(io.invert().getImage(), 0.08);
-		return io.imageBalancing(255, pix).invert().getImage();
+		double[] pix = getProbablyWhitePixels(io.invertImageJ().getImage(), 0.08);
+		return io.imageBalancing(255, pix).invertImageJ().getImage();
 	}
 	
 	@Override

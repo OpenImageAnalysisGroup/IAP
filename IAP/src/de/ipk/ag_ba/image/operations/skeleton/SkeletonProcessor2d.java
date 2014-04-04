@@ -49,7 +49,7 @@ public class SkeletonProcessor2d {
 	}
 	
 	public SkeletonProcessor2d(Image inp) {
-		this.skelImg = inp.getAs2A().clone();
+		this.skelImg = inp.getAs2A();
 	}
 	
 	public SkeletonProcessor2d(int[][] image) {
@@ -374,10 +374,9 @@ public class SkeletonProcessor2d {
 		
 		int width = skelImg.length;
 		int height = skelImg[0].length;
-		int[][] imgbin;
 		
-		imgbin = rgbToBinaryArray(skelImg);
-		skelImg = binaryArrayToRgb(imgbin);
+		int[][] imgbin = rgbToBinaryArray(skelImg);
+		// skelImg = binaryArrayToRgb(imgbin);
 		
 		if (endpoints != null)
 			endpoints.clear();
@@ -420,16 +419,17 @@ public class SkeletonProcessor2d {
 					}
 				}
 			}
-			if (postProcessing != null) {
-				final int[][] unchangedSkeleton = new Image(skelImg).getAs2A();
-				postProcessing.add(new RunnableOnImage() {
-					@Override
-					public Image postProcess(Image in) {
-						return new ImageOperation(unchangedSkeleton).replaceColor(Color.black.getRGB(), ImageOperation.BACKGROUND_COLORint).or(in)
-								.getImage();
-					}
-				});
-			}
+		}
+		if (postProcessing != null) {
+			final int[][] unchangedSkeleton = skelImg.clone();
+			postProcessing.add(new RunnableOnImage() {
+				@Override
+				public Image postProcess(Image in) {
+					return new ImageOperation(unchangedSkeleton).replaceColor(Color.black.getRGB(),
+							ImageOperation.BACKGROUND_COLORint).or(in).getImage().show("result skeleton", debug);
+				}
+				
+			});
 		}
 	}
 	
@@ -490,6 +490,7 @@ public class SkeletonProcessor2d {
 	}
 	
 	/**
+	 * Make sure that the input skeleton is colorized as foreground (option skeleton-processor)
 	 * First try to connect, than delete
 	 * 
 	 * @param threshold
@@ -498,11 +499,8 @@ public class SkeletonProcessor2d {
 		int n = 0;
 		boolean repeat = threshold > 0;
 		do {
-			// do {
 			removeShortEndLimbsUpdateCrossingsAndEndpoints();
 			calculateEndlimbsRecursive();
-			// System.out.println("numofendlimbs0: " + endlimbs.size());
-			// } while (connectSkeleton() && n < 1000);
 			int autothreshold = getAutoThresh(threshold / (double) 100);
 			boolean goRecursive = false;
 			do {
@@ -598,10 +596,10 @@ public class SkeletonProcessor2d {
 	private boolean matchMask3x3(int[][] mask, int[][] img) {
 		for (int x = 0; x < 3; x++) {
 			for (int y = 0; y < 3; y++) {
-				if (img[x][y] != -16777216)
-					// System.out.println(img[x][y]);
-					if (mask[x][y] != 2 && mask[x][y] != img[x][y])
-						return false;
+				// if (img[x][y] != 0)
+				// System.out.println(img[x][y]);
+				if (mask[x][y] != 2 && mask[x][y] != img[x][y])
+					return false;
 			}
 		}
 		return true;

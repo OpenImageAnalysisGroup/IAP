@@ -28,7 +28,7 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 		if (img == null)
 			return null;
 		
-		ImageOperation io = img.copy().io().invert().thresholdBlueHigherThan(getInt("minimum blue intensity level", 6))
+		ImageOperation io = img.copy().io().invertImageJ().thresholdBlueHigherThan(getInt("minimum blue intensity level", 6))
 				.show("result of blue threshold", debug);
 		// remove pure white area inside the box
 		io = io.bm().erode().io()

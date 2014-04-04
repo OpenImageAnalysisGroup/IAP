@@ -4,6 +4,7 @@ import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
+import iap.blocks.postprocessing.BlSaveResultImages;
 import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.segmentation.BlKMeansVis;
@@ -65,6 +66,7 @@ public class RootPipeline extends AbstractPipelineTemplate {
 				new BlRootsSkeletonize(),
 				new BlRunPostProcessors(),
 				new BlMoveMasksToImageSet(),
+				new BlSaveResultImages(),
 		
 		};
 	}
