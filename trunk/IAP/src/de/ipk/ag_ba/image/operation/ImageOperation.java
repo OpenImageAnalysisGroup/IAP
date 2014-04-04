@@ -2115,7 +2115,7 @@ public class ImageOperation implements MemoryHogInterface {
 		ImagePlus ip = new ImagePlus();
 		ip.setGlobalCalibration(new Calibration());
 		
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: set thread count to 0 for IJ");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: set thread count to 1 for IJ");
 		Prefs.setThreads(1);
 		
 		return result;
