@@ -19,6 +19,7 @@ import javax.swing.border.LineBorder;
 import org.FolderPanel;
 import org.MarkComponent;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
@@ -57,6 +58,8 @@ public class BlockSelector {
 	private Object[] getAnalysisBlockTypes() {
 		int n = 0;
 		for (ImageAnalysisBlock bl : IAPpluginManager.getInstance().getKnownAnalysisBlocks()) {
+			if (bl.getBlockType() == null)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Block " + bl.getClass().getCanonicalName() + " doesn't specify its block type.");
 			if (bl.getBlockType() == blockType) {
 				n++;
 			}
@@ -82,9 +85,6 @@ public class BlockSelector {
 		JButton res = new JButton();
 		style(res);
 		res.setText("<html><table><tr>"
-				// "<td>"
-				// + getBlockDescriptionAnnotation("", inst)
-				// + "</td>"
 				+ "<td><b>" + inst.getName() + "</b><br>" +
 				"<font color='gray' size=-2>" + StringManipulationTools.getWordWrap(inst.getDescription(), 60) + "</font>"
 				+ "</td></table>");
@@ -111,34 +111,36 @@ public class BlockSelector {
 		button.setBorder(compound);
 	}
 	
-	public static String getBlockDescriptionAnnotation(String inf, ImageAnalysisBlock inst) {
-		String gs = "<font color='green'>";
-		String ge = "</font>";
-		String rs = "<font color='red'>";
-		String re = "</font>";
-		String ns = "<font color='gray'>";
-		String ne = "</font>";
-		String is = "<font color='blue'>";
-		String ie = "</font>";
-		
-		String vi = gs + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
-		String fi = rs + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
-		String ni = ns + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
-		String ii = is + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
-		
-		String vo = gs + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
-		String fo = rs + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
-		String no = ns + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
-		String io = is + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
-		
-		inf = "" +
-				"<table border='0'><tr>" +
-				"<td>" + getBlockTypeAnnotation(inst.getBlockType()) + "</td>" +
-				"<td>" + inf
-				+ "</td><td><font color='gray' size='-2'><code>"
-				+ " IN &#9656; " + vi + " " + fi + " " + ni + " " + ii + ""
-				+ "<br> OUT&#9656; " + vo + " " + fo + " " + no + " " + io + "</code></font></td></tr></table>";
-		return inf;
+	public static String getBlockDescriptionAnnotation(String inp, ImageAnalysisBlock inst) {
+		String res = "";
+		for (String inf : inp.split("//")) {
+			String gs = "<font color='green'>";
+			String ge = "</font>";
+			String rs = "<font color='red'>";
+			String re = "</font>";
+			String ns = "<font color='gray'>";
+			String ne = "</font>";
+			String is = "<font color='blue'>";
+			String ie = "</font>";
+			
+			String vi = gs + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
+			String fi = rs + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
+			String ni = ns + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
+			String ii = is + (inst.getCameraInputTypes() != null && inst.getCameraInputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
+			
+			String vo = gs + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.VIS) ? "&#9632;" : "&#9633;") + ge;
+			String fo = rs + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.FLUO) ? "&#9632;" : "&#9633;") + re;
+			String no = ns + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.NIR) ? "&#9632;" : "&#9633;") + ne;
+			String io = is + (inst.getCameraInputTypes() != null && inst.getCameraOutputTypes().contains(CameraType.IR) ? "&#9632;" : "&#9633;") + ie;
+			
+			res += "<table border='0'><tr>" +
+					"<td>" + getBlockTypeAnnotation(inst.getBlockType()) + "</td>" +
+					"<td>" + inf
+					+ "</td><td><font color='gray' size='-2'><code>"
+					+ " IN &#9656; " + vi + " " + fi + " " + ni + " " + ii + ""
+					+ "<br> OUT&#9656; " + vo + " " + fo + " " + no + " " + io + "</code></font></td></tr></table>";
+		}
+		return res;
 	}
 	
 	public static String getBlockTypeAnnotation(BlockType bt) {

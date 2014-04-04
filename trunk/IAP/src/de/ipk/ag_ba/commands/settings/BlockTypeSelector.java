@@ -6,6 +6,7 @@ import info.clearthought.layout.TableLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -13,6 +14,7 @@ import javax.swing.JPanel;
 import org.FolderPanel;
 import org.MarkComponent;
 
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 /**
@@ -45,22 +47,38 @@ public class BlockTypeSelector {
 	private Object[] getAnalysisBlockTypes() {
 		Object[] res = new Object[BlockType.values().length * 2];
 		int i = 0;
+		
+		HashMap<BlockType, Integer> bt2cnt = new HashMap<BlockType, Integer>();
+		for (BlockType bt : BlockType.values())
+			bt2cnt.put(bt, 0);
+		
+		for (ImageAnalysisBlock bl : IAPpluginManager.getInstance().getKnownAnalysisBlocks()) {
+			BlockType bt = null;
+			if (bl.getBlockType() == null)
+				bt = BlockType.UNDEFINED;
+			else
+				bt = bl.getBlockType();
+			bt2cnt.put(bt, bt2cnt.get(bt) + 1);
+		}
+		
 		for (BlockType bt : BlockType.values()) {
+			if (bt2cnt.get(bt) == 0)
+				continue;
 			res[i++] = "<html>" + BlockSelector.getBlockTypeAnnotation(bt);
 			if (currentSelection != null) {
-				MarkComponent mc = new MarkComponent(getBlockSelectionButton(bt),
+				MarkComponent mc = new MarkComponent(getBlockSelectionButton(bt, bt2cnt.get(bt)),
 						bt == currentSelection.getBlockType(), TableLayout.FILL, false, 5);
 				res[i++] = mc;
 			} else
-				res[i++] = getBlockSelectionButton(bt);
+				res[i++] = getBlockSelectionButton(bt, bt2cnt.get(bt));
 		}
 		return res;
 	}
 	
-	private JPanel getBlockSelectionButton(final BlockType bt) {
+	private JPanel getBlockSelectionButton(final BlockType bt, int cnt) {
 		JButton res = new JButton();
 		String sizetags = "<br>";
-		res.setText("<html>" + sizetags + "<b>" + bt.getName() + sizetags + sizetags);
+		res.setText("<html>" + sizetags + "<b>" + bt.getName() + "</b> (" + cnt + ")" + sizetags + sizetags);
 		res.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

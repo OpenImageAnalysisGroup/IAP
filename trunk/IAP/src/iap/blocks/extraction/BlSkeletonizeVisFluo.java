@@ -335,10 +335,12 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			rt.addValue("leaf.width.outer.max", leafWidthInPixels);
 		}
 		
-		if (bloomLimbCount > 0)
-			rt.addValue("bloom", 1);
-		else
-			rt.addValue("bloom", 0);
+		if (getBoolean("Detect Bloom", false)) {
+			if (bloomLimbCount > 0)
+				rt.addValue("bloom", 1);
+			else
+				rt.addValue("bloom", 0);
+		}
 		
 		if (leafcount > 0) {
 			if (distHorizontal != null)

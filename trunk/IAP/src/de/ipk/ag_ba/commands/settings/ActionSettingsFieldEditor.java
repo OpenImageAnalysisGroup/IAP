@@ -254,39 +254,52 @@ public class ActionSettingsFieldEditor extends AbstractNavigationAction {
 										BlockListEditHelper.installEditButton(entries, blockName, blockDesc, leftLabel, sl, startLine);
 									}
 								}
-								Object[] inp = MyInputHelper.getInput(getHelp() + specialHelp +
-										"You may modify multiple text entries (settings items '" + setting + "'). <br>" +
-										"Add '//' and then additional text to a line, to add/insert a new line.<br>",
-										"Modify "
-												+ setting, entries.toArray());
-								if (inp != null) {
-									if (inp.length > 0) {
-										ArrayList<String> newValues = new ArrayList<String>();
-										for (Object o : inp) {
-											if (o != null && o instanceof String) {
-												String es = (String) o;
-												for (String nn : es.split("//")) {
-													newValues.add(nn);
+								boolean repeatNeeded = false;
+								do {
+									Object[] inp = MyInputHelper.getInput(getHelp() + specialHelp +
+											(specialHelp.isEmpty() ?
+													"You may modify multiple text entries (settings items '" + setting + "'). <br>" +
+															"Add '//' and then additional text to a line, to add/insert a new line.<br>" : ""),
+											"Modify "
+													+ setting, entries.toArray());
+									if (inp != null) {
+										if (inp.length > 0) {
+											ArrayList<String> newValues = new ArrayList<String>();
+											for (Object o : inp) {
+												if (o != null && o instanceof String) {
+													String es = (String) o;
+													for (String nn : es.split("//")) {
+														newValues.add(nn);
+													}
+												}
+												if (o != null && o instanceof JComponent) {
+													GuiRow gr = (GuiRow) ((JComponent) o).getClientProperty("guiRow");
+													String es;
+													if (gr.right instanceof MarkComponent)
+														es = ((JTextField) ((MarkComponent) gr.right).getMarkedComponent()).getText();
+													else
+														es = ((JTextField) gr.right).getText();
+													if (es.startsWith("REOPEN|")) {
+														repeatNeeded = true;
+														es = es.substring("REOPEN|".length());
+													}
+													if (!es.equals("//")) {
+														for (String nn : es.split("//")) {
+															newValues.add(nn);
+														}
+														if (es.endsWith("//"))
+															newValues.add("");
+													}
 												}
 											}
-											if (o != null && o instanceof JComponent) {
-												GuiRow gr = (GuiRow) ((JComponent) o).getClientProperty("guiRow");
-												String es;
-												if (gr.right instanceof MarkComponent)
-													es = ((JTextField) ((MarkComponent) gr.right).getMarkedComponent()).getText();
-												else
-													es = ((JTextField) gr.right).getText();
-												for (String nn : es.split("//")) {
-													newValues.add(nn);
-												}
-											}
+											if (!repeatNeeded)
+												SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
+														this.actionSettingsEditor.iniIO)
+														.setStringArray(this.actionSettingsEditor.section, setting,
+																newValues);
 										}
-										SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
-												this.actionSettingsEditor.iniIO)
-												.setStringArray(this.actionSettingsEditor.section, setting,
-														newValues);
 									}
-								}
+								} while (repeatNeeded);
 							}
 					}
 	}
