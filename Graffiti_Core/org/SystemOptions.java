@@ -35,48 +35,46 @@ public class SystemOptions {
 	private static Thread updateCheckThread;
 	
 	private SystemOptions(final String iniFileName, final IniIoProvider iniIO) throws Exception {
-		synchronized (SystemOptions.class) {
-			if (updateCheckThread == null) {
-				Thread t = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							do {
-								Thread.sleep(1000);
-								synchronized (SystemOptions.getInstance()) {
-									synchronized (updateCheckTasks) {
-										for (Runnable r : new ArrayList<Runnable>(updateCheckTasks)) {
-											try {
-												r.run();
-											} catch (Exception e) {
-												e.printStackTrace();
-											}
+		if (updateCheckThread == null) {
+			Thread t = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						do {
+							Thread.sleep(1000);
+							synchronized (SystemOptions.getInstance()) {
+								synchronized (updateCheckTasks) {
+									for (Runnable r : new ArrayList<Runnable>(updateCheckTasks)) {
+										try {
+											r.run();
+										} catch (Exception e) {
+											e.printStackTrace();
 										}
 									}
 								}
-							} while (true);
-						} catch (InterruptedException e1) {
-							e1.printStackTrace();
-						}
+							}
+						} while (true);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
 					}
-				});
-				t.setName("Settings Change Monitor");
-				t.setPriority(Thread.MIN_PRIORITY);
-				t.setDaemon(true);
-				t.start();
-				updateCheckThread = t;
-			}
-			
-			this.iniFileName = iniFileName;
-			this.iniIO = iniIO;
-			if (iniIO != null) {
-				ini = new Ini(new StringReader(iniIO.getString()));
-				WeakReference<IniIoProvider> wr = new WeakReference<IniIoProvider>(iniIO);
-				readIniAndPrepareProviderCheck(wr);
-				return;
-			}
-			readIniAndPrepareFileCheck(iniFileName);
+				}
+			});
+			t.setName("Settings Change Monitor");
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.setDaemon(true);
+			t.start();
+			updateCheckThread = t;
 		}
+		
+		this.iniFileName = iniFileName;
+		this.iniIO = iniIO;
+		if (iniIO != null) {
+			ini = new Ini(new StringReader(iniIO.getString()));
+			WeakReference<IniIoProvider> wr = new WeakReference<IniIoProvider>(iniIO);
+			readIniAndPrepareProviderCheck(wr);
+			return;
+		}
+		readIniAndPrepareFileCheck(iniFileName);
 	}
 	
 	private synchronized void readIniAndPrepareProviderCheck(final WeakReference<IniIoProvider> iniIOref) {
@@ -90,37 +88,35 @@ public class SystemOptions {
 			@Override
 			public void run() {
 				try {
-					synchronized (iniIO.getInstance()) {
-						IniIoProvider iniIO = iniIOref.get();
-						if (iniIO == null) {
-							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider is not available any more. Update-check stops for this object.");
-							updateCheckTasks.remove(this);
-							return;
-						}
-						if (!iniIO.isAbleToSaveData())
-							return; // no need to update from source in this case (normally read-only sources are not updated regularily
-						// or interactively
-						Long mt;
-						try {
-							mt = iniIO.lastModified();
-						} catch (Exception e) {
-							e.printStackTrace();
-							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider can't be accessed. Update-check stops for this object. Error: "
-									+ e.getMessage());
-							updateCheckTasks.remove(this);
-							return;
-						}
-						if (mt != null && mt != iniIO.storedLastUpdateTime()) {
-							iniIO.setStoredLastUpdateTime(mt);
-							iniIO.getInstance().ini = readIniFileOrProvider();
-							ini = iniIO.getInstance().ini;
-							for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
-								for (Runnable r : rr) {
-									try {
-										r.run();
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
+					IniIoProvider iniIO = iniIOref.get();
+					if (iniIO == null) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider is not available any more. Update-check stops for this object.");
+						updateCheckTasks.remove(this);
+						return;
+					}
+					if (!iniIO.isAbleToSaveData())
+						return; // no need to update from source in this case (normally read-only sources are not updated regularily
+					// or interactively
+					Long mt;
+					try {
+						mt = iniIO.lastModified();
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider can't be accessed. Update-check stops for this object. Error: "
+								+ e.getMessage());
+						updateCheckTasks.remove(this);
+						return;
+					}
+					if (mt != null && mt != iniIO.storedLastUpdateTime()) {
+						iniIO.setStoredLastUpdateTime(mt);
+						iniIO.getInstance().ini = readIniFileOrProvider();
+						ini = iniIO.getInstance().ini;
+						for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
+							for (Runnable r : rr) {
+								try {
+									r.run();
+								} catch (Exception e) {
+									e.printStackTrace();
 								}
 							}
 						}
