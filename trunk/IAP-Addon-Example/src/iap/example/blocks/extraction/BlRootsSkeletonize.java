@@ -239,9 +239,11 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		
 		SkeletonProcessor2d skel = inp.replaceColor(Color.BLACK.getRGB(), Color.MAGENTA.getRGB()).skel2d();
 		skel.createEndpointsAndBranchesLists(null);
+		skel.show("before hair-root removal", debug);
 		skel.deleteShortEndLimbs(minlen, false, new HashSet<Point>());
 		skel.createEndpointsAndBranchesLists(postProcessing);
 		skel.calculateEndlimbsRecursive();
+		skel.show("after hair-root removal", debug);
 		
 		img = skel.getImageOperation().show("THE SKELETON", debug);
 		
