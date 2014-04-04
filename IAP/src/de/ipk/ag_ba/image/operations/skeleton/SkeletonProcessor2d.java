@@ -606,7 +606,7 @@ public class SkeletonProcessor2d {
 	}
 	
 	public void show(String title, boolean show) {
-		new Image(this.skelImg).show(title, show);
+		new Image(this.skelImg).copy().show(title, show);
 	}
 	
 	public Image getAsImage() {
