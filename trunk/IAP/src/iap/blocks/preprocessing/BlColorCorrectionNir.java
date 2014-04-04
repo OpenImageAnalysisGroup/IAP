@@ -47,7 +47,7 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 		ImageOperation image_io = image.io().histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35));
 		ImageOperation blured = image_io.copy();
 		// double avgValBlured = blured.getMedian();
-		blured = blured.blur(blurRadius).invert();
+		blured = blured.blur(blurRadius).invertImageJ();
 		return blured.add(image_io.getImage()).histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35))
 				.getImage();
 	}

@@ -51,7 +51,7 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlock {
 			
 			private Image markSkelOnMask(Image nirMask_fin, Image sk_fin) {
 				return nirMask_fin.io().draw(
-						sk_fin.io().replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).invert()
+						sk_fin.io().replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).invertImageJ()
 								.replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint).getImage(), ImageOperation.BACKGROUND_COLORint);
 			}
 			

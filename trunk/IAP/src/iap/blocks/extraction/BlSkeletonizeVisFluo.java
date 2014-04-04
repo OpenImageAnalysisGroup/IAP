@@ -179,9 +179,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						getDouble("bloom hue", 0.075f)).io().// blur(3).
 						thresholdGrayClearLowerThan(getInt("bloom-max-brightness", 255), Color.BLACK.getRGB()).getImage();
 				
-				probablyBloomFluo = probablyBloomFluo.io().show("probably bloom area unfiltered", false).invert()
+				probablyBloomFluo = probablyBloomFluo.io().show("probably bloom area unfiltered", false).invertImageJ()
 						.removeSmallClusters(true, null).bm().
-						erode(getInt("bloom-erode-cnt", 4)).io().invert().
+						erode(getInt("bloom-erode-cnt", 4)).io().invertImageJ().
 						getImage();
 			}
 			if (debug2) {

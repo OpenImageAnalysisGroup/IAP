@@ -207,10 +207,10 @@ public class ImageSet {
 	}
 	
 	public ImageSet invert() {
-		Image v = new ImageOperation(vis).invert().getImage();
-		Image f = new ImageOperation(fluo).invert().getImage();
-		Image n = new ImageOperation(nir).invert().getImage();
-		Image i = new ImageOperation(ir).invert().getImage();
+		Image v = new ImageOperation(vis).invertImageJ().getImage();
+		Image f = new ImageOperation(fluo).invertImageJ().getImage();
+		Image n = new ImageOperation(nir).invertImageJ().getImage();
+		Image i = new ImageOperation(ir).invertImageJ().getImage();
 		return new ImageSet(v, f, n, i);
 	}
 	

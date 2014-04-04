@@ -28,7 +28,7 @@ public class BlRootsScanDetectZoom extends AbstractSnapshotAnalysisBlock {
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
 			
-			int whitePixels = img.copy().io().invert().thresholdBlueHigherThan(3).show("WHITE AREA", debug).countFilledPixels();
+			int whitePixels = img.copy().io().invertImageJ().thresholdBlueHigherThan(3).show("WHITE AREA", debug).countFilledPixels();
 			int allPixels = img.getWidth() * img.getHeight();
 			
 			if (whitePixels / (double) allPixels < 0.15d) {

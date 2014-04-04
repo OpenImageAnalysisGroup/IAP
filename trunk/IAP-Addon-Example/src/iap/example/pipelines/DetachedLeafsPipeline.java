@@ -6,6 +6,7 @@ import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
+import iap.blocks.postprocessing.BlSaveResultImages;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlObjectSeparator;
 import iap.blocks.segmentation.BlKMeansVis;
@@ -73,7 +74,8 @@ public class DetachedLeafsPipeline extends AbstractPipelineTemplate {
 				new BlCalcColorHistograms(),
 				new BlCalcAreas(),
 				new BlRunPostProcessors(),
-				new BlMoveMasksToImageSet()
+				new BlMoveMasksToImageSet(),
+				new BlSaveResultImages(),
 		};
 	}
 	

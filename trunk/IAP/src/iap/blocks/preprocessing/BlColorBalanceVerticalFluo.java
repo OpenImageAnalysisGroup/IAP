@@ -142,9 +142,9 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 				double[] pix;
 				if (invert) {
 					// FLUO
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invert().getImage(),
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invertImageJ().getImage(),
 							getDouble("balance-size-width-top-invert", 0.08), bpleft, bpright);
-					Image bal = input.io().invert().imageBalancing(whitePoint, pix).invert().getImage();
+					Image bal = input.io().invertImageJ().imageBalancing(whitePoint, pix).invertImageJ().getImage();
 					return bal;
 				} else {
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, getDouble("balance-size-width-top", 0.3), null, null);
@@ -172,18 +172,18 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 			double[] pix;
 			if (markerPosY != -1)
 				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invert().getImage(),
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invertImageJ().getImage(),
 							getDouble("balance-size-width-side-invert", 0.08), bpleft, bpright);
-					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
+					res = io.invertImageJ().imageBalancing(whitePoint, pix).invertImageJ().getImage();
 				} else { // nir - remove round shade
 					pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);
 					res = io.imageBalancing(whitePoint, pix).getImage();
 				}
 			else
 				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invert().getImage(),
+					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invertImageJ().getImage(),
 							getDouble("balance-size-width-side-invert", 0.08), bpleft, bpright);
-					res = io.invert().imageBalancing(whitePoint, pix).invert().getImage();
+					res = io.invertImageJ().imageBalancing(whitePoint, pix).invertImageJ().getImage();
 				} else {
 					pix = getProbablyWhitePixels(inputUsedForColorAnalysis,
 							getDouble("balance-size-width-side", 0.08), bpleft, bpright);
