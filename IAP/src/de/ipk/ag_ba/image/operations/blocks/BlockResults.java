@@ -368,9 +368,10 @@ public class BlockResults implements BlockResultSet {
 			
 			storedImages.get(blockPosition).put(id, image);
 		}
-		synchronized (deleteAtPipelineFinishing) {
-			deleteAtPipelineFinishing.add(id);
-		}
+		if (deleteAtPipelineCompletion)
+			synchronized (deleteAtPipelineFinishing) {
+				deleteAtPipelineFinishing.add(id);
+			}
 	}
 	
 	@Override

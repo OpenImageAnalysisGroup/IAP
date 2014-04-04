@@ -12,8 +12,8 @@ import java.util.LinkedList;
 import org.StringManipulationTools;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
-import de.ipk.ag_ba.image.operation.BorderAnalysis;
-import de.ipk.ag_ba.image.operation.BorderFeature;
+import tests.JMP.leaf_clustering.BorderAnalysis;
+import tests.JMP.leaf_clustering.BorderFeature;
 import de.ipk.ag_ba.image.operation.ImageConvolution;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -21,14 +21,13 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
- * Block for calculation of leaf-tips (position [x,y] and angle [0 => points down, 180 => points upward])
- * 
  * @author pape
  */
 public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	boolean ignore = false;
 	boolean debug_borderDetection;
+	double borderSize;
 	
 	@Override
 	protected void prepare() {
@@ -37,7 +36,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", false)) {
 			boolean isBestAngle = isBestAngle();
 			if (!isBestAngle)
-				ignore = false;
+				ignore = true;
 		}
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
 	}
@@ -48,12 +47,13 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			return null;
 		Image workimg = input().masks().vis().copy();
 		if (getBoolean("Calculate on Visible Image", false) && !ignore) {
-			int searchRadius = getInt("Search-radius (Vis)", 35);
+			int searchRadius = getInt("Search-radius (Vis)", 33);
 			double fillGradeInPercent = getDouble("Fillgrade (Vis)", 0.3);
+			borderSize = searchRadius / 2;
 			workimg.setCameraType(input().masks().vis().getCameraType());
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 1), getInt("Masksize Erode (Vis)", 12),
-					getInt("Masksize Dilate (Vis)", 14));
-			saveAndDrawPeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 3), getInt("Masksize Erode (Vis)", 8),
+					getInt("Masksize Dilate (Vis)", 12));
+			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
 					searchRadius);
 		}
 		return input().masks().vis();
@@ -64,13 +64,14 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().fluo() == null)
 			return null;
 		Image workimg = input().masks().fluo().copy();
-		if (getBoolean("Calculate on Fluorescence Image", true) && !ignore) {
+		if (getBoolean("Calculate on Fluorescence Image", false) && !ignore) {
 			int searchRadius = getInt("Search-radius (Fluo)", 30);
-			double fillGradeInPercent = getDouble("Fillgrade", 0.3);
+			double fillGradeInPercent = getDouble("Fillgrade (Fluo)", 0.3);
+			borderSize = searchRadius / 2;
 			workimg.setCameraType(CameraType.FLUO);
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 2), getInt("Masksize Erode (Fluo)", 2),
-					getInt("Masksize Dilate (Fluo)", 4));
-			saveAndDrawPeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.FLUO, optionsAndResults.getCameraPosition(),
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 2), getInt("Masksize Erode (Fluo)", 8),
+					getInt("Masksize Dilate (Fluo)", 12));
+			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.FLUO, optionsAndResults.getCameraPosition(),
 					searchRadius);
 		}
 		return input().masks().fluo();
@@ -83,32 +84,43 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		Image workimg = input().masks().nir().copy();
 		if (getBoolean("Calculate on Near-infrared Image", false) && !ignore) {
 			int searchRadius = getInt("Search-radius (Nir)", 20);
-			double fillGradeInPercent = getDouble("Fillgrade", 0.35);
-			workimg.setCameraType(CameraType.FLUO);
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Nir)", 1), getInt("Masksize Erode (Nir)", 4),
-					getInt("Masksize Dilate (Nir)", 8));
-			saveAndDrawPeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.NIR, optionsAndResults.getCameraPosition(),
+			double fillGradeInPercent = getDouble("Fillgrade (Nir)", 0.35);
+			borderSize = searchRadius / 2;
+			workimg.setCameraType(CameraType.NIR);
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Nir)", 2), getInt("Masksize Erode (Nir)", 2),
+					getInt("Masksize Dilate (Nir)", 4));
+			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.NIR, optionsAndResults.getCameraPosition(),
 					searchRadius);
 		}
 		return input().masks().nir();
 	}
 	
-	private void saveAndDrawPeaksAndFeatures(LinkedList<BorderFeature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius) {
-		int index = 1;
+	private void savePeaksAndFeatures(LinkedList<BorderFeature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius) {
 		
+		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist", peakList);
+		
+		int index = 1;
 		for (BorderFeature bf : peakList) {
-			final Vector2D pos = bf.getPosition();
+			Vector2D pos = bf.getPosition();
 			final Double angle = (Double) bf.getFeature("angle");
+			Vector2D direction = (Vector2D) bf.getFeature("direction");
 			final CameraType cameraType_fin = cameraType;
+			
 			if (pos == null || cameraPosition == null || cameraType == null) {
 				continue;
 			}
+			
+			// correct positions
+			Vector2D sub = new Vector2D(-borderSize, -borderSize);
+			final Vector2D pos_fin = pos.add(sub);
+			final Vector2D direction_fin = direction.add(sub);
+			
 			getResultSet().setNumericResult(0,
 					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".x",
-					pos.getX(), "px");
+					pos_fin.getX(), "px");
 			getResultSet().setNumericResult(0,
 					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".y",
-					pos.getY(), "px");
+					pos_fin.getY(), "px");
 			
 			if (angle != null)
 				getResultSet().setNumericResult(0,
@@ -122,7 +134,17 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 					
 					@Override
 					public Image postProcessMask(Image mask) {
-						return mask.io().canvas().drawCircle((int) pos.getX(), (int) pos.getY(), searchRadius_fin, Color.RED.getRGB(), 0.5, 3).getImage();
+						return mask
+								.io()
+								.canvas()
+								.drawCircle((int) pos_fin.getX(), (int) pos_fin.getY(), searchRadius_fin, Color.RED.getRGB(), 0.5, 3)
+								.drawLine((int) pos_fin.getX(), (int) pos_fin.getY(), (int) direction_fin.getX(), (int) direction_fin.getY(), Color.BLUE.getRGB(), 0.5,
+										2)
+								.text((int) direction_fin.getX() + 10, (int) direction_fin.getY(),
+										"x: " + (int) direction_fin.getX() + " y: " + (int) direction_fin.getY(),
+										Color.BLACK)
+								.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, "angle: " + angle, Color.BLACK)
+								.getImage();
 					}
 					
 					@Override
@@ -137,8 +159,9 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 				});
 			}
 		}
-		getResultSet().setNumericResult(0,
-				"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", index, "leaftips");
+		// save leaf count
+		getResultSet().setNumericResult(getBlockPosition(),
+				"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", index - 1, "leaftips");
 	}
 	
 	private LinkedList<BorderFeature> getPeaksFromBorder(Image img, int searchRadius, double fillGradeInPercent) {
@@ -148,11 +171,11 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			ba = new BorderAnalysis(img);
 			int geometricThresh = (int) (fillGradeInPercent * (Math.PI * searchRadius * searchRadius));
 			ba.calcSUSAN(searchRadius, geometricThresh);
-			ba.getPeaksFromBorder(2, 10, "susan");
+			ba.getPeaksFromBorder(1, searchRadius * 2, "susan");
 			ba.approxDirection(searchRadius * 2);
 			
 			if (debug_borderDetection)
-				ba.plot(searchRadius);
+				ba.plot(0, searchRadius);
 			
 			res = ba.getPeakList();
 		} catch (InterruptedException e) {
@@ -177,14 +200,19 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		// morphological operations
-		img = img.io().bm().erode(erode).dilate(dilate).getImage().show("Erode and Dilate on " + ct.toString(), debugValues);
+		img = img.io().bm().dilate(dilate).erode(erode).getImage().show("Erode and Dilate on " + ct.toString(), debugValues);
 		
 		// blur
 		img = img.io().blur(blurSize).getImage().show("Blured Image " + ct.toString(), debugValues);
 		
-		// enlarge 1 px lines
+		// enlarge 1 px lines TODO this works, but the border tracking returns errors even if 1 px lines are enlarged.
 		ImageConvolution ic = new ImageConvolution(img);
+		// img.show("before");
 		img = ic.enlargeLines().getImage().show("Enlarged Lines " + ct.toString(), debugValues);
+		// img.show("after");
+		
+		// add border around image
+		img = img.io().addBorder((int) borderSize, 0, 0, background).getImage();
 		
 		return img;
 	}
@@ -200,11 +228,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
-		HashSet<CameraType> res = new HashSet<CameraType>();
-		res.add(CameraType.VIS);
-		res.add(CameraType.FLUO);
-		res.add(CameraType.NIR);
-		return res;
+		return getCameraInputTypes();
 	}
 	
 	@Override
@@ -219,6 +243,6 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Detect leaf-tips of a plant. (number of leaves) <br><br>If skeleton (fluo) is calculated within the pipeline in a previous step, all plant objects are connected.";
+		return "Detect leaf-tips of a plant. (e.g. could be used for calculation of leaf number)";
 	}
 }
