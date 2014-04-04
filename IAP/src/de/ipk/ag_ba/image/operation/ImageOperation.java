@@ -89,8 +89,7 @@ public class ImageOperation implements MemoryHogInterface {
 	protected final ImagePlus image;
 	protected ResultsTableWithUnits rt;
 	private CameraType cameraType;
-	public static final Color BACKGROUND_COLOR = SystemOptions.getInstance().getColor("Pipeline-Debugging", "Background-Color",
-			new Color(150, 50, 200));
+	public static final Color BACKGROUND_COLOR = SystemOptions.getInstance().getColor("Pipeline-Debugging", "Background-Color", new Color(150, 50, 200));
 	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
 	/**
@@ -1134,9 +1133,21 @@ public class ImageOperation implements MemoryHogInterface {
 		return res;
 	}
 	
-	public ImageOperation invert() {
+	public ImageOperation invertImageJ() {
 		image.getProcessor().invert();
 		return new ImageOperation(getImage());
+	}
+	
+	public ImageOperation invert() {
+		int[] img = getAs1D();
+		int i = 0;
+		for (int pix : img) {
+			if (pix != BACKGROUND_COLORint) {
+				img[i] = 0xFFFFFF - pix;
+			}
+			i++;
+		}
+		return this;
 	}
 	
 	public Image draw(Image fi, int background) {
@@ -1255,7 +1266,6 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		int[] clusterSizes = null;
 		int[] clusterDimensionMinWH = null;
-		
 		if (optClusterSizeReturn != null)
 			optClusterSizeReturn.setObject(ps.getClusterSize());
 		clusterDimensionMinWH = ps.getClusterDimensionMinWH();
@@ -2733,6 +2743,40 @@ public class ImageOperation implements MemoryHogInterface {
 				if (xt - bordersize - translatex >= 0 && yt - bordersize - translatey >= 0 && xt >= 0 && yt >= 0)
 					if (xt < nw && yt < nh)
 						result[xt][yt] = img2d[xt - bordersize - translatex][yt - bordersize - translatey];
+			}
+		}
+		return new ImageOperation(result);
+	}
+	
+	/**
+	 * Copy the image into a new image, which size is increased according to the specified bordersize.
+	 * 
+	 * @param input
+	 * @param bordersize
+	 * @param translatex
+	 * @param translatey
+	 * @param borderColor
+	 *           - color of the border
+	 * @return
+	 */
+	public ImageOperation removeBorder(int bordersize, int translatex, int translatey, int borderColor) {
+		if (bordersize == 0 && translatex == 0 && translatey == 0)
+			return this;
+		int width = image.getWidth();
+		int height = image.getHeight();
+		
+		int[][] img2d = getAs2D();
+		int nw = width - (2 * bordersize);
+		int nh = height - (2 * bordersize);
+		int[][] result = new int[nw][nh];
+		
+		result = fillArray(result, borderColor);
+		
+		for (int xt = bordersize + translatex; xt < (width + bordersize + translatex); xt++) {
+			for (int yt = bordersize + translatey; yt < (height + bordersize + translatey); yt++) {
+				if (xt - bordersize - translatex >= 0 && yt - bordersize - translatey >= 0 && xt >= 0 && yt >= 0)
+					if (xt < nw && yt < nh)
+						result[xt - bordersize - translatex][yt - bordersize - translatey] = img2d[xt][yt];
 			}
 		}
 		return new ImageOperation(result);
@@ -4895,7 +4939,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int[][] img = getAs2D();
 		ImageOperation ioBorderPixels = new ImageOperation(getAs2D()).border().borderDetection(background,
 				mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION ? Integer.MAX_VALUE : borderColor,
-				false);// .show("BORDER PIXELS");
+				false).show("BORDER PIXELS");
 		int borderLength = (int) ioBorderPixels.getResultsTable().getValue("border", 0);
 		int[][] borderMap = ioBorderPixels.getAs2D();
 		int[] borderList = getBorderList(borderMap, borderLength);
@@ -4905,7 +4949,7 @@ public class ImageOperation implements MemoryHogInterface {
 			for (int y = 0; y < h; y++) {
 				if (img[x][y] != background && borderMap[x][y] == background) { // Foreground, no borderpixel
 					for (int i = 0; i < borderList.length; i += 2) { // iterate borderlist
-						dist = processBordertListPixel(mode, img, borderList, dist, x, y, i);
+						dist = processBorderListPixel(mode, img, borderList, dist, x, y, i);
 					}
 					if (mode == DistanceCalculationMode.DISTANCE_VISUALISATION_GRAY) {
 						if (dist > 25)
@@ -4922,7 +4966,7 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(distMap);
 	}
 	
-	private int processBordertListPixel(DistanceCalculationMode mode, int[][] img, int[] borderList, int dist, int x, int y, int i) {
+	private int processBorderListPixel(DistanceCalculationMode mode, int[][] img, int[] borderList, int dist, int x, int y, int i) {
 		int xtemp;
 		int ytemp;
 		int disttemp;
