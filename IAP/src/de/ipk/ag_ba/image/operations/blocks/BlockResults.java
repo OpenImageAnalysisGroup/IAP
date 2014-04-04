@@ -318,11 +318,12 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public void setImage(int blockPosition, String id, ImageData image, boolean deleteAtPipelineCompletion) {
-		if (!storedImages.containsKey(blockPosition))
-			storedImages.put(blockPosition, new TreeMap<String, ImageData>());
-		
-		storedImages.get(blockPosition).put(id, image);
-		
+		synchronized (storedImages) {
+			if (!storedImages.containsKey(blockPosition))
+				storedImages.put(blockPosition, new TreeMap<String, ImageData>());
+			
+			storedImages.get(blockPosition).put(id, image);
+		}
 		synchronized (deleteAtPipelineFinishing) {
 			deleteAtPipelineFinishing.add(id);
 		}
@@ -330,40 +331,46 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public void setImage(int position, String id, Image image, boolean deleteAtPipelineCompletion) {
-		if (!storedImages.containsKey(position))
-			storedImages.put(position, new TreeMap<String, ImageData>());
-		
-		storedImages.get(position).put(id, new ImageInMemory(null, image));
-		synchronized (deleteAtPipelineFinishing) {
-			deleteAtPipelineFinishing.add(id);
+		synchronized (storedImages) {
+			if (!storedImages.containsKey(position))
+				storedImages.put(position, new TreeMap<String, ImageData>());
+			
+			storedImages.get(position).put(id, new ImageInMemory(null, image));
+			synchronized (deleteAtPipelineFinishing) {
+				deleteAtPipelineFinishing.add(id);
+			}
 		}
 	}
 	
 	@Override
 	public Image getImage(int blockPosition, String id) {
-		if (!storedImages.containsKey(blockPosition))
-			return null;
-		ImageData res = storedImages.get(blockPosition).get(id);
-		if (res == null)
-			return null;
-		else {
-			storedImages.get(blockPosition).remove(id);
-			return ((ImageInMemory) res).getImageData();
-		}
-	}
-	
-	@Override
-	public Image getImage(String id) {
-		for (Integer blockPosition : storedImages.keySet()) {
+		synchronized (storedImages) {
+			if (!storedImages.containsKey(blockPosition))
+				return null;
 			ImageData res = storedImages.get(blockPosition).get(id);
 			if (res == null)
-				continue;
+				return null;
 			else {
 				storedImages.get(blockPosition).remove(id);
 				return ((ImageInMemory) res).getImageData();
 			}
 		}
-		return null;
+	}
+	
+	@Override
+	public Image getImage(String id) {
+		synchronized (storedImages) {
+			for (Integer blockPosition : storedImages.keySet()) {
+				ImageData res = storedImages.get(blockPosition).get(id);
+				if (res == null)
+					continue;
+				else {
+					storedImages.get(blockPosition).remove(id);
+					return ((ImageInMemory) res).getImageData();
+				}
+			}
+			return null;
+		}
 	}
 	
 	@Override
