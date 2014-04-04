@@ -895,7 +895,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			imageProcessor.execute(options, input, inputMasks, maximumThreadCountOnImageLevel);
 			
 			well2analysisResults = imageProcessor.getNumericResults();
-			
 		}
 		
 		if (well2analysisResults != null)
