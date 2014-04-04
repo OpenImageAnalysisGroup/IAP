@@ -204,7 +204,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				statisticsResult.getHeader().setStorageTime(new Date());
 				statisticsResult.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
 				
-				boolean removeCameraInfosAndReMerge = false; // normaly not needed and requires high memory and compute time
+				boolean removeCameraInfosAndReMerge = false; // normally not needed and requires high memory and compute time
 				if (removeCameraInfosAndReMerge) {
 					for (SubstanceInterface si : statisticsResult) {
 						String name = si.getName();
