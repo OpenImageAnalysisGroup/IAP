@@ -24,7 +24,7 @@ public interface BlockResultSet {
 	/**
 	 * @param searchIndex
 	 *           0 == current block property, -1 = last property from any
-	 *           previous block, -2 == property from block before last block 1
+	 *           previous block, -2 == property from block before last block, 1
 	 *           == search any previous value, 2 == search any previous value
 	 *           which has been stored before any previous value.
 	 * @param name
@@ -52,7 +52,7 @@ public interface BlockResultSet {
 	 */
 	public ArrayList<BlockResultValue> searchResults(String search);
 	
-	public ArrayList<BlockResultValue> searchResults(boolean exact, String search);
+	public ArrayList<BlockResultValue> searchResults(boolean exact, String search, boolean removeReturnedValue);
 	
 	void setNumericResult(int currentPositionInPipeline, String name, double value, String unit);
 	

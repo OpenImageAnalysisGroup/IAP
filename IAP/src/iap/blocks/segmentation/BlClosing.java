@@ -14,22 +14,22 @@ public class BlClosing extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISmask() {
-		return closing(input().masks().vis(), input().images().vis(), getInt("VIS-count", 3));
+		return closing(input().masks().vis(), input().images().vis(), getInt("VIS-size", 3));
 	}
 	
 	@Override
 	protected Image processFLUOmask() {
-		return closing(input().masks().fluo(), input().images().fluo(), getInt("FLUO-count", 0));
+		return closing(input().masks().fluo(), input().images().fluo(), getInt("FLUO-size", 0));
 	}
 	
 	@Override
 	protected Image processNIRmask() {
-		return closing(input().masks().nir(), input().images().nir(), getInt("NIR-count", 0));
+		return closing(input().masks().nir(), input().images().nir(), getInt("NIR-size", 0));
 	}
 	
 	@Override
 	protected Image processIRmask() {
-		return closing(input().masks().ir(), input().images().ir(), getInt("IR-count", 0));
+		return closing(input().masks().ir(), input().images().ir(), getInt("IR-size", 0));
 	}
 	
 	private Image closing(Image mask, Image image, int n) {

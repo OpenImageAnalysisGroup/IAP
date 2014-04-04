@@ -336,7 +336,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					BlockResultSet summaryResult = summaryResultArray.get(tray);
 					BlockResultSet rt = allResultsForSnapshot.get(configName).get(tray);
 					for (String property : desiredProperties) {
-						ArrayList<BlockResultValue> calculationResults = rt.searchResults(true, property);
+						ArrayList<BlockResultValue> calculationResults = rt.searchResults(true, property, false);
 						if (calculationResults.isEmpty() && showWarning)
 							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found. Config=" + configName
 									+ ", Tray=" + tray + ", Time=" + time);

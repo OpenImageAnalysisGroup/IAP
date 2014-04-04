@@ -300,15 +300,16 @@ public class ImageProcessorOptionsAndResults {
 			return realDist;
 	}
 	
-	public HashMap<Long, ArrayList<BlockResultValue>> searchPreviousResults(String string,
-			boolean exact, int well, String valid_config) {
+	public TreeMap<Long, ArrayList<BlockResultValue>> searchPreviousResults(String string,
+			boolean exact, int well, String valid_config, boolean removeReturnedValue) {
 		if (valid_config == null) {
 			throw new IllegalArgumentException("valid_config must not be null!");
 		}
-		HashMap<Long, ArrayList<BlockResultValue>> res = new HashMap<Long, ArrayList<BlockResultValue>>();
+		TreeMap<Long, ArrayList<BlockResultValue>> res = new TreeMap<Long, ArrayList<BlockResultValue>>();
 		synchronized (plantResults) {
 			for (Long time : plantResults.keySet()) {
-				HashMap<String, ArrayList<BlockResultValue>> r = searchResultsOfCurrentSnapshot(string, exact, well, valid_config);
+				HashMap<String, ArrayList<BlockResultValue>> r = searchResultsOfCurrentSnapshot(string, exact, well, valid_config, removeReturnedValue,
+						plantResults.get(time));
 				for (String k : r.keySet()) {
 					res.put(time, r.get(k));
 				}
@@ -320,22 +321,27 @@ public class ImageProcessorOptionsAndResults {
 	/**
 	 * @param valid_config
 	 *           - can be null to get all results (all angles).
+	 * @param removeReturnedValue
+	 * @param optPreviousResult
 	 * @return config -> result list
 	 */
 	public HashMap<String, ArrayList<BlockResultValue>> searchResultsOfCurrentSnapshot(String string,
-			boolean exact, int valid_well, String valid_config) {
+			boolean exact, int valid_well, String valid_config, boolean removeReturnedValue, TreeMap<String, HashMap<Integer, BlockResultSet>> optPreviousResult) {
 		HashMap<String, ArrayList<BlockResultValue>> res = new HashMap<String, ArrayList<BlockResultValue>>();
-		if (previousResultsForThisTimePoint != null) {
-			synchronized (previousResultsForThisTimePoint) {
-				for (String config : previousResultsForThisTimePoint.keySet()) {
+		TreeMap<String, HashMap<Integer, BlockResultSet>> ds = optPreviousResult;
+		if (ds == null)
+			ds = previousResultsForThisTimePoint;
+		if (ds != null) {
+			synchronized (ds) {
+				for (String config : ds.keySet()) {
 					if (valid_config != null && !valid_config.equals(config))
 						continue;
-					HashMap<Integer, BlockResultSet> rs = previousResultsForThisTimePoint.get(config);
+					HashMap<Integer, BlockResultSet> rs = ds.get(config);
 					if (rs != null && !rs.isEmpty()) {
 						for (Integer well : rs.keySet()) {
 							if (well != valid_well)
 								continue;
-							ArrayList<BlockResultValue> v = rs.get(well).searchResults(exact, string);
+							ArrayList<BlockResultValue> v = rs.get(well).searchResults(exact, string, removeReturnedValue);
 							if (v != null)
 								res.put(config, v);
 						}

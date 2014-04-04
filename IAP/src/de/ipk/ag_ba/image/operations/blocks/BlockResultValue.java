@@ -7,6 +7,7 @@ public class BlockResultValue {
 	private final String name;
 	private final String unit;
 	private final Double value;
+	private Object object;
 	private Double position;
 	private NumericMeasurement3D binary;
 	
@@ -21,6 +22,14 @@ public class BlockResultValue {
 		this.binary = binary;
 		this.unit = null;
 		this.value = null;
+	}
+	
+	public BlockResultValue(String name, Object object) {
+		this.name = name;
+		this.binary = null;
+		this.unit = null;
+		this.value = null;
+		this.object = object;
 	}
 	
 	public BlockResultValue(String fromString) {
@@ -66,5 +75,9 @@ public class BlockResultValue {
 	
 	public void setPosition(Double d) {
 		position = d;
+	}
+	
+	public Object getObject() {
+		return object;
 	}
 }
