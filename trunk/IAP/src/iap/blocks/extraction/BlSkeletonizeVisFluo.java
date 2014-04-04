@@ -319,7 +319,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			getResultSet().setImage(getBlockPosition(), "skeleton_" + CameraType.FLUO.toString(), skelres, true);
 		}
 		
-		rt.addValue("bloom.count", bloomLimbCount);
+		if (getBoolean("Detect Bloom", false)) {
+			rt.addValue("bloom.count", bloomLimbCount);
+		}
 		rt.addValue("leaf.count", leafcount);
 		if (leafcount > 0) {
 			if (distHorizontal != null)

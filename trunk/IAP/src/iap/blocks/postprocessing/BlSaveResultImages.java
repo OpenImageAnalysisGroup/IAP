@@ -34,7 +34,7 @@ public class BlSaveResultImages extends AbstractBlock {
 			try {
 				LoadedImage res = processAndOrSaveResultImage(outImageReference, image);
 				if (res != null)
-					getResultSet().setImage(getBlockPosition(), "RESULT_" + res.getSubstanceName(), res.getImageDataReference(), true);
+					getResultSet().setImage(getBlockPosition(), "RESULT_" + res.getSubstanceName(), res.getImageDataReference(), false);
 			} catch (Exception e) {
 				throw new RuntimeException("Could not save result image", e);
 			}
