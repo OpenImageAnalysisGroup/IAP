@@ -21,7 +21,7 @@ public class IntensityAnalysis {
 	}
 	
 	public ResultsTableWithUnits calculateHistorgram(Double optDistHorizontal, Double optRealMarkerDistance,
-			Histogram.Mode mode, boolean addHistogramValues, boolean calcCurtosis) {
+			Histogram.Mode mode, boolean addHistogramValues, boolean calcCurtosis, boolean isVisibleInputImage) {
 		
 		ResultsTableWithUnits result = new ResultsTableWithUnits();
 		
@@ -233,7 +233,7 @@ public class IntensityAnalysis {
 				}
 			}
 			
-			boolean addStressIndicatorHueValues = true;
+			boolean addStressIndicatorHueValues = isVisibleInputImage;
 			if (addStressIndicatorHueValues) {
 				double green5to8 = histHue.getFreqAt(5 - 1) + histHue.getFreqAt(6 - 1) + histHue.getFreqAt(7 - 1) + histHue.getFreqAt(8 - 1);
 				if (green5to8 > 0) {
