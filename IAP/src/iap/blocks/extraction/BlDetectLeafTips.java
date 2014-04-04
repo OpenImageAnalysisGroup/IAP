@@ -139,11 +139,11 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 								.canvas()
 								.drawCircle((int) pos_fin.getX(), (int) pos_fin.getY(), searchRadius_fin, Color.RED.getRGB(), 0.5, 3)
 								.drawLine((int) pos_fin.getX(), (int) pos_fin.getY(), (int) direction_fin.getX(), (int) direction_fin.getY(), Color.BLUE.getRGB(), 0.5,
-										2)
+										1)
 								.text((int) direction_fin.getX() + 10, (int) direction_fin.getY(),
 										"x: " + (int) direction_fin.getX() + " y: " + (int) direction_fin.getY(),
 										Color.BLACK)
-								.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, "angle: " + angle, Color.BLACK)
+								.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, "angle: " + angle.intValue(), Color.BLACK)
 								.getImage();
 					}
 					
