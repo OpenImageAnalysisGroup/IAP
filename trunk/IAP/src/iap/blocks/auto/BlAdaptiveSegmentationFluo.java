@@ -69,7 +69,7 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			r = r.io().show("BEFORE HUE", false).filterByHSV_hue(getDouble("Auto-Tune - Minimum Result Hue", 0.4), optionsAndResults.getBackground())
 					.show("AFTER HUE", false).getImage();
 		}
-		getResultSet().setImage(getBlockPosition(), RESULT_OF_FLUO_INTENSITY, r);
+		getResultSet().setImage(getBlockPosition(), RESULT_OF_FLUO_INTENSITY, r, true);
 		return input().images().fluo().io().applyMask(r).getImage();
 	}
 	

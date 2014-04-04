@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -268,6 +269,7 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	TreeMap<String, String> name2unit = getUnits();
+	private final HashSet<String> deleteAtPipelineFinishing = new HashSet<String>();
 	
 	private String getUnitFromName(String name) {
 		if (name2unit.containsKey(name))
@@ -315,19 +317,26 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public void setImage(int blockPosition, String id, ImageData image) {
+	public void setImage(int blockPosition, String id, ImageData image, boolean deleteAtPipelineCompletion) {
 		if (!storedImages.containsKey(blockPosition))
 			storedImages.put(blockPosition, new TreeMap<String, ImageData>());
 		
 		storedImages.get(blockPosition).put(id, image);
+		
+		synchronized (deleteAtPipelineFinishing) {
+			deleteAtPipelineFinishing.add(id);
+		}
 	}
 	
 	@Override
-	public void setImage(int position, String id, Image image) {
+	public void setImage(int position, String id, Image image, boolean deleteAtPipelineCompletion) {
 		if (!storedImages.containsKey(position))
 			storedImages.put(position, new TreeMap<String, ImageData>());
 		
 		storedImages.get(position).put(id, new ImageInMemory(null, image));
+		synchronized (deleteAtPipelineFinishing) {
+			deleteAtPipelineFinishing.add(id);
+		}
 	}
 	
 	@Override
@@ -459,5 +468,17 @@ public class BlockResults implements BlockResultSet {
 	@Override
 	public void setImages(TreeMap<Integer, TreeMap<String, ImageData>> storedImages) {
 		this.storedImages = storedImages;
+	}
+	
+	@Override
+	public void clearNotUsedResults() {
+		synchronized (deleteAtPipelineFinishing) {
+			for (String id : deleteAtPipelineFinishing) {
+				for (Integer bp : storedImages.keySet()) {
+					if (storedImages.get(bp).containsKey(id))
+						storedImages.get(bp).remove(id);
+				}
+			}
+		}
 	}
 }

@@ -66,9 +66,9 @@ public interface BlockResultSet {
 	
 	public void printAnalysisResults();
 	
-	public void setImage(int currentPositionInPipeline, String id, ImageData image);
+	public void setImage(int currentPositionInPipeline, String id, ImageData image, boolean deleteAtPipelineCompletion);
 	
-	public void setImage(int currentPositionInPipeline, String id, Image image);
+	public void setImage(int currentPositionInPipeline, String id, Image image, boolean deleteAtPipelineCompletion);
 	
 	public Image getImage(int currentPositionInPipeline, String id);
 	
@@ -108,5 +108,7 @@ public interface BlockResultSet {
 	public void removeResultObject(BlockResultObject result1);
 	
 	Image getImage(String id);
+	
+	public void clearNotUsedResults();
 	
 }

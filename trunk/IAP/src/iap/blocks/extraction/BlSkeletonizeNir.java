@@ -28,7 +28,7 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlock {
 				Image sk = nirMask.copy().io().skeletonize().getImage();
 				if (sk != null) {
 					sk = mapOriginalOnSkel(sk, nirMask, optionsAndResults.getBackground());
-					getResultSet().setImage(getBlockPosition(), "nir_skeleton", sk.show("SKELETON", debug));
+					getResultSet().setImage(getBlockPosition(), "nir_skeleton", sk.show("SKELETON", debug), true);
 					if (getBoolean("draw_skeleton", true)) {
 						addPostprocessor(nirMask, sk, CameraType.NIR);
 					}

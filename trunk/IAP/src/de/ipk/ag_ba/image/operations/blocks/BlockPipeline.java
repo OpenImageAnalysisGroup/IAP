@@ -121,6 +121,8 @@ public class BlockPipeline {
 					synchronized (options.forcedDebugStacks) {
 						options.forcedDebugStacks.add(ds);
 					}
+				res.clearStoredPostprocessors();
+				res.clearNotUsedResults();
 				blockResults.put(well, res);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
