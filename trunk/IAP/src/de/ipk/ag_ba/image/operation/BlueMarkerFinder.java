@@ -48,7 +48,7 @@ public class BlueMarkerFinder {
 		regionPositions = markerPositionsImage.findRegions(debug);
 		
 		markerPositionsImage = markerPositionsImage
-				.invert()
+				.invertImageJ()
 				.replaceColor(Color.WHITE.getRGB(), background)
 				.show("Markers enlarged (b)", debug);
 	}
