@@ -417,6 +417,8 @@ public class NumericMeasurement3D extends NumericMeasurement {
 				} else
 					found = true;
 			}
+			if (found)
+				setAnnotation(res.toString());
 			return found;
 		}
 	}
