@@ -85,6 +85,7 @@ public class NavigationButton implements StyleAware {
 	private boolean iconUpdated;
 	private Object validIconCheckObject;
 	private boolean enabled = true;
+	private ActionEvent lastEvent;
 	
 	public NavigationButton(String overrideTitle, NavigationAction navigationAction, GUIsetting guiSetting) {
 		this(navigationAction, guiSetting);
@@ -896,6 +897,7 @@ public class NavigationButton implements StyleAware {
 		n1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				n.setLastEvent(e);
 				n.performAction();
 			}
 		});
@@ -922,6 +924,10 @@ public class NavigationButton implements StyleAware {
 		return rr;
 	}
 	
+	protected void setLastEvent(ActionEvent lastEvent) {
+		this.lastEvent = lastEvent;
+	}
+
 	public static int defaultButtonSize = 48;
 	
 	private static int getImageSize(ButtonDrawStyle style, final PanelTarget target) {
@@ -1013,5 +1019,9 @@ public class NavigationButton implements StyleAware {
 	
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public ActionEvent getEventSource() {
+		return lastEvent;
 	}
 }

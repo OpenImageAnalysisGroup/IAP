@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.commands.experiment;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -19,6 +21,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 public final class ActionNumericExportCommands extends AbstractNavigationAction implements ActionDataProcessing {
 	private final ArrayList<ThreadSafeOptions> toggles;
 	private ExperimentReference experiment;
+	private NavigationButton src;
 	
 	public ActionNumericExportCommands(
 			String tooltip, ArrayList<ThreadSafeOptions> toggles) {
@@ -38,14 +41,14 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		// empty
+		this.src = src;
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		ThreadSafeOptions exportIndividualAngles = new ThreadSafeOptions();
-		exportIndividualAngles.setBval(0, false);
+		exportIndividualAngles.setBval(0, true);
 		
 		ThreadSafeOptions exportIndividualReplicates = new ThreadSafeOptions();
 		exportIndividualReplicates.setBval(0, true);
@@ -54,6 +57,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 		res.add(new NavigationButton(new ActionDataExportTar(experiment), guiSetting));
 		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
 		
+		if (src!=null && src.getEventSource()!=null && (src.getEventSource().getModifiers() & ActionEvent.SHIFT_MASK)!=0) {
 		res.add(new NavigationButton(
 				new ActionToggle("Enable/disable export of data for individual (side) angles",
 						"<html>"
@@ -67,7 +71,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 								+ "<center>Export individual<br>"
 								+ "replicate data &#8594;", exportIndividualReplicates),
 				guiSetting));
-		
+		}
 		res.add(new NavigationButton(
 				new ActionPdfCreation3(
 						experiment,

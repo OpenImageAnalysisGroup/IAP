@@ -1502,7 +1502,8 @@ public class MongoDB {
 			@Override
 			public void run() {
 				try {
-					m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
+					if (m!=null)
+						m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
 							"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
 				} catch (Exception e1) {
 					ErrorMsg.addErrorMessage(e1);
