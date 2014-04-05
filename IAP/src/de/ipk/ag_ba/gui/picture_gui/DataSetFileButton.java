@@ -1,11 +1,10 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import iap.pipelines.ImageProcessorOptionsAndResults;
-import ij.ImagePlus;
 import ij.WindowManager;
-//import ij.io.FileInfoXYZ;
+// import ij.io.FileInfoXYZ;
 import ij.io.Opener;
-//import ij.io.TiffDecoderExtended;
+// import ij.io.TiffDecoderExtended;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
@@ -873,14 +872,14 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				}
 				if (fi == null || fi.getWidth() == 0) {
 					try {
-//						TiffDecoderExtended tid = new TiffDecoderExtended(
-//								myImage.fileURLlabel.getInputStream(),
-//								myImage.fileURLlabel.getFileName());
-//						FileInfoXYZ[] info = tid.getTiffInfo();
+						// TiffDecoderExtended tid = new TiffDecoderExtended(
+						// myImage.fileURLlabel.getInputStream(),
+						// myImage.fileURLlabel.getFileName());
+						// FileInfoXYZ[] info = tid.getTiffInfo();
 						Opener o = new Opener();
-//						ImagePlus imp = o.openTiffStack(info);
-//						imp.show("Image Label View - "
-//								+ myImage.fileURLlabel.getFileNameDecoded());
+						// ImagePlus imp = o.openTiffStack(info);
+						// imp.show("Image Label View - "
+						// + myImage.fileURLlabel.getFileNameDecoded());
 						IAPservice.showImageJ();
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(null,
@@ -1404,13 +1403,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	}
 	
 	private JMenuItem getAnnotationChangeMenuItem(CameraSelection cs, DaySelection ds, PlantSelection ps, AnnotionChangeCommand mode) {
-		JMenuItem cmd = new JMenuItem(mode + "");
+		JMenuItem cmd = new JMenuItem("" + mode);
 		cmd.setAction(getAnnotionChangeAction(cs, ds, ps, mode));
 		return cmd;
 	}
 	
 	private Action getAnnotionChangeAction(final CameraSelection cs, final DaySelection ds, final PlantSelection ps, final AnnotionChangeCommand mode) {
-		Action res = new AbstractAction() {
+		Action res = new AbstractAction("" + mode) {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {

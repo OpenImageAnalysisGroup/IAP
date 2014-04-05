@@ -29,6 +29,7 @@ public class BlSaveResultImages extends AbstractBlock {
 			boolean manyWells = optionsAndResults.getWellCnt() > 1;
 			ImageData outImageReference = (ImageData) input().images().getImageInfo(image.getCameraType())
 					.clone(input().images().getImageInfo(image.getCameraType()).getParentSample());
+			
 			if (manyWells)
 				outImageReference.setQualityAnnotation(outImageReference.getQualityAnnotation() + "_" + getWellIdx());
 			try {

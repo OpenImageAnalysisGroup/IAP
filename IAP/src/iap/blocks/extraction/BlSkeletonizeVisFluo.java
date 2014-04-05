@@ -56,10 +56,10 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
 			Image viswork = vis.copy().io().show("orig", debug)
 					.border(5)
-					.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 20)) // 10
-					.bm().erode(getInt("Erode-Cnt-Vis", 16))
-					.dilate(getInt("Dilate-Cnt-Vis", 8)).io()
-					.blur(getDouble("Blur-Vis", 2.0))
+					.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 10)) // 10
+					.bm().erode(getInt("Erode-Cnt-Vis", 5))
+					.dilate(getInt("Dilate-Cnt-Vis", 10)).io()
+					.blur(getDouble("Blur-Vis", 0))
 					.getImage().show("vis", debug);
 			
 			if (viswork != null)
@@ -99,9 +99,11 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		if (fluo == null)
 			return fluo;
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
-			Image fluowork = fluo.copy().io().bm()// .medianFilter32Bit()
-					.erode(getInt("Erode-Cnt-Fluo", 0))
-					.dilate(getInt("Dilate-Cnt-Fluo", 0)).io()
+			Image fluowork = fluo.copy().io()
+					.dilateHorizontal(getInt("Dilate-Cnt-Fluo-Hor", 10)) // 10
+					.bm()// .medianFilter32Bit()
+					.erode(getInt("Erode-Cnt-Fluo", 5))
+					.dilate(getInt("Dilate-Cnt-Fluo", 10)).io()
 					.blur(getDouble("Blur-Fluo", 0.0))
 					.getImage().show("fluo", debug);
 			

@@ -34,7 +34,7 @@ public class BorderAnalysis {
 	boolean onlyBiggest = true;
 	boolean checkSplit = false;
 	
-	public BorderAnalysis(Image img) throws InterruptedException {
+	public BorderAnalysis(Image img) {
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
 		borderLength = (int) borderIO.getResultsTable().getValue("border", 0);
 		borderImage = borderIO.getAs2D();
@@ -75,7 +75,7 @@ public class BorderAnalysis {
 		}
 	}
 	
-	public void plot(int waitTime, int radius) throws InterruptedException {
+	public void plot(int waitTime, int radius) {
 		Image img = image.copy();
 		
 		ImageCanvas ic = img.copy().io().canvas();
@@ -99,7 +99,12 @@ public class BorderAnalysis {
 		}
 		
 		ic.getImage().show("susanImage");
-		Thread.sleep(waitTime);
+		try {
+			Thread.sleep(waitTime);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/*
@@ -554,7 +559,7 @@ public class BorderAnalysis {
 	 * @throws InterruptedException
 	 */
 	// TODO adaption for disconnected border has to be checked
-	private static ArrayList<ArrayList<Integer>> getBorderLists(int[][] borderMap, int borderLength, boolean debug) throws InterruptedException {
+	private static ArrayList<ArrayList<Integer>> getBorderLists(int[][] borderMap, int borderLength, boolean debug) {
 		int w = borderMap.length;
 		int h = borderMap[0].length;
 		ArrayList<Integer> borderList = new ArrayList<Integer>();
@@ -591,7 +596,11 @@ public class BorderAnalysis {
 						
 						if (debug) {
 							show.update(new Image(borderMap));
-							Thread.sleep(debugSpeed);
+							try {
+								Thread.sleep(debugSpeed);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
 						}
 						
 						inside = ry - 1 >= 0;

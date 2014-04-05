@@ -26,21 +26,17 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 
 /**
- * @author pape
+ * @author pape, klukas
  */
 public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void prepare() {
-		
 		CameraPosition cp = optionsAndResults.getCameraPosition();
 		for (CameraType ct : CameraType.values()) {
-			if (ct != CameraType.VIS)
-				continue;
-			TreeMap<Long, ArrayList<BlockResultValue>> oldResults = optionsAndResults.searchPreviousResults("plant", true, getWellIdx(),
+			TreeMap<Long, ArrayList<BlockResultValue>> oldResults = optionsAndResults.searchPreviousResults("plant_" + ct, true, getWellIdx(),
 					optionsAndResults.getConfigAndAngle(), true);
-			BlockResultObject result1 = getResultSet().searchObjectResult(getBlockPosition(), 1, "leaftiplist");
+			BlockResultObject result1 = getResultSet().searchObjectResult(getBlockPosition(), 1, "leaftiplist_" + ct);
 			ArrayList<BlockResultValue> result2 = oldResults == null || oldResults.isEmpty() ? null : oldResults.lastEntry().getValue();
 			LinkedList<BorderFeature> unassignedResults = null;
 			Plant previousResults = null;
@@ -82,7 +78,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 		LeafTipMatcher ltm = new LeafTipMatcher(unassignedResults, timepoint);
 		ltm.setMinDist(100.0);
 		ltm.matchLeafTips();
-		getResultSet().setObjectResult(getBlockPosition(), "plant", ltm.getMatchedPlant());
+		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, ltm.getMatchedPlant());
 	}
 	
 	private void matchNewResults(Plant previousResults,
@@ -90,7 +86,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 		LeafTipMatcher ltm = new LeafTipMatcher(previousResults, unassignedResults, timepoint);
 		ltm.matchLeafTips();
 		final Plant plant = ltm.getMatchedPlant();
-		// TODO clac dist between leaftips , dist / (time_n +1 - time_n) * 24*60*60*1000; Leaflength += dist;
+		// TODO calc dist between leaftips , dist / (time_n +1 - time_n) * 24*60*60*1000; Leaflength += dist;
 		
 		getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
 			
@@ -122,7 +118,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 			}
 		});
 		
-		getResultSet().setObjectResult(getBlockPosition(), "plant", plant);
+		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, plant);
 	}
 	
 	@Override
@@ -151,6 +147,6 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Tracks Leaf Tips (processing of Block Detect Leaf Tips is nessessary)";
+		return "Tracks Leaf Tips (prior processing of block 'Detect Leaf-Tips' is nessessary)";
 	}
 }
