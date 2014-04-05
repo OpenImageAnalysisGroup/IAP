@@ -365,7 +365,10 @@ public class BlockResults implements BlockResultSet {
 		synchronized (storedImages) {
 			if (!storedImages.containsKey(blockPosition))
 				storedImages.put(blockPosition, new TreeMap<String, ImageData>());
-			
+			else
+				if (storedImages.get(blockPosition).containsKey(id))
+					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result set already contains image with ID '" + id
+							+ "', overwriting previous information!");
 			storedImages.get(blockPosition).put(id, image);
 		}
 		if (deleteAtPipelineCompletion)

@@ -21,7 +21,7 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
- * @author pape
+ * @author pape, klukas
  */
 public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	
@@ -42,11 +42,16 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	@Override
+	public boolean isChangingImages() {
+		return true; // post-processor highlights leaf-tips
+	}
+	
+	@Override
 	protected Image processVISmask() {
 		if (input().masks().vis() == null)
 			return null;
-		Image workimg = input().masks().vis().copy();
 		if (getBoolean("Calculate on Visible Image", false) && !ignore) {
+			Image workimg = input().masks().vis().copy();
 			int searchRadius = getInt("Search-radius (Vis)", 33);
 			double fillGradeInPercent = getDouble("Fillgrade (Vis)", 0.3);
 			borderSize = searchRadius / 2;
@@ -63,8 +68,8 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	protected Image processFLUOmask() {
 		if (input().masks().fluo() == null)
 			return null;
-		Image workimg = input().masks().fluo().copy();
 		if (getBoolean("Calculate on Fluorescence Image", false) && !ignore) {
+			Image workimg = input().masks().fluo().copy();
 			int searchRadius = getInt("Search-radius (Fluo)", 30);
 			double fillGradeInPercent = getDouble("Fillgrade (Fluo)", 0.3);
 			borderSize = searchRadius / 2;
@@ -81,8 +86,8 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	protected Image processNIRmask() {
 		if (input().masks().nir() == null)
 			return null;
-		Image workimg = input().masks().nir().copy();
 		if (getBoolean("Calculate on Near-infrared Image", false) && !ignore) {
+			Image workimg = input().masks().nir().copy();
 			int searchRadius = getInt("Search-radius (Nir)", 20);
 			double fillGradeInPercent = getDouble("Fillgrade (Nir)", 0.35);
 			borderSize = searchRadius / 2;
@@ -97,7 +102,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	private void savePeaksAndFeatures(LinkedList<BorderFeature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius) {
 		
-		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist", peakList);
+		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, peakList);
 		
 		int index = 1;
 		for (BorderFeature bf : peakList) {
@@ -167,21 +172,18 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	private LinkedList<BorderFeature> getPeaksFromBorder(Image img, int searchRadius, double fillGradeInPercent) {
 		BorderAnalysis ba = null;
 		LinkedList<BorderFeature> res = null;
-		try {
-			ba = new BorderAnalysis(img);
-			int geometricThresh = (int) (fillGradeInPercent * (Math.PI * searchRadius * searchRadius));
-			ba.calcSUSAN(searchRadius, geometricThresh);
-			ba.getPeaksFromBorder(1, searchRadius * 2, "susan");
-			ba.approxDirection(searchRadius * 2);
-			
-			if (debug_borderDetection)
-				ba.plot(0, searchRadius);
-			
-			res = ba.getPeakList();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		ba = new BorderAnalysis(img);
+		int geometricThresh = (int) (fillGradeInPercent * (Math.PI * searchRadius * searchRadius));
+		ba.calcSUSAN(searchRadius, geometricThresh);
+		ba.getPeaksFromBorder(1, searchRadius * 2, "susan");
+		ba.approxDirection(searchRadius * 2);
+		
+		if (debug_borderDetection)
+			ba.plot(0, searchRadius);
+		
+		res = ba.getPeakList();
+		
 		return res;
 	}
 	
