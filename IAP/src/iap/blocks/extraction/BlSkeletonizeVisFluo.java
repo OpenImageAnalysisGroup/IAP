@@ -318,7 +318,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		
 		if (skelres != null) {
 			skelres.show("Result Skeleton", debug);
-			getResultSet().setImage(getBlockPosition(), "skeleton_" + CameraType.FLUO.toString(), skelres, true);
+			getResultSet().setImage(getBlockPosition(), "skeleton_" + cameraType, skelres, true);
 		}
 		
 		if (getBoolean("Detect Bloom", false)) {
