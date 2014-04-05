@@ -191,7 +191,6 @@ public class BlockListEditHelper {
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								textField.setText("#" + textField.getText());
-								MainFrame.showMessageDialog(MSG_CLOSE_WINDOW, "Further action needed");
 							}
 						});
 						popup.add(menuItem);
@@ -203,7 +202,6 @@ public class BlockListEditHelper {
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								textField.setText(textField.getText().substring("#".length()));
-								MainFrame.showMessageDialog(MSG_CLOSE_WINDOW, "Further action needed");
 							}
 						});
 						popup.add(menuItem);
