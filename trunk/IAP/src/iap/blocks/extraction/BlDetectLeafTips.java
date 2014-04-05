@@ -50,7 +50,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	protected Image processVISmask() {
 		if (input().masks().vis() == null)
 			return null;
-		if (getBoolean("Calculate on Visible Image", false) && !ignore) {
+		if (getBoolean("Calculate on Visible Image", true) && !ignore) {
 			Image workimg = input().masks().vis().copy();
 			int searchRadius = getInt("Search-radius (Vis)", 33);
 			double fillGradeInPercent = getDouble("Fillgrade (Vis)", 0.3);
@@ -68,7 +68,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	protected Image processFLUOmask() {
 		if (input().masks().fluo() == null)
 			return null;
-		if (getBoolean("Calculate on Fluorescence Image", false) && !ignore) {
+		if (getBoolean("Calculate on Fluorescence Image", true) && !ignore) {
 			Image workimg = input().masks().fluo().copy();
 			int searchRadius = getInt("Search-radius (Fluo)", 30);
 			double fillGradeInPercent = getDouble("Fillgrade (Fluo)", 0.3);
