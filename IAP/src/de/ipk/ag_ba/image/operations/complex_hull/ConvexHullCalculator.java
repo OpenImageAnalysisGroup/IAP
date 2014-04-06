@@ -220,7 +220,7 @@ public class ConvexHullCalculator {
 									.getImage();
 						}
 					};
-					if (br != null)
+					if (br != null && io != null && io.getCameraType() != null)
 						br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
 				}
 			}
@@ -257,7 +257,8 @@ public class ConvexHullCalculator {
 									.getImage();
 						}
 					};
-					br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
+					if (br != null && io != null && io.getCameraType() != null)
+						br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
 				}
 			}
 			
@@ -289,7 +290,8 @@ public class ConvexHullCalculator {
 							return a.getImage();
 						}
 					};
-					br.addImagePostProcessor(io.getCameraType(), null, roi);
+					if (br != null && io != null && io.getCameraType() != null)
+						br.addImagePostProcessor(io.getCameraType(), null, roi);
 				}
 			}
 			
@@ -308,7 +310,8 @@ public class ConvexHullCalculator {
 				}
 				
 			};
-			br.addImagePostProcessor(io.getCameraType(), null, roi);
+			if (br != null && io != null && io.getCameraType() != null)
+				br.addImagePostProcessor(io.getCameraType(), null, roi);
 		}
 		
 		return res;
