@@ -485,7 +485,7 @@ public class Image {
 	 * @return
 	 */
 	public Image saveToFile(String fileName) {
-		io().saveImage(fileName);
+		io().saveImage(null).saveAsPng(fileName);
 		return this;
 	}
 	
