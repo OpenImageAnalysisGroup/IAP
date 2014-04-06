@@ -1,5 +1,7 @@
 package tests.JMP.leaf_clustering;
 
+import iap.blocks.extraction.Normalisation;
+
 import java.util.HashMap;
 
 import javax.vecmath.Point2d;
@@ -16,18 +18,32 @@ public class LeafTip {
 	private int leafID;
 	private double minDist; // distance to next leaftip
 	private HashMap<String, Object> featureMap;
+	private Normalisation normalisationFactor;
 	
 	public LeafTip(long time, int x, int y) {
 		this.time = time;
-		this.x = x;
-		this.y = y;
+		if (normalisationFactor != null) {
+			this.x = x;
+			this.y = y;
+		} else {
+			this.x = (normalisationFactor.convertImgXtoRealWorldX(x));
+			this.y = (normalisationFactor.convertImgYtoRealWorldY(y));
+		}
 		leafID = -1;
 	}
 	
-	public LeafTip(long time, Vector2D pos, HashMap<String, Object> featureMap) {
+	public LeafTip(long time, Vector2D pos, HashMap<String, Object> featureMap, Normalisation normalisationFactor) {
 		this.time = time;
-		x = (int) pos.getX();
-		y = (int) pos.getY();
+		this.normalisationFactor = normalisationFactor;
+		
+		if (normalisationFactor == null) {
+			x = (int) pos.getX();
+			y = (int) pos.getY();
+		} else {
+			x = (normalisationFactor.convertImgXtoRealWorldX(pos.getX()));
+			y = (normalisationFactor.convertImgYtoRealWorldY(pos.getY()));
+		}
+		
 		this.featureMap = new HashMap<String, Object>();
 		this.featureMap = featureMap;
 	}
@@ -56,22 +72,22 @@ public class LeafTip {
 	 */
 	public double dist(Leaf leaf) {
 		LeafTip temp = leaf.getLast();
-		return Math.sqrt((getX() - temp.getX()) * (getX() - temp.getX()) + (y - temp.y) * (y - temp.y));
+		return Math.sqrt((getRealWorldX() - temp.getRealWorldX()) * (getRealWorldX() - temp.getRealWorldX()) + (y - temp.y) * (y - temp.y));
 	}
 	
 	public double dist(LeafTip lt) {
-		return Math.sqrt((x - lt.getX()) * (x - lt.getX()) + (y - lt.getY()) * (y - lt.getY()));
+		return Math.sqrt((x - lt.getRealWorldX()) * (x - lt.getRealWorldX()) + (y - lt.getRealWorldY()) * (y - lt.getRealWorldY()));
 	}
 	
 	public long getTime() {
 		return time;
 	}
 	
-	public int getX() {
+	public int getRealWorldX() {
 		return x;
 	}
 	
-	public int getY() {
+	public int getRealWorldY() {
 		return y;
 	}
 	
@@ -85,5 +101,13 @@ public class LeafTip {
 	
 	public double dist(Point2d p) {
 		return Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
+	}
+	
+	public int getImageX(Normalisation norm) {
+		return norm == null ? x : norm.getImageXfromRealWorldX(x);
+	}
+	
+	public int getImageY(Normalisation norm) {
+		return norm == null ? y : norm.getImageYfromRealWorldY(y);
 	}
 }

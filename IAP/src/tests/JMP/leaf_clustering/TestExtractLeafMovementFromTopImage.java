@@ -1,5 +1,7 @@
 package tests.JMP.leaf_clustering;
 
+import iap.blocks.extraction.Normalisation;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +48,7 @@ public class TestExtractLeafMovementFromTopImage {
 			
 			HelperMethods.write(pathout, "out", avgLeafMovement);
 			Point2d cen = getAvgCentroid(centroidsForEachSnapshot);
-			Plant tempPlant = matchPlant(tipPositionsForEachDay, Integer.MAX_VALUE);
+			Plant tempPlant = matchPlant(tipPositionsForEachDay, Integer.MAX_VALUE, null);
 			tempPlant.setID(id);
 			tempPlant.calcMovementForEachLeaf(cen);
 			tempPlant.saveLeafCoordinates(pathout);
@@ -66,8 +68,9 @@ public class TestExtractLeafMovementFromTopImage {
 		return new Point2d(sum.x / s, sum.y / s);
 	}
 	
-	private Plant matchPlant(HashMap<Integer, LinkedList<BorderFeature>> tipPositionsForEachDay, int minDist) throws InterruptedException {
-		LeafTipMatcher ltm = new LeafTipMatcher(tipPositionsForEachDay.values());
+	private Plant matchPlant(HashMap<Integer, LinkedList<BorderFeature>> tipPositionsForEachDay,
+			int minDist, Normalisation norm) throws InterruptedException {
+		LeafTipMatcher ltm = new LeafTipMatcher(tipPositionsForEachDay.values(), norm);
 		ltm.setMinDist(minDist);
 		ltm.matchLeafTips();
 		// TODO get dim

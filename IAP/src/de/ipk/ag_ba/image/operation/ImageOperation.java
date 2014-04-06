@@ -2138,7 +2138,8 @@ public class ImageOperation implements MemoryHogInterface {
 					ama = af > ama ? af : ama;
 					bma = bf > bma ? bf : bma;
 				}
-		System.out.println(SystemAnalysis.getCurrentTime() + ">Calculated Lab-Cube. Value Ranges: L:[" + lmi + "," + lma + "], A:[" + ami + "," + ama + "], B:["
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Calculated Lab-Cube. Value Ranges: L:[" + lmi + "," + lma + "], A:[" + ami + "," + ama
+				+ "], B:["
 				+ bmi + "," + bma + "]");
 	}
 	

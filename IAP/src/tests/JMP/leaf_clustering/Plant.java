@@ -76,7 +76,7 @@ public class Plant {
 		for (Leaf l : leafList) {
 			out += "Leaf: " + l.getID() + "\n";
 			for (LeafTip lt : l) {
-				out += lt.getX() + ",;" + lt.getY() + ",\n";
+				out += lt.getRealWorldX() + ",;" + lt.getRealWorldY() + ",\n";
 			}
 			out += "\n";
 		}

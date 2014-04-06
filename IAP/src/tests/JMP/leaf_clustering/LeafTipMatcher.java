@@ -1,5 +1,7 @@
 package tests.JMP.leaf_clustering;
 
+import iap.blocks.extraction.Normalisation;
+
 import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,18 +32,19 @@ public class LeafTipMatcher {
 		matchedPlant = new Plant();
 	}
 	
-	public LeafTipMatcher(Collection<LinkedList<BorderFeature>> tipPositionsForEachDay) {
-		leafTipList = convert(tipPositionsForEachDay);
+	public LeafTipMatcher(Collection<LinkedList<BorderFeature>> tipPositionsForEachDay, Normalisation norm) {
+		leafTipList = convert(tipPositionsForEachDay, norm);
 		matchedPlant = new Plant();
 	}
 	
-	public LeafTipMatcher(Plant plant, LinkedList<BorderFeature> tipPositionsForOneDay, long timepoint) {
-		leafTipList = convert(tipPositionsForOneDay, timepoint);
+	public LeafTipMatcher(Plant plant, LinkedList<BorderFeature> tipPositionsForOneDay,
+			long timepoint, Normalisation norm) {
+		leafTipList = convert(tipPositionsForOneDay, timepoint, norm);
 		matchedPlant = plant;
 	}
 	
-	public LeafTipMatcher(LinkedList<BorderFeature> leafTipListForOneDay, long timepoint) {
-		leafTipList = convert(leafTipListForOneDay, timepoint);
+	public LeafTipMatcher(LinkedList<BorderFeature> leafTipListForOneDay, long timepoint, Normalisation norm) {
+		leafTipList = convert(leafTipListForOneDay, timepoint, norm);
 		matchedPlant = new Plant();
 	}
 	
@@ -89,8 +92,8 @@ public class LeafTipMatcher {
 					int currentTime = (int) lt.getTime();
 					if (day == currentTime) {
 						int r = (int) (255 * ((growTime - currentTime) / (double) (growTime)));
-						int x = lt.getX() + fac;
-						int y = lt.getY() + fac;
+						int x = lt.getRealWorldX() + fac;
+						int y = lt.getRealWorldY() + fac;
 						
 						img_all.io().canvas()
 								.drawCircle(x, y, 15, new Color(255 - r, 0, r).getRGB(), 0.5, 3)
@@ -128,8 +131,8 @@ public class LeafTipMatcher {
 				// Vector2d vec = (Vector2d) lt.getFeature("angle");
 				// if (vec == null)
 				// continue;
-				int x = lt.getX() + fac;
-				int y = lt.getY() + fac;
+				int x = lt.getRealWorldX() + fac;
+				int y = lt.getRealWorldY() + fac;
 				img_all.io().canvas()
 						.drawCircle(x, y, 10, hsb, 0.5, 2)
 						// .drawLine(x, y, (int) (vec.x), (int) (vec.y), Color.BLUE.getRGB(), 0.5, 1)
@@ -310,7 +313,7 @@ public class LeafTipMatcher {
 		return out;
 	}
 	
-	private ArrayList<LinkedList<LeafTip>> convert(Collection<LinkedList<BorderFeature>> list) {
+	private ArrayList<LinkedList<LeafTip>> convert(Collection<LinkedList<BorderFeature>> list, Normalisation norm) {
 		ArrayList<LinkedList<LeafTip>> tiplistForEachDay = new ArrayList<LinkedList<LeafTip>>();
 		LinkedList<LeafTip> tiplist;
 		long time = 0;
@@ -321,7 +324,7 @@ public class LeafTipMatcher {
 				for (BorderFeature p : l) {
 					if (p != null) {
 						Vector2D pos = p.getPosition();
-						tiplist.add(new LeafTip(time, pos, p.getFeatureMap()));
+						tiplist.add(new LeafTip(time, pos, p.getFeatureMap(), norm));
 					}
 				}
 			}
@@ -330,10 +333,11 @@ public class LeafTipMatcher {
 		return tiplistForEachDay;
 	}
 	
-	private ArrayList<LinkedList<LeafTip>> convert(LinkedList<BorderFeature> leafTipListForOneDay, long timepoint) {
+	private ArrayList<LinkedList<LeafTip>> convert(LinkedList<BorderFeature> leafTipListForOneDay,
+			long timepoint, Normalisation norm) {
 		LinkedList<LeafTip> ll = new LinkedList<LeafTip>();
 		for (BorderFeature bf : leafTipListForOneDay) {
-			ll.add(new LeafTip(timepoint, bf.getPosition(), bf.getFeatureMap()));
+			ll.add(new LeafTip(timepoint, bf.getPosition(), bf.getFeatureMap(), norm));
 		}
 		ArrayList<LinkedList<LeafTip>> al = new ArrayList<LinkedList<LeafTip>>();
 		al.add(ll);

@@ -56,16 +56,19 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				if (time == null)
 					time = new Long(id.getTime());
 				
+				Normalisation n = new Normalisation(optionsAndResults.getREAL_MARKER_DISTANCE(), optionsAndResults.getCalculatedBlueMarkerDistance(),
+						input().masks(), ct);
+				
 				if (previousResults != null) {
 					if (unassignedResults != null) {
 						// match
-						matchNewResults(previousResults, unassignedResults, cp, ct, time);
+						matchNewResults(previousResults, unassignedResults, cp, ct, time, n);
 						getResultSet().removeResultObject(result1);
 					}
 				} else {
 					if (unassignedResults != null) {
 						// first run, create new plant
-						createNewPlant(unassignedResults, cp, ct, time);
+						createNewPlant(unassignedResults, cp, ct, time, n);
 						getResultSet().removeResultObject(result1);
 					}
 				}
@@ -74,16 +77,17 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private void createNewPlant(LinkedList<BorderFeature> unassignedResults, CameraPosition cameraPosition,
-			CameraType cameraType, long timepoint) {
-		LeafTipMatcher ltm = new LeafTipMatcher(unassignedResults, timepoint);
+			CameraType cameraType, long timepoint, Normalisation norm) {
+		LeafTipMatcher ltm = new LeafTipMatcher(unassignedResults, timepoint, norm);
 		ltm.setMinDist(100.0);
 		ltm.matchLeafTips();
 		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, ltm.getMatchedPlant());
 	}
 	
 	private void matchNewResults(Plant previousResults,
-			LinkedList<BorderFeature> unassignedResults, CameraPosition cameraPosition, final CameraType cameraType, long timepoint) {
-		LeafTipMatcher ltm = new LeafTipMatcher(previousResults, unassignedResults, timepoint);
+			LinkedList<BorderFeature> unassignedResults, CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
+			final Normalisation norm) {
+		LeafTipMatcher ltm = new LeafTipMatcher(previousResults, unassignedResults, timepoint, norm);
 		ltm.matchLeafTips();
 		final Plant plant = ltm.getMatchedPlant();
 		// TODO calc dist between leaftips , dist / (time_n +1 - time_n) * 24*60*60*1000; Leaflength += dist;
@@ -98,8 +102,8 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				int idx = 0;
 				for (Leaf l : ll) {
 					for (LeafTip lt : l) {
-						c = c.fillCircle(lt.getX(), lt.getY(), 5, col.get(idx).getRGB(), 0.5)
-								.drawCircle(lt.getX(), lt.getY(), 6, Color.RED.getRGB(), 0.5, 2)
+						c = c.fillCircle(lt.getImageX(norm), lt.getImageY(norm), 5, col.get(idx).getRGB(), 0.5)
+								.drawCircle(lt.getImageX(norm), lt.getImageY(norm), 6, Color.RED.getRGB(), 0.5, 1)
 						;
 					}
 					idx++;
