@@ -152,7 +152,7 @@ public class ImageOperation implements MemoryHogInterface {
 		setCameraType(type);
 	}
 	
-	private ImageOperation setCameraType(CameraType type) {
+	public ImageOperation setCameraType(CameraType type) {
 		this.cameraType = type;
 		return this;
 	}
@@ -5170,6 +5170,35 @@ public class ImageOperation implements MemoryHogInterface {
 		ImageCalculator ic = new ImageCalculator();
 		ImagePlus ip = ic.run("diff, 32", this.image, image.getAsImagePlus());
 		return new ImageOperation(ip);
+	}
+	
+	public ImageOperation diffSatVal(Image oi) {
+		float[] compArray1 = new float[3];
+		float[] compArray2 = new float[3];
+		int[] res = new int[getWidth() * getHeight()];
+		int idx = 0;
+		int[] compare = oi.getAs1A();
+		for (int rgb : getAs1D()) {
+			int r = ((rgb >> 16) & 0xff);
+			int g = ((rgb >> 8) & 0xff);
+			int b = (rgb & 0xff);
+			Color.RGBtoHSB(r, g, b, compArray1);
+			float h1 = compArray1[0];
+			float s1 = compArray1[1];
+			float v1 = compArray1[2];
+			
+			rgb = compare[idx];
+			r = ((rgb >> 16) & 0xff);
+			g = ((rgb >> 8) & 0xff);
+			b = (rgb & 0xff);
+			Color.RGBtoHSB(r, g, b, compArray2);
+			float h2 = compArray2[0];
+			float s2 = compArray2[1];
+			float v2 = compArray2[2];
+			
+			res[idx++] = Color.HSBtoRGB(h1, s2, (Math.abs(h1 - h2) + Math.abs(s1 - s2) + Math.abs(v1 - v2)) / 3);// (s1 - s2) / 2f + 0.5f, (v1 - v2) / 2f + 0.5f);
+		}
+		return new ImageOperation(res, getWidth(), getHeight());
 	}
 	
 	public ImageOperation add(Image image) {
