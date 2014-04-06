@@ -43,10 +43,13 @@ public class ActionToggle extends AbstractNavigationAction {
 				return setting2;
 		} else {
 			String s = setting;
+			String s2 = (String) option.getParam(1, null);
+			if (s2 == null)
+				s2 = "";
 			if (SystemAnalysis.isHeadless())
 				return (option.getBval(0, true) ? "(#) " : "(_) ") + pretty(s);
 			else
-				return pretty(s);
+				return pretty(s) + s2;
 		}
 	}
 	
@@ -72,6 +75,8 @@ public class ActionToggle extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
+		if (option.getParam(1, null) != null)
+			return "img/ext/gpl2/Gnome-System-Run-64.png";
 		if (option.getBval(0, true))
 			return "img/ext/gpl2/gtce.png";
 		else
