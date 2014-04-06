@@ -90,6 +90,9 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	private NavigationButtonFilter optNavigationButtonFilter;
 	
 	public static NavigationButtonFilter optStaticNavigationButtonFilter;
+	public static Color optCustomBackground;
+	public static Color optCustomBackgroundStart;
+	public static Color optCustomBackgroundSide;
 	
 	public IAPnavigationPanel(PanelTarget target, JComponent graphPanel, JPanel actionPanelRight) {
 		this.target = target;
@@ -159,7 +162,8 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			});
 			popup.add(menuItem);
 		}
-		addMouseListener(new PopupListener(popup));
+		if (optCustomBackground == null)
+			addMouseListener(new PopupListener(popup));
 		updateLayout();
 	}
 	
@@ -370,7 +374,10 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 					if (buttonStyle == ButtonDrawStyle.COMPACT_LIST)
 						b = 1;
 					
-					actionPanelRight.setBackground(new Color(255, 220, 220));
+					if (optCustomBackgroundSide != null)
+						actionPanelRight.setBackground(optCustomBackgroundSide);
+					else
+						actionPanelRight.setBackground(new Color(255, 220, 220));
 					actionPanelRight.setLayout(TableLayout.getLayout(TableLayout.PREFERRED, TableLayout.PREFERRED));
 					actionPanelRight.removeAll();
 					actionPanelRight.add(TableLayout.getMultiSplit(right, TableLayout.PREFERRED, b + 1, b + 1, b, b), "0,0");
@@ -561,6 +568,8 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	public static Color getTabColor() {
+		if (optCustomBackground != null)
+			return optCustomBackground;
 		Color c2;
 		c2 = UIManager.getColor("MenuBar.background");
 		if (c2 == null)
@@ -686,7 +695,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			Color c2;
 			c2 = IAPnavigationPanel.getTabColor();
 			
-			gp = new GradientPaint(0, 0, new Color(250, 250, 250), 0, h, c2);
+			gp = new GradientPaint(0, 0, optCustomBackgroundStart != null ? optCustomBackgroundStart : new Color(250, 250, 250), 0, h, c2);
 		}
 		g2d.setPaint(gp);
 		g2d.fillRect(0, 0, w, h);
