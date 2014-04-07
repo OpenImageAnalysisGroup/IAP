@@ -1,4 +1,4 @@
-package tests.JMP.leaf_clustering;
+package iap.blocks.imageAnalysisTools.leafClustering;
 
 import iap.blocks.extraction.Normalisation;
 

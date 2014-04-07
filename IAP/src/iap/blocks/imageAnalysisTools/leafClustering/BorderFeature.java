@@ -1,4 +1,4 @@
-package tests.JMP.leaf_clustering;
+package iap.blocks.imageAnalysisTools.leafClustering;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,6 +8,9 @@ import javax.vecmath.Point3d;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
+/**
+ * @author pape
+ */
 public class BorderFeature {
 	HashMap<String, Object> featureMap = new HashMap<String, Object>();
 	

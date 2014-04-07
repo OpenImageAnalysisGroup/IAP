@@ -1,4 +1,4 @@
-package tests.JMP.leaf_clustering;
+package iap.blocks.imageAnalysisTools.leafClustering;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ import javax.vecmath.Point3d;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
-import tests.JMP.methods.HelperMethods;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
@@ -32,7 +31,7 @@ public class BorderAnalysis {
 	private LinkedList<BorderFeature> peakList;
 	boolean debug = false;
 	boolean onlyBiggest = true;
-	boolean checkSplit = false;
+	boolean checkSplit = true;
 	
 	public BorderAnalysis(Image img) {
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
@@ -67,7 +66,7 @@ public class BorderAnalysis {
 		// }
 		
 		peaks = CurveAnalysis.findMaximaIJ(data, 1, false);
-		peaks = CurveAnalysis.summerizeMaxima(peaks, listsize, distBetweenPeaks);
+		peaks = CurveAnalysis.summarizeMaxima(peaks, listsize, distBetweenPeaks);
 		
 		// save results
 		for (int idx = 0; idx < peaks.length; idx++) {
@@ -167,7 +166,7 @@ public class BorderAnalysis {
 				ytemp = tempArray.get(idx + 1);
 				
 				// get region (boundingbox) in size of circle-diameter
-				int[][] predefinedRegion = HelperMethods.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
+				int[][] predefinedRegion = ImageOperation.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
 				
 				// do region-growing
 				ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, debug);
@@ -196,9 +195,9 @@ public class BorderAnalysis {
 		}
 	}
 	
-	public static boolean isSplit(int[][] region, ArrayList<PositionAndColor> regiona, int radius, boolean debug) throws InterruptedException {
+	public static boolean isSplit(int[][] region, ArrayList<PositionAndColor> regionColors, int radius, boolean debug) throws InterruptedException {
 		int[][] region2d = new int[region.length][region[0].length];
-		region2d = copyRegiontoArray(region, regiona);
+		region2d = copyRegiontoArray(region, regionColors);
 		int w = region2d.length;
 		int h = region2d[0].length;
 		LinkedList<int[]> circleCoordinates = getCircleCoordinatesSorted(radius - (int) (radius * 0.05));
@@ -702,5 +701,9 @@ public class BorderAnalysis {
 	
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+	
+	public void setCheckSplit(boolean checkSplit) {
+		this.checkSplit = checkSplit;
 	}
 }

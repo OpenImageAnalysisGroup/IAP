@@ -1,4 +1,4 @@
-package tests.JMP.leaf_clustering;
+package iap.blocks.imageAnalysisTools.leafClustering;
 
 import iap.blocks.extraction.Normalisation;
 
@@ -18,11 +18,14 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
+/**
+ * @author pape
+ */
 public class LeafTipMatcher {
 	
 	private final ArrayList<LinkedList<LeafTip>> leafTipList;
 	private final Plant matchedPlant;
-	private double minDist = 50.0;
+	private double maxDistanceBetweenLeafTips = 50.0;
 	private final int fac = 0;
 	
 	public LeafTipMatcher(String path) throws IOException {
@@ -48,23 +51,23 @@ public class LeafTipMatcher {
 		matchedPlant = new Plant();
 	}
 	
-	public void draw(Vismode vm, int w, int h) throws InterruptedException {
+	public void draw(Vismode vm, int w, int h, Normalisation norm) throws InterruptedException {
 		int[][] img2d = new int[w][h];
 		ImageOperation.fillArray(img2d, ImageOperation.BACKGROUND_COLORint);
 		ImageStack is = new ImageStack();
 		
 		switch (vm) {
 			case PERLEAF:
-				is = visPerLeaf(img2d, matchedPlant);
+				is = visPerLeaf(img2d, matchedPlant, norm);
 				break;
 			case PERDAY:
-				is = visPerDay(img2d, matchedPlant);
+				is = visPerDay(img2d, matchedPlant, norm);
 				break;
 		}
 		is.show(vm.toString());
 	}
 	
-	private ImageStack visPerDay(int[][] img2d, Plant plant) {
+	private ImageStack visPerDay(int[][] img2d, Plant plant, Normalisation norm) {
 		Image img_all = new Image(img2d);
 		ImageStack is = new ImageStack();
 		
@@ -92,8 +95,8 @@ public class LeafTipMatcher {
 					int currentTime = (int) lt.getTime();
 					if (day == currentTime) {
 						int r = (int) (255 * ((growTime - currentTime) / (double) (growTime)));
-						int x = lt.getRealWorldX() + fac;
-						int y = lt.getRealWorldY() + fac;
+						int x = lt.getImageX(norm) + fac;
+						int y = lt.getImageY(norm) + fac;
 						
 						img_all.io().canvas()
 								.drawCircle(x, y, 15, new Color(255 - r, 0, r).getRGB(), 0.5, 3)
@@ -114,7 +117,7 @@ public class LeafTipMatcher {
 		return is;
 	}
 	
-	private ImageStack visPerLeaf(int[][] img2d, Plant plant) {
+	private ImageStack visPerLeaf(int[][] img2d, Plant plant, Normalisation norm) {
 		Image img_all = new Image(img2d);
 		ImageStack is = new ImageStack();
 		Image temp = new Image(img2d);
@@ -131,8 +134,8 @@ public class LeafTipMatcher {
 				// Vector2d vec = (Vector2d) lt.getFeature("angle");
 				// if (vec == null)
 				// continue;
-				int x = lt.getRealWorldX() + fac;
-				int y = lt.getRealWorldY() + fac;
+				int x = lt.getImageX(norm) + fac;
+				int y = lt.getImageY(norm) + fac;
 				img_all.io().canvas()
 						.drawCircle(x, y, 10, hsb, 0.5, 2)
 						// .drawLine(x, y, (int) (vec.x), (int) (vec.y), Color.BLUE.getRGB(), 0.5, 1)
@@ -160,11 +163,10 @@ public class LeafTipMatcher {
 	
 	public void matchLeafTips() {
 		int snapshotIndex = 0;
-		double time = 0.0;
+		long time = 0;
 		for (LinkedList<LeafTip> tempTipListIn : leafTipList) {
 			int tipIndex = 0;
-			// double oldTime = time;
-			if (time == 0.0d)
+			if (time == 0)
 				time = tempTipListIn.getFirst().getTime();
 			else
 				time += (tempTipListIn.getFirst().getTime() - time);
@@ -194,7 +196,7 @@ public class LeafTipMatcher {
 					}
 					lastMatchedTips.remove(bestPair[0]);
 					tempTipListIn.remove(bestPair[1]);
-					if (bestDist < minDist) {
+					if (bestDist < maxDistanceBetweenLeafTips) {
 						bestPair[1].setDist(bestDist);
 						bestPair[1].setLeafID(bestPair[0].getLeafID());
 						matchedPlant.addLeafTip(bestPair[1]);
@@ -348,8 +350,8 @@ public class LeafTipMatcher {
 		return matchedPlant;
 	}
 	
-	public void setMinDist(double val) {
-		minDist = val;
+	public void setMaxDistanceBetweenLeafTips(double val) {
+		maxDistanceBetweenLeafTips = val;
 	}
 	
 	public enum Vismode {

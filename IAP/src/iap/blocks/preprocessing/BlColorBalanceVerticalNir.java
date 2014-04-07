@@ -45,7 +45,7 @@ public class BlColorBalanceVerticalNir extends AbstractSnapshotAnalysisBlock {
 			return null;
 		ImageOperation inv = nir.io().copy();
 		if (getBoolean("black NIR background", false)) {
-			inv = inv.invertImageJ();
+			inv = inv.invert();
 			double[] darkPixelValues = getProbablyWhitePixels(inv.getImage());
 			int[] rgb = new int[darkPixelValues.length];
 			for (int i = 0; i < rgb.length; i++)
@@ -54,7 +54,7 @@ public class BlColorBalanceVerticalNir extends AbstractSnapshotAnalysisBlock {
 			double[] brightPixelValues = getProbablyWhitePixels(nir);
 			return inv.imageBalancing(getInt("balance-vertical-brigthness", 180), brightPixelValues).invertImageJ().getImage();
 		} else {
-			double[] darkPixelValues = getProbablyWhitePixels(inv.invertImageJ().getImage().show("input for bl lev", debug));
+			double[] darkPixelValues = getProbablyWhitePixels(inv.invert().getImage().show("input for bl lev", debug));
 			int[] rgb = new int[darkPixelValues.length];
 			for (int i = 0; i < rgb.length; i++)
 				rgb[i] = (int) (-darkPixelValues[i] + 10);

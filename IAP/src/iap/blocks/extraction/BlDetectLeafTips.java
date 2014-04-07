@@ -3,6 +3,8 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
+import iap.blocks.imageAnalysisTools.leafClustering.BorderAnalysis;
+import iap.blocks.imageAnalysisTools.leafClustering.BorderFeature;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
@@ -12,8 +14,6 @@ import java.util.LinkedList;
 import org.StringManipulationTools;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
-import tests.JMP.leaf_clustering.BorderAnalysis;
-import tests.JMP.leaf_clustering.BorderFeature;
 import de.ipk.ag_ba.image.operation.ImageConvolution;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -175,6 +175,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		ba = new BorderAnalysis(img);
 		int geometricThresh = (int) (fillGradeInPercent * (Math.PI * searchRadius * searchRadius));
+		ba.setCheckSplit(true);
 		ba.calcSUSAN(searchRadius, geometricThresh);
 		ba.getPeaksFromBorder(1, searchRadius * 2, "susan");
 		ba.approxDirection(searchRadius * 2);

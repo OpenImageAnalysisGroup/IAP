@@ -1,4 +1,4 @@
-package tests.JMP.leaf_clustering;
+package iap.blocks.imageAnalysisTools.leafClustering;
 
 import ij.util.Tools;
 
@@ -13,6 +13,9 @@ import org.apache.commons.math3.optimization.general.LevenbergMarquardtOptimizer
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.Image;
 
+/**
+ * @author pape
+ */
 public class CurveAnalysis {
 	static double[] data;
 	
@@ -246,7 +249,7 @@ public class CurveAnalysis {
 	/**
 	 * Method to summarize max if positions are < maxDiff.
 	 */
-	public static int[] summerizeMaxima(int[] peaks, int length, int maxDiff) {
+	public static int[] summarizeMaxima(int[] peaks, int length, int maxDiff) {
 		LinkedList<Integer> newPeaks = new LinkedList<Integer>();
 		int peaksLength = peaks.length;
 		Arrays.sort(peaks);
@@ -259,6 +262,8 @@ public class CurveAnalysis {
 				idx2 = (idx2 + 1) % peaksLength;
 				diff = Math.abs(temp - peaks[idx2]);
 				count++;
+				if (count > (length * 2))
+					return peaks;
 			}
 			newPeaks.add(sum / count);
 			idx = idx + count - 1;

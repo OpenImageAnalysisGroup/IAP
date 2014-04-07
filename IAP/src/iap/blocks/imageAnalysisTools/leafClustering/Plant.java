@@ -1,11 +1,12 @@
-package tests.JMP.leaf_clustering;
+package iap.blocks.imageAnalysisTools.leafClustering;
 
 import java.util.LinkedList;
 
 import javax.vecmath.Point2d;
 
-import tests.JMP.methods.HelperMethods;
-
+/**
+ * @author pape
+ */
 public class Plant {
 	private final LinkedList<Leaf> leafList;
 	private int growTime;
@@ -69,29 +70,5 @@ public class Plant {
 				lt.addFeature(lt.dist(cen), "disttocenter");
 			}
 		}
-	}
-	
-	public void saveLeafCoordinates(String path) {
-		String out = "";
-		for (Leaf l : leafList) {
-			out += "Leaf: " + l.getID() + "\n";
-			for (LeafTip lt : l) {
-				out += lt.getRealWorldX() + ",;" + lt.getRealWorldY() + ",\n";
-			}
-			out += "\n";
-		}
-		HelperMethods.write(path, "Leaf Coordinates of " + getID(), out);
-	}
-	
-	public void saveLeafTipFeature(String path, String key) {
-		String out = "";
-		for (Leaf l : leafList) {
-			out += "Leaf: " + l.getID() + "\n";
-			for (LeafTip lt : l) {
-				out += lt.getFeature(key) + ",\n";
-			}
-			out += "\n";
-		}
-		HelperMethods.write(path, "Feature-" + key + getID(), out);
 	}
 }

@@ -1,4 +1,4 @@
-package tests.JMP.methods;
+package iap.blocks.imageAnalysisTools.methods;
 
 import java.awt.Color;
 import java.util.ArrayList;

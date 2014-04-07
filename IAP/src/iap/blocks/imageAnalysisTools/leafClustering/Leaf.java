@@ -1,8 +1,11 @@
-package tests.JMP.leaf_clustering;
+package iap.blocks.imageAnalysisTools.leafClustering;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * @author pape
+ */
 public class Leaf implements Iterable<LeafTip> {
 	ArrayList<LeafTip> tipList;
 	public int leafID;

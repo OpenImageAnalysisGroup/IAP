@@ -1,4 +1,4 @@
-package tests.JMP.methods;
+package iap.blocks.imageAnalysisTools.methods;
 
 import java.util.TreeMap;
 import java.util.TreeSet;
