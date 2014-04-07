@@ -101,7 +101,7 @@ public class SkeletonProcessor2d {
 		if (endpoint != null) {
 			res.setInitialpoint(endpoint);
 			endpoints.remove(endpoint);
-			res.isCut = true;
+			res.setCut(true);
 			endlimbs.add(res);
 			ok = true;
 		}
@@ -193,7 +193,7 @@ public class SkeletonProcessor2d {
 	public boolean connectSkeleton() {
 		boolean added = false;
 		for (Limb l : endlimbs) {
-			if (l.isCut) {
+			if (l.isCut()) {
 				// System.out.println("connecting limbs: " + l.endpoint.toString() + " , " + l.initialpoint.toString());
 				Point[] toConnect = getNearestLimb(l);
 				connect(toConnect[0], toConnect[1], colorMarkedEndLimbs, l);
@@ -209,13 +209,13 @@ public class SkeletonProcessor2d {
 		Point ini = l.initialpoint;
 		Point res = null;
 		for (Point p : endpoints) {
-			if (ini.distance(p) < dist && p != ini) {
+			if (ini.distance(p) < dist && !l.initialOrEndpoint(p)) {
 				res = p;
 				dist = (int) ini.distance(p);
 			}
 		}
 		for (Point p : branches) {
-			if (ini.distance(p) < dist && p != ini) {
+			if (ini.distance(p) < dist && !l.initialOrEndpoint(p)) {
 				res = p;
 				dist = (int) ini.distance(p);
 			}
@@ -224,14 +224,14 @@ public class SkeletonProcessor2d {
 		boolean endok = false;
 		Point end = l.endpoint;
 		for (Point p : endpoints) {
-			if (end.distance(p) < dist && p != end) {
+			if (end.distance(p) < dist && !l.initialOrEndpoint(p)) {
 				res = p;
 				dist = (int) end.distance(p);
 				endok = true;
 			}
 		}
 		for (Point p : branches) {
-			if (end.distance(p) < dist && p != end) {
+			if (end.distance(p) < dist && !l.initialOrEndpoint(p)) {
 				res = p;
 				dist = (int) end.distance(p);
 				endok = true;

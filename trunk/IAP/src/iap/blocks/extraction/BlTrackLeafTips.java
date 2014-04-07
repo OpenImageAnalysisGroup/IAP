@@ -3,6 +3,11 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
+import iap.blocks.imageAnalysisTools.leafClustering.BorderFeature;
+import iap.blocks.imageAnalysisTools.leafClustering.Leaf;
+import iap.blocks.imageAnalysisTools.leafClustering.LeafTip;
+import iap.blocks.imageAnalysisTools.leafClustering.LeafTipMatcher;
+import iap.blocks.imageAnalysisTools.leafClustering.Plant;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
@@ -13,11 +18,6 @@ import java.util.TreeMap;
 
 import org.Colors;
 
-import tests.JMP.leaf_clustering.BorderFeature;
-import tests.JMP.leaf_clustering.Leaf;
-import tests.JMP.leaf_clustering.LeafTip;
-import tests.JMP.leaf_clustering.LeafTipMatcher;
-import tests.JMP.leaf_clustering.Plant;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultObject;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
@@ -79,7 +79,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	private void createNewPlant(LinkedList<BorderFeature> unassignedResults, CameraPosition cameraPosition,
 			CameraType cameraType, long timepoint, Normalisation norm) {
 		LeafTipMatcher ltm = new LeafTipMatcher(unassignedResults, timepoint, norm);
-		ltm.setMinDist(100.0);
+		ltm.setMaxDistanceBetweenLeafTips(100.0);
 		ltm.matchLeafTips();
 		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, ltm.getMatchedPlant());
 	}

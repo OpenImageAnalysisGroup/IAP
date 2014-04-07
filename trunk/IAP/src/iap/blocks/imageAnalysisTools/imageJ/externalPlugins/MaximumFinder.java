@@ -1,4 +1,4 @@
-package tests.JMP.imageJ.Plugins;
+package iap.blocks.imageAnalysisTools.imageJ.externalPlugins;
 
 import ij.IJ;
 import ij.ImagePlus;

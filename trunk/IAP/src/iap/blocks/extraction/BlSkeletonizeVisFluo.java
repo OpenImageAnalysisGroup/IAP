@@ -138,12 +138,19 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	public synchronized Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged,
 			boolean specialLeafWidthCalculations, boolean specialSkeletonBasedLeafWidthCalculation, boolean addPostProcessor, CameraType cameraType) {
 		// ***skeleton calculations***
-		SkeletonProcessor2d skel2d = inp.io().skeletonize().
+		SkeletonProcessor2d skel2d = inp.io().skeletonize().replaceColor(Color.BLACK.getRGB(), Color.MAGENTA.getRGB()).
 				show("out sk", false).skel2d();
 		
 		skel2d.markEndpointsAndBranches();
 		skel2d.createEndpointsAndBranchesLists();
 		skel2d.show("endpoints and branches (unfiltered)", debug);
+		
+		if (getBoolean("Join Skeleton Parts", true)) {
+			skel2d.calculateEndlimbsRecursive();
+			skel2d.connectSkeleton();
+			skel2d.markEndpointsAndBranches();
+			skel2d.createEndpointsAndBranchesLists();
+		}
 		
 		double xf = fluo.getWidth() / (double) vis.getWidth();
 		double yf = fluo.getHeight() / (double) vis.getHeight();
@@ -200,11 +207,19 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			
 			rt.addValue("fluo.bloom.area.size", probablyBloomFluo.io().show("BLOOM AREA", debug2).countFilledPixels());
 		}
+		skel2d.calculateEndlimbsRecursive();
 		skel2d.deleteShortEndLimbs(getInt("delete limbs threshold", 20), false, new HashSet<Point>());
-		leafcount = skel2d.endlimbs.size();
-		skel2d.show("endpoints and branches (filtered)", debug);
-		if (debug)
+		
+		if (debug) {
+			leafcount = skel2d.endlimbs.size();
+			skel2d.show("endpoints and branches (filtered)", debug);
 			System.out.println("B Leaf count: " + leafcount);
+		}
+		
+		skel2d.calculateEndlimbsRecursive();
+		leafcount = skel2d.endlimbs.size();
+		if (debug)
+			System.out.println("C Leaf count: " + leafcount);
 		Double leafWidthInPixels = null;
 		if (specialLeafWidthCalculations) {
 			ArrayList<Point> branchPoints = skel2d.getBranches();
@@ -317,7 +332,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		if (skelres != null) {
-			skelres.show("Result Skeleton", debug);
+			skelres.show("Result Skeleton", false);
 			getResultSet().setImage(getBlockPosition(), "skeleton_" + cameraType, skelres, true);
 		}
 		
@@ -325,11 +340,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			rt.addValue("bloom.count", bloomLimbCount);
 		}
 		rt.addValue("leaf.count", leafcount);
-		if (leafcount > 0) {
-			if (distHorizontal != null)
-				rt.addValue("leaf.length.sum.norm", leaflength * normFactor);
-			rt.addValue("leaf.length.sum", leaflength);
-		}
+		if (distHorizontal != null)
+			rt.addValue("leaf.length.sum.norm", leaflength * normFactor);
+		rt.addValue("leaf.length.sum", leaflength);
 		
 		if (leafWidthInPixels != null && leafWidthInPixels > 0 && !Double.isNaN(leafWidthInPixels) && !Double.isInfinite(leafWidthInPixels)) {
 			if (distHorizontal != null)
@@ -360,11 +373,11 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && rt != null)
 			getResultSet().storeResults(
-					"RESULT_side.", "|skeleton", rt,
+					"RESULT_side." + cameraType + ".", "|skeleton", rt,
 					getBlockPosition());
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && rt != null)
 			getResultSet().storeResults(
-					"RESULT_top.", "|skeleton", rt,
+					"RESULT_top." + cameraType + ".", "|skeleton", rt,
 					getBlockPosition());
 		
 		if (addPostProcessor) {
