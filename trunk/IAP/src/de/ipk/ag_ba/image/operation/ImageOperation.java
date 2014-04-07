@@ -5252,4 +5252,20 @@ public class ImageOperation implements MemoryHogInterface {
 				false);
 		return io;
 	}
+	
+	public static int[][] crop(int[][] img, int w, int h, int pLeft, int pRight, int pTop,
+			int pBottom) {
+		int[][] res = new int[pRight - pLeft][pBottom - pTop];
+		pLeft = Math.max(pLeft, 0);
+		pRight = Math.min(pRight, w);
+		pTop = Math.max(pTop, 0);
+		pBottom = Math.min(pBottom, h);
+		
+		for (int x = pLeft; x < pRight; x++) {
+			for (int y = pTop; y < pBottom; y++) {
+				res[x - pLeft][y - pTop] = img[x][y];
+			}
+		}
+		return res;
+	}
 }
