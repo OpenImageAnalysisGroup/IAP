@@ -10,7 +10,6 @@ import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
@@ -27,15 +26,20 @@ public class BlSaveResultImages extends AbstractBlock {
 	protected Image processImage(Image image) {
 		if (image != null) {
 			boolean manyWells = optionsAndResults.getWellCnt() > 1;
+			CameraType ct1 = image.getCameraType();
 			ImageData outImageReference = (ImageData) input().images().getImageInfo(image.getCameraType())
 					.clone(input().images().getImageInfo(image.getCameraType()).getParentSample());
-			
+			String ct2 = outImageReference.getSubstanceName();
 			if (manyWells)
 				outImageReference.setQualityAnnotation(outImageReference.getQualityAnnotation() + "_" + getWellIdx());
 			try {
+				CameraType ct3 = image.getCameraType();
 				LoadedImage res = processAndOrSaveResultImage(outImageReference, image);
-				if (res != null)
+				if (res != null) {
+					String ct4 = res.getSubstanceName();
 					getResultSet().setImage(getBlockPosition(), "RESULT_" + res.getSubstanceName(), res.getImageDataReference(), false);
+					// System.out.println("A/B/C=" + ct1 + " / " + ct4); // " / " + ct2 + " / " + ct3 +
+				}
 			} catch (Exception e) {
 				throw new RuntimeException("Could not save result image", e);
 			}
@@ -63,17 +67,17 @@ public class BlSaveResultImages extends AbstractBlock {
 			
 			outImageReference.setURL(new IOurl(null, null, outImageReference.getURL().getFileName()));
 			
-			return saveImage(tray, tray_cnt, outImageReference, resImage, "." + IAPservice.getTargetFileExtension(false, null));
+			return saveImage(tray, tray_cnt, outImageReference, resImage);
 		}
 	}
 	
 	private LoadedImage saveImage(
 			final int tray, final int tray_cnt,
-			final ImageData id, final Image image, final String labelFileExtension) throws Exception {
+			final ImageData id, final Image image) throws Exception {
 		if (id != null && id.getParentSample() != null) {
 			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
 			// loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-			return saveImageAndUpdateURL(loadedImage, optionsAndResults.databaseTarget, false, tray, tray_cnt);
+			return saveImageAndUpdateURL(loadedImage, optionsAndResults.databaseTarget, false, tray, tray_cnt, image.getCameraType());
 		} else
 			return null;
 	}
@@ -90,11 +94,17 @@ public class BlSaveResultImages extends AbstractBlock {
 	
 	protected LoadedImage saveImageAndUpdateURL(LoadedImage result,
 			DatabaseTarget databaseTarget, boolean processLabelUrl,
-			int tray, int tray_cnt) throws Exception {
+			int tray, int tray_cnt, CameraType cameraType) throws Exception {
 		if (result.getURL() == null)
 			result.setURL(new IOurl(null, StringManipulationTools.removeFileExtension(result.getURL().getFileName())
 					+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png")));
-		result.getURL().setFileName(addTrayInfo(tray, tray_cnt, result.getURL().getFileName()));
+		System.out.println("CT=" + cameraType + ", WxH=" + result.getLoadedImage().getWidth() + " x " + result.getLoadedImage().getHeight());
+		if (cameraType == CameraType.NIR && result.getLoadedImage().getWidth() > 570) {
+			new Image(result.getLoadedImage()).show(cameraType + " ?");
+			System.out.println("CT=" + cameraType + ", W=" + result.getLoadedImage().getWidth());
+		}
+		
+		result.getURL().setFileName(addTrayInfo(tray, tray_cnt, cameraType + "_" + result.getURL().getFileName()));
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
 		
 		if (result.getLabelURL() != null && processLabelUrl) {
