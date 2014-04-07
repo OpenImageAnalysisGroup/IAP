@@ -420,10 +420,19 @@ public class Image {
 	}
 	
 	public Image copy() {
-		return new Image(getWidth(), getHeight(), getAs1A().clone());
+		Image res = new Image(getWidth(), getHeight(), getAs1A().clone());
+		res.setCameraType(getCameraType());
+		return res;
 	}
 	
 	public void setCameraType(CameraType type) {
+		if (cameraType != null && cameraType != CameraType.UNKNOWN && type != CameraType.UNKNOWN) {
+			if (cameraType != type) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Overwriting existing image type '"
+						+ cameraType + "'  with different new image type '"
+						+ type + "'.");
+			}
+		}
 		this.cameraType = type;
 	}
 	

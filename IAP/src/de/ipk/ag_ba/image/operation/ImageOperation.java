@@ -153,6 +153,13 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation setCameraType(CameraType type) {
+		if (cameraType != null && cameraType != CameraType.UNKNOWN && type != CameraType.UNKNOWN) {
+			if (cameraType != type) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Overwriting existing image type '"
+						+ cameraType + "' of an image-operation with different new image type '"
+						+ type + "'.");
+			}
+		}
 		this.cameraType = type;
 		return this;
 	}
@@ -308,7 +315,7 @@ public class ImageOperation implements MemoryHogInterface {
 			}
 			
 		}
-		return new ImageOperation(getImage());
+		return this;
 	}
 	
 	/**
@@ -4077,7 +4084,9 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation copy() {
-		return new ImageOperation(getImage().copy());
+		ImageOperation res = new ImageOperation(getImage().copy());
+		res.setCameraType(getCameraType());
+		return res;
 	}
 	
 	/**
