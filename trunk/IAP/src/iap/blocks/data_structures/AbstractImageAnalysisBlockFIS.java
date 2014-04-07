@@ -60,6 +60,12 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	private static LinkedHashMap<String, ThreadSafeOptions> id2time = new LinkedHashMap<String, ThreadSafeOptions>();
 	
+	protected Image setImageType(Image image, CameraType ct) {
+		if (image != null)
+			image.setCameraType(ct);
+		return image;
+	}
+	
 	public void addExecutionTime(ExecutionTimeStep step, long execTime) {
 		boolean error = execTime < 0;
 		if (error)

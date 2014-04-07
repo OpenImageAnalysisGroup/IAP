@@ -1,7 +1,11 @@
 package iap.blocks.data_structures;
 
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
+/**
+ * @author klukas
+ */
 public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	protected Image processImage(Image image) {
@@ -12,16 +16,16 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected Image processVISimage() {
-		if (input().images() != null && input().images().vis() != null)
-			return processImage(input().images().vis());
-		else
+		if (input().images() != null && input().images().vis() != null) {
+			return setImageType(processImage(input().images().vis()), CameraType.VIS);
+		} else
 			return null;
 	}
 	
 	@Override
 	protected Image processFLUOimage() {
 		if (input().images() != null && input().images().fluo() != null)
-			return processImage(input().images().fluo());
+			return setImageType(processImage(input().images().fluo()), CameraType.FLUO);
 		else
 			return null;
 	}
@@ -29,7 +33,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processNIRimage() {
 		if (input().images() != null && input().images().nir() != null)
-			return processImage(input().images().nir());
+			return setImageType(processImage(input().images().nir()), CameraType.NIR);
 		else
 			return null;
 	}
@@ -37,7 +41,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processIRimage() {
 		if (input().images() != null && input().images().ir() != null)
-			return processImage(input().images().ir());
+			return setImageType(processImage(input().images().ir()), CameraType.IR);
 		else
 			return null;
 	}
@@ -45,7 +49,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processVISmask() {
 		if (input().masks() != null && input().masks().vis() != null)
-			return processMask(input().masks().vis());
+			return setImageType(processMask(input().masks().vis()), CameraType.VIS);
 		else
 			return null;
 	}
@@ -53,7 +57,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processFLUOmask() {
 		if (input().masks() != null && input().masks().fluo() != null)
-			return processMask(input().masks().fluo());
+			return setImageType(processMask(input().masks().fluo()), CameraType.FLUO);
 		else
 			return null;
 	}
@@ -61,7 +65,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processNIRmask() {
 		if (input().masks() != null && input().masks().nir() != null)
-			return processMask(input().masks().nir());
+			return setImageType(processMask(input().masks().nir()), CameraType.NIR);
 		else
 			return null;
 	}
@@ -69,7 +73,7 @@ public abstract class AbstractBlock extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processIRmask() {
 		if (input().masks() != null && input().masks().ir() != null)
-			return processMask(input().masks().ir());
+			return setImageType(processMask(input().masks().ir()), CameraType.IR);
 		else
 			return null;
 	}
