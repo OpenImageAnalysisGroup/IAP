@@ -165,6 +165,8 @@ public class LeafTipMatcher {
 		int snapshotIndex = 0;
 		long time = 0;
 		for (LinkedList<LeafTip> tempTipListIn : leafTipList) {
+			if(tempTipListIn.isEmpty())
+				continue;
 			int tipIndex = 0;
 			if (time == 0)
 				time = tempTipListIn.getFirst().getTime();

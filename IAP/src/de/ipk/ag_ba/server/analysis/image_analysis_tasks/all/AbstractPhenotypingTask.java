@@ -697,8 +697,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (bpv.getBinary() != null) {
 					ImageData id = ((ImageData) bpv.getBinary());
 					
-					System.out.println("d/e/f=" + " // " + bpv.getName() + " // " + copyFrom.getSubstanceName() + " // "
-							+ id.getURL().getFileName() + " // " + id.getSubstanceName());
+//					System.out.println("d/e/f=" + " // " + bpv.getName() + " // " + copyFrom.getSubstanceName() + " // "
+//							+ id.getURL().getFileName() + " // " + id.getSubstanceName());
 					outputAdd(bpv.getBinary());
 				} else {
 					NumericMeasurement3D m = new NumericMeasurement3D(copyFrom, bpv.getName(), null);

@@ -98,11 +98,11 @@ public class BlSaveResultImages extends AbstractBlock {
 		if (result.getURL() == null)
 			result.setURL(new IOurl(null, StringManipulationTools.removeFileExtension(result.getURL().getFileName())
 					+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png")));
-		System.out.println("CT=" + cameraType + ", WxH=" + result.getLoadedImage().getWidth() + " x " + result.getLoadedImage().getHeight());
-		if (cameraType == CameraType.NIR && result.getLoadedImage().getWidth() > 570) {
-			new Image(result.getLoadedImage()).show(cameraType + " ?");
-			System.out.println("CT=" + cameraType + ", W=" + result.getLoadedImage().getWidth());
-		}
+//		System.out.println("CT=" + cameraType + ", WxH=" + result.getLoadedImage().getWidth() + " x " + result.getLoadedImage().getHeight());
+//		if (cameraType == CameraType.NIR && result.getLoadedImage().getWidth() > 570) {
+//			new Image(result.getLoadedImage()).show(cameraType + " ?");
+//			System.out.println("CT=" + cameraType + ", W=" + result.getLoadedImage().getWidth());
+//		}
 		
 		result.getURL().setFileName(addTrayInfo(tray, tray_cnt, cameraType + "_" + result.getURL().getFileName()));
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
