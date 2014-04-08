@@ -77,6 +77,7 @@ public class BlCutFromSide extends AbstractBlock {
 					double cutTop = r.y - cutoffMarkerTop;
 					double cutBottom = 1 - (r.y + r.height + cutoffMarkerBottom);
 					
+					optionsAndResults.shiftImage((int) (cutLeft * result.getWidth()), (int) (cutTop * result.getHeight()), mask.getCameraType());
 					result = result
 							.clearImage(ImageSide.Left, cutLeft, background)
 							.clearImage(ImageSide.Right, cutRight, background)
@@ -117,6 +118,8 @@ public class BlCutFromSide extends AbstractBlock {
 					cutRight = Math.max(0, Math.min(1, cutRight));
 					cutTop = Math.max(0, Math.min(1, cutTop));
 					cutBottom = Math.max(0, Math.min(1, cutBottom));
+					
+					optionsAndResults.shiftImage((int) (cutLeft * result.getWidth()), (int) (cutTop * result.getHeight()), mask.getCameraType());
 					
 					result = result.crop(cutLeft, cutRight, cutTop, cutBottom);
 				}

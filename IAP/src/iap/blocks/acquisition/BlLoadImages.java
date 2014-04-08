@@ -199,6 +199,15 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (IR)");
 			processedMasks.setNir(null);
 		}
+		
+		if (processedImages.vis() != null)
+			optionsAndResults.setImageCenter((int) (processedImages.vis().getWidth() / 2d), (int) (processedImages.vis().getHeight() / 2d), CameraType.VIS);
+		if (processedImages.fluo() != null)
+			optionsAndResults.setImageCenter((int) (processedImages.fluo().getWidth() / 2d), (int) (processedImages.fluo().getHeight() / 2d), CameraType.FLUO);
+		if (processedImages.nir() != null)
+			optionsAndResults.setImageCenter((int) (processedImages.nir().getWidth() / 2d), (int) (processedImages.nir().getHeight() / 2d), CameraType.NIR);
+		if (processedImages.ir() != null)
+			optionsAndResults.setImageCenter((int) (processedImages.ir().getWidth() / 2d), (int) (processedImages.ir().getHeight() / 2d), CameraType.IR);
 	}
 	
 	@Override

@@ -123,7 +123,8 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			int DEBUG_SINGLE_DAY = SystemOptions.getInstance().getInteger("Pipeline-Debugging", "DEBUG-SINGLE-DAY", 48);
 			boolean filterPlant = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-ONLY-SINGLE-PLANT", false); // process only one plant?
 			String plantFilter = SystemOptions.getInstance().getString("Pipeline-Debugging", "DEBUG-SINGLE-PLANT-ID", "001447-D1"); // "1107BA1350"; //
-																																											// "1121KN063";
+			boolean filterAngle = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-ONLY-ONE-ANGLE", false);
+			int DEBUG_SINGLE_ANGLE = SystemOptions.getInstance().getInteger("Pipeline-Debugging", "DEBUG-SINGLE-ANGLE", 0); // "1121KN063";
 			
 			filterOutliers(experimentToBeAnalysed, workload, sf, filterTop, filterSide, filterTime, DEBUG_SINGLE_DAY, filterPlant, plantFilter);
 			
@@ -148,7 +149,9 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			int ti = 1;// SystemAnalysis.getNumberOfCPUs() / 2;
 			
 			ImageAnalysisTask task = getImageAnalysisTask();
-			
+			if (filterAngle) {
+				task.setValidSideAngle(DEBUG_SINGLE_ANGLE);
+			}
 			task.setInput(
 					AbstractPhenotypingTask.getWateringInfo(experimentToBeAnalysed),
 					workload, null, m, workOnSubset, numberOfSubsets);

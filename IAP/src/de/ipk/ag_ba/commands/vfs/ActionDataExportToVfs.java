@@ -239,7 +239,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							+ experimentReference.getExperimentName()
 							+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " incomplete (" + errorCount + " errors). // "
 							+ SystemAnalysis.getCurrentTime());
-					postResult = "Saved Incomplete (" + errorCount + " errors)<br>(" + SystemAnalysis.getCurrentTime() + ")";
+					postResult = "<html>Saved Incomplete (" + errorCount + " errors)<br>(" + SystemAnalysis.getCurrentTime() + ")";
 				}
 				if (errorCount > 0)
 					experiment.getHeader().setRemark(

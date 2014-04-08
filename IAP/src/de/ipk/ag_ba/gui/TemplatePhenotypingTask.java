@@ -7,8 +7,6 @@ import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.util.ArrayList;
 
-import org.ErrorMsg;
-
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
@@ -45,7 +43,8 @@ public class TemplatePhenotypingTask extends AbstractPhenotypingTask {
 					
 					return getPipelineFromBlockList(options.getOptSystemOptions(), defaultBlockList.toArray(new String[] {}));
 				} catch (Error e) {
-					System.out.println(SystemAnalysis.getCurrentTime()+">INFO: Found invalid pipeline definition '"+getName()+"' (Error: "+e.getMessage()+")!");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Found invalid pipeline definition '" + getName() + "' (Error: " + e.getMessage()
+							+ ")!");
 					return null;
 				}
 			}

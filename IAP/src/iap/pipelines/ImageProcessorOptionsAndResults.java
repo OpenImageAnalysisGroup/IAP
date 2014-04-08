@@ -20,6 +20,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
 
@@ -284,6 +285,14 @@ public class ImageProcessorOptionsAndResults {
 	
 	public DatabaseTarget databaseTarget;
 	
+	private final int[] leftShiftX = new int[CameraType.values().length];
+	
+	private final int[] topShiftY = new int[CameraType.values().length];
+	
+	private final int[] imageCenterX = new int[CameraType.values().length];
+	
+	private final int[] imageCenterY = new int[CameraType.values().length];
+	
 	public Double getCalculatedBlueMarkerDistance() {
 		return calculatedBlueMarkerDistance;
 	}
@@ -363,5 +372,31 @@ public class ImageProcessorOptionsAndResults {
 	
 	public String getConfigAndAngle() {
 		return configAndAngle;
+	}
+	
+	public void shiftImage(int leftShiftX, int topShiftY, CameraType cameraType) {
+		this.leftShiftX[cameraType.ordinal()] += leftShiftX;
+		this.topShiftY[cameraType.ordinal()] += topShiftY;
+	}
+	
+	public int getLeftShiftX(CameraType ct) {
+		return leftShiftX[ct.ordinal()];
+	}
+	
+	public int getTopShiftY(CameraType ct) {
+		return topShiftY[ct.ordinal()];
+	}
+	
+	public void setImageCenter(int width, int height, CameraType ct) {
+		this.imageCenterX[ct.ordinal()] = width;
+		this.imageCenterY[ct.ordinal()] = height;
+	}
+	
+	public int getCenterX(CameraType ct) {
+		return imageCenterX[ct.ordinal()];
+	}
+	
+	public int getCenterY(CameraType ct) {
+		return imageCenterY[ct.ordinal()];
 	}
 }

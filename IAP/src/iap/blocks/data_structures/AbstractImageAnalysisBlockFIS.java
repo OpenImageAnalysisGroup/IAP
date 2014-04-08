@@ -382,7 +382,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	private Double getAngleFromConfig(String configName) {
 		boolean isTop = configName.toUpperCase().contains("TOP");
-		configName = configName.substring(configName.indexOf("#") + "#".length());
+		configName = configName.substring(configName.indexOf(";") + ";".length());
 		Double angle = Double.parseDouble(configName);
 		if (isTop && Math.abs(angle) < 0.001)
 			angle = -1d;
