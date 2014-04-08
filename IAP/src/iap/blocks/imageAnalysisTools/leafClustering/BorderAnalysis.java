@@ -171,23 +171,20 @@ public class BorderAnalysis {
 				// do region-growing
 				ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, debug);
 				
-				// test for split region
-				boolean split = false;
-				if (checkSplit)
-					try {
-						split = isSplit(predefinedRegion, region, radius, debug);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				
 				// check area (condition: (region.size() < geometricThresh) => get only positive results)
-				if (region != null && !split)
-					if (region.size() < geometricThresh)
-						borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key);
-					else
+				if (region != null) {
+					if (region.size() < geometricThresh) {
+						// test for split region
+						boolean split = false;
+						if (checkSplit)
+							split = isSplit(predefinedRegion, region, radius, debug);
+						if (!split || !checkSplit)
+							borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key);
+						else
+							borderFeatureList.addFeature(idx / 2, 0.0, key);
+					} else
 						borderFeatureList.addFeature(idx / 2, 0.0, key);
-				else
+				} else
 					borderFeatureList.addFeature(idx / 2, Double.NaN, key);
 			}
 			if (onlyBiggest)
@@ -195,7 +192,8 @@ public class BorderAnalysis {
 		}
 	}
 	
-	public static boolean isSplit(int[][] region, ArrayList<PositionAndColor> regionColors, int radius, boolean debug) throws InterruptedException {
+	public static boolean isSplit(int[][] region, ArrayList<PositionAndColor> regionColors, int radius, boolean debug) {
+		debug = false;
 		int[][] region2d = new int[region.length][region[0].length];
 		region2d = copyRegiontoArray(region, regionColors);
 		int w = region2d.length;
@@ -232,7 +230,12 @@ public class BorderAnalysis {
 		}
 		if (debug && splitCount > 1) {
 			new Image(region2d).show("detect");
-			// Thread.sleep(10000);
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return splitCount > 1 ? true : false;
 	}

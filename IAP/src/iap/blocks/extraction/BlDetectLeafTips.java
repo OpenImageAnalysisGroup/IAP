@@ -88,7 +88,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			return null;
 		if (getBoolean("Calculate on Near-infrared Image", false) && !ignore) {
 			Image workimg = input().masks().nir().copy();
-			int searchRadius = getInt("Search-radius (Nir)", 20);
+			int searchRadius = getInt("Search-radius (Nir)", 15);
 			double fillGradeInPercent = getDouble("Fillgrade (Nir)", 0.35);
 			borderSize = searchRadius / 2;
 			workimg.setCameraType(CameraType.NIR);
