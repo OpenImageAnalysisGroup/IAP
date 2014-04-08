@@ -136,4 +136,10 @@ public class VolumeStatistics implements ImageAnalysisTask {
 			throw new UnsupportedOperationException("ToDo: for this task the unit test info is not utilized.");
 	}
 	
+	@Override
+	public void setValidSideAngle(int dEBUG_SINGLE_ANGLE) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

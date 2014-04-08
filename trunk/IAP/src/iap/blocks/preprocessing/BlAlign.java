@@ -205,6 +205,10 @@ public class BlAlign extends AbstractBlock {
 		int horTm = -horTooTooMuch / 2;
 		int verTooTooMuch = (int) ((1d - zoomY) * img.getHeight());
 		int verTm = -verTooTooMuch / 2;
+		int leftShiftX = (int) (horTm + offX);
+		int topShiftY = (int) (verTm + offY);
+		
+		optionsAndResults.shiftImage(leftShiftX, topShiftY, img.getCameraType());
 		return img
 				.addBorder(horTm, verTm, (int) offX, (int) offY, ImageOperation.BACKGROUND_COLORint)
 				.getImage();

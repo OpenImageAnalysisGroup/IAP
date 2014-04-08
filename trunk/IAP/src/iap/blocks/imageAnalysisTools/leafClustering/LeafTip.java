@@ -42,6 +42,7 @@ public class LeafTip {
 		} else {
 			x = (normalisationFactor.convertImgXtoRealWorldX(pos.getX()));
 			y = (normalisationFactor.convertImgYtoRealWorldY(pos.getY()));
+			// System.out.println("x: " + x + " : y: " + y + " posx/y: " + pos.getX() + " : " + pos.getY());
 		}
 		
 		this.featureMap = new HashMap<String, Object>();

@@ -53,7 +53,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			return vis;
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		Image res = vis;
-		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && getResultSet() != null) {
 			Image viswork = vis.copy().io().show("orig", debug)
 					.border(5)
 					.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 10)) // 10
@@ -63,8 +63,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 					.getImage().show("vis", debug);
 			
 			if (viswork != null)
-				if (vis != null && fluo != null) {
-					calcSkeleton(viswork, vis, fluo, fluo.copy(),
+				if (vis != null) {
+					calcSkeleton(viswork, vis, fluo, fluo != null ? fluo.copy() : null,
 							getBoolean("Leaf Width Calculation Type A (VIS)", false),
 							getBoolean("Leaf Width Calculation Type B (VIS)", false),
 							getBoolean("draw_skeleton", true),
@@ -152,8 +152,6 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			skel2d.createEndpointsAndBranchesLists();
 		}
 		
-		double xf = fluo.getWidth() / (double) vis.getWidth();
-		double yf = fluo.getHeight() / (double) vis.getHeight();
 		int w = vis.getWidth();
 		int height = vis.getHeight();
 		
@@ -166,7 +164,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		rt.incrementCounter();
 		
 		int bloomLimbCount = 0;
-		if (getBoolean("Detect Bloom", false)) {
+		if (getBoolean("Detect Bloom", false) && fluo != null) {
+			double xf = fluo.getWidth() / (double) vis.getWidth();
+			double yf = fluo.getHeight() / (double) vis.getHeight();
 			Image proc = fluo;
 			Image probablyBloomFluo = null;
 			if (!getBoolean("consider fluo image for bloom detection", true)) {

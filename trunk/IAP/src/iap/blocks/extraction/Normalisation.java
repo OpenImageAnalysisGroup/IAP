@@ -17,8 +17,17 @@ public class Normalisation {
 	int imgHeight = -1;
 	private double conversionFactorImageDist2realWorldDist;
 	private boolean valid;
+	private final int cShiftX;
+	private final int cShiftY;
+	private final int imageCenterX;
+	private final int imageCenterY;
 	
-	public Normalisation(Double real_marker_distance, Double calculated_marker_distance, ImageSet masks, CameraType ct) {
+	public Normalisation(Double real_marker_distance, Double calculated_marker_distance, ImageSet masks, CameraType ct, int leftShiftX, int topShiftY,
+			int imageCenterX, int imageCenterY) {
+		this.cShiftX = leftShiftX;
+		this.cShiftY = topShiftY;
+		this.imageCenterX = imageCenterX;
+		this.imageCenterY = imageCenterY;
 		this.conversionFactorImageDist2realWorldDist = real_marker_distance / calculated_marker_distance;
 		
 		if (masks.getImage(ct) == null || masks.vis() == null || real_marker_distance == null || calculated_marker_distance == null) {
@@ -59,18 +68,18 @@ public class Normalisation {
 	}
 	
 	public int convertImgXtoRealWorldX(double x) {
-		return (int) ((x - imgWidth / 2d) * conversionFactorImageDist2realWorldDist);
+		return (int) ((x - imageCenterX + cShiftX) / conversionFactorImageDist2realWorldDist);
 	}
 	
 	public int convertImgYtoRealWorldY(double y) {
-		return (int) ((y - imgHeight / 2d) * conversionFactorImageDist2realWorldDist);
+		return (int) ((y - imageCenterY + cShiftY) / conversionFactorImageDist2realWorldDist);
 	}
 	
 	public int getImageXfromRealWorldX(int x) {
-		return (int) (x / conversionFactorImageDist2realWorldDist) + imgWidth / 2;
+		return (int) (x * conversionFactorImageDist2realWorldDist) + imageCenterX - cShiftX;
 	}
 	
 	public int getImageYfromRealWorldY(int y) {
-		return (int) (y / conversionFactorImageDist2realWorldDist) + imgHeight / 2;
+		return (int) (y * conversionFactorImageDist2realWorldDist) + imageCenterY - cShiftY;
 	}
 }

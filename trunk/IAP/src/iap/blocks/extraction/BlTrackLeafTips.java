@@ -57,7 +57,8 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 					time = new Long(id.getTime());
 				
 				Normalisation n = new Normalisation(optionsAndResults.getREAL_MARKER_DISTANCE(), optionsAndResults.getCalculatedBlueMarkerDistance(),
-						input().masks(), ct);
+						input().masks(), ct, optionsAndResults.getLeftShiftX(ct), optionsAndResults.getTopShiftY(ct), optionsAndResults.getCenterX(ct),
+						optionsAndResults.getCenterY(ct));
 				
 				if (!n.isRealWorldCoordinateValid())
 					continue;
@@ -105,9 +106,9 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				int idx = 0;
 				for (Leaf l : ll) {
 					for (LeafTip lt : l) {
-						c = c.fillCircle(lt.getImageX(norm), lt.getImageY(norm), 5, col.get(idx).getRGB(), 0.5)
-								.drawCircle(lt.getImageX(norm), lt.getImageY(norm), 6, Color.RED.getRGB(), 0.5, 1)
-						;
+						c = c.fillCircle(lt.getImageX(norm), lt.getImageY(norm), 0, 8, col.get(idx).getRGB(), 0.0)
+								.text(lt.getImageX(norm), lt.getImageY(norm) + 10, "rx: " + lt.getRealWorldX() + " ry: " + lt.getRealWorldY() +
+										" a: " + ((Double) lt.getFeature("angle")).intValue(), Color.BLACK);
 					}
 					idx++;
 				}

@@ -82,6 +82,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private int[] debugValidTrays;
 	private final PipelineDesc pd;
 	private String debugLastSystemOptionStorageGroup;
+	private int DEBUG_SINGLE_ANGLE;
+	private boolean filterAngle;
 	
 	public AbstractPhenotypingTask(PipelineDesc pd) {
 		this.pd = pd;
@@ -527,6 +529,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						String imageConfigurationAndRotationAngle = id.getPosition() != null ? imageConfigurationName + ";"
 								+ id.getPosition() : imageConfigurationName + ";" + 0d;
 						
+						if (filterAngle) {
+							double p = id.getPosition() != null ? id.getPosition() : 0d;
+							int pi = (int) p;
+							
+							if (pi != DEBUG_SINGLE_ANGLE) {
+								continue;
+							}
+						}
+						
 						if (!sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).containsKey(
 								imageConfigurationAndRotationAngle)) {
 							sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.get(sampleTimeAndFullPlantAnnotation).put(
@@ -697,8 +708,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (bpv.getBinary() != null) {
 					ImageData id = ((ImageData) bpv.getBinary());
 					
-//					System.out.println("d/e/f=" + " // " + bpv.getName() + " // " + copyFrom.getSubstanceName() + " // "
-//							+ id.getURL().getFileName() + " // " + id.getSubstanceName());
+					// System.out.println("d/e/f=" + " // " + bpv.getName() + " // " + copyFrom.getSubstanceName() + " // "
+					// + id.getURL().getFileName() + " // " + id.getSubstanceName());
 					outputAdd(bpv.getBinary());
 				} else {
 					NumericMeasurement3D m = new NumericMeasurement3D(copyFrom, bpv.getName(), null);
@@ -1024,4 +1035,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.debugLastSystemOptionStorageGroup = debugLastSystemOptionStorageGroup;
 	}
 	
+	@Override
+	public void setValidSideAngle(int DEBUG_SINGLE_ANGLE) {
+		this.DEBUG_SINGLE_ANGLE = DEBUG_SINGLE_ANGLE;
+		this.filterAngle = true;
+	}
 }

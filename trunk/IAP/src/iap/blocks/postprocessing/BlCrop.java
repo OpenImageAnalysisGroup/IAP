@@ -1,8 +1,7 @@
 package iap.blocks.postprocessing;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
+import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -15,118 +14,19 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlCrop extends AbstractSnapshotAnalysisBlock {
+public class BlCrop extends AbstractBlock {
 	
 	@Override
-	protected Image processVISimage() {
-		if (input() != null && input().images() != null && input().images().vis() != null) {
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				return input().images().vis().io().crop().getImage();
-			} else {
-				int potCut = -1;
-				return input().images().vis().io().cropAbs(-1, -1, -1, potCut).getImage();
-			}
-		} else
-			return null;
+	protected Image processImage(Image image) {
+		return image.io().crop().getImage();
 	}
 	
 	@Override
-	protected Image processVISmask() {
-		if (input() != null && input().masks() != null && input().masks().vis() != null) {
-			if (!getBoolean("Process Masks", false))
-				return input().masks().vis();
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				return input().masks().vis().io().crop().getImage();
-			} else {
-				int potCut = -1;
-				return input().masks().vis().io().cropAbs(-1, -1, -1, potCut).getImage();
-			}
-		} else
-			return null;
-	}
-	
-	@Override
-	protected Image processFLUOmask() {
-		if (input() != null && input().masks() != null && input().masks().fluo() != null) {
-			if (!getBoolean("Process Masks", false))
-				return input().masks().fluo();
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				return input().masks().fluo().io().crop().getImage();
-			} else {
-				int potCut = -1;
-				return input().masks().fluo().io().cropAbs(-1, -1, -1, potCut).getImage();
-			}
-		} else
-			return null;
-	}
-	
-	@Override
-	protected Image processNIRmask() {
-		if (input() != null && input().masks() != null && input().masks().nir() != null) {
-			if (!getBoolean("Process Masks", false))
-				return input().masks().nir();
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				return input().masks().nir().io().crop().getImage();
-			} else {
-				int potCut = -1;
-				return input().masks().nir().io().cropAbs(-1, -1, -1, potCut).getImage();
-			}
-		} else
-			return null;
-	}
-	
-	@Override
-	protected Image processIRmask() {
-		if (input() != null && input().masks() != null && input().masks().ir() != null) {
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				if (!getBoolean("Process Masks", false))
-					return input().masks().ir();
-				return input().masks().ir().io().crop().getImage();
-			} else {
-				int potCut = -1;
-				return input().masks().ir().io().cropAbs(-1, -1, -1, potCut).getImage();
-			}
-		} else
-			return null;
-	}
-	
-	@Override
-	protected Image processFLUOimage() {
-		if (input() != null && input().images() != null && input().images().fluo() != null) {
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				return input().images().fluo().io().crop().getImage();
-			} else {
-				int potCut = -1;
-				return input().images().fluo().io().cropAbs(-1, -1, -1, potCut).getImage();
-			}
-		} else
-			return null;
-	}
-	
-	@Override
-	protected Image processNIRimage() {
-		if (input() != null && input().images() != null && input().images().nir() != null) {
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				return input().images().nir().io().crop().getImage();
-			} else {
-				int potCut = -1;
-				return input().images().nir().io().cropAbs(-1, -1, -1, potCut).getImage();
-			}
-		} else
-			return null;
-	}
-	
-	@Override
-	protected Image processIRimage() {
-		if (input() != null && input().images() != null && input().images().ir() != null) {
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				return input().images().ir().io().crop().getImage();
-			} else {
-				int potCut = -1;
-				return input().images().ir().io().cropAbs(-1, -1, -1, potCut).getImage();
-			}
-		} else
-			return null;
+	protected Image processMask(Image mask) {
+		if (!getBoolean("Process Masks", false))
+			return mask;
+		else
+			return mask.io().crop().getImage();
 	}
 	
 	@Override
