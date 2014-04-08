@@ -454,7 +454,7 @@ public class SnapshotDataIAP {
 		
 		if (position2store == null) {
 			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;
-			return "" + separator + "" + separator
+			return "no imaging" + separator + "" + separator
 					+ replaceNull(s.getPlantId()) + separator
 					+ replaceNull(s.getCondition()) + separator
 					+ replaceNull(s.getSpecies()) + separator
@@ -504,13 +504,24 @@ public class SnapshotDataIAP {
 						}
 					}
 				}
+				boolean addWater = false;
+				String rowType = "";
+				if (angle >= 0) {
+					rowType = "side" + separator + enDe(numberFormat_deTrue_enFalse, angle + "");
+				} else
+					if (Math.abs(-angle - 1) < 0.00001) {
+						rowType = "top" + separator + enDe(numberFormat_deTrue_enFalse, 0d + "");
+					} else
+						if (Math.abs(-angle - 720) < 0.00001) {
+							rowType = "combined" + separator;
+							addWater = true;
+						} else {
+							rowType = "top" + separator + enDe(numberFormat_deTrue_enFalse, (-angle) + "");
+						}
 				String res =
-						(angle >= 0 ? enDe(numberFormat_deTrue_enFalse, angle + "") : "")
+						rowType
 								+ separator
-								+
-								(angle < 0 ? enDe(numberFormat_deTrue_enFalse, (Math.abs(-angle - 1) < 0.00001 ? 0d : (Math.abs(-angle - 720) < 0.00001 ? "" : -angle))
-										+ "") : "") + separator +
-								replaceNull(s.getPlantId()) + separator
+								+ replaceNull(s.getPlantId()) + separator
 								+ replaceNull(s.getCondition()) + separator
 								+ replaceNull(s.getSpecies()) + separator
 								+ replaceNull(s.getGenotype()) + separator
@@ -522,15 +533,20 @@ public class SnapshotDataIAP {
 								+ (s.getSnapshotTime() != null ? new Date(s.getSnapshotTime()).toString() : "") + separator
 								+ StringManipulationTools.getNumbersFromString(s.getTimePoint()) + separator
 								+ enDe(numberFormat_deTrue_enFalse, fineTime.toString()) + separator
-								+ weightBeforeWatering + separator
-								+ sumBA + separator
-								+ waterWeight + separator
-								+ waterAmount + separator
+								+ (addWater ? weightBeforeWatering : "") + separator
+								+ (addWater ? sumBA : "") + separator
+								+ (addWater ? waterWeight : "") + separator
+								+ (addWater ? waterAmount : "") + separator
 								+ replaceNull(s.getUrlList(urlManager, CameraType.VIS, angle)) + separator
 								+ replaceNull(s.getUrlList(urlManager, CameraType.FLUO, angle)) + separator
 								+ replaceNull(s.getUrlList(urlManager, CameraType.NIR, angle)) + separator
 								+ replaceNull(s.getUrlList(urlManager, CameraType.IR, angle)) + separator
-								+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, angle))
+								+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, angle)) + separator
+								+ replaceNull(s.getConfigList(urlManager, CameraType.VIS, angle)) + separator
+								+ replaceNull(s.getConfigList(urlManager, CameraType.FLUO, angle)) + separator
+								+ replaceNull(s.getConfigList(urlManager, CameraType.NIR, angle)) + separator
+								+ replaceNull(s.getConfigList(urlManager, CameraType.IR, angle)) + separator
+								+ replaceNull(s.getConfigList(urlManager, CameraType.UNKNOWN, angle))
 								+ columnData + "\r\n";
 				result.append(res);
 			}
