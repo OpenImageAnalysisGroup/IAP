@@ -113,9 +113,15 @@ public class SplitResult {
 				new HashMap<ExperimentHeaderInterface, String>();
 		String originName = null;
 		int nnii = 1;
+		ExperimentHeaderInterface sourceHeader = null;
 		for (ExperimentHeaderInterface ii : knownResults) {
 			experiment2id.put(ii, ii.getDatabaseId());
 			nnii++;
+			if (sourceHeader == null) {
+				ExperimentReference eRef = new ExperimentReference(ii.getOriginDbId());
+				ExperimentHeaderInterface oriH = eRef.getHeader();
+				sourceHeader = oriH;
+			}
 			if (originName == null) {
 				ExperimentReference eRef = new ExperimentReference(ii.getOriginDbId());
 				ExperimentHeaderInterface oriH = eRef.getHeader();
@@ -192,6 +198,12 @@ public class SplitResult {
 		e.getHeader().setExperimentname(originName);
 		e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
 		e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
+		{
+			e.getHeader().setCoordinator(sourceHeader.getCoordinator());
+			e.getHeader().setImportusername(sourceHeader.getImportusername());
+			e.getHeader().setOriginDbId(sourceHeader.getDatabaseId());
+			e.getHeader().setDatabase(sourceHeader.getDatabase());
+		}
 		e.getHeader().setRemark(
 				e.getHeader().getRemark() +
 						" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
