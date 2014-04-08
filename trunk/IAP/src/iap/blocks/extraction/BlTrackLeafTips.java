@@ -59,6 +59,9 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				Normalisation n = new Normalisation(optionsAndResults.getREAL_MARKER_DISTANCE(), optionsAndResults.getCalculatedBlueMarkerDistance(),
 						input().masks(), ct);
 				
+				if (!n.isRealWorldCoordinateValid())
+					continue;
+				
 				if (previousResults != null) {
 					if (unassignedResults != null) {
 						// match
