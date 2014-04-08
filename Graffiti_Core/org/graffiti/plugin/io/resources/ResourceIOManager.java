@@ -10,6 +10,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.SystemAnalysis;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 public class ResourceIOManager {
 	
@@ -230,14 +233,21 @@ public class ResourceIOManager {
 	}
 	
 	public static InputStream decompressStream(InputStream input) throws IOException {
-		PushbackInputStream pb = new PushbackInputStream(input, 2);
-		byte[] signature = new byte[2];
-		pb.read(signature); // read the signature
-		pb.unread(signature); // push back the signature to the stream
-		if (signature[0] == 31 /* 0x1f */&& signature[1] == -117/* 0x8b */) // check if matches standard gzip magic number
-			return new GZIPInputStream(pb);
-		else
-			return pb;
+		
+		try {
+			CompressorInputStream in = new CompressorStreamFactory().createCompressorInputStream(input);
+			return in;
+		} catch (CompressorException e) {
+			PushbackInputStream pb = new PushbackInputStream(input, 2);
+			byte[] signature = new byte[2];
+			pb.read(signature); // read the signature
+			pb.unread(signature); // push back the signature to the stream
+			if (signature[0] == 31 /* 0x1f */&& signature[1] == -117/* 0x8b */) // check if matches standard gzip magic number
+				return new GZIPInputStream(pb);
+			else
+				return pb;
+		}
+		
 	}
 	
 	public synchronized LinkedHashSet<ResourceIOHandler> getHandlers() {

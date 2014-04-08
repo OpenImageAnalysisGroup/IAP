@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/jdom.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/soap.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-compress-1.8.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
