@@ -429,14 +429,15 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			HashMap<Integer, HashMap<Integer, Object>> row2col2value = new HashMap<Integer, HashMap<Integer, Object>>();
 			if (!clustering)
 				row2col2value = null;
-			boolean water = false;
+			
 			if (status != null)
 				status.setCurrentStatusText2("Create snapshots");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set");
 			StringBuilder indexHeader = new StringBuilder();
 			String csvHeader = "";
 			final ThreadSafeOptions written = new ThreadSafeOptions();
-			if (!water) {
+			
+			{
 				HashMap<String, Integer> indexInfo = new HashMap<String, Integer>();
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						urlManager, experiment, indexInfo, false,
@@ -454,14 +455,6 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				csv.appendLine(csvHeader + indexHeader.toString() + "\r\n", written);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
-			} else {
-				snapshots = IAPservice.getSnapshotsFromExperiment(
-						null, experiment, null, false, exportIndividualAngles.getBval(0, false),
-						xlsx, snFilter, status, optCustomSubsetDef, exportCommand);
-				csvHeader = getCSVheader(false);
-				csv.appendLine(csvHeader + indexHeader.toString() + "\r\n", written);
-				if (row2col2value != null)
-					row2col2value.put(0, getColumnValues(csvHeader.split(separator)));
 			}
 			if (status != null)
 				status.setCurrentStatusValueFine(-1);
