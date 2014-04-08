@@ -16,12 +16,14 @@ public class Normalisation {
 	int imgWidth = -1;
 	int imgHeight = -1;
 	private double conversionFactorImageDist2realWorldDist;
+	private boolean valid;
 	
 	public Normalisation(Double real_marker_distance, Double calculated_marker_distance, ImageSet masks, CameraType ct) {
 		this.conversionFactorImageDist2realWorldDist = real_marker_distance / calculated_marker_distance;
 		
-		if (masks.getImage(ct) == null) {
+		if (masks.getImage(ct) == null || masks.vis() == null || real_marker_distance == null || calculated_marker_distance == null) {
 			conversionFactorImageDist2realWorldDist = Double.NaN;
+			this.valid = false;
 		} else {
 			switch (ct) {
 				case VIS:
@@ -48,7 +50,12 @@ public class Normalisation {
 				default:
 					throw new UnsupportedOperationException("Cant process yet unknown camera type");
 			}
+			valid = true;
 		}
+	}
+	
+	public boolean isRealWorldCoordinateValid() {
+		return valid;
 	}
 	
 	public int convertImgXtoRealWorldX(double x) {

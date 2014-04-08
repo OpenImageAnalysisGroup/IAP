@@ -196,6 +196,8 @@ public class SkeletonProcessor2d {
 			if (l.isCut()) {
 				// System.out.println("connecting limbs: " + l.endpoint.toString() + " , " + l.initialpoint.toString());
 				Point[] toConnect = getNearestLimb(l);
+				if (toConnect == null || toConnect.length == 0 || toConnect[0] == null || toConnect[1] == null)
+					continue;
 				connect(toConnect[0], toConnect[1], colorMarkedEndLimbs, l);
 				added = true;
 			}
@@ -256,6 +258,8 @@ public class SkeletonProcessor2d {
 	 * @param l
 	 */
 	private void connect(Point initialpoint, Point endpoint, int color, Limb l) {
+		if (initialpoint == null)
+			return;
 		int x0 = initialpoint.x;
 		int x1 = endpoint.x;
 		int y0 = initialpoint.y;

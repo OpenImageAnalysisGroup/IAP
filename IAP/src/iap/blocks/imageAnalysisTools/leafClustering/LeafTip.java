@@ -22,7 +22,7 @@ public class LeafTip {
 	
 	public LeafTip(long time, int x, int y) {
 		this.time = time;
-		if (normalisationFactor != null) {
+		if (normalisationFactor == null || !normalisationFactor.isRealWorldCoordinateValid()) {
 			this.x = x;
 			this.y = y;
 		} else {
@@ -36,7 +36,7 @@ public class LeafTip {
 		this.time = time;
 		this.normalisationFactor = normalisationFactor;
 		
-		if (normalisationFactor == null) {
+		if (normalisationFactor == null || !normalisationFactor.isRealWorldCoordinateValid()) {
 			x = (int) pos.getX();
 			y = (int) pos.getY();
 		} else {
