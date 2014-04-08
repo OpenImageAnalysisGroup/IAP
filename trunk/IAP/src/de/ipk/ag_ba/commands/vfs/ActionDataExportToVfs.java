@@ -23,7 +23,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.GZIPOutputStream;
 
 import javax.imageio.ImageIO;
 
@@ -32,6 +31,7 @@ import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
@@ -1037,9 +1037,17 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		System.gc();
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Begin dumping data structure into XML file... (Memory Status: "
 				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
+		
+		OutputStream co = null;
+		
+		if (compressed) {
+			co = new CompressorStreamFactory()
+					.createCompressorOutputStream(CompressorStreamFactory.BZIP2, f.getOutputStream());
+		}
+		
 		Experiment.write(ei, optStatus,
 				compressed ?
-						new GZIPOutputStream(f.getOutputStream(), 128 * 1024)
+						co
 						: f.getOutputStream()
 				); // to temp file
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Finished dumping data structure into XML file. (Memory Status: "

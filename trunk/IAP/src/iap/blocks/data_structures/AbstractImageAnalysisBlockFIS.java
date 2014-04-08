@@ -336,9 +336,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					time2config2summaryResult.get(time).put(configName, new HashMap<Integer, BlockResultSet>());
 				HashMap<Integer, BlockResultSet> summaryResultArray = time2config2summaryResult.get(time).get(configName);
 				for (Integer tray : allResultsForSnapshot.get(configName).keySet()) {
+					Double angle = getAngleFromConfig(configName);
 					if (!summaryResultArray.containsKey(tray))
-						summaryResultArray.put(tray, new BlockResults(null)); // these kind of values have no angle, the relative value calculation processes the
-																								// average of the angle values
+						summaryResultArray.put(tray, new BlockResults(angle));
 					BlockResultSet summaryResult = summaryResultArray.get(tray);
 					BlockResultSet rt = allResultsForSnapshot.get(configName).get(tray);
 					for (String property : desiredProperties) {
@@ -378,6 +378,15 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				}
 			}
 		}
+	}
+	
+	private Double getAngleFromConfig(String configName) {
+		boolean isTop = configName.toUpperCase().contains("TOP");
+		configName = configName.substring(configName.indexOf("#") + "#".length());
+		Double angle = Double.parseDouble(configName);
+		if (isTop && Math.abs(angle) < 0.001)
+			angle = -1d;
+		return isTop ? -angle : angle;
 	}
 	
 	private void initMaps(HashMap<String, TreeMap<String, TreeMap<Integer, Long>>> prop2config2tray2lastTime,
