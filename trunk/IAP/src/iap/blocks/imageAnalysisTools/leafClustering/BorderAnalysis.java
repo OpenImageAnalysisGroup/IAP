@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
@@ -68,7 +69,22 @@ public class BorderAnalysis {
 		// System.out.println(d);
 		// }
 		
-		peaks = CurveAnalysis.findMaximaIJ(data, 1, false);
+		boolean duplicateArrayForEdgePeakDetection = true;
+		if (duplicateArrayForEdgePeakDetection) {
+			double[] data2 = new double[data.length * 2];
+			for (int i = 0; i < data2.length; i++)
+				data2[i] = data[i % data.length];
+			peaks = CurveAnalysis.findMaximaIJ(data2, 1, false);
+			TreeSet<Integer> val = new TreeSet<Integer>();
+			for (int p : peaks) {
+				val.add(p % data.length);
+			}
+			peaks = new int[val.size()];
+			int i = 0;
+			for (int p : val)
+				peaks[i++] = p;
+		} else
+			peaks = CurveAnalysis.findMaximaIJ(data, 1, false);
 		peaks = CurveAnalysis.summarizeMaxima(peaks, listsize, distBetweenPeaks);
 		
 		// save results
