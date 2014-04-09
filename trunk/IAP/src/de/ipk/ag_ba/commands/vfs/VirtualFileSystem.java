@@ -147,7 +147,7 @@ public abstract class VirtualFileSystem {
 	
 	public abstract String getTargetName();
 	
-	public abstract String getTransferProtocolName();
+	public abstract String getProtocolName();
 	
 	public abstract String getTargetPathName();
 	
@@ -228,7 +228,7 @@ public abstract class VirtualFileSystem {
 		String ico = IAPimages.getFolderRemoteClosed();
 		String ico2 = IAPimages.getFolderRemoteOpen();
 		String ico3 = IAPimages.getFolderRemoteClosed();
-		if (vfsEntry.getTransferProtocolName().contains("UDP")) {
+		if (vfsEntry.getProtocolName().contains("UDP")) {
 			ico = "img/ext/network-workgroup.png";
 			ico2 = "img/ext/network-workgroup-power.png";
 			ico3 = IAPimages.getFolderRemoteClosed();
@@ -248,7 +248,7 @@ public abstract class VirtualFileSystem {
 			action.addAdditionalEntity(new NavigationButton(na, guiSetting));
 		}
 		NavigationButton vfsSrc = new NavigationButton(vfsEntry.getTargetName(), action, guiSetting);
-		vfsSrc.setToolTipText("Target: " + vfsEntry.getTargetPathName() + " via " + vfsEntry.getTransferProtocolName());
+		vfsSrc.setToolTipText("Target: " + vfsEntry.getTargetPathName() + " via " + vfsEntry.getProtocolName());
 		return vfsSrc;
 	}
 	

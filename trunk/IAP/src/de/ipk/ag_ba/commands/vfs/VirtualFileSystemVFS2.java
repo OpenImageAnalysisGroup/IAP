@@ -93,7 +93,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	}
 	
 	@Override
-	public String getTransferProtocolName() {
+	public String getProtocolName() {
 		return protocoll;
 	}
 	
@@ -696,6 +696,10 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		this.host = host;
 	}
 	
+	public String getHost() {
+		return host;
+	}
+	
 	public void setUser(String user) {
 		this.user = user;
 	}
@@ -744,5 +748,25 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			default:
 				return false;
 		}
+	}
+	
+	public String getStoredPass() {
+		return pass;
+	}
+	
+	public String getDirectory() {
+		return folder;
+	}
+	
+	public boolean getStoreMongoDBfiles() {
+		return useForMongoFileStorage;
+	}
+	
+	public boolean getUseOnlyForMongoDBfileStorage() {
+		return useOnlyForMongoFileStorage;
+	}
+	
+	public String getMongoDBdbName() {
+		return useForMongoFileStorageCloudName;
 	}
 }

@@ -48,7 +48,7 @@ public class ActionLoadDataSet extends AbstractNavigationAction {
 		
 		if (showLoadLocalOrRemote)
 			res.add(new NavigationButton(new ActionDataLoadingFromUserSelectedFileSystemFolder(
-					"Load dataset from local file system"), src.getGUIsetting()));
+					"Load dataset from local file system", true), src.getGUIsetting()));
 		
 		if (vfs)
 			res.add(new NavigationButton(new ActionDataLoadingFromUserSelectedVFStarget(
