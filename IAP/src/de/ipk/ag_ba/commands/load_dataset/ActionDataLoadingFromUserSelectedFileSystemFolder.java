@@ -69,24 +69,19 @@ public class ActionDataLoadingFromUserSelectedFileSystemFolder extends AbstractN
 					ico3 = vfsEntry.getDesiredIcon();
 				}
 			VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
-					new String[] {},
+					new String[] { ".txt", ".url", ".webloc", ".gml", ".graphml", ".pdf", ".html", ".htm" },
 					IAPmain.loadIcon(ico),
 					IAPmain.loadIcon(ico2),
 					IAPmain.loadIcon(ico3));
+			dataSourceHsm.readDataSource();
 			ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
+			this.vfsAction = action;
+			
 			for (NavigationAction na : vfsEntry.getAdditionalNavigationActions()) {
 				action.addAdditionalEntity(new NavigationButton(na, guiSetting));
 			}
-			this.vfsAction = action;
-			if (vfsAction != null) {
-				try {
-					vfsAction.performActionCalculateResults(src);
-					resultActions.addAll(vfsAction.getResultNewActionSet());
-				} catch (Exception e) {
-					e.printStackTrace();
-					// add error icon
-				}
-			}
+			vfsAction.performActionCalculateResults(src);
+			resultActions.addAll(vfsAction.getResultNewActionSet());
 		}
 	}
 	
@@ -149,6 +144,11 @@ public class ActionDataLoadingFromUserSelectedFileSystemFolder extends AbstractN
 						SystemOptions.getInstance().setBoolean("VFS-" + idx, "Use only for Mongo-DB storage", vfsEntry.getUseOnlyForMongoDBfileStorage());
 						SystemOptions.getInstance().setString("VFS-" + idx, "Mongo-DB database name", vfsEntry.getMongoDBdbName());
 					}
+				}
+				
+				@Override
+				public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+					return currentSet;
 				}
 				
 				@Override
