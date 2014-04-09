@@ -125,7 +125,7 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 			ico3 = vfsEntry.getDesiredIcon();
 		}
 		VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
-				new String[] {},
+				new String[] { ".txt", ".url", ".webloc", ".gml", ".graphml", ".pdf", ".html", ".htm" },
 				IAPmain.loadIcon(ico),
 				IAPmain.loadIcon(ico2),
 				IAPmain.loadIcon(ico3));
