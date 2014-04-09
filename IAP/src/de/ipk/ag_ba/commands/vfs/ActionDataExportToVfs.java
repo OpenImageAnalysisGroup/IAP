@@ -87,7 +87,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	public ActionDataExportToVfs(MongoDB m,
 			ExperimentReference experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers, VfsFileSystemSource optFileSystemSource) {
-		super("Copy to " + vfs.getTargetName() + " (" + vfs.getTransferProtocolName() + ")");
+		super("Copy to " + vfs.getTargetName() + " (" + vfs.getProtocolName() + ")");
 		this.m = m;
 		this.ignoreOutliers = ignoreOutliers;
 		this.optFileSystemSource = optFileSystemSource;
@@ -98,7 +98,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	public ActionDataExportToVfs(MongoDB m,
 			ArrayList<ExperimentReference> experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers, VfsFileSystemSource optFileSystemSource) {
-		super("Copy to " + vfs.getTargetName() + " (" + vfs.getTransferProtocolName() + ")");
+		super("Copy to " + vfs.getTargetName() + " (" + vfs.getProtocolName() + ")");
 		this.m = m;
 		this.ignoreOutliers = ignoreOutliers;
 		this.optFileSystemSource = optFileSystemSource;

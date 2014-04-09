@@ -37,7 +37,7 @@ public class VirtualFileSystemFolderStorage extends VirtualFileSystem {
 	}
 	
 	@Override
-	public String getTransferProtocolName() {
+	public String getProtocolName() {
 		return protocolDescription;
 	}
 	

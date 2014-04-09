@@ -38,11 +38,6 @@ public class ActionDataLoadingFromUserSelectedVFStarget extends AbstractNavigati
 					"Load from remote site using " + p, p);
 			res.add(new NavigationButton(navigationAction, guiSetting));
 		}
-		{
-			NavigationAction navigationAction = new ActionDataLoadingFromUserSpecficVFStarget(
-					"Load from local file system", VfsFileProtocol.LOCAL);
-			res.add(new NavigationButton(navigationAction, guiSetting));
-		}
 		return res;
 	}
 	

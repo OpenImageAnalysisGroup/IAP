@@ -114,7 +114,7 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 		String ico = IAPimages.getFolderRemoteClosed();
 		String ico2 = IAPimages.getFolderRemoteOpen();
 		String ico3 = IAPimages.getFolderRemoteClosed();
-		if (vfsEntry.getTransferProtocolName().contains("UDP")) {
+		if (vfsEntry.getProtocolName().contains("UDP")) {
 			ico = "img/ext/network-workgroup.png";
 			ico2 = "img/ext/network-workgroup-power.png";
 			ico3 = IAPimages.getFolderRemoteClosed();
