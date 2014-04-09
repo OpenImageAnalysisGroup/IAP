@@ -74,7 +74,7 @@ public class BorderAnalysis {
 			double[] data2 = new double[data.length * 2];
 			for (int i = 0; i < data2.length; i++)
 				data2[i] = data[i % data.length];
-			peaks = CurveAnalysis.findMaximaIJ(data2, 1, false);
+			peaks = CurveAnalysis.findMaximaIJ(data2, 1, true);
 			TreeSet<Integer> val = new TreeSet<Integer>();
 			for (int p : peaks) {
 				val.add(p % data.length);
