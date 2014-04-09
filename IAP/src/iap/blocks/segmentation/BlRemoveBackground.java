@@ -30,7 +30,7 @@ public class BlRemoveBackground extends AbstractBlock {
 		CameraType ct = mask.getCameraType();
 		if (input().images().getImage(ct) != null) {
 			ArrayList<String> possibleValues = new ArrayList<String>(Arrays.asList(AutoThresholder.getMethods()));
-			String Value = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", "Otsu", possibleValues);
+			String Value = optionsAndResults.getStringSettingRadio(this, "Thresholding Method (" + ct + ")", "Otsu", possibleValues);
 			Image image = input().images().getImage(ct).show("inp", debug);
 			if (getBoolean("Normalize " + ct + " Image", ct == CameraType.FLUO))
 				image = image.io().copy().histogramEqualisation(true, 0.35).getImage().show("img_he", debug);
