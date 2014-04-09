@@ -1,5 +1,7 @@
 package iap.blocks.imageAnalysisTools.leafClustering;
 
+import iap.blocks.imageAnalysisTools.leafClustering.FeatureObject.FeatureObjectType;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +15,7 @@ import javax.vecmath.Point3d;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
+import de.ipk.ag_ba.image.operation.ImageConvolution;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
@@ -35,8 +38,12 @@ public class BorderAnalysis {
 	
 	public BorderAnalysis(Image img) {
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
-		borderLength = (int) borderIO.getResultsTable().getValue("border", 0);
-		borderImage = borderIO.getAs2D();
+		Image boImg = new ImageConvolution(borderIO).clearBorder().getImage();
+		borderLength = boImg.io().countFilledPixels();
+		borderImage = boImg.getAs2A();
+		// borderLength = (int) borderIO.getResultsTable().getValue("border", 0);
+		// borderImage = borderIO.getAs2D();
+		// borderIO.show("borrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
 		borderLists = getBorderLists(borderImage, borderLength, debug);
 		borderLists = sort();
 		borderFeatureList = new BorderFeatureList(borderLists, onlyBiggest);
@@ -125,13 +132,13 @@ public class BorderAnalysis {
 					Vector2D p3 = borderFeatureList.get(ahead).getPosition();
 					Point2d p4 = new Point2d((p1.getX() + p3.getX()) / 2, (p1.getY() + p3.getY()) / 2);
 					Vector2D v1 = new Vector2D((p2.getX() - p4.x) * 2 + p4.x, (p2.getY() - p4.y) * 2 + p4.y);
-					p.addFeature("direction", v1);
+					p.addFeature("direction", v1, FeatureObjectType.VECTOR);
 					// p.addFeature("angle", v1.angle(new Vector2d(1.0, 0.0)));
 					// calculate angle
 					Vector2D trans1 = v1.subtract(p2);
 					Vector2D trans2 = new Vector2D(0.0, 1.0);
 					double angle = calcAngle(trans1, trans2);
-					p.addFeature("angle", angle);
+					p.addFeature("angle", angle, FeatureObjectType.NUMERIC);
 				}
 			}
 		}
@@ -179,13 +186,13 @@ public class BorderAnalysis {
 						if (checkSplit)
 							split = isSplit(predefinedRegion, region, radius, debug);
 						if (!split || !checkSplit)
-							borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key);
+							borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key, FeatureObjectType.NUMERIC);
 						else
-							borderFeatureList.addFeature(idx / 2, 0.0, key);
+							borderFeatureList.addFeature(idx / 2, 0.0, key, FeatureObjectType.NUMERIC);
 					} else
-						borderFeatureList.addFeature(idx / 2, 0.0, key);
+						borderFeatureList.addFeature(idx / 2, 0.0, key, FeatureObjectType.NUMERIC);
 				} else
-					borderFeatureList.addFeature(idx / 2, Double.NaN, key);
+					borderFeatureList.addFeature(idx / 2, Double.NaN, key, FeatureObjectType.NUMERIC);
 			}
 			if (onlyBiggest)
 				break;

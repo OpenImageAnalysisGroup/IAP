@@ -1,6 +1,7 @@
 package iap.blocks.imageAnalysisTools.leafClustering;
 
 import iap.blocks.extraction.Normalisation;
+import iap.blocks.imageAnalysisTools.leafClustering.FeatureObject.FeatureObjectType;
 
 import java.util.HashMap;
 
@@ -17,7 +18,7 @@ public class LeafTip {
 	private final int y;
 	private int leafID;
 	private double minDist; // distance to next leaftip
-	private HashMap<String, Object> featureMap;
+	private HashMap<String, FeatureObject> featureMap;
 	private Normalisation normalisationFactor;
 	
 	public LeafTip(long time, int x, int y) {
@@ -32,7 +33,7 @@ public class LeafTip {
 		leafID = -1;
 	}
 	
-	public LeafTip(long time, Vector2D pos, HashMap<String, Object> featureMap, Normalisation normalisationFactor) {
+	public LeafTip(long time, Vector2D pos, HashMap<String, FeatureObject> featureMap, Normalisation normalisationFactor) {
 		this.time = time;
 		this.normalisationFactor = normalisationFactor;
 		
@@ -45,7 +46,24 @@ public class LeafTip {
 			// System.out.println("x: " + x + " : y: " + y + " posx/y: " + pos.getX() + " : " + pos.getY());
 		}
 		
-		this.featureMap = new HashMap<String, Object>();
+		this.featureMap = new HashMap<String, FeatureObject>();
+		this.featureMap = featureMap;
+	}
+	
+	public LeafTip(long time, double x, double y, HashMap<String, FeatureObject> featureMap, Normalisation normalisationFactor) {
+		this.time = time;
+		this.normalisationFactor = normalisationFactor;
+		
+		if (normalisationFactor == null || !normalisationFactor.isRealWorldCoordinateValid()) {
+			this.x = (int) x;
+			this.y = (int) y;
+		} else {
+			this.x = (normalisationFactor.convertImgXtoRealWorldX(x));
+			this.y = (normalisationFactor.convertImgYtoRealWorldY(y));
+			// System.out.println("x: " + x + " : y: " + y + " posx/y: " + pos.getX() + " : " + pos.getY());
+		}
+		
+		this.featureMap = new HashMap<String, FeatureObject>();
 		this.featureMap = featureMap;
 	}
 	
@@ -93,11 +111,11 @@ public class LeafTip {
 	}
 	
 	public Object getFeature(String key) {
-		return featureMap.get(key);
+		return featureMap.get(key).feature;
 	}
 	
-	public void addFeature(Object value, String key) {
-		featureMap.put(key, value);
+	public void addFeature(Object value, String key, FeatureObjectType type) {
+		featureMap.put(key, new FeatureObject(value, type));
 	}
 	
 	public double dist(Point2d p) {

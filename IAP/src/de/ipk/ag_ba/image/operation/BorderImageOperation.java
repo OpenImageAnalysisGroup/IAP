@@ -45,8 +45,9 @@ public class BorderImageOperation {
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[] out = new int[w * h];
+		boolean eightNeighborhood = false;
 		
-		int border = borderDetection(backgroundColor, borderColor, removeInnerBorders, in, w, h, out);
+		int border = borderDetection(backgroundColor, borderColor, removeInnerBorders, eightNeighborhood, in, w, h, out);
 		
 		ImageOperation res = new ImageOperation(new Image(w, h, out));
 		
@@ -87,7 +88,7 @@ public class BorderImageOperation {
 	 * @return Number of border pixels.
 	 * @author klukas
 	 */
-	public int borderDetection(int backgroundColor, int borderColor, boolean removeInnerBorders,
+	public int borderDetection(int backgroundColor, int borderColor, boolean removeInnerBorders, boolean eightNeighborhood,
 			int[] in, int w, int h, int[] out) {
 		int bc = removeInnerBorders ? bc = Color.CYAN.getRGB() : borderColor;
 		int[] tempOut = removeInnerBorders ? new int[w * h] : out;
@@ -103,10 +104,23 @@ public class BorderImageOperation {
 						int left = in[x - 1 + w_y];
 						int right = in[x + 1 + w_y];
 						int below = in[x + w * (y + 1)];
-						if (above == backgroundColor || left == backgroundColor || right == backgroundColor || below == backgroundColor) {
-							tempOut[x + w_y] = borderColor != Integer.MAX_VALUE ? bc : in[x + w_y];
-							res++;
-						}
+						
+						if (eightNeighborhood) {
+							int aboveLeft = in[x - 1 + w * (y - 1)];
+							int aboveRight = in[x + 1 + w * (y - 1)];
+							int belowLeft = in[x - 1 + w * (y + 1)];
+							int belowRight = in[x + 1 + w * (y + 1)];
+							
+							if (above == backgroundColor || left == backgroundColor || right == backgroundColor || below == backgroundColor
+									|| aboveLeft == backgroundColor || aboveRight == backgroundColor || belowLeft == backgroundColor || belowRight == backgroundColor) {
+								tempOut[x + w_y] = borderColor != Integer.MAX_VALUE ? bc : in[x + w_y];
+								res++;
+							}
+						} else
+							if (above == backgroundColor || left == backgroundColor || right == backgroundColor || below == backgroundColor) {
+								tempOut[x + w_y] = borderColor != Integer.MAX_VALUE ? bc : in[x + w_y];
+								res++;
+							}
 					}
 				}
 			}
@@ -128,7 +142,7 @@ public class BorderImageOperation {
 				floodFill(tempOut, w, h, backgroundColor, fillColor, w - 1, y);
 			}
 			// highlight outside borders, anything else (inner borders) will cleaned
-			res = borderDetection(fillColor, borderColor, false, tempOut, w, h, out);
+			res = borderDetection(fillColor, borderColor, false, false, tempOut, w, h, out);
 		}
 		return res;
 	}

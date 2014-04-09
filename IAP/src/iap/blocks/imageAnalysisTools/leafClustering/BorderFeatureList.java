@@ -1,5 +1,7 @@
 package iap.blocks.imageAnalysisTools.leafClustering;
 
+import iap.blocks.imageAnalysisTools.leafClustering.FeatureObject.FeatureObjectType;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -84,8 +86,8 @@ public class BorderFeatureList {
 		return borderFeatureList.get(idxFeature).getFeaturePoint(filterKey);
 	}
 	
-	public void addFeature(int index, Double val, String key) {
-		borderFeatureList.get(index).addFeature(key, val);
+	public void addFeature(int index, Double val, String key, FeatureObjectType type) {
+		borderFeatureList.get(index).addFeature(key, val, type);
 	}
 	
 	public BorderFeature get(int index) {

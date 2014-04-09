@@ -5,9 +5,14 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.imageAnalysisTools.leafClustering.BorderAnalysis;
 import iap.blocks.imageAnalysisTools.leafClustering.BorderFeature;
+import iap.blocks.imageAnalysisTools.leafClustering.FeatureObject;
+import iap.blocks.imageAnalysisTools.leafClustering.FeatureObject.FeatureObjectType;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
+import ij.gui.Roi;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -58,8 +63,10 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			workimg.setCameraType(input().masks().vis().getCameraType());
 			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 3), getInt("Masksize Erode (Vis)", 8),
 					getInt("Masksize Dilate (Vis)", 12));
+			Roi bb = workimg.io().getBoundingBox();
+			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
-					searchRadius);
+					searchRadius, maxValidY);
 		}
 		return input().masks().vis();
 	}
@@ -76,8 +83,10 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			workimg.setCameraType(CameraType.FLUO);
 			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 2), getInt("Masksize Erode (Fluo)", 8),
 					getInt("Masksize Dilate (Fluo)", 12));
+			Roi bb = workimg.io().getBoundingBox();
+			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.FLUO, optionsAndResults.getCameraPosition(),
-					searchRadius);
+					searchRadius, maxValidY);
 		}
 		return input().masks().fluo();
 	}
@@ -94,79 +103,106 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			workimg.setCameraType(CameraType.NIR);
 			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Nir)", 2), getInt("Masksize Erode (Nir)", 2),
 					getInt("Masksize Dilate (Nir)", 4));
+			Roi bb = workimg.io().getBoundingBox();
+			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.NIR, optionsAndResults.getCameraPosition(),
-					searchRadius);
+					searchRadius, maxValidY);
 		}
 		return input().masks().nir();
 	}
 	
-	private void savePeaksAndFeatures(LinkedList<BorderFeature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius) {
+	private void savePeaksAndFeatures(LinkedList<BorderFeature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius, int maxValidY) {
+		boolean saveListObject = true;
+		boolean saveFeaturesInResultSet = false;
 		
-		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, peakList);
-		
-		int index = 1;
-		for (BorderFeature bf : peakList) {
-			Vector2D pos = bf.getPosition();
-			final Double angle = (Double) bf.getFeature("angle");
-			Vector2D direction = (Vector2D) bf.getFeature("direction");
-			final CameraType cameraType_fin = cameraType;
-			
-			if (pos == null || cameraPosition == null || cameraType == null) {
-				continue;
+		if (saveListObject) {
+			ArrayList<BorderFeature> toRemove = new ArrayList<BorderFeature>();
+			// remove bordersize from all positions
+			for (BorderFeature bf : peakList) {
+				HashMap<String, FeatureObject> fm = bf.getFeatureMap();
+				if (bf.getPosition().getY() > maxValidY)
+					toRemove.add(bf);
+				for (FeatureObject fo : fm.values()) {
+					if (fo.featureObjectType == FeatureObjectType.POSITION) {
+						fo.feature = (int) ((Integer) (fo.feature) - borderSize);
+					}
+					if (fo.featureObjectType == FeatureObjectType.VECTOR) {
+						fo.feature = ((Vector2D) fo.feature).add(new Vector2D(-borderSize, -borderSize));
+					}
+				}
 			}
-			
-			// correct positions
-			Vector2D sub = new Vector2D(-borderSize, -borderSize);
-			final Vector2D pos_fin = pos.add(sub);
-			final Vector2D direction_fin = direction.add(sub);
-			
-			getResultSet().setNumericResult(0,
-					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".x",
-					pos_fin.getX(), "px");
-			getResultSet().setNumericResult(0,
-					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".y",
-					pos_fin.getY(), "px");
-			
-			if (angle != null)
-				getResultSet().setNumericResult(0,
-						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".angle",
-						angle, "degree");
-			index++;
-			
-			if (searchRadius > 0) {
-				final int searchRadius_fin = searchRadius;
-				getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
-					
-					@Override
-					public Image postProcessMask(Image mask) {
-						return mask
-								.io()
-								.canvas()
-								.drawCircle((int) pos_fin.getX(), (int) pos_fin.getY(), searchRadius_fin, Color.RED.getRGB(), 0.5, 3)
-								.drawLine((int) pos_fin.getX(), (int) pos_fin.getY(), (int) direction_fin.getX(), (int) direction_fin.getY(), Color.BLUE.getRGB(), 0.5,
-										1)
-								.text((int) direction_fin.getX() + 10, (int) direction_fin.getY(),
-										"x: " + ((int) pos_fin.getX() + borderSize) + " y: " + ((int) pos_fin.getY() + borderSize),
-										Color.BLACK)
-								.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, "angle: " + angle.intValue(), Color.BLACK)
-								.getImage();
-					}
-					
-					@Override
-					public Image postProcessImage(Image image) {
-						return image;
-					}
-					
-					@Override
-					public CameraType getConfig() {
-						return cameraType_fin;
-					}
-				});
-			}
+			peakList.removeAll(toRemove);
+			getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, peakList);
 		}
-		// save leaf count
-		getResultSet().setNumericResult(getBlockPosition(),
-				"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", index - 1, "leaftips");
+		if (saveFeaturesInResultSet) {
+			int index = 1;
+			for (BorderFeature bf : peakList) {
+				Vector2D pos = bf.getPosition();
+				final Double angle = (Double) bf.getFeature("angle");
+				Vector2D direction = (Vector2D) bf.getFeature("direction");
+				final CameraType cameraType_fin = cameraType;
+				
+				if (pos == null || cameraPosition == null || cameraType == null) {
+					continue;
+				}
+				
+				// correct positions
+				Vector2D sub = new Vector2D(-borderSize, -borderSize);
+				final Vector2D pos_fin = pos.add(sub);
+				final Vector2D direction_fin = direction.add(sub);
+				
+				getResultSet().setNumericResult(0,
+						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".x",
+						pos_fin.getX(), "px");
+				getResultSet().setNumericResult(0,
+						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".y",
+						pos_fin.getY(), "px");
+				
+				if (angle != null)
+					getResultSet()
+							.setNumericResult(
+									0,
+									"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index)
+											+ ".angle",
+									angle, "degree");
+				index++;
+				
+				if (searchRadius > 0) {
+					final int searchRadius_fin = searchRadius;
+					getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
+						
+						@Override
+						public Image postProcessMask(Image mask) {
+							return mask
+									.io()
+									.canvas()
+									.drawCircle((int) pos_fin.getX(), (int) pos_fin.getY(), searchRadius_fin, Color.RED.getRGB(), 0.5, 3)
+									.drawLine((int) pos_fin.getX(), (int) pos_fin.getY(), (int) direction_fin.getX(), (int) direction_fin.getY(), Color.BLUE.getRGB(),
+											0.8,
+											1)
+									.text((int) direction_fin.getX() + 10, (int) direction_fin.getY(),
+											"x: " + ((int) pos_fin.getX() + borderSize) + " y: " + ((int) pos_fin.getY() + borderSize),
+											Color.BLACK)
+									.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, "angle: " + angle.intValue(), Color.BLACK)
+									.getImage();
+						}
+						
+						@Override
+						public Image postProcessImage(Image image) {
+							return image;
+						}
+						
+						@Override
+						public CameraType getConfig() {
+							return cameraType_fin;
+						}
+					});
+				}
+			}
+			// save leaf count
+			getResultSet().setNumericResult(getBlockPosition(),
+					"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", index - 1, "leaftips");
+		}
 	}
 	
 	private LinkedList<BorderFeature> getPeaksFromBorder(Image img, int searchRadius, double fillGradeInPercent) {

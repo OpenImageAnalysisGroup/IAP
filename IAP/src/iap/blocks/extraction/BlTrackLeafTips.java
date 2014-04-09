@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.Colors;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultObject;
@@ -85,48 +86,110 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 		LeafTipMatcher ltm = new LeafTipMatcher(unassignedResults, timepoint, norm);
 		ltm.setMaxDistanceBetweenLeafTips(100.0);
 		ltm.matchLeafTips();
-		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, ltm.getMatchedPlant());
+		Plant plant = ltm.getMatchedPlant();
+		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, plant);
+		markAndSaveLeafFeatures(cameraPosition, cameraType, norm, plant);
 	}
 	
 	private void matchNewResults(Plant previousResults,
-			LinkedList<BorderFeature> unassignedResults, CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
+			LinkedList<BorderFeature> unassignedResults, final CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
 			final Normalisation norm) {
 		LeafTipMatcher ltm = new LeafTipMatcher(previousResults, unassignedResults, timepoint, norm);
+		ltm.setMaxDistanceBetweenLeafTips(300.0);
 		ltm.matchLeafTips();
 		final Plant plant = ltm.getMatchedPlant();
 		// TODO calc dist between leaftips , dist / (time_n +1 - time_n) * 24*60*60*1000; Leaflength += dist;
 		
-		getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
-			
-			@Override
-			public Image postProcessMask(Image mask) {
-				ImageCanvas c = mask.io().canvas();
-				LinkedList<Leaf> ll = plant.getLeafList();
-				ArrayList<Color> col = Colors.get(ll.size());
-				int idx = 0;
-				for (Leaf l : ll) {
-					for (LeafTip lt : l) {
-						c = c.fillCircle(lt.getImageX(norm), lt.getImageY(norm), 0, 8, col.get(idx).getRGB(), 0.0)
-								.text(lt.getImageX(norm), lt.getImageY(norm) + 10, "rx: " + lt.getRealWorldX() + " ry: " + lt.getRealWorldY() +
-										" a: " + ((Double) lt.getFeature("angle")).intValue(), Color.BLACK);
-					}
-					idx++;
-				}
-				return c.getImage();
-			}
-			
-			@Override
-			public Image postProcessImage(Image image) {
-				return image;
-			}
-			
-			@Override
-			public CameraType getConfig() {
-				return cameraType;
-			}
-		});
+		markAndSaveLeafFeatures(cameraPosition, cameraType, norm, plant);
 		
 		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, plant);
+	}
+	
+	private void markAndSaveLeafFeatures(CameraPosition cameraPosition, final CameraType cameraType, final Normalisation norm, final Plant plant) {
+		// save to resultSet
+		LinkedList<Leaf> ll = plant.getLeafList();
+		final ArrayList<Color> col = Colors.get(ll.size() + 1, 1);
+		for (Leaf l : plant.getLeafList()) {
+			LeafTip lt = l.getLast();
+			LeafTip ltFirst = l.getFirst();
+			
+			final int num = l.leafID;
+			
+			if (lt != ltFirst) {
+				Vector2D trans1 = new Vector2D(lt.getImageX(norm) - ltFirst.getImageX(norm), lt.getImageY(norm) - ltFirst.getImageY(norm));
+				Vector2D trans2 = new Vector2D(0.0, 1.0);
+				double angle = calcAngle(trans1, trans2);
+				getResultSet().setNumericResult(0,
+						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leafOrientation." + num + ".",
+						angle, "degree");
+			}
+			
+			if (lt == null || cameraPosition == null || cameraType == null)
+				continue;
+			
+			final int xPos_norm = lt.getRealWorldX();
+			final int yPos_norm = lt.getRealWorldY();
+			final Double angle = (Double) lt.getFeature("angle");
+			
+			getResultSet().setNumericResult(0,
+					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + num + ".x",
+					xPos_norm, "px");
+			getResultSet().setNumericResult(0,
+					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + num + ".y",
+					yPos_norm, "px");
+			
+			if (angle != null)
+				getResultSet()
+						.setNumericResult(
+								0,
+								"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + num
+										+ ".angle",
+								angle, "degree");
+		}
+		for (Leaf l : plant.getLeafList()) {
+			for (LeafTip lt : l) {
+				
+				if (lt == null || cameraPosition == null || cameraType == null)
+					continue;
+				
+				final int num = l.leafID;
+				final int xPos = lt.getImageX(norm);
+				final int yPos = lt.getImageY(norm);
+				final int xPos_norm = lt.getRealWorldX();
+				final int yPos_norm = lt.getRealWorldY();
+				final Double angle = (Double) lt.getFeature("angle");
+				final Vector2D direction = (Vector2D) lt.getFeature("direction");
+				getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
+					
+					@Override
+					public Image postProcessMask(Image mask) {
+						ImageCanvas c = mask.io().canvas();
+						c = c.fillCircle(xPos, yPos, 4, 12, col.get(num).getRGB(), 0.0)
+								.drawLine(xPos, yPos, (int) direction.getX(), (int) direction.getY(), Color.BLUE.getRGB(), 0.8, 1)
+								.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
+										" a: " + angle.intValue(), Color.BLACK);
+						
+						return c.getImage();
+					}
+					
+					@Override
+					public Image postProcessImage(Image image) {
+						return image;
+					}
+					
+					@Override
+					public CameraType getConfig() {
+						return cameraType;
+					}
+				});
+			}
+		}
+	}
+	
+	private double calcAngle(Vector2D v1, Vector2D v2) {
+		double val = (v1.getX() * v2.getX() + v1.getY() * v2.getY())
+				/ ((Math.sqrt(v1.getX() * v1.getX() + v1.getY() * v1.getY())) * (Math.sqrt(v2.getX() * v2.getX() + v2.getY() * v2.getY())));
+		return Math.acos(val) * 180d / Math.PI;
 	}
 	
 	@Override
