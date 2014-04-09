@@ -23,7 +23,7 @@ public class Leaf implements Iterable<LeafTip> {
 	}
 	
 	public LeafTip getLast() {
-		float time = Integer.MIN_VALUE;
+		long time = Long.MIN_VALUE;
 		int tipidx = -1;
 		int idx = 0;
 		for (LeafTip lt : tipList) {
@@ -51,5 +51,19 @@ public class Leaf implements Iterable<LeafTip> {
 	@Override
 	public Iterator<LeafTip> iterator() {
 		return tipList.iterator();
+	}
+	
+	public LeafTip getFirst() {
+		long time = Long.MAX_VALUE;
+		int tipidx = -1;
+		int idx = 0;
+		for (LeafTip lt : tipList) {
+			if (lt.getTime() < time) {
+				time = lt.getTime();
+				tipidx = idx;
+			}
+			idx++;
+		}
+		return tipList.get(tipidx);
 	}
 }

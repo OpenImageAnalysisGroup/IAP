@@ -69,7 +69,7 @@ public class ConvexHullCalculator {
 		
 		int b = borderColor;
 		
-		borderPixels = io.border().borderDetection(backgroundColor, b, false,
+		borderPixels = io.border().borderDetection(backgroundColor, b, false, false,
 				in, w, h, borderImage);
 		
 		int n = 0;

@@ -949,7 +949,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int[][] img = getAs2D();
 		int top = img.length, left = img[0].length, right = -1, down = -1;
 		
-		double background = image.getProcessor().getBackgroundValue();
+		int background = BACKGROUND_COLORint;
 		
 		for (int i = 0; i < img.length; i++) {
 			for (int j = 0; j < img[0].length; j++) {

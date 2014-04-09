@@ -165,7 +165,7 @@ public class LeafTipMatcher {
 		int snapshotIndex = 0;
 		long time = 0;
 		for (LinkedList<LeafTip> tempTipListIn : leafTipList) {
-			if(tempTipListIn.isEmpty())
+			if (tempTipListIn.isEmpty())
 				continue;
 			int tipIndex = 0;
 			if (time == 0)
@@ -341,7 +341,7 @@ public class LeafTipMatcher {
 			long timepoint, Normalisation norm) {
 		LinkedList<LeafTip> ll = new LinkedList<LeafTip>();
 		for (BorderFeature bf : leafTipListForOneDay) {
-			ll.add(new LeafTip(timepoint, bf.getPosition(), bf.getFeatureMap(), norm));
+			ll.add(new LeafTip(timepoint, ((Integer) bf.getFeature("x")).doubleValue(), ((Integer) bf.getFeature("y")).doubleValue(), bf.getFeatureMap(), norm));
 		}
 		ArrayList<LinkedList<LeafTip>> al = new ArrayList<LinkedList<LeafTip>>();
 		al.add(ll);

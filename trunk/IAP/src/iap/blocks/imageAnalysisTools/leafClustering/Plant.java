@@ -1,5 +1,7 @@
 package iap.blocks.imageAnalysisTools.leafClustering;
 
+import iap.blocks.imageAnalysisTools.leafClustering.FeatureObject.FeatureObjectType;
+
 import java.util.LinkedList;
 
 import javax.vecmath.Point2d;
@@ -67,7 +69,7 @@ public class Plant {
 	public void calcMovementForEachLeaf(Point2d cen) {
 		for (Leaf l : leafList) {
 			for (LeafTip lt : l) {
-				lt.addFeature(lt.dist(cen), "disttocenter");
+				lt.addFeature(lt.dist(cen), "disttocenter", FeatureObjectType.NUMERIC);
 			}
 		}
 	}
