@@ -73,10 +73,10 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				
 				// segmentation
 				new BlRemoveBackground(),
-				new BlMorphologicalOperations(),
 				new BlKMeansVis(),
 				new BlAdaptiveSegmentationFluo(),
 				new BlMedianFilterFluo(),
+				new BlMorphologicalOperations(),
 				new BlAdaptiveRemoveSmallObjectsVisFluo(),
 				// new BlAutoAdaptiveThresholdNir(),
 				new BlAdaptiveUseFluoMaskToClearOther(),

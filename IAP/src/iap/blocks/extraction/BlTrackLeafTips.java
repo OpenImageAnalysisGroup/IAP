@@ -147,11 +147,13 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 								angle, "degree");
 		}
 		for (Leaf l : plant.getLeafList()) {
+			LeafTip last = l.getLast();
 			for (LeafTip lt : l) {
 				
 				if (lt == null || cameraPosition == null || cameraType == null)
 					continue;
 				
+				final boolean isLast = last == lt;
 				final int num = l.leafID;
 				final int xPos = lt.getImageX(norm);
 				final int yPos = lt.getImageY(norm);
@@ -164,7 +166,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 					@Override
 					public Image postProcessMask(Image mask) {
 						ImageCanvas c = mask.io().canvas();
-						c = c.fillCircle(xPos, yPos, 4, 12, col.get(num).getRGB(), 0.0)
+						c = c.fillCircle(xPos, yPos, isLast ? 6 : 4, isLast ? 16 : 6, col.get(num).getRGB(), 0.0)
 								.drawLine(xPos, yPos, (int) direction.getX(), (int) direction.getY(), Color.BLUE.getRGB(), 0.8, 1)
 								.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
 										" a: " + angle.intValue(), Color.BLACK);
