@@ -231,7 +231,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		// get skeleton-image to connect lose leaves and for optimization
 		Image skel = getResultSet().getImage("skeleton_" + ct.toString());
 		if (skel != null)
-			img = img.io().or(skel.copy().io().replaceColor(-16777216, background).getImage()).getImage()
+			img = img.io().or(skel.copy().io().bm().dilate(3).io().replaceColor(-16777216, background).getImage()).getImage()
 					.show("skel on mask" + ct.toString(), debugValues);
 		else {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No " + ct.toString()

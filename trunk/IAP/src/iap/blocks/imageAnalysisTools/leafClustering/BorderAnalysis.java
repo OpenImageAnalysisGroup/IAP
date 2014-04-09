@@ -15,7 +15,6 @@ import javax.vecmath.Point3d;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
-import de.ipk.ag_ba.image.operation.ImageConvolution;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
@@ -38,17 +37,14 @@ public class BorderAnalysis {
 	
 	public BorderAnalysis(Image img) {
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
-		Image boImg = new ImageConvolution(borderIO).clearBorder().getImage();
+		borderIO = borderIO.skeletonize().replaceColor(Color.BLACK.getRGB(), Color.BLUE.getRGB());
+		Image boImg = borderIO.getImage();
 		borderLength = boImg.io().countFilledPixels();
-		borderImage = boImg.getAs2A();
-		// borderLength = (int) borderIO.getResultsTable().getValue("border", 0);
-		// borderImage = borderIO.getAs2D();
-		// borderIO.show("borrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+		borderImage = borderIO.getAs2D();
 		borderLists = getBorderLists(borderImage, borderLength, debug);
 		borderLists = sort();
 		borderFeatureList = new BorderFeatureList(borderLists, onlyBiggest);
 		image = img;
-		borderIO.getImage().show("borderImage", debug);
 		this.setDebug(false);
 	}
 	
