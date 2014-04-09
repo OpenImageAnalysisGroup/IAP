@@ -192,6 +192,8 @@ public class ResourceIOManager {
 		for (ResourceIOHandler mh : getInstance().handlers)
 			if (mh.getPrefix().startsWith(prefix))
 				return mh;
+		// for (ResourceIOHandler mh : getInstance().handlers)
+		// System.out.println("Known Handler: " + mh.getPrefix());
 		return null;
 	}
 	
