@@ -4025,7 +4025,7 @@ public class ImageOperation implements MemoryHogInterface {
 			int cnt = 0;
 			int color = ImageOperation.BACKGROUND_COLORint;
 			for (int xdiff = -offX; xdiff <= offX; xdiff++) {
-				if (x - xdiff < 0 || x + xdiff >= w)
+				if (x + xdiff < 0 || x + xdiff >= w)
 					continue;
 				int ii = i + xdiff;
 				if (ii < 0)
@@ -4042,7 +4042,8 @@ public class ImageOperation implements MemoryHogInterface {
 			} else
 				out[i] = img[i];
 			x++;
-			x = x % w;
+			if (x == w)
+				x = 0;
 		}
 		return new ImageOperation(out, w, h);
 	}

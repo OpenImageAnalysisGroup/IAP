@@ -25,7 +25,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 		Image res = null;
 		boolean debug = debugValues;
 		
-		distanceEnabled[0] = getBoolean("Lightness (L*a*b*)", true);
+		distanceEnabled[0] = getBoolean("Lightness (L*a*b*)", false);
 		distanceEnabled[1] = getBoolean("Green-Magenta (L*a*b*)", true);
 		distanceEnabled[2] = getBoolean("Blue-Yellow (L*a*b*)", true);
 		distanceEnabled[3] = getBoolean("Hue (HSB)", true);
