@@ -20,11 +20,14 @@ import java.awt.image.BufferedImage;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -33,7 +36,9 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.ProgressStatusService;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
+import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.gui.IAPfeature;
@@ -101,6 +106,7 @@ public class NavigationButton implements StyleAware {
 				CloundManagerNavigationAction ra = new CloundManagerNavigationAction(rca.getMongoDB(), false);
 				navigationAction = new RemoteExecutionWrapperAction(navigationAction,
 						new NavigationButton(ra, guiSetting));
+				
 			}
 			navigationAction.setSource(navigationAction, guiSetting);
 			this.setTitle(navigationAction.getDefaultTitle());
@@ -743,6 +749,8 @@ public class NavigationButton implements StyleAware {
 		if (icon != null)
 			icon.setDescription(imgS + "");
 		
+		final NavigationAction ac = n.action;
+		
 		final JButton n1 = new JButton("" + n.getTitle()) {
 			private static final long serialVersionUID = 1L;
 			
@@ -750,13 +758,21 @@ public class NavigationButton implements StyleAware {
 			
 			@Override
 			public void setText(String title) {
-				super.setText(title);
+				super.setText(process(title));
 				if (!removeCalled)
 					if (title != null && title.contains("[REMOVE FROM UPDATE]")) {
 						removeCalled = true;
 						if (n.getGUIsetting() != null && n.getGUIsetting().getActionPanel() != null)
 							n.getGUIsetting().getActionPanel().updateGUI();
 					}
+			}
+			
+			private String process(String title) {
+				if (n.isProcessing() && ac != null && ac.getStatusProvider() != null && ac.getStatusProvider().pluginWaitsForUser())
+					return title + "<hr><small>[Waiting for User-Interaction]<br>[Please right-click command button]</small>";
+				if (n.isProcessing() && ac != null && ac.getStatusProvider() != null && ac.getStatusProvider().wantsToStop())
+					return title + "<hr><small>[Command-Interruption Requested]<br>[Please wait]</small>";
+				return title;
 			}
 			
 			@Override
@@ -806,6 +822,7 @@ public class NavigationButton implements StyleAware {
 		}
 		
 		n1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		
 		n1.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -815,8 +832,61 @@ public class NavigationButton implements StyleAware {
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				//
-				
+				if (e.isPopupTrigger()) {
+					if (ac != null && ac.getStatusProvider() != null) {
+						JPopupMenu p = new JPopupMenu();
+						boolean added = false;
+						if (ac.getStatusProvider().wantsToStop()) {
+							AbstractAction a = new AbstractAction("Stop is Requested (Command is still active)") {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									MainFrame.getInstance().showMessageDialog(
+											"<html>"
+													+ "Command execution interruption has been requested.<br>"
+													+ "Depending on the execution status, this request may be fullfilled with<br>"
+													+ "a non-constant delay.",
+											"Information");
+								}
+							};
+							p.add(new JMenuItem(a));
+							added = true;
+						} else
+							if (n.isProcessing()) {
+								AbstractAction a = new AbstractAction("Request Stop (Command is active)") {
+									@Override
+									public void actionPerformed(ActionEvent e) {
+										ac.getStatusProvider().pleaseStop();
+										if (!ac.getStatusProvider().wantsToStop()) {
+											MainFrame.getInstance().showMessageDialog(
+													"<html>"
+															+ "This command does not support interruption of its processing.<br><br>"
+															+ "Please wait for command completion or quit the program to<br>"
+															+ "stop command processing in complete.",
+													"Information");
+										}
+									}
+								};
+								p.add(new JMenuItem(a));
+								added = true;
+							}
+						if (ac.getStatusProvider().pluginWaitsForUser()) {
+							AbstractAction a = new AbstractAction("Continue (Command waits for user-action)") {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									ac.getStatusProvider().pleaseContinueRun();
+								}
+							};
+							p.add(new JMenuItem(a));
+							added = true;
+						}
+						if (added) {
+							p.show(e.getComponent(), e.getX(), e.getY());
+						} else {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Command not active, popup-menu contains no commands and is not shown.");
+							java.awt.Toolkit.getDefaultToolkit().beep();
+						}
+					}
+				}
 			}
 			
 			@Override
@@ -927,7 +997,7 @@ public class NavigationButton implements StyleAware {
 	protected void setLastEvent(ActionEvent lastEvent) {
 		this.lastEvent = lastEvent;
 	}
-
+	
 	public static int defaultButtonSize = 48;
 	
 	private static int getImageSize(ButtonDrawStyle style, final PanelTarget target) {
@@ -1020,7 +1090,7 @@ public class NavigationButton implements StyleAware {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-
+	
 	public ActionEvent getEventSource() {
 		return lastEvent;
 	}
