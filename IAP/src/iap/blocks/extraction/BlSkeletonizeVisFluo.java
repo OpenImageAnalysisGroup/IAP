@@ -49,7 +49,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected synchronized Image processVISmask() {
 		Image vis = input().masks().vis();
-		if (!getBoolean("skeletonize VIS", false))
+		if (!getBoolean("skeletonize VIS", true))
 			return vis;
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		Image res = vis;

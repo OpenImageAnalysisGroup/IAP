@@ -61,8 +61,8 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			double fillGradeInPercent = getDouble("Fillgrade (Vis)", 0.3);
 			borderSize = searchRadius / 2;
 			workimg.setCameraType(input().masks().vis().getCameraType());
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 3), getInt("Masksize Erode (Vis)", 8),
-					getInt("Masksize Dilate (Vis)", 12));
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 0), getInt("Masksize Erode (Vis)", 5),
+					getInt("Masksize Dilate (Vis)", 7));
 			Roi bb = workimg.io().getBoundingBox();
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
@@ -81,8 +81,8 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			double fillGradeInPercent = getDouble("Fillgrade (Fluo)", 0.3);
 			borderSize = searchRadius / 2;
 			workimg.setCameraType(CameraType.FLUO);
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 2), getInt("Masksize Erode (Fluo)", 8),
-					getInt("Masksize Dilate (Fluo)", 12));
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 0), getInt("Masksize Erode (Fluo)", 5),
+					getInt("Masksize Dilate (Fluo)", 7));
 			Roi bb = workimg.io().getBoundingBox();
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.FLUO, optionsAndResults.getCameraPosition(),
@@ -101,7 +101,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			double fillGradeInPercent = getDouble("Fillgrade (Nir)", 0.35);
 			borderSize = searchRadius / 2;
 			workimg.setCameraType(CameraType.NIR);
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Nir)", 2), getInt("Masksize Erode (Nir)", 2),
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Nir)", 0), getInt("Masksize Erode (Nir)", 2),
 					getInt("Masksize Dilate (Nir)", 4));
 			Roi bb = workimg.io().getBoundingBox();
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
@@ -230,10 +230,10 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		// get skeleton-image to connect lose leaves and for optimization
 		Image skel = getResultSet().getImage("skeleton_" + ct.toString());
-		if (skel != null)
-			img = img.io().or(skel.copy().io().bm().dilate(3).io().replaceColor(-16777216, background).getImage()).getImage()
+		if (skel != null) {
+			img = img.io().or(skel.copy().io().bm().dilate(3).getImage()).getImage()
 					.show("skel on mask" + ct.toString(), debugValues);
-		else {
+		} else {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No " + ct.toString()
 					+ " skeleton image available, can't process it within leaf-tip detection!");
 		}

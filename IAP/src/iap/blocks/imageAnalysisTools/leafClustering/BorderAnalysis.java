@@ -85,11 +85,13 @@ public class BorderAnalysis {
 				peaks[i++] = p;
 		} else
 			peaks = CurveAnalysis.findMaximaIJ(data, 1, false);
+		
 		peaks = CurveAnalysis.summarizeMaxima(peaks, listsize, distBetweenPeaks);
 		
 		// save results
 		for (int idx = 0; idx < peaks.length; idx++) {
 			peakList.add(borderFeatureList.getFeatureMap(peaks[idx]));
+			peakList.get(idx).addFeature("borderposition", peaks[idx], FeatureObjectType.NUMERIC);
 		}
 	}
 	
@@ -109,11 +111,13 @@ public class BorderAnalysis {
 			Vector2D pos = p.getPosition();
 			Vector2D direction = (Vector2D) p.getFeature("direction");
 			Double angle = (Double) p.getFeature("angle");
+			Integer borderpos = (Integer) p.getFeature("borderposition");
 			ic.drawCircle((int) pos.getX(), (int) pos.getY(), radius, Color.GREEN.getRGB(), 0.5, 3);
 			ic.text((int) pos.getX() + 10, (int) pos.getY() + 10, "x: " + (int) pos.getX() + " y: " + (int) pos.getY(), Color.DARK_GRAY);
 			if (direction != null)
 				ic.drawLine((int) pos.getX(), (int) pos.getY(), (int) direction.getX(), (int) direction.getY(), Color.BLUE.getRGB(), 0.5, 2)
-						.text((int) direction.getX() + 10, (int) direction.getY() + 10, "dir: " + angle.intValue(), Color.DARK_GRAY);
+						.text((int) direction.getX() + 10, (int) direction.getY() + 10, "dir: " + angle.intValue(), Color.DARK_GRAY)
+						.text((int) pos.getX(), (int) pos.getY() - 10, "bp: " + borderpos, Color.DARK_GRAY);
 		}
 		
 		ic.getImage().show("susanImage");
