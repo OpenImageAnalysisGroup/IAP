@@ -318,4 +318,8 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 		return null;
 	}
 	
+	@Override
+	public boolean wantsToStop() {
+		return false;
+	}
 }

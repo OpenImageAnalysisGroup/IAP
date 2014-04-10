@@ -274,6 +274,11 @@ public class KeggSoapAndPathwayService
 		pleaseStop = true;
 	}
 	
+	@Override
+	public boolean wantsToStop() {
+		return pleaseStop;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()

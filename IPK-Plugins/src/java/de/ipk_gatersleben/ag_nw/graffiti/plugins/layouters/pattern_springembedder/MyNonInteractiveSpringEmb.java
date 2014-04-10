@@ -86,6 +86,11 @@ public class MyNonInteractiveSpringEmb
 	public void pleaseStop() {
 	}
 	
+	@Override
+	public boolean wantsToStop() {
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()

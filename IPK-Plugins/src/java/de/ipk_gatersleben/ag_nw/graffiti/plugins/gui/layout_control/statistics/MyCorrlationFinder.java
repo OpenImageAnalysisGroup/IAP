@@ -104,6 +104,11 @@ public class MyCorrlationFinder implements BackgroundTaskStatusProvider, Runnabl
 	}
 	
 	@Override
+	public boolean wantsToStop() {
+		return pleaseStop;
+	}
+	
+	@Override
 	public boolean pluginWaitsForUser() {
 		return false;
 	}

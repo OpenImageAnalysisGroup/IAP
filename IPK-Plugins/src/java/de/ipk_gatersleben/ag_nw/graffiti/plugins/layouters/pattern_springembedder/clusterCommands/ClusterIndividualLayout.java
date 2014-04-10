@@ -263,6 +263,11 @@ class MyLayoutService implements BackgroundTaskStatusProvider, Runnable {
 		pleaseStop = true;
 	}
 	
+	@Override
+	public boolean wantsToStop() {
+		return pleaseStop;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()

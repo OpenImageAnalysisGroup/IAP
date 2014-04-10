@@ -424,6 +424,11 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 		// pleaseStop = true;
 	}
 	
+	@Override
+	public boolean wantsToStop() {
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see

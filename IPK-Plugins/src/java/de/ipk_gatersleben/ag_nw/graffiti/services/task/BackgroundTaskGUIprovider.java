@@ -30,4 +30,8 @@ public interface BackgroundTaskGUIprovider {
 	 *         For a JDialog a implementation might call isVisible()
 	 */
 	public abstract boolean isProgressViewVisible();
+	
+	public abstract String getTitle();
+	
+	public abstract void setTitle(String string);
 }
