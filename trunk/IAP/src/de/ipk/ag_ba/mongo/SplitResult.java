@@ -94,7 +94,7 @@ public class SplitResult {
 		System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
 				+ ", RESULTS AVAILABLE: " + knownResults.size());
 		
-		ExperimentInterface e = new Experiment();
+		ExperimentInterface mergedExperiment = optPreviousResultsToBeMerged != null ? new Experiment() : null;
 		
 		if (optPreviousResultsToBeMerged != null) {
 			String msg = "Previous analysis results, to be merged with current result, will now be loaded (" + optPreviousResultsToBeMerged.getExperimentName()
@@ -102,7 +102,7 @@ public class SplitResult {
 					+ optPreviousResultsToBeMerged.getHeader().getImportdate() + ")";
 			System.out.println(msg);
 			MongoDB.saveSystemMessage(msg);
-			e = optPreviousResultsToBeMerged.getData();
+			mergedExperiment = optPreviousResultsToBeMerged.getData();
 		}
 		
 		long tFinish = System.currentTimeMillis();
@@ -155,7 +155,12 @@ public class SplitResult {
 			// System.out.println(">Condition: " + c);
 			
 			StopWatch s = new StopWatch(">e.addMerge");
-			e.addAndMerge(ei);
+			if (mergedExperiment == null) {
+				mergedExperiment = new Experiment();
+				mergedExperiment.getHeader().setAttributesFromMap(sourceHeader.getAttributeMap());
+				mergedExperiment.getHeader().setDatabaseId(null);
+			}
+			mergedExperiment.addAndMerge(ei);
 			System.out.println(" // merged in " + s.getTime() + " ms");
 			if (optStatus != null)
 				optStatus.setCurrentStatusText2("Processed " + (nnii - 1) + "/" + tempDataSetDescription.getPartCntI() + "<br>" +
@@ -169,10 +174,10 @@ public class SplitResult {
 		String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
 		if (sn.indexOf(".") > 0)
 			sn = sn.substring(sn.lastIndexOf(".") + 1);
-		e.getHeader().setDatabaseId("");
-		for (SubstanceInterface si : e) {
+		mergedExperiment.getHeader().setDatabaseId("");
+		for (SubstanceInterface si : mergedExperiment) {
 			for (ConditionInterface ci : si) {
-				ci.setExperimentName(e.getHeader().getExperimentName());
+				ci.setExperimentName(mergedExperiment.getHeader().getExperimentName());
 				ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
 			}
 		}
@@ -181,12 +186,12 @@ public class SplitResult {
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Get mapping path objects");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
-			ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(e, false);
-			e.clear();
+			ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(mergedExperiment, false);
+			mergedExperiment.clear();
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Mapping path obhjects to experiment");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
-			e = MappingData3DPath.merge(mdpl, false);
+			mergedExperiment = MappingData3DPath.merge(mdpl, false);
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Created unified experiment");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
@@ -195,17 +200,11 @@ public class SplitResult {
 		long tProcessing = tFinish - tStart;
 		int nToDo = tempDataSetDescription.getPartCntI();
 		int nFinish = knownResults.size();
-		e.getHeader().setExperimentname(originName);
-		e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
-		e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
-		{
-			e.getHeader().setCoordinator(sourceHeader.getCoordinator());
-			e.getHeader().setImportusername(sourceHeader.getImportusername());
-			e.getHeader().setOriginDbId(sourceHeader.getDatabaseId());
-			e.getHeader().setDatabase(sourceHeader.getDatabase());
-		}
-		e.getHeader().setRemark(
-				e.getHeader().getRemark() +
+		mergedExperiment.getHeader().setExperimentname(originName);
+		mergedExperiment.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+		mergedExperiment.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
+		mergedExperiment.getHeader().setRemark(
+				mergedExperiment.getHeader().getRemark() +
 						" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
 						" // processing time: " +
 						SystemAnalysis.getWaitTime(tProcessing) + " // split results merged: " +
@@ -213,17 +212,17 @@ public class SplitResult {
 		System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
 		System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
 		System.out.println("*****************************");
-		System.out.println("Merged Experiment: " + e.getName());
-		System.out.println("Merged Measurements: " + e.getNumberOfMeasurementValues());
+		System.out.println("Merged Experiment: " + mergedExperiment.getName());
+		System.out.println("Merged Measurements: " + mergedExperiment.getNumberOfMeasurementValues());
 		
 		System.out.println("> SAVE COMBINED EXPERIMENT...");
-		m.saveExperiment(e, optStatus == null ? new BackgroundTaskConsoleLogger("", "", true) : optStatus, true, true);
+		m.saveExperiment(mergedExperiment, optStatus == null ? new BackgroundTaskConsoleLogger("", "", true) : optStatus, true, true);
 		System.out.println("> COMBINED EXPERIMENT HAS BEEN SAVED");
 		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Saved combined experiment " + e.getName());
+			optStatus.setCurrentStatusText1("Saved combined experiment " + mergedExperiment.getName());
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Merge-time: " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish));
-		MongoDB.saveSystemMessage("Saved combined experiment " + e.getName() +
+		MongoDB.saveSystemMessage("Saved combined experiment " + mergedExperiment.getName() +
 				" merging data took " +
 				SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish));
 		// System.out.println("> DELETE TEMP DATA IS DISABLED!");
@@ -264,7 +263,7 @@ public class SplitResult {
 			}
 		}
 		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Saved combined experiment " + e.getName());
+			optStatus.setCurrentStatusText1("Saved combined experiment " + mergedExperiment.getName());
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Time to completion: " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish));
 		if (optStatus != null)
