@@ -941,6 +941,31 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 			
 			@Override
+			public boolean wantsToStop() {
+				return status.wantsToStop();
+			}
+			
+			@Override
+			public void pleaseStop() {
+				status.pleaseStop();
+			}
+			
+			@Override
+			public boolean pluginWaitsForUser() {
+				return status.pluginWaitsForUser();
+			}
+			
+			@Override
+			public void pleaseContinueRun() {
+				status.pleaseContinueRun();
+			}
+			
+			@Override
+			public void setPluginWaitsForUser(boolean wait) {
+				// not yet implemented
+			}
+			
+			@Override
 			public synchronized void setCurrentStatusValueFineAdd(double smallProgressStep) {
 				super.setCurrentStatusValueFineAdd(smallProgressStep);
 				if (smallProgressStep > 0) {
