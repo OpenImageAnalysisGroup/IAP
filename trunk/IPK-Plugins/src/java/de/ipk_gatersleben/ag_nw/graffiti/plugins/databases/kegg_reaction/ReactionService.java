@@ -301,6 +301,11 @@ public class ReactionService
 		// abort of file loading not supported
 	}
 	
+	@Override
+	public boolean wantsToStop() {
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvider#pluginWaitsForUser()

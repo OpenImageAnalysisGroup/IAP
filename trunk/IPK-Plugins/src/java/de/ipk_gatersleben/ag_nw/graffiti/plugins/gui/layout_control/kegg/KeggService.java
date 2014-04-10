@@ -775,6 +775,11 @@ public class KeggService implements BackgroundTaskStatusProvider, HelperClass {
 		pleaseStop = true;
 	}
 	
+	@Override
+	public boolean wantsToStop() {
+		return pleaseStop;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see

@@ -12,23 +12,24 @@ import java.awt.event.ActionListener;
 import javax.swing.JDialog;
 
 import org.BackgroundTaskStatusProvider;
+import org.FolderPanel;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 
 public class BackgroundTaskWindow extends JDialog implements BackgroundTaskGUIprovider, ActionListener {
 	private static final long serialVersionUID = -4862794883295382225L;
-	private BackgroundTaskPanelEntry panel;
-	private boolean isModal;
+	private final BackgroundTaskPanelEntry panel;
+	private final boolean isModal;
 	
 	public BackgroundTaskWindow(boolean modal) {
 		super(GravistoService.getInstance().getMainFrame(),
-							"", false);
+				"", false);
 		// setSize(320, 180);
 		// setLocationByPlatform(true);
 		double border = 10;
 		double[][] size =
 		{
-							{ border, TableLayoutConstants.PREFERRED, border }, // Columns
+				{ border, TableLayoutConstants.PREFERRED, border }, // Columns
 				{ border, TableLayoutConstants.PREFERRED, border }
 		}; // Rows
 		
@@ -60,16 +61,19 @@ public class BackgroundTaskWindow extends JDialog implements BackgroundTaskGUIpr
 		return false;
 	}
 	
+	@Override
 	public BackgroundTaskStatusProvider getStatusProvider() {
 		return panel.getStatusProvider();
 	}
 	
+	@Override
 	public boolean isProgressViewVisible() {
 		return panel.isProgressViewVisible();
 	}
 	
+	@Override
 	public void setStatusProvider(BackgroundTaskStatusProvider statusProvider,
-						String title, String taskMessage) {
+			String title, String taskMessage) {
 		panel.setStatusProvider(statusProvider, title, taskMessage);
 		panel.disableTitleView();
 		validate();
@@ -78,6 +82,7 @@ public class BackgroundTaskWindow extends JDialog implements BackgroundTaskGUIpr
 		setVisible(true);
 	}
 	
+	@Override
 	public void setTaskFinished(boolean autoClose, long duration) {
 		panel.setTaskFinished(autoClose, duration);
 		if (isModal) {
@@ -85,7 +90,12 @@ public class BackgroundTaskWindow extends JDialog implements BackgroundTaskGUIpr
 		}
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		dispose();
+	}
+	
+	public void updateSize() {
+		FolderPanel.performDialogResize(panel);
 	}
 }

@@ -758,4 +758,8 @@ public class HammingCalculator implements Runnable,
 		return null;
 	}
 	
+	@Override
+	public boolean wantsToStop() {
+		return stopWanted;
+	}
 }

@@ -226,4 +226,10 @@ public class AllSuperGraphsCreator implements BackgroundTaskStatusProvider,
 	public String getCurrentStatusMessage3() {
 		return null;
 	}
+	
+	@Override
+	public boolean wantsToStop() {
+		return false;
+	}
+	
 }

@@ -439,4 +439,14 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 	public void addCloseActionListener(ActionListener al) {
 		progressClosedActionListener.add(al);
 	}
+	
+	@Override
+	public String getTitle() {
+		return taskStatusLabel.getText();
+	}
+	
+	@Override
+	public void setTitle(String text) {
+		taskStatusLabel.setText(text);
+	}
 }

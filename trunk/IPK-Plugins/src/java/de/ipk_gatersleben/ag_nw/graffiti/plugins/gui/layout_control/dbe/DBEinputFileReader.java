@@ -324,4 +324,9 @@ public class DBEinputFileReader extends ExperimentDataFileReader {
 	public String getCurrentStatusMessage3() {
 		return null;
 	}
+	
+	@Override
+	public boolean wantsToStop() {
+		return false;
+	}
 }

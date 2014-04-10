@@ -306,6 +306,11 @@ public class AlgorithmServices implements HelperClass {
 		public String getCurrentStatusMessage3() {
 			return null;
 		}
+		
+		@Override
+		public boolean wantsToStop() {
+			return false;
+		}
 	}
 	
 	/**
