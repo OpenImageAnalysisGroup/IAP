@@ -21,12 +21,16 @@ import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.gui.webstart.IAPrunMode;
+import de.ipk.ag_ba.mongo.Batch;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -169,6 +173,15 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			if (statisticsResult == null) { // || statisticsResult.getNumberOfMeasurementValues() <= 0
 				System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: no statistics result");
+				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
+					Batch.pingHost(m, SystemAnalysisExt.getHostName(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN,
+							"system.exit (no statistics result)");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO STATISTICS RESULT");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
+					Thread.sleep(9000);
+					System.exit(0);
+				}
+				
 				this.experimentResult = null;
 				if (getResultReceiver() == null)
 					mpc = new MainPanelComponent("No analysis results or analysis stop requested.");
