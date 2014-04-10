@@ -30,6 +30,8 @@ public class SystemOptions {
 	
 	private final static ArrayList<Runnable> updateCheckTasks = new ArrayList<Runnable>();
 	
+	private boolean settingsInvalid = false;;
+	
 	private final static HashMap<String, ObjectRef> lastModification = new HashMap<String, ObjectRef>();
 	
 	private static Thread updateCheckThread;
@@ -157,16 +159,8 @@ public class SystemOptions {
 						lastModification.get(ffnn).setObject(mt);
 						ini = readIniFileOrProvider();
 						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-File " + iniFileName
-								+ " has been changed and has been reloaded.");
-						for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
-							for (Runnable r : rr) {
-								try {
-									r.run();
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-							}
-						}
+								+ " has been changed and will be reloaded later.");
+						SystemOptions.this.settingsInvalid = true;
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -258,6 +252,7 @@ public class SystemOptions {
 				setting = setting.split("\\|", 2)[1];
 			}
 			
+			checkInvalidStatus();
 			Boolean r = ini.get(group, setting, Boolean.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
@@ -265,6 +260,21 @@ public class SystemOptions {
 				return defaultValue;
 			} else
 				return r;
+		}
+	}
+	
+	private void checkInvalidStatus() {
+		if (settingsInvalid) {
+			settingsInvalid = false;
+			for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
+				for (Runnable r : rr) {
+					try {
+						r.run();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 	
@@ -291,6 +301,7 @@ public class SystemOptions {
 			return defaultValue;
 		} else {
 			Integer r;
+			checkInvalidStatus();
 			try {
 				r = ini.get(group, setting, Integer.class);
 			} catch (Exception err) {
@@ -312,6 +323,7 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
 			return;
 		} else {
+			checkInvalidStatus();
 			ini.put(group, setting, value);
 			store(group, setting);
 		}
@@ -322,6 +334,7 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
+			checkInvalidStatus();
 			Double r = ini.get(group, setting, Double.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
@@ -337,6 +350,7 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
 			return;
 		} else {
+			checkInvalidStatus();
 			ini.put(group, setting, value);
 			store(group, setting);
 		}
@@ -351,6 +365,7 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
+			checkInvalidStatus();
 			String r = ini.get(group, setting, String.class);
 			if (r == null) {
 				if (addDefaultIfNeeded) {
@@ -377,6 +392,7 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
+			checkInvalidStatus();
 			String r = ini.get(group, setting, String.class);
 			if (r == null) {
 				String storeValue = StringManipulationTools.getColorHTMLdef(defaultValue);
@@ -454,6 +470,7 @@ public class SystemOptions {
 			return;
 		} else {
 			value = ExternalPasswordStorage.encryptValueIfNeeded(group, setting, value);
+			checkInvalidStatus();
 			ini.put(group, setting, value + "");
 			store(group, setting);
 		}
@@ -465,6 +482,7 @@ public class SystemOptions {
 			return;
 		} else {
 			String svalue = StringManipulationTools.getColorHTMLdef(value);
+			checkInvalidStatus();
 			ini.put(group, setting, svalue + "");
 			store(group, setting);
 		}
@@ -475,6 +493,7 @@ public class SystemOptions {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
+			checkInvalidStatus();
 			Ini.Section section = ini.get(group);
 			if (section == null) {
 				getString(group, "hint", "Start an entry with # to disable it.");
@@ -515,6 +534,7 @@ public class SystemOptions {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
 			return res;
 		} else {
+			checkInvalidStatus();
 			if (ini.get(section) != null)
 				for (String s : new ArrayList<String>(ini.get(section).keySet()))
 					res.add(s);
@@ -523,6 +543,7 @@ public class SystemOptions {
 	}
 	
 	public synchronized String getObject(String section, String setting, int returnMax) {
+		checkInvalidStatus();
 		List<String> l = ini.get(section) != null ? ini.get(section).getAll(setting) : new ArrayList<String>();
 		if (l == null)
 			l = new ArrayList<String>();
@@ -536,11 +557,13 @@ public class SystemOptions {
 	}
 	
 	public synchronized boolean isBooleanSetting(String section, String setting) {
+		checkInvalidStatus();
 		String v = ini.get(section).get(setting);
 		return v != null && (v.equals("true") || v.equals("false"));
 	}
 	
 	public synchronized boolean isIntegerSetting(String section, String setting) {
+		checkInvalidStatus();
 		String v = ini.get(section).get(setting);
 		Integer i = null;
 		try {
@@ -552,6 +575,7 @@ public class SystemOptions {
 	}
 	
 	public synchronized boolean isFloatSetting(String section, String setting) {
+		checkInvalidStatus();
 		String v = ini.get(section).get(setting);
 		Double d = null;
 		try {
@@ -567,6 +591,7 @@ public class SystemOptions {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
 			return;
 		}
+		checkInvalidStatus();
 		Ini.Section sec = ini.get(section);
 		if (sec == null)
 			sec = ini.add(section);
@@ -601,6 +626,7 @@ public class SystemOptions {
 	}
 	
 	public synchronized void removeValuesOfSectionAndGroup(String section, String group) {
+		checkInvalidStatus();
 		Section sec = ini.get(section);
 		if (sec != null) {
 			// remove only the right "group"-values
@@ -651,6 +677,7 @@ public class SystemOptions {
 	}
 	
 	public synchronized String getIniValue() throws IOException {
+		checkInvalidStatus();
 		StringWriter sw = new StringWriter();
 		ini.store(sw);
 		return sw.toString();
