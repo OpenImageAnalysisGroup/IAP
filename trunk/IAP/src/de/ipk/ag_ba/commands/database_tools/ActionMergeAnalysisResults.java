@@ -71,15 +71,15 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent(splitCount + " temporary split datasets have been merged and removed. " +
-				mergedDocuments.size() + " result datasets have been saved.");
+		return new MainPanelComponent((splitCount != null ? splitCount : "no") + " temporary split datasets have been processed. " +
+				mergedDocuments.size() + " combined result datasets have been saved.");
 	}
 	
 	@Override
 	public BackgroundTaskStatusProviderSupportingExternalCall getStatusProvider() {
 		return status;
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
