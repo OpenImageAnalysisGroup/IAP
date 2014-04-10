@@ -829,12 +829,15 @@ public class NavigationButton implements StyleAware {
 		n1.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				//
-				
+				checkForContextMenu(n, ac, e);
 			}
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
+				checkForContextMenu(n, ac, e);
+			}
+			
+			private void checkForContextMenu(final NavigationButton n, final NavigationAction ac, MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					if (ac != null && ac.getStatusProvider() != null) {
 						JPopupMenu p = new JPopupMenu();
