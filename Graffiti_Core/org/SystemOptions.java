@@ -132,8 +132,10 @@ public class SystemOptions {
 		updateCheckTasks.add(updateChecker);
 	}
 	
-	private synchronized void readIniAndPrepareFileCheck(final String iniFileName) {
-		fileIniInstances.put(iniFileName, this);
+	private void readIniAndPrepareFileCheck(final String iniFileName) {
+		synchronized (fileIniInstances) {
+			fileIniInstances.put(iniFileName, this);
+		}
 		ini = readIniFileOrProvider();
 		
 		String ffnn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
@@ -172,31 +174,35 @@ public class SystemOptions {
 	
 	protected static HashMap<String, SystemOptions> fileIniInstances = new HashMap<String, SystemOptions>();
 	
-	public synchronized static SystemOptions getInstance(String iniFileName, IniIoProvider iniIO) {
+	public static SystemOptions getInstance(String iniFileName, IniIoProvider iniIO) {
 		if (iniIO != null)
 			try {
 				if (iniIO.getInstance() != null)
 					return iniIO.getInstance();
-				SystemOptions i = new SystemOptions(iniFileName, iniIO);
-				iniIO.setInstance(i);
-				return i;
+				synchronized (iniIO) {
+					SystemOptions i = new SystemOptions(iniFileName, iniIO);
+					iniIO.setInstance(i);
+					return i;
+				}
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		
 		if (iniFileName == null)
 			iniFileName = "iap.ini";
-		SystemOptions instance = fileIniInstances.get(iniFileName);
-		try {
-			if (instance == null)
-				instance = new SystemOptions(iniFileName, iniIO);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		synchronized (fileIniInstances) {
+			SystemOptions instance = fileIniInstances.get(iniFileName);
+			try {
+				if (instance == null)
+					instance = new SystemOptions(iniFileName, iniIO);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			return instance;
 		}
-		return instance;
 	}
 	
-	public synchronized static SystemOptions getInstance() {
+	public static SystemOptions getInstance() {
 		try {
 			return getInstance(null, null);
 		} catch (Exception e) {
