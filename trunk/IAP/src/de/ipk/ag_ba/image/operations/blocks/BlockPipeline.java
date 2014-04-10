@@ -164,8 +164,10 @@ public class BlockPipeline {
 		double progressOfThisWell = 100d / executionWellCount;
 		int nBlocks = blocks.size();
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
-			if (status != null && status.wantsToStop())
+			if (status != null && status.wantsToStop()) {
+				System.out.println("Break requested");
 				break;
+			}
 			
 			ImageAnalysisBlock block = null;
 			try {
