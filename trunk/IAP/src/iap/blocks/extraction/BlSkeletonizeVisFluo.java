@@ -49,14 +49,14 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected synchronized Image processVISmask() {
 		Image vis = input().masks().vis();
-		if (!getBoolean("skeletonize VIS", true))
+		if (!getBoolean("skeletonize VIS", optionsAndResults.getCameraPosition() == CameraPosition.SIDE))
 			return vis;
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		Image res = vis;
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && getResultSet() != null) {
 			Image viswork = vis.copy().io().show("orig", debug)
-					.border(5)
-					.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 10)) // 10
+					// .border(5)
+					.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 25)) // 10
 					.bm().erode(getInt("Erode-Cnt-Vis", 5))
 					.dilate(getInt("Dilate-Cnt-Vis", 10)).io()
 					.blur(getDouble("Blur-Vis", 0))
@@ -93,14 +93,14 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected synchronized Image processFLUOmask() {
 		Image vis = input().masks().vis();
-		if (!getBoolean("skeletonize FLUO", true))
+		if (!getBoolean("skeletonize FLUO", optionsAndResults.getCameraPosition() == CameraPosition.SIDE))
 			return input().masks().fluo();
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		if (fluo == null)
 			return fluo;
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
 			Image fluowork = fluo.copy().io()
-					.dilateHorizontal(getInt("Dilate-Cnt-Fluo-Hor", 10)) // 10
+					.dilateHorizontal(getInt("Dilate-Cnt-Fluo-Hor", 15)) // 10
 					.bm()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Fluo", 5))
 					.dilate(getInt("Dilate-Cnt-Fluo", 10)).io()
@@ -334,6 +334,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		if (skelres != null) {
 			skelres.show("Result Skeleton", false);
 			getResultSet().setImage(getBlockPosition(), "skeleton_" + cameraType, skelres, true);
+			getResultSet().setImage(getBlockPosition(), "skeleton_workimage_" + cameraType, inp, true);
 		}
 		
 		if (getBoolean("Detect Bloom", false)) {

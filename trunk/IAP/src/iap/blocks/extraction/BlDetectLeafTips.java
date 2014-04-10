@@ -43,6 +43,15 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			if (!isBestAngle)
 				ignore = true;
 		}
+		
+		// calculation for side
+		if (!getBoolean("Process Side", true) && optionsAndResults.getCameraPosition() == CameraPosition.SIDE)
+			ignore = true;
+		
+		// calculation for top
+		if (!getBoolean("Process Top", false) && optionsAndResults.getCameraPosition() == CameraPosition.TOP)
+			ignore = true;
+		
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
 	}
 	
@@ -57,12 +66,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			return null;
 		if (getBoolean("Calculate on Visible Image", true) && !ignore) {
 			Image workimg = input().masks().vis().copy();
-			int searchRadius = getInt("Search-radius (Vis)", 33);
+			int searchRadius = getInt("Search-radius (Vis)", 50);
 			double fillGradeInPercent = getDouble("Fillgrade (Vis)", 0.3);
 			borderSize = searchRadius / 2;
 			workimg.setCameraType(input().masks().vis().getCameraType());
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 0), getInt("Masksize Erode (Vis)", 5),
-					getInt("Masksize Dilate (Vis)", 7));
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 0), getInt("Masksize Erode (Vis)", 2),
+					getInt("Masksize Dilate (Vis)", 5));
 			Roi bb = workimg.io().getBoundingBox();
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
@@ -77,12 +86,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			return null;
 		if (getBoolean("Calculate on Fluorescence Image", true) && !ignore) {
 			Image workimg = input().masks().fluo().copy();
-			int searchRadius = getInt("Search-radius (Fluo)", 30);
+			int searchRadius = getInt("Search-radius (Fluo)", 40);
 			double fillGradeInPercent = getDouble("Fillgrade (Fluo)", 0.3);
 			borderSize = searchRadius / 2;
 			workimg.setCameraType(CameraType.FLUO);
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 0), getInt("Masksize Erode (Fluo)", 5),
-					getInt("Masksize Dilate (Fluo)", 7));
+			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 0), getInt("Masksize Erode (Fluo)", 2),
+					getInt("Masksize Dilate (Fluo)", 5));
 			Roi bb = workimg.io().getBoundingBox();
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.FLUO, optionsAndResults.getCameraPosition(),
@@ -102,7 +111,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			borderSize = searchRadius / 2;
 			workimg.setCameraType(CameraType.NIR);
 			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Nir)", 0), getInt("Masksize Erode (Nir)", 2),
-					getInt("Masksize Dilate (Nir)", 4));
+					getInt("Masksize Dilate (Nir)", 5));
 			Roi bb = workimg.io().getBoundingBox();
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.NIR, optionsAndResults.getCameraPosition(),
@@ -228,11 +237,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		int background = ImageOperation.BACKGROUND_COLORint;
 		CameraType ct = img.getCameraType();
 		
-		// get skeleton-image to connect lose leaves and for optimization
+		// get skeleton-image and workimage to connect lose leaves and for optimization
 		Image skel = getResultSet().getImage("skeleton_" + ct.toString());
-		if (skel != null) {
-			img = img.io().or(skel.copy().io().bm().dilate(3).getImage()).getImage()
-					.show("skel on mask" + ct.toString(), debugValues);
+		Image skel_workimge = getResultSet().getImage("skeleton_workimage_" + ct.toString());
+		if (skel != null && skel_workimge != null) {
+			img = img.io().or(skel.copy().io().bm().dilate(15).getImage()).or(skel_workimge).getImage()
+					.show("skel images on mask" + ct.toString(), debugValues);
 		} else {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No " + ct.toString()
 					+ " skeleton image available, can't process it within leaf-tip detection!");
