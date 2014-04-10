@@ -13,6 +13,7 @@ public class Plant {
 	private final LinkedList<Leaf> leafList;
 	private int growTime;
 	private String iD;
+	private String settingFolder;
 	
 	public Plant() {
 		leafList = new LinkedList<Leaf>();
@@ -72,5 +73,13 @@ public class Plant {
 				lt.addFeature(lt.dist(cen), "disttocenter", FeatureObjectType.NUMERIC);
 			}
 		}
+	}
+	
+	public String getSettingFolder() {
+		return settingFolder;
+	}
+	
+	public void setSettingFolder(String s) {
+		this.settingFolder = s;
 	}
 }

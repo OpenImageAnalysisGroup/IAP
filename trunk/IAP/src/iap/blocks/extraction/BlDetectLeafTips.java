@@ -53,6 +53,8 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			ignore = true;
 		
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
+		if (debug_borderDetection == true)
+			System.out.println("db true");
 	}
 	
 	@Override
