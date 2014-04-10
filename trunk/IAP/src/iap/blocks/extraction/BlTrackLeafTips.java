@@ -153,7 +153,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				if (lt == null || cameraPosition == null || cameraType == null)
 					continue;
 				
-				final boolean db = true; // debugValues;
+				final boolean db = debugValues;
 				final boolean isLast = last == lt && last.getTime() == timepoint;
 				final int num = l.leafID;
 				final int xPos = lt.getImageX(norm);
@@ -163,37 +163,38 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				final Double angle = (Double) lt.getFeature("angle");
 				final Vector2D direction = (Vector2D) lt.getFeature("direction");
 				
-				if (db)
-					getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
-						
-						@Override
-						public Image postProcessMask(Image mask) {
-							ImageCanvas c = mask.io().canvas();
-							if (!isLast)
-								c = c.drawRectanglePoints(xPos - 8, yPos - 8, 16, 16, col.get(num), 1)
-										.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
-												" a: " + angle.intValue(), Color.BLACK);
-							else {
-								Vector2D d = direction.subtract(new Vector2D(xPos, yPos)).normalize()
-										.scalarMultiply((1 + (Math.sqrt(2) - 1) * (1 - Math.abs(Math.cos(2 * angle / 180. * Math.PI)))) * 16);
-								c = c.drawRectangle(xPos - 18, yPos - 18, 36, 36, col.get(num), 2)
-										.drawLine(xPos, yPos, (int) d.getX() + xPos, (int) d.getY() + yPos, col.get(num).getRGB(), 0.2, 1)
-										.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
-												" a: " + angle.intValue(), Color.BLACK);
-							}
-							return c.getImage();
+				getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
+					
+					@Override
+					public Image postProcessMask(Image mask) {
+						ImageCanvas c = mask.io().canvas();
+						if (!isLast)
+							c = c.drawRectanglePoints(xPos - 8, yPos - 8, 16, 16, col.get(num), 1);
+						if (db)
+							c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
+									" a: " + angle.intValue(), Color.BLACK);
+						else {
+							Vector2D d = direction.subtract(new Vector2D(xPos, yPos)).normalize()
+									.scalarMultiply((1 + (Math.sqrt(2) - 1) * (1 - Math.abs(Math.cos(2 * angle / 180. * Math.PI)))) * 16);
+							c = c.drawRectangle(xPos - 18, yPos - 18, 36, 36, col.get(num), 2)
+									.drawLine(xPos, yPos, (int) d.getX() + xPos, (int) d.getY() + yPos, col.get(num).getRGB(), 0.2, 1);
+							if (db)
+								c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
+										" a: " + angle.intValue(), Color.BLACK);
 						}
-						
-						@Override
-						public Image postProcessImage(Image image) {
-							return image;
-						}
-						
-						@Override
-						public CameraType getConfig() {
-							return cameraType;
-						}
-					});
+						return c.getImage();
+					}
+					
+					@Override
+					public Image postProcessImage(Image image) {
+						return image;
+					}
+					
+					@Override
+					public CameraType getConfig() {
+						return cameraType;
+					}
+				});
 			}
 		}
 	}
