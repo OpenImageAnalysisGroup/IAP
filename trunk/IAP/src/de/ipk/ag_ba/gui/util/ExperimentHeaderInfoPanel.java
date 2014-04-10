@@ -365,10 +365,11 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					false);
 		fp.addGuiComponentRow(new JLabel("History"), disable(new JTextField(getVersionString(experimentHeader))), false);
 		try {
-		String so = SystemOptions.getInstance(null,
-					new ExperimentAnalysisSettingsIOprovder(experimentHeader, m)).getString("DESCRIPTION",
-					"pipeline_name", "(unnamed)", false);
-		fp.addGuiComponentRow(
+			ExperimentAnalysisSettingsIOprovder nnn = new ExperimentAnalysisSettingsIOprovder(experimentHeader, m);
+			String so = nnn != null ? SystemOptions.getInstance(null,
+					nnn).getString("DESCRIPTION",
+					"pipeline_name", "(unnamed)", false) : null;
+			fp.addGuiComponentRow(
 					new JLabel("Analysis Settings"),
 					disable(new JTextField(
 							experimentHeader == null || experimentHeader.getSettings() == null || experimentHeader.getSettings().isEmpty() ? "(not assigned)" :
@@ -711,7 +712,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 	private ArrayList<MatchInfo> match(ExperimentInterface optExperiment, String[] match, boolean inverseSecond) {
 		ArrayList<MatchInfo> res = new ArrayList<MatchInfo>();
 		for (SubstanceInterface si : optExperiment) {
-			if (si.getName()!=null && si.getName().startsWith(match[0]) &&
+			if (si.getName() != null && si.getName().startsWith(match[0]) &&
 					(
 					(!inverseSecond && si.getName().endsWith(match[1])) ||
 					(inverseSecond && !si.getName().endsWith(match[1]))
