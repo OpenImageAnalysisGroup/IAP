@@ -270,7 +270,7 @@ public class CurveAnalysis {
 			
 			// check if last and first are the same peak
 			if ((temp + maxDiff) >= length) {
-				if (newPeaks.getFirst() - newPeaks.getLast() < maxDiff) {
+				if (Math.abs((length + newPeaks.getFirst()) - newPeaks.getLast()) < maxDiff) {
 					int val;
 					if ((newPeaks.getFirst() + length - newPeaks.getLast()) > 0)
 						val = (int) ((newPeaks.getFirst() + length - newPeaks.getLast()) / 2d);

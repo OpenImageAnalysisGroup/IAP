@@ -4020,10 +4020,13 @@ public class ImageOperation implements MemoryHogInterface {
 		int h = image.getHeight();
 		int[] out = new int[img.length];
 		int offX = maskWidth / 2;
+		int x = 0;
 		for (int i = 0; i < img.length; i++) {
 			int cnt = 0;
 			int color = ImageOperation.BACKGROUND_COLORint;
 			for (int xdiff = -offX; xdiff <= offX; xdiff++) {
+				if (x - xdiff < 0 || x + xdiff >= w)
+					continue;
 				int ii = i + xdiff;
 				if (ii < 0)
 					ii = 0;
@@ -4038,6 +4041,8 @@ public class ImageOperation implements MemoryHogInterface {
 				out[i] = color;
 			} else
 				out[i] = img[i];
+			x++;
+			x = x % w;
 		}
 		return new ImageOperation(out, w, h);
 	}
