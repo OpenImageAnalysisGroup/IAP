@@ -38,7 +38,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	protected void prepare() {
 		super.prepare();
 		// search for best side image
-		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", false)) {
+		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
 			boolean isBestAngle = isBestAngle();
 			if (!isBestAngle)
 				ignore = true;

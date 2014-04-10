@@ -147,7 +147,7 @@ public class BorderAnalysis {
 					Vector2D p1 = borderFeatureList.get(back).getPosition();
 					Vector2D p3 = borderFeatureList.get(ahead).getPosition();
 					Point2d p4 = new Point2d((p1.getX() + p3.getX()) / 2, (p1.getY() + p3.getY()) / 2);
-					Vector2D v1 = new Vector2D((p2.getX() - p4.x) * 2 + p4.x, (p2.getY() - p4.y) * 2 + p4.y);
+					Vector2D v1 = new Vector2D((p2.getX() - p4.x) * 1.5 + p4.x, (p2.getY() - p4.y) * 1.5 + p4.y);
 					p.addFeature("direction", v1, FeatureObjectType.VECTOR);
 					// p.addFeature("angle", v1.angle(new Vector2d(1.0, 0.0)));
 					// calculate angle
