@@ -69,7 +69,8 @@ public class SystemOptions {
 		this.iniFileName = iniFileName;
 		this.iniIO = iniIO;
 		if (iniIO != null) {
-			ini = new Ini(new StringReader(iniIO.getString()));
+			String nnn = iniIO.getString();
+			ini = nnn != null ? new Ini(new StringReader(nnn)) : new Ini();
 			WeakReference<IniIoProvider> wr = new WeakReference<IniIoProvider>(iniIO);
 			readIniAndPrepareProviderCheck(wr);
 			return;
