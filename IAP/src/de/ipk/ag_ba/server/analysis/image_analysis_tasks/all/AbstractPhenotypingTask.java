@@ -276,7 +276,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 			final int todo = workLoad.size();
 			final ThreadSafeOptions progr = new ThreadSafeOptions();
-			while (!workLoad.isEmpty()) {
+			while (!workLoad.isEmpty() && !status.wantsToStop()) {
 				Runnable t = workLoad.poll();
 				String d = workLoad_desc.poll();
 				wait.add(BackgroundThreadDispatcher.addTask(t, d, true));
@@ -341,6 +341,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		if (imageSetWithSpecificAngle != null) {
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
+				if (status.wantsToStop())
+					continue;
+				
 				LinkedList<LocalComputeJob> wait = new LinkedList<LocalComputeJob>();
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
 					if (configAndAngle.startsWith("1st_top"))
@@ -355,6 +358,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				BackgroundThreadDispatcher.waitFor(wait);
 				wait.clear();
 				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
+					if (status.wantsToStop())
+						continue;
+					
 					if (!configAndAngle.startsWith("1st_top"))
 						wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
 							@Override
@@ -369,7 +375,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			} // for each time point
 		} // if image data available
 		
-		if (!plantResults.isEmpty()) {
+		if (!plantResults.isEmpty() && !status.wantsToStop()) {
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> postprocessingResults;
 			try {
 				synchronized (AbstractPhenotypingTask.class) {

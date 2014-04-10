@@ -31,6 +31,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import org.ErrorMsg;
 import org.ObjectRef;
@@ -39,6 +40,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.gui.IAPfeature;
@@ -60,6 +62,7 @@ import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.server.task_management.RemoteCapableAnalysisAction;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskWindow;
 
 /**
  * @author klukas
@@ -836,6 +839,41 @@ public class NavigationButton implements StyleAware {
 					if (ac != null && ac.getStatusProvider() != null) {
 						JPopupMenu p = new JPopupMenu();
 						boolean added = false;
+						
+						if (n.isProcessing() && n.getAction() != null) {
+							AbstractAction a = new AbstractAction("Show Progress Dialog") {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									final BackgroundTaskWindow taskWindow = new BackgroundTaskWindow(false);
+									taskWindow.setStatusProvider(ac.getStatusProvider(), ac.getDefaultTitle(), ac.getDefaultTitle());
+									final ThreadSafeOptions tso = new ThreadSafeOptions();
+									Timer checkStatus = new Timer(100, new ActionListener() {
+										boolean finishedCalled = false;
+										
+										@Override
+										public void actionPerformed(ActionEvent arg0) {
+											taskWindow.updateSize();
+											if (!n.isProcessing()) {
+												if (!finishedCalled) {
+													finishedCalled = true;
+													taskWindow.dispose();
+													Timer checkStatusTimer = (Timer) tso.getParam(0, null);
+													if (checkStatusTimer != null)
+														checkStatusTimer.stop();
+												}
+											}
+										}
+									});
+									tso.setParam(0, checkStatus);
+									checkStatus.start();
+								}
+							};
+							JMenuItem menuItem = new JMenuItem(a);
+							menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, "img/ext/gpl2/Gnome-System-Run-64.png", 16, 16, false));
+							p.add(menuItem);
+							added = true;
+						}
+						
 						if (ac.getStatusProvider().wantsToStop()) {
 							AbstractAction a = new AbstractAction("Stop is Requested (Command is still active)") {
 								@Override
@@ -866,19 +904,24 @@ public class NavigationButton implements StyleAware {
 										}
 									}
 								};
-								p.add(new JMenuItem(a));
+								JMenuItem menuItem = new JMenuItem(a);
+								menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, "img/ext/gpl2/Gnome-Media-Playback-Stop-64.png", 16, 16, false));
+								p.add(menuItem);
 								added = true;
 							}
-						if (ac.getStatusProvider().pluginWaitsForUser()) {
+						if (n.isProcessing() && ac.getStatusProvider().pluginWaitsForUser()) {
 							AbstractAction a = new AbstractAction("Continue (Command waits for user-action)") {
 								@Override
 								public void actionPerformed(ActionEvent e) {
 									ac.getStatusProvider().pleaseContinueRun();
 								}
 							};
-							p.add(new JMenuItem(a));
+							JMenuItem menuItem = new JMenuItem(a);
+							menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, "img/ext/gpl2/Gnome-Media-Playback-Start-64.png", 16, 16, false));
+							p.add(menuItem);
 							added = true;
 						}
+						
 						if (added) {
 							p.show(e.getComponent(), e.getX(), e.getY());
 						} else {
