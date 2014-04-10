@@ -4077,7 +4077,7 @@ public class ImageOperation implements MemoryHogInterface {
 								if (!(x - diffX >= 0 && y - diffY >= 0 && x - diffX < w && y - diffY < h))
 									continue;
 								if ((v == SkeletonProcessor2d.colorEndpoints || v == SkeletonProcessor2d.colorBloomEndpoint) &&
-										((diffX * diffX + diffY * diffY) <= 6 * 6) ||
+										((diffX * diffX + diffY * diffY) <= (r - 2) * (r - 2)) ||
 										(diffX * diffX + diffY * diffY) >= r * r)
 									continue;
 								res[x - diffX][y - diffY] = v;// avg(v, plantImg[index - diffX + w * diffY]);
