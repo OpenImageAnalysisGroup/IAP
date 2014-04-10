@@ -168,12 +168,12 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 					@Override
 					public Image postProcessMask(Image mask) {
 						ImageCanvas c = mask.io().canvas();
-						if (!isLast)
+						if (!isLast) {
 							c = c.drawRectanglePoints(xPos - 8, yPos - 8, 16, 16, col.get(num), 1);
-						if (db)
-							c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
-									" a: " + angle.intValue(), Color.BLACK);
-						else {
+							if (db)
+								c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
+										" a: " + angle.intValue(), Color.BLACK);
+						} else {
 							Vector2D d = direction.subtract(new Vector2D(xPos, yPos)).normalize()
 									.scalarMultiply((1 + (Math.sqrt(2) - 1) * (1 - Math.abs(Math.cos(2 * angle / 180. * Math.PI)))) * 16);
 							c = c.drawRectangle(xPos - 18, yPos - 18, 36, 36, col.get(num), 2)
