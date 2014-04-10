@@ -26,6 +26,8 @@ public class BlRemoveBackground extends AbstractBlock {
 	
 	@Override
 	protected Image processMask(Image mask) {
+		if (mask == null)
+			return null;
 		boolean debug = debugValues;
 		CameraType ct = mask.getCameraType();
 		if (input().images().getImage(ct) != null) {
@@ -35,7 +37,13 @@ public class BlRemoveBackground extends AbstractBlock {
 			if (getBoolean("Normalize " + ct + " Image", ct == CameraType.FLUO))
 				image = image.io().copy().histogramEqualisation(true, 0.35).getImage().show("img_he", debug);
 			// mask = mask.io().histogramEqualisation(true, 0.35).getImage().show("mask_he", debug);
-			Image diff_image = mask.io().diff(image).getImage().show("diff", debug);
+			if (mask == null || image == null)
+				return null;
+			Image diff_image = mask.io().diff(image).getImage();
+			if (debug)
+				diff_image.show("diff", debug);
+			if (diff_image == null)
+				return null;
 			Image thresh_image = diff_image.io().thresholdImageJ(Value, false).replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint).getImage()
 					.show("thresh", debug);
 			Image res = input().images().copy().getImage(ct).io()
