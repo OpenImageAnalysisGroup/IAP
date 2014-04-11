@@ -115,6 +115,14 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 		// save to resultSet
 		LinkedList<Leaf> ll = plant.getLeafList();
 		final ArrayList<Color> col = Colors.get(ll.size() + 1, 1);
+		
+		getResultSet().setNumericResult(getBlockPosition(),
+				"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count", ll.size(), "tracked leafs|SUSAN");
+		
+		if (isBestAngle())
+			getResultSet().setNumericResult(getBlockPosition(),
+					"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count.best_angle", ll.size(), "tracked leafs|SUSAN");
+		
 		for (Leaf l : plant.getLeafList()) {
 			LeafTip lt = l.getLast();
 			LeafTip ltFirst = l.getFirst();
