@@ -687,6 +687,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 									if (!(nmi instanceof BinaryMeasurement))
 										onlyImages = false;
 							}
+							sai.recalculateSampleAverage(false);
 						}
 					}
 				}
