@@ -123,7 +123,9 @@ public class BlockPipeline {
 					}
 				res.clearStoredPostprocessors();
 				res.clearNotUsedResults();
-				blockResults.put(well, res);
+				synchronized (blockResults) {
+					blockResults.put(well, res);
+				}
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 				exception.setObject(e);
