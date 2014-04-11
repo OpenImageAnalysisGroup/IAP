@@ -5,6 +5,7 @@ import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
+import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
@@ -23,6 +24,7 @@ import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.postprocessing.BlSaveResultImages;
 import iap.blocks.preprocessing.BlAlign;
+import iap.blocks.preprocessing.BlColorBalanceCircularVisNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlColorCorrectionNir;
@@ -70,15 +72,16 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlColorBalanceVerticalVis(),
 				new BlColorBalanceVerticalFluo(),
 				new BlColorCorrectionNir(),
+				new BlColorBalanceCircularVisNir(),
 				
 				// segmentation
 				new BlRemoveBackground(),
-				new BlKMeansVis(),
 				new BlAdaptiveSegmentationFluo(),
+				new BlKMeansVis(),
+				new BlAutoAdaptiveThresholdNir(),
 				new BlMedianFilterFluo(),
 				new BlMorphologicalOperations(),
 				new BlAdaptiveRemoveSmallObjectsVisFluo(),
-				// new BlAutoAdaptiveThresholdNir(),
 				new BlAdaptiveUseFluoMaskToClearOther(),
 				
 				// feature extraction

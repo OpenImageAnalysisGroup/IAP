@@ -21,14 +21,17 @@ public class BlAutoAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processNIRmask() {
 		boolean debug = getBoolean("debug", false);
+		boolean process = getBoolean("Process NIR Mask", false);
+		boolean autoTune = getBoolean("Auto-tune", true);
+		
 		if (input().masks().nir() == null)
 			return null;
 		Image nirMask = input().masks().nir();
 		
-		if (!getBoolean("enabled", true)) {
+		if (!getBoolean("enabled", true) || !process) {
 			return nirMask;
 		}
-		boolean autoTune = getBoolean("Auto-tune", true);
+		
 		Image origNirMask = optionsAndResults.getCameraPosition() == CameraPosition.TOP && nirMask != null ? nirMask.copy() : null;
 		int average = autoTune ? nirMask.io().histogram(true).getMostCommonValueB() : getInt("Replace color value", 180);
 		if (nirMask != null) {
