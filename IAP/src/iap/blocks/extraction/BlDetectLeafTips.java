@@ -33,13 +33,14 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	boolean ignore = false;
 	boolean debug_borderDetection;
 	double borderSize;
+	private boolean isBestAngle;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
+		this.isBestAngle = isBestAngle();
 		// search for best side image
 		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
-			boolean isBestAngle = isBestAngle();
 			if (!isBestAngle)
 				ignore = true;
 		}
@@ -145,6 +146,21 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			peakList.removeAll(toRemove);
 			getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, peakList);
 		}
+		
+		int count = 0;
+		for (BorderFeature bf : peakList) {
+			count++;
+		}
+		
+		// save leaf count
+		getResultSet().setNumericResult(getBlockPosition(),
+				"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", count, "leaftips|SUSAN");
+		
+		// save leaf count for best angle
+		if (isBestAngle)
+			getResultSet().setNumericResult(getBlockPosition(),
+					"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count.best_angle", count, "leaftips|SUSAN");
+		
 		if (saveFeaturesInResultSet) {
 			int index = 1;
 			for (BorderFeature bf : peakList) {
@@ -210,9 +226,6 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 					});
 				}
 			}
-			// save leaf count
-			getResultSet().setNumericResult(getBlockPosition(),
-					"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", index - 1, "leaftips");
 		}
 	}
 	
