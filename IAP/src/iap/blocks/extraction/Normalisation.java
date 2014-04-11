@@ -28,7 +28,10 @@ public class Normalisation {
 		this.cShiftY = topShiftY;
 		this.imageCenterX = imageCenterX;
 		this.imageCenterY = imageCenterY;
-		this.conversionFactorImageDist2realWorldDist = real_marker_distance / calculated_marker_distance;
+		if (real_marker_distance == null || calculated_marker_distance == null)
+			this.conversionFactorImageDist2realWorldDist = Double.NaN;
+		else
+			this.conversionFactorImageDist2realWorldDist = real_marker_distance / calculated_marker_distance;
 		
 		if (masks.getImage(ct) == null || masks.vis() == null || real_marker_distance == null || calculated_marker_distance == null) {
 			conversionFactorImageDist2realWorldDist = Double.NaN;
