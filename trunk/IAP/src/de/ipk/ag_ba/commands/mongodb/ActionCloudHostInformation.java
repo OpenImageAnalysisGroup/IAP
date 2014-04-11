@@ -101,12 +101,8 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 							}
 						// if (System.currentTimeMillis() - ip.getLastUpdateTime() > 5 * 60 * 1000)
 						// status3 += "<br>[REMOVE FROM UPDATE]";
-						String rA = "";
-						if (ch.getBlocksExecutedWithinLastMinute() > 0 || ch.getTasksWithinLastMinute() > 0)
-							rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
-						else
-							return "";// "idle, ";
-						return (System.currentTimeMillis() - ch.getLastUpdateTime() >= 10 * 1000 ? "" : ch.getPipelinesPerHour() + " p.e./h, ") + rA + "t_p="
+						String rA = ch.getBlocksExecutedWithinLastMinute() + " bpm, ";
+						return ch.getPipelinesPerHour() + " p.e./h, " + rA + "t_p="
 								+ ch.getLastPipelineTime() + " s, " +
 								ch.getPipelineExecutedWithinCurrentHour() + " p.e.";
 					} else
@@ -213,7 +209,7 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 		res.add(src);
 		return res;
 	}
-
+	
 	@Override
 	public boolean requestTitleUpdates() {
 		return true;
