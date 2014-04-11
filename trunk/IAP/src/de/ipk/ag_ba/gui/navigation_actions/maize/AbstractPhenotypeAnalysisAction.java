@@ -173,7 +173,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			if (statisticsResult == null) { // || statisticsResult.getNumberOfMeasurementValues() <= 0
 				System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: no statistics result");
-				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
+				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE) {
 					Batch.pingHost(m, SystemAnalysisExt.getHostName(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN,
 							"system.exit (no statistics result)");
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO STATISTICS RESULT");
