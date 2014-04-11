@@ -34,6 +34,7 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.editcomponents.chart_settings.GraffitiCharts;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawComponent.XmlDataChartComponent;
 
 public class DataChartComponentWindow extends JFrame {
@@ -56,11 +57,12 @@ public class DataChartComponentWindow extends JFrame {
 		final Node ge = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForKeggNode(100, 100));
 		NodeHelper nh = new NodeHelper(ge);
 		// nh.setLabel(experiment.iterator().next().getName());
-		nh.addDataMapping(experiment.iterator().next());
+		SubstanceInterface ex = experiment.iterator().next();
+		nh.addDataMapping(ex);
 		nh.removeAttribute("graphics");
 		graph.removeAttribute("directed");
 		
-		setDefaultChartDisplay(graph, ge, experiment.iterator().next().getName());
+		setDefaultChartDisplay(graph, ge, experiment.iterator().next().getName(), ex.size() < 10);
 		
 		final XmlDataChartComponent chart = new XmlDataChartComponent(experiment, GraffitiCharts.AUTOMATIC.getName(), graph, ge);
 		chart.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -112,7 +114,7 @@ public class DataChartComponentWindow extends JFrame {
 	}
 	
 	@SuppressWarnings("unused")
-	private void setDefaultChartDisplay(Graph graph, Node ge, String title) {
+	private void setDefaultChartDisplay(Graph graph, Node ge, String title, boolean showLegendF) {
 		int idx = 0;
 		Boolean mFalse = new Boolean(false);
 		Boolean mTrue = new Boolean(true);
@@ -124,7 +126,7 @@ public class DataChartComponentWindow extends JFrame {
 				SystemOptions.getInstance("charts.ini", null).getBoolean("Axis", "Show-X", true), mFalse)).booleanValue();
 		boolean showRangeAxis = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_showRangeAxis",
 				SystemOptions.getInstance("charts.ini", null).getBoolean("Axis", "Show-Y", true),
-					mFalse)).booleanValue();
+				mFalse)).booleanValue();
 		Boolean showRangeAxis2 = ((Boolean) AttributeHelper.getAttributeValue(ge, "charting", "showRangeAxis", null,
 				SystemOptions.getInstance("charts.ini", null).getBoolean("Axis", "Show-Y2", true), false));
 		int axisFontSize = ((Integer) AttributeHelper.getAttributeValue(graph, "", "node_plotAxisFontSize", new Integer(
@@ -133,16 +135,18 @@ public class DataChartComponentWindow extends JFrame {
 				SystemOptions.getInstance("charts.ini", null).getBoolean("Axis", "Show-Grid-X", false), mTrue)).booleanValue();
 		Double temp = (Double) AttributeHelper.getAttributeValue(graph, "", "node_outlineBorderWidth",
 				SystemOptions.getInstance("charts.ini", null).getDouble("Plot", "Outline Line Width", 1),
-					new Double(4d));
+				new Double(4d));
 		temp = (Double) AttributeHelper.getAttributeValue(graph, "", "node_chartStdDevLineWidth",
 				SystemOptions.getInstance("charts.ini", null).getDouble("Plot", "Std-Dev Line Width", 1),
-					new Double(4d));
+				new Double(4d));
 		boolean showLegend = ((Boolean) AttributeHelper.getAttributeValue(ge, "charting", "show_legend",
 				SystemOptions.getInstance("charts.ini", null).getBoolean("Legend", "Show", true),
-					new Boolean(false))).booleanValue();
+				new Boolean(false))).booleanValue();
+		if (!showLegendF)
+			AttributeHelper.setAttribute(ge, "charting", "show_legend", false);
 		String rangeAxis = (String) AttributeHelper.getAttributeValue(ge, "charting", "rangeAxis", "[unit]", "[unit]");
 		String domainAxis = (String) AttributeHelper.getAttributeValue(ge, "charting", "domainAxis",
-					new String("[unit]"), new String("[unit]"));
+				new String("[unit]"), new String("[unit]"));
 		String add = "";
 		Attribute newAtt = StringAttribute.getTypedStringAttribute(GraphicAttributeConstants.CHARTBACKGROUNDCOLOR
 				+ add, ColorUtil.getHexFromColor(Color.WHITE));
