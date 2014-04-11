@@ -2,7 +2,6 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -12,7 +11,6 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * @author klukas
  */
-@Deprecated
 public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock {
 	
 	private boolean debug = false;
@@ -37,7 +35,7 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	@Override
 	protected Image processVISimage() {
 		int steps = getInt("Shade-Steps-Vis", 50);
-		if (input().images().vis() == null || !getBoolean("process VIS image", optionsAndResults.getCameraPosition() != CameraPosition.TOP))
+		if (input().images().vis() == null || !getBoolean("process VIS image", false))
 			return input().images().vis();
 		
 		Image input = input().images().vis();
@@ -49,7 +47,7 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	@Override
 	protected Image processVISmask() {
 		int steps = getInt("Shade-Steps-Vis", 50);
-		if (input().masks().vis() == null || !getBoolean("process VIS mask", optionsAndResults.getCameraPosition() != CameraPosition.TOP))
+		if (input().masks().vis() == null || !getBoolean("process VIS mask", false))
 			return input().masks().vis();
 		
 		Image input = input().masks().vis();
@@ -61,7 +59,7 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	@Override
 	protected Image processNIRimage() {
 		int steps = getInt("Shade-Steps-NIR", 180);
-		if (input().images().nir() == null || !getBoolean("process NIR image", optionsAndResults.getCameraPosition() != CameraPosition.TOP))
+		if (input().images().nir() == null || !getBoolean("process NIR image", false))
 			return input().images().nir();
 		
 		Image input = input().images().nir();
@@ -73,7 +71,7 @@ public class BlColorBalanceCircularVisNir extends AbstractSnapshotAnalysisBlock 
 	@Override
 	protected Image processNIRmask() {
 		int steps = getInt("Shade-Steps-NIR", 180);
-		if (input().masks().nir() == null || !getBoolean("process NIR mask", optionsAndResults.getCameraPosition() != CameraPosition.TOP))
+		if (input().masks().nir() == null || !getBoolean("process NIR mask", false))
 			return input().masks().nir();
 		
 		Image input = input().masks().nir();
