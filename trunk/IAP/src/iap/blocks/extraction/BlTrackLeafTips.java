@@ -128,9 +128,25 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				Vector2D trans1 = new Vector2D(lt.getImageX(norm) - ltFirst.getImageX(norm), lt.getImageY(norm) - ltFirst.getImageY(norm));
 				Vector2D trans2 = new Vector2D(0.0, 1.0);
 				double angle = calcAngle(trans1, trans2);
+				double a = (ltFirst.getRealWorldX() - lt.getRealWorldX());
+				double b = (ltFirst.getRealWorldY() - lt.getRealWorldY());
+				double span_norm = Math.sqrt(a * a + b * b);
+				
+				double c = (ltFirst.getImageX(norm) - lt.getImageX(norm));
+				double d = (ltFirst.getImageY(norm) - lt.getImageY(norm));
+				double span = Math.sqrt(c * c + d * d);
+				
 				getResultSet().setNumericResult(0,
 						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".orientation",
 						angle, "degree");
+				
+				getResultSet().setNumericResult(0,
+						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".span.norm",
+						span_norm, "mm");
+				
+				getResultSet().setNumericResult(0,
+						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".span",
+						span, "px");
 			}
 			
 			final int xPos_norm = lt.getRealWorldX();
