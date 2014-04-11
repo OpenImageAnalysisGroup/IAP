@@ -128,10 +128,10 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 						}
 					}
 					String rA = "";
-					if (blocksExecutedWithinLastMinute > 0 || tasksWithinLastMinute > 0)
-						rA = blocksExecutedWithinLastMinute + " bpm, ";
-					else
-						return ""; // "idle, ";
+					// if (blocksExecutedWithinLastMinute > 0 || tasksWithinLastMinute > 0)
+					rA = blocksExecutedWithinLastMinute + " bpm, ";
+					// else
+					// return ""; // "idle, ";
 					return speed + " p.e./h, " + rA + "t_p=[" + lastPipelineTimeMin + "," + lastPipelineTimeMax + "] s";
 				} catch (Exception e) {
 					// empty
@@ -228,7 +228,6 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	public String getDefaultTooltip() {
 		return "<html>" + super.getDefaultTooltip() + postFix;
 	}
-
 	
 	@Override
 	public boolean requestTitleUpdates() {
