@@ -156,7 +156,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		int height = vis.getHeight();
 		
 		skel2d.calculateEndlimbsRecursive();
-		int leafcount = skel2d.endlimbs.size();
+		int leafcount = skel2d.endpoints.size();
 		if (debug)
 			System.out.println("A Leaf count: " + leafcount);
 		
@@ -211,13 +211,13 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		skel2d.deleteShortEndLimbs(getInt("delete limbs threshold", 20), false, new HashSet<Point>());
 		
 		if (debug) {
-			leafcount = skel2d.endlimbs.size();
+			leafcount = skel2d.endpoints.size();
 			skel2d.show("endpoints and branches (filtered)", debug);
 			System.out.println("B Leaf count: " + leafcount);
 		}
 		
 		skel2d.calculateEndlimbsRecursive();
-		leafcount = skel2d.endlimbs.size();
+		leafcount = skel2d.endpoints.size();
 		if (debug)
 			System.out.println("C Leaf count: " + leafcount);
 		Double leafWidthInPixels = null;
@@ -264,7 +264,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			}
 		}
 		
-		leafcount = skel2d.endlimbs.size();
+		leafcount = skel2d.endpoints.size();
 		// System.out.println("C Leaf count: " + leafcount);
 		Image skelres = skel2d.getAsImage();
 		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.getDefaultBackground());
