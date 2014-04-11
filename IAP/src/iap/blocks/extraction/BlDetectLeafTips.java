@@ -246,8 +246,9 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			img = img.io().or(skel.copy().io().bm().dilate(15).getImage()).or(skel_workimge).getImage()
 					.show("skel images on mask" + ct.toString(), debugValues);
 		} else {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No " + ct.toString()
-					+ " skeleton image available, can't process it within leaf-tip detection!");
+			if (ct != CameraType.NIR)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No " + ct.toString()
+						+ " skeleton image available, can't process it within leaf-tip detection!");
 		}
 		
 		// morphological operations
