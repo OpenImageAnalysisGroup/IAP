@@ -203,6 +203,7 @@ public class SplitResult {
 		mergedExperiment.getHeader().setExperimentname(originName);
 		mergedExperiment.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
 		mergedExperiment.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
+		mergedExperiment.getHeader().setOriginDbId(sourceHeader.getDatabaseId());
 		mergedExperiment.getHeader().setRemark(
 				mergedExperiment.getHeader().getRemark() +
 						" // " + nFinish + " compute tasks finished // " + nToDo + " jobs scheduled at  " + SystemAnalysis.getCurrentTime(tStart) +
