@@ -440,10 +440,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					if (!analysisInput.containsKey(time))
 						analysisInput.put(time, new TreeMap<String, ImageData>());
 					synchronized (plantResults) {
-						if (!plantResults.containsKey(time))
-							plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-						analysisInput.get(time).put(configAndAngle, inImage);
-						plantResults.get(time).put(configAndAngle, results);
+						synchronized (plantResults.get(time)) {
+							if (!plantResults.containsKey(time))
+								plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+							analysisInput.get(time).put(configAndAngle, inImage);
+							plantResults.get(time).put(configAndAngle, results);
+						}
 					}
 				}
 			}
@@ -749,7 +751,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					for (String volumeID : analysisResults.get(time).get(configName).get(tray).getVolumeNames()) {
 						VolumeData v = analysisResults.get(time).get(configName).get(tray).getVolume(volumeID);
 						if (v != null) {
-							analysisResults.get(time).get(configName).get(tray).setVolume(volumeID, null);
+							synchronized (analysisResults.get(time)) {
+								analysisResults.get(time).get(configName).get(tray).setVolume(volumeID, null);
+							}
 							
 							try {
 								StopWatch s = new StopWatch(
@@ -787,47 +791,49 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							}
 						}
 					}
-					for (BlockResultValue bpv : analysisResults.get(time).get(configName).get(tray).searchResults("RESULT_")) {
-						if (bpv.getName() == null)
-							continue;
-						String name = bpv.getName();
-						if (name.contains("_cut.")) {
-							name = name.substring(0, name.indexOf("_cut."));
-						}
-						
-						NumericMeasurement3D m = new NumericMeasurement3D(
-								new NumericMeasurement(inSamples.get(time)), name, inSamples.get(time)
-										.getParentCondition().getExperimentName()
-										+ " ("
-										+ getName() + ")");
-						
-						if (bpv != null && m != null) {
-							m.setValue(bpv.getValue());
-							m.setUnit(bpv.getUnit());
-							if (inSamples.get(time).size() > 0) {
-								NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
-								m.setReplicateID(template.getReplicateID());
-								m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-								m.setQualityAnnotation(template.getQualityAnnotation() + (multipleTrays ? "_" + tray : ""));
-								// rotation angle needs to be determined from the config-name
-								if (bpv.getPosition() != null)
-									m.setPosition(bpv.getPosition());
-								else {
-									String angle = configName;
-									if (angle != null && angle.contains(";"))
-										angle = angle.split(";")[1];
-									try {
-										double ra = Double.parseDouble(angle);
-										m.setPosition(ra);
-									} catch (Exception e) {
-										System.out
-												.println(SystemAnalysis.getCurrentTime() + ">WARNING: Can't determine rotation angle from config '" + configName + "'!");
-										m.setPosition(null);// template.getPosition());
-									}
-								}
-								m.setPositionUnit(template.getPositionUnit());
+					synchronized (analysisResults.get(time)) {
+						for (BlockResultValue bpv : analysisResults.get(time).get(configName).get(tray).searchResults("RESULT_")) {
+							if (bpv.getName() == null)
+								continue;
+							String name = bpv.getName();
+							if (name.contains("_cut.")) {
+								name = name.substring(0, name.indexOf("_cut."));
 							}
-							outputAdd(m);
+							
+							NumericMeasurement3D m = new NumericMeasurement3D(
+									new NumericMeasurement(inSamples.get(time)), name, inSamples.get(time)
+											.getParentCondition().getExperimentName()
+											+ " ("
+											+ getName() + ")");
+							
+							if (bpv != null && m != null) {
+								m.setValue(bpv.getValue());
+								m.setUnit(bpv.getUnit());
+								if (inSamples.get(time).size() > 0) {
+									NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
+									m.setReplicateID(template.getReplicateID());
+									m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
+									m.setQualityAnnotation(template.getQualityAnnotation() + (multipleTrays ? "_" + tray : ""));
+									// rotation angle needs to be determined from the config-name
+									if (bpv.getPosition() != null)
+										m.setPosition(bpv.getPosition());
+									else {
+										String angle = configName;
+										if (angle != null && angle.contains(";"))
+											angle = angle.split(";")[1];
+										try {
+											double ra = Double.parseDouble(angle);
+											m.setPosition(ra);
+										} catch (Exception e) {
+											System.out
+													.println(SystemAnalysis.getCurrentTime() + ">WARNING: Can't determine rotation angle from config '" + configName + "'!");
+											m.setPosition(null);// template.getPosition());
+										}
+									}
+									m.setPositionUnit(template.getPositionUnit());
+								}
+								outputAdd(m);
+							}
 						}
 					}
 				}
