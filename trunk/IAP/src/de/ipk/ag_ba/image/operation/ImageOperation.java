@@ -9,6 +9,7 @@ import ij.measure.Calibration;
 import ij.plugin.ContrastEnhancer;
 import ij.plugin.ImageCalculator;
 import ij.plugin.filter.GaussianBlur;
+import ij.plugin.filter.RankFilters;
 import ij.plugin.filter.UnsharpMask;
 import ij.process.AutoThresholder.Method;
 import ij.process.BinaryProcessor;
@@ -2363,7 +2364,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * 
 	 * @return The result mask, to be applied to the input image, for filtering.
 	 */
-	public ImageOperation autoThresholdingColorImageByUsingBrightnessMaxEntropy(boolean darkBackground, boolean debug) {
+	public ImageOperation autoThresholdingColorImageByUsingBrightnessMaxEntropy(boolean darkBackground, Method m, boolean debug) {
 		
 		byte[] hue, s, b;
 		ColorProcessor cp = (ColorProcessor) image.getProcessor();
@@ -2376,7 +2377,7 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		ByteProcessor pr = new ByteProcessor(w, h, b, null);
 		pr.setRoi(getCropRectangle());
-		pr.setAutoThreshold(Method.Yen, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
+		pr.setAutoThreshold(m, darkBackground, ImageProcessor.BLACK_AND_WHITE_LUT);
 		ImageOperation ioRED = new ImageOperation(new TypeConverter(pr, false).convertToRGB().getBufferedImage()).show("Auto-Threshold Mask Result", debug);
 		int[] res = getAs1D();
 		int idx = 0;
@@ -5257,6 +5258,20 @@ public class ImageOperation implements MemoryHogInterface {
 		ImageOperation io = new ImageOperation(buf).show("Auto-Threshold Result" + method.name(),
 				false);
 		return io;
+	}
+	
+	/**
+	 * @param maskSize
+	 *           = radius of filter kernel
+	 * @param mode
+	 *           = use modes from ImageJ RankFilters class
+	 * @return
+	 */
+	public ImageOperation rankFilterImageJ(double maskSize, int mode) {
+		ImageProcessor ip = image.getProcessor();
+		RankFilters rf = new RankFilters();
+		rf.rank(ip, maskSize, mode);
+		return new ImageOperation(ip.getBufferedImage());
 	}
 	
 	public static int[][] crop(int[][] img, int w, int h, int pLeft, int pRight, int pTop,

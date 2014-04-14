@@ -51,7 +51,7 @@ public class BlCalcWidthAndHeight extends
 		Double realMarkerDistHorizontal = optionsAndResults.getREAL_MARKER_DISTANCE();
 		Double distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
 		
-		boolean useFluo = false;// options.isMaize();
+		boolean useFluo = false;
 		
 		Image visRes = input().masks().vis();
 		if (visRes == null)

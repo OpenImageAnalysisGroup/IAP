@@ -6,6 +6,7 @@ package iap.blocks.segmentation;
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 import ij.process.AutoThresholder;
+import ij.process.AutoThresholder.Method;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -44,6 +45,14 @@ public class BlRemoveBackground extends AbstractBlock {
 				diff_image.show("diff", debug);
 			if (diff_image == null)
 				return null;
+			
+			boolean tune = true;
+			Method[] methods = Method.values();
+			
+			if (tune) {
+				int idx = (int) optionsAndResults.getUnitTestIdx();
+				Value = methods[idx].name();
+			}
 			Image thresh_image = diff_image.io().thresholdImageJ(Value, false).replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint).getImage()
 					.show("thresh", debug);
 			Image res = input().images().copy().getImage(ct).io()

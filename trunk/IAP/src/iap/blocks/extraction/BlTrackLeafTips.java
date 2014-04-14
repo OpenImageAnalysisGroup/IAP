@@ -176,6 +176,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 										+ ".angle",
 								angle, "degree");
 		}
+		
 		for (Leaf l : plant.getLeafList()) {
 			LeafTip last = l.getLast();
 			for (LeafTip lt : l) {

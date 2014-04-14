@@ -156,12 +156,12 @@ public class ImageProcessorOptionsAndResults {
 				res = (customNullBlockPrefix != null ? customNullBlockPrefix : "Postprocessing");
 		}
 		
-		if (block != null && (customNullBlockPrefix != null || infoCamConfOrLateOrEearly != null)) {
-			boolean useCommonSetting = optSystemOptionStorage.getBoolean(
-					getSystemOptionStorageGroup(null), getSettingName(block, "Use Common Settings"), true);
-			if (useCommonSetting)
-				return getSystemOptionStorageGroupWithoutCustomInfo();
-		}
+		// if (block != null && (customNullBlockPrefix != null || infoCamConfOrLateOrEearly != null)) {
+		// boolean useCommonSetting = optSystemOptionStorage.getBoolean(
+		// getSystemOptionStorageGroup(null), getSettingName(block, "Use Common Settings"), true);
+		// if (useCommonSetting)
+		// return getSystemOptionStorageGroupWithoutCustomInfo();
+		// }
 		
 		return res;
 	}
