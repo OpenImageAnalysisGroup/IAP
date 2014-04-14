@@ -141,18 +141,29 @@ public class ImageProcessorOptionsAndResults {
 		this.customNullBlockPrefix = customNullBlockPrefix;
 	}
 	
-	public String getSystemOptionStorageGroup() {
+	public String getSystemOptionStorageGroup(ImageAnalysisBlock block) {
+		String res = null;
+		
 		if (infoCamConfOrLateOrEearly != null) {
 			if (getCameraPosition() != CameraPosition.UNKNOWN)
-				return getCameraPosition() + " settings" + infoCamConfOrLateOrEearly;
+				res = getCameraPosition() + " settings" + infoCamConfOrLateOrEearly;
 			else
-				return (customNullBlockPrefix != null ? customNullBlockPrefix : "Postprocessing") + infoCamConfOrLateOrEearly;
+				res = (customNullBlockPrefix != null ? customNullBlockPrefix : "Postprocessing") + infoCamConfOrLateOrEearly;
 		} else {
 			if (getCameraPosition() != CameraPosition.UNKNOWN)
-				return getCameraPosition() + " settings";
+				res = getCameraPosition() + " settings";
 			else
-				return (customNullBlockPrefix != null ? customNullBlockPrefix : "Postprocessing");
+				res = (customNullBlockPrefix != null ? customNullBlockPrefix : "Postprocessing");
 		}
+		
+		if (block != null && (customNullBlockPrefix != null || infoCamConfOrLateOrEearly != null)) {
+			boolean useCommonSetting = optSystemOptionStorage.getBoolean(
+					getSystemOptionStorageGroup(null), getSettingName(block, "Use Common Settings"), true);
+			if (useCommonSetting)
+				return getSystemOptionStorageGroupWithoutCustomInfo();
+		}
+		
+		return res;
 	}
 	
 	private String getSystemOptionStorageGroupWithoutCustomInfo() {
@@ -171,7 +182,7 @@ public class ImageProcessorOptionsAndResults {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getBoolean(
-					getSystemOptionStorageGroup(), getSettingName(block, title), infoCamConfOrLateOrEearly == null ? defaultValue :
+					getSystemOptionStorageGroup(block), getSettingName(block, title), infoCamConfOrLateOrEearly == null ? defaultValue :
 							optSystemOptionStorage.getBoolean(getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue)
 					);
 	}
@@ -181,7 +192,7 @@ public class ImageProcessorOptionsAndResults {
 			return false;
 		else {
 			optSystemOptionStorage.setBoolean(
-					getSystemOptionStorageGroup(), getSettingName(block, title), defaultValue);
+					getSystemOptionStorageGroup(block), getSettingName(block, title), defaultValue);
 			return true;
 		}
 	}
@@ -197,7 +208,7 @@ public class ImageProcessorOptionsAndResults {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getDouble(
-					getSystemOptionStorageGroup(), getSettingName(block, title),
+					getSystemOptionStorageGroup(block), getSettingName(block, title),
 					infoCamConfOrLateOrEearly == null ? defaultValue :
 							optSystemOptionStorage.getDouble(
 									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
@@ -208,7 +219,7 @@ public class ImageProcessorOptionsAndResults {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getInteger(
-					getSystemOptionStorageGroup(), getSettingName(block, title),
+					getSystemOptionStorageGroup(block), getSettingName(block, title),
 					infoCamConfOrLateOrEearly == null ? defaultValue :
 							optSystemOptionStorage.getInteger(
 									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
@@ -219,7 +230,7 @@ public class ImageProcessorOptionsAndResults {
 			return;
 		else
 			optSystemOptionStorage.setInteger(
-					getSystemOptionStorageGroup(), getSettingName(block, title), value);
+					getSystemOptionStorageGroup(block), getSettingName(block, title), value);
 	}
 	
 	public String getStringSetting(ImageAnalysisBlock block, String title, String defaultValue) {
@@ -227,7 +238,7 @@ public class ImageProcessorOptionsAndResults {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getString(
-					getSystemOptionStorageGroup(), getSettingName(block, title),
+					getSystemOptionStorageGroup(block), getSettingName(block, title),
 					infoCamConfOrLateOrEearly == null ? defaultValue :
 							optSystemOptionStorage.getString(
 									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
@@ -238,7 +249,7 @@ public class ImageProcessorOptionsAndResults {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getStringRadioSelection(
-					getSystemOptionStorageGroup(), getSettingName(block, title), possibleValues,
+					getSystemOptionStorageGroup(block), getSettingName(block, title), possibleValues,
 					infoCamConfOrLateOrEearly == null ? defaultValue :
 							optSystemOptionStorage.getStringRadioSelection(
 									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), possibleValues,
@@ -251,7 +262,7 @@ public class ImageProcessorOptionsAndResults {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getColor(
-					getSystemOptionStorageGroup(), getSettingName(block, title),
+					getSystemOptionStorageGroup(block), getSettingName(block, title),
 					infoCamConfOrLateOrEearly == null ? defaultValue :
 							optSystemOptionStorage.getColor(getSystemOptionStorageGroupWithoutCustomInfo(),
 									getSettingName(block, title), defaultValue));
@@ -262,7 +273,7 @@ public class ImageProcessorOptionsAndResults {
 			;
 		else
 			optSystemOptionStorage.setColor(
-					getSystemOptionStorageGroup(), getSettingName(block, title), value);
+					getSystemOptionStorageGroup(block), getSettingName(block, title), value);
 	}
 	
 	public Integer[] getIntArraySetting(ImageAnalysisBlock block, String title, Integer[] defaultValue) {
@@ -270,7 +281,7 @@ public class ImageProcessorOptionsAndResults {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getIntArray(
-					getSystemOptionStorageGroup(), getSettingName(block, title),
+					getSystemOptionStorageGroup(block), getSettingName(block, title),
 					infoCamConfOrLateOrEearly == null ? defaultValue :
 							optSystemOptionStorage.getIntArray(
 									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
