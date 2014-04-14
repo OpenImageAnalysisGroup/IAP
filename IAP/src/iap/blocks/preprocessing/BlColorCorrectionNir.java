@@ -44,11 +44,11 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 	private Image process(Image image, double blurRadius) {
 		String nm = optionsAndResults.getStringSettingRadio(this, "Mode", "Normalization",
 				StringManipulationTools.getStringListFromArray(new String[] { "Normalization", "Equalization" }));
-		ImageOperation image_io = image.io().histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35));
-		ImageOperation blured = image_io.copy();
-		// double avgValBlured = blured.getMedian();
-		blured = blured.blur(blurRadius).invertImageJ();
-		return blured.add(image_io.getImage()).histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35))
+		ImageOperation image_io = image.io();
+		ImageOperation filteredImage = image_io.copy();
+		filteredImage = filteredImage.blur(blurRadius).invertImageJ();// rankFilterImageJ(blurRadius, RankFilters.MEDIAN).invertImageJ();
+		return filteredImage.add(image_io.getImage())
+				.histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35))
 				.getImage();
 	}
 	
@@ -77,5 +77,12 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getDescription() {
 		return "Corrects illumination of the Nir-image by modelling shading by gaussian blur.";
+	}
+	
+	@Override
+	public String getDescriptionForParameters() {
+		return "<ul>" +
+				"<li>Saturated (for Normalization) - overall percentage of the most bright and most dark pixels which are used for the threshold determination." +
+				"</ul>";
 	}
 }

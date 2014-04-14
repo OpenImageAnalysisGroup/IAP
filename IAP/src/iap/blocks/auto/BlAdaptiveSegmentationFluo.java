@@ -2,8 +2,12 @@ package iap.blocks.auto;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import ij.process.AutoThresholder;
+import ij.process.AutoThresholder.Method;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -24,6 +28,14 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 		super.prepare();
 		this.auto_tune = getBoolean("Auto-Tune", true);
 		this.auto_tune_process_red_by_green = getBoolean("Auto-Tune - Process Mostly Red", false);
+		boolean tune = false;
+		if (tune) {
+			if (((int) optionsAndResults.getUnitTestIdx()) % 2 == 0)
+				auto_tune_process_red_by_green = true;
+			else
+				auto_tune_process_red_by_green = false;
+		}
+		
 	}
 	
 	@Override
@@ -54,7 +66,23 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 				filterInp = filterInp.convertFluo2intensity(FluoAnalysis.CLASSIC, 255);
 			ImageOperation filter = filterInp;
 			filter = filter.replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).show("Input For Auto-Threshold", debugValues);
-			filter = filter.autoThresholdingColorImageByUsingBrightnessMaxEntropy(auto_tune_process_red_by_green, debugValues).getImage()
+			ArrayList<String> possibleValues = new ArrayList<String>(Arrays.asList(AutoThresholder.getMethods()));
+			String methodName = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", "Yen", possibleValues);
+			Method[] methods = Method.values();
+			Method method = null;
+			for (Method m : methods)
+				if (methodName.equalsIgnoreCase(m.name()))
+					method = m;
+			
+			boolean tune = false;
+			
+			if (tune) {
+				int idx = (int) optionsAndResults.getUnitTestIdx();
+				idx = (int) (idx / 2d);
+				method = methods[idx];
+			}
+			
+			filter = filter.autoThresholdingColorImageByUsingBrightnessMaxEntropy(auto_tune_process_red_by_green, method, debugValues).getImage()
 					.show("Result Filter", debugValues).io();
 			io = io.applyMask(filter.getImage()).show("USED FOR CALC", debugValues);
 			
