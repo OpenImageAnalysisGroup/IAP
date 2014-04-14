@@ -66,7 +66,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				
 				// check if new config equals current config
 				if (previousResults != null)
-					if (!optionsAndResults.getSystemOptionStorageGroup().equals(previousResults.getSettingFolder()))
+					if (!optionsAndResults.getSystemOptionStorageGroup(this).equals(previousResults.getSettingFolder()))
 						previousResults = null;
 				
 				if (previousResults != null) {
@@ -92,7 +92,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 		ltm.setMaxDistanceBetweenLeafTips(100.0);
 		ltm.matchLeafTips();
 		Plant plant = ltm.getMatchedPlant();
-		plant.setSettingFolder(optionsAndResults.getSystemOptionStorageGroup());
+		plant.setSettingFolder(optionsAndResults.getSystemOptionStorageGroup(this));
 		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, plant);
 		markAndSaveLeafFeatures(cameraPosition, cameraType, norm, plant, timepoint);
 	}

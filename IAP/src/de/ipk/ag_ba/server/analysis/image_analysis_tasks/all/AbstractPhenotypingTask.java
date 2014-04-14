@@ -911,7 +911,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		
 		if (forceDebugStack) {
-			this.setDebugLastSystemOptionStorageGroup(options.getSystemOptionStorageGroup());
+			this.setDebugLastSystemOptionStorageGroup(options.getSystemOptionStorageGroup(null));
 		}
 		
 		HashMap<Integer, BlockResultSet> well2analysisResults = null;
