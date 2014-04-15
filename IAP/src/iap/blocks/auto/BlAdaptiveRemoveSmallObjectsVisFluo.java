@@ -51,11 +51,12 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 		double averageLeafWidthEstimationVIS = Double.NaN;
 		if (autoTune)
 			if (!Double.isNaN(averageLeafWidthEstimationFluo))
-				averageLeafWidthEstimationVIS = averageLeafWidthEstimationFluo /
-						input().masks().fluo().getWidth() * input().masks().vis().getWidth();
-			else
-				averageLeafWidthEstimationVIS = input().masks().vis().io().countFilledPixels() /
-						(double) input().masks().vis().copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels();
+				averageLeafWidthEstimationVIS = (averageLeafWidthEstimationFluo) /
+						input().masks().fluo().getWidth() * input().masks().vis().getWidth() - 7;
+			else {
+				averageLeafWidthEstimationVIS = (input().masks().vis().io().countFilledPixels()) /
+						input().masks().vis().copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels() - 7;
+			}
 		
 		res = new ImageOperation(mask).copy().bm().dilate(getInt("dilation vis", 0)).io().removeSmallClusters(
 				autoTune ? (int) (averageLeafWidthEstimationVIS * averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Area", 20 * 20),
