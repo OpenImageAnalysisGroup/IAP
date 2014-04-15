@@ -17,7 +17,7 @@ public class BlRootsSharpenImage extends AbstractSnapshotAnalysisBlock {
 		Image img = input().images().vis();
 		if (img != null)
 			img = img.io().copy()
-					.blur(getInt("blur", 2))
+					.blurImageJ(getInt("blur", 2))
 					.sharpen(getInt("sharpen", 3))
 					.getImage();
 		return img;

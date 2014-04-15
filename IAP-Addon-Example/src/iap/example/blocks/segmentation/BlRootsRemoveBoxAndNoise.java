@@ -39,7 +39,7 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 		io = io.replaceColor(optionsAndResults.getBackground(), blue);
 		io = io.threshold(getInt("minimum brightness", 10), optionsAndResults.getBackground(), blue)
 				.show("minimum brightness filtered", debug);
-		ImageOperation removeBlack = img.copy().io().blur(20).thresholdGrayClearLowerThan(150).show("large black area", debug);
+		ImageOperation removeBlack = img.copy().io().blurImageJ(20).thresholdGrayClearLowerThan(150).show("large black area", debug);
 		io = io.bm().erode(getInt("Reduce-area-ignore-border of box_erode-cnt", 70)).io()
 				.show("reduced area to ignore box border", debug);
 		io = io.bm().erode().io().removeSmallElements(
