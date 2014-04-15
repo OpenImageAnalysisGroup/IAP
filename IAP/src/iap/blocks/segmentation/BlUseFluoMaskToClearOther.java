@@ -28,16 +28,25 @@ public class BlUseFluoMaskToClearOther extends AbstractSnapshotAnalysisBlock {
 		int back = optionsAndResults.getBackground();
 		if (getBoolean("process VIS and FLUO", true) && processedMasks.fluo() != null) {
 			// apply enlarged FLUO mask to VIS
+			double fluoOnVis = getDouble("blur fluo mask on vis", 6);
+			double visOnFluo = getDouble("blur vis mask on fluo", 40d);
+			// boolean unitTune = true;
+			// if (unitTune)
+			// if (optionsAndResults.getUnitTestSteps() > 0) {
+			// fluoOnVis += (int) ((optionsAndResults.getUnitTestIdx() / 4) - 2) * 2;
+			// visOnFluo += ((int) ((optionsAndResults.getUnitTestIdx()) % 4) - 2) * 2;
+			// }
+			
 			if (processedMasks.vis() != null) {
 				double fW = (double) processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
 				double fH = (double) processedMasks.vis().getHeight() / (double) processedMasks.fluo().getHeight();
 				processedMasks.setVis(
 						processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
-								processedMasks.fluo().io().copy().blur(getDouble("blur fluo mask on vis", 10)).getImage(),
+								processedMasks.fluo().io().copy().blur(fluoOnVis).getImage(),
 								back).getImage());
 				processedMasks.setFluo(
 						processedMasks.fluo().io().copy().applyMask(
-								processedMasks.vis().io().copy().resize(1d / fW, 1d / fH).blur(getDouble("blur vis mask on fluo", 40d)).getImage(),
+								processedMasks.vis().io().copy().resize(1d / fW, 1d / fH).blur(visOnFluo).getImage(),
 								back).getImage());
 			}
 		}

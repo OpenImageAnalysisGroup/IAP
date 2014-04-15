@@ -87,8 +87,9 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 						optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
 						autoTune ? true : getBoolean("Use Fluo Area Parameter", true)).show("result fluo", debugValues)
 				.getImage();
-		if (getInt("dilation fluo", 0) > 0)
-			res = res.io().bm().erode(getInt("dilation fluo", 0)).getImage();
+		
+		if (getInt("dilation fluo", 1) > 0)
+			res = res.io().bm().erode(getInt("dilation fluo", 1)).getImage();
 		
 		res = input().masks().fluo().io().applyMask(res).getImage();
 		
