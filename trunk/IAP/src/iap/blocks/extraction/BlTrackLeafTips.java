@@ -41,46 +41,48 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 			ArrayList<BlockResultValue> result2 = oldResults == null || oldResults.isEmpty() ? null : oldResults.lastEntry().getValue();
 			LinkedList<BorderFeature> unassignedResults = null;
 			Plant previousResults = null;
+			
 			if (result1 != null) {
 				unassignedResults = (LinkedList<BorderFeature>) result1.getObject();
 			}
+			
 			if (result2 != null && !result2.isEmpty()) {
 				previousResults = (Plant) result2.iterator().next().getObject();
 			}
 			
+			// if no results break up
 			if (result1 == null && result2 == null)
 				continue;
-			else {
-				// get current timepoint
-				SampleInterface id = input().images().getAnyInfo().getParentSample();
-				Long time = id.getSampleFineTimeOrRowId();
-				if (time == null)
-					time = new Long(id.getTime());
-				
-				Normalisation n = new Normalisation(optionsAndResults.getREAL_MARKER_DISTANCE(), optionsAndResults.getCalculatedBlueMarkerDistance(),
-						input().masks(), ct, optionsAndResults.getLeftShiftX(ct), optionsAndResults.getTopShiftY(ct), optionsAndResults.getCenterX(ct),
-						optionsAndResults.getCenterY(ct));
-				
-				if (!n.isRealWorldCoordinateValid())
-					continue;
-				
-				// check if new config equals current config
-				if (previousResults != null)
-					if (!optionsAndResults.getSystemOptionStorageGroup(this).equals(previousResults.getSettingFolder()))
-						previousResults = null;
-				
-				if (previousResults != null) {
-					if (unassignedResults != null) {
-						// match
-						matchNewResults(previousResults, unassignedResults, cp, ct, time, n);
-						getResultSet().removeResultObject(result1);
-					}
-				} else {
-					if (unassignedResults != null) {
-						// first run, create new plant
-						createNewPlant(unassignedResults, cp, ct, time, n);
-						getResultSet().removeResultObject(result1);
-					}
+			
+			// get current timepoint
+			SampleInterface id = input().images().getAnyInfo().getParentSample();
+			Long time = id.getSampleFineTimeOrRowId();
+			if (time == null)
+				time = new Long(id.getTime());
+			
+			Normalisation n = new Normalisation(optionsAndResults.getREAL_MARKER_DISTANCE(), optionsAndResults.getCalculatedBlueMarkerDistance(),
+					input().masks(), ct, optionsAndResults.getLeftShiftX(ct), optionsAndResults.getTopShiftY(ct), optionsAndResults.getCenterX(ct),
+					optionsAndResults.getCenterY(ct));
+			
+			if (!n.isRealWorldCoordinateValid())
+				continue;
+			
+			// check if new config equals current config, if not reset plant object
+			if (previousResults != null)
+				if (!optionsAndResults.getSystemOptionStorageGroup(this).equals(previousResults.getSettingFolder()))
+					previousResults = null;
+			
+			if (previousResults != null) {
+				if (unassignedResults != null) {
+					// match new leaf tips
+					matchNewResults(previousResults, unassignedResults, cp, ct, time, n);
+					getResultSet().removeResultObject(result1);
+				}
+			} else {
+				if (unassignedResults != null) {
+					// first run, create new plant
+					createNewPlant(unassignedResults, cp, ct, time, n);
+					getResultSet().removeResultObject(result1);
 				}
 			}
 		}
@@ -113,35 +115,36 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	private void markAndSaveLeafFeatures(CameraPosition cameraPosition, final CameraType cameraType, final Normalisation norm, final Plant plant, long timepoint) {
 		// save to resultSet
-		LinkedList<Leaf> ll = plant.getLeafList();
-		final ArrayList<Color> col = Colors.get(ll.size() + 1, 1);
+		LinkedList<Leaf> leafList = plant.getLeafList();
+		final ArrayList<Color> colors = Colors.get(leafList.size() + 1, 1);
 		
 		getResultSet().setNumericResult(getBlockPosition(),
-				"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count", ll.size(), "tracked leafs|SUSAN");
+				"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count", leafList.size(), "tracked leaves|SUSAN");
 		
 		if (isBestAngle())
 			getResultSet().setNumericResult(getBlockPosition(),
-					"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count.best_angle", ll.size(), "tracked leafs|SUSAN");
+					"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count.best_angle", leafList.size(), "tracked leaves|SUSAN");
 		
+		// calculate leaf parameter
 		for (Leaf l : plant.getLeafList()) {
-			LeafTip lt = l.getLast();
+			LeafTip ltLast = l.getLast();
 			LeafTip ltFirst = l.getFirst();
 			
 			final int num = l.leafID;
 			
-			if (lt == null || cameraPosition == null || cameraType == null)
+			if (ltLast == null || cameraPosition == null || cameraType == null)
 				continue;
 			
-			if (lt != ltFirst) {
-				Vector2D trans1 = new Vector2D(lt.getImageX(norm) - ltFirst.getImageX(norm), lt.getImageY(norm) - ltFirst.getImageY(norm));
+			if (ltLast != ltFirst) {
+				Vector2D trans1 = new Vector2D(ltLast.getImageX(norm) - ltFirst.getImageX(norm), ltLast.getImageY(norm) - ltFirst.getImageY(norm));
 				Vector2D trans2 = new Vector2D(0.0, 1.0);
 				double angle = calcAngle(trans1, trans2);
-				double a = (ltFirst.getRealWorldX() - lt.getRealWorldX());
-				double b = (ltFirst.getRealWorldY() - lt.getRealWorldY());
+				double a = (ltFirst.getRealWorldX() - ltLast.getRealWorldX());
+				double b = (ltFirst.getRealWorldY() - ltLast.getRealWorldY());
 				double span_norm = Math.sqrt(a * a + b * b);
 				
-				double c = (ltFirst.getImageX(norm) - lt.getImageX(norm));
-				double d = (ltFirst.getImageY(norm) - lt.getImageY(norm));
+				double c = (ltFirst.getImageX(norm) - ltLast.getImageX(norm));
+				double d = (ltFirst.getImageY(norm) - ltLast.getImageY(norm));
 				double span = Math.sqrt(c * c + d * d);
 				
 				getResultSet().setNumericResult(0,
@@ -157,9 +160,9 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 						span, "px");
 			}
 			
-			final int xPos_norm = lt.getRealWorldX();
-			final int yPos_norm = lt.getRealWorldY();
-			final Double angle = (Double) lt.getFeature("angle");
+			final int xPos_norm = ltLast.getRealWorldX();
+			final int yPos_norm = ltLast.getRealWorldY();
+			final Double angle = (Double) ltLast.getFeature("angle");
 			
 			getResultSet().setNumericResult(0,
 					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".x",
@@ -177,6 +180,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 								angle, "degree");
 		}
 		
+		// calculate leaf tip parameter
 		for (Leaf l : plant.getLeafList()) {
 			LeafTip last = l.getLast();
 			for (LeafTip lt : l) {
@@ -200,7 +204,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 					public Image postProcessMask(Image mask) {
 						ImageCanvas c = mask.io().canvas();
 						if (!isLast) {
-							c = c.drawRectanglePoints(xPos - 4, yPos - 4, 8, 8, col.get(num), 1);
+							c = c.drawRectanglePoints(xPos - 4, yPos - 4, 8, 8, colors.get(num), 1);
 							if (db)
 								c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
 										" a: " + angle.intValue(), Color.BLACK);
@@ -210,8 +214,8 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 									vv.normalize()
 											.scalarMultiply((1 + (Math.sqrt(2) - 1) * (1 - Math.abs(Math.cos(2 * angle / 180. * Math.PI)))) * 16)
 									: vv;
-							c = c.drawRectangle(xPos - 18, yPos - 18, 36, 36, col.get(num), 2)
-									.drawLine(xPos, yPos, (int) d.getX() + xPos, (int) d.getY() + yPos, col.get(num).getRGB(), 0.2, 1);
+							c = c.drawRectangle(xPos - 18, yPos - 18, 36, 36, colors.get(num), 2)
+									.drawLine(xPos, yPos, (int) d.getX() + xPos, (int) d.getY() + yPos, colors.get(num).getRGB(), 0.2, 1);
 							if (db)
 								c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
 										" a: " + angle.intValue(), Color.BLACK);

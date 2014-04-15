@@ -49,8 +49,8 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 			if (input().masks().fluo() != null) {
 				// apply enlarged fluo mask to vis
 				Image mask = input().masks().fluo().copy().io().
-						crop(0.06, 0.08, 0.04, 0.02).show("Cropped Fluo Mask", false).
-						blur(getDouble("blur VIS mask", 20)).
+						cropPercent(0.06, 0.08, 0.04, 0.02).show("Cropped Fluo Mask", false).
+						blurImageJ(getDouble("blur VIS mask", 20)).
 						binary(Color.BLACK.getRGB(), optionsAndResults.getBackground()).show("blurred fluo mask", debug).getImage();
 				if (debug)
 					visMask.copy().io().or(mask.copy()).show("ORR");
@@ -177,7 +177,7 @@ public class BlUseFluoMaskToClearOtherImages extends AbstractSnapshotAnalysisBlo
 		if (processedMasks.fluo() != null) {
 			// apply enlarged VIS mask to nir
 			ImageOperation nir = processedMasks.nir().copy().io().show("NIRRRR", debug);
-			Image mask = processedMasks.fluo().copy().io().blur(3).
+			Image mask = processedMasks.fluo().copy().io().blurImageJ(3).
 					binary(Color.BLACK.getRGB(), optionsAndResults.getBackground()).show("blurred vis mask", debug).getImage();
 			processedMasks.setNir(nir.applyMask_ResizeMaskIfNeeded(
 					mask,

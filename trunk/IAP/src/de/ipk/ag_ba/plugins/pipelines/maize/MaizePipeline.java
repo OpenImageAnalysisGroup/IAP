@@ -12,6 +12,7 @@ import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcMainAxis;
+import iap.blocks.extraction.BlCalcMoments;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.extraction.BlDetectLeafTips;
@@ -27,7 +28,6 @@ import iap.blocks.preprocessing.BlAlign;
 import iap.blocks.preprocessing.BlColorBalanceCircularVisNir;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
-import iap.blocks.preprocessing.BlColorCorrectionNir;
 import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlRotate;
@@ -68,10 +68,8 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlAlign(),
 				new BlDetectBlueMarkers(),
 				new BlCutFromSide(),
-				
 				new BlColorBalanceVerticalVis(),
 				new BlColorBalanceVerticalFluo(),
-				new BlColorCorrectionNir(),
 				new BlColorBalanceCircularVisNir(),
 				
 				// segmentation
@@ -89,6 +87,7 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				new BlSkeletonizeNir(),
 				new BlCalcWidthAndHeight(),
 				new BlCalcCOG(),
+				new BlCalcMoments(),
 				new BlCalcMainAxis(),
 				new BlCalcColorHistograms(),
 				new BlCalcConvexHull(),

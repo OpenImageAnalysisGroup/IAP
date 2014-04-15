@@ -34,14 +34,14 @@ public class BlUseFluoMaskToClearNir extends AbstractSnapshotAnalysisBlock {
 					processedMasks.setNir(
 							processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy()
-											.blur(getDouble("blur fluo mask", 2d))
+											.blurImageJ(getDouble("blur fluo mask", 2d))
 											.getImage(),
 									back).show("FILTERED NIR IMAGE", debug).getImage());
 				}
 				if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 					processedMasks.setNir(
 							processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(processedMasks.fluo().io().copy()
-									.blur(getDouble("blur fluo mask", 0d)).getImage(),
+									.blurImageJ(getDouble("blur fluo mask", 0d)).getImage(),
 									back).show("FILTERED NIR IMAGE", debug).getImage());
 				}
 			}

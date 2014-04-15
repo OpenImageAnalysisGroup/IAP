@@ -2,7 +2,9 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import ij.gui.Roi;
 
+import java.awt.Rectangle;
 import java.util.HashSet;
 
 import org.StringManipulationTools;
@@ -41,14 +43,30 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 			return input().masks().nir();
 	}
 	
+	/**
+	 * @param Saturated
+	 *           (for Normalization) - 0.35 is equivalent to ImageJ´s 'Adjust Brightness/Contrast' method
+	 * @return
+	 */
 	private Image process(Image image, double blurRadius) {
 		String nm = optionsAndResults.getStringSettingRadio(this, "Mode", "Normalization",
 				StringManipulationTools.getStringListFromArray(new String[] { "Normalization", "Equalization" }));
 		ImageOperation image_io = image.io();
 		ImageOperation filteredImage = image_io.copy();
-		filteredImage = filteredImage.blur(blurRadius).invertImageJ();// rankFilterImageJ(blurRadius, RankFilters.MEDIAN).invertImageJ();
-		return filteredImage.add(image_io.getImage())
+		Roi bb = filteredImage.getBoundingBox();
+		Rectangle br = bb.getBounds();
+		filteredImage = filteredImage.crop(bb);
+		filteredImage = filteredImage.blurImageJ(blurRadius).invert();
+		int borderSizeLeftRight = (image.getWidth() - br.width) / 2;
+		int borderSizeTopBottom = (image.getHeight() - br.height) / 2;
+		return filteredImage
+				.addBorder(borderSizeLeftRight, borderSizeTopBottom, (int) br.getMinX() - borderSizeLeftRight, (int) br.getMinY() - borderSizeTopBottom,
+						ImageOperation.BACKGROUND_COLORint)
+				.add(image_io.getImage())
+				.crop(bb)
 				.histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35))
+				.addBorder(borderSizeLeftRight, borderSizeTopBottom, (int) br.getMinX() - borderSizeLeftRight, (int) br.getMinY() - borderSizeTopBottom,
+						ImageOperation.BACKGROUND_COLORint)
 				.getImage();
 	}
 	

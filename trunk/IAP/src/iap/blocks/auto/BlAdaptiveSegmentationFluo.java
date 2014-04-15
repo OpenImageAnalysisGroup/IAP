@@ -27,7 +27,7 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 	protected void prepare() {
 		super.prepare();
 		this.auto_tune = getBoolean("Auto-Tune", true);
-		this.auto_tune_process_red_by_green = getBoolean("Auto-Tune - Process Mostly Red", false);
+		this.auto_tune_process_red_by_green = getBoolean("Auto-Tune - Process Mostly Red", true);
 		boolean tune = false;
 		if (tune) {
 			if (((int) optionsAndResults.getUnitTestIdx()) % 2 == 0)
@@ -67,7 +67,7 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			ImageOperation filter = filterInp;
 			filter = filter.replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).show("Input For Auto-Threshold", debugValues);
 			ArrayList<String> possibleValues = new ArrayList<String>(Arrays.asList(AutoThresholder.getMethods()));
-			String methodName = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", "Yen", possibleValues);
+			String methodName = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", "Shanbhag", possibleValues);
 			Method[] methods = Method.values();
 			Method method = null;
 			for (Method m : methods)

@@ -79,7 +79,7 @@ public class BlKMeansVis extends AbstractSnapshotAnalysisBlock {
 			
 			float epsilon = (float) getDouble("epsilon", 0.001);
 			
-			res = kMeans(inp.copy().io().blur(getDouble("Blur", 0)).getImage(), seedColors, clusterColors, epsilon, initClusters);
+			res = kMeans(inp.copy().io().blurImageJ(getDouble("Blur", 0)).getImage(), seedColors, clusterColors, epsilon, initClusters);
 			
 			res.show("segres", debug);
 			

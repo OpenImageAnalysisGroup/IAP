@@ -47,7 +47,7 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
-			pix = getPixelsSimilarToReferenceColor(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(), true);
+			pix = getPixelsSimilarToReferenceColor(vis.copy().io().blurImageJ(getInt("vis-balance-blur", 5)).getImage(), true);
 		} else {
 			boolean adjustLeftRight = getBoolean("Adjust Left and Right Separately", false);
 			boolean adjustAuto = getBoolean("Automatic Adjustment Left and Right", false);
@@ -96,7 +96,7 @@ public class BlColorBalanceVerticalVis extends AbstractSnapshotAnalysisBlock {
 		ImageOperation io = new ImageOperation(vis);
 		double[] pix;
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE)
-			pix = getPixelsSimilarToReferenceColor(vis.copy().io().blur(getInt("vis-balance-blur", 5)).getImage(),
+			pix = getPixelsSimilarToReferenceColor(vis.copy().io().blurImageJ(getInt("vis-balance-blur", 5)).getImage(),
 					!getBoolean("Adjust to Center Brightness", true));
 		else
 			pix = getPixelsSimilarToReferenceColor(vis, !getBoolean("Adjust to Center Brightness", true));

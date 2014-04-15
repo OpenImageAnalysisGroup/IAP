@@ -44,7 +44,7 @@ public class BlAdaptiveUseFluoMaskToClearOther extends AbstractSnapshotAnalysisB
 				// System.out.println("DEBUG: FOR MASKING VIS BLUR FLUO: " + fluoBlur);
 				processedMasks.setVis(
 						processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
-								processedMasks.fluo().io().copy().blur(fluoBlur).getImage(),
+								processedMasks.fluo().io().copy().blurImageJ(fluoBlur).getImage(),
 								back).getImage());
 				
 				if (getDouble("Blur Leaf-width Factor Vis on Fluo", 1) > 0) {
@@ -55,7 +55,7 @@ public class BlAdaptiveUseFluoMaskToClearOther extends AbstractSnapshotAnalysisB
 					// System.out.println("DEBUG: FOR MASKING FLUO BLUR VIS: " + visBlur);
 					processedMasks.setFluo(
 							processedMasks.fluo().io().copy().applyMask(
-									processedMasks.vis().io().copy().resize(1d / fW, 1d / fH).blur(visBlur).getImage(),
+									processedMasks.vis().io().copy().resize(1d / fW, 1d / fH).blurImageJ(visBlur).getImage(),
 									back).getImage());
 				}
 			}
@@ -67,7 +67,7 @@ public class BlAdaptiveUseFluoMaskToClearOther extends AbstractSnapshotAnalysisB
 				// System.out.println("DEBUG: FOR MASKING NIR BLUR FLUO: " + fluoBlur);
 				processedMasks.setNir(
 						processedMasks.nir().io().applyMask_ResizeMaskIfNeeded(
-								processedMasks.fluo().io().copy().blur(fluoBlur).getImage(),
+								processedMasks.fluo().io().copy().blurImageJ(fluoBlur).getImage(),
 								back).getImage());
 			}
 		}

@@ -245,7 +245,7 @@ public class ImageCanvas {
 	}
 	
 	public void updateFromGraphics() {
-		image = new Image(buf);
+		image = new Image(Image.processTransparency(null, buf));
 	}
 	
 	/**

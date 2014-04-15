@@ -121,7 +121,7 @@ public class BlCutFromSide extends AbstractBlock {
 					
 					optionsAndResults.shiftImage((int) (cutLeft * result.getWidth()), (int) (cutTop * result.getHeight()), mask.getCameraType());
 					
-					result = result.crop(cutLeft, cutRight, cutTop, cutBottom);
+					result = result.cropPercent(cutLeft, cutRight, cutTop, cutBottom);
 				}
 			}
 		return result.getImage();

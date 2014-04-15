@@ -59,7 +59,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 					.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 25)) // 10
 					.bm().erode(getInt("Erode-Cnt-Vis", 5))
 					.dilate(getInt("Dilate-Cnt-Vis", 10)).io()
-					.blur(getDouble("Blur-Vis", 0))
+					.blurImageJ(getDouble("Blur-Vis", 0))
 					.getImage().show("vis", debug);
 			
 			if (viswork != null)
@@ -75,7 +75,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			Image viswork = vis.copy().io().bm()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Vis", 12))
 					.dilate(getInt("Dilate-Cnt-Vis", 6)).io()
-					.blur(getDouble("Blur-Vis", 3.0))
+					.blurImageJ(getDouble("Blur-Vis", 3.0))
 					.getImage().show("vis", debug);
 			
 			if (viswork != null)
@@ -104,7 +104,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 					.bm()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Fluo", 5))
 					.dilate(getInt("Dilate-Cnt-Fluo", 10)).io()
-					.blur(getDouble("Blur-Fluo", 0.0))
+					.blurImageJ(getDouble("Blur-Fluo", 0.0))
 					.getImage().show("fluo", debug);
 			
 			if (fluowork != null)
@@ -120,7 +120,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			Image viswork = fluo.copy().io().bm()// .filterRGB(150, 255, 255)
 					.erode(getInt("Erode-Cnt-Fluo", 0))
 					.dilate(getInt("Dilate-Cnt-Fluo", 0)).io()
-					.blur(getDouble("Blur-Fluo", 0.0))
+					.blurImageJ(getDouble("Blur-Fluo", 0.0))
 					.getImage().show("fluo", debug);
 			
 			if (viswork != null)
@@ -184,7 +184,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						.getImage().show("bloom filtered by HSV and then cleaned", getBoolean("debug bloom detection HSV filter", false));
 			} else {
 				probablyBloomFluo = skel2d.calcProbablyBloomImage(
-						proc.io().blur(getInt("bloom-blur", 10)).getImage().show("blur for bloom detection", debug),
+						proc.io().blurImageJ(getInt("bloom-blur", 10)).getImage().show("blur for bloom detection", debug),
 						getDouble("bloom hue", 0.075f)).io().// blur(3).
 						thresholdGrayClearLowerThan(getInt("bloom-max-brightness", 255), Color.BLACK.getRGB()).getImage();
 				
