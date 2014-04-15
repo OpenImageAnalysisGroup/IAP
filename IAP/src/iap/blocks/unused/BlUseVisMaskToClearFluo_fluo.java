@@ -37,8 +37,8 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlock 
 			int b = (int) (input().masks().vis().getWidth() * 0.3);
 			Image mask = input().masks().vis().copy().io().
 					addBorder(b, b / 2, (b / 2), optionsAndResults.getBackground()).
-					crop(0.23, 0.03, 0.285, 0.09).
-					blur(getDouble("blur", 25)).
+					cropPercent(0.23, 0.03, 0.285, 0.09).
+					blurImageJ(getDouble("blur", 25)).
 					binary(Color.BLACK.getRGB(), optionsAndResults.getBackground()).show("blurred vis mask", debug).getImage();
 			if (debug)
 				fluo.copy().or(mask.copy()).show("ORR");
@@ -72,7 +72,7 @@ public class BlUseVisMaskToClearFluo_fluo extends AbstractSnapshotAnalysisBlock 
 			ImageOperation nir = processedMasks.nir().copy().io().show("NIRRRR", debug);
 			Image mask = processedMasks.vis().copy().io().or(
 					input().masks().fluo()
-					).show("OR operation", debug).blur(20).
+					).show("OR operation", debug).blurImageJ(20).
 					binary(Color.BLACK.getRGB(), optionsAndResults.getBackground()).show("blurred vis mask", debug).getImage();
 			int gray = new Color(180, 180, 180).getRGB();
 			int back = optionsAndResults.getBackground();

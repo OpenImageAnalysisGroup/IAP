@@ -34,7 +34,7 @@ public class BlUseFluoMaskToClearIr extends AbstractSnapshotAnalysisBlock {
 					processedMasks.setIr(
 							processedMasks.ir().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().addBorder(0, 0, 0, 0, optionsAndResults.getBackground())
-											.blur(getDouble("mask blur", 2)).getImage(),
+											.blurImageJ(getDouble("mask blur", 2)).getImage(),
 									back).show("FILTERED IR IMAGE", debug).getImage());
 				}
 				if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && getBoolean("enabled", true)) {
@@ -42,7 +42,7 @@ public class BlUseFluoMaskToClearIr extends AbstractSnapshotAnalysisBlock {
 							processedMasks.ir().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy()
 											// .addBorder(0, 0, 0, 0, options.getBackground())
-											.blur(getDouble("mask blur", 2)).getImage(),
+											.blurImageJ(getDouble("mask blur", 2)).getImage(),
 									back).show("FILTERED IR IMAGE", debug).getImage());
 				}
 			}

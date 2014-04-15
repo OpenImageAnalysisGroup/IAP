@@ -34,7 +34,7 @@ public class BlRemoveBlackBelt extends AbstractSnapshotAnalysisBlock {
 			
 			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				// detect black belt
-				vis = vis.show("Start image", debug).blur(getDouble("blur", 3)).show("blurred", debug)
+				vis = vis.show("Start image", debug).blurImageJ(getDouble("blur", 3)).show("blurred", debug)
 						.filterRemoveLAB(
 								getInt("belt-lab-l-min", 0), getInt("belt-lab-l-max", 130),
 								getInt("belt-lab-a-min", 110), getInt("belt-lab-a-max", 130),

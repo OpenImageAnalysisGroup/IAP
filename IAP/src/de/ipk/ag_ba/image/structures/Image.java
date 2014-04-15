@@ -28,6 +28,8 @@ import java.awt.image.PixelGrabber;
 import java.awt.image.RGBImageFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -38,6 +40,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
 import sun.awt.image.ByteInterleavedRaster;
+import sun.awt.image.IntegerInterleavedRaster;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operation.ArrayUtil;
@@ -95,44 +98,7 @@ public class Image {
 		if (inpimg == null)
 			throw new Exception("Image could not be read: " + url);
 		try {
-			byte[] bp = ((ByteInterleavedRaster) inpimg.getRaster()).getDataStorage();
-			int[] pixels = new int[inpimg.getWidth() * inpimg.getHeight()];
-			boolean noAlpha = pixels.length != bp.length / 4;
-			int idx = 0;
-			int out_idx = 0;
-			int b1 = 0, b2 = 0, b3 = 0, b4;
-			for (byte bb : bp) {
-				int b = bb;
-				int off = idx % 4;
-				if (off == 0) {
-					// alpha
-					b1 = b; //
-				} else
-					if (off == 1) {
-						b2 = b;
-					} else
-						if (off == 2) {
-							b3 = b;
-						} else { // 3
-							// b
-							b4 = b;
-							if (noAlpha)
-								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b3) << 16) | ((0xFF & b2) << 8) | (0xFF & b4);
-							else {
-								if ((0xFF & b1) < 0xFF)
-									pixels[out_idx] = ImageOperation.BACKGROUND_COLORint;
-								else
-									pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b4) << 16) | ((0xFF & b3) << 8) | (0xFF & b2);
-							}
-							out_idx++;
-						}
-				idx++;
-				if (noAlpha && idx % 4 == 0) {
-					b1 = 0xFF;
-					idx++;
-				}
-			}
-			image = new ImagePlus(url.getFileName(), new ColorProcessor(inpimg.getWidth(), inpimg.getHeight(), pixels));
+			image = processTransparency(url.getFileName(), inpimg);
 		} catch (Exception e) {
 			System.out
 					.println(SystemAnalysis.getCurrentTime() + ">WARNING: Quick-load didn't work correctly, revert to save-conversion. Error: " + e.getMessage());
@@ -150,6 +116,58 @@ public class Image {
 		// h = image.getHeight();
 		// }
 		
+	}
+	
+	public static ImagePlus processTransparency(String optName, BufferedImage inpimg) {
+		
+		byte[] bp;
+		if (inpimg.getRaster() instanceof IntegerInterleavedRaster) {
+			int[] data = ((IntegerInterleavedRaster) inpimg.getRaster()).getDataStorage();
+			ByteBuffer byteBuffer = ByteBuffer.allocate(data.length * 4);
+			IntBuffer intBuffer = byteBuffer.asIntBuffer();
+			intBuffer.put(data);
+			bp = byteBuffer.array();
+		} else {
+			bp = ((ByteInterleavedRaster) inpimg.getRaster()).getDataStorage();
+		}
+		
+		int[] pixels = new int[inpimg.getWidth() * inpimg.getHeight()];
+		boolean noAlpha = pixels.length != bp.length / 4;
+		int idx = 0;
+		int out_idx = 0;
+		int b1 = 0, b2 = 0, b3 = 0, b4;
+		for (byte bb : bp) {
+			int b = bb;
+			int off = idx % 4;
+			if (off == 0) {
+				// alpha
+				b1 = b; //
+			} else
+				if (off == 1) {
+					b2 = b;
+				} else
+					if (off == 2) {
+						b3 = b;
+					} else { // 3
+						// b
+						b4 = b;
+						if (noAlpha)
+							pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b3) << 16) | ((0xFF & b2) << 8) | (0xFF & b4);
+						else {
+							if ((0xFF & b1) < 0xFF)
+								pixels[out_idx] = ImageOperation.BACKGROUND_COLORint;
+							else
+								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b4) << 16) | ((0xFF & b3) << 8) | (0xFF & b2);
+						}
+						out_idx++;
+					}
+			idx++;
+			if (noAlpha && idx % 4 == 0) {
+				b1 = 0xFF;
+				idx++;
+			}
+		}
+		return new ImagePlus(optName, new ColorProcessor(inpimg.getWidth(), inpimg.getHeight(), pixels));
 	}
 	
 	public Image(ImagePlus image) {

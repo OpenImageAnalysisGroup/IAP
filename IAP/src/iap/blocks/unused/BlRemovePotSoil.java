@@ -32,7 +32,7 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 				
 				ImageOperation mask = input().masks().vis().copy().io();
 				
-				mask = mask.blur(getDouble("blur", 2));
+				mask = mask.blurImageJ(getDouble("blur", 2));
 				mask = mask.filterRemoveLAB(
 						getInt("soil-lab-l-min", 90), getInt("soil-lab-l-max", 145),
 						getInt("soil-lab-a-min", 120), getInt("soil-lab-a-max", 135),

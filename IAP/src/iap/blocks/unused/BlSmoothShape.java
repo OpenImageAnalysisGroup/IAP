@@ -16,7 +16,7 @@ public class BlSmoothShape extends AbstractBlock {
 	protected Image processMask(Image mask) {
 		if (mask != null && mask.getCameraType() == CameraType.VIS) {
 			return mask.io().applyMask_ResizeMaskIfNeeded(
-					mask.copy().io().bm().erode(2).io().blur(3).bm().erode().erode().io().show("blurred mask", debug).getImage(),
+					mask.copy().io().bm().erode(2).io().blurImageJ(3).bm().erode().erode().io().show("blurred mask", debug).getImage(),
 					optionsAndResults.getBackground()).getImage();
 		} else
 			return mask;

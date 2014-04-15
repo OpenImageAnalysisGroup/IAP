@@ -13,6 +13,7 @@ import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcMainAxis;
+import iap.blocks.extraction.BlCalcMoments;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.extraction.BlCalcWidthAndHeightLR;
@@ -93,6 +94,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlCalcAreas(),
 				new BlCalcColorHistograms(),
 				new BlCalcMainAxis(),
+				new BlCalcMoments(),
 				new BlCalcVolumes(),
 				new BlCalcWidthAndHeight(),
 				new BlCalcWidthAndHeightLR(),

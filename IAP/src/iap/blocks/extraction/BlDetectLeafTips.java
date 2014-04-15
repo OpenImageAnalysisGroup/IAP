@@ -268,7 +268,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		img = img.io().bm().dilate(dilate).erode(erode).getImage().show("Erode and Dilate on " + ct.toString(), debugValues);
 		
 		// blur
-		img = img.io().blur(blurSize).getImage().show("Blured Image " + ct.toString(), debugValues);
+		img = img.io().blurImageJ(blurSize).getImage().show("Blured Image " + ct.toString(), debugValues);
 		
 		// enlarge 1 px lines TODO this works, but the border tracking returns errors even if 1 px lines are enlarged.
 		ImageConvolution ic = new ImageConvolution(img);

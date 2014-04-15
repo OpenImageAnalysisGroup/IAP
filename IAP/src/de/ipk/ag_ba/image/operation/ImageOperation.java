@@ -1146,6 +1146,9 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(getImage());
 	}
 	
+	/**
+	 * ignores background
+	 */
 	public ImageOperation invert() {
 		int[] img = getAs1D();
 		int i = 0;
@@ -1170,61 +1173,14 @@ public class ImageOperation implements MemoryHogInterface {
 		return new Image(image.getWidth(), image.getHeight(), img);
 	}
 	
-	public ImageOperation blur(double radius) {
+	public ImageOperation blurImageJ(double radius) {
 		if (radius < 0.001)
 			return this;
-		boolean oldStyle = true;
-		if (oldStyle) {
-			Prefs.setThreads(1);
-			GaussianBlur gb = new GaussianBlur();
-			gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
-			return this;// new ImageOperation(new FlexibleImage(getImage().getAs2A()));
-		} else {
-			int sidePixels = (int) (radius * 2d);
-			if (sidePixels < 3)
-				sidePixels = 3;
-			int[] img = getAs1D();
-			int[] imgR = new int[img.length];
-			int[] imgG = new int[img.length];
-			int[] imgB = new int[img.length];
-			int w = image.getWidth();
-			int h = image.getHeight();
-			for (int i = 0; i < img.length; i++) {
-				int p = img[i];
-				imgR[i] = (p & 0xff0000) >> 16;
-				imgG[i] = (p & 0x00ff00) >> 8;
-				imgB[i] = (p & 0x0000ff);
-			}
-			int sideL = -sidePixels / 2;
-			int sideR = sidePixels / 2;
-			int sumR, sumG, sumB;
-			for (int i = 0; i < img.length; i++) {
-				sumR = 0;
-				sumG = 0;
-				sumB = 0;
-				int n = 0;
-				for (int y = sideL; y < sideR; y++) {
-					int yw = y * w;
-					for (int x = sideL; x < sideR; x++) {
-						int idx = i + x + yw;
-						if (idx < 0)
-							idx = 0;
-						else
-							if (idx >= img.length)
-								idx = img.length - 1;
-						sumR += imgR[idx];
-						sumG += imgG[idx];
-						sumB += imgB[idx];
-						n++;
-					}
-				}
-				sumR /= n;
-				sumG /= n;
-				sumB /= n;
-				img[i] = (0xFF << 24 | (sumR & 0xFF) << 16) | ((sumG & 0xFF) << 8) | ((sumB & 0xFF) << 0);
-			}
-			return new ImageOperation(img, w, h);
-		}
+		
+		Prefs.setThreads(1);
+		GaussianBlur gb = new GaussianBlur();
+		gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
+		return this;// new ImageOperation(new FlexibleImage(getImage().getAs2A()));
 	}
 	
 	/**
@@ -1473,14 +1429,12 @@ public class ImageOperation implements MemoryHogInterface {
 	// }
 	//
 	/**
-	 * @param double: pLeft
-	 *        - percent leaft
+	 * @param double: pLeft percent
 	 * @param pRight
 	 * @param pTop
 	 * @param pBottom
-	 * @return
 	 */
-	public ImageOperation crop(double pLeft, double pRight, double pTop,
+	public ImageOperation cropPercent(double pLeft, double pRight, double pTop,
 			double pBottom) {
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -3850,7 +3804,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation unsharpedMask(Image inp, double weight, double sigma) {
 		double[] fac = { weight, weight, weight };
-		Image blured = new ImageOperation(image).blur(sigma).multiplicateImageChannelsWithFactors(fac).getImage();
+		Image blured = new ImageOperation(image).blurImageJ(sigma).multiplicateImageChannelsWithFactors(fac).getImage();
 		blured.show("blured");
 		return new ImageOperation(inp).show("orig").subtractImages(blured, "").show("sub");
 	}
@@ -5269,5 +5223,19 @@ public class ImageOperation implements MemoryHogInterface {
 			}
 		}
 		return res;
+	}
+	
+	public void setRoi(Roi boundingBox) {
+		image.setRoi(boundingBox);
+	}
+	
+	public ImageOperation crop(Roi bb) {
+		Rectangle br = bb.getBounds();
+		return cropAbs((int) br.getMinX(), (int) br.getMaxX(), (int) br.getMinY(), (int) br.getMaxY());
+	}
+	
+	public ImageOperation convertFP2RGB() {
+		image.setProcessor(image.getProcessor().convertToColorProcessor());
+		return this;
 	}
 }

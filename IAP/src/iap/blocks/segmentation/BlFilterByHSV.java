@@ -48,7 +48,7 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlock {
 				st = new ImageStack();
 			for (int filter = 1; filter <= HSVfilters; filter++) {
 				String pf = optics + " filter " + filter + " ";
-				ImageOperation blurred = processedMask.blur(getDouble(pf + " blur", 1)).show("in mask blurred", debug);
+				ImageOperation blurred = processedMask.blurImageJ(getDouble(pf + " blur", 1)).show("in mask blurred", debug);
 				boolean manip = getBoolean(pf + "manipulate mask", false);
 				if (!manip) {
 					processedMask = blurred.filterRemoveHSV(

@@ -34,7 +34,7 @@ public class BlUseFluoMaskToClearVis extends AbstractSnapshotAnalysisBlock {
 				if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 					processedMasks.setVis(
 							processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
-									processedMasks.fluo().io().copy().blur(getDouble("blur fluo mask on vis", 2)).getImage(),
+									processedMasks.fluo().io().copy().blurImageJ(getDouble("blur fluo mask on vis", 2)).getImage(),
 									back).show("FILTERED VIS IMAGE", debug).getImage());
 				}
 				double f = (double) processedMasks.vis().getWidth() / (double) processedMasks.fluo().getWidth();
@@ -42,14 +42,14 @@ public class BlUseFluoMaskToClearVis extends AbstractSnapshotAnalysisBlock {
 					processedMasks.setVis(
 							processedMasks.vis().io().applyMask_ResizeMaskIfNeeded(
 									processedMasks.fluo().io().copy().resize(f, f)
-											.blur(getDouble("blur fluo mask on vis", 0d)).getImage(),
+											.blurImageJ(getDouble("blur fluo mask on vis", 0d)).getImage(),
 									back).show("FILTERED VIS IMAGE", debug).getImage());
 				}
 				if (getBoolean("Apply Filtered VIS back to FLUO", false))
 					processedMasks.setFluo(
 							processedMasks.fluo().io().copy().applyMask_ResizeMaskIfNeeded(
 									processedMasks.vis().io().copy().resize(1d / f, 1d / f)
-											.blur(getDouble("blur vis mask on fluo", 1.5d)).getImage(),
+											.blurImageJ(getDouble("blur vis mask on fluo", 1.5d)).getImage(),
 									back).show("FILTERED FLUO IMAGE", debug).getImage());
 			}
 		}

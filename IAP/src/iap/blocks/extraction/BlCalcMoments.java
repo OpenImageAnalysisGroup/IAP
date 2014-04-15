@@ -115,7 +115,7 @@ public class BlCalcMoments extends AbstractBlock {
 					Graphics2D g = (Graphics2D) canvas.getGraphics();
 					g.setColor(Color.GRAY);
 					g.rotate(omega, centerOfGravity.x, centerOfGravity.y);
-					g.setStroke(new BasicStroke(2f));;
+					g.setStroke(new BasicStroke(2f));
 					g.drawOval(centerOfGravity.x - (int) length_major, centerOfGravity.y - (int) length_minor, (int) (1 + length_major) * 2,
 							(int) (1 + length_minor) * 2);
 					canvas.updateFromGraphics();
@@ -180,8 +180,6 @@ public class BlCalcMoments extends AbstractBlock {
 	
 	@Override
 	protected Image processMask(Image mask) {
-		// TODO Auto-generated method stub
-		return null;
+		return mask;
 	}
-	
 }
