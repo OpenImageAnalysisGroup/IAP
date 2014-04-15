@@ -3,9 +3,7 @@ package de.ipk.ag_ba.plugins.pipelines.maize;
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
-import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
-import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
@@ -74,9 +72,7 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 				
 				// segmentation
 				new BlRemoveBackground(),
-				new BlAdaptiveSegmentationFluo(),
 				new BlKMeansVis(),
-				new BlAutoAdaptiveThresholdNir(),
 				new BlMedianFilterFluo(),
 				new BlMorphologicalOperations(),
 				new BlAdaptiveRemoveSmallObjectsVisFluo(),

@@ -16,6 +16,8 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
+ * Not needed if BlRemoveBackground is used and if a reference image is available, as this already is performing a thresholding, which works fine in most cases.
+ * 
  * @author klukas
  */
 public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
