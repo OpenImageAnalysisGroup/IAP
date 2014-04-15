@@ -80,11 +80,11 @@ public class ImageMoments {
 		double tempSum = 0;
 		
 		int[][] img2d = img.getAs2A();
-		int w = img.getWidth();
-		int h = img.getHeight();
+		// int w = img.getWidth();
+		// int h = img.getHeight();
 		
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
+		for (int x = 0; x < img2d.length; x++) {
+			for (int y = 0; y < img2d[x].length; y++) {
 				if (img2d[x][y] != background) {
 					tempSum += Math.pow(x - cogX, i) * Math.pow(y - cogY, j);
 				}

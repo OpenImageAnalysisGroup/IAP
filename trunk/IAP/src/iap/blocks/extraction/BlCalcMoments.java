@@ -28,7 +28,8 @@ public class BlCalcMoments extends AbstractBlock {
 		calcOnVis = getBoolean("Process on Vis Image", false);
 		Image img = input().masks().vis();
 		if (img != null && calcOnVis) {
-			calcMoments(img);
+			if (img.getWidth() > 1 && img.getHeight() > 1)
+				calcMoments(img);
 		}
 		return img;
 	}
@@ -38,7 +39,8 @@ public class BlCalcMoments extends AbstractBlock {
 		calcOnVis = getBoolean("Process on Vis Image", false);
 		Image img = input().masks().fluo();
 		if (img != null && !calcOnVis) {
-			calcMoments(img);
+			if (img.getWidth() > 1 && img.getHeight() > 1)
+				calcMoments(img);
 		}
 		return img;
 	}
