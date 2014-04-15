@@ -19,22 +19,23 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlCalcCOG extends AbstractBlock {
 	
 	@Override
-	protected Image processMask(Image mask) {
-		return mask;
-	}
-	
-	@Override
-	protected Image processVISmask() {
-		Image fi = input().masks() != null ? input().masks().vis() : null;
-		if (!getBoolean("Process Fluo Instead of Vis", true)) {
+	protected Image processMask(Image fi) {
+		if (fi == null)
+			return null;
+		if (!getBoolean("Process " + fi.getCameraType(), true)) {
 			if (fi != null) {
 				final Vector2d cog = fi.io().stat().getCOG();
 				if (cog != null) {
 					String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
 					getResultSet().setNumericResult(getBlockPosition(),
-							pos + "vis.cog.x", cog.x, "px");
+							pos + fi.getCameraType() + ".cog.x", cog.x, "px");
 					getResultSet().setNumericResult(getBlockPosition(),
-							pos + "vis.cog.y", cog.y, "px");
+							pos + fi.getCameraType() + ".cog.y", cog.y, "px");
+					
+					Double averageDistance = fi.io().stat().calculateAverageDistanceTo(cog);
+					if (averageDistance != null)
+						getResultSet().setNumericResult(0, pos + fi.getCameraType() + ".cog.avg_distance_to_center", averageDistance, "px");
+					
 				}
 				RunnableOnImage runnableOnMask = new RunnableOnImage() {
 					@Override
@@ -42,34 +43,7 @@ public class BlCalcCOG extends AbstractBlock {
 						return in.io().canvas().drawCircle((int) cog.x, (int) cog.y, 5, Color.BLACK.getRGB(), 0.5d, 1).getImage();
 					}
 				};
-				getResultSet().addImagePostProcessor(CameraType.VIS, null, runnableOnMask);
-			}
-		}
-		return fi;
-	}
-	
-	@Override
-	protected Image processFLUOmask() {
-		Image fi = input().masks() != null ? input().masks().fluo() : null;
-		if (getBoolean("Process Fluo Instead of Vis", true)) {
-			if (fi != null) {
-				final Vector2d cog = fi.io().stat().getCOG();
-				if (cog != null) {
-					String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
-					getResultSet().setNumericResult(getBlockPosition(),
-							pos + "fluo.cog.x", cog.x, "px");
-					getResultSet().setNumericResult(getBlockPosition(),
-							pos + "fluo.cog.y", cog.y, "px");
-					
-					RunnableOnImage runnableOnMask = new RunnableOnImage() {
-						@Override
-						public Image postProcess(Image in) {
-							return in.io().canvas().drawCircle((int) cog.x, (int) cog.y, 5, Color.BLACK.getRGB(), 0.5d, 1).getImage();
-						}
-					};
-					getResultSet().addImagePostProcessor(CameraType.FLUO, null, runnableOnMask);
-					
-				}
+				getResultSet().addImagePostProcessor(fi.getCameraType(), null, runnableOnMask);
 			}
 		}
 		return fi;
@@ -80,15 +54,14 @@ public class BlCalcCOG extends AbstractBlock {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	
 	@Override
 	public HashSet<CameraType> getCameraOutputTypes() {
-		HashSet<CameraType> res = new HashSet<CameraType>();
-		res.add(CameraType.VIS);
-		res.add(CameraType.FLUO);
-		return res;
+		return getCameraInputTypes();
 	}
 	
 	@Override
@@ -108,11 +81,6 @@ public class BlCalcCOG extends AbstractBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Calculates the center of gravity.";
-	}
-	
-	@Override
-	public String getDescriptionForParameters() {
-		return "Process Fluo images (default) or Vis images (if instead selected).";
+		return "Calculates the center of gravity and the average distance of the plant pixels to the center.";
 	}
 }

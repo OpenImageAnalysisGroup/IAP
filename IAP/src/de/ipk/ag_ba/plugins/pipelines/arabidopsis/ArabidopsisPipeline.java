@@ -4,6 +4,7 @@ import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
+import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
@@ -74,6 +75,7 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 				new BlSkeletonizeVisFluo(),
 				new BlCalcWidthAndHeight(),
 				new BlCalcAreas(),
+				new BlCalcCOG(),
 				new BlCalcColorHistograms(),
 				new BlCalcConvexHull(),
 				

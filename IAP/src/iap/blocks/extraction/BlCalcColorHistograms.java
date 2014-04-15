@@ -8,7 +8,6 @@ import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import java.util.HashSet;
 
 import org.SystemAnalysis;
-import org.Vector2d;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -74,16 +73,6 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 					for (int r = 0; r < regions; r++)
 						processVisibleImage(io.getInnerCircle(r, regions).show("Top Part " + r + "/" + regions, debugRegionParts),
 								pre + ".section_" + (r + 1) + "_" + regions + ".", true);
-				}
-			}
-			
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				// calculate average distance to center
-				Vector2d gravityCenter = io.getCentroid(optionsAndResults.getBackground());
-				if (gravityCenter != null) {
-					double averageDistance = io.calculateAverageDistanceTo(gravityCenter);
-					if (!Double.isNaN(averageDistance))
-						getResultSet().setNumericResult(0, pre + ".avg_distance_to_center", averageDistance, "px");
 				}
 			}
 			

@@ -41,4 +41,32 @@ public class ImageCalculation {
 			return null;
 	}
 	
+	public Double calculateAverageDistanceTo(Vector2d p) {
+		if (p == null)
+			return null;
+		
+		int width = imageOperation.getWidth();
+		int height = imageOperation.getHeight();
+		
+		int[] image1d = imageOperation.getAs1D();
+		
+		int black = ImageOperation.BACKGROUND_COLORint;
+		
+		int area = 0;
+		double distanceSum = 0;
+		
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				if (image1d[x + y * width] != black) {
+					distanceSum += Math.sqrt((p.x - x) * (p.x - x) + (p.y - y) * (p.y - y));
+					area++;
+				}
+			}
+		}
+		if (area > 0)
+			return distanceSum / area;
+		else
+			return null;
+	}
+	
 }

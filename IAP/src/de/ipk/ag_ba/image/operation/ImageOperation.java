@@ -4862,34 +4862,6 @@ public class ImageOperation implements MemoryHogInterface {
 		return getAs1D()[x + y * getWidth()];
 	}
 	
-	public double calculateAverageDistanceTo(Vector2d p) {
-		if (p == null)
-			return java.lang.Double.NaN;
-		
-		int width = image.getWidth();
-		int height = image.getHeight();
-		
-		int[] image1d = getAs1D();
-		
-		int black = BACKGROUND_COLORint;
-		
-		int area = 0;
-		double distanceSum = 0;
-		
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				if (image1d[x + y * width] != black) {
-					distanceSum += Math.sqrt((p.x - x) * (p.x - x) + (p.y - y) * (p.y - y));
-					area++;
-				}
-			}
-		}
-		if (area > 0)
-			return distanceSum / area;
-		else
-			return java.lang.Double.NaN;
-	}
-	
 	/**
 	 * Values <=0 mean, clear until non-background is found
 	 */
@@ -5185,6 +5157,15 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation diff(Image image) {
 		ImageCalculator ic = new ImageCalculator();
 		ImagePlus ip = ic.run("diff, 32", this.image, image.getAsImagePlus());
+		return new ImageOperation(ip);
+	}
+	
+	public ImageOperation imageCalculatorImageJ(Image image, String mode, boolean mode32) {
+		ImageCalculator ic = new ImageCalculator();
+		String combinedModes = mode;
+		if (mode32)
+			combinedModes += ", 32";
+		ImagePlus ip = ic.run(combinedModes, this.image, image.getAsImagePlus());
 		return new ImageOperation(ip);
 	}
 	
