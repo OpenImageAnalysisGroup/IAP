@@ -10,6 +10,7 @@ import java.util.HashSet;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.fluoop.FluoAnalysis;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.intensity.Histogram;
 import de.ipk.ag_ba.image.operations.intensity.Histogram.Mode;
@@ -139,6 +140,16 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 			
 			{ // blue color fluo image
 				Image of = getResultSet().getImage(BlAdaptiveSegmentationFluo.RESULT_OF_FLUO_INTENSITY);
+				if (of == null) {
+					Image resClassic, resChlorophyll, resPhenol;
+					double p1 = getDouble("minimum-intensity-classic", 220);
+					double p2 = getDouble("minimum-intensity-chloro", 220);
+					double p3 = getDouble("minimum-intensity-phenol", 170);
+					resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, p1).getImage();
+					resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, p2).getImage();
+					resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, p3).getImage();
+					of = new Image(resClassic, resChlorophyll, resPhenol);
+				}
 				if (of != null) {
 					of = of.io().applyMask(input().masks().fluo()).getImage().show("Blue Color Fluo Image", debug);
 					ResultsTableWithUnits rt = of.io().intensity(getInt("Bin-Cnt-Fluo", 20))
