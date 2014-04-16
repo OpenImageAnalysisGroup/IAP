@@ -3,31 +3,23 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
+import iap.blocks.extraction.postprocessors.MomentResultPostProcessor;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.HashSet;
 
-import javax.vecmath.Point2d;
-
 import de.ipk.ag_ba.image.operation.ImageMoments;
 import de.ipk.ag_ba.image.operation.ImageOperation;
-import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
 public class BlCalcMoments extends AbstractBlock {
 	
-	boolean calcOnVis;
-	
 	@Override
 	protected Image processVISmask() {
-		calcOnVis = getBoolean("Process on Vis Image", false);
 		Image img = input().masks().vis();
-		if (img != null && calcOnVis) {
+		if (img != null) {
 			if (img.getWidth() > 1 && img.getHeight() > 1)
 				calcMoments(img);
 		}
@@ -36,9 +28,8 @@ public class BlCalcMoments extends AbstractBlock {
 	
 	@Override
 	protected Image processFLUOmask() {
-		calcOnVis = getBoolean("Process on Vis Image", false);
 		Image img = input().masks().fluo();
-		if (img != null && !calcOnVis) {
+		if (img != null) {
 			if (img.getWidth() > 1 && img.getHeight() > 1)
 				calcMoments(img);
 		}
@@ -64,7 +55,7 @@ public class BlCalcMoments extends AbstractBlock {
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
 		
-		String imageModality = calcOnVis == true ? "vis." : "fluo.";
+		final CameraType imageModality = img.getCameraType();
 		
 		if (lambdas[1] > lambdas[0]) {
 			double temp1 = my20;
@@ -92,53 +83,7 @@ public class BlCalcMoments extends AbstractBlock {
 		final double length_minor = Math.sqrt(1 * (a + c - Math.sqrt(b * b + (a - c) * (a - c))));
 		
 		if (getBoolean("Mark in Result Image", false)) {
-			RunnableOnImageSet ri = new RunnableOnImageSet() {
-				
-				@Override
-				public Image postProcessMask(Image img) {
-					Point2d p1_start = new Point2d((centerOfGravity.x + length_major * Math.cos(omega)), (centerOfGravity.y + length_major * Math.sin(omega)));
-					Point2d p2_start = new Point2d((centerOfGravity.x + length_minor * -Math.sin(omega)), (centerOfGravity.y + length_minor * Math.cos(omega)));
-					
-					Point2d p1_end = new Point2d((centerOfGravity.x - length_major * Math.cos(omega)), (centerOfGravity.y - length_major * Math.sin(omega)));
-					Point2d p2_end = new Point2d((centerOfGravity.x - length_minor * -Math.sin(omega)), (centerOfGravity.y - length_minor * Math.cos(omega)));
-					
-					// draw moments
-					img = img
-							.io()
-							.canvas()
-							.drawLine((int) p1_start.x, (int) p1_start.y, centerOfGravity.x, centerOfGravity.y, Color.PINK.getRGB(), 0.2, 1)
-							.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p1_end.x, (int) p1_end.y, Color.PINK.getRGB(), 0.2, 1)
-							.drawLine((int) p2_start.x, (int) p2_start.y, centerOfGravity.x, centerOfGravity.y, Color.GREEN.getRGB(), 0.2, 1)
-							.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p2_end.x, (int) p2_end.y, Color.GREEN.getRGB(), 0.2, 1)
-							.getImage();
-					
-					// draw MEE
-					ImageCanvas canvas = img.io().canvas();
-					Graphics2D g = (Graphics2D) canvas.getGraphics();
-					g.setColor(Color.GRAY);
-					g.rotate(omega, centerOfGravity.x, centerOfGravity.y);
-					g.setStroke(new BasicStroke(2f));
-					g.drawOval(centerOfGravity.x - (int) length_major, centerOfGravity.y - (int) length_minor, (int) (1 + length_major) * 2,
-							(int) (1 + length_minor) * 2);
-					canvas.updateFromGraphics();
-					img = canvas.getImage();
-					
-					return img;
-				}
-				
-				@Override
-				public Image postProcessImage(Image image) {
-					return image;
-				}
-				
-				@Override
-				public CameraType getConfig() {
-					if (!calcOnVis)
-						return CameraType.FLUO;
-					else
-						return CameraType.VIS;
-				}
-			};
+			RunnableOnImageSet ri = new MomentResultPostProcessor(length_major, centerOfGravity, imageModality, length_minor, omega);
 			
 			getResultSet().addImagePostProcessor(ri);
 		}
@@ -147,10 +92,8 @@ public class BlCalcMoments extends AbstractBlock {
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
-		if (calcOnVis)
-			res.add(CameraType.VIS);
-		else
-			res.add(CameraType.FLUO);
+		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
@@ -176,7 +119,7 @@ public class BlCalcMoments extends AbstractBlock {
 	
 	@Override
 	public String getDescriptionForParameters() {
-		return "Process Fluo images (default) or Vis images (if instead selected).";
+		return null;
 		
 	}
 	

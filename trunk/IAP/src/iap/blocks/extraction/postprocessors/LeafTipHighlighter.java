@@ -1,4 +1,4 @@
-package iap.blocks.extraction;
+package iap.blocks.extraction.postprocessors;
 
 import iap.blocks.data_structures.RunnableOnImageSet;
 
