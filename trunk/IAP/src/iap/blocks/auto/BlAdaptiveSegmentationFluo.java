@@ -69,7 +69,7 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			ImageOperation filter = filterInp;
 			filter = filter.replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).show("Input For Auto-Threshold", debugValues);
 			ArrayList<String> possibleValues = new ArrayList<String>(Arrays.asList(AutoThresholder.getMethods()));
-			String methodName = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", "Shanbhag", possibleValues);
+			String methodName = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", "RenyiEntropy", possibleValues);
 			Method[] methods = Method.values();
 			Method method = null;
 			for (Method m : methods)
