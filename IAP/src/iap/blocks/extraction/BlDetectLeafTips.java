@@ -131,41 +131,16 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	private void savePeaksAndFeatures(LinkedList<BorderFeature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius, int maxValidY) {
 		boolean saveListObject = true;
+		boolean saveLeafCount = true;
 		boolean saveFeaturesInResultSet = false;
 		
 		if (saveListObject) {
-			ArrayList<BorderFeature> toRemove = new ArrayList<BorderFeature>();
-			// remove bordersize from all positions
-			for (BorderFeature bf : peakList) {
-				HashMap<String, FeatureObject> fm = bf.getFeatureMap();
-				if (bf.getPosition().getY() > maxValidY)
-					toRemove.add(bf);
-				for (FeatureObject fo : fm.values()) {
-					if (fo.featureObjectType == FeatureObjectType.POSITION) {
-						fo.feature = (int) ((Integer) (fo.feature) - borderSize);
-					}
-					if (fo.featureObjectType == FeatureObjectType.VECTOR) {
-						fo.feature = ((Vector2D) fo.feature).add(new Vector2D(-borderSize, -borderSize));
-					}
-				}
-			}
-			peakList.removeAll(toRemove);
-			getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, peakList);
+			saveLeafTipList(peakList, cameraType, maxValidY);
 		}
 		
-		int count = 0;
-		for (BorderFeature bf : peakList) {
-			count++;
+		if (saveLeafCount) {
+			saveLeafCount(cameraType, cameraPosition, peakList.size());
 		}
-		
-		// save leaf count
-		getResultSet().setNumericResult(getBlockPosition(),
-				"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", count, "leaftips|SUSAN");
-		
-		// save leaf count for best angle
-		if (isBestAngle)
-			getResultSet().setNumericResult(getBlockPosition(),
-					"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count.best_angle", count, "leaftips|SUSAN");
 		
 		if (saveFeaturesInResultSet) {
 			int index = 1;
@@ -235,6 +210,37 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		}
 	}
 	
+	private void saveLeafCount(CameraType cameraType, CameraPosition cameraPosition, int count) {
+		// save leaf count
+		getResultSet().setNumericResult(getBlockPosition(),
+				"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", count, "leaftips|SUSAN");
+		
+		// save leaf count for best angle
+		if (isBestAngle)
+			getResultSet().setNumericResult(getBlockPosition(),
+					"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count.best_angle", count, "leaftips|SUSAN");
+	}
+	
+	private void saveLeafTipList(LinkedList<BorderFeature> peakList, CameraType cameraType, int maxValidY) {
+		ArrayList<BorderFeature> toRemove = new ArrayList<BorderFeature>();
+		// remove bordersize from all position-features
+		for (BorderFeature bf : peakList) {
+			HashMap<String, FeatureObject> fm = bf.getFeatureMap();
+			if (bf.getPosition().getY() > maxValidY)
+				toRemove.add(bf);
+			for (FeatureObject fo : fm.values()) {
+				if (fo.featureObjectType == FeatureObjectType.POSITION) {
+					fo.feature = (int) ((Integer) (fo.feature) - borderSize);
+				}
+				if (fo.featureObjectType == FeatureObjectType.VECTOR) {
+					fo.feature = ((Vector2D) fo.feature).add(new Vector2D(-borderSize, -borderSize));
+				}
+			}
+		}
+		peakList.removeAll(toRemove);
+		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, peakList);
+	}
+	
 	private LinkedList<BorderFeature> getPeaksFromBorder(Image img, int searchRadius, double fillGradeInPercent) {
 		BorderAnalysis ba = null;
 		LinkedList<BorderFeature> res = null;
@@ -276,7 +282,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		// blur
 		img = img.io().blurImageJ(blurSize).getImage().show("Blured Image " + ct.toString(), debugValues);
 		
-		// enlarge 1 px lines TODO this works, but the border tracking returns errors even if 1 px lines are enlarged.
+		// enlarge 1 px lines
 		ImageConvolution ic = new ImageConvolution(img);
 		// img.show("before");
 		img = ic.enlargeLines().getImage().show("Enlarged Lines " + ct.toString(), debugValues);
