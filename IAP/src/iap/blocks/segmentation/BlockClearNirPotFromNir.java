@@ -31,8 +31,8 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlock {
 		
 		int[][] nirArray = nir.getAs2A();
 		
-		int w = nir.getWidth();
-		int h = nir.getHeight();
+		int w = nirArray.length;
+		int h = nirArray[0].length;
 		
 		if (h > 22)
 			for (int y = h - 1; y >= 21; y--) {

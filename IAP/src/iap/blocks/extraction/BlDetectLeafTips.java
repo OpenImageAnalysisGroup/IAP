@@ -54,8 +54,6 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			ignore = true;
 		
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
-		if (debug_borderDetection == true)
-			System.out.println("db true");
 	}
 	
 	@Override
@@ -69,14 +67,22 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			return null;
 		if (getBoolean("Calculate on Visible Image", true) && !ignore) {
 			Image workimg = input().masks().vis().copy();
+			
 			int searchRadius = getInt("Search-radius (Vis)", 50);
 			double fillGradeInPercent = getDouble("Fillgrade (Vis)", 0.3);
+			
+			int i1 = (int) (optionsAndResults.getUnitTestIdx() / 6);
+			int i2 = (int) (optionsAndResults.getUnitTestIdx() % 6);
+			
+			searchRadius = searchRadius + (i1 - 2) * 10;
+			fillGradeInPercent = fillGradeInPercent + (i2 - 2) * 0.05;
+			
 			borderSize = searchRadius / 2;
 			workimg.setCameraType(input().masks().vis().getCameraType());
 			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 0), getInt("Masksize Erode (Vis)", 2),
 					getInt("Masksize Dilate (Vis)", 5));
 			Roi bb = workimg.io().getBoundingBox();
-			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
+			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", -1) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
 					searchRadius, maxValidY);
 		}
@@ -87,7 +93,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	protected Image processFLUOmask() {
 		if (input().masks().fluo() == null)
 			return null;
-		if (getBoolean("Calculate on Fluorescence Image", true) && !ignore) {
+		if (getBoolean("Calculate on Fluorescence Image", false) && !ignore) {
 			Image workimg = input().masks().fluo().copy();
 			int searchRadius = getInt("Search-radius (Fluo)", 40);
 			double fillGradeInPercent = getDouble("Fillgrade (Fluo)", 0.3);
@@ -96,7 +102,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 0), getInt("Masksize Erode (Fluo)", 2),
 					getInt("Masksize Dilate (Fluo)", 5));
 			Roi bb = workimg.io().getBoundingBox();
-			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
+			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", -1) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.FLUO, optionsAndResults.getCameraPosition(),
 					searchRadius, maxValidY);
 		}
@@ -116,7 +122,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Nir)", 0), getInt("Masksize Erode (Nir)", 2),
 					getInt("Masksize Dilate (Nir)", 5));
 			Roi bb = workimg.io().getBoundingBox();
-			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", 5) / 100d * bb.getBounds().height);
+			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", -1) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.NIR, optionsAndResults.getCameraPosition(),
 					searchRadius, maxValidY);
 		}

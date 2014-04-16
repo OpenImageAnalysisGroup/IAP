@@ -107,8 +107,8 @@ public class ImageMoments {
 		double tempSum = 0;
 		
 		int[][] img2d = img.getAs2A();
-		int w = img.getWidth();
-		int h = img.getHeight();
+		int w = img2d.length;
+		int h = img2d[0].length;
 		
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {

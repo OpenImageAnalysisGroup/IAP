@@ -46,8 +46,8 @@ public class BlRemoveLevitatingObjects extends AbstractSnapshotAnalysisBlock {
 	
 	private int searchSplitObjectsInYDirection(Image input, int tolerance, int background) {
 		int[][] imgArray = input.getAs2A();
-		int width = input.getWidth();
-		int height = input.getHeight();
+		int width = imgArray.length;
+		int height = imgArray[0].length;
 		int result = -1;
 		int count = 0;
 		

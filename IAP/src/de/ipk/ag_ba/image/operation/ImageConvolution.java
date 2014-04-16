@@ -31,9 +31,9 @@ public class ImageConvolution {
 	 * Enlarge 1 px lines of foreground objects.
 	 */
 	public ImageConvolution enlargeLines() {
-		int w = image.getWidth();
-		int h = image.getHeight();
 		int[][] img2d = image.getAs2A();
+		int w = img2d.length;
+		int h = img2d[0].length;
 		
 		int[][] mask1 = { { 0, 0, 0 }, { 1, 1, 1 }, { 0, 0, 0 } };
 		int[][] mask2 = { { 0, 1, 0 }, { 0, 1, 0 }, { 0, 1, 0 } };
@@ -58,9 +58,9 @@ public class ImageConvolution {
 	}
 	
 	public ImageConvolution clearBorder() {
-		int w = image.getWidth();
-		int h = image.getHeight();
 		int[][] img2d = image.getAs2A();
+		int w = img2d.length;
+		int h = img2d[0].length;
 		
 		int[][] mask1 = { { 0, 0, 1 }, { 0, 1, 1 }, { 0, 0, 0 } };
 		int[][] mask2 = { { 0, 0, 0 }, { 0, 1, 1 }, { 0, 0, 1 } };

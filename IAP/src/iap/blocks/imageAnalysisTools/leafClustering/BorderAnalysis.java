@@ -172,8 +172,8 @@ public class BorderAnalysis {
 		int xtemp;
 		int ytemp;
 		int[][] img2d = image.getAs2A();
-		int w = image.getWidth();
-		int h = image.getHeight();
+		int w = img2d.length;
+		int h = img2d[0].length;
 		int stepsize = 1;
 		boolean debug = false;
 		String key = "susan";
