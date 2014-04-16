@@ -44,6 +44,7 @@ public class BlRemoveBackground extends AbstractBlock {
 			// mask = mask.io().histogramEqualisation(true, 0.35).getImage().show("mask_he", debug);
 			if (mask == null || image == null)
 				return null;
+			
 			// Nir: invert mask then add to image
 			// Fluo: diff = image - mask
 			Image diff_image;
