@@ -1008,8 +1008,8 @@ public class ImageOperation implements MemoryHogInterface {
 		int[][] imgArr = new Image(image).getAs2A();
 		int bx2 = bx + bw;
 		int by2 = by + bh;
-		int w = image.getWidth();
-		int h = image.getHeight();
+		int w = imgArr.length;
+		int h = imgArr[0].length;
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
 				boolean inside = x >= bx && x < bx2 && y >= by && y < by2;
@@ -1028,8 +1028,8 @@ public class ImageOperation implements MemoryHogInterface {
 			int iBackgroundFill) {
 		int[][] imgArr = new Image(image).getAs2A();
 		Vector2d center = new Vector2d(bx, by);
-		int w = image.getWidth();
-		int h = image.getHeight();
+		int w = imgArr.length;
+		int h = imgArr[0].length;
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
 				boolean inside = center.distance(x, y) < d;
@@ -4014,8 +4014,8 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation drawSkeleton2(Image image2, int size, boolean doItReally, int background) {
 		int[][] res = getAs2D();
 		int[][] skelImg = image2.getAs2A();
-		int w = image.getWidth();
-		int h = image.getHeight();
+		int w = skelImg.length;
+		int h = skelImg[0].length;
 		if (doItReally)
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
@@ -4257,8 +4257,8 @@ public class ImageOperation implements MemoryHogInterface {
 		if (b == null)
 			return this;
 		int[][] aa = getAs2D();
-		int w = image.getWidth();
-		int h = image.getHeight();
+		int w = aa.length;
+		int h = aa[0].length;
 		int[][] ba = b.resize(w, h).getAs2A();
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
@@ -4280,8 +4280,8 @@ public class ImageOperation implements MemoryHogInterface {
 		if (b == null)
 			return this;
 		int[][] aa = getAs2D();
-		int w = image.getWidth();
-		int h = image.getHeight();
+		int w = aa.length;
+		int h = aa[0].length;
 		int[][] ba = b.getAs2A();
 		int bW = b.getWidth();
 		int bH = b.getHeight();
@@ -4311,8 +4311,8 @@ public class ImageOperation implements MemoryHogInterface {
 		if (b == null || c == null)
 			return this;
 		int[][] aa = getAs2D();
-		int w = image.getWidth();
-		int h = image.getHeight();
+		int w = aa.length;
+		int h = aa[0].length;
 		int[][] ba = b.getAs2A();
 		int[][] ca = c.getAs2A();
 		int bW = b.getWidth();
@@ -4367,8 +4367,8 @@ public class ImageOperation implements MemoryHogInterface {
 		if (b == null)
 			return this;
 		int[][] aa = getAs2D();
-		int w = image.getWidth();
-		int h = image.getHeight();
+		int w = aa.length;
+		int h = aa[0].length;
 		int[][] ba = b.resize(w, h).getAs2A();
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {

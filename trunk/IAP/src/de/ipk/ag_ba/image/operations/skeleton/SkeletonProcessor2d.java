@@ -441,12 +441,9 @@ public class SkeletonProcessor2d {
 	 * Not Mask based
 	 */
 	public void markEndpointsAndBranches() {
-		int width = skelImg.length;
-		int height = skelImg[0].length;
-		
 		int[][] imgbin = new Image(skelImg).copy().getAs2A();
-		// new Image(imgbin).show("bin");
-		// skelImg = binaryArrayToRgb(imgbin);
+		int width = imgbin.length;
+		int height = imgbin[0].length;
 		
 		int back = ImageOperation.BACKGROUND_COLORint;
 		
@@ -839,8 +836,8 @@ public class SkeletonProcessor2d {
 	
 	public Image calcProbablyBloomImage(Image image, double hueBloom) {
 		int[][] visImg = image.getAs2A();
-		int h = image.getHeight();
-		int w = image.getWidth();
+		int h = visImg[0].length;
+		int w = visImg.length;
 		int r, g, b, c = 0;
 		float distToYellow = 0f;
 		float[] hsbvals = new float[3];
@@ -849,8 +846,6 @@ public class SkeletonProcessor2d {
 		float avgHue = (float) hueBloom;
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
-				if (y < 0 || y >= h)
-					continue;
 				c = visImg[x][y];
 				if (c != ImageOperation.BACKGROUND_COLORint) {
 					r = ((c & 0xff0000) >> 16); // R 0..1
