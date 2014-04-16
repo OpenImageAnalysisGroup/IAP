@@ -51,14 +51,20 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 		double averageLeafWidthEstimationVIS = Double.NaN;
 		if (autoTune)
 			if (!Double.isNaN(averageLeafWidthEstimationFluo))
-				averageLeafWidthEstimationVIS = (averageLeafWidthEstimationFluo) /
+				averageLeafWidthEstimationVIS = averageLeafWidthEstimationFluo /
 						input().masks().fluo().getWidth() * input().masks().vis().getWidth() - 7;
-			else {
-				averageLeafWidthEstimationVIS = (input().masks().vis().io().countFilledPixels()) /
-						input().masks().vis().copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels() - 7;
+			else
+				averageLeafWidthEstimationVIS = input().masks().vis().io().countFilledPixels() /
+						(double) input().masks().vis().copy().io().skel().skeletonize(ImageOperation.BACKGROUND_COLORint).countFilledPixels() - 7;
+		
+		int dil = 0;
+		boolean unitTune = false;
+		if (unitTune)
+			if (optionsAndResults.getUnitTestSteps() > 0) {
+				dil = (int) ((optionsAndResults.getUnitTestIdx() / 3));
 			}
 		
-		res = new ImageOperation(mask).copy().bm().dilate(getInt("dilation vis", 0)).io().removeSmallClusters(
+		res = new ImageOperation(mask).copy().bm().dilate(getInt("dilation vis", 0) + dil).io().removeSmallClusters(
 				autoTune ? (int) (averageLeafWidthEstimationVIS * averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Area", 20 * 20),
 				autoTune ? (int) (averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Dimension-Absolute", 20), -1,
 				optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
@@ -87,9 +93,14 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 						optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
 						autoTune ? true : getBoolean("Use Fluo Area Parameter", true)).show("result fluo", debugValues)
 				.getImage();
-		
-		if (getInt("dilation fluo", 1) > 0)
-			res = res.io().bm().erode(getInt("dilation fluo", 1)).getImage();
+		int dil = 0;
+		boolean unitTune = false;
+		if (unitTune)
+			if (optionsAndResults.getUnitTestSteps() > 0) {
+				dil = ((int) ((optionsAndResults.getUnitTestIdx()) % 3));
+			}
+		if (getInt("dilation fluo", 0) > 0)
+			res = res.io().bm().erode(getInt("dilation fluo", 2) + dil).getImage();
 		
 		res = input().masks().fluo().io().applyMask(res).getImage();
 		
