@@ -2121,6 +2121,14 @@ public class TableLayout implements java.awt.LayoutManager2, java.io.Serializabl
 		return result;
 	}
 	
+	public static JComponent getMultiSplit(JComponent[] guiElements, double componentsWidth, int spaceT,
+			int spaceL, int spaceB, int spaceR) {
+		ArrayList<JComponent> ge = new ArrayList<JComponent>();
+		for (JComponent j : guiElements)
+			ge.add(j);
+		return getMultiSplit(ge, componentsWidth, spaceT, spaceL, spaceB, spaceR);
+	}
+	
 	public static JComponent getMultiSplit(ArrayList<JComponent> guiElements, double componentsWidth, int spaceT,
 			int spaceL, int spaceB, int spaceR) {
 		JPanel result = new JPanel();
