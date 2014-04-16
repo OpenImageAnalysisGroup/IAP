@@ -623,7 +623,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 			ArrayList<GuiRow> rows1 = new ArrayList<GuiRow>();
 			ArrayList<GuiRow> rows2 = new ArrayList<GuiRow>();
 			
-			double width = 90, space = 5, border = 2;
+			int width = 90, space = 5, border = 2;
 			// rows.add(new GuiRow(new JLabel("<html><br>Average visual property per plant versus manual measurement<hr>"), null));
 			Collection<MatchInfo> sortedMatch = match(optExperiment, new String[] { "corr.", ".avg" }, false);
 			Collections.sort((List<MatchInfo>) sortedMatch, new Comparator<MatchInfo>() {
@@ -639,14 +639,18 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 				}
 			});
 			for (MatchInfo mi : sortedMatch) {
-				JComponent desc, height, leafWidth, freshWeight, dryWeight;
+				JComponent desc, height, leafCount, leafWidth, freshWeight, dryWeight;
 				desc = new JLabel(mi.getDesc());
 				desc.setToolTipText(mi.getDesc());
 				height = new JLabel(mi.getHeight());
+				leafCount = new JLabel(mi.getLeafCount());
 				leafWidth = new JLabel(mi.getLeafWidth());
 				freshWeight = new JLabel(mi.getFreshWeight());
 				dryWeight = new JLabel(mi.getDryWeight());
-				JComponent right = TableLayout.get4Split(height, leafWidth, freshWeight, dryWeight, width, space, border);
+				addSideBorder(new JComponent[] { height, leafCount, leafWidth, freshWeight, dryWeight });
+				JComponent right = TableLayout.getMultiSplit(new JComponent[] { height, leafCount, leafWidth, freshWeight, dryWeight }, width, border, border,
+						border,
+						border);
 				rows1.add(new GuiRow(desc, right));
 			}
 			// rows.add(new GuiRow(new JLabel(""), null));
@@ -665,13 +669,15 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 				}
 			});
 			for (MatchInfo mi : sortedMatch) {
-				JComponent desc, height, leafWidth, freshWeight, dryWeight;
+				JComponent desc, height, leafCount, leafWidth, freshWeight, dryWeight;
 				desc = new JLabel(mi.getDesc());
 				desc.setToolTipText(mi.getDesc());
 				height = new JLabel(mi.getHeight());
+				leafCount = new JLabel(mi.getLeafCount());
 				leafWidth = new JLabel(mi.getLeafWidth());
 				freshWeight = new JLabel(mi.getFreshWeight());
 				dryWeight = new JLabel(mi.getDryWeight());
+				addSideBorder(new JComponent[] { height, leafCount, leafWidth, freshWeight, dryWeight });
 				JComponent right = TableLayout.get4Split(height, leafWidth, freshWeight, dryWeight, width, space, border);
 				rows2.add(new GuiRow(desc, right));
 			}
@@ -682,11 +688,10 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 			fp1.enableSearch(true);
 			fp2.setMaximumRowCount(10);
 			fp2.enableSearch(true);
-			JComponent right1 = TableLayout.get4Split(new JLabel("Height"), new JLabel("Leaf Width"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width,
-					space,
-					border);
-			JComponent right2 = TableLayout.get4Split(new JLabel("Height"), new JLabel("Leaf Width"), new JLabel("Fresh Weight"), new JLabel("Dry Weight"), width,
-					space, border);
+			JComponent right1 = TableLayout.getMultiSplit(new JComponent[] { new JLabel("Height"), new JLabel("Leaf Count"), new JLabel("Leaf Width"),
+					new JLabel("Fresh Weight"), new JLabel("Dry Weight") }, width, border, border, border, border);
+			JComponent right2 = TableLayout.getMultiSplit(new JComponent[] { new JLabel("Height"), new JLabel("Leaf Count"), new JLabel("Leaf Width"),
+					new JLabel("Fresh Weight"), new JLabel("Dry Weight") }, width, border, border, border, border);
 			fp1.addGuiComponentRow(new JLabel("Visual Property"), right1, false);
 			fp2.addGuiComponentRow(new JLabel("Visual Property"), right2, false);
 			
@@ -709,6 +714,12 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		}
 	}
 	
+	private void addSideBorder(JComponent[] jComponents) {
+		for (JComponent jc : jComponents) {
+			jc.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
+		}
+	}
+	
 	private ArrayList<MatchInfo> match(ExperimentInterface optExperiment, String[] match, boolean inverseSecond) {
 		ArrayList<MatchInfo> res = new ArrayList<MatchInfo>();
 		for (SubstanceInterface si : optExperiment) {
@@ -721,6 +732,15 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 				boolean matched = false;
 				for (ConditionInterface ci : si) {
 					System.out.println(ci.getConditionName());
+					if (ci.getConditionName().contains("leaf count")) {
+						for (SampleInterface sam : ci) {
+							mi.setLeafCount(
+									StringManipulationTools.formatNumber(
+											sam.getSampleAverage().getValue(), "#.###") + (sam.getAverageUnit() != null ? " " + sam.getAverageUnit() : ""));
+							matched = true;
+							break;
+						}
+					}
 					if (ci.getConditionName().contains("leaf width")) {
 						for (SampleInterface sam : ci) {
 							mi.setLeafWidth(
