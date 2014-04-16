@@ -7,8 +7,10 @@ public class MatchInfo {
 	final String desc;
 	
 	private Double cv;
-
-	private String leafWidth="";
+	
+	private String leafWidth = "";
+	
+	private String leafCount = "";
 	
 	public MatchInfo(String desc) {
 		this.desc = desc;
@@ -40,10 +42,14 @@ public class MatchInfo {
 		return dryWeight;
 	}
 	
+	public String getLeafCount() {
+		return leafCount;
+	}
+	
 	public String getLeafWidth() {
 		return leafWidth;
 	}
-
+	
 	public void setDryWeight(String dryWeight) {
 		this.dryWeight = dryWeight;
 	}
@@ -63,7 +69,11 @@ public class MatchInfo {
 	public Double getComparisonValue() {
 		return cv;
 	}
-
+	
+	public void setLeafCount(String leafCount) {
+		this.leafCount = leafCount;
+	}
+	
 	public void setLeafWidth(String leafWidth) {
 		this.leafWidth = leafWidth;
 	}
