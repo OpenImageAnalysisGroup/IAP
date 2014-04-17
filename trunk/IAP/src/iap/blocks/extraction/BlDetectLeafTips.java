@@ -68,21 +68,28 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		if (getBoolean("Calculate on Visible Image", true) && !ignore) {
 			Image workimg = input().masks().vis().copy();
 			
-			int searchRadius = getInt("Search-radius (Vis)", 50);
+			int searchRadius = getInt("Search-radius (Vis)", 30);
 			double fillGradeInPercent = getDouble("Fillgrade (Vis)", 0.3);
+			int blurSize = getInt("Size for Bluring (Vis)", 0);
+			int erodeSize = getInt("Masksize Erode (Vis)", 2);
+			int dilateSize = getInt("Masksize Dilate (Vis)", 5);
+			int minHeightPercent = getInt("Minimum Leaf Height Percent", -1);
 			
+			// test sr and fg
 			int i1 = (int) (optionsAndResults.getUnitTestIdx() / 6);
 			int i2 = (int) (optionsAndResults.getUnitTestIdx() % 6);
 			
-			searchRadius = searchRadius + (i1 - 2) * 10;
-			fillGradeInPercent = fillGradeInPercent + (i2 - 2) * 0.05;
+			searchRadius = searchRadius + i1 * 2;
+			fillGradeInPercent = fillGradeInPercent + (i2 - 2) * 0.025;
+			
+			// searchRadius = searchRadius + (i1 - 2) * 10;
+			// fillGradeInPercent = fillGradeInPercent + (i2 - 2) * 0.05;
 			
 			borderSize = searchRadius / 2;
 			workimg.setCameraType(input().masks().vis().getCameraType());
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Vis)", 0), getInt("Masksize Erode (Vis)", 2),
-					getInt("Masksize Dilate (Vis)", 5));
+			workimg = preprocessImage(workimg, searchRadius, blurSize, erodeSize, dilateSize);
 			Roi bb = workimg.io().getBoundingBox();
-			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", -1) / 100d * bb.getBounds().height);
+			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - minHeightPercent / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
 					searchRadius, maxValidY);
 		}
