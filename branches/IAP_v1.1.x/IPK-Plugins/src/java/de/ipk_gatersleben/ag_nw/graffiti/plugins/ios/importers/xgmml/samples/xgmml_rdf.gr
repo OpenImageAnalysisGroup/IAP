@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<graph xmlns = "http://www.cs.rpi.edu/XGMML"
+       directed="1" >
+<node id="3" label="http://www.cs.rpi.edu/courses/" weight="5427">
+<att>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.0/">
+  <rdf:Description about="http://www.cs.rpi.edu/courses/"
+    dc:title="Courses at Rensselaer Computer Science
+    Department"
+    dc:subject="www@cs.rpi.edu; M.S. requirements; CSCI-1190
+    Beginning C Programming for Engineers; Courses; People;
+    Graduate Program; CSCI-4020 Computer  Algorithms; CSCI-
+    2220-01  Programming in Java; Research; Course Selection
+    Guide; CSCI-4961-01,  CSCI-6961-01 Advanced Robotics; 
+    Programming in Java; CSCI-2400 Models  of Computation"
+    dc:date="2000-01-31"
+    dc:type="Text"
+    >
+    <dc:format>
+      <rdf:Bag
+        rdf:_1="text/html"
+        rdf:_2="5427 bytes"
+      />
+    </dc:format>
+  </rdf:Description>
+</rdf:RDF>
+</att>
+</node>
+<node id="7" label="http://www.cs.rpi.edu/research/" weight="5508">
+<att>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.0/">
+  <rdf:Description about="http://www.cs.rpi.edu/research/"
+    dc:title="Research at Rensselaer Computer Science
+    Department"
+    dc:subject="www@cs.rpi.edu; Computing  Twin Primes and
+    Brun's Constant; Generic Programming; ASHE; Current
+    Events; TEMPEST; Courses; People; Graduate Program; High-
+    Performance  Object-Oriented Programming in Fortran 90;
+    High Performance  Problem-Solving Environment for
+    Optimization and Control of  Chemical and Biological
+    Processes; Computer Vision; Theory and Algorithms;
+    technical report library; RPInfo; Undergraduate  Program;
+    Research; Research; Design Conference Room; Rensselaer;
+    Bryan Rudge; Engineering Databases; anonymous ftp; I.SEE;
+    info@cs.rpi.edu; Scientific Computing; OpenMath; Proactive
+    Network Problem Avoidance; Computing   Facilities; Computer
+    Science Department"
+    dc:date="1999-11-19"
+    dc:type="Text"
+    >
+    <dc:format>
+      <rdf:Bag
+        rdf:_1="text/html"
+        rdf:_2="5508 bytes"
+      />
+    </dc:format>
+  </rdf:Description>
+</rdf:RDF>
+</att>
+</node>
+<node id="8" label="http://www.cs.rpi.edu/undergrad/" weight="7511">
+<att>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.0/">
+  <rdf:Description about="http://www.cs.rpi.edu/undergrad/"
+    dc:title="Undergraduate Program at Rensselaer Computer
+    Science Department"
+    dc:subject="www@cs.rpi.edu; Association for Computing
+    Machinery; People; Graduate Program; Minor; Prospective
+    Students FAQ; Admissions Office; Research; BS-MS Degree;
+    Rensselaer Catalog; Dual Majors; Admissions; ; Computing
+    Facilities; Undergraduate  Program; Rensselaer; Course  
+    Descriptions;Computer Science Department"
+    dc:date="2000-01-26"
+    dc:type="Text"
+    >
+    <dc:format>
+      <rdf:Bag
+        rdf:_1="text/html"
+        rdf:_2="7511 bytes"
+      />
+    </dc:format>
+  </rdf:Description>
+</rdf:RDF>
+</att>
+</node>
+<node id="1" label="http://www.cs.rpi.edu/" weight="3352">
+<att>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.0/">
+  <rdf:Description about="http://www.cs.rpi.edu/"
+    dc:title="Rensselaer Computer Science Department"
+    dc:subject="www@cs.rpi.edu; faculty positions; Rensselaer;
+    Bryan Rudge; Computing Facilities; Courses; People;
+    Graduate Program; info@cs.rpi.edu; Current Events; ;
+    RPInfo; Research; Undergraduate  Program"
+    dc:date="2000-01-26"
+    dc:type="Text"
+    >
+    <dc:format>
+      <rdf:Bag
+        rdf:_1="text/html"
+        rdf:_2="3352 bytes"
+      />
+    </dc:format>
+  </rdf:Description>
+</rdf:RDF>
+</att>
+</node>
+<edge source="1" target="3" weight="0" label="SRC IMG gfx/courses2.jpg" />
+<edge source="7" target="3" weight="0" label="SRC IMG ../gfx/courses2.jpg" />
+<edge source="8" target="3" weight="0" label="SRC IMG ../gfx/courses2.jpg" />
+<edge source="3" target="7" weight="0" label="SRC IMG ../../gfx/research2.jpg" />
+<edge source="1" target="7" weight="0" label="SRC IMG gfx/research2.jpg" />
+<edge source="8" target="7" weight="0" label="SRC IMG ../gfx/research2.jpg" />
+<edge source="3" target="8" weight="0" label="SRC IMG ../../gfx/ugrad2.jpg" />
+<edge source="7" target="8" weight="0" label="SRC IMG ../gfx/ugrad2.jpg" />
+<edge source="1" target="8" weight="0" label="SRC IMG gfx/ugrad2.jpg" />
+<edge source="3" target="1" weight="0" label="SRC IMG ../../gfx/corner2.jpg" />
+<edge source="7" target="1" weight="0" label="SRC IMG ../gfx/corner2.jpg" />
+<edge source="8" target="1" weight="0" label="SRC IMG ../gfx/corner2.jpg" />
+</graph>
+
