@@ -31,6 +31,7 @@ import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
@@ -685,7 +686,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			ExperimentInterface ei = experiment;
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Create XML File");
-			storeXMLdataset(experiment, hsmManager, tsave, eidx,
+			storeXMLdataset(SystemOptions.getInstance().getBoolean("VFS", "Compress Data File", true),
+					experiment, hsmManager, tsave, eidx,
 					tempFile2fileName, ei, optStatus);
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Create Condition File");
@@ -1028,7 +1030,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		// return resName;
 	}
 	
-	private void storeXMLdataset(final ExperimentInterface experiment,
+	private void storeXMLdataset(boolean compressed, final ExperimentInterface experiment,
 			final HSMfolderTargetDataManager hsmManager, long tsave, int eidx,
 			LinkedHashMap<VfsFileObject, String> tempFile2fileName,
 			ExperimentInterface ei,
@@ -1042,7 +1044,19 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		System.gc();
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Begin dumping data structure into XML file... (Memory Status: "
 				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
-		Experiment.write(ei, optStatus, f.getOutputStream()); // to temp file
+		
+		OutputStream co = null;
+		
+		if (compressed) {
+			co = new CompressorStreamFactory()
+					.createCompressorOutputStream(CompressorStreamFactory.BZIP2, f.getOutputStream());
+		}
+		
+		Experiment.write(ei, optStatus,
+				compressed ?
+						co
+						: f.getOutputStream()
+				); // to temp file
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Finished dumping data structure into XML file. (Memory Status: "
 				+ SystemAnalysis.getUsedMemoryInMB() + " MB of RAM used)");
 		// f.setExecutable(false);
