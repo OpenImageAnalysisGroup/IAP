@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE plugin
+  PUBLIC "-//GRAFFITI/DTD Plugin Descriptin 1.0//EN"
+   "http://iap.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
+
+<plugin>
+	<author>Christian Klukas and Jean-Michel Pape</author>
+	<description>Example add-on adds analysis functions for scanned root images and images of detached barley leaves.</description>
+
+	<plugindesc>
+	     <name>IAP Example Add-on</name>
+             <main>iap.example.addon.PluginIAPexampleAddOn</main>
+             <version>1.0</version>
+             <compatibility>1.1</compatibility>
+             <available>http://iap.ipk-gatersleben.de/addons</available>
+	</plugindesc>
+</plugin>
