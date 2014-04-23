@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import org.IniIoProvider;
 import org.StringManipulationTools;
 import org.SystemOptions;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -36,7 +37,7 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	
 	private static String getBlockDesc(String group) {
 		try {
-			ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
+			ImageAnalysisBlock inst = (ImageAnalysisBlock) InstanceLoader.createInstance(group);
 			return "<br><br>" + StringManipulationTools.getWordWrap(inst.getDescription(), 60);
 		} catch (Exception e) {
 			return "";
@@ -51,7 +52,7 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		try {
-			ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
+			ImageAnalysisBlock inst = (ImageAnalysisBlock) InstanceLoader.createInstance(group);
 			BlockType bt = inst.getBlockType();
 			String pre = "";
 			if (bt != null)
@@ -121,7 +122,7 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		try {
-			ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
+			ImageAnalysisBlock inst = (ImageAnalysisBlock) InstanceLoader.createInstance(group);
 			return new MainPanelComponent("<html><b>" + inst.getName() + "</b><br><br>" +
 					"Description:" +
 					"<ul><li>" +
