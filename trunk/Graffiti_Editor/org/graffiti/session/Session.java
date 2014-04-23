@@ -25,6 +25,7 @@ import org.graffiti.plugin.GenericPlugin;
 import org.graffiti.plugin.algorithm.Algorithm;
 import org.graffiti.plugin.mode.Mode;
 import org.graffiti.plugin.view.View;
+import org.graffiti.util.InstanceLoader;
 
 /**
  * Contains a session. A session consists of a <code>org.graffiti.graph.Graph</code> and a list of corresponding <code>org.graffiti.plugin.view.View</code>s.
@@ -36,7 +37,7 @@ import org.graffiti.plugin.view.View;
  * @see org.graffiti.plugin.mode.Mode
  */
 public class Session
-					implements ConstraintCheckerListener {
+		implements ConstraintCheckerListener {
 	// ~ Instance fields ========================================================
 	
 	/**
@@ -187,6 +188,7 @@ public class Session
 	 * @param msg
 	 *           tells details about the unsatisfied constraints.
 	 */
+	@Override
 	public void checkFailed(String msg) {
 	}
 	
@@ -229,15 +231,9 @@ public class Session
 		for (int i = 0; i < vs.length; i++) {
 			View v;
 			try {
-				v = (View) Class.forName(vs[i]).newInstance();
+				v = (View) InstanceLoader.createInstance(vs[i]);
 				views.add(v);
-			} catch (InstantiationException e) {
-				ErrorMsg.addErrorMessage(e);
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				ErrorMsg.addErrorMessage(e);
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
+			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 				e.printStackTrace();
 			}
@@ -255,7 +251,7 @@ public class Session
 	public void removeView(View view) {
 		if (view == null) {
 			throw new IllegalArgumentException(
-								"trying to remove a view, which is null.");
+					"trying to remove a view, which is null.");
 		}
 		
 		views.remove(view);

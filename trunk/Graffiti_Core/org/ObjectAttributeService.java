@@ -16,6 +16,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.graffiti.util.InstanceCreationException;
+import org.graffiti.util.InstanceLoader;
+
 /**
  * @author Christian Klukas
  *         (c) 2004 IPK-Gatersleben
@@ -49,7 +52,7 @@ public class ObjectAttributeService implements HelperClass {
 	 * @throws InvalidClassException
 	 */
 	public static Object getObjectFromString(String serializedObject)
-						throws InvalidClassException, IOException, ClassNotFoundException {
+			throws InvalidClassException, IOException, ClassNotFoundException {
 		if (serializedObject.startsWith(objectToStringMappingPossible_StringPrefix)) {
 			serializedObject = serializedObject.substring(objectToStringMappingPossible_StringPrefix.length());
 			List<Byte> bytes = new LinkedList<Byte>();
@@ -65,7 +68,7 @@ public class ObjectAttributeService implements HelperClass {
 			byte[] buf = new byte[bytes.size()];
 			int idx = 0;
 			for (Iterator<Byte> it = bytes.iterator(); it.hasNext();) {
-				buf[idx++] = ((Byte) it.next()).byteValue();
+				buf[idx++] = it.next().byteValue();
 			}
 			ByteArrayInputStream is = new ByteArrayInputStream(buf);
 			ObjectInputStream ois = new ObjectInputStream(is);
@@ -99,19 +102,12 @@ public class ObjectAttributeService implements HelperClass {
 			string = string.substring(objectToStringMappingPossible_StringPrefix.length());
 			try {
 				String cn = string.substring(0, string.indexOf("$"));
-				Class<?> cl = Class.forName(cn);
-				Object o = cl.newInstance();
+				Object o = InstanceLoader.createInstance(cn);
 				if (o instanceof ProvidesStringInitMethod) {
 					((ProvidesStringInitMethod) o).fromString(objstring);
 				}
 				return o;
-			} catch (ClassNotFoundException e) {
-				ErrorMsg.addErrorMessage(e.getLocalizedMessage());
-				return null;
-			} catch (InstantiationException e) {
-				ErrorMsg.addErrorMessage(e.getLocalizedMessage());
-				return null;
-			} catch (IllegalAccessException e) {
+			} catch (InstanceCreationException e) {
 				ErrorMsg.addErrorMessage(e.getLocalizedMessage());
 				return null;
 			}
