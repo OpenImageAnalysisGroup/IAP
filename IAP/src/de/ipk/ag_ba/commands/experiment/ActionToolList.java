@@ -29,7 +29,10 @@ public class ActionToolList extends AbstractNavigationAction implements ActionDa
 		for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentToolActions(experimentReference))
 			res.add(new NavigationButton(adp, guiSetting));
 		
-		res.add(new NavigationButton(new ActionPdfReport("Automated diagram creation and report generation"), guiSetting));
+		ActionPdfReport a = new ActionPdfReport("Automated diagram creation and report generation");
+		a.setExperimentReference(experimentReference);
+		
+		res.add(new NavigationButton(a, guiSetting));
 		
 		return res;
 	}
