@@ -1,0 +1,126 @@
+VANTED/KGML-ED/DBE-Gravisto is (c) 2003-2007 Network Analysis Group, IPK Gatersleben,
+http://nwg.bic-gh.de
+
+The source code for this project which is developed by our group is available under 
+the GPL license. By using VANTED/KGML-ED/DBE-Gravisto you need to accept the terms and 
+conditions of this license, the below stated disclaimer of warranties and the below 
+mentioned library licenses.
+
+This development is based on and contains code of Gravisto (c) 2001-2004 Gravisto Team, 
+University of Passau, http://gravisto.fim.uni-passau.de/
+
+Gravisto has been published under the GPL license:
+Gravisto: Graph Visualization Toolkit (Poster), Graph Drawing Conference, GD 2004. 
+
+Disclaimer of Warranties: You acknowledge and agree that the use of VANTED/KGML-ED/DBE-Gravisto
+is at your sole risk and that the entire risk as to satisfactory quality, performance, accuracy 
+and effort is with you. It can not be guaranteed, that the functions contained in this software 
+will meet your requirements, that the operation of the systems will be uninterrupted or error-
+free, or that defects in the software will be corrected.
+
+The following libraries where used for the development of VANTED/KGML-ED/DBE-Gravisto:
+
+Important remark: The build-in KEGG access functions may limit or prohibit the commercial use of
+this software. Users need to adhere to the KEGG license terms and may need to disable 
+KEGG related program features upon first launch of the applications. All other features will
+be unaffected by this setting.
+
+This product includes software developed by the Apache Software Foundation (www.apache.org).
+
+SecondString
+
+a open-source Java-based package of approximate string-matching techniques
+
+University of Illinois/NCSA Open Source License
+
+http://opensource.org/licenses/UoI-NCSA.php
+
+JRuby
+
+a pure Java implementation of the Ruby interpreter
+
+JRuby is free software released under a tri CPL/GPL/LGPL license.
+
+http://opensource.org/licenses/cpl1.0.php
+
+http://opensource.org/licenses/gpl-license.php
+
+http://opensource.org/licenses/lgpl-license.php
+
+Apache SOAP; Axis
+
+A implementation of the SOAP submission to W3C; Axis is essentially a SOAP engine
+
+Apache SOAP packages are made available under the Apache Software License
+
+http://ws.apache.org/LICENSE.txt
+
+JavaMail
+
+a platform-independent and protocol-independent framework to build mail and messaging applications
+
+Copyright 1994-2005 Sun Microsystems, Inc.
+
+JavaHelp
+
+a full-featured, platform-independent, extensible help system
+
+Copyright 2003 Sun Microsystems, Inc.
+
+JCommon
+
+a collection of useful classes used by JFreeChart, JFreeReport and other projects
+
+JCommon is licensed under the terms of the GNU Lesser General Public Licence (LGPL).
+
+http://www.jfree.org/lgpl.php
+
+KEGG libraries and SOAP access
+
+KEGG - Kyoto Encyclopedia of Genes and Genomes (Kanehisa Laboratory of Kyoto University Bioinformatics Center)
+
+Academic users may freely use the KEGG web site at http://www.genome.jp/kegg/. Non-academic users may also use the KEGG web site as end users, but any form of distribution requires a license agreement (see below).Non-academic users are requested to obtain a license agreement through the licensor, Pathway Solutions Inc., for installation of KEGG at their sites, for distribution or reselling of KEGG data, for software development and any other commercial activities that make use of KEGG, and also as end users of the third-party programs that access the KEGG ftp site.
+
+http://www.genome.jp/kegg/kegg5.html
+
+Jakarta Commons
+
+The Commons is a Jakarta subproject focused on all aspects of reusable Java components.
+
+Apache License Version 2.0
+
+http://jakarta.apache.org/commons/license.html
+
+CUP Parser Generator
+
+LALR Parser Generator in Java - Version 11
+
+CUP Parser Generator Copyright Notice, License, and DisclaimerCopyright 1996-1999 by Scott Hudson, Frank Flannery, C. Scott AnanianPermission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appear in all copies and that both the copyright notice and this permission notice and warranty disclaimer appear in supporting documentation, and that the names of the authors or their employers not be used in advertising or publicity pertaining to distribution of the software without specific, written prior permission. The authors and their employers disclaim all warranties with regard to this software, including all implied warranties of merchantability and fitness. In no event shall the authors or their employers be liable for any special, indirect or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action of contract, negligence or other tortious action, arising out of or in connection with the use or performance of this software.
+
+http://www2.cs.tum.edu/projects/cup/licence.html
+
+BeanShell
+
+BeanShell is a small, free, embeddable Java source interpreter with object scripting language features, written in Java.
+
+BeanShell is dual licensed under both the SPL and LGPL. You may use and develop BeanShell under either license.
+
+http://www.netbeans.org/about/legal/spl.html
+
+http://www.gnu.org/copyleft/lesser.html
+
+Enzyme Nomenclature Database (SIB)
+
+we believe that the ENZYME database can be useful to anybody working with enzymes
+
+This database is copyright from the Swiss Institute of Bioinformatics.There are no restrictions on its use by any institutions as long as its content is in no way modified.
+
+http://www.expasy.org/cgi-bin/lists?enzyme.get
+
+JFreeChart
+
+a free chart library for the Java(tm) platform
+
+This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
+
+http://www.gnu.org/copyleft/lesser.html
