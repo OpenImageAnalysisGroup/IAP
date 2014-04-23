@@ -235,7 +235,6 @@ public class ResourceIOManager {
 	}
 	
 	public static InputStream decompressStream(InputStream input) throws IOException {
-		
 		try {
 			CompressorInputStream in = new CompressorStreamFactory().createCompressorInputStream(input);
 			return in;
