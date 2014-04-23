@@ -35,6 +35,7 @@ import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugins.editcomponents.ComponentBorder;
 import org.graffiti.plugins.editcomponents.ComponentBorder.Edge;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.gui.images.IAPimages;
 
@@ -92,7 +93,7 @@ public class BlockListEditHelper {
 							inf = "Step --- (new)";
 						first = false;
 						try {
-							ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(sl).newInstance();
+							ImageAnalysisBlock inst = (ImageAnalysisBlock) InstanceLoader.createInstance(sl);
 							blockName = inst.getName();
 							String blockDesc = inst.getDescription();
 							setToolTipText("<html>" + StringManipulationTools.getWordWrap(blockDesc, 60));
@@ -103,7 +104,7 @@ public class BlockListEditHelper {
 							if (sl != null && sl.startsWith("#")) {
 								try {
 									String s = sl.substring(1);
-									ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(s).newInstance();
+									ImageAnalysisBlock inst = (ImageAnalysisBlock) InstanceLoader.createInstance(s);
 									blockName = inst.getName();
 									String blockDesc = inst.getDescription();
 									setToolTipText("<html>" + StringManipulationTools.getWordWrap(blockDesc, 60));
@@ -124,7 +125,7 @@ public class BlockListEditHelper {
 							if (sl != null && sl.startsWith("#")) {
 								try {
 									String s = sl.substring(1);
-									ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(s).newInstance();
+									ImageAnalysisBlock inst = (ImageAnalysisBlock) InstanceLoader.createInstance(s);
 									blockName = inst.getName();
 									String blockDesc = inst.getDescription();
 									setToolTipText("<html>" + StringManipulationTools.getWordWrap(blockDesc, 60));
