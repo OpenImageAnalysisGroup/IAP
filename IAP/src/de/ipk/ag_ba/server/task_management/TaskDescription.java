@@ -15,6 +15,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.graffiti.util.InstanceCreationException;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -76,7 +77,7 @@ public class TaskDescription {
 	}
 	
 	public void startWork(final BatchCmd batch, String hostName, String ip, final MongoDB m)
-			throws ClassCastException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+			throws ClassCastException, ClassNotFoundException, InstantiationException, IllegalAccessException, InstanceCreationException {
 		final RemoteCapableAnalysisAction action = RemoteAnalysisRepository.getInstance().getNewAnalysisAction(
 				analysisActionClassName);
 		action.setParams(experimentInput, m, params);

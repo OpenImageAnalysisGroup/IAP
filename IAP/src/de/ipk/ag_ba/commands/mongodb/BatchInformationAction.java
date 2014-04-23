@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.graffiti.util.InstanceCreationException;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -30,11 +32,11 @@ public class BatchInformationAction extends AbstractNavigationAction {
 	private final MongoDB m;
 	private final String experimentName;
 	
-	public BatchInformationAction(final BatchCmd cmd, MongoDB m) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+	public BatchInformationAction(final BatchCmd cmd, MongoDB m) throws InstanceCreationException {
 		super("Cloud Compute Job: " + cmd.getRemoteCapableAnalysisActionClassName());
 		this.cmd = cmd;
 		this.m = m;
-		actionProxy = (RemoteCapableAnalysisAction) Class.forName(cmd.getRemoteCapableAnalysisActionClassName()).newInstance();
+		actionProxy = (RemoteCapableAnalysisAction) InstanceLoader.createInstance(cmd.getRemoteCapableAnalysisActionClassName());
 		jobStatus = new MongoJobStatusProvider(cmd, this.m);
 		ExperimentHeaderInterface ehi = cmd.getExperimentHeader();
 		experimentName = ehi != null ? ehi.getExperimentName() : "null";
