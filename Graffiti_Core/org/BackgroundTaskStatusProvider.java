@@ -65,11 +65,6 @@ public interface BackgroundTaskStatusProvider {
 	public void pleaseStop();
 	
 	/**
-	 * @return True, if supported by the command and stop has been called upon this command before. False in all other cases.
-	 */
-	public boolean wantsToStop();
-	
-	/**
 	 * @return Let this method return true in order to show a "Continue" button
 	 *         in the GUI. When this buttons is clicked, the method <code>pleaseContinueRun</code> is called. Use these two methods to
 	 *         let the user interact with the GUI while the algorithm is waiting

@@ -2,11 +2,7 @@ package org;
 
 import java.awt.AWTException;
 import java.awt.GraphicsEnvironment;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
@@ -22,7 +18,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
-import java.util.Map;
 import java.util.Scanner;
 
 import org.junit.Test;
@@ -278,14 +273,10 @@ public class SystemAnalysis {
 		return day;
 	}
 	
-	public static String getDataTransferSpeedString(long transfered, long start, long end) {
-		return getDataTransferSpeedString(transfered, transfered, start, end);
-	}
-	
 	/**
 	 * @return Transfer speed string as in these examples: 2.4 MB/sec, 4.0 MB/min, 6 MB/hour or 0.8 MB/day.
 	 */
-	public static String getDataTransferSpeedString(long overallTransfered, long transfered, long start, long end) {
+	public static String getDataTransferSpeedString(long transfered, long start, long end) {
 		if (transfered <= 0)
 			return "- transfer skipped -";
 		double kiloBytesPerSecond = transfered / 1024d / ((end - start) / 1000d);
@@ -295,7 +286,7 @@ public class SystemAnalysis {
 		double megaBytesPerDay = megaBytesPerHour * 24d;
 		String fS = "#.#";
 		String fL = "#";
-		String pre = getDataAmountString(overallTransfered) + ", ";
+		String pre = getDataAmountString(transfered) + ", ";
 		if (kiloBytesPerSecond < 1024)
 			return pre + StringManipulationTools.formatNumber(kiloBytesPerSecond, kiloBytesPerSecond > 10 ? fL : fS) + " KB/s";
 		if (megaBytesPerSecond > 1)
@@ -447,43 +438,5 @@ public class SystemAnalysis {
 		if (d < 1024l * 1024l * 1024l * 1024l)
 			return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d, "#.#") + " GB";
 		return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d / 1024d, "#.#") + " TB";
-	}
-	
-	public static String[] getEnvArray() {
-		String[] res = new String[System.getenv().size()];
-		Map<String, String> m = System.getenv();
-		int idx = 0;
-		for (String key : m.keySet()) {
-			res[idx] = key + "=" + m.get(key);
-			idx++;
-		}
-		return res;
-	}
-	
-	public static boolean isFileOpen(String fileName) throws IOException {
-		if (isWindowsRunning()) {
-			File file = new File(fileName);
-			return !(file.renameTo(new File(fileName + ".test_rename")) && new File(fileName + ".test_rename").renameTo(new File(fileName)));
-		} else {
-			File file = new File(fileName);
-			Process plsof = new ProcessBuilder(new String[] { "lsof", "|", "grep", file.getAbsolutePath() }).start();
-			InputStream pis = plsof.getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(pis));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				if (line.contains(file.getAbsolutePath())) {
-					reader.close();
-					pis.close();
-					plsof.destroy();
-					return true;
-				}
-			}
-			
-			reader.close();
-			pis.close();
-			plsof.destroy();
-			
-			return false;
-		}
 	}
 }

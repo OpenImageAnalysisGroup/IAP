@@ -18,7 +18,7 @@ import javax.swing.JApplet;
 import javax.swing.JOptionPane;
 
 public class ReleaseInfo implements HelperClass {
-	public static String IAP_VERSION_STRING = "1.2.0";
+	public static final String IAP_VERSION_STRING = "1.1.1";
 	private static Release currentRelease = Release.DEBUG;
 	
 	public static Release getRunningReleaseStatus() {
@@ -333,7 +333,6 @@ public class ReleaseInfo implements HelperClass {
 	
 	private static boolean updateCheckRun = false;
 	private static String lastVersion = null;
-	private static boolean preventSystemExit;
 	
 	public static UpdateInfoResult isUpdated() {
 		if (!updateCheckRun)
@@ -436,13 +435,5 @@ public class ReleaseInfo implements HelperClass {
 	public static String getDesktopFolder() {
 		String home = System.getProperty("user.home");
 		return home + File.separator + "Desktop";
-	}
-	
-	public static void setPreventSystemExitUponWindowClose(boolean preventSystemExit) {
-		ReleaseInfo.preventSystemExit = preventSystemExit;
-	}
-	
-	public static boolean isPreventSystemExit() {
-		return ReleaseInfo.preventSystemExit;
 	}
 }

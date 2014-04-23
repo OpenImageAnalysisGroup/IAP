@@ -817,19 +817,12 @@ public class StringManipulationTools implements HelperClass {
 	}
 	
 	public static String getStringList(String pre, Collection<?> elements, String div) {
-		return getStringList(pre, elements, div, false);
-	}
-	
-	public static String getStringList(String pre, Collection<?> elements, String div, boolean trim) {
 		if (elements == null || elements.size() <= 0)
 			return "";
 		else {
 			StringBuilder sb = new StringBuilder();
 			int i = 0;
 			for (Object e : elements) {
-				if (trim) {
-					e = ("" + e).trim();
-				}
 				sb.append(pre + e + "");
 				if (i < elements.size() - 1)
 					sb.append(div);
@@ -905,15 +898,15 @@ public class StringManipulationTools implements HelperClass {
 		return ErrorMsg.getDecimalFormat(pattern).format(d);
 	}
 	
-	private static Locale locale = Locale.getDefault();
-	
 	public static String formatNumber(long l) {
+		Locale locale = Locale.getDefault();
 		NumberFormat f = NumberFormat.getNumberInstance(locale);
 		f.setMaximumFractionDigits(0);
 		return f.format(l);
 	}
 	
 	public static String formatNumber(double l, int fracDigits) {
+		Locale locale = Locale.getDefault();
 		NumberFormat f = NumberFormat.getNumberInstance(locale);
 		f.setMaximumFractionDigits(fracDigits);
 		return f.format(l);
@@ -941,10 +934,10 @@ public class StringManipulationTools implements HelperClass {
 		TreeSet<String> res = new TreeSet<String>();
 		if (list1 != null)
 			for (String s : list1.split(split))
-				res.add(s.trim());
+				res.add(s);
 		if (list2 != null)
 			for (String s : list2.split(split))
-				res.add(s.trim());
+				res.add(s);
 		return getStringList(res, " " + split + " ");
 	}
 	
@@ -1002,11 +995,5 @@ public class StringManipulationTools implements HelperClass {
 			return value.substring(0, maxLength - 3) + "...";
 		else
 			return value;
-	}
-	
-	public static String removeFileExtension(String fileName) {
-		if (fileName != null && fileName.contains("."))
-			fileName = fileName.substring(0, fileName.lastIndexOf("."));
-		return fileName;
 	}
 }

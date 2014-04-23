@@ -30,23 +30,21 @@ public class SystemOptions {
 	
 	private final static ArrayList<Runnable> updateCheckTasks = new ArrayList<Runnable>();
 	
-	private boolean settingsInvalid = false;;
-	
 	private final static HashMap<String, ObjectRef> lastModification = new HashMap<String, ObjectRef>();
 	
 	private static Thread updateCheckThread;
 	
 	private SystemOptions(final String iniFileName, final IniIoProvider iniIO) throws Exception {
-		if (updateCheckThread == null) {
-			Thread t = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						do {
-							Thread.sleep(1000);
-							synchronized (SystemOptions.getInstance()) {
-								synchronized (updateCheckTasks) {
-									for (Runnable r : new ArrayList<Runnable>(updateCheckTasks)) {
+		synchronized (SystemOptions.class) {
+			if (updateCheckThread == null) {
+				Thread t = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							do {
+								Thread.sleep(1000);
+								for (Runnable r : new ArrayList<Runnable>(updateCheckTasks)) {
+									synchronized (SystemOptions.this) {
 										try {
 											r.run();
 										} catch (Exception e) {
@@ -54,30 +52,29 @@ public class SystemOptions {
 										}
 									}
 								}
-							}
-						} while (true);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
+							} while (true);
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
 					}
-				}
-			});
-			t.setName("Settings Change Monitor");
-			t.setPriority(Thread.MIN_PRIORITY);
-			t.setDaemon(true);
-			t.start();
-			updateCheckThread = t;
+				});
+				t.setName("Settings Change Monitor");
+				t.setPriority(Thread.MIN_PRIORITY);
+				t.setDaemon(true);
+				t.start();
+				updateCheckThread = t;
+			}
+			
+			this.iniFileName = iniFileName;
+			this.iniIO = iniIO;
+			if (iniIO != null) {
+				ini = new Ini(new StringReader(iniIO.getString()));
+				WeakReference<IniIoProvider> wr = new WeakReference<IniIoProvider>(iniIO);
+				readIniAndPrepareProviderCheck(wr);
+				return;
+			}
+			readIniAndPrepareFileCheck(iniFileName);
 		}
-		
-		this.iniFileName = iniFileName;
-		this.iniIO = iniIO;
-		if (iniIO != null) {
-			String nnn = iniIO.getString();
-			ini = nnn != null ? new Ini(new StringReader(nnn)) : new Ini();
-			WeakReference<IniIoProvider> wr = new WeakReference<IniIoProvider>(iniIO);
-			readIniAndPrepareProviderCheck(wr);
-			return;
-		}
-		readIniAndPrepareFileCheck(iniFileName);
 	}
 	
 	private synchronized void readIniAndPrepareProviderCheck(final WeakReference<IniIoProvider> iniIOref) {
@@ -97,9 +94,6 @@ public class SystemOptions {
 						updateCheckTasks.remove(this);
 						return;
 					}
-					if (!iniIO.isAbleToSaveData())
-						return; // no need to update from source in this case (normally read-only sources are not updated regularily
-					// or interactively
 					Long mt;
 					try {
 						mt = iniIO.lastModified();
@@ -132,10 +126,8 @@ public class SystemOptions {
 		updateCheckTasks.add(updateChecker);
 	}
 	
-	private void readIniAndPrepareFileCheck(final String iniFileName) {
-		synchronized (fileIniInstances) {
-			fileIniInstances.put(iniFileName, this);
-		}
+	private synchronized void readIniAndPrepareFileCheck(final String iniFileName) {
+		fileIniInstances.put(iniFileName, this);
 		ini = readIniFileOrProvider();
 		
 		String ffnn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
@@ -161,8 +153,16 @@ public class SystemOptions {
 						lastModification.get(ffnn).setObject(mt);
 						ini = readIniFileOrProvider();
 						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-File " + iniFileName
-								+ " has been changed and will be reloaded later.");
-						SystemOptions.this.settingsInvalid = true;
+								+ " has been changed and has been reloaded.");
+						for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
+							for (Runnable r : rr) {
+								try {
+									r.run();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -174,35 +174,31 @@ public class SystemOptions {
 	
 	protected static HashMap<String, SystemOptions> fileIniInstances = new HashMap<String, SystemOptions>();
 	
-	public static SystemOptions getInstance(String iniFileName, IniIoProvider iniIO) {
+	public synchronized static SystemOptions getInstance(String iniFileName, IniIoProvider iniIO) {
 		if (iniIO != null)
 			try {
 				if (iniIO.getInstance() != null)
 					return iniIO.getInstance();
-				synchronized (iniIO) {
-					SystemOptions i = new SystemOptions(iniFileName, iniIO);
-					iniIO.setInstance(i);
-					return i;
-				}
+				SystemOptions i = new SystemOptions(iniFileName, iniIO);
+				iniIO.setInstance(i);
+				return i;
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		
 		if (iniFileName == null)
 			iniFileName = "iap.ini";
-		synchronized (fileIniInstances) {
-			SystemOptions instance = fileIniInstances.get(iniFileName);
-			try {
-				if (instance == null)
-					instance = new SystemOptions(iniFileName, iniIO);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			return instance;
+		SystemOptions instance = fileIniInstances.get(iniFileName);
+		try {
+			if (instance == null)
+				instance = new SystemOptions(iniFileName, iniIO);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
+		return instance;
 	}
 	
-	public static SystemOptions getInstance() {
+	public synchronized static SystemOptions getInstance() {
 		try {
 			return getInstance(null, null);
 		} catch (Exception e) {
@@ -258,7 +254,6 @@ public class SystemOptions {
 				setting = setting.split("\\|", 2)[1];
 			}
 			
-			checkInvalidStatus();
 			Boolean r = ini.get(group, setting, Boolean.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
@@ -266,21 +261,6 @@ public class SystemOptions {
 				return defaultValue;
 			} else
 				return r;
-		}
-	}
-	
-	private void checkInvalidStatus() {
-		if (settingsInvalid) {
-			settingsInvalid = false;
-			for (LinkedHashSet<Runnable> rr : changeListeners.values()) {
-				for (Runnable r : rr) {
-					try {
-						r.run();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
 		}
 	}
 	
@@ -307,7 +287,6 @@ public class SystemOptions {
 			return defaultValue;
 		} else {
 			Integer r;
-			checkInvalidStatus();
 			try {
 				r = ini.get(group, setting, Integer.class);
 			} catch (Exception err) {
@@ -329,7 +308,6 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
 			return;
 		} else {
-			checkInvalidStatus();
 			ini.put(group, setting, value);
 			store(group, setting);
 		}
@@ -340,7 +318,6 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
-			checkInvalidStatus();
 			Double r = ini.get(group, setting, Double.class);
 			if (r == null) {
 				ini.put(group, setting, defaultValue);
@@ -356,7 +333,6 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, setting value is not stored!");
 			return;
 		} else {
-			checkInvalidStatus();
 			ini.put(group, setting, value);
 			store(group, setting);
 		}
@@ -371,7 +347,6 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
-			checkInvalidStatus();
 			String r = ini.get(group, setting, String.class);
 			if (r == null) {
 				if (addDefaultIfNeeded) {
@@ -398,7 +373,6 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
-			checkInvalidStatus();
 			String r = ini.get(group, setting, String.class);
 			if (r == null) {
 				String storeValue = StringManipulationTools.getColorHTMLdef(defaultValue);
@@ -453,10 +427,6 @@ public class SystemOptions {
 			ini.store();
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes in INI-File " + iniFileName
 					+ " have been saved. Updated setting: " + srcSection + "//" + srcSetting);
-			if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).exists())
-				new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).createNewFile();
-			if (!lastModification.containsKey(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName))
-				lastModification.put(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName, new ObjectRef());
 			lastModification.get(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).setObject(
 					new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified());
 			LinkedHashSet<Runnable> rr = changeListeners.get(getKey(srcSection, srcSetting));
@@ -476,7 +446,6 @@ public class SystemOptions {
 			return;
 		} else {
 			value = ExternalPasswordStorage.encryptValueIfNeeded(group, setting, value);
-			checkInvalidStatus();
 			ini.put(group, setting, value + "");
 			store(group, setting);
 		}
@@ -488,7 +457,6 @@ public class SystemOptions {
 			return;
 		} else {
 			String svalue = StringManipulationTools.getColorHTMLdef(value);
-			checkInvalidStatus();
 			ini.put(group, setting, svalue + "");
 			store(group, setting);
 		}
@@ -499,7 +467,6 @@ public class SystemOptions {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
-			checkInvalidStatus();
 			Ini.Section section = ini.get(group);
 			if (section == null) {
 				getString(group, "hint", "Start an entry with # to disable it.");
@@ -540,7 +507,6 @@ public class SystemOptions {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
 			return res;
 		} else {
-			checkInvalidStatus();
 			if (ini.get(section) != null)
 				for (String s : new ArrayList<String>(ini.get(section).keySet()))
 					res.add(s);
@@ -549,7 +515,6 @@ public class SystemOptions {
 	}
 	
 	public synchronized String getObject(String section, String setting, int returnMax) {
-		checkInvalidStatus();
 		List<String> l = ini.get(section) != null ? ini.get(section).getAll(setting) : new ArrayList<String>();
 		if (l == null)
 			l = new ArrayList<String>();
@@ -563,13 +528,11 @@ public class SystemOptions {
 	}
 	
 	public synchronized boolean isBooleanSetting(String section, String setting) {
-		checkInvalidStatus();
 		String v = ini.get(section).get(setting);
 		return v != null && (v.equals("true") || v.equals("false"));
 	}
 	
 	public synchronized boolean isIntegerSetting(String section, String setting) {
-		checkInvalidStatus();
 		String v = ini.get(section).get(setting);
 		Integer i = null;
 		try {
@@ -581,7 +544,6 @@ public class SystemOptions {
 	}
 	
 	public synchronized boolean isFloatSetting(String section, String setting) {
-		checkInvalidStatus();
 		String v = ini.get(section).get(setting);
 		Double d = null;
 		try {
@@ -593,16 +555,8 @@ public class SystemOptions {
 	}
 	
 	public synchronized void setStringArray(String section, String setting, ArrayList<String> newValues) {
-		if (ini == null) {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, returning default setting value!");
-			return;
-		}
-		checkInvalidStatus();
 		Ini.Section sec = ini.get(section);
-		if (sec == null)
-			sec = ini.add(section);
-		if (sec.containsKey(setting))
-			sec.remove(setting);
+		sec.remove(setting);
 		for (String nv : newValues)
 			sec.add(setting, nv);
 		if (newValues.size() == 0) {
@@ -632,7 +586,6 @@ public class SystemOptions {
 	}
 	
 	public synchronized void removeValuesOfSectionAndGroup(String section, String group) {
-		checkInvalidStatus();
 		Section sec = ini.get(section);
 		if (sec != null) {
 			// remove only the right "group"-values
@@ -683,7 +636,6 @@ public class SystemOptions {
 	}
 	
 	public synchronized String getIniValue() throws IOException {
-		checkInvalidStatus();
 		StringWriter sw = new StringWriter();
 		ini.store(sw);
 		return sw.toString();
