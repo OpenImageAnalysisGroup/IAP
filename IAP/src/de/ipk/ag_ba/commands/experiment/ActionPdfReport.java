@@ -83,7 +83,7 @@ public class ActionPdfReport extends AbstractNavigationAction implements ActionD
 	
 	@Override
 	public String getDefaultTitle() {
-		return "PDF Report";
+		return "PDF Report (experimental)";
 	}
 	
 	@Override

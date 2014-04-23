@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import de.ipk.ag_ba.commands.experiment.ActionAnalysis;
 import de.ipk.ag_ba.commands.experiment.ActionCopyExperiment;
-import de.ipk.ag_ba.commands.experiment.ActionPdfReport;
 import de.ipk.ag_ba.commands.experiment.ActionShowDataWithinVANTED;
 import de.ipk.ag_ba.commands.experiment.ActionToolList;
 import de.ipk.ag_ba.commands.experiment.ActionViewExportData;
@@ -37,7 +36,6 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		actions.add(new ActionViewExportData());
 		if (experimentReference.getIniIoProvider() != null && experimentReference.getIniIoProvider().isAbleToSaveData())
 			actions.add(new ActionAnalysis("Analysis Tasks"));
-		actions.add(new ActionPdfReport("Automated diagram creation and report generation"));
 		
 		if (IAPmain.getRunMode() == IAPrunMode.WEB) {
 			actions.add(new ActionNumericDataReport());
