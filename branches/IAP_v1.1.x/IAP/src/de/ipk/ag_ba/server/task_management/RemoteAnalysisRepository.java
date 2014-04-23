@@ -6,6 +6,9 @@
  */
 package de.ipk.ag_ba.server.task_management;
 
+import org.graffiti.util.InstanceCreationException;
+import org.graffiti.util.InstanceLoader;
+
 /**
  * @author klukas
  */
@@ -24,9 +27,9 @@ public class RemoteAnalysisRepository {
 	}
 	
 	public RemoteCapableAnalysisAction getNewAnalysisAction(String analysisActionClassName)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException, ClassCastException {
+			throws ClassCastException, InstanceCreationException {
 		if (analysisActionClassName != null) {
-			Object o = Class.forName(analysisActionClassName).newInstance();
+			Object o = InstanceLoader.createInstance(analysisActionClassName);
 			RemoteCapableAnalysisAction res = (RemoteCapableAnalysisAction) o;
 			return res;
 		} else

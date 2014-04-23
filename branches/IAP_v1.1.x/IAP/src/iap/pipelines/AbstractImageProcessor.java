@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -110,13 +111,13 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			for (String b : defaultBlockList) {
 				if (b != null && !b.startsWith("#") && !b.trim().isEmpty()) {
 					try {
-						Class<?> c = Class.forName(b);
+						Class<?> c = InstanceLoader.createInstance(b).getClass();
 						if (ImageAnalysisBlock.class.isAssignableFrom(c))
 							p.add((Class<? extends ImageAnalysisBlock>) c);
 						else
 							System.out.println("WARNING: ImageAnalysisBlock " + b + " is not assignable to " + ImageAnalysisBlock.class.getCanonicalName()
 									+ "! (block is not added to pipeline!)");
-					} catch (ClassNotFoundException cnfe) {
+					} catch (Exception cnfe) {
 						System.out.println("ERROR: ImageAnalysisBlock " + b + " is unknown! (start block name with '#' to disable a specific block). Pipeline: "
 								+ so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", false));
 					}

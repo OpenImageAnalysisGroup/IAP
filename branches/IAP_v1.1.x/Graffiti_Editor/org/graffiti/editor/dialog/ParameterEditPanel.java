@@ -32,7 +32,6 @@ import javax.swing.SwingConstants;
 import org.AttributeHelper;
 import org.ErrorMsg;
 import org.FolderPanel;
-import org.graffiti.plugin.Displayable;
 import org.graffiti.plugin.ToolTipHelper;
 import org.graffiti.plugin.editcomponent.StandardValueEditComponent;
 import org.graffiti.plugin.editcomponent.ValueEditComponent;
@@ -210,8 +209,7 @@ public class ParameterEditPanel extends JPanel {
 		
 		if (parameter != null && parameter instanceof BooleanParameter) {
 			try {
-				Class<?> vecClass = Class.forName("org.graffiti.plugins.editcomponents.defaults.BooleanEditComponent");
-				vec = (ValueEditComponent) vecClass.getDeclaredConstructor(Displayable.class).newInstance(parameter);
+				vec = (ValueEditComponent) InstanceLoader.createInstance("org.graffiti.plugins.editcomponents.defaults.BooleanEditComponent", parameter);
 			} catch (Exception e) {
 				throw new UnsupportedOperationException(e);
 			}
