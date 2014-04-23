@@ -1,0 +1,12 @@
+// @menu.window:Background-Color: WHITE
+
+import org.graffiti.editor.MainFrame;
+import org.graffiti.editor.GraffitiSingleton;
+import org.graffiti.plugin.view.AbstractView;
+import java.awt.Color;
+import java.awt.Container;
+
+mf = MainFrame.getInstance();
+view = (AbstractView) mf.getActiveSession().getActiveView();
+v = view.getParent();
+v.setBackground(Color.WHITE);
