@@ -227,7 +227,7 @@ public class BlockListEditHelper {
 							};
 							ImageAnalysisBlock currentSelection;
 							try {
-								currentSelection = (ImageAnalysisBlock) Class.forName(textField.getText()).newInstance();
+								currentSelection = (ImageAnalysisBlock) InstanceLoader.createInstance(textField.getText());
 							} catch (Error err) {
 								currentSelection = null;
 							} catch (Exception err) {
