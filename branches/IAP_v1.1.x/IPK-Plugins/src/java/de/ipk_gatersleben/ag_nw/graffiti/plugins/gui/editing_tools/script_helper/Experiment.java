@@ -41,7 +41,6 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -1113,21 +1112,10 @@ public class Experiment implements ExperimentInterface {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Process XML structure...");
 		
-		boolean useDOM = false;
-		
-		if (useDOM) {
-			SAXBuilder sb = new SAXBuilder();
-			org.jdom.Document doc = sb.build(is);
-			if (optStatus != null) {
-				optStatus.setCurrentStatusText1("Generate experiment structure...");
-				optStatus.setCurrentStatusText2("");
-			}
-			return Experiment.getExperimentFromJDOM(doc, optStatus);
-		} else
-			return Experiment.getSAXhandler(is, inputStreamLength).getExperiment(optStatus);
+		return Experiment.getSAXhandler(is, inputStreamLength).getExperiment(optStatus);
 	}
 	
-	private static ExperimentSaxHandler getSAXhandler(InputStream is, long inputStreamLength) {
+	private static ExperimentSaxHandler getSAXhandler(InputStream is, long inputStreamLength) throws IOException {
 		return new ExperimentSaxHandler(is, inputStreamLength);
 	}
 	
