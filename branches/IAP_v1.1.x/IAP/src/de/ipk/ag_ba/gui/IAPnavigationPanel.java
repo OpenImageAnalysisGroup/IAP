@@ -60,6 +60,7 @@ import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -330,13 +331,15 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			actionPanelRight.repaint();
 		}
 		revalidate();
+		final IAPnavigationPanel tc = this;
+		BackgroundTaskHelper.executeLaterOnSwingTask(1, new Runnable() {
+			@Override
+			public void run() {
+				tc.revalidate();
+				repaint();
+			}
+		});
 		repaint();
-		
-		// for (NavigationButton n : cachedButtons.keySet())
-		// if (n != null)
-		// if (n.isRemoved())
-		// if (n.getGUIsetting() != null)
-		// n.removedCleanup();
 	}
 	
 	private void enableContextMenu() {
