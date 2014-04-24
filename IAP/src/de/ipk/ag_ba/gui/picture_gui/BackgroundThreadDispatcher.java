@@ -105,6 +105,29 @@ public class BackgroundThreadDispatcher {
 			t.start();
 	}
 	
+	public static void runWithTimeout(long timeout, Runnable runnable) {
+		runWithTimeout(timeout, runnable, "Background Task");
+	}
+	
+	public static void runWithTimeout(long timeout, Runnable runnable, String desc) {
+		Thread t = new Thread(runnable);
+		t.setName(desc + " // Timeout=" + timeout);
+		t.start();
+		long start = System.currentTimeMillis();
+		while (t.isAlive()) {
+			if (System.currentTimeMillis() - start > timeout) {
+				t.interrupt();
+				return;
+			} else {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// empty
+				}
+			}
+		}
+	}
+	
 	public static void waitFor(LocalComputeJob[] threads) throws InterruptedException {
 		HashSet<LocalComputeJob> t = new HashSet<LocalComputeJob>();
 		for (LocalComputeJob m : threads)

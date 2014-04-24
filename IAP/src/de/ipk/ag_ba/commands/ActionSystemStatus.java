@@ -24,6 +24,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.util.WebCamInfo;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -42,7 +43,7 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 	}
 	
 	@Override
-	public void performActionCalculateResults(NavigationButton src) {
+	public void performActionCalculateResults(final NavigationButton src) {
 		this.src = src;
 		infoset.clear();
 		resultNavigationButtons.clear();
@@ -59,46 +60,62 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 		}
 		
 		{
-			for (MongoDB dc : MongoDB.getMongos()) {
-				try {
-					for (GridFSDBFile sf : dc.getSavedScreenshots()) {
-						resultNavigationButtons.add(
-								new NavigationButton(
-										new ActionGridFSscreenshotMonitoring(
-												dc, "" + sf.getId(),
-												sf.getFilename(),
-												dc.getScreenshotFS()),
-										src.getGUIsetting()));
+			BackgroundThreadDispatcher.runWithTimeout(1000, new Runnable() {
+				@Override
+				public void run() {
+					for (MongoDB dc : MongoDB.getMongos()) {
+						try {
+							for (GridFSDBFile sf : dc.getSavedScreenshots()) {
+								if (!Thread.currentThread().isInterrupted())
+									resultNavigationButtons.add(
+											new NavigationButton(
+													new ActionGridFSscreenshotMonitoring(
+															dc, "" + sf.getId(),
+															sf.getFilename(),
+															dc.getScreenshotFS()),
+													src.getGUIsetting()));
+							}
+						} catch (Exception e) {
+							ErrorMsg.addErrorMessage(e);
+						}
 					}
-				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
 				}
-			}
+			});
 		}
 		if (SystemOptions.getInstance().getBoolean("IAP", "show_grid_status_icon", true)) {
-			ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
-			for (MongoDB m : MongoDB.getMongos()) {
-				try {
-					m.batch().getScheduledForStart(0);
-					CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m, true);
-					try {
-						cmna.performActionCalculateResults(src);
-						for (NavigationButton o : cmna.getResultNewActionSet())
-							cloudHostList.add(o.getAction());
-					} catch (Exception e) {
-						e.printStackTrace();
+			BackgroundThreadDispatcher.runWithTimeout(1000, new Runnable() {
+				
+				@Override
+				public void run() {
+					ArrayList<NavigationAction> cloudHostList = new ArrayList<NavigationAction>();
+					for (MongoDB m : MongoDB.getMongos()) {
+						try {
+							m.batch().getScheduledForStart(0);
+							if (!Thread.currentThread().isInterrupted()) {
+								CloundManagerNavigationAction cmna = new CloundManagerNavigationAction(m, true);
+								try {
+									cmna.performActionCalculateResults(src);
+									for (NavigationButton o : cmna.getResultNewActionSet())
+										cloudHostList.add(o.getAction());
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+							if (!Thread.currentThread().isInterrupted())
+								break;
+						} catch (Exception e) {
+							System.out.println(m.getDatabaseName() + " is not accessible!");
+						}
 					}
-				} catch (Exception e) {
-					System.out.println(m.getDatabaseName() + " is not accessible!");
+					if (!Thread.currentThread().isInterrupted())
+						if (cloudHostList.size() > 0) {
+							ActionFolder cloudHosts = new ActionFolder(
+									"Cloud Hosts", "Show overview of cloud computing hosts",
+									cloudHostList.toArray(new NavigationAction[] {}), src.getGUIsetting());
+							resultNavigationButtons.add(new NavigationButton(cloudHosts, src.getGUIsetting()));
+						}
 				}
-			}
-			
-			if (cloudHostList.size() > 0) {
-				ActionFolder cloudHosts = new ActionFolder(
-						"Cloud Hosts", "Show overview of cloud computing hosts",
-						cloudHostList.toArray(new NavigationAction[] {}), src.getGUIsetting());
-				resultNavigationButtons.add(new NavigationButton(cloudHosts, src.getGUIsetting()));
-			}
+			});
 		}
 		
 		boolean showLTstorageTimeCheckIcon = SystemOptions.getInstance().getBoolean(
@@ -191,6 +208,9 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 				resultNavigationButtons.get(resultNavigationButtons.size() - 1).setRightAligned(true);
 			}
 		}
+		
+		resultNavigationButtons.add(new NavigationButton(new ActionBlockStatistics("Show overview of block execution times"),
+				src.getGUIsetting()));
 		
 		// boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
 		// resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-03",

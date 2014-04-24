@@ -11,6 +11,7 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
@@ -25,6 +26,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.ZoomedImage;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -49,8 +51,32 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	private int blockPositionInPipeline;
 	private int well;
 	
+	private static LinkedHashMap<String, ThreadSafeOptions> id2time = new LinkedHashMap<String, ThreadSafeOptions>();
+	
 	public AbstractImageAnalysisBlockFIS() {
 		// empty
+	}
+	
+	public void addExecutionTime(ExecutionTimeStep step, long execTime) {
+		boolean error = execTime < 0;
+		if (error)
+			execTime = -execTime;
+		String stepName = step + "";
+		String blockName = getBlockType() + "//" + this.getClass().getCanonicalName() + "";
+		synchronized (id2time) {
+			if (!id2time.containsKey(stepName))
+				id2time.put(stepName, new ThreadSafeOptions());
+			id2time.get(stepName).addLong(execTime);
+			id2time.get(stepName).addInt(1);
+			if (error)
+				id2time.get(stepName).addDouble(1);
+			if (!id2time.containsKey(blockName))
+				id2time.put(blockName, new ThreadSafeOptions());
+			id2time.get(blockName).addLong(execTime);
+			id2time.get(blockName).addInt(1);
+			if (error)
+				id2time.get(blockName).addDouble(1);
+		}
 	}
 	
 	protected int getWellIdx() {
@@ -284,8 +310,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
 					for (String property : desiredProperties) {
 						ArrayList<BlockPropertyValue> sr = rt.getPropertiesSearch(true, property);
-						if (sr.isEmpty())
-							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found.");
+						// if (sr.isEmpty())
+						// System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found.");
 						for (BlockPropertyValue v : sr) {
 							if (v.getValue() != null) {
 								if (!prop2config2lastHeightAndWidth.containsKey(property))
@@ -410,5 +436,40 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	@Override
 	public String getDescriptionForParameters() {
 		return null;
+	}
+	
+	public static LinkedHashMap<String, ThreadSafeOptions> getBlockStatistics() {
+		LinkedHashMap<String, ThreadSafeOptions> res = new LinkedHashMap<String, ThreadSafeOptions>();
+		synchronized (id2time) {
+			for (String key : id2time.keySet()) {
+				ThreadSafeOptions v = id2time.get(key);
+				ThreadSafeOptions nv = new ThreadSafeOptions();
+				nv.setDouble(v.getDouble());
+				nv.setLong(v.getLong());
+				if (key.contains("/"))
+					nv.setInt(v.getInt() / 10);
+				else
+					if (key.toUpperCase().contains("PREPARE") || key.toUpperCase().contains("POST-PROCESS"))
+						nv.setInt(v.getInt());
+					else
+						nv.setInt(v.getInt() / 2);
+				
+				res.put(key, nv);
+			}
+		}
+		return res;
+	}
+	
+	public static void resetBlockStatistics(boolean fullReset) {
+		synchronized (id2time) {
+			if (fullReset)
+				id2time.clear();
+			else {
+				for (String key : id2time.keySet()) {
+					id2time.get(key).setLong(0);
+					id2time.get(key).setInt(0);
+				}
+			}
+		}
 	}
 }

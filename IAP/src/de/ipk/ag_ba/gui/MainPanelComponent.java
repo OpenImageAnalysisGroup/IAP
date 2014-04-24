@@ -128,7 +128,7 @@ public class MainPanelComponent {
 		}
 	}
 	
-	public MainPanelComponent(ArrayList<JComponent> res, int border) {
+	public MainPanelComponent(Collection<JComponent> res, int border) {
 		JComponent jp = new JPanel(new FlowLayoutImproved(FlowLayout.LEFT, border, border));
 		jp.setOpaque(false);
 		

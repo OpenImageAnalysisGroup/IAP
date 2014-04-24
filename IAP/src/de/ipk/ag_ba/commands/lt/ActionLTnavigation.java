@@ -11,11 +11,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeMap;
 
-import org.ErrorMsg;
+import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionNavigateDataSource;
 import de.ipk.ag_ba.commands.Other;
+import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.LTdocuSource;
 import de.ipk.ag_ba.gui.IAPoptions;
@@ -38,6 +39,7 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 	ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 	private ArrayList<String> listOfDatabases = new ArrayList<String>();
 	private final TreeMap<String, ArrayList<ExperimentHeaderInterface>> experimentMap = new TreeMap<String, ArrayList<ExperimentHeaderInterface>>();
+	private String errorMessage;
 	
 	public ActionLTnavigation() {
 		super("Access LT-DB");
@@ -57,7 +59,18 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 	 */
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return result;
+		if (listOfDatabases != null && listOfDatabases.size() > 0) {
+			return result;
+		} else {
+			Book book = new Book(null, "<html><center>" +
+					"User Documentation<br>" +
+					"<font color='gray'><small>(online PDF)</small></font></center>",
+					new IOurl("http://iap.ipk-gatersleben.de/documentation.pdf"),
+					"img/dataset.png");
+			ArrayList<NavigationButton> rr = new ArrayList<NavigationButton>();
+			rr.add(book.getNavigationButton(src));
+			return rr;
+		}
 	}
 	
 	@Override
@@ -65,11 +78,18 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 		if (listOfDatabases != null && listOfDatabases.size() > 0)
 			return super.getResultMainPanel();
 		else {
-			return new MainPanelComponent("<h1>Setup Required!</h1>" +
+			return new MainPanelComponent("<h2>Direct phenotyping database access</h2>"
+					+ ""
+					+ "This function provides functionalities, to access LT imaging data sources directly from the corresponding<br>"
+					+ "systems database. If you don't have this kind hard- and software-equipment, please use the<br>"
+					+ "<i>'Start' > 'Load or Create Datasets'</i> function buttons, to work with file-based image sources."
+					+ "<br><br>"
+					+ "<h2>Setup Required</h2>" +
 					"No databases could be found. The most likely reason is, that the settings for accessing the database are not<br>" +
 					"correctly set. Click '<b>Start &gt; Settings &gt; Lt-db &gt; PostgreSQL</b>' and specify the database host name,<br>" +
 					"the database user name and password.<br><br>" +
-					"Click '<b>Start &gt; About &gt; User Documentation</b>' for more detailed instructions.");
+					"Click '<b>Start &gt; About &gt; User Documentation</b>' for more detailed instructions.<br><br>"
+					+ "<b><code>Error-Message:<br><br>" + errorMessage + "</code></b>");
 		}
 	}
 	
@@ -89,8 +109,10 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		// connect to db
+		this.errorMessage = "";
 		this.src = src;
 		result.clear();
+		
 		try {
 			if (IAPmain.getRunMode() == IAPrunMode.WEB)
 				result.add(new NavigationButton(new ActionLTlogout(), src.getGUIsetting()));
@@ -172,7 +194,7 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			
 		} catch (Exception e) {
 			// error
-			ErrorMsg.addErrorMessage(e);
+			this.errorMessage = e.getMessage();
 		}
 	}
 	

@@ -1139,32 +1139,36 @@ public class LTdataExchange implements ExperimentLoader {
 			experiment.getHeader().setOriginDbId("lt:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
 		}
 		
-		if (seq != null && StringManipulationTools.containsAny(seq, getMetaNamesSeedDates())) {
-			String[] values = seq.split("//");
-			seedDateLookupLoop: for (String v : values) {
-				v = v.trim();
-				if (StringManipulationTools.containsAny(v, getMetaNamesSeedDates()) && v.contains(":")) {
-					try {
-						String[] descAndVal = v.split(":", 2);
-						String seedDate = descAndVal[1];
-						String[] dayMonthYear = seedDate.split("\\.", 3);
-						int year = Integer.parseInt(dayMonthYear[2].trim());
-						int month = Integer.parseInt(dayMonthYear[1].trim());
-						int day = Integer.parseInt(dayMonthYear[0].trim());
-						GregorianCalendar cal = new GregorianCalendar(year, month - 1, day);
-						Date seedDateDate = cal.getTime();
-						Date startDate = experiment.getHeader().getStartdate();
-						int days = DateUtil.getElapsedDays(seedDateDate, startDate);
-						if (startDate.before(seedDateDate))
-							days = -days;
-						updateSnapshotTimes(experiment, days, "das");
-					} catch (Exception err) {
-						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Invalid seed-date definition in plant mapping: " + v);
+		for (SubstanceInterface si : experiment)
+			for (ConditionInterface ci : si) {
+				String sq = ci.getSequence() + "//" + seq;
+				if (sq != null && StringManipulationTools.containsAny(sq, getMetaNamesSeedDates())) {
+					String[] values = sq.split("//");
+					seedDateLookupLoop: for (String v : values) {
+						v = v.trim();
+						if (StringManipulationTools.containsAny(v, getMetaNamesSeedDates()) && v.contains(":")) {
+							try {
+								String[] descAndVal = v.split(":", 2);
+								String seedDate = descAndVal[1];
+								String[] dayMonthYear = seedDate.split("\\.", 3);
+								int year = Integer.parseInt(dayMonthYear[2].trim());
+								int month = Integer.parseInt(dayMonthYear[1].trim());
+								int day = Integer.parseInt(dayMonthYear[0].trim());
+								GregorianCalendar cal = new GregorianCalendar(year, month - 1, day);
+								Date seedDateDate = cal.getTime();
+								Date startDate = experiment.getHeader().getStartdate();
+								int days = DateUtil.getElapsedDays(seedDateDate, startDate);
+								if (startDate.before(seedDateDate))
+									days = -days;
+								updateSnapshotTimes(ci, days, "das");
+							} catch (Exception err) {
+								System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Invalid seed-date definition in plant mapping: " + v);
+							}
+							break seedDateLookupLoop;
+						}
 					}
-					break seedDateLookupLoop;
 				}
 			}
-		}
 		if (optStatus != null)
 			optStatus.setCurrentStatusValue(100);
 		
@@ -1190,6 +1194,14 @@ public class LTdataExchange implements ExperimentLoader {
 					s.setTimeUnit(newTimeUnit);
 				}
 			}
+		}
+	}
+	
+	private void updateSnapshotTimes(ConditionInterface ci, int add, String newTimeUnit) {
+		for (SampleInterface s : ci) {
+			int day = s.getTime() - 1;
+			s.setTime(day + add);
+			s.setTimeUnit(newTimeUnit);
 		}
 	}
 	
