@@ -1,7 +1,6 @@
 package iap.blocks.data_structures;
 
-import org.ErrorMsg;
-
+import info.StopWatch;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.image.structures.Image;
@@ -21,12 +20,16 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 		final ImageSet processedImages = new ImageSet(input().images());
 		final ImageSet processedMasks = new ImageSet(input().images());
 		
+		StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PREPARE + "");
 		try {
 			prepare();
+			addExecutionTime(ExecutionTimeStep.BLOCK_PREPARE, pw.getTime());
 		} catch (Error err1) {
-			reportError(err1, "BLOCK PREPARE ERROR: " + err1.getMessage());
+			addExecutionTime(ExecutionTimeStep.BLOCK_PREPARE, -pw.getTime());
+			reportError(err1, "could not pre-process block - error");
 		} catch (Exception err2) {
-			reportError(err2, "BLOCK PREPARE EXCEPTION: " + err2.getMessage());
+			addExecutionTime(ExecutionTimeStep.BLOCK_PREPARE, -pw.getTime());
+			reportError(err2, "could not pre-process block - exception");
 		}
 		
 		String name = this.getClass().getSimpleName();
@@ -35,121 +38,145 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
 						try {
 							processedImages.setVis(processVISimage());
-						} catch (OutOfMemoryError er) {
-							er.printStackTrace();
-							reportError(er, "could not process VIS image - out of memory");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
+							reportError(er, "could not process VIS image - error");
 						} catch (Exception e) {
-							reportError(e, "could not process VIS image");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
+							reportError(e, "could not process VIS image - exception");
 						}
 					}
-				}, name + " process VIS image", true),
+				}, name + " process VIS image", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
 						try {
 							processedImages.setFluo(processFLUOimage());
-						} catch (OutOfMemoryError er) {
-							er.printStackTrace();
-							reportError(er, "could not process FLUO image - out of memory");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
+							reportError(er, "could not process FLUO image - error");
 						} catch (Exception e) {
-							reportError(e, "could not process FLUO image");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
+							reportError(e, "could not process FLUO image - exception");
 						}
 					}
-				}, name + " process FLU image", true),
+				}, name + " process FLU image", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_NIR + "");
 						try {
 							processedImages.setNir(processNIRimage());
-						} catch (OutOfMemoryError er) {
-							er.printStackTrace();
-							reportError(er, "could not process NIR image - out of memory");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, -pw.getTime());
+							reportError(er, "could not process NIR image - error");
 						} catch (Exception e) {
-							reportError(e, "could not process NIR image");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, -pw.getTime());
+							reportError(e, "could not process NIR image - exception");
 						}
 					}
-				}, name + " process NIR image", true),
+				}, name + " process NIR image", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_IR + "");
 						try {
 							processedImages.setIr(processIRimage());
-						} catch (OutOfMemoryError er) {
-							er.printStackTrace();
-							reportError(er, "could not process IR image - out of memory");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, -pw.getTime());
+							reportError(er, "could not process IR image - error");
 						} catch (Exception e) {
-							reportError(e, "could not process IR image");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, -pw.getTime());
+							reportError(e, "could not process IR image - exception");
 						}
 					}
-				}, name + " process NIR image", true),
+				}, name + " process NIR image", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
 						try {
 							processedMasks.setVis(processVISmask());
-						} catch (OutOfMemoryError er) {
-							er.printStackTrace();
-							reportError(er, "could not process VIS mask - out of memory");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
+							reportError(er, "could not process VIS mask - error");
 						} catch (Exception e) {
-							e.printStackTrace();
-							reportError(e, "could not process VIS mask");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
+							reportError(e, "could not process VIS mask - exception");
 						}
 					}
-				}, name + " process VIS mask", true),
+				}, name + " process VIS mask", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
 						try {
 							processedMasks.setFluo(processFLUOmask());
-						} catch (OutOfMemoryError er) {
-							er.printStackTrace();
-							reportError(er, "could not process FLUO mask - out of memory");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
+							reportError(er, "could not process FLUO mask - error");
 						} catch (Exception e) {
-							reportError(e, "could not process FLUO mask");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
+							reportError(e, "could not process FLUO mask - exception");
 						}
 					}
-				}, name + " process FLU mask", true),
+				}, name + " process FLU mask", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_NIR + "");
 						try {
 							processedMasks.setNir(processNIRmask());
-						} catch (OutOfMemoryError er) {
-							er.printStackTrace();
-							reportError(er, "could not process NIR mask - out of memory");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, -pw.getTime());
+							reportError(er, "could not process NIR mask - error");
 						} catch (Exception e) {
-							reportError(e, "could not process NIR mask");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, -pw.getTime());
+							reportError(e, "could not process NIR mask - exception");
 						}
 					}
-				}, name + " process NIR mask", true),
+				}, name + " process NIR mask", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_IR + "");
 						try {
 							processedMasks.setIr(processIRmask());
-						} catch (OutOfMemoryError er) {
-							er.printStackTrace();
-							reportError(er, "could not process IR mask - out of memory");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, -pw.getTime());
+							reportError(er, "could not process IR mask - error");
 						} catch (Exception e) {
-							reportError(e, "could not process IR mask");
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, -pw.getTime());
+							reportError(e, "could not process IR mask - exception");
 						}
 					}
-				}, name + " process IR mask", true) };
+				}, name + " process IR mask", false) };
 		
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					BackgroundThreadDispatcher.waitFor(work);
-					postProcess(processedImages, processedMasks);
-				} catch (Exception e) {
-					ErrorMsg.addErrorMessage(e);
-				}
-			}
-		};
-		r.run();// BackgroundThreadDispatcher.addTask(r, "process block data", true).getResult();
+		BackgroundThreadDispatcher.waitFor(work);
+		
+		pw = new StopWatch(ExecutionTimeStep.BLOCK_POST_PROCESS + "");
+		try {
+			postProcess(processedImages, processedMasks);
+			addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, pw.getTime());
+		} catch (Error e) {
+			addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, -pw.getTime());
+			reportError(e, "Could not perform post-processing - error");
+		} catch (Exception e) {
+			addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, -pw.getTime());
+			reportError(e, "Could not perform post-processing - exception");
+		}
 		return new MaskAndImageSet(processedImages, processedMasks);
 	}
 	
