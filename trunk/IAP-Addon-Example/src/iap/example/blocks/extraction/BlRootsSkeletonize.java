@@ -60,6 +60,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		rt.incrementCounter();
 		ImageOperation origImage = img.copy();
 		img = img.binary(0, background);// Color.WHITE.getRGB());
+		
 		ImageOperation inDilatedForSectionDetection = img.copy().bm().dilate(getInt("Dilate for section detection", 1)).io()
 				.show("Dilated image for section detection", debug);
 		
