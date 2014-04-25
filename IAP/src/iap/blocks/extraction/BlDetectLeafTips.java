@@ -3,10 +3,10 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
-import iap.blocks.imageAnalysisTools.leafClustering.BorderAnalysis;
-import iap.blocks.imageAnalysisTools.leafClustering.BorderFeature;
-import iap.blocks.imageAnalysisTools.leafClustering.FeatureObject;
-import iap.blocks.imageAnalysisTools.leafClustering.FeatureObject.FeatureObjectType;
+import iap.blocks.image_analysis_tools.leafClustering.BorderAnalysis;
+import iap.blocks.image_analysis_tools.leafClustering.BorderFeature;
+import iap.blocks.image_analysis_tools.leafClustering.FeatureObject;
+import iap.blocks.image_analysis_tools.leafClustering.FeatureObject.FeatureObjectType;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import ij.gui.Roi;
 

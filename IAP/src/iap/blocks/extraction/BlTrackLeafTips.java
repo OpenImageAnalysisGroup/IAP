@@ -3,11 +3,11 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
-import iap.blocks.imageAnalysisTools.leafClustering.BorderFeature;
-import iap.blocks.imageAnalysisTools.leafClustering.Leaf;
-import iap.blocks.imageAnalysisTools.leafClustering.LeafTip;
-import iap.blocks.imageAnalysisTools.leafClustering.LeafTipMatcher;
-import iap.blocks.imageAnalysisTools.leafClustering.Plant;
+import iap.blocks.image_analysis_tools.leafClustering.BorderFeature;
+import iap.blocks.image_analysis_tools.leafClustering.Leaf;
+import iap.blocks.image_analysis_tools.leafClustering.LeafTip;
+import iap.blocks.image_analysis_tools.leafClustering.LeafTipMatcher;
+import iap.blocks.image_analysis_tools.leafClustering.Plant;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
