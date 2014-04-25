@@ -7,6 +7,7 @@ import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
 import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
+import iap.blocks.auto.BlWarpImages;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
@@ -139,7 +140,8 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlThreeDreconstruction(),
 				new BlDetectLeafTips(),
 				new BlRemoveLevitatingObjects(),
-				new BlFilterImagesByAngle()
+				new BlFilterImagesByAngle(),
+				new BlWarpImages()
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
