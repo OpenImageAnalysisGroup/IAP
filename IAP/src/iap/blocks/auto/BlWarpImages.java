@@ -14,12 +14,13 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * This block enables the automatically alignment of the mask images using the bUnwarpJ plugin (Fiji http://fiji.sc/BUnwarpJ). Beware of the resizing of the
+ * This block enables the automatically alignment (registration) of the mask images using the bUnwarpJ plugin (Fiji http://fiji.sc/BUnwarpJ). Beware of the
+ * resizing of the
  * fluorescence and near-infrared images, traits like height and width or area will be modified.
  * 
  * @author pape
  */
-public class BlAutoAlignImages extends AbstractBlock {
+public class BlWarpImages extends AbstractBlock {
 	
 	@Override
 	protected Image processMask(Image mask) {
@@ -86,12 +87,12 @@ public class BlAutoAlignImages extends AbstractBlock {
 	
 	@Override
 	public BlockType getBlockType() {
-		return BlockType.FEATURE_EXTRACTION;
+		return BlockType.SEGMENTATION;
 	}
 	
 	@Override
 	public String getName() {
-		return "Test Block Auto Alignment";
+		return "Auto Alignment (Warping)";
 	}
 	
 	@Override
