@@ -63,9 +63,8 @@ public class RootPipeline extends AbstractPipelineTemplate {
 				new BlMorphologicalOperations(),
 				new BlRemoveSmallObjectsVisFluo(),
 				new BlRootsSkeletonize(),
-				new BlRunPostProcessors(),
 				new BlMoveMasksToImageSet(),
-		
+				new BlRunPostProcessors(),
 		};
 	}
 	
