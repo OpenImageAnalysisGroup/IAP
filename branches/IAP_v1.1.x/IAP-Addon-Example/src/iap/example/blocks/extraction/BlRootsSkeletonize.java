@@ -4,6 +4,9 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.unused.ClusterSizeAndClusterId;
 import iap.blocks.unused.RunnableOnImage;
+import ij.ImagePlus;
+import ij.plugin.filter.EDM;
+import ij.process.FloatProcessor;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -42,7 +45,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 	@Override
 	protected Image processVISmask() {
 		debug = getBoolean("debug", false);
-		int background = options.getBackground();
+		int background = ImageOperation.BACKGROUND_COLORint;
 		
 		ImageOperation img = null;
 		{
@@ -51,10 +54,12 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 				return null;
 			img = i.io().closing();
 		}
+		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
+		img.show("input", debug);
 		ImageOperation origImage = img.copy();
-		img = img.binary(0, Color.WHITE.getRGB());
+		img = img.binary(0, background);
 		
 		ImageOperation inDilatedForSectionDetection = img.copy().dilate(getInt("Dilate for section detection", 1))
 				.show("Dilated image for section detection", debug);
@@ -83,7 +88,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		boolean thinClusterSkel = true;
 		if (thinClusterSkel) {
 			for (int i = 0; i < unchangedSkeletonPixels.length; i++)
-				if (unchangedSkeletonPixels[i] == -16777216)
+				if (unchangedSkeletonPixels[i] == background)
 					clusterIDsPixels[i] = background;
 			
 			HashMap<Integer, Integer> color2clusterId = new HashMap<Integer, Integer>();
@@ -110,92 +115,117 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 				idx++;
 			}
 			
-			ioClusteredSkeltonImage = new ImageOperation(clusterIDsPixels, ioClusteredSkeltonImage.getWidth(), ioClusteredSkeltonImage.getHeight());
+			if (debugValues) {
+				ioClusteredSkeltonImage = new ImageOperation(clusterIDsPixels, ioClusteredSkeltonImage.getWidth(), ioClusteredSkeltonImage.getHeight());
+				ioClusteredSkeltonImage.show("CLUSTERS", false);
+			}
 		}
-		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
 		getProperties().storeResults("RESULT_", rt, getBlockPosition());
 		Image ress = ioClusteredSkeltonImage.dilate(getInt("Dilate for section detection", 5)).getImage();
 		for (RunnableOnImage roi : postProcessing) {
 			getProperties().addImagePostProcessor(ImageConfiguration.VisTop, roi, null);
 		}
-		ress.show("res", debug);
+		
+		// copy endpoints and branches on clustered
+		// ioClusteredSkeltonImage.show("clusssssss");
+		// img.show("iiiiiiimmmmmmmmmmggggggggg");
+		//
+		// int idx = 0;
+		// for (int pix : clusterIDsPixels) {
+		// if (unchangedSkeletonPixels[idx] == SkeletonProcessor2d.colorBranches || unchangedSkeletonPixels[idx] == SkeletonProcessor2d.colorEndpoints)
+		// clusterIDsPixels[idx] = unchangedSkeletonPixels[idx];
+		// }
+		
+		// return new ImageOperation(clusterIDsPixels, ioClusteredSkeltonImage.getWidth(), ioClusteredSkeltonImage.getHeight()).show("res", true).getImage();
 		return ress;
 	}
 	
+	private int[][] getDistanceMap(FloatProcessor fp, DistanceCalculationMode mode) {
+		int[][] res = new int[fp.getWidth()][fp.getHeight()];
+		float[][] temp = fp.getFloatArray();
+		int s = 1;
+		if (mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION)
+			s = 10;
+		for (int x = 0; x < fp.getWidth(); x++) {
+			for (int y = 0; y < fp.getHeight(); y++) {
+				res[x][y] = (int) (temp[x][y] * s);
+			}
+		}
+		return res;
+	}
+	
 	private void graphAnalysis(int[] optClusterIDsPixels, ImageOperation in, ResultsTableWithUnits rt, String resultPrefix,
-			boolean isThinnedImage, int[][] optDistanceMap, ArrayList<RunnableOnImage> postProcessing)
-			throws Exception {
-		boolean graphAnalysis = getBoolean("Calculate Graph Diameters", false);
-		if (graphAnalysis) {
-			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
-			skel.background = SkeletonProcessor2d.getDefaultBackground();
-			skel.findEndpointsAndBranches(null);
-			// skel.getAsFlexibleImage().show("BOBOBO");
-			// int nEndLimbs = skel.endlimbs.size();
-			// rt.addValue("roots" + resultPrefix + ".skeleton.endlimbs", nEndLimbs);
-			in = skel.getImageOperation();
-			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
-			sg.createGraph(optClusterIDsPixels, optDistanceMap, 0, postProcessing, getInt("Remove leaf segments shorter than", 20));
-			new ImageOperation(optClusterIDsPixels, in.getWidth(), in.getHeight())
-					// .debugPrintValueSetToConsole()
-					.debugIntToGrayScale().dilate(5);
-			
-			if (sg.getGraph().getNumberOfNodes() > 0) {
-				rt.addValue("roots" + resultPrefix + ".graph.leafnodes", GraphHelper.getLeafNodesUndir(sg.getGraph()).size());
-				rt.addValue("roots" + resultPrefix + ".graph.nodes", sg.getGraph().getNumberOfNodes());
-				rt.addValue("roots" + resultPrefix + ".graph.edges", sg.getGraph().getNumberOfEdges());
-				{
-					DescriptiveStatistics limbs = new DescriptiveStatistics();
-					for (Edge e : sg.getGraph().getEdges()) {
-						Double val = e.getDouble("len");
-						if (val != null) {
-							limbs.addValue(val / 2);
-						}
+			boolean isThinnedImage, int[][] optDistanceMap, ArrayList<RunnableOnImage> postProcessing) {
+		
+		SkeletonProcessor2d skel = new SkeletonProcessor2d(in.replaceColor(ImageOperation.BACKGROUND_COLORint, SkeletonProcessor2d.getDefaultBackground())
+				.getImage());
+		skel.background = SkeletonProcessor2d.getDefaultBackground();
+		skel.findEndpointsAndBranches(null);
+		// int nEndLimbs = skel.endlimbs.size();
+		// rt.addValue("roots" + resultPrefix + ".skeleton.endlimbs", nEndLimbs);
+		in = skel.getImageOperation();
+		SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
+		sg.createGraph(optClusterIDsPixels, optDistanceMap, 0, postProcessing, getInt("Remove leaf segments shorter than", 20));
+		new ImageOperation(optClusterIDsPixels, in.getWidth(), in.getHeight())
+				// .debugPrintValueSetToConsole()
+				.debugIntToGrayScale().dilate(5);
+		
+		if (sg.getGraph().getNumberOfNodes() > 0) {
+			rt.addValue("roots" + resultPrefix + ".graph.leafnodes", GraphHelper.getLeafNodesUndir(sg.getGraph()).size());
+			rt.addValue("roots" + resultPrefix + ".graph.nodes", sg.getGraph().getNumberOfNodes());
+			rt.addValue("roots" + resultPrefix + ".graph.edges", sg.getGraph().getNumberOfEdges());
+			{
+				DescriptiveStatistics limbs = new DescriptiveStatistics();
+				for (Edge e : sg.getGraph().getEdges()) {
+					Double val = e.getDouble("len");
+					if (val != null) {
+						limbs.addValue(val / 2);
 					}
-					if (resultPrefix.isEmpty())
-						if (limbs.getN() > 0) {
-							rt.addValue("roots" + resultPrefix + ".graph.edges.length.average", limbs.getMean());
-							rt.addValue("roots" + resultPrefix + ".graph.edges.length.stddev", limbs.getStandardDeviation());
-							rt.addValue("roots" + resultPrefix + ".graph.edges.length.skewness", limbs.getSkewness());
-							rt.addValue("roots" + resultPrefix + ".graph.edges.length.kurtosis", limbs.getKurtosis());
-						}
 				}
-				rt.addValue("roots" + resultPrefix + ".graph.analysis_performed", 1);
-				HashMap<Integer, Double> id2size = getBoolean("Diameter Calculation Limit to Thick to Thin", true) ?
-						sg.calculateDiameterThickToThin(getBoolean("Debug - Save Graphs to Files", false), isThinnedImage, postProcessing, rt,
-								!getBoolean("Diameter Calculation Limit to Thick to Thin Disable Edge Traversal Veto", true)) :
-						sg.calculateDiameter(getBoolean("Debug - Save Graphs to Files", false), postProcessing, isThinnedImage);
-				HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
-				int idx = 1;
-				ArrayList<Double> sizeList = new ArrayList<Double>(id2size.size() - 1);
-				for (Integer id : id2size.keySet()) {
-					if (id > 0)
-						sizeList.add(id2size.get(id));
-				}
-				Collections.sort(sizeList);
-				rt.addValue("roots" + resultPrefix + ".graph.parts", id2size.size() - 1); // the largest graph is added twice (once more with id -1)
-				for (Integer id : id2size.keySet()) {
-					if (id2size.get(id) <= 0)
-						continue;
-					if (id != -1 && !co2i.containsKey(id))
-						co2i.put(id, idx++);
-					int niceID = id;
-					if (id != -1)
-						niceID = co2i.get(id);
-					if (niceID >= 0) {
-						double sz = sizeList.remove(sizeList.size() - 1);// id2size.get(id) / 2;
-						if (resultPrefix.isEmpty()) {
-							rt.addValue("roots" + resultPrefix + ".graph.diameter_part." + StringManipulationTools.formatNumber(niceID, "00") + ".length",
-									sz);
-						}
-					} else {
-						double sz = id2size.get(-1) / 2;
-						rt.addValue("roots" + resultPrefix + ".graph.diameter.max", sz);
+				if (resultPrefix.isEmpty())
+					if (limbs.getN() > 0) {
+						rt.addValue("roots" + resultPrefix + ".graph.edges.length.average", limbs.getMean());
+						rt.addValue("roots" + resultPrefix + ".graph.edges.length.stddev", limbs.getStandardDeviation());
+						rt.addValue("roots" + resultPrefix + ".graph.edges.length.skewness", limbs.getSkewness());
+						rt.addValue("roots" + resultPrefix + ".graph.edges.length.kurtosis", limbs.getKurtosis());
 					}
+			}
+			rt.addValue("roots" + resultPrefix + ".graph.analysis_performed", 1);
+			HashMap<Integer, Double> id2size = getBoolean("Diameter Calculation Limit to Thick to Thin", true) ?
+					sg.calculateDiameterThickToThin(getBoolean("Debug - Save Graphs to Files", false), isThinnedImage, postProcessing, rt,
+							!getBoolean("Diameter Calculation Limit to Thick to Thin Disable Edge Traversal Veto", true)) :
+					sg.calculateDiameter(getBoolean("Debug - Save Graphs to Files", false), postProcessing, isThinnedImage);
+			HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
+			int idx = 1;
+			ArrayList<Double> sizeList = new ArrayList<Double>(id2size.size() - 1);
+			for (Integer id : id2size.keySet()) {
+				if (id > 0)
+					sizeList.add(id2size.get(id));
+			}
+			Collections.sort(sizeList);
+			rt.addValue("roots" + resultPrefix + ".graph.parts", id2size.size() - 1); // the largest graph is added twice (once more with id -1)
+			for (Integer id : id2size.keySet()) {
+				if (id2size.get(id) <= 0)
+					continue;
+				if (id != -1 && !co2i.containsKey(id))
+					co2i.put(id, idx++);
+				int niceID = id;
+				if (id != -1)
+					niceID = co2i.get(id);
+				if (niceID >= 0) {
+					double sz = sizeList.remove(sizeList.size() - 1);// id2size.get(id) / 2;
+					if (resultPrefix.isEmpty()) {
+						rt.addValue("roots" + resultPrefix + ".graph.diameter_part." + StringManipulationTools.formatNumber(niceID, "00") + ".length",
+								sz);
+					}
+				} else {
+					double sz = id2size.get(-1) / 2;
+					rt.addValue("roots" + resultPrefix + ".graph.diameter.max", sz);
 				}
 			}
 		}
+		
 	}
 	
 	private ImageOperation skeletonizeImage(
@@ -236,10 +266,12 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		if (rt != null)
 			rt.addValue(pre + "roots.skeleton.length", len);
 		
-		SkeletonProcessor2d skel = new SkeletonProcessor2d(inp.show("INPUT FOR SKEL", debug).getImage()); // getInvert(
+		SkeletonProcessor2d skel = new SkeletonProcessor2d(inp.show("INPUT FOR SKEL", debug).replaceColor(background, SkeletonProcessor2d.getDefaultBackground())
+				.getImage()); // getInvert(
+		
 		skel.findEndpointsAndBranches(postProcessing);
 		
-		img = skel.getImageOperation().show("THE SKELETON", debug);
+		img = skel.getImageOperation().show("THE SKELETON", debug).replaceColor(SkeletonProcessor2d.getDefaultBackground(), background);
 		
 		ArrayList<Point> branchPoints = skel.getBranches();
 		ArrayList<Point> eps = skel.getEndpoints();
@@ -264,9 +296,16 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		double scale = 2;
 		image = image.resize(scale);
 		nonBinaryImage = nonBinaryImage.resize(scale);
+		DistanceCalculationMode mode = DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION;
+		ImageOperation distMap = image.copy();
+		FloatProcessor fp = edm(distMap.getImageAsImagePlus());
+		int[][] distanceMap = getDistanceMap(fp, mode);
+		int sub = 1;
+		if (mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION)
+			sub = 10;
+		
 		do {
-			ImageOperation sk = image.copy().skeletonize(false);
-			
+			ImageOperation sk = image.copy().skeletonize(true);
 			pixelCnt = sk.countFilledPixels();
 			if (pixelCnt > 0) {
 				if (width < 4) {
@@ -275,40 +314,46 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 						prefix = ".thinned" + StringManipulationTools.formatNumber(width - 1, "00");
 					if (getBoolean("Calculate Width-Histogram", true) || getBoolean("Calculate Graph Diameters", false)) {
 						
-						try {
-							ImageOperation tobeSkeletonized = image.copy().dilate();
-							int[][] distanceMap = null;
-							ImageOperation skeletonImage = tobeSkeletonized.skeletonize(true);// .resize(0.5d);
-							if (width < 2) {
-								// first image, not thinned
+						ImageOperation tobeSkeletonized = image.copy().dilate();
+						ImageOperation skeletonImage = tobeSkeletonized.skeletonize(true);// .resize(0.5d);
+						if (width < 2) {
+							// first image, not thinned
+							
+							// skeletonImage.or(tobeSkeletonized.distanceMap(DistanceCalculationMode.DISTANCE_VISUALISATION_GRAY).getImage()).show("DISTANCE MAP",
+							// false);
+							
+							// calculate fraction based volume
+							DescriptiveStatistics skelStat = new DescriptiveStatistics();
+							for (Vector2i i : skeletonImage.getForegroundPixels())
+								skelStat.addValue(distanceMap[i.x][i.y] / 10d / 2d);
+							int endTipps = SkeletonProcessor2d.countEndPoints(skeletonImage.copy().getImage());
+							rt.addValue("roots.volume.skeleton_dist_based", Math.PI * (1 + skelStat.getMean()) * (1 + skelStat.getMean())
+									* (endTipps * skelStat.getMean() + skelStat.getN() / 2d));
+							rt.addValue("roots.width.skeleton_based.average", (1 + skelStat.getMean()));
+							if (getBoolean("Calculate Graph Diameters", false)) {
 								
-								distanceMap = nonBinaryImage.distanceMap(DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION, scale).getImageAs2dArray();
-								// skeletonImage.or(tobeSkeletonized.distanceMap(DistanceCalculationMode.DISTANCE_VISUALISATION_GRAY).getImage()).show("DISTANCE MAP",
-								// false);
+								graphAnalysis(getClusterIDarray(image.copy().dilate(5)),
+										new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
+												skeletonImage.getImageAs1dArray())
+												.show("input for graph analysis", debug).io(), rt, prefix, width > 1, distanceMap, postProcessing);
 								
-								// calculate fraction based volume
-								DescriptiveStatistics skelStat = new DescriptiveStatistics();
-								for (Vector2i i : skeletonImage.getForegroundPixels())
-									skelStat.addValue(distanceMap[i.x][i.y] / 10d / 2d);
-								int endTipps = SkeletonProcessor2d.countEndPoints(skeletonImage.copy().getImage());
-								rt.addValue("roots.volume.skeleton_dist_based", Math.PI * (1 + skelStat.getMean()) * (1 + skelStat.getMean())
-										* (endTipps * skelStat.getMean() + skelStat.getN() / 2d));
-								rt.addValue("roots.width.skeleton_based.average", (1 + skelStat.getMean()));
-								if (getBoolean("Calculate Graph Diameters", true)) {
-									graphAnalysis(getClusterIDarray(image.copy().dilate(5)),
-											new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
-													skeletonImage.getImageAs1dArray())
-													.show("input for graph analysis", debug).io(), rt, prefix, width > 1, distanceMap, postProcessing);
-								}
 							}
-						} catch (Exception e) {
-							e.printStackTrace();
+							
 						}
 					}
 				}
 				width2len.put(width, pixelCnt);
 				image = image.erode();
 				width += 1;
+				
+				// lower distance map
+				for (int x = 0; x < distanceMap.length; x++) {
+					for (int y = 0; y < distanceMap[0].length; y++) {
+						distanceMap[x][y] = distanceMap[x][y] - sub;
+						if (distanceMap[x][y] < 0)
+							distanceMap[x][y] = 0;
+					}
+				}
 			}
 		} while (pixelCnt > 0);
 		width--;
@@ -351,6 +396,11 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		}
 		if (!Double.isNaN(volume))
 			rt.addValue("roots.volume.histogram_based", volume);
+	}
+	
+	public FloatProcessor edm(ImagePlus image) {
+		EDM edm = new EDM();
+		return edm.makeFloatEDM(image.getProcessor().convertToByte(false), -1, false);
 	}
 	
 	private int[] getClusterIDarray(ImageOperation img) {
