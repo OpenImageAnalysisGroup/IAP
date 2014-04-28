@@ -4,7 +4,6 @@ import iap.blocks.unused.RunnableOnImage;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +26,6 @@ import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
-import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 
 import de.ipk.ag_ba.image.operation.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -508,7 +506,7 @@ public class SkeletonGraph {
 	 * @param postProcessors
 	 * @return map from cluster ID 2 size, -1 to largest size
 	 */
-	public HashMap<Integer, Double> calculateDiameter(boolean saveGraphFiles, ArrayList<RunnableOnImage> postProcessing, boolean thinned) throws Exception {
+	public HashMap<Integer, Double> calculateDiameter(boolean saveGraphFiles, ArrayList<RunnableOnImage> postProcessing, boolean thinned) {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
 		System.out.println("Skeleton graph created. Number of components: " + gl.size());
@@ -568,13 +566,13 @@ public class SkeletonGraph {
 					return canv.getImage();
 				}
 			});
-			if (optGMLoutputFileName != null) {
-				GMLWriter gw = new GMLWriter();
-				// ReleaseInfo.getDesktopFolder() + "/skel.gml")
-				gw.write(new FileOutputStream(optGMLoutputFileName), graph);
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Largest Component Diameter: " + (int) largestDiameter + ", saved graph in "
-						+ optGMLoutputFileName);
-			}
+			// if (optGMLoutputFileName != null) {
+			// GMLWriter gw = new GMLWriter();
+			// // ReleaseInfo.getDesktopFolder() + "/skel.gml")
+			// gw.write(new FileOutputStream(optGMLoutputFileName), graph);
+			// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Largest Component Diameter: " + (int) largestDiameter + ", saved graph in "
+			// + optGMLoutputFileName);
+			// }
 		}
 		return id2size;
 	}
@@ -586,8 +584,7 @@ public class SkeletonGraph {
 	 * @return map from cluster ID 2 size, -1 to largest size
 	 */
 	public HashMap<Integer, Double> calculateDiameterThickToThin(boolean saveGraphFiles,
-			boolean isThinned, ArrayList<RunnableOnImage> postProcessing, ResultsTableWithUnits rt, final boolean VETO_SUPPORT)
-			throws Exception {
+			boolean isThinned, ArrayList<RunnableOnImage> postProcessing, ResultsTableWithUnits rt, final boolean VETO_SUPPORT) {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
 		
@@ -728,10 +725,10 @@ public class SkeletonGraph {
 				continue;
 			}
 			
-			if (optGMLoutputFileName != null) {
-				System.out.print(SystemAnalysis.getCurrentTime() + ">INFO Determine graph diameter: ");
-				new GMLWriter().write(new FileOutputStream(ReleaseInfo.getAppFolderWithFinalSep() + "GG1.gml"), gg);
-			}
+			// if (optGMLoutputFileName != null) {
+			// System.out.print(SystemAnalysis.getCurrentTime() + ">INFO Determine graph diameter: ");
+			// new GMLWriter().write(new FileOutputStream(ReleaseInfo.getAppFolderWithFinalSep() + "GG1.gml"), gg);
+			// }
 			int delcnt = 0;
 			for (Edge e : new ArrayList<Edge>(gg.getEdges())) {
 				if (!edgeVeto.followEdge(e)) {
@@ -739,20 +736,21 @@ public class SkeletonGraph {
 					delcnt++;
 				}
 			}
-			if (optGMLoutputFileName != null) {
-				System.out.println("Deleted " + delcnt + " edges!");
-				new GMLWriter().write(new FileOutputStream(ReleaseInfo.getAppFolderWithFinalSep() + "GG2.gml"), gg);
-			}
+			// if (optGMLoutputFileName != null) {
+			// System.out.println("Deleted " + delcnt + " edges!");
+			// new GMLWriter().write(new FileOutputStream(ReleaseInfo.getAppFolderWithFinalSep() + "GG2.gml"), gg);
+			// }
 			
 			Collection<GraphElement> thickestStartingPoints = filterThickestStartingPoints(gg.getGraphElements(), postProcessing);
 			
 			List<GraphElement> elem = null;
 			Double dia = null;
 			double longestDia = 0;
+			HashSet<GraphElement> ges = new HashSet<GraphElement>(gg.getGraphElements());
 			for (GraphElement thick : thickestStartingPoints) {
 				ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
 				List<GraphElement> elemTest = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathStartAndEndPoints(
-						thick, gg.getGraphElements(),
+						thick, ges,
 						new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
 						optLengthReturn, true);
 				Double diaTest = optLengthReturn.getDouble();
@@ -826,13 +824,13 @@ public class SkeletonGraph {
 					}
 				}
 				
-				if (optGMLoutputFileName != null) {
-					GMLWriter gw = new GMLWriter();
-					// ReleaseInfo.getDesktopFolder() + "/skel.gml")
-					gw.write(new FileOutputStream(optGMLoutputFileName), graph);
-					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Largest Component Diameter: " + (int) largestDiameter + ", saved graph in "
-							+ optGMLoutputFileName);
-				}
+				// if (optGMLoutputFileName != null) {
+				// GMLWriter gw = new GMLWriter();
+				// // ReleaseInfo.getDesktopFolder() + "/skel.gml")
+				// gw.write(new FileOutputStream(optGMLoutputFileName), graph);
+				// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Largest Component Diameter: " + (int) largestDiameter + ", saved graph in "
+				// + optGMLoutputFileName);
+				// }
 			}
 		return id2size;
 	}
