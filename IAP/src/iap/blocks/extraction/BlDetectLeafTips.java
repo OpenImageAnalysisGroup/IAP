@@ -76,11 +76,11 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			int minHeightPercent = getInt("Minimum Leaf Height Percent", -1);
 			
 			// test sr and fg
-			int i1 = (int) (optionsAndResults.getUnitTestIdx() / 6);
-			int i2 = (int) (optionsAndResults.getUnitTestIdx() % 6);
-			
-			searchRadius = searchRadius + i1 * 2;
-			fillGradeInPercent = fillGradeInPercent + (i2 - 2) * 0.025;
+			// int i1 = (int) (optionsAndResults.getUnitTestIdx() / 6);
+			// int i2 = (int) (optionsAndResults.getUnitTestIdx() % 6);
+			//
+			// searchRadius = searchRadius + i1 * 2;
+			// fillGradeInPercent = fillGradeInPercent + (i2 - 2) * 0.025;
 			
 			// searchRadius = searchRadius + (i1 - 2) * 10;
 			// fillGradeInPercent = fillGradeInPercent + (i2 - 2) * 0.05;
@@ -256,7 +256,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		int geometricThresh = (int) (fillGradeInPercent * (Math.PI * searchRadius * searchRadius));
 		ba.setCheckSplit(true);
 		ba.calcSUSAN(searchRadius, geometricThresh);
-		ba.getPeaksFromBorder(1, searchRadius * 2, "susan");
+		ba.getPeaksFromBorder(1, (int) (searchRadius * 1.5), "susan");
 		ba.approxDirection(searchRadius * 2);
 		
 		if (debug_borderDetection)
@@ -291,9 +291,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		// enlarge 1 px lines
 		ImageConvolution ic = new ImageConvolution(img);
-		// img.show("before");
 		img = ic.enlargeLines().getImage().show("Enlarged Lines " + ct.toString(), debugValues);
-		// img.show("after");
 		
 		// add border around image
 		img = img.io().addBorder((int) borderSize, 0, 0, background).getImage();

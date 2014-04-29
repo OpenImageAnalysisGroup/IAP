@@ -31,8 +31,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	
+	double maxDistBetweenLeafTips;
+	
 	@Override
 	public void prepare() {
+		// get parms
+		maxDistBetweenLeafTips = getDouble("Maximal distance between leaf-tips", 100.0);
+		
 		CameraPosition cp = optionsAndResults.getCameraPosition();
 		for (CameraType ct : CameraType.values()) {
 			TreeMap<Long, ArrayList<BlockResultValue>> oldResults = optionsAndResults.searchPreviousResults("plant_" + ct, true, getWellIdx(),
@@ -91,7 +96,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	private void createNewPlant(LinkedList<BorderFeature> unassignedResults, CameraPosition cameraPosition,
 			CameraType cameraType, long timepoint, Normalisation norm) {
 		LeafTipMatcher ltm = new LeafTipMatcher(unassignedResults, timepoint, norm);
-		ltm.setMaxDistanceBetweenLeafTips(100.0);
+		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);
 		ltm.matchLeafTips();
 		Plant plant = ltm.getMatchedPlant();
 		plant.setSettingFolder(optionsAndResults.getSystemOptionStorageGroup(this));
@@ -103,7 +108,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 			LinkedList<BorderFeature> unassignedResults, final CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
 			final Normalisation norm) {
 		LeafTipMatcher ltm = new LeafTipMatcher(previousResults, unassignedResults, timepoint, norm);
-		ltm.setMaxDistanceBetweenLeafTips(300.0);
+		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);
 		ltm.matchLeafTips();
 		final Plant plant = ltm.getMatchedPlant();
 		// TODO calc dist between leaftips , dist / (time_n +1 - time_n) * 24*60*60*1000; Leaflength += dist;
