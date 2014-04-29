@@ -83,8 +83,9 @@ public class BorderAnalysis {
 			int i = 0;
 			for (int p : val)
 				peaks[i++] = p;
-		} else
+		} else {
 			peaks = CurveAnalysis.findMaximaIJ(data, 1, false);
+		}
 		
 		peaks = CurveAnalysis.summarizeMaxima(peaks, listsize, distBetweenPeaks);
 		

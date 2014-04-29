@@ -22,6 +22,7 @@ public class LeafTipMatcher {
 	private final Plant matchedPlant;
 	private double maxDistanceBetweenLeafTips = 50.0;
 	private final int fac = 0;
+	private final int millisecondsOfOneDay = 24 * 60 * 60 * 1000;
 	
 	public LeafTipMatcher(Collection<LinkedList<BorderFeature>> tipPositionsForEachDay, Normalisation norm) {
 		leafTipList = convert(tipPositionsForEachDay, norm);
@@ -151,6 +152,7 @@ public class LeafTipMatcher {
 	public void matchLeafTips() {
 		int snapshotIndex = 0;
 		long time = 0;
+		double timeFac;
 		for (LinkedList<LeafTip> tempTipListIn : leafTipList) {
 			if (tempTipListIn.isEmpty())
 				continue;
@@ -175,7 +177,8 @@ public class LeafTipMatcher {
 					double bestDist = Double.MAX_VALUE;
 					for (LeafTip lastMatchedTip : lastMatchedTips) {
 						for (LeafTip tempTipIn : toMatch) {
-							double dist = tempTipIn.dist(lastMatchedTip);
+							timeFac = (tempTipIn.getTime() - lastMatchedTip.getTime()) * millisecondsOfOneDay;
+							double dist = tempTipIn.dist(lastMatchedTip) / timeFac;
 							if (dist < bestDist) {
 								bestDist = dist;
 								bestPair[0] = lastMatchedTip;
@@ -215,7 +218,7 @@ public class LeafTipMatcher {
 		for (LinkedList<BorderFeature> l : list) {
 			tiplist = new LinkedList<LeafTip>();
 			if (l != null) {
-				time += 24 * 60 * 60 * 1000;
+				time += millisecondsOfOneDay;
 				for (BorderFeature p : l) {
 					if (p != null) {
 						Vector2D pos = p.getPosition();
