@@ -55,7 +55,8 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			
 			Vector2i[] clusterPositions = cd.getClusterCenterPoints();
 			int[] clusterSize = cd.getClusterSize();
-			
+			if (clusterSize == null)
+				return null;
 			final int[] sortCriteria;
 			if (sortBySize) {
 				sortCriteria = clusterSize;
