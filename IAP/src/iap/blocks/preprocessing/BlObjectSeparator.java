@@ -78,7 +78,8 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			}
 			
 			int[] clusteredPixels = cd.getImageClusterIdMask();
-			
+			if (clusteredPixels == null)
+				return null;
 			int minimumPixelCount = (int) (clusteredPixels.length * minimumSize);
 			int nValidClusters = 0;
 			boolean first = true;
