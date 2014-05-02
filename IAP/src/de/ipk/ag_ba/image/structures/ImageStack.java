@@ -2,8 +2,10 @@ package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
+import ij.gui.StackWindow;
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -12,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -19,7 +22,9 @@ import javax.swing.SwingUtilities;
 import org.ErrorMsg;
 import org.FolderPanel;
 import org.SystemAnalysis;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.IAPservice;
 
 public class ImageStack {
@@ -89,6 +94,77 @@ public class ImageStack {
 			SwingUtilities.invokeLater(r);
 		} else {
 			image.show(title + " (" + stack.getSize() + ")");
+			IAPservice.showImageJ();
+		}
+	}
+	
+	public void show(String title, final Runnable actionCmd, String buttonTitle, JComponent optSideComponent) {
+		show(title, actionCmd, buttonTitle, optSideComponent, null);
+	}
+	
+	public void show(String title, final Runnable actionCmd, String buttonTitle, final JComponent optSideComponent,
+			final ThreadSafeOptions tsoCurrentImageDisplayPage) {
+		if (SystemAnalysis.isHeadless())
+			return;
+		ImagePlus image = new ImagePlus() {
+			
+			@Override
+			public void updatePosition(int c, int z, int t) {
+				super.updatePosition(c, z, t);
+				if (tsoCurrentImageDisplayPage != null) {
+					try {
+						String tt = getStack().getSliceLabel(z);
+						if (tt != null && tt.startsWith("Result of ")) {
+							tt = tt.substring("Result of ".length());
+							// try {
+							// ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(tt).newInstance();
+							// String desc = inst.getDescription();
+							// tsoCurrentImageDisplayPage.setParam(1, desc);
+							// } catch (Exception ee) {
+							// // empty
+							// tsoCurrentImageDisplayPage.setParam(1, null);
+							// }
+						} else
+							tsoCurrentImageDisplayPage.setParam(1, null);
+						tsoCurrentImageDisplayPage.setParam(0, tt);
+					} catch (Exception e) {
+						// empty
+					}
+				}
+			}
+			
+		};
+		image.setStack(stack);
+		if (image.getWidth() > 0 && image.getHeight() > 0) {
+			final JButton jb = new JButton(buttonTitle);
+			jb.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png").getScaledInstance(24, 24,
+					java.awt.Image.SCALE_SMOOTH)));
+			
+			jb.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					actionCmd.run();
+				}
+			});
+			JComponent ccc = FolderPanel.getBorderedComponent(
+					TableLayout.get3Split(jb, null, optSideComponent, TableLayout.PREFERRED, 5, TableLayout.PREFERRED), 5, 5, 5, 5);
+			
+			StackWindow win = new StackWindow(image) {
+				
+				@Override
+				public void paint(Graphics arg0) {
+					super.paint(arg0);
+					
+					jb.repaint();
+					optSideComponent.repaint();
+					
+				}
+			};
+			win.add(ccc);
+			win.pack();
+			
+			image.show(title + " (" + stack.getSize() + ")");
+			
 			IAPservice.showImageJ();
 		}
 	}
