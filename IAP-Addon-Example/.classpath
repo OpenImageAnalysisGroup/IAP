@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/MultimodalDataHandling"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/IPK_lib"/>
 	<classpathentry kind="src" path="/IPK-Plugins"/>
+	<classpathentry kind="lib" path="/IAP/lib/ij-1.48r.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
