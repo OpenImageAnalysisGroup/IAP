@@ -1,11 +1,7 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import iap.pipelines.ImageProcessorOptions;
-import ij.ImagePlus;
 import ij.WindowManager;
-import ij.io.FileInfoXYZ;
-import ij.io.Opener;
-import ij.io.TiffDecoderExtended;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
@@ -828,34 +824,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		}
 		if (evt.getSource() == showImageCmdLabel) {
 			try {
-				Image fi = null;
-				try {
-					fi = new Image(myImage.fileURLlabel);
-				} catch (Exception err) {
-					// try to load as TIFF..
-				}
-				if (fi == null || fi.getWidth() == 0) {
-					try {
-						TiffDecoderExtended tid = new TiffDecoderExtended(
-								myImage.fileURLlabel.getInputStream(),
-								myImage.fileURLlabel.getFileName());
-						FileInfoXYZ[] info = tid.getTiffInfo();
-						Opener o = new Opener();
-						ImagePlus imp = o.openTiffStack(info);
-						imp.show("Image Label View - "
-								+ myImage.fileURLlabel.getFileNameDecoded());
-						IAPservice.showImageJ();
-					} catch (Exception e) {
-						JOptionPane.showMessageDialog(null,
-								"Error: " + e.getLocalizedMessage()
-										+ ". Image can not be shown.",
-								"Unknown Image Format",
-								JOptionPane.INFORMATION_MESSAGE);
-					}
-				} else
-					if (fi != null)
-						fi.show("Image Label View - "
-								+ myImage.fileURLlabel.getFileNameDecoded());
+				Image fi = new Image(myImage.fileURLlabel);
+				fi.show("Image Label View - "
+						+ myImage.fileURLlabel.getFileNameDecoded());
 			} catch (Exception e) {
 				JOptionPane
 						.showMessageDialog(null,

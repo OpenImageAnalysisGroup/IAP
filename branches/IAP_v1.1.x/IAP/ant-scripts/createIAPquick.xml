@@ -114,7 +114,8 @@
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/vecmath.jar"/>
 <!--            <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/swingx.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/postgresql-9.0-801.jdbc4.jar"/>
-<!--            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/mongo.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/mongo.jar"/>
+             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/ij-1.48r.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jai_codec.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jai_core.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/commons-compress-1.1.jar"/>
