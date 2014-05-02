@@ -26,6 +26,7 @@ import info.StopWatch;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.awt.geom.Line2D.Double;
@@ -2882,15 +2883,24 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation findMax(double tolerance, double threshold,
 			int outputType, boolean excludeOnEdges, boolean isEDM) {
 		
-		MaximumFinder find = new MaximumFinder();
-		ResultsTable rt = new ResultsTableWithUnits();
-		find.findMaxima(image.getProcessor(), tolerance,
-				threshold, outputType, excludeOnEdges, isEDM, rt);
-		if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
-			return new ImageOperation(image, (ResultsTableWithUnits) rt);
-		} else {
-			setResultsTable((ResultsTableWithUnits) rt);
-			return this;
+		synchronized (ImageOperation.class) {
+			MaximumFinder find = new MaximumFinder();
+			
+			ResultsTable rt = new ResultsTableWithUnits();
+			Polygon max = find.getMaxima(image.getProcessor(), tolerance, excludeOnEdges);
+			for (int i = 0; i < max.npoints; i++) {
+				int x = max.xpoints[i];
+				int y = max.ypoints[i];
+				rt.addValue(0, x);
+				rt.addValue(1, y);
+			}
+			if (!(outputType == MaximumFinder.COUNT || outputType == MaximumFinder.LIST || outputType == MaximumFinder.POINT_SELECTION)) {
+				find.findMaxima(image.getProcessor(), tolerance, threshold, outputType, excludeOnEdges, isEDM);
+				return new ImageOperation(image, (ResultsTableWithUnits) rt);
+			} else {
+				setResultsTable((ResultsTableWithUnits) rt);
+				return this;
+			}
 		}
 	}
 	

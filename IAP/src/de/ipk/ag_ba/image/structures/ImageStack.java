@@ -21,7 +21,6 @@ import org.FolderPanel;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.util.IAPservice;
-import de.ipk.ag_ba.image.utils.MyFileSaver;
 
 public class ImageStack {
 	
@@ -70,8 +69,8 @@ public class ImageStack {
 	public void saveAsLayeredTif(OutputStream os) {
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);
-		
-		new MyFileSaver(image).saveAsTiffStack(os);
+		throw new UnsupportedOperationException("TODO NOT YET IMPLEMENTED");
+		// new MyFileSaver(image).saveAsTiffStack(os);
 	}
 	
 	public void show(final String title) {
