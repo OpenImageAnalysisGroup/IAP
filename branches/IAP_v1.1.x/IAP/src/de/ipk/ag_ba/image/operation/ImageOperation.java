@@ -2891,6 +2891,7 @@ public class ImageOperation implements MemoryHogInterface {
 			for (int i = 0; i < max.npoints; i++) {
 				int x = max.xpoints[i];
 				int y = max.ypoints[i];
+				rt.incrementCounter();
 				rt.addValue(0, x);
 				rt.addValue(1, y);
 			}
