@@ -16,6 +16,14 @@ public class ClusterDetection implements Segmentation {
 	private Vector2i[] centerPoints;
 	private Vector2i[] widthAndHeight;
 	private int foregroundPixelCount;
+	private boolean eightMode = false;
+	
+	/**
+	 * Enables 8-connection for pixel neighbor search.
+	 */
+	public void enableNeighbourMode() {
+		eightMode = true;
+	}
 	
 	public ClusterDetection(Image image, int background) {
 		this.img = image.getAs1A();
@@ -126,6 +134,33 @@ public class ClusterDetection implements Segmentation {
 				queue[++qR] = f;
 				if (qR == maxQueueLength)
 					qR = 0;
+			}
+			
+			if (eightMode == true) {
+				f = idx - 1 - w; // left/above
+				if (idx % w > 0 && img[f] != back && clu[f] == 0) {
+					queue[++qR] = f;
+					if (qR == maxQueueLength)
+						qR = 0;
+				}
+				f = idx - w + 1; // right/above
+				if (idx > w && img[f] != back && clu[f] == 0) {
+					queue[++qR] = f;
+					if (qR == maxQueueLength)
+						qR = 0;
+				}
+				f = idx - 1 + w; // left/below
+				if ((idx) % w < w - 1 && img[f] != back && clu[f] == 0) {
+					queue[++qR] = f;
+					if (qR == maxQueueLength)
+						qR = 0;
+				}
+				f = idx + w + 1; // right/below
+				if (idx < img.length - w && img[f] != back && clu[f] == 0) {
+					queue[++qR] = f;
+					if (qR == maxQueueLength)
+						qR = 0;
+				}
 			}
 		}
 	}

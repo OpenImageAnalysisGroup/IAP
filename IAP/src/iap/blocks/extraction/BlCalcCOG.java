@@ -19,22 +19,22 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlCalcCOG extends AbstractBlock {
 	
 	@Override
-	protected Image processMask(Image fi) {
-		if (fi == null)
+	protected Image processMask(Image img) {
+		if (img == null)
 			return null;
-		if (!getBoolean("Process " + fi.getCameraType(), true)) {
-			if (fi != null) {
-				final Vector2d cog = fi.io().stat().getCOG();
+		if (getBoolean("Process " + img.getCameraType(), true)) {
+			if (img != null) {
+				final Vector2d cog = img.io().stat().getCOG();
 				if (cog != null) {
 					String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
 					getResultSet().setNumericResult(getBlockPosition(),
-							pos + fi.getCameraType() + ".cog.x", cog.x, "px");
+							pos + img.getCameraType() + ".cog.x", cog.x, "px");
 					getResultSet().setNumericResult(getBlockPosition(),
-							pos + fi.getCameraType() + ".cog.y", cog.y, "px");
+							pos + img.getCameraType() + ".cog.y", cog.y, "px");
 					
-					Double averageDistance = fi.io().stat().calculateAverageDistanceTo(cog);
+					Double averageDistance = img.io().stat().calculateAverageDistanceTo(cog);
 					if (averageDistance != null)
-						getResultSet().setNumericResult(0, pos + fi.getCameraType() + ".cog.avg_distance_to_center", averageDistance, "px");
+						getResultSet().setNumericResult(0, pos + img.getCameraType() + ".cog.avg_distance_to_center", averageDistance, "px");
 					
 				}
 				RunnableOnImage runnableOnMask = new RunnableOnImage() {
@@ -43,10 +43,10 @@ public class BlCalcCOG extends AbstractBlock {
 						return in.io().canvas().drawCircle((int) cog.x, (int) cog.y, 5, Color.BLACK.getRGB(), 0.5d, 1).getImage();
 					}
 				};
-				getResultSet().addImagePostProcessor(fi.getCameraType(), null, runnableOnMask);
+				getResultSet().addImagePostProcessor(img.getCameraType(), null, runnableOnMask);
 			}
 		}
-		return fi;
+		return img;
 	}
 	
 	@Override

@@ -122,11 +122,11 @@ public class LeafTip {
 		return Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
 	}
 	
-	public int getImageX(Normalisation norm) {
-		return norm == null ? x : norm.getImageXfromRealWorldX(x);
+	public int getImageX() {
+		return normalisationFactor == null ? x : normalisationFactor.getImageXfromRealWorldX(x);
 	}
 	
-	public int getImageY(Normalisation norm) {
-		return norm == null ? y : norm.getImageYfromRealWorldY(y);
+	public int getImageY() {
+		return normalisationFactor == null ? y : normalisationFactor.getImageYfromRealWorldY(y);
 	}
 }
