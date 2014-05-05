@@ -22,6 +22,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultObject;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -141,15 +142,15 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				continue;
 			
 			if (ltLast != ltFirst) {
-				Vector2D trans1 = new Vector2D(ltLast.getImageX(norm) - ltFirst.getImageX(norm), ltLast.getImageY(norm) - ltFirst.getImageY(norm));
+				Vector2D trans1 = new Vector2D(ltLast.getImageX() - ltFirst.getImageX(), ltLast.getImageY() - ltFirst.getImageY());
 				Vector2D trans2 = new Vector2D(0.0, 1.0);
 				double angle = calcAngle(trans1, trans2);
 				double a = (ltFirst.getRealWorldX() - ltLast.getRealWorldX());
 				double b = (ltFirst.getRealWorldY() - ltLast.getRealWorldY());
 				double span_norm = Math.sqrt(a * a + b * b);
 				
-				double c = (ltFirst.getImageX(norm) - ltLast.getImageX(norm));
-				double d = (ltFirst.getImageY(norm) - ltLast.getImageY(norm));
+				double c = (ltFirst.getImageX() - ltLast.getImageX());
+				double d = (ltFirst.getImageY() - ltLast.getImageY());
 				double span = Math.sqrt(c * c + d * d);
 				
 				getResultSet().setNumericResult(0,
@@ -176,13 +177,36 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".y",
 					yPos_norm, "px");
 			
-			if (angle != null)
+			if (angle != null) {
 				getResultSet()
 						.setNumericResult(
 								0,
 								"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num
 										+ ".angle",
 								angle, "degree");
+			}
+			
+			boolean saveDistToCenter = true;
+			
+			if (saveDistToCenter) {
+				String searchX = "RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".cog.x";
+				String searchY = "RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".cog.y";
+				BlockResult cogXBR = getResultSet().searchNumericResult(getBlockPosition(), 1, searchX);
+				BlockResult cogYBR = getResultSet().searchNumericResult(getBlockPosition(), 1, searchY);
+				
+				if (cogXBR != null && cogYBR != null) {
+					int cogX = (int) cogXBR.getValue();
+					int cogY = (int) cogYBR.getValue();
+					int lx = ltLast.getImageX();
+					int ly = ltLast.getImageY();
+					
+					double distToCenter = Math.sqrt((cogX - lx) * (cogX - lx) + (cogY - ly) * (cogY - ly));
+					
+					getResultSet().setNumericResult(0,
+							"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".dist_to_cog",
+							distToCenter, "px");
+				}
+			}
 		}
 		
 		// calculate leaf tip parameter
@@ -196,8 +220,8 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				final boolean db = debugValues;
 				final boolean isLast = last == lt && last.getTime() == timepoint;
 				final int num = l.leafID;
-				final int xPos = lt.getImageX(norm);
-				final int yPos = lt.getImageY(norm);
+				final int xPos = lt.getImageX();
+				final int yPos = lt.getImageY();
 				final int xPos_norm = lt.getRealWorldX();
 				final int yPos_norm = lt.getRealWorldY();
 				final Double angle = (Double) lt.getFeature("angle");

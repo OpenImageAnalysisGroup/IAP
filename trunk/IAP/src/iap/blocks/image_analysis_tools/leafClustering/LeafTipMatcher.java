@@ -83,8 +83,8 @@ public class LeafTipMatcher {
 					int currentTime = (int) lt.getTime();
 					if (day == currentTime) {
 						int r = (int) (255 * ((growTime - currentTime) / (double) (growTime)));
-						int x = lt.getImageX(norm) + fac;
-						int y = lt.getImageY(norm) + fac;
+						int x = lt.getImageX() + fac;
+						int y = lt.getImageY() + fac;
 						
 						img_all.io().canvas()
 								.drawCircle(x, y, 15, new Color(255 - r, 0, r).getRGB(), 0.5, 3)
@@ -122,8 +122,8 @@ public class LeafTipMatcher {
 				// Vector2d vec = (Vector2d) lt.getFeature("angle");
 				// if (vec == null)
 				// continue;
-				int x = lt.getImageX(norm) + fac;
-				int y = lt.getImageY(norm) + fac;
+				int x = lt.getImageX() + fac;
+				int y = lt.getImageY() + fac;
 				img_all.io().canvas()
 						.drawCircle(x, y, 10, hsb, 0.5, 2)
 						// .drawLine(x, y, (int) (vec.x), (int) (vec.y), Color.BLUE.getRGB(), 0.5, 1)

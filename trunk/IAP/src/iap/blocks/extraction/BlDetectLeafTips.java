@@ -23,7 +23,6 @@ import de.ipk.ag_ba.image.operation.ImageConvolution;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author pape, klukas
@@ -278,9 +277,9 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 			img = img.io().or(skel.copy().io().bm().dilate(15).getImage()).or(skel_workimge).getImage()
 					.show("skel images on mask" + ct.toString(), debugValues);
 		} else {
-			if (ct != CameraType.NIR)
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No " + ct.toString()
-						+ " skeleton image available, can't process it within leaf-tip detection!");
+			// if (ct != CameraType.NIR)
+			// System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No " + ct.toString()
+			// + " skeleton image available, can't process it within leaf-tip detection!");
 		}
 		
 		// morphological operations

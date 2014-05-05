@@ -4886,7 +4886,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int[][] img = getAs2D();
 		ImageOperation ioBorderPixels = new ImageOperation(getAs2D()).border().borderDetection(background,
 				mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION ? Integer.MAX_VALUE : borderColor,
-				false).show("BORDER PIXELS");
+				false).show("BORDER PIXELS", false);
 		int borderLength = (int) ioBorderPixels.getResultsTable().getValue("border", 0);
 		int[][] borderMap = ioBorderPixels.getAs2D();
 		int[] borderList = getBorderList(borderMap, borderLength);
@@ -5114,6 +5114,12 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(ip);
 	}
 	
+	/**
+	 * @param mode
+	 *           - possible modes: "add","sub","mul","div", "and", "or", "xor", "min", "max", "ave", "diff", "copy", "zero"
+	 * @param mode32
+	 *           - retrun float result.
+	 */
 	public ImageOperation imageCalculatorImageJ(Image image, String mode, boolean mode32) {
 		ImageCalculator ic = new ImageCalculator();
 		String combinedModes = mode;
