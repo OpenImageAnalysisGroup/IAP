@@ -510,7 +510,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					
 					String sampleTimeAndFullPlantAnnotation = id.getParentSample().getSampleTime() + ";"
 							+ id.getParentSample().getSampleFineTimeOrRowId() + ";"
-							+ id.getParentSample().getFullId() + ";"
+							+ id.getParentSample().getFullId(true) + ";"
 							+ id.getReplicateID();
 					if (!sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.containsKey(sampleTimeAndFullPlantAnnotation)) {
 						sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.put(sampleTimeAndFullPlantAnnotation,

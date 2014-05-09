@@ -215,7 +215,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 												.getFileNameMain();
 										Collection<NumericMeasurementInterface> match = IAPservice
 												.getMatchFor(s, targetTreeNode
-														.getExperiment().getExperiment());
+														.getExperiment().getExperiment(), false);
 										
 										for (NumericMeasurementInterface nmi : match) {
 											ImageData id = (ImageData) nmi;
@@ -259,7 +259,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										.getMatchFor(imageResult
 												.getBinaryFileInfo()
 												.getFileNameMain(),
-												targetTreeNode.getExperiment().getExperiment());
+												targetTreeNode.getExperiment().getExperiment(), false);
 								if (match.size() > 0) {
 									ImageStack snapshot = new ImageStack();
 									for (NumericMeasurementInterface nmi : match) {
@@ -331,27 +331,34 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						jp.add(debugPipelineTestShowReferenceImage);
 					jp.add(debugPipelineTestShowImage);
 					
+					JMenuItem stl = new JMenuItem("Show Image Timeline");
+					stl.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Appointment-Soon-64.png").getScaledInstance(16, 16,
+							java.awt.Image.SCALE_SMOOTH)));
+					stl.addActionListener(getListener(targetTreeNode, true,
+							false, false, true));
+					jp.add(stl);
+					
 					JMenu sn = new JMenu("Show Complete Snapshot Set");
 					sn.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Photos-64.png").getScaledInstance(16, 16,
 							java.awt.Image.SCALE_SMOOTH)));
 					
 					JMenuItem a = new JMenuItem("Main");
 					a.addActionListener(getListener(targetTreeNode, true,
-							false, false));
+							false, false, false));
 					sn.add(a);
 					JMenuItem b = new JMenuItem("Reference");
 					b.addActionListener(getListener(targetTreeNode, false,
-							true, false));
+							true, false, false));
 					sn.add(b);
 					JMenuItem c = new JMenuItem("Annotation");
 					c.addActionListener(getListener(targetTreeNode, false,
-							false, true));
+							false, true, false));
 					sn.add(c);
 					
 					JMenuItem debugShowSnapshotNoStack = new JMenuItem(
 							"Main, Reference, Annotation");
 					debugShowSnapshotNoStack.addActionListener(getListener(
-							targetTreeNode, true, true, true));
+							targetTreeNode, true, true, true, false));
 					sn.add(debugShowSnapshotNoStack);
 					sn.add(debugShowSnapshot);
 					jp.add(sn);
@@ -1202,7 +1209,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	}
 	
 	private ActionListener getListener(final MongoTreeNode targetTreeNode,
-			final boolean main, final boolean ref, final boolean anno) {
+			final boolean main, final boolean ref, final boolean anno, final boolean showTimeLine) {
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1210,8 +1217,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					Collection<NumericMeasurementInterface> match = IAPservice
 							.getMatchFor(imageResult.getBinaryFileInfo()
 									.getFileNameMain(), targetTreeNode
-									.getExperiment().getExperiment());
+									.getExperiment().getExperiment(), showTimeLine);
 					if (match.size() > 0) {
+						ArrayList<ImageData> toBeLoaded = new ArrayList<ImageData>();
 						NumericMeasurementInterface a = match.iterator().next();
 						String pre = "snapshot "
 								+ a.getQualityAnnotation()
@@ -1220,46 +1228,73 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								+ " "
 								+ a.getParentSample().getParentCondition()
 										.getConditionName();
-						
-						if (main)
+						String desiredCamera = ((ImageData) imageResult.getBinaryFileInfo().getEntity()).getParentSample().getParentCondition().getParentSubstance()
+								.getName();
+						if (main) {
+							ImageStack is = new ImageStack();
 							for (NumericMeasurementInterface nmi : match) {
+								if (showTimeLine && !desiredCamera.equals(nmi.getParentSample().getParentCondition().getParentSubstance().getName()))
+									continue;
 								if (nmi instanceof ImageData) {
 									ImageData id = (ImageData) nmi;
 									if (id.getURL() != null) {
-										Image fi = new Image(
-												id.getURL());
-										fi.show(id.getSubstanceName() + " // "
-												+ pre);
+										if (showTimeLine)
+											toBeLoaded.add(id);
+										else {
+											Image fi = new Image(
+													id.getURL());
+											fi.show(id.getSubstanceName() + " // " + pre);
+										}
 									}
 								}
 							}
-						if (ref)
+						}
+						if (ref) {
+							ImageStack is = new ImageStack();
 							for (NumericMeasurementInterface nmi : match) {
+								if (showTimeLine && !desiredCamera.equals(nmi.getParentSample().getParentCondition().getParentSubstance().getName()))
+									continue;
 								if (nmi instanceof ImageData) {
 									ImageData id = (ImageData) nmi;
 									if (id.getLabelURL() != null) {
 										Image fi = new Image(
 												id.getLabelURL());
-										fi.show("Reference "
-												+ id.getSubstanceName()
-												+ " // " + pre);
+										if (showTimeLine)
+											is.addImage(id.getQualityAnnotation() + " / " + id.getSubstanceName() + " / " + id.getParentSample().getTimeUnit() + " "
+													+ id.getParentSample().getTime(), fi);
+										else
+											fi.show("Reference " + id.getSubstanceName() + " // " + pre);
 									}
 								}
 							}
-						if (anno)
+							if (showTimeLine)
+								is.show("Reference " + pre);
+						}
+						if (anno) {
+							ImageStack is = new ImageStack();
 							for (NumericMeasurementInterface nmi : match) {
+								if (showTimeLine && !desiredCamera.equals(nmi.getParentSample().getParentCondition().getParentSubstance().getName()))
+									continue;
 								if (nmi instanceof ImageData) {
 									ImageData id = (ImageData) nmi;
 									if (id.getAnnotationField("oldreference") != null) {
 										Image fi = new Image(
 												new IOurl(
 														id.getAnnotationField("oldreference")));
-										fi.show("Annotation "
-												+ id.getSubstanceName()
-												+ " // " + pre);
+										if (showTimeLine)
+											is.addImage(id.getQualityAnnotation() + " / " + id.getSubstanceName() + " / " + id.getParentSample().getTimeUnit() + " "
+													+ id.getParentSample().getTime(), fi);
+										else
+											fi.show("Annotation " + id.getSubstanceName() + " // " + pre);
 									}
 								}
 							}
+							if (showTimeLine)
+								is.show("Annotation " + pre);
+						}
+						if (toBeLoaded.size() > 0) {
+							IAPservice.showImages(toBeLoaded);
+						}
 					}
 				} catch (Exception err) {
 					JOptionPane.showMessageDialog(null,
@@ -1296,7 +1331,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							.getMatchFor(imageResult
 									.getBinaryFileInfo()
 									.getFileNameMain(),
-									targetTreeNode.getExperiment().getExperiment());
+									targetTreeNode.getExperiment().getExperiment(), false);
 					System.out.println("BLOCKS: " + iat.getImageProcessor().getPipeline(
 							new ImageProcessorOptionsAndResults(iat.getSystemOptions(), null, null)).getSize() + ", Image Set Hits: " + match.size());
 					for (NumericMeasurementInterface nmi : match)

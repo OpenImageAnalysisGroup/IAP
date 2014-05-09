@@ -15,7 +15,6 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -104,6 +103,8 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableOnDB;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
@@ -127,6 +128,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.Runnable
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.PathwayWebLinkItem;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -485,7 +487,7 @@ public class IAPservice {
 		return array;
 	}
 	
-	public static ArrayList<NumericMeasurementInterface> getMatchFor(IOurl url, ExperimentInterface experiment) {
+	public static ArrayList<NumericMeasurementInterface> getMatchFor(IOurl url, ExperimentInterface experiment, boolean ignoreTime) {
 		
 		ArrayList<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
 		
@@ -495,7 +497,7 @@ public class IAPservice {
 			if (md instanceof ImageData) {
 				ImageData id = (ImageData) md;
 				if (url.equals(id.getURL())) {
-					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
+					String key = id.getParentSample().getFullId(!ignoreTime) + ";" + id.getReplicateID() + ";" + id.getPosition();
 					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
 					if (name.contains("."))
 						if (LTdataExchange.positionFirst)
@@ -511,7 +513,7 @@ public class IAPservice {
 			for (NumericMeasurementInterface md : ml) {
 				if (md instanceof ImageData) {
 					ImageData id = (ImageData) md;
-					String key = id.getParentSample().getFullId() + ";" + id.getReplicateID() + ";" + id.getPosition();
+					String key = id.getParentSample().getFullId(!ignoreTime) + ";" + id.getReplicateID() + ";" + id.getPosition();
 					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
 					if (name.contains("."))
 						if (LTdataExchange.positionFirst)
@@ -525,12 +527,26 @@ public class IAPservice {
 			}
 		}
 		
+		if (ignoreTime) {
+			// sort snapshots, as data from different time points will be returned
+			Collections.sort(result, new Comparator<NumericMeasurementInterface>() {
+				@Override
+				public int compare(NumericMeasurementInterface a, NumericMeasurementInterface b) {
+					long tA = a.getParentSample().getSampleFineTimeOrRowId() != null ? a.getParentSample().getSampleFineTimeOrRowId() : a.getParentSample()
+							.getTime();
+					long tB = b.getParentSample().getSampleFineTimeOrRowId() != null ? b.getParentSample().getSampleFineTimeOrRowId() : b.getParentSample()
+							.getTime();
+					return tA < tB ? -1 : (tA == tB ? 0 : 1);
+				}
+			});
+		}
+		
 		return result;
 	}
 	
 	public static Collection<NumericMeasurementInterface> getMatchForReference(IOurl fileNameMain,
 			ExperimentInterface experiment) {
-		Collection<NumericMeasurementInterface> pairs = getMatchFor(fileNameMain, experiment);
+		Collection<NumericMeasurementInterface> pairs = getMatchFor(fileNameMain, experiment, false);
 		
 		Collection<NumericMeasurementInterface> result = new ArrayList<NumericMeasurementInterface>();
 		
@@ -1703,7 +1719,7 @@ public class IAPservice {
 		return MassCopySupport.getInstance();
 	}
 	
-	public static Image getImage(Object ref, String name) throws Exception {
+	public static java.awt.Image getImage(Object ref, String name) throws Exception {
 		final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(
 				GravistoService.getIOurl(ref.getClass(), name, null).getInputStream());
 		SeekableStream ss = SeekableStream.wrapInputStream(in, true);
@@ -1724,7 +1740,7 @@ public class IAPservice {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static Image getImage(Class ref, String name) {
+	public static java.awt.Image getImage(Class ref, String name) {
 		URL url = GravistoService.getResource(ref, name);
 		if (url == null)
 			return null;
@@ -1820,5 +1836,46 @@ public class IAPservice {
 			experiment.getHeader().setRemark(remark);
 		}
 		return removed;
+	}
+	
+	public static void showImages(final ArrayList<ImageData> toBeLoaded) {
+		if (toBeLoaded == null || toBeLoaded.size() == 0)
+			return;
+		final ImageStack is = new ImageStack();
+		
+		final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
+		Runnable backgroundTask1 = new Runnable() {
+			
+			@Override
+			public void run() {
+				int err = 0;
+				for (int i = 0; i < toBeLoaded.size(); i++) {
+					status.setCurrentStatusText1("Load image " + (i + 1) + "/" + toBeLoaded.size());
+					ImageData id = toBeLoaded.get(i);
+					Image fi;
+					try {
+						fi = new Image(id.getURL());
+						is.addImage(id.getQualityAnnotation() + " / " + id.getSubstanceName() + " / " + id.getParentSample().getTimeUnit() + " "
+								+ id.getParentSample().getTime(), fi);
+					} catch (Exception e) {
+						e.printStackTrace();
+						err++;
+					}
+					if (err > 0)
+						status.setCurrentStatusText2(err + " errors");
+					status.setCurrentStatusValueFine(100d * (i + 1) / toBeLoaded.size());
+				}
+				status.setCurrentStatusText1("Processing completed, loaded " + toBeLoaded.size() + " images");
+				status.setCurrentStatusValue(100);
+			}
+		};
+		Runnable finishSwingTask = new Runnable() {
+			@Override
+			public void run() {
+				is.show("Image Stack");
+			}
+		};
+		
+		BackgroundTaskHelper.issueSimpleTaskInWindow("Load Image List", "Initialize", backgroundTask1, finishSwingTask, status, false, true);
 	}
 }
