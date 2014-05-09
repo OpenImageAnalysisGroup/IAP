@@ -131,15 +131,15 @@ public class Sample implements SampleInterface {
 	 *         points from other substances.
 	 */
 	@Override
-	public DataMappingId getFullId() {
+	public DataMappingId getFullId(boolean includeTime) {
 		int seriesId = parent.getSeriesId();
 		String expName = parent.getExperimentName();
 		String seriesName = parent.getConditionName();
 		String species = parent.getSpecies();
 		String genotype = parent.getGenotype();
-		String rowId = getSampleFineTimeOrRowId() + "";
-		String timeP = getTime() + "";
-		String timeU = getTimeUnit();
+		String rowId = includeTime ? getSampleFineTimeOrRowId() + "" : "";
+		String timeP = includeTime ? getTime() + "" : "";
+		String timeU = includeTime ? getTimeUnit() : "";
 		
 		return DataMappingId.getEmptyDataMappingWithoutReplicateInformation(seriesId, expName, seriesName, species,
 				genotype, rowId, timeP, timeU);

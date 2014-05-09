@@ -1086,7 +1086,7 @@ public class NodeHelper implements Node, HelperClass {
 	public static TreeMap<DataMappingId, Stack<Double>> getIdsAndValues(GraphElement ge, Integer overrideReplicateId) {
 		TreeMap<DataMappingId, Stack<Double>> result = new TreeMap<DataMappingId, Stack<Double>>();
 		for (NumericMeasurementInterface sd : getMappedSampleData(ge)) {
-			DataMappingId sid = sd.getParentSample().getFullId();
+			DataMappingId sid = sd.getParentSample().getFullId(true);
 			
 			DataMappingId fullId;
 			if (overrideReplicateId != null)
@@ -1110,7 +1110,7 @@ public class NodeHelper implements Node, HelperClass {
 	public static TreeMap<DataMappingId, Stack<Double>> getIdsAndAverageValues(GraphElement ge) {
 		TreeMap<DataMappingId, Stack<Double>> result = new TreeMap<DataMappingId, Stack<Double>>();
 		for (SampleAverageInterface sd : getMappedAverageSampleData(ge)) {
-			DataMappingId sid = sd.getParentSample().getFullId();
+			DataMappingId sid = sd.getParentSample().getFullId(true);
 			
 			DataMappingId fullId;
 			fullId = sid.getFullDataMappingIdForReplicate(-1);

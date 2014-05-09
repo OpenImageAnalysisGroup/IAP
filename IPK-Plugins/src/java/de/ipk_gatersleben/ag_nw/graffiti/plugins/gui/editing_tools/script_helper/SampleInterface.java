@@ -40,7 +40,7 @@ public interface SampleInterface extends MappingDataEntity, Comparable<SampleInt
 	 * @return A id, which may be used to compare the data point with other data
 	 *         points from other substances.
 	 */
-	public abstract DataMappingId getFullId();
+	public abstract DataMappingId getFullId(boolean includeTime);
 	
 	public abstract int compareTo(SampleInterface sd, boolean ignoreSnapshotFineTime);
 	
