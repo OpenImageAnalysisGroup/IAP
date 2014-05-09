@@ -458,7 +458,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 			return null;
 		
 		ByteProcessor outIp;
-		byte[] pixels;
+		
 		if (outputType == SEGMENTED) {
 			// Segmentation required, convert to 8bit (also for 8-bit images, since the calibration
 			// may have a negative slope). outIp has background 0, maximum areas 255

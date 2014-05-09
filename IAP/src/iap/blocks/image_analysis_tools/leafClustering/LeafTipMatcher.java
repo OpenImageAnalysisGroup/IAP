@@ -24,18 +24,18 @@ public class LeafTipMatcher {
 	private final int fac = 0;
 	private final int millisecondsOfOneDay = 24 * 60 * 60 * 1000;
 	
-	public LeafTipMatcher(Collection<LinkedList<BorderFeature>> tipPositionsForEachDay, Normalisation norm) {
+	public LeafTipMatcher(Collection<LinkedList<Feature>> tipPositionsForEachDay, Normalisation norm) {
 		leafTipList = convert(tipPositionsForEachDay, norm);
 		matchedPlant = new Plant();
 	}
 	
-	public LeafTipMatcher(Plant plant, LinkedList<BorderFeature> tipPositionsForOneDay,
+	public LeafTipMatcher(Plant plant, LinkedList<Feature> tipPositionsForOneDay,
 			long timepoint, Normalisation norm) {
 		leafTipList = convert(tipPositionsForOneDay, timepoint, norm);
 		matchedPlant = plant;
 	}
 	
-	public LeafTipMatcher(LinkedList<BorderFeature> leafTipListForOneDay, long timepoint, Normalisation norm) {
+	public LeafTipMatcher(LinkedList<Feature> leafTipListForOneDay, long timepoint, Normalisation norm) {
 		leafTipList = convert(leafTipListForOneDay, timepoint, norm);
 		matchedPlant = new Plant();
 	}
@@ -211,15 +211,15 @@ public class LeafTipMatcher {
 		this.leafTipList.clear();
 	}
 	
-	private ArrayList<LinkedList<LeafTip>> convert(Collection<LinkedList<BorderFeature>> list, Normalisation norm) {
+	private ArrayList<LinkedList<LeafTip>> convert(Collection<LinkedList<Feature>> list, Normalisation norm) {
 		ArrayList<LinkedList<LeafTip>> tiplistForEachDay = new ArrayList<LinkedList<LeafTip>>();
 		LinkedList<LeafTip> tiplist;
 		long time = 0;
-		for (LinkedList<BorderFeature> l : list) {
+		for (LinkedList<Feature> l : list) {
 			tiplist = new LinkedList<LeafTip>();
 			if (l != null) {
 				time += millisecondsOfOneDay;
-				for (BorderFeature p : l) {
+				for (Feature p : l) {
 					if (p != null) {
 						Vector2D pos = p.getPosition();
 						tiplist.add(new LeafTip(time, pos, p.getFeatureMap(), norm));
@@ -231,10 +231,10 @@ public class LeafTipMatcher {
 		return tiplistForEachDay;
 	}
 	
-	private ArrayList<LinkedList<LeafTip>> convert(LinkedList<BorderFeature> leafTipListForOneDay,
+	private ArrayList<LinkedList<LeafTip>> convert(LinkedList<Feature> leafTipListForOneDay,
 			long timepoint, Normalisation norm) {
 		LinkedList<LeafTip> ll = new LinkedList<LeafTip>();
-		for (BorderFeature bf : leafTipListForOneDay) {
+		for (Feature bf : leafTipListForOneDay) {
 			ll.add(new LeafTip(timepoint, ((Integer) bf.getFeature("x")).doubleValue(), ((Integer) bf.getFeature("y")).doubleValue(), bf.getFeatureMap(), norm));
 		}
 		ArrayList<LinkedList<LeafTip>> al = new ArrayList<LinkedList<LeafTip>>();

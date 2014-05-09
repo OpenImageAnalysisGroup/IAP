@@ -3,7 +3,7 @@ package iap.blocks.extraction;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
-import iap.blocks.image_analysis_tools.leafClustering.BorderFeature;
+import iap.blocks.image_analysis_tools.leafClustering.Feature;
 import iap.blocks.image_analysis_tools.leafClustering.Leaf;
 import iap.blocks.image_analysis_tools.leafClustering.LeafTip;
 import iap.blocks.image_analysis_tools.leafClustering.LeafTipMatcher;
@@ -45,11 +45,11 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 					optionsAndResults.getConfigAndAngle(), true);
 			BlockResultObject result1 = getResultSet().searchObjectResult(getBlockPosition(), 1, "leaftiplist_" + ct);
 			ArrayList<BlockResultValue> result2 = oldResults == null || oldResults.isEmpty() ? null : oldResults.lastEntry().getValue();
-			LinkedList<BorderFeature> unassignedResults = null;
+			LinkedList<Feature> unassignedResults = null;
 			Plant previousResults = null;
 			
 			if (result1 != null) {
-				unassignedResults = (LinkedList<BorderFeature>) result1.getObject();
+				unassignedResults = (LinkedList<Feature>) result1.getObject();
 			}
 			
 			if (result2 != null && !result2.isEmpty()) {
@@ -94,7 +94,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 		}
 	}
 	
-	private void createNewPlant(LinkedList<BorderFeature> unassignedResults, CameraPosition cameraPosition,
+	private void createNewPlant(LinkedList<Feature> unassignedResults, CameraPosition cameraPosition,
 			CameraType cameraType, long timepoint, Normalisation norm) {
 		LeafTipMatcher ltm = new LeafTipMatcher(unassignedResults, timepoint, norm);
 		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);
@@ -106,7 +106,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	private void matchNewResults(Plant previousResults,
-			LinkedList<BorderFeature> unassignedResults, final CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
+			LinkedList<Feature> unassignedResults, final CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
 			final Normalisation norm) {
 		LeafTipMatcher ltm = new LeafTipMatcher(previousResults, unassignedResults, timepoint, norm);
 		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);

@@ -4,7 +4,7 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.image_analysis_tools.leafClustering.BorderAnalysis;
-import iap.blocks.image_analysis_tools.leafClustering.BorderFeature;
+import iap.blocks.image_analysis_tools.leafClustering.Feature;
 import iap.blocks.image_analysis_tools.leafClustering.FeatureObject;
 import iap.blocks.image_analysis_tools.leafClustering.FeatureObject.FeatureObjectType;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
@@ -135,7 +135,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		return input().masks().nir();
 	}
 	
-	private void savePeaksAndFeatures(LinkedList<BorderFeature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius, int maxValidY) {
+	private void savePeaksAndFeatures(LinkedList<Feature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius, int maxValidY) {
 		boolean saveListObject = true;
 		boolean saveLeafCount = true;
 		boolean saveFeaturesInResultSet = false;
@@ -150,7 +150,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		
 		if (saveFeaturesInResultSet) {
 			int index = 1;
-			for (BorderFeature bf : peakList) {
+			for (Feature bf : peakList) {
 				Vector2D pos = bf.getPosition();
 				final Double angle = (Double) bf.getFeature("angle");
 				Vector2D direction = (Vector2D) bf.getFeature("direction");
@@ -227,10 +227,10 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 					"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count.best_angle", count, "leaftips|SUSAN");
 	}
 	
-	private void saveLeafTipList(LinkedList<BorderFeature> peakList, CameraType cameraType, int maxValidY) {
-		ArrayList<BorderFeature> toRemove = new ArrayList<BorderFeature>();
+	private void saveLeafTipList(LinkedList<Feature> peakList, CameraType cameraType, int maxValidY) {
+		ArrayList<Feature> toRemove = new ArrayList<Feature>();
 		// remove bordersize from all position-features
-		for (BorderFeature bf : peakList) {
+		for (Feature bf : peakList) {
 			HashMap<String, FeatureObject> fm = bf.getFeatureMap();
 			if (bf.getPosition().getY() > maxValidY)
 				toRemove.add(bf);
@@ -247,9 +247,9 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, peakList);
 	}
 	
-	private LinkedList<BorderFeature> getPeaksFromBorder(Image img, int searchRadius, double fillGradeInPercent) {
+	private LinkedList<Feature> getPeaksFromBorder(Image img, int searchRadius, double fillGradeInPercent) {
 		BorderAnalysis ba = null;
-		LinkedList<BorderFeature> res = null;
+		LinkedList<Feature> res = null;
 		
 		ba = new BorderAnalysis(img);
 		int geometricThresh = (int) (fillGradeInPercent * (Math.PI * searchRadius * searchRadius));

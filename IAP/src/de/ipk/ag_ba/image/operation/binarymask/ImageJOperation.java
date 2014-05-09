@@ -199,7 +199,7 @@ public class ImageJOperation {
 		return this;
 	}
 	
-	public FloatProcessor edm() {
+	public FloatProcessor edmFloat() {
 		EDM edm = new EDM();
 		return edm.makeFloatEDM(image.getProcessor(), -1, false);
 	}

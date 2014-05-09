@@ -11,21 +11,21 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 /**
  * @author pape
  */
-public class BorderFeature {
+public class Feature {
 	HashMap<String, FeatureObject> featureMap = new HashMap<String, FeatureObject>();
 	
-	public BorderFeature(Integer X, Integer Y) {
+	public Feature(Integer X, Integer Y) {
 		featureMap.put("x", new FeatureObject(X.intValue(), FeatureObjectType.POSITION));
 		featureMap.put("y", new FeatureObject(Y.intValue(), FeatureObjectType.POSITION));
 	}
 	
-	public BorderFeature(int x, int y, double i, String key) {
+	public Feature(int x, int y, double i, String key) {
 		featureMap.put("x", new FeatureObject(x, FeatureObjectType.POSITION));
 		featureMap.put("y", new FeatureObject(y, FeatureObjectType.POSITION));
 		featureMap.put(key, new FeatureObject(i, FeatureObjectType.NUMERIC));
 	}
 	
-	public BorderFeature() {
+	public Feature() {
 	}
 	
 	public void addFeatureOverwrite(String key, Object value) {
@@ -56,12 +56,4 @@ public class BorderFeature {
 		return featureMap;
 	}
 	
-	// public void addBorderFeature(BorderFeature borderFeature) {
-	// Iterator it = borderFeature.featureMap.entrySet().iterator();
-	// while (it.hasNext()) {
-	// Map.Entry pairs = (Map.Entry) it.next();
-	// featureMap.put((String) pairs.getKey(), (FeatureObject) pairs.getValue());
-	// it.remove(); // avoids a ConcurrentModificationException
-	// }
-	// }
 }
