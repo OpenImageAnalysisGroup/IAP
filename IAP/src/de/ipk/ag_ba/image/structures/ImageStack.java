@@ -18,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import org.ErrorMsg;
 import org.FolderPanel;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -52,10 +51,10 @@ public class ImageStack {
 		} else {
 			if (w > 1 && h > 1)
 				image = image.resize(w, h);
-			if (image.getWidth() != w)
-				ErrorMsg.addErrorMessage("mismatching image size: " + w + " <> " + image.getWidth());
-			if (image.getHeight() != h)
-				ErrorMsg.addErrorMessage("mismatching image size: " + h + " <!> " + image.getHeight());
+		}
+		if (image.getWidth() != w || image.getHeight() != h) {
+			System.out.println(SystemAnalysis.getCurrentTime() + "ERROR: mismatching image size: " + h + " <!> " + image.getHeight());
+			return;
 		}
 		try {
 			stack.addSlice(label + (optSettingsPath != null ? "//Settings: " + optSettingsPath + "//" : ""),
