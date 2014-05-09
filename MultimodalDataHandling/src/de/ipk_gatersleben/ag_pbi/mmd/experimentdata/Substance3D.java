@@ -12,7 +12,6 @@
 package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -288,9 +287,9 @@ public class Substance3D extends Substance {
 			return -1l;
 	}
 	
-	public static Collection<NumericMeasurementInterface> getAllMeasurements(
+	public static ArrayList<NumericMeasurementInterface> getAllMeasurements(
 			ExperimentInterface e) {
-		Collection<NumericMeasurementInterface> res = new ArrayList<NumericMeasurementInterface>();
+		ArrayList<NumericMeasurementInterface> res = new ArrayList<NumericMeasurementInterface>();
 		for (SubstanceInterface si : e) {
 			for (ConditionInterface ci : si) {
 				for (SampleInterface s : ci) {
