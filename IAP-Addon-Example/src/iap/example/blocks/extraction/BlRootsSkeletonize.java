@@ -274,7 +274,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		DistanceCalculationMode mode = DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION;
 		ImageOperation distMap = nonBinaryImage.copy();
 		ImageJOperation ijo = new ImageJOperation(distMap.getAs1D(), distMap.getWidth(), distMap.getHeight());
-		FloatProcessor fp = ijo.edm();
+		FloatProcessor fp = ijo.edmFloat();
 		int[][] distanceMap = getDistanceMap(fp, mode);
 		int sub = 1;
 		if (mode == DistanceCalculationMode.INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION)
