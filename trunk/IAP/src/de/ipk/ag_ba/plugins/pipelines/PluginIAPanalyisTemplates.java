@@ -18,6 +18,7 @@ import iap.blocks.extraction.BlCalcMoments;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.extraction.BlCalcWidthAndHeightLR;
+import iap.blocks.extraction.BlDetectLeafCenterPoints;
 import iap.blocks.extraction.BlDetectLeafTips;
 import iap.blocks.extraction.BlLeafCurlingAnalysis;
 import iap.blocks.extraction.BlSkeletonizeNir;
@@ -141,7 +142,8 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlDetectLeafTips(),
 				new BlRemoveLevitatingObjects(),
 				new BlFilterImagesByAngle(),
-				new BlWarpImages()
+				new BlWarpImages(),
+				new BlDetectLeafCenterPoints(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];

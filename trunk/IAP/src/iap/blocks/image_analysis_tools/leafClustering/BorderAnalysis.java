@@ -30,8 +30,8 @@ public class BorderAnalysis {
 	int[][] borderImage;
 	int borderLength;
 	private ArrayList<ArrayList<Integer>> borderLists;
-	private final BorderFeatureList borderFeatureList;
-	private LinkedList<BorderFeature> peakList;
+	private final FeatureList borderFeatureList;
+	private LinkedList<Feature> peakList;
 	boolean debug = false;
 	boolean onlyBiggest = true;
 	boolean checkSplit = true;
@@ -44,7 +44,7 @@ public class BorderAnalysis {
 		borderImage = borderIO.getAs2D();
 		borderLists = getBorderLists(borderImage, borderLength, debug);
 		borderLists = sort();
-		borderFeatureList = new BorderFeatureList(borderLists, onlyBiggest);
+		borderFeatureList = new FeatureList(borderLists, onlyBiggest);
 		image = img;
 		this.setDebug(false);
 	}
@@ -53,7 +53,7 @@ public class BorderAnalysis {
 	 * Extract Peaks of feature list. (get middle of peaks)
 	 **/
 	public void getPeaksFromBorder(double minSizeOfPeak, int distBetweenPeaks, String filterKey) {
-		peakList = new LinkedList<BorderFeature>();
+		peakList = new LinkedList<Feature>();
 		int listsize = borderFeatureList.size();
 		int[] peaks = null;
 		
@@ -108,7 +108,7 @@ public class BorderAnalysis {
 		}
 		
 		// plot peak list and peak features
-		for (BorderFeature p : peakList) {
+		for (Feature p : peakList) {
 			Vector2D pos = p.getPosition();
 			Vector2D direction = (Vector2D) p.getFeature("direction");
 			Double angle = (Double) p.getFeature("angle");
@@ -141,7 +141,7 @@ public class BorderAnalysis {
 			int ahead = (idx + triangleSize) % listSize;
 			
 			// is peak
-			for (BorderFeature p : peakList) {
+			for (Feature p : peakList) {
 				Vector2D pos = p.getPosition();
 				Vector2D p2 = borderFeatureList.get(idx).getPosition();
 				if (pos.getX() == p2.getX() && pos.getY() == p2.getY()) {
@@ -718,7 +718,7 @@ public class BorderAnalysis {
 		return borderLists;
 	}
 	
-	public LinkedList<BorderFeature> getPeakList() {
+	public LinkedList<Feature> getPeakList() {
 		return peakList;
 	}
 	

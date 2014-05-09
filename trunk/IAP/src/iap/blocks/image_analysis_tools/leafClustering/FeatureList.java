@@ -10,25 +10,25 @@ import javax.vecmath.Point3d;
 /**
  * @author pape
  */
-public class BorderFeatureList {
-	LinkedList<BorderFeature> borderFeatureList;
+public class FeatureList {
+	LinkedList<Feature> borderFeatureList;
 	boolean onlyBiggest;
 	
-	public BorderFeatureList(ArrayList<ArrayList<Integer>> borderLists, boolean val) {
-		borderFeatureList = new LinkedList<BorderFeature>();
+	public FeatureList(ArrayList<ArrayList<Integer>> borderLists, boolean val) {
+		borderFeatureList = new LinkedList<Feature>();
 		onlyBiggest = val;
 		for (ArrayList<Integer> list : borderLists) {
 			for (int i = 0; i < list.size(); i += 2) {
 				Integer x = list.get(i);
 				Integer y = list.get(i + 1);
-				borderFeatureList.add(new BorderFeature(x, y));
+				borderFeatureList.add(new Feature(x, y));
 			}
 			if (onlyBiggest)
 				break;
 		}
 	}
 	
-	public LinkedList<BorderFeature> getFeatureList() {
+	public LinkedList<Feature> getFeatureList() {
 		return borderFeatureList;
 	}
 	
@@ -42,7 +42,7 @@ public class BorderFeatureList {
 		double max = Double.MIN_VALUE;
 		
 		// get min and max val
-		for (BorderFeature p : borderFeatureList) {
+		for (Feature p : borderFeatureList) {
 			double val = (Double) p.getFeature(key);
 			if (val < min)
 				min = val;
@@ -53,7 +53,7 @@ public class BorderFeatureList {
 		LinkedList<Point3d> norm = new LinkedList<Point3d>();
 		
 		// calc normalized value
-		for (BorderFeature p : borderFeatureList) {
+		for (Feature p : borderFeatureList) {
 			double val = (Double) p.getFeature(key);
 			double fac = (int) (255 * ((val - min) / (max - min)));
 			Integer x = (Integer) p.getFeature("x");
@@ -78,7 +78,7 @@ public class BorderFeatureList {
 		return borderFeatureList.get(idxFeature).getFeature(filterKey);
 	}
 	
-	public BorderFeature getFeatureMap(int idxFeature) {
+	public Feature getFeatureMap(int idxFeature) {
 		return borderFeatureList.get(idxFeature);
 	}
 	
@@ -90,7 +90,7 @@ public class BorderFeatureList {
 		borderFeatureList.get(index).addFeature(key, val, type);
 	}
 	
-	public BorderFeature get(int index) {
+	public Feature get(int index) {
 		return borderFeatureList.get(index);
 	}
 }
