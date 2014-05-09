@@ -5,6 +5,7 @@ import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 
 import org.ErrorMsg;
@@ -168,11 +169,11 @@ public class IAPpluginManager {
 	}
 	
 	public Collection<ImageAnalysisBlock> getKnownAnalysisBlocks() {
-		final Collection<ImageAnalysisBlock> blocks = new ArrayList<ImageAnalysisBlock>();
+		final HashSet<String> known = new HashSet<String>();
+		final ArrayList<ImageAnalysisBlock> blocks = new ArrayList<ImageAnalysisBlock>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
 			@Override
 			public void processPlugin(IAPplugin p) {
-				HashSet<String> known = new HashSet<String>();
 				ImageAnalysisBlock[] bla = p.getImageAnalysisBlocks();
 				if (bla != null)
 					for (ImageAnalysisBlock bl : bla) {
@@ -185,6 +186,14 @@ public class IAPpluginManager {
 			}
 		};
 		processPlugins(r);
+		Collections.sort(blocks, new Comparator<ImageAnalysisBlock>() {
+			@Override
+			public int compare(ImageAnalysisBlock a, ImageAnalysisBlock b) {
+				String nameA = a.getName() != null ? a.getName() : a.getClass().getName();
+				String nameB = b.getName() != null ? b.getName() : b.getClass().getName();
+				return nameA.compareTo(nameB);
+			}
+		});
 		return blocks;
 	}
 }
