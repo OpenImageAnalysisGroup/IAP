@@ -15,10 +15,10 @@ public class Download {
 		try {
 			String url = args[0];
 			AbstractResourceIOHandler h;
-			if (url.startsWith("http"))
+			if (url.contains("http://") || url.contains("https://"))
 				h = new HTTPhandler();
 			else
-				if (url.startsWith("ftp"))
+				if (url.contains("ftp://"))
 					h = new FTPhandler();
 				else {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Currently, only http or ftp downloads are supported by this function!");
