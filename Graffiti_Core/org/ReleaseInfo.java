@@ -18,7 +18,7 @@ import javax.swing.JApplet;
 import javax.swing.JOptionPane;
 
 public class ReleaseInfo implements HelperClass {
-	public static final String IAP_VERSION_STRING = "1.1.3";
+	public static final String IAP_VERSION_STRING = "1.1.4";
 	private static Release currentRelease = Release.DEBUG;
 	
 	public static Release getRunningReleaseStatus() {
