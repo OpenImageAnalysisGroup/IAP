@@ -16,26 +16,27 @@ import de.ipk.ag_ba.image.structures.ImageStack;
 /**
  * @author pape
  */
-public class LeafTipMatcher {
+public class LeafMatcher {
 	
 	private final ArrayList<LinkedList<LeafTip>> leafTipList;
 	private final Plant matchedPlant;
 	private double maxDistanceBetweenLeafTips = 50.0;
 	private final int fac = 0;
 	private final int millisecondsOfOneDay = 24 * 60 * 60 * 1000;
+	private final double maxAgeForMatching = 2.0;
 	
-	public LeafTipMatcher(Collection<LinkedList<Feature>> tipPositionsForEachDay, Normalisation norm) {
+	public LeafMatcher(Collection<LinkedList<Feature>> tipPositionsForEachDay, Normalisation norm) {
 		leafTipList = convert(tipPositionsForEachDay, norm);
 		matchedPlant = new Plant();
 	}
 	
-	public LeafTipMatcher(Plant plant, LinkedList<Feature> tipPositionsForOneDay,
+	public LeafMatcher(Plant plant, LinkedList<Feature> tipPositionsForOneDay,
 			long timepoint, Normalisation norm) {
 		leafTipList = convert(tipPositionsForOneDay, timepoint, norm);
 		matchedPlant = plant;
 	}
 	
-	public LeafTipMatcher(LinkedList<Feature> leafTipListForOneDay, long timepoint, Normalisation norm) {
+	public LeafMatcher(LinkedList<Feature> leafTipListForOneDay, long timepoint, Normalisation norm) {
 		leafTipList = convert(leafTipListForOneDay, timepoint, norm);
 		matchedPlant = new Plant();
 	}
@@ -152,10 +153,11 @@ public class LeafTipMatcher {
 	public void matchLeafTips() {
 		int snapshotIndex = 0;
 		long time = 0;
-		double timeFac;
+		
 		for (LinkedList<LeafTip> tempTipListIn : leafTipList) {
 			if (tempTipListIn.isEmpty())
 				continue;
+			
 			int tipIndex = 0;
 			if (time == 0)
 				time = tempTipListIn.getFirst().getTime();
@@ -172,32 +174,16 @@ public class LeafTipMatcher {
 			} else {
 				LinkedList<LeafTip> lastMatchedTips = matchedPlant.getLastTips();
 				LinkedList<LeafTip> toMatch = tempTipListIn;
-				while (!tempTipListIn.isEmpty() && !lastMatchedTips.isEmpty()) {
-					LeafTip[] bestPair = new LeafTip[2];
-					double bestDist = Double.MAX_VALUE;
-					for (LeafTip lastMatchedTip : lastMatchedTips) {
-						for (LeafTip tempTipIn : toMatch) {
-							timeFac = (tempTipIn.getTime() - lastMatchedTip.getTime()) * millisecondsOfOneDay;
-							double dist = tempTipIn.dist(lastMatchedTip) / timeFac;
-							if (dist < bestDist) {
-								bestDist = dist;
-								bestPair[0] = lastMatchedTip;
-								bestPair[1] = tempTipIn;
-							}
+				claculateBestPairs(lastMatchedTips, toMatch);
+				// old leaves remaining -> check for ignore
+				if (!lastMatchedTips.isEmpty())
+					for (LeafTip lt : lastMatchedTips) {
+						if ((time - lt.getTime()) > maxAgeForMatching * millisecondsOfOneDay) {
+							int leafID = lt.getLeafID();
+							matchedPlant.setIgnoreForLeaf(leafID);
 						}
 					}
-					lastMatchedTips.remove(bestPair[0]);
-					tempTipListIn.remove(bestPair[1]);
-					if (bestDist < maxDistanceBetweenLeafTips) {
-						bestPair[1].setDist(bestDist);
-						bestPair[1].setLeafID(bestPair[0].getLeafID());
-						matchedPlant.addLeafTip(bestPair[1]);
-					} else {
-						bestPair[1].setDist(bestDist);
-						bestPair[1].setLeafID(matchedPlant.getNumberOfLeaves() + 1);
-						matchedPlant.addNewLeaf(bestPair[1]);
-					}
-				}
+				// new leaves remaining -> create new leaves
 				if (!toMatch.isEmpty())
 					for (LeafTip lt : toMatch) {
 						lt.setLeafID(matchedPlant.getNumberOfLeaves() + 1);
@@ -207,8 +193,54 @@ public class LeafTipMatcher {
 			}
 			snapshotIndex++;
 		}
-		matchedPlant.setGrowTime((int) time);
+		matchedPlant.addTime(time);
 		this.leafTipList.clear();
+	}
+	
+	/**
+	 * Match leaf objects.
+	 */
+	private void claculateBestPairs(LinkedList<LeafTip> lastMatchedTips, LinkedList<LeafTip> toMatch) {
+		while (!toMatch.isEmpty() && !lastMatchedTips.isEmpty()) {
+			LeafTip[] bestPair = new LeafTip[2];
+			double bestDist = Double.MAX_VALUE;
+			for (LeafTip lastMatchedTip : lastMatchedTips) {
+				for (LeafTip tempTipIn : toMatch) {
+					double dist = claculateDistance(tempTipIn, lastMatchedTip);
+					if (dist < bestDist) {
+						bestDist = dist;
+						bestPair[0] = lastMatchedTip;
+						bestPair[1] = tempTipIn;
+					}
+				}
+			}
+			lastMatchedTips.remove(bestPair[0]);
+			toMatch.remove(bestPair[1]);
+			if (bestDist < maxDistanceBetweenLeafTips) {
+				bestPair[1].setDist(bestDist);
+				bestPair[1].setLeafID(bestPair[0].getLeafID());
+				matchedPlant.addLeafTip(bestPair[1]);
+			} else {
+				bestPair[1].setDist(bestDist);
+				bestPair[1].setLeafID(matchedPlant.getNumberOfLeaves() + 1);
+				matchedPlant.addNewLeaf(bestPair[1]);
+			}
+		}
+	}
+	
+	private double claculateDistance(LeafTip tempTipIn, LeafTip lastMatchedTip) {
+		double dist = 0.0;
+		Distmode dm = Distmode.DEFAULT;
+		switch (dm) {
+			case DEFAULT:
+				dist = tempTipIn.dist(lastMatchedTip);
+				break;
+			case USETIME:
+				double timeFac = (tempTipIn.getTime() - lastMatchedTip.getTime()) * millisecondsOfOneDay;
+				dist = tempTipIn.dist(lastMatchedTip); // / timeFac : TODO distance will ignore time, weighting has to be fixed.
+				break;
+		}
+		return dist;
 	}
 	
 	private ArrayList<LinkedList<LeafTip>> convert(Collection<LinkedList<Feature>> list, Normalisation norm) {
@@ -252,5 +284,9 @@ public class LeafTipMatcher {
 	
 	public enum Vismode {
 		PERLEAF, PERDAY
+	}
+	
+	public enum Distmode {
+		DEFAULT, USETIME
 	}
 }
