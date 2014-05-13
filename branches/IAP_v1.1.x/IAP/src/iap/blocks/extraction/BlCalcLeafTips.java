@@ -1223,7 +1223,12 @@ public class BlCalcLeafTips extends AbstractSnapshotAnalysisBlock {
 			public ArrayList<BlockPropertyValue> postProcessCalculatedProperties(long time, int tray) {
 				
 				ArrayList<Double> topAngles = new ArrayList<Double>();
-				for (BlockPropertyValue v : getCalculatedValues("RESULT_top.fluo.main.axis.rotation", true, time, tray)) {
+				ArrayList<BlockPropertyValue> rotationResults = getCalculatedValues("RESULT_top.fluo.main.axis.rotation", true, time, tray);
+				
+				if (rotationResults == null)
+					return null;
+				
+				for (BlockPropertyValue v : rotationResults) {
 					if (v.getValue() != null) {
 						Double a = v.getValue();
 						topAngles.add(a);
