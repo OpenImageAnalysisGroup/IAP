@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.commands.settings;
 
+import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.util.ArrayList;
@@ -43,7 +44,11 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	public String getDefaultTitle() {
 		try {
 			ImageAnalysisBlock inst = (ImageAnalysisBlock) InstanceLoader.createInstance(group);
-			return inst.getName();
+			BlockType bt = inst.getBlockType();
+			String pre = "";
+			if (bt != null)
+				pre = "<html><font bgcolor='" + bt.getColor() + "'>&nbsp;";
+			return pre + inst.getName() + (pre.isEmpty() ? "" : "&nbsp;");
 		} catch (Exception e) {
 			String g = group;
 			if (g != null && g.indexOf(".Block") > 0)
