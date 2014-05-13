@@ -111,7 +111,10 @@ public class LeafTip {
 	}
 	
 	public Object getFeature(String key) {
-		return featureMap.get(key).feature;
+		Object f = null;
+		if (featureMap != null && featureMap.get(key) != null)
+			f = featureMap.get(key).feature;
+		return f;
 	}
 	
 	public void addFeature(Object value, String key, FeatureObjectType type) {

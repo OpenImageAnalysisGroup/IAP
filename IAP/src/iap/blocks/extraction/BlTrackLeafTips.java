@@ -6,7 +6,7 @@ import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.image_analysis_tools.leafClustering.Feature;
 import iap.blocks.image_analysis_tools.leafClustering.Leaf;
 import iap.blocks.image_analysis_tools.leafClustering.LeafTip;
-import iap.blocks.image_analysis_tools.leafClustering.LeafTipMatcher;
+import iap.blocks.image_analysis_tools.leafClustering.LeafMatcher;
 import iap.blocks.image_analysis_tools.leafClustering.Plant;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
@@ -96,7 +96,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	
 	private void createNewPlant(LinkedList<Feature> unassignedResults, CameraPosition cameraPosition,
 			CameraType cameraType, long timepoint, Normalisation norm) {
-		LeafTipMatcher ltm = new LeafTipMatcher(unassignedResults, timepoint, norm);
+		LeafMatcher ltm = new LeafMatcher(unassignedResults, timepoint, norm);
 		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);
 		ltm.matchLeafTips();
 		Plant plant = ltm.getMatchedPlant();
@@ -108,7 +108,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	private void matchNewResults(Plant previousResults,
 			LinkedList<Feature> unassignedResults, final CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
 			final Normalisation norm) {
-		LeafTipMatcher ltm = new LeafTipMatcher(previousResults, unassignedResults, timepoint, norm);
+		LeafMatcher ltm = new LeafMatcher(previousResults, unassignedResults, timepoint, norm);
 		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);
 		ltm.matchLeafTips();
 		final Plant plant = ltm.getMatchedPlant();
@@ -168,7 +168,9 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			final int xPos_norm = ltLast.getRealWorldX();
 			final int yPos_norm = ltLast.getRealWorldY();
-			final Double angle = (Double) ltLast.getFeature("angle");
+			Double angle = null;
+			if (ltLast.getFeature("angle") != null)
+				angle = (Double) ltLast.getFeature("angle");
 			
 			getResultSet().setNumericResult(0,
 					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".x",
@@ -238,13 +240,15 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 								c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
 										" a: " + angle.intValue(), Color.BLACK);
 						} else {
-							Vector2D vv = direction.subtract(new Vector2D(xPos, yPos));
-							Vector2D d = vv.getNorm() > 0.01 ?
-									vv.normalize()
-											.scalarMultiply((1 + (Math.sqrt(2) - 1) * (1 - Math.abs(Math.cos(2 * angle / 180. * Math.PI)))) * 16)
-									: vv;
-							c = c.drawRectangle(xPos - 18, yPos - 18, 36, 36, colors.get(num), 2)
-									.drawLine(xPos, yPos, (int) d.getX() + xPos, (int) d.getY() + yPos, colors.get(num).getRGB(), 0.2, 1);
+							if (direction != null) {
+								Vector2D vv = direction.subtract(new Vector2D(xPos, yPos));
+								Vector2D d = vv.getNorm() > 0.01 ?
+										vv.normalize()
+												.scalarMultiply((1 + (Math.sqrt(2) - 1) * (1 - Math.abs(Math.cos(2 * angle / 180. * Math.PI)))) * 16)
+										: vv;
+								c.drawLine(xPos, yPos, (int) d.getX() + xPos, (int) d.getY() + yPos, colors.get(num).getRGB(), 0.2, 1);
+							}
+							c = c.drawRectangle(xPos - 18, yPos - 18, 36, 36, colors.get(num), 2);
 							if (db)
 								c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
 										" a: " + angle.intValue(), Color.BLACK);

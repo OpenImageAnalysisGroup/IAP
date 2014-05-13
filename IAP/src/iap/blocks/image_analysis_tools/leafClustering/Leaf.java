@@ -9,6 +9,8 @@ import java.util.Iterator;
 public class Leaf implements Iterable<LeafTip> {
 	ArrayList<LeafTip> tipList;
 	public int leafID;
+	public long oldestLeafTip;
+	public boolean ignore; // if leaf has no match for long time -> set ignore
 	
 	public Leaf(LeafTip l, int id) {
 		tipList = new ArrayList<LeafTip>();
@@ -65,5 +67,14 @@ public class Leaf implements Iterable<LeafTip> {
 			idx++;
 		}
 		return tipList.get(tipidx);
+	}
+	
+	public long getTimeForLastMatch() {
+		long t = 0;
+		for (LeafTip lt : tipList) {
+			if (lt.getTime() > t)
+				t = lt.getTime();
+		}
+		return t;
 	}
 }

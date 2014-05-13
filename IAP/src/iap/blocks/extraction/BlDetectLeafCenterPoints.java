@@ -36,8 +36,10 @@ public class BlDetectLeafCenterPoints extends AbstractBlock {
 	}
 	
 	private Image saveAndMarkResults(Image img, LinkedList<Feature> pointList) {
-		boolean markResults = true;
+		boolean markResults = false;
+		boolean saveResults = true;
 		boolean saveResultObject = true;
+		
 		if (markResults) {
 			ImageCanvas ic = new ImageCanvas(img);
 			for (Feature p : pointList) {
@@ -46,8 +48,25 @@ public class BlDetectLeafCenterPoints extends AbstractBlock {
 			img = ic.getImage();
 		}
 		
-		if (saveResultObject) {
+		if (saveResults) {
+			// save leaf count
+			getResultSet().setNumericResult(getBlockPosition(),
+					"RESULT_" + getBlockPosition() + "." + img.getCameraType() + ".leaf.count", pointList.size(), "leaves|CENTERPOINTS");
 			
+			// save x and y position
+			for (Feature p : pointList) {
+				getResultSet().setNumericResult(getBlockPosition(),
+						"RESULT_" + getBlockPosition() + "." + img.getCameraType() + ".leaf.x", (int) p.getPosition().getX(), "leaves|CENTERPOINTS");
+				
+				getResultSet().setNumericResult(getBlockPosition(),
+						"RESULT_" + getBlockPosition() + "." + img.getCameraType() + ".leaf.x", (int) p.getPosition().getY(), "leaves|CENTERPOINTS");
+			}
+		}
+		
+		if (saveResultObject) {
+			String name = this.getClass().getSimpleName();
+			name = name.toLowerCase();
+			getResultSet().setObjectResult(getBlockPosition(), "name" + "_" + img.getCameraType(), pointList);
 		}
 		
 		return img;
@@ -60,7 +79,12 @@ public class BlDetectLeafCenterPoints extends AbstractBlock {
 			new Image(edmfp.getBufferedImage()).show("distmap");
 		
 		MaximumFinder mf = new MaximumFinder();
-		ByteProcessor bp = mf.findMaxima(edmfp, 1, 1, mf.LIST, true, true);
+		int maxTolerance = getInt("Maximum Tolerance", 5);
+		ByteProcessor bp = mf.findMaxima(edmfp, maxTolerance, 1, mf.LIST, true, true);
+		
+		if (debugValues)
+			new Image(bp.getBufferedImage()).show("Maximas");
+		
 		ResultsTable rt = mf.getRt();
 		
 		if (debugValues)

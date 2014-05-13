@@ -11,13 +11,14 @@ import javax.vecmath.Point2d;
  */
 public class Plant {
 	private final LinkedList<Leaf> leafList;
-	private int growTime;
+	private final LinkedList<Long> timePoints; // sample points for measurements
 	private String iD;
 	private String settingFolder;
 	
 	public Plant() {
 		leafList = new LinkedList<Leaf>();
 		iD = "";
+		timePoints = new LinkedList<Long>();
 	}
 	
 	public LinkedList<Leaf> getLeafList() {
@@ -39,21 +40,26 @@ public class Plant {
 		leafList.add(new Leaf(tempTip, tempTip.getLeafID()));
 	}
 	
-	public void setGrowTime(int t) {
-		growTime = t;
+	public void addTime(long t) {
+		timePoints.add(t);
 	}
 	
 	public int getGrowTime() {
-		return growTime;
+		return (int) (timePoints.getLast() - timePoints.getFirst());
 	}
 	
 	public int getNumberOfLeaves() {
 		return leafList.size();
 	}
 	
+	/**
+	 * Returns last matched leaves (considered the ignored flag, this leaves will not be included in the returned list).
+	 */
 	public LinkedList<LeafTip> getLastTips() {
 		LinkedList<LeafTip> out = new LinkedList<LeafTip>();
 		for (Leaf l : leafList) {
+			if (l.ignore == true)
+				continue;
 			out.add(l.getLast());
 		}
 		return out;
@@ -81,5 +87,15 @@ public class Plant {
 	
 	public void setSettingFolder(String s) {
 		this.settingFolder = s;
+	}
+	
+	/**
+	 * Set ignore for leaf n.
+	 */
+	public void setIgnoreForLeaf(int n) {
+		for (Leaf l : leafList) {
+			if (l.leafID == n)
+				l.ignore = true;
+		}
 	}
 }
