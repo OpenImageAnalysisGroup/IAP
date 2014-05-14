@@ -512,7 +512,10 @@ public class Image {
 	 * @return
 	 */
 	public Image saveToFile(String fileName) {
-		io().saveImage(null).saveAsPng(fileName);
+		if (fileName.toLowerCase().endsWith(".jpg") || fileName.toLowerCase().endsWith(".jpeg"))
+			io().saveImage(null).saveAsJpeg(fileName);
+		else
+			io().saveImage(null).saveAsPng(fileName);
 		return this;
 	}
 	
