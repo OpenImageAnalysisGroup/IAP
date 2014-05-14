@@ -220,6 +220,8 @@ public class SystemOptions {
 			if (iniIO != null) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Read INI Provider Content");
 				String ss = iniIO.getString();
+				if (ss == null)
+					return null;
 				ini = new Ini(new StringReader(ss));
 				return ini;
 			} else {
