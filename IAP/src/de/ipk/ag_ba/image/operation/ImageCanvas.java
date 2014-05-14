@@ -3,6 +3,7 @@ package de.ipk.ag_ba.image.operation;
 import iap.blocks.unused.RunnableOnImage;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -313,6 +314,14 @@ public class ImageCanvas {
 	public ImageCanvas text(int x, int y, String text, Color color) {
 		image.io().image.getProcessor().setColor(color);
 		image.io().image.getProcessor().drawString(text, x, y);
+		return this;
+	}
+	
+	public ImageCanvas text(int x, int y, String text, Color color, int size) {
+		image.io().image.getProcessor().setColor(color);
+		image.io().image.getProcessor().setFont(new Font("", Font.BOLD, size));
+		image.io().image.getProcessor().drawString(text, x, y);
+		image.io().image.getProcessor().reset();
 		return this;
 	}
 	
