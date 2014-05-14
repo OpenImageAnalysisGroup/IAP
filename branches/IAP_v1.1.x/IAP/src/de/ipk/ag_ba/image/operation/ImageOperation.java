@@ -1413,7 +1413,10 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return
 	 */
 	public ImageOperation saveImage(String fileName) {
-		saveImage(fileName, ImageSaveFormat.PNG);
+		if (fileName.toLowerCase().endsWith(".jpg") || fileName.toLowerCase().endsWith(".jpeg"))
+			saveImage(fileName, ImageSaveFormat.JPG);
+		else
+			saveImage(fileName, ImageSaveFormat.PNG);
 		return this;
 	}
 	
