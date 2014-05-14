@@ -10,6 +10,9 @@ import org.graffiti.plugin.io.resources.FTPhandler;
 import org.graffiti.plugin.io.resources.HTTPhandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
+/**
+ * @author Christian Klukas
+ */
 public class Download {
 	public static void main(String[] args) {
 		try {
