@@ -1380,6 +1380,28 @@ public class LTdataExchange implements ExperimentLoader {
 		return res;
 	}
 	
+	public static void main(String[] args) {
+		try {
+			String u = args[0];
+			String p = args[1];
+			if (new LTdataExchange().isUserKnown(u, p)) {
+				System.out.println("OK");
+				System.exit(0);
+			} else {
+				System.out.println("INVALID USER OR PASSWORD");
+				System.exit(1);
+			}
+		} catch (Exception e) {
+			System.out.println("INVALID (RUNTIME EXCEPTION '+" + e.getMessage() + "+')");
+			e.printStackTrace();
+			System.exit(2);
+		} catch (Error e) {
+			System.out.println("INVALID (RUNTIME ERROR '+" + e.getMessage() + "+')");
+			e.printStackTrace();
+			System.exit(3);
+		}
+	}
+	
 	public boolean isUserKnown(String u, String p) throws Exception {
 		Connection connection = openConnectionToDatabase("LTSystem");
 		boolean ok = false;
