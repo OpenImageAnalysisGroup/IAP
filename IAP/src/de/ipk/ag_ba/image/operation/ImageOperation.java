@@ -202,8 +202,7 @@ public class ImageOperation implements MemoryHogInterface {
 			else
 				target[idx++] = replace;
 		}
-		return this;// new ImageOperation(target, getImage().getWidth(), getImage()
-		// .getHeight());
+		return new ImageOperation(target, getImage().getWidth(), getImage().getHeight());
 	}
 	
 	public ImageOperation replaceColorsScanLine(int search, int replace) {
@@ -5205,7 +5204,8 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @param maskSize
 	 *           = radius of filter kernel
 	 * @param mode
-	 *           = use modes from ImageJ RankFilters class
+	 *           = use modes from ImageJ RankFilters class MEAN=0, MIN=1, MAX=2, VARIANCE=3, MEDIAN=4, OUTLIERS=5, DESPECKLE=6, REMOVE_NAN=7,
+	 *           OPEN=8, CLOSE=9
 	 * @return
 	 */
 	public ImageOperation rankFilterImageJ(double maskSize, int mode) {
