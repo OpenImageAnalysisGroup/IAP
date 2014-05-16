@@ -613,7 +613,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 		int[] pList = new int[width * height]; // here we enter points starting from a maximum
 		Vector xyVector = null;
 		Roi roi = null;
-		boolean displayOrCount = outputType == POINT_SELECTION || outputType == LIST || outputType == COUNT;
+		boolean displayOrCount = outputType == POINT_SELECTION || outputType == LIST || outputType == COUNT || outputType == IN_TOLERANCE;
 		if (displayOrCount)
 			xyVector = new Vector();
 		if (imp != null)
@@ -754,7 +754,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
 				}
 				points = new Polygon(xpoints, ypoints, npoints);
 			} else
-				if (outputType == LIST) {
+				if (outputType == LIST || outputType == IN_TOLERANCE) {
 					Analyzer.resetCounter();
 					rt = ResultsTable.getResultsTable();
 					for (int i = 0; i < npoints; i++) {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Stack;
 
+import org.Colors;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.operation.PositionAndColor;
@@ -22,31 +23,40 @@ public class RegionLabeling implements Segmentation {
 	Image labeledImage;
 	int[][] visitedImage;
 	LinkedList<ArrayList<PositionAndColor>> regionList;
-	private int numberOfClusters;
 	
-	public RegionLabeling(Image img, boolean isBorderImage, int borderColor) {
+	public LinkedList<ArrayList<PositionAndColor>> getRegionList() {
+		return regionList;
+	}
+	
+	private int numberOfClusters;
+	private final int background;
+	
+	public RegionLabeling(Image img, boolean isBorderImage, int background, int borderColor) {
 		this.image = img;
 		this.isBorderImage = isBorderImage;
 		this.borderColor = borderColor;
 		this.visitedImage = img.getAs2A();
+		this.background = background;
 	}
 	
 	public Image getLabeledImage() {
 		int[][] labeled = image.copy().getAs2A();
 		int fac = 0;
+		ArrayList<Color> colors = Colors.get(regionList.size(), 1);
+		int idx = 0;
 		for (ArrayList<PositionAndColor> clu : regionList) {
 			fac += 255 / numberOfClusters;
-			int cluColor = new Color(fac, fac, fac).getRGB();
+			int cluColor = colors.get(idx).getRGB();
 			for (PositionAndColor pix : clu) {
 				labeled[pix.x][pix.y] = cluColor;
 			}
+			idx++;
 		}
 		
 		return new Image(labeled);
 	}
 	
-	public ArrayList<PositionAndColor> regionGrowing(int x, int y, int background, double radius, int geometricThresh, boolean debug)
-			throws InterruptedException {
+	public ArrayList<PositionAndColor> regionGrowing(int x, int y, int background, double radius, int geometricThresh, boolean debug) {
 		radius = radius * radius;
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -72,13 +82,18 @@ public class RegionLabeling implements Segmentation {
 		if (rx >= 0 && ry >= 0 && rx < w && ry < h)
 			inside = true;
 		
-		visitedImage[rx][ry] = background;
+		// visitedImage[rx][ry] = background;
 		
 		while (!visited.empty()) {
 			// update process window for debug
 			if (visitedImage[rx][ry] != background && debug) {
 				show.update(new Image(visitedImage));
-				Thread.sleep(100);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			visitedImage[rx][ry] = background;
 			
@@ -97,67 +112,81 @@ public class RegionLabeling implements Segmentation {
 					}
 				
 				inside = ry - 1 >= 0;
-				if (!find && inside)
+				if (inside)
 					if (visitedImage[rx][ry - 1] != background) {
-						find = true;
-						ry = ry - 1;
+						if (!find) {
+							find = true;
+							ry = ry - 1;
+						}
 					} else {
 						numOfBackgroundPixels++;
 					}
 				
 				inside = ry - 1 >= 0 && rx + 1 < w;
-				if (!find && inside)
+				if (inside)
 					if (visitedImage[rx + 1][ry - 1] != background) {
-						find = true;
-						rx = rx + 1;
-						ry = ry - 1;
+						if (!find) {
+							find = true;
+							rx = rx + 1;
+							ry = ry - 1;
+						}
 					} else {
 						numOfBackgroundPixels++;
 					}
 				
 				inside = rx - 1 >= 0;
-				if (!find && inside)
+				if (inside)
 					if (visitedImage[rx - 1][ry] != background) {
-						find = true;
-						rx = rx - 1;
+						if (!find) {
+							find = true;
+							rx = rx - 1;
+						}
 					} else {
 						numOfBackgroundPixels++;
 					}
 				
 				inside = rx + 1 < w;
-				if (!find && inside)
+				if (inside)
 					if (visitedImage[rx + 1][ry] != background) {
-						find = true;
-						rx = rx + 1;
+						if (!find) {
+							find = true;
+							rx = rx + 1;
+						}
 					} else {
 						numOfBackgroundPixels++;
 					}
 				
 				inside = rx - 1 >= 0 && ry + 1 < h;
-				if (!find && inside)
+				if (inside)
 					if (visitedImage[rx - 1][ry + 1] != background) {
-						find = true;
-						rx = rx - 1;
-						ry = ry + 1;
+						if (!find) {
+							find = true;
+							rx = rx - 1;
+							ry = ry + 1;
+						}
 					} else {
 						numOfBackgroundPixels++;
 					}
 				
 				inside = ry + 1 < h;
-				if (!find && inside)
+				if (inside)
 					if (visitedImage[rx][ry + 1] != background) {
-						find = true;
-						ry = ry + 1;
+						if (!find) {
+							find = true;
+							ry = ry + 1;
+						}
 					} else {
 						numOfBackgroundPixels++;
 					}
 				
 				inside = rx + 1 < w && ry + 1 < h;
-				if (!find && inside)
+				if (inside)
 					if (visitedImage[rx + 1][ry + 1] != background) {
-						find = true;
-						rx = rx + 1;
-						ry = ry + 1;
+						if (!find) {
+							find = true;
+							rx = rx + 1;
+							ry = ry + 1;
+						}
 					} else {
 						numOfBackgroundPixels++;
 					}
@@ -170,22 +199,25 @@ public class RegionLabeling implements Segmentation {
 					// current region bigger than geometricThresh
 					if (resultRegion.size() > geometricThresh - 1)
 						return resultRegion;
-					if (numOfBackgroundPixels <= 1) {
-						visited.push(temp);
-						dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
-					} else
-						goBack = true;
+					visited.push(temp);
+					dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
+					// if (numOfBackgroundPixels > 0) {
+					// visited.push(temp);
+					// dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
+					// } else {
+					// goBack = true;
+					// }
 					// no pixel found -> go back
-				} else
-					goBack = true;
-				
-				if (goBack) {
+				} else {
+					// if (goBack) {
+					visitedImage[rx][ry] = background;
 					if (!visited.empty())
 						visited.pop();
 					if (!visited.empty()) {
 						rx = visited.peek().x;
 						ry = visited.peek().y;
 						dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
+						// }
 					}
 				}
 				// new pixel is not in radius -> go back
@@ -210,19 +242,16 @@ public class RegionLabeling implements Segmentation {
 	public void detectClusters() {
 		int w = image.getWidth();
 		int h = image.getHeight();
+		regionList = new LinkedList<>();
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
-				if (visitedImage[x][y] != Color.WHITE.getRGB())
-					try {
-						ArrayList<PositionAndColor> region = regionGrowing(x, y, Color.WHITE.getRGB(), Double.MAX_VALUE, Integer.MAX_VALUE, true);
-						if (region.size() > 0) {
-							regionList.add(region);
-							numberOfClusters++;
-						}
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				if (visitedImage[x][y] != background) {
+					ArrayList<PositionAndColor> region = regionGrowing(x, y, background, Double.MAX_VALUE, Integer.MAX_VALUE, false);
+					if (region.size() > 0) {
+						regionList.add(region);
+						numberOfClusters++;
 					}
+				}
 			}
 		}
 	}
