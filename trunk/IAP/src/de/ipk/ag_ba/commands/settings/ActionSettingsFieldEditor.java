@@ -22,6 +22,7 @@ import org.SystemAnalysis;
 import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.Unicode;
@@ -237,7 +238,7 @@ public class ActionSettingsFieldEditor extends AbstractNavigationAction {
 											inf = "Step 0" + (line - 1);
 										
 										try {
-											ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(sl).newInstance();
+											ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(sl, true, InstanceLoader.getCurrentLoader()).newInstance();
 											blockName = inst.getName();
 											blockDesc = inst.getDescription();
 											inf = "<html>" + BlockSelector.getBlockDescriptionAnnotation(inf, inst);

@@ -11,6 +11,7 @@ import javax.swing.JComponent;
 import org.IniIoProvider;
 import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -82,7 +83,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 				res.add(nb);
 				String bln = "";
 				try {
-					ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group).newInstance();
+					ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group, true, InstanceLoader.getCurrentLoader()).newInstance();
 					bln = inst.getName();
 				} catch (Exception e) {
 					// empty

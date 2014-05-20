@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -99,7 +100,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 			for (String b : defaultBlockList) {
 				if (b != null && !b.startsWith("#") && !b.trim().isEmpty()) {
 					try {
-						Class<?> c = Class.forName(b);
+						Class<?> c = Class.forName(b, true, InstanceLoader.getCurrentLoader());
 						if (ImageAnalysisBlock.class.isAssignableFrom(c))
 							p.add((Class<? extends ImageAnalysisBlock>) c);
 						else
