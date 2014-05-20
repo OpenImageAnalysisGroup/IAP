@@ -18,6 +18,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.apache.commons.lang3.text.WordUtils;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -187,7 +188,7 @@ public class ActionBlockStatistics extends AbstractNavigationAction {
 							ThreadSafeOptions o = blockType2block.get(bt).get(key);
 							String title = key;
 							try {
-								Class c = Class.forName(title);
+								Class c = Class.forName(title, true, InstanceLoader.getCurrentLoader());
 								Object oo = c.newInstance();
 								ImageAnalysisBlock iab = (ImageAnalysisBlock) oo;
 								title = iab.getName();

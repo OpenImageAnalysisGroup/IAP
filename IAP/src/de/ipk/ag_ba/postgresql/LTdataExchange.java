@@ -34,6 +34,7 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.commands.load_lt.TableDataHeadingRow;
 import de.ipk.ag_ba.datasources.ExperimentLoader;
@@ -756,7 +757,7 @@ public class LTdataExchange implements ExperimentLoader {
 	}
 	
 	private static void loadJdbcDriver() throws ClassNotFoundException {
-		Class.forName(driver);
+		Class.forName(driver, true, InstanceLoader.getCurrentLoader());
 	}
 	
 	private Connection openConnectionToDatabase(String database) throws SQLException, ClassNotFoundException {
