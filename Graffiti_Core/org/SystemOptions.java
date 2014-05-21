@@ -104,10 +104,10 @@ public class SystemOptions {
 					try {
 						mt = iniIO.lastModified();
 					} catch (Exception e) {
-						e.printStackTrace();
 						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-Provider can't be accessed. Update-check stops for this object. Error: "
 								+ e.getMessage());
 						updateCheckTasks.remove(this);
+						ErrorMsg.addErrorMessage(e);
 						return;
 					}
 					if (mt != null && mt != iniIO.storedLastUpdateTime()) {
@@ -119,13 +119,13 @@ public class SystemOptions {
 								try {
 									r.run();
 								} catch (Exception e) {
-									e.printStackTrace();
+									ErrorMsg.addErrorMessage(e);
 								}
 							}
 						}
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					ErrorMsg.addErrorMessage(e);
 				}
 			}
 		};
