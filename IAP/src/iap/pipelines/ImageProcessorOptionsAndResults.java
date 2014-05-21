@@ -82,9 +82,9 @@ public class ImageProcessorOptionsAndResults {
 				infoCamConfOrLateOrEearly = " (" + lateOrEarly + ")";
 			else
 				if (cameraConfig != null && lateOrEarly == null)
-					infoCamConfOrLateOrEearly = " for " + cameraConfig;
+					infoCamConfOrLateOrEearly = " for " + cameraConfig.trim();
 				else
-					infoCamConfOrLateOrEearly = " for " + cameraConfig + " (" + lateOrEarly + ")";
+					infoCamConfOrLateOrEearly = " for " + cameraConfig.trim() + " (" + lateOrEarly + ")";
 		
 	}
 	
