@@ -183,4 +183,8 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 		return options.getIntSetting(this, "Maximum Object Count", 10);
 	}
 	
+	@Override
+	public boolean isEnabled(ImageProcessorOptions options) {
+		return options.getBooleanSetting(this, "enabled", true);
+	}
 }
