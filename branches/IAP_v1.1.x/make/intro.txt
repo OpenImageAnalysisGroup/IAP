@@ -1,7 +1,7 @@
 ###General information:###
 
-Create/update plugin list before first start by executing createfilelist.bat 
-(Windows) or createfilelist.cmd (Linux/Mac/...) from the command line.
+Create/update plugin list before first start by executing createfilelist.cmd 
+(Windows) or createfilelist.sh (Linux/Mac/...) from the command line.
 
 ###Launch config for VANTED:###
 
