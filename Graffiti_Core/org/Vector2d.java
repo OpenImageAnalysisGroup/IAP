@@ -107,4 +107,22 @@ public class Vector2d {
 		this.x += leftX;
 		this.y += topY;
 	}
+
+	public Vector2d add(Vector2d sub) {
+		return new Vector2d(x+sub.x, y+sub.y);
+	}
+	
+	public Vector2d subtract(Vector2d sub) {
+		return new Vector2d(x-sub.x, y-sub.y);
+	}
+
+	public double getX() {
+		return x;
+	}
+	
+	public double getY() {
+		return y;
+	}
+
+	
 }
