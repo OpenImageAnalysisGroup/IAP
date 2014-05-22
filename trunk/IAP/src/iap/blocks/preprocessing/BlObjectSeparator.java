@@ -186,6 +186,11 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 		return options.getIntSetting(this, "Maximum Object Count", 10);
 	}
 	
+	@Override
+	public boolean isEnabled(ImageProcessorOptionsAndResults options) {
+		return options.getBooleanSetting(this, "enabled", true);
+	}
+	
 	public static Image getImage(Image inp, int idx, int maxN) throws InterruptedException {
 		BlObjectSeparator blSep = new BlObjectSeparator();
 		ImageSet masks = new ImageSet(inp, null, null, null);
