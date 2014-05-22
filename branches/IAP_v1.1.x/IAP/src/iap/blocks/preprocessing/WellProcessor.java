@@ -13,4 +13,5 @@ public interface WellProcessor {
 	
 	public int getDefinedWellCount(ImageProcessorOptions options);
 	
+	public boolean isEnabled(ImageProcessorOptions options);
 }
