@@ -259,4 +259,9 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 		
 		return n;
 	}
+
+	@Override
+	public boolean isEnabled(ImageProcessorOptionsAndResults options) {
+		return options.getBooleanSetting(this, "enabled", true);
+	}
 }

@@ -12,5 +12,6 @@ import iap.pipelines.ImageProcessorOptionsAndResults;
 public interface WellProcessor {
 	
 	public int getDefinedWellCount(ImageProcessorOptionsAndResults options);
-	
+
+	public boolean isEnabled(ImageProcessorOptionsAndResults options);
 }
