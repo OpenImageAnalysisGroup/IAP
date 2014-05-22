@@ -28,7 +28,16 @@ public class RegionLabeling implements Segmentation {
 		return regionList;
 	}
 	
-	private int numberOfClusters;
+	/**
+	 * Converts integer values to real gray values.
+	 */
+	public LinkedList<ArrayList<PositionAndColor>> getRegionListConverted() {
+		for (ArrayList<PositionAndColor> list : regionList)
+			for (PositionAndColor pix : list)
+				pix.setIntensityInt((pix.intensityInt & 0xff0000) >> 16);
+		return regionList;
+	}
+	
 	private final int background;
 	
 	public RegionLabeling(Image img, boolean isBorderImage, int background, int borderColor) {
@@ -41,11 +50,9 @@ public class RegionLabeling implements Segmentation {
 	
 	public Image getLabeledImage() {
 		int[][] labeled = image.copy().getAs2A();
-		int fac = 0;
 		ArrayList<Color> colors = Colors.get(regionList.size(), 1);
 		int idx = 0;
 		for (ArrayList<PositionAndColor> clu : regionList) {
-			fac += 255 / numberOfClusters;
 			int cluColor = colors.get(idx).getRGB();
 			for (PositionAndColor pix : clu) {
 				labeled[pix.x][pix.y] = cluColor;
@@ -71,8 +78,6 @@ public class RegionLabeling implements Segmentation {
 		boolean inside = false;
 		double dist = 0.0;
 		Image show = null;
-		boolean goBack = false;
-		int numOfBackgroundPixels;
 		if (debug) {
 			show = new Image(visitedImage);
 			show.show("debug");
@@ -81,8 +86,6 @@ public class RegionLabeling implements Segmentation {
 		// test if new pixel is in image space
 		if (rx >= 0 && ry >= 0 && rx < w && ry < h)
 			inside = true;
-		
-		// visitedImage[rx][ry] = background;
 		
 		while (!visited.empty()) {
 			// update process window for debug
@@ -98,7 +101,6 @@ public class RegionLabeling implements Segmentation {
 			visitedImage[rx][ry] = background;
 			
 			find = false;
-			numOfBackgroundPixels = 0;
 			
 			if (dist < radius) {
 				inside = rx - 1 >= 0 && ry - 1 >= 0;
@@ -107,8 +109,6 @@ public class RegionLabeling implements Segmentation {
 						find = true;
 						rx = rx - 1;
 						ry = ry - 1;
-					} else {
-						numOfBackgroundPixels++;
 					}
 				
 				inside = ry - 1 >= 0;
@@ -118,8 +118,6 @@ public class RegionLabeling implements Segmentation {
 							find = true;
 							ry = ry - 1;
 						}
-					} else {
-						numOfBackgroundPixels++;
 					}
 				
 				inside = ry - 1 >= 0 && rx + 1 < w;
@@ -130,8 +128,6 @@ public class RegionLabeling implements Segmentation {
 							rx = rx + 1;
 							ry = ry - 1;
 						}
-					} else {
-						numOfBackgroundPixels++;
 					}
 				
 				inside = rx - 1 >= 0;
@@ -141,8 +137,6 @@ public class RegionLabeling implements Segmentation {
 							find = true;
 							rx = rx - 1;
 						}
-					} else {
-						numOfBackgroundPixels++;
 					}
 				
 				inside = rx + 1 < w;
@@ -152,8 +146,6 @@ public class RegionLabeling implements Segmentation {
 							find = true;
 							rx = rx + 1;
 						}
-					} else {
-						numOfBackgroundPixels++;
 					}
 				
 				inside = rx - 1 >= 0 && ry + 1 < h;
@@ -164,8 +156,6 @@ public class RegionLabeling implements Segmentation {
 							rx = rx - 1;
 							ry = ry + 1;
 						}
-					} else {
-						numOfBackgroundPixels++;
 					}
 				
 				inside = ry + 1 < h;
@@ -175,8 +165,6 @@ public class RegionLabeling implements Segmentation {
 							find = true;
 							ry = ry + 1;
 						}
-					} else {
-						numOfBackgroundPixels++;
 					}
 				
 				inside = rx + 1 < w && ry + 1 < h;
@@ -187,26 +175,17 @@ public class RegionLabeling implements Segmentation {
 							rx = rx + 1;
 							ry = ry + 1;
 						}
-					} else {
-						numOfBackgroundPixels++;
 					}
 				
 				// Found new pixel?
 				if (find) {
 					PositionAndColor temp = new PositionAndColor(rx, ry, visitedImage[rx][ry]);
-					// count++;
 					resultRegion.add(temp);
 					// current region bigger than geometricThresh
 					if (resultRegion.size() > geometricThresh - 1)
 						return resultRegion;
 					visited.push(temp);
 					dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
-					// if (numOfBackgroundPixels > 0) {
-					// visited.push(temp);
-					// dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
-					// } else {
-					// goBack = true;
-					// }
 					// no pixel found -> go back
 				} else {
 					// if (goBack) {
@@ -249,7 +228,6 @@ public class RegionLabeling implements Segmentation {
 					ArrayList<PositionAndColor> region = regionGrowing(x, y, background, Double.MAX_VALUE, Integer.MAX_VALUE, false);
 					if (region.size() > 0) {
 						regionList.add(region);
-						numberOfClusters++;
 					}
 				}
 			}

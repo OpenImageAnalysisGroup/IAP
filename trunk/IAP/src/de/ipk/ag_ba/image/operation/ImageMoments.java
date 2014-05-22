@@ -5,6 +5,8 @@ import java.awt.Point;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
+ * Class for calculation of image moments based on http://en.wikipedia.org/wiki/Image_moment.
+ * 
  * @author pape
  */
 public class ImageMoments {
@@ -14,9 +16,21 @@ public class ImageMoments {
 	static Point centerOfGravity;
 	static int background;
 	
+	/**
+	 * Constructor uses background from Class ImageOperation.
+	 */
 	public ImageMoments(Image img) {
 		this.img = img;
 		this.background = ImageOperation.BACKGROUND_COLORint;
+		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
+	}
+	
+	/**
+	 * Constructor uses self defined background.
+	 */
+	public ImageMoments(Image img, int background) {
+		this.img = img;
+		this.background = background;
 		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
 	}
 	

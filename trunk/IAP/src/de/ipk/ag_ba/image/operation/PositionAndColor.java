@@ -1,7 +1,7 @@
 package de.ipk.ag_ba.image.operation;
 
 /**
- * Creates an object which stores the position and the intensity value of an image pixel.
+ * Creates an object which stores the position and the intensity int-value of an image pixel.
  * 
  * @author pape
  */
@@ -9,12 +9,12 @@ public class PositionAndColor {
 	
 	public int x;
 	public int y;
-	public int colorInt;
+	public int intensityInt;
 	
-	public PositionAndColor(int x, int y, int color) {
+	public PositionAndColor(int x, int y, int colorInt) {
 		this.x = x;
 		this.y = y;
-		this.colorInt = color;
+		this.intensityInt = colorInt;
 	}
 	
 	@Override
@@ -29,7 +29,10 @@ public class PositionAndColor {
 	}
 	
 	public int distQ(PositionAndColor a) {
-		
 		return (x - a.x) * (x - a.x) + (y - a.y) * (y - a.y);
+	}
+	
+	public void setIntensityInt(int val) {
+		this.intensityInt = val;
 	}
 }
