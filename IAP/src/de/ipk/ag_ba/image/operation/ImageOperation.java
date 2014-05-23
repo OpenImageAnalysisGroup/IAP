@@ -1983,7 +1983,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int cpus = SystemAnalysis.getNumberOfCPUs();
 		if (cpus > 6)
 			cpus = cpus / 2;
-		
+		final ColorSpaceConverter convert = new ColorSpaceConverter();
 		final float cont = 16f / 116f;
 		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>(256);
 		for (int rr = 0; rr < 256; rr++) {
@@ -2008,52 +2008,56 @@ public class ImageOperation implements MemoryHogInterface {
 						
 						for (int blue = 0; blue < 256; blue++) {
 							
-							bd += step;
-							
-							boolean old = true;
-							
-							if (old) {
-								// white reference D65 PAL/SECAM
-								X = 0.430587f * rd + 0.341545f * gd + 0.178336f * bd;
-								Y = 0.222021f * rd + 0.706645f * gd + 0.0713342f * bd;
-								Z = 0.0201837f * rd + 0.129551f * gd + 0.939234f * bd;
-								
-								// XYZ to Lab
-								if (X > 0.008856)
-									fX = IAPservice.cubeRoots[(int) (1000 * X)];
-								else
-									fX = (7.78707f * X) + cont;// 7.7870689655172
-									
-								if (Y > 0.008856)
-									fY = IAPservice.cubeRoots[(int) (1000 * Y)];
-								else
-									fY = (7.78707f * Y) + cont;
-								
-								if (Z > 0.008856)
-									fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
-								else
-									fZ = (7.78707f * Z) + cont;
-								
-								La = ((116 * fY) - 16) * 2.55f;
-								aa = 1.0625f * (500f * (fX - fY)) + 128f;
-								bb = 1.0625f * (200f * (fY - fZ)) + 128f;
-							} else {
-								// white reference D65 PAL/SECAM
-								X = aXa + 178.336f * bd;
-								Y = aYa + 71.3342f * bd;
-								Z = aZa + 939.234f * bd;
-								
-								fX = IAPservice.cubeRoots[(int) X];
-								fY = IAPservice.cubeRoots[(int) Y];
-								fZ = IAPservice.cubeRoots[(int) Z];
-								
-								La = ((116 * fY) - 16) * 2.55f;
-								aa = 1.0625f * (500f * (fX - fY)) + 128f;
-								bb = 1.0625f * (200f * (fY - fZ)) + 128f;
-							}
-							p[blue] = La;
-							p[blue + 256] = aa;
-							p[blue + 512] = bb;
+							// bd += step;
+							//
+							// boolean old = true;
+							//
+							// if (old) {
+							// // white reference D65 PAL/SECAM
+							// X = 0.430587f * rd + 0.341545f * gd + 0.178336f * bd;
+							// Y = 0.222021f * rd + 0.706645f * gd + 0.0713342f * bd;
+							// Z = 0.0201837f * rd + 0.129551f * gd + 0.939234f * bd;
+							//
+							// // XYZ to Lab
+							// if (X > 0.008856)
+							// fX = IAPservice.cubeRoots[(int) (1000 * X)];
+							// else
+							// fX = (7.78707f * X) + cont;// 7.7870689655172
+							//
+							// if (Y > 0.008856)
+							// fY = IAPservice.cubeRoots[(int) (1000 * Y)];
+							// else
+							// fY = (7.78707f * Y) + cont;
+							//
+							// if (Z > 0.008856)
+							// fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
+							// else
+							// fZ = (7.78707f * Z) + cont;
+							//
+							// La = ((116 * fY) - 16) * 2.55f;
+							// aa = 1.0625f * (500f * (fX - fY)) + 128f;
+							// bb = 1.0625f * (200f * (fY - fZ)) + 128f;
+							// } else {
+							// // white reference D65 PAL/SECAM
+							// X = aXa + 178.336f * bd;
+							// Y = aYa + 71.3342f * bd;
+							// Z = aZa + 939.234f * bd;
+							//
+							// fX = IAPservice.cubeRoots[(int) X];
+							// fY = IAPservice.cubeRoots[(int) Y];
+							// fZ = IAPservice.cubeRoots[(int) Z];
+							//
+							// La = ((116 * fY) - 16) * 2.55f;
+							// aa = 1.0625f * (500f * (fX - fY)) + 128f;
+							// bb = 1.0625f * (200f * (fY - fZ)) + 128f;
+							// }
+							// p[blue] = La;
+							// p[blue + 256] = aa;
+							// p[blue + 512] = bb;
+							double[] lab = convert.RGBtoLAB(red, green, blue);
+							p[blue] = (float) lab[0];
+							p[blue + 256] = (float) lab[1];
+							p[blue + 512] = (float) lab[2];
 						}
 					}
 				}
