@@ -87,7 +87,7 @@ public class BorderAnalysis {
 			peaks = CurveAnalysis.findMaximaIJ(data, 1, false);
 		}
 		
-		peaks = CurveAnalysis.summarizeMaxima(peaks, listsize, distBetweenPeaks);
+		peaks = CurveAnalysis.summarizeMaxima(peaks, listsize, distBetweenPeaks, CurveAnalysis.SummarizeMode.SUM);
 		
 		// save results
 		for (int idx = 0; idx < peaks.length; idx++) {
