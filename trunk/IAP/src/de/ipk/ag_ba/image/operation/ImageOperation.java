@@ -2055,9 +2055,9 @@ public class ImageOperation implements MemoryHogInterface {
 							// p[blue + 256] = aa;
 							// p[blue + 512] = bb;
 							double[] lab = convert.RGBtoLAB(red, green, blue);
-							p[blue] = (float) lab[0];
-							p[blue + 256] = (float) lab[1];
-							p[blue + 512] = (float) lab[2];
+							p[blue] = (float) lab[0] * 2.55f;
+							p[blue + 256] = (float) lab[1] + 128f;
+							p[blue + 512] = (float) lab[2] + 128f;
 						}
 					}
 				}

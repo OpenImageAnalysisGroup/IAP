@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+import org.Vector2i;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math3.optimization.fitting.PolynomialFitter;
 import org.apache.commons.math3.optimization.general.LevenbergMarquardtOptimizer;
@@ -249,24 +250,39 @@ public class CurveAnalysis {
 	/**
 	 * Method to summarize max if positions are < maxDiff.
 	 */
-	public static int[] summarizeMaxima(int[] peaks, int length, int maxDiff) {
+	public static int[] summarizeMaxima(int[] peaks, int length, int maxDiff, SummarizeMode mode) {
 		LinkedList<Integer> newPeaks = new LinkedList<Integer>();
 		int peaksLength = peaks.length;
 		Arrays.sort(peaks);
 		for (int idx = 0; idx < peaksLength; idx++) {
 			int temp = peaks[idx];
-			int count = 1, idx2 = (idx + 1) % peaksLength, diff = Math.abs(temp - peaks[idx2]), sum = temp;
+			int idx2 = (idx + 1) % peaksLength, diff = Math.abs(temp - peaks[idx2]);
+			// position and value for temp-peak
+			LinkedList<Vector2i> tempPeakList = new LinkedList<Vector2i>();
+			tempPeakList.add(new Vector2i(idx2, temp));
 			while (diff < maxDiff) {
 				temp = peaks[idx2];
-				sum = sum + temp;
+				tempPeakList.add(new Vector2i(idx2, temp));
 				idx2 = (idx2 + 1) % peaksLength;
 				diff = Math.abs(temp - peaks[idx2]);
-				count++;
-				if (count > (length * 2))
+				if (tempPeakList.size() > (length * 2))
 					return peaks;
 			}
-			newPeaks.add(sum / count);
-			idx = idx + count - 1;
+			if (mode == SummarizeMode.SUM) {
+				int sum = 0;
+				for (Vector2i v : tempPeakList)
+					sum += v.y;
+				newPeaks.add(sum / tempPeakList.size());
+			}
+			if (mode == SummarizeMode.MAX) {
+				Vector2i max = new Vector2i(-1, Integer.MIN_VALUE);
+				for (Vector2i v : tempPeakList) {
+					if (v.y > max.y)
+						max = v;
+				}
+				newPeaks.add(max.y);
+			}
+			idx = idx + tempPeakList.size() - 1;
 			
 			// check if last and first are the same peak
 			if ((temp + maxDiff) >= length) {
@@ -293,5 +309,9 @@ public class CurveAnalysis {
 			ret[i] = newPeaks.get(i).intValue();
 		}
 		return ret;
+	}
+	
+	public enum SummarizeMode {
+		SUM, MAX
 	}
 }

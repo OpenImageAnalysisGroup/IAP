@@ -29,7 +29,6 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.postgresql.DatabaseDataExchange;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
@@ -391,30 +390,30 @@ public class Console {
 		}
 	}
 	
-	public String validateDomainLogin(String user, String pass) throws Exception {
-		try {
-			boolean ok = (user.equals("public") && pass.equals("user")) ||
-					new DatabaseDataExchange().isValidDomainUser(user, pass);
-			if (ok) {
-				validDomainLogin = true;
-				this.domainUser = user;
-				if (user.equals("public"))
-					this.domainUserGroups = new String[] { "public" };
-				else
-					this.domainUserGroups = new String[] { "public" };// = new DatabaseDataExchange().getUserGroups(user, pass);
-					
-				updateAllActionCustomization();
-				System.out.println("OK: Data processing access enabled for user: " + user + " // " + SystemAnalysis.getCurrentTime());
-				return "OK: Data processing access is enabled.";
-			} else {
-				System.out.println("ERROR: Data processing access denied for user: " + user + " // " + SystemAnalysis.getCurrentTime());
-				return "Please check your login data. " +
-						"If in doubt, contact the IPK research group image analysis.";
-			}
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
-		}
-	}
+	// public String validateDomainLogin(String user, String pass) throws Exception {
+	// try {
+	// boolean ok = (user.equals("public") && pass.equals("user")) ||
+	// new DatabaseDataExchange().isValidDomainUser(user, pass);
+	// if (ok) {
+	// validDomainLogin = true;
+	// this.domainUser = user;
+	// if (user.equals("public"))
+	// this.domainUserGroups = new String[] { "public" };
+	// else
+	// this.domainUserGroups = new String[] { "public" };// = new DatabaseDataExchange().getUserGroups(user, pass);
+	//
+	// updateAllActionCustomization();
+	// System.out.println("OK: Data processing access enabled for user: " + user + " // " + SystemAnalysis.getCurrentTime());
+	// return "OK: Data processing access is enabled.";
+	// } else {
+	// System.out.println("ERROR: Data processing access denied for user: " + user + " // " + SystemAnalysis.getCurrentTime());
+	// return "Please check your login data. " +
+	// "If in doubt, contact the IPK research group image analysis.";
+	// }
+	// } catch (Exception e) {
+	// throw new Exception(e.getMessage());
+	// }
+	// }
 	
 	private void updateAllActionCustomization() {
 		for (NavigationButton nb : navigationBarContent) {
