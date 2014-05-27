@@ -1260,6 +1260,10 @@ public class Experiment implements ExperimentInterface {
 	}
 	
 	public static ExperimentInterface copyAndExtractSubtanceInclusiveData(Collection<SubstanceInterface> toBeExtracted) {
+		return copyAndExtractSubtanceInclusiveData(toBeExtracted, null);
+	}
+	
+	public static ExperimentInterface copyAndExtractSubtanceInclusiveData(Collection<SubstanceInterface> toBeExtracted, ConditionInterface validCondition) {
 		Experiment experiment = new Experiment();
 		if (toBeExtracted.isEmpty())
 			return experiment;
@@ -1268,6 +1272,8 @@ public class Experiment implements ExperimentInterface {
 		for (SubstanceInterface sub : toBeExtracted) {
 			SubstanceInterface su = sub.clone();
 			for (ConditionInterface c : sub) {
+				if (validCondition != null && validCondition != c)
+					continue;
 				ConditionInterface cu = c.clone(su);
 				for (SampleInterface si : c) {
 					SampleInterface sic = si.clone(cu);
@@ -1287,7 +1293,13 @@ public class Experiment implements ExperimentInterface {
 	public static ExperimentInterface copyAndExtractSubtanceInclusiveData(SubstanceInterface toBeExtracted) {
 		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>();
 		sl.add(toBeExtracted);
-		return copyAndExtractSubtanceInclusiveData(sl);
+		return copyAndExtractSubtanceInclusiveData(sl, null);
+	}
+	
+	public static ExperimentInterface copyAndExtractSubtanceInclusiveData(SubstanceInterface toBeExtracted, ConditionInterface validCondition) {
+		ArrayList<SubstanceInterface> sl = new ArrayList<SubstanceInterface>();
+		sl.add(toBeExtracted);
+		return copyAndExtractSubtanceInclusiveData(sl, validCondition);
 	}
 	
 	public ExperimentStatistics getExperimentStatistics() {
