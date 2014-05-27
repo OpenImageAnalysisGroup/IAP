@@ -83,6 +83,13 @@ public class LTdataExchange implements ExperimentLoader {
 		host = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//host", "lemna-db.ipk-gatersleben.de");
 	}
 	
+	public LTdataExchange(String user, String password, String host, String port) {
+		this.user = user;
+		this.password = password;
+		this.host = host;
+		this.port = port;
+	}
+	
 	public Collection<String> getDatabases() throws SQLException, ClassNotFoundException {
 		HashSet<String> invalidDBs = new HashSet<String>();
 		
@@ -1383,9 +1390,24 @@ public class LTdataExchange implements ExperimentLoader {
 	
 	public static void main(String[] args) {
 		try {
-			String u = args[0];
-			String p = args[1];
-			if (new LTdataExchange().isUserKnown(u, p)) {
+			boolean res = false;
+			if (args.length == 2) {
+				String u = args[0];
+				String p = args[1];
+				res = new LTdataExchange().isUserKnown(u, p);
+			} else
+				if (args.length == 6) {
+					String u = args[0];
+					String p = args[1];
+					String dbU = args[2];
+					String dbP = args[3];
+					String dbH = args[4];
+					String dbPort = args[5];
+					res = new LTdataExchange(dbU, dbP, dbH, dbPort).isUserKnown(u, p);
+				} else {
+					System.out.println("INVALID PARAMETER SET (USER PASSWORD or USER PASSWORD DBUSER DBPASSWORD DBHOST DBPORT");
+				}
+			if (res) {
 				System.out.println("OK");
 				System.exit(0);
 			} else {
