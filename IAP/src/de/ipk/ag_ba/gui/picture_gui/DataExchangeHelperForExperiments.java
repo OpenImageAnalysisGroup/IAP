@@ -189,6 +189,7 @@ public class DataExchangeHelperForExperiments {
 		boolean cleared = false;
 		final ArrayList<LocalComputeJob> executeLater = new ArrayList<LocalComputeJob>();
 		Substance3D sub = null;
+		Condition3D con = null;
 		try {
 			ArrayList<BinaryFileInfo> bbb = new ArrayList<BinaryFileInfo>();
 			BinaryFileInfo primary = null;
@@ -217,6 +218,7 @@ public class DataExchangeHelperForExperiments {
 					} else {
 						if (mde instanceof Substance3D) {
 							sub = (Substance3D) mde;
+							con = null;
 							primary = null;
 							for (ConditionInterface c : sub)
 								for (SampleInterface si : c) {
@@ -274,6 +276,8 @@ public class DataExchangeHelperForExperiments {
 							} else {
 								if (mde instanceof Condition3D) {
 									Condition3D c3d = (Condition3D) mde;
+									con = c3d;
+									sub = (Substance3D) c3d.getParentSubstance();
 									primary = null;
 									for (SampleInterface si : c3d) {
 										Sample3D s3d = (Sample3D) si;
@@ -338,7 +342,7 @@ public class DataExchangeHelperForExperiments {
 					cleared = true;
 					clearPanel(filePanel, mt, expTree);
 				}
-				processChartGenerator(executeLater, sub, sub, mt, expTree, filePanel, bbb.isEmpty(), stop);
+				processChartGenerator(executeLater, con != null ? con : sub, sub, mt, expTree, filePanel, bbb.isEmpty(), stop);
 			}
 			
 			BinaryFileInfo lastBBB = null;
@@ -402,7 +406,7 @@ public class DataExchangeHelperForExperiments {
 		}
 	}
 	
-	private static void processChartGenerator(ArrayList<LocalComputeJob> executeLater, MappingDataEntity mde, final Substance3D sub,
+	private static void processChartGenerator(ArrayList<LocalComputeJob> executeLater, final MappingDataEntity mde, final Substance3D sub,
 			MongoTreeNode mt, JTree expTree, DataSetFilePanel filePanel, boolean isLast, StopObject stop) {
 		if (mt != expTree.getSelectionPath().getLastPathComponent())
 			return;
@@ -411,14 +415,32 @@ public class DataExchangeHelperForExperiments {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
 			
 			final DataSetFileButton chartingButton = new DataSetFileButton(
-					mt, null, previewImage, mt.isReadOnly(), true, "Create Data Chart", null);
+					mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
+							"<html><center>Create Data Chart<br>"
+									+ "(for specific condition)" : "<html><center>Create Data Chart<br>(for&nbsp;selected&nbsp;property)", null);
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
-					
-					Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
-					exp = MappingData3DPath.merge(md, true);
+					ExperimentInterface exp;
+					if (mde instanceof Condition3D) {
+						exp = Experiment.copyAndExtractSubtanceInclusiveData(sub, (ConditionInterface) mde);
+						Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
+						ArrayList<MappingData3DPath> mmd = new ArrayList<MappingData3DPath>();
+						for (NumericMeasurementInterface nmi : md) {
+							MappingData3DPath mp = new MappingData3DPath(nmi, true);
+							mp.getConditionData().setVariety(mp.getConditionData().getVariety() != null && !mp.getConditionData().getVariety().isEmpty() ?
+									mp.getConditionData().getVariety() + "/" + mp.getMeasurement().getQualityAnnotation()
+									: mp.getMeasurement().getQualityAnnotation());
+							
+							mmd.add(mp);
+						}
+						exp = MappingData3DPath.merge(mmd, true);
+						
+					} else {
+						exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
+						Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
+						exp = MappingData3DPath.merge(md, true);
+					}
 					
 					HashSet<String> speciesNames = new HashSet<String>();
 					for (SubstanceInterface si : exp)
@@ -448,7 +470,9 @@ public class DataExchangeHelperForExperiments {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
 			
 			final DataSetFileButton chartingButton = new DataSetFileButton(
-					mt, null, previewImage, mt.isReadOnly(), true, "Export Data (XLSX)", null);
+					mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
+							"<html><center>Export Data (XLSX)<br>"
+									+ "(for specific condition)" : "<html><center>Export Data (XLSX)<br>(for&nbsp;selected&nbsp;property)", null);
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -482,9 +506,13 @@ public class DataExchangeHelperForExperiments {
 						 * ThreadSafeOptions tsoSplitSecond,
 						 * boolean exportCommand
 						 */
+						ExperimentInterface exp;
+						if (mde instanceof Condition3D)
+							exp = Experiment.copyAndExtractSubtanceInclusiveData(sub, (ConditionInterface) mde);
+						else
+							exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
 						action.setExperimentReference(
-								new ExperimentReference(
-										Experiment.copyAndExtractSubtanceInclusiveData(sub)));
+								new ExperimentReference(exp));
 						action.setUseIndividualReportNames(true);
 						action.setStatusProvider(null);
 						action.setSource(null, null);

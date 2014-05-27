@@ -73,6 +73,7 @@ import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.ImageAnalysisTasks;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.UserDefinedImageAnalysisPipelineTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -536,8 +537,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		if (imageResult != null && getMaxString(imageResult.getFileNameMain()).endsWith("..."))
 			setToolTipText(imageResult.getFileNameMain());
 		else
-			if (imageResult == null)
-				setToolTipText(((Substance3D) projectNode.getTargetEntity()).getName());
+			if (imageResult == null) {
+				if (projectNode.getTargetEntity() instanceof Substance3D)
+					setToolTipText(((Substance3D) projectNode.getTargetEntity()).getName());
+				else
+					if (projectNode.getTargetEntity() instanceof Condition3D)
+						setToolTipText(((Condition3D) projectNode.getTargetEntity()).getName());
+			}
 	}
 	
 	private static String strip(String fileName, String opt) {
