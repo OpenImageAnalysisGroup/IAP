@@ -110,9 +110,9 @@
 <!--            <fileset dir="../Hive Add-on/build/classes"/> -->
 <!--            <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/myswing.jar"/> -->
 <!--            <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/AnaglyphCanvas3Dlib.jar"/> -->
-            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/j3dcore.jar"/>
+<!--            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/j3dcore.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/j3dutils.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/vecmath.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/vecmath.jar"/> -->
 <!--            <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/swingx.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/postgresql-9.0-801.jdbc4.jar"/>
 <!--            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/mongo.jar"/> -->
