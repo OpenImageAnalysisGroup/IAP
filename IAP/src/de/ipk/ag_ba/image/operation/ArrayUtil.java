@@ -30,4 +30,22 @@ public class ArrayUtil {
 		return image;
 	}
 	
+	public static double[][][] half(double[][][] in) {
+		int len = in[0][0].length;
+		int newlen = len / 2;
+		double[][][] res = new double[newlen][newlen][newlen];
+		for (int x = 0; x < len; x++)
+			for (int y = 0; y < len; y++)
+				for (int z = 0; z < len; z++) {
+					res[x][y][z] = res[x][y][z] + in[x / 2][y / 2][z / 2];
+				}
+		
+		for (int x = 0; x < len; x++)
+			for (int y = 0; y < len; y++)
+				for (int z = 0; z < len; z++) {
+					res[x][y][z] = res[x][y][z] / 4;
+				}
+		
+		return res;
+	}
 }
