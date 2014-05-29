@@ -299,7 +299,7 @@ public class BorderAnalysis {
 		ImageOperation.fillArray(res, ImageOperation.BACKGROUND_COLORint);
 		for (Iterator<PositionAndColor> i = region.iterator(); i.hasNext();) {
 			PositionAndColor temp = i.next();
-			res[temp.x - dim[0]][temp.y - dim[2]] = temp.colorInt;
+			res[temp.x - dim[0]][temp.y - dim[2]] = temp.intensityInt;
 		}
 		return res;
 	}
@@ -308,7 +308,7 @@ public class BorderAnalysis {
 		ImageOperation.fillArray(res, ImageOperation.BACKGROUND_COLORint);
 		for (Iterator<PositionAndColor> i = regiona.iterator(); i.hasNext();) {
 			PositionAndColor temp = i.next();
-			res[temp.x][temp.y] = temp.colorInt;
+			res[temp.x][temp.y] = temp.intensityInt;
 		}
 		return res;
 	}
