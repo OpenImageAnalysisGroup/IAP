@@ -69,9 +69,9 @@ public class Util {
 							+ "! (block is not added to pipeline!)");
 			}
 		}
-		SystemOptions settings;
-		TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint;
-		TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults;
+		SystemOptions settings = null;
+		TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint = null;
+		TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults = null;
 		ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(settings, previousResultsForThisTimePoint, plantResults);
 		MaskAndImageSet input = new MaskAndImageSet(
 				new ImageSet((Image) null, (Image) null, (Image) null, (Image) null),
@@ -114,7 +114,7 @@ public class Util {
 			else
 				input.images().set(img);
 		}
-		HashMap<Integer, BlockResultSet> blockResults;
+		HashMap<Integer, BlockResultSet> blockResults = null;
 		p.execute(options, input, blockResults, new CommandLineBackgroundTaskStatusProvider(true));
 	}
 	
