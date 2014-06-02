@@ -178,11 +178,11 @@ public class ImageSet {
 		this.ir = ir;
 	}
 	
-	public void set(Image flexibleImage) {
-		if (flexibleImage == null) {
-			throw new UnsupportedOperationException("FlexibleImage is NULL");
+	public void set(Image image) {
+		if (image == null) {
+			throw new UnsupportedOperationException("Image is NULL");
 		}
-		setImage(flexibleImage.getCameraType(), flexibleImage);
+		setImage(image.getCameraType(), image);
 	}
 	
 	public ImageSet copy() {

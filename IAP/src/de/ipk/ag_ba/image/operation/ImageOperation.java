@@ -75,6 +75,7 @@ import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
+import de.ipk.ag_ba.image.structures.ChannelMode;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.labcube.ImageOperationLabCube;
@@ -3828,7 +3829,7 @@ public class ImageOperation implements MemoryHogInterface {
 			um.run(fp);
 		}
 		
-		return new ImageOperation(new Image(w, h, channelR, channelG, channelB));
+		return new ImageOperation(new Image(w, h, channelR, channelG, channelB, ChannelMode.RGB));
 	}
 	
 	public ImageOperation subtractGrayImages(Image image2) {
@@ -5247,5 +5248,37 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation convertFP2RGB() {
 		image.setProcessor(image.getProcessor().convertToColorProcessor());
 		return this;
+	}
+	
+	public int countColors() {
+		// make shure threre is no argb
+		int[] argbpixels = getAs1D();
+		int[] rgbpixels = new int[argbpixels.length];
+		
+		int r, g, b, combine;
+		int count = 0;
+		for (int argb : argbpixels) {
+			r = ((argb >> 16) & 0xff);
+			g = ((argb >> 8) & 0xff);
+			b = (argb & 0xff);
+			combine = r;
+			combine = (combine << 8) + g;
+			combine = (combine << 8) + b;
+			rgbpixels[count] = combine;
+			count++;
+		}
+		
+		int colors = 0;
+		int MAX_COLORS = 16777216;
+		int[] counts = new int[MAX_COLORS];
+		
+		for (int i = 0; i < rgbpixels.length; i++)
+			counts[rgbpixels[i]]++;
+		for (int i = 0; i < MAX_COLORS; i++) {
+			if (counts[i] > 1)
+				colors++;
+			
+		}
+		return colors;
 	}
 }
