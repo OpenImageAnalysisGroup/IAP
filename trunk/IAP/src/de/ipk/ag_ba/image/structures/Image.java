@@ -44,6 +44,7 @@ import sun.awt.image.IntegerInterleavedRaster;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operation.ArrayUtil;
+import de.ipk.ag_ba.image.operation.ColorSpaceConverter;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.channels.Channel;
 
@@ -189,17 +190,32 @@ public class Image {
 		this(new ImagePlus("Image", image));
 	}
 	
-	public Image(int w, int h, float[] channelR, float[] channelG, float[] channelB) {
+	public Image(int w, int h, float[] channelR, float[] channelG, float[] channelB, ChannelMode mode) {
 		this.w = w;
 		this.h = h;
 		int a = 255;
 		@SuppressWarnings("unused")
 		int alpha = ((a & 0xFF) << 24);
 		int[] img = new int[w * h];
+		ColorSpaceConverter csc = new ColorSpaceConverter();
 		for (int idx = 0; idx < img.length; idx++) {
-			int r = (int) (channelR[idx] * 255d + 0.5d);
-			int g = (int) (channelG[idx] * 255d + 0.5d);
-			int b = (int) (channelB[idx] * 255d + 0.5d);
+			int r, g, b;
+			if (mode == ChannelMode.RGB) {
+				r = (int) (channelR[idx] * 255d + 0.5d);
+				g = (int) (channelG[idx] * 255d + 0.5d);
+				b = (int) (channelB[idx] * 255d + 0.5d);
+			} else
+				if (mode == ChannelMode.LAB) {
+					float labl = channelR[idx];
+					float laba = channelG[idx];
+					float labb = channelB[idx];
+					int[] converted = csc.LABtoRGB(labl / 2.55f, laba - 128f, labb - 128f);
+					r = converted[0];
+					g = converted[1];
+					b = converted[2];
+				} else {
+					throw new UnsupportedOperationException("Unknown colormode");
+				}
 			int c = // alpha |
 			((r & 0xFF) << 16) |
 					((g & 0xFF) << 8) |
@@ -610,5 +626,4 @@ public class Image {
 		
 		return bimage;
 	}
-	
 }

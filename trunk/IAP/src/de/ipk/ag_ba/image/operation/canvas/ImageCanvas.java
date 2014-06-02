@@ -354,6 +354,13 @@ public class ImageCanvas {
 				.drawLine(x, y + h, x, y, ci, 0, thickness);
 	}
 	
+	public ImageCanvas drawRectangle(int x, int y, int w, int h, int ci, int thickness) {
+		return drawLine(x, y, x + w, y, ci, 0, thickness)
+				.drawLine(x + w, y, x + w, y + h, ci, 0, thickness)
+				.drawLine(x + w, y + h, x, y + h, ci, 0, thickness)
+				.drawLine(x, y + h, x, y, ci, 0, thickness);
+	}
+	
 	public ImageCanvas drawRectanglePoints(int x, int y, int w, int h, Color c, int thickness) {
 		int ci = c.getRGB();
 		return drawLine(x, y, x + 1, y + 1, ci, 0, thickness)
