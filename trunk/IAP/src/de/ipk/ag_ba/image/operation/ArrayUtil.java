@@ -37,12 +37,12 @@ public class ArrayUtil {
 		for (int x = 0; x < len; x++)
 			for (int y = 0; y < len; y++)
 				for (int z = 0; z < len; z++) {
-					res[x][y][z] = res[x][y][z] + in[x / 2][y / 2][z / 2];
+					res[x / 2][y / 2][z / 2] = res[x / 2][y / 2][z / 2] + in[x][y][z];
 				}
 		
-		for (int x = 0; x < len; x++)
-			for (int y = 0; y < len; y++)
-				for (int z = 0; z < len; z++) {
+		for (int x = 0; x < newlen; x++)
+			for (int y = 0; y < newlen; y++)
+				for (int z = 0; z < newlen; z++) {
 					res[x][y][z] = res[x][y][z] / 4;
 				}
 		
