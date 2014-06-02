@@ -512,6 +512,10 @@ public class Image {
 		return result;
 	}
 	
+	public void setFilename(String f) {
+		this.fileName = f;
+	}
+	
 	/**
 	 * @return File name (if available), or NULL.
 	 */
