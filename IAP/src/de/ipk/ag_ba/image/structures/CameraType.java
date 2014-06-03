@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.structures;
 
+import java.util.HashSet;
+
 public enum CameraType {
 	VIS, FLUO, NIR, IR, UNKNOWN;
 	
@@ -21,5 +23,12 @@ public enum CameraType {
 				break;
 		}
 		return s;
+	}
+	
+	public static HashSet<CameraType> getHashSet(CameraType... ct) {
+		HashSet<CameraType> r = new HashSet<CameraType>();
+		for (CameraType c : ct)
+			r.add(c);
+		return r;
 	}
 }
