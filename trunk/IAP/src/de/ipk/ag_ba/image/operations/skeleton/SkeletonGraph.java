@@ -761,7 +761,7 @@ public class SkeletonGraph {
 				}
 			}
 			
-			Collection<GraphElement> thickestStartingPoints = filterThickestStartingPoints(gg.getGraphElements(), postProcessing);
+			Collection<Node> thickestStartingPoints = filterThickestStartingPoints(gg.getGraphElements(), postProcessing);
 			
 			List<GraphElement> elem = null;
 			Double dia = null;
@@ -866,10 +866,10 @@ public class SkeletonGraph {
 	 * This method should not return all graph elements, but only those with the maximum distance to the border, which
 	 * means, that only very thick starting points should be considered.
 	 */
-	private Collection<GraphElement> filterThickestStartingPoints(Collection<GraphElement> graphElements,
+	private Collection<Node> filterThickestStartingPoints(Collection<GraphElement> graphElements,
 			ArrayList<RunnableOnImage> postProcessors) {
 		double maximumWidth = -1;
-		final ArrayList<GraphElement> thickestStartingPoints = new ArrayList<GraphElement>();
+		final ArrayList<Node> thickestStartingPoints = new ArrayList<Node>();
 		for (GraphElement ge : graphElements) {
 			if (ge.getGraph() == null) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Internal error: graphelement list contains deleted elements!");
@@ -893,6 +893,9 @@ public class SkeletonGraph {
 					// ignore this element
 				}
 			}
+		}
+		for (Node thickStart : thickestStartingPoints) {
+			thickStart.setBoolean("thickStart", true);
 		}
 		RunnableOnImage pp = new RunnableOnImage() {
 			
