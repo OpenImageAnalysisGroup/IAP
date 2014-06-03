@@ -197,6 +197,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 						rt.addValue("roots" + resultPrefix + ".graph.diameter.max", sz);
 					}
 				}
+				getResultSet().setObjectResult(getBlockPosition(), "root.graph", sg.getGraph());
 			}
 		}
 	}
