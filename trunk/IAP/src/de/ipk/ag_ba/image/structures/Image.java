@@ -456,6 +456,7 @@ public class Image {
 	public Image copy() {
 		Image res = new Image(getWidth(), getHeight(), getAs1A().clone());
 		res.setCameraType(getCameraType());
+		res.setFilename(getFileName());
 		return res;
 	}
 	
