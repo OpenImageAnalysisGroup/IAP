@@ -2652,10 +2652,10 @@ public class ImageOperation implements MemoryHogInterface {
 	 * 
 	 * @param input
 	 * @param param
-	 *           "Subtract create" = image - input
+	 *           "add","subtract","multiply","divide", "and", "or", "xor", "min", "max", "average", "difference" or "copy"
 	 * @return
 	 */
-	public ImageOperation subtractImages(Image input, String param) {
+	public ImageOperation imageCalculatorImageJ(Image input, String param) {
 		ImageCalculator ic = new ImageCalculator();
 		ImagePlus result = ic.run(param, image, input.getAsImagePlus());
 		return new ImageOperation(result);
@@ -3810,7 +3810,7 @@ public class ImageOperation implements MemoryHogInterface {
 		double[] fac = { weight, weight, weight };
 		Image blured = new ImageOperation(image).blurImageJ(sigma).multiplicateImageChannelsWithFactors(fac).getImage();
 		blured.show("blured");
-		return new ImageOperation(inp).show("orig").subtractImages(blured, "").show("sub");
+		return new ImageOperation(inp).show("orig").imageCalculatorImageJ(blured, "").show("sub");
 	}
 	
 	public ImageOperation unsharpenMask() {
