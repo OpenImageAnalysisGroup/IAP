@@ -188,6 +188,44 @@ public class BorderImageOperation {
 	}
 	
 	/**
+	 * @return number of filled pixels
+	 * @author klukas
+	 */
+	private int floodFillToBoder(int[] image, int w, int h, int border, Integer startX, Integer startY) {
+		int res = 0;
+		if (image[startX + w * startY] != border) {
+			Stack<Vector2i> toDo = new Stack<Vector2i>();
+			toDo.add(new Vector2i(startX, startY));
+			int x, y;
+			while (!toDo.isEmpty()) {
+				Vector2i p = toDo.pop();
+				x = p.x;
+				y = p.y;
+				image[x + w * y] = border;
+				res++;
+				
+				// check right
+				if (x < w - 1 && image[x + 1 + w * y] != border) {
+					toDo.push(new Vector2i(x + 1, y));
+				}
+				// check above
+				if (y > 0 && image[x + w * (y - 1)] != border) {
+					toDo.add(new Vector2i(x, y - 1));
+				}
+				// check left
+				if (x > 0 && image[x - 1 + w * y] != border) {
+					toDo.push(new Vector2i(x - 1, y));
+				}
+				// check below
+				if (y < h - 1 && image[x + w * (y + 1)] != border) {
+					toDo.push(new Vector2i(x, y + 1));
+				}
+			}
+		}
+		return res;
+	}
+	
+	/**
 	 * Flood fill starting from the image borders (top, left, right, bottom).
 	 * The number of pixels is added to the ResultTable of the result (column 'filled').
 	 * In case a ImageOperation resulttable is available in this object, it is extended and transfered to the result object.
@@ -213,6 +251,43 @@ public class BorderImageOperation {
 		for (int y = 0; y < h; y++) {
 			filled += floodFill(out, w, h, background, fill, 0, y);
 			filled += floodFill(out, w, h, background, fill, w - 1, y);
+		}
+		// sw.printTime(0);
+		ImageOperation res = new ImageOperation(new Image(w, h, out));
+		if (rt == null)
+			rt = new ResultsTableWithUnits();
+		rt.incrementCounter();
+		rt.addValue("filled", filled);
+		res.setResultsTable(rt);
+		return res;
+	}
+	
+	/**
+	 * Flood fill starting from the image borders (top, left, right, bottom).
+	 * The number of pixels is added to the ResultTable of the result (column 'filled').
+	 * In case a ImageOperation resulttable is available in this object, it is extended and transfered to the result object.
+	 * 
+	 * @param background
+	 *           Background-color.
+	 * @param fill
+	 *           Fill-color.
+	 * @return New image, outside background (pixels equal to background-color) is filled with the fill-color.
+	 * @author klukas
+	 */
+	public ImageOperation floodFillFromOutsideToBorder(int border) {
+		
+		int[] out = new ImageOperation(image, rt).getAs1D();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int filled = 0;
+		// StopWatch sw = new StopWatch("Flood-fill");
+		for (int x = 0; x < w; x++) {
+			filled += floodFillToBoder(out, w, h, border, x, 0);
+			filled += floodFillToBoder(out, w, h, border, x, h - 1);
+		}
+		for (int y = 0; y < h; y++) {
+			filled += floodFillToBoder(out, w, h, border, 0, y);
+			filled += floodFillToBoder(out, w, h, border, w - 1, y);
 		}
 		// sw.printTime(0);
 		ImageOperation res = new ImageOperation(new Image(w, h, out));

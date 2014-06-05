@@ -39,6 +39,8 @@ public class ConvexHullCalculator {
 	
 	private double hullLength;
 	
+	private boolean disableSizeCheck;
+	
 	/**
 	 * The imageOperation - ResultTable is retained and extended (if available)
 	 * during calculation.
@@ -301,17 +303,21 @@ public class ConvexHullCalculator {
 		res.setResultsTable(rt);
 		
 		final Point centroidF = centroid;
-		if ((drawHull || drawCentroid) && (new Vector2i(res.getCropRectangle()).getArea() > 50 * 50)) {
+		if ((drawHull || drawCentroid) && (disableSizeCheck || (!disableSizeCheck && (new Vector2i(res.getCropRectangle()).getArea() > 50 * 50)))) {
 			RunnableOnImage roi = new RunnableOnImage() {
 				@Override
 				public Image postProcess(Image res) {
 					return drawHullAndCentroid(drawHull, drawCentroid, res.io(), polygon,
-							hullLineColor, centroidF, centroidColor).getImage();
+							hullLineColor, centroidF, centroidColor, 4).getImage();
 				}
 				
 			};
 			if (br != null && io != null && io.getCameraType() != null)
 				br.addImagePostProcessor(io.getCameraType(), null, roi);
+			if (br == null && io != null) {
+				res = drawHullAndCentroid(drawHull, drawCentroid, res, polygon,
+						hullLineColor, centroidF, centroidColor, 1).getImage().io();
+			}
 		}
 		
 		return res;
@@ -328,7 +334,7 @@ public class ConvexHullCalculator {
 	
 	private static ImageOperation drawHullAndCentroid(boolean drawHull,
 			boolean drawCentroid, ImageOperation in, Polygon polygon,
-			int hullLineColor, Point centroid, int centroidColor) {
+			int hullLineColor, Point centroid, int centroidColor, int hullWidth) {
 		
 		// in = in.getCanvas().fillRectOutside(polygon.getRectangle(),
 		// ImageOperation.BACKGROUND_COLORint).getImage().getIO();
@@ -338,7 +344,7 @@ public class ConvexHullCalculator {
 		Graphics2D g2d = (Graphics2D) bi.getGraphics();
 		
 		if (drawHull && polygon != null)
-			drawHull(g2d, polygon, 4, hullLineColor);
+			drawHull(g2d, polygon, hullWidth, hullLineColor);
 		
 		if (drawCentroid && centroid != null)
 			drawCross(g2d, centroid, 50, 5, centroidColor);
@@ -350,9 +356,11 @@ public class ConvexHullCalculator {
 			int lineWidth, int hullLineColor) {
 		g2d.setStroke(new BasicStroke(lineWidth));
 		g2d.setPaint(new Color(hullLineColor));
-		float opacity = 0.5f;
-		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-				opacity));
+		if (lineWidth > 1) {
+			float opacity = 0.5f;
+			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+					opacity));
+		}
 		g2d.drawPolygon(polygon.getGraphics2Dpolygon());
 	}
 	
@@ -384,5 +392,10 @@ public class ConvexHullCalculator {
 					borderImage[x + w * y] = p_image;
 				}
 			}
+	}
+	
+	public ConvexHullCalculator disableSizeCheck() {
+		disableSizeCheck = true;
+		return this;
 	}
 }
