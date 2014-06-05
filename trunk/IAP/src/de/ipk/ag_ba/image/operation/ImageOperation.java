@@ -4370,21 +4370,19 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation xor(Image b) {
 		if (b == null)
 			return this;
-		int[][] aa = getAs2D();
-		int w = aa.length;
-		int h = aa[0].length;
-		int[][] ba = b.resize(w, h).getAs2A();
-		for (int x = 0; x < w; x++)
-			for (int y = 0; y < h; y++) {
-				int apixel = aa[x][y];
-				int bpixel = ba[x][y];
-				if (apixel != BACKGROUND_COLORint && bpixel != BACKGROUND_COLORint) {
-					aa[x][y] = BACKGROUND_COLORint;
-				} else
-					if (apixel == BACKGROUND_COLORint)
-						aa[x][y] = bpixel;
-			}
-		return new Image(aa).io();
+		int[] aa = getAs1D();
+		int l = aa.length;
+		int[] ba = b.getAs1A();
+		for (int x = 0; x < l; x++) {
+			int apixel = aa[x];
+			int bpixel = ba[x];
+			if (apixel != BACKGROUND_COLORint && bpixel != BACKGROUND_COLORint) {
+				aa[x] = BACKGROUND_COLORint;
+			} else
+				if (apixel == BACKGROUND_COLORint)
+					aa[x] = bpixel;
+		}
+		return new Image(getWidth(), getHeight(), aa).io();
 	}
 	
 	public ImageOperation filterGray(int minBrightness, int maxAdiff, int maxBdiff) {

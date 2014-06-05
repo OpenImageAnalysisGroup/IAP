@@ -20,6 +20,10 @@ public class Point {
 		this(p.x, p.y);
 	}
 	
+	public Point(java.awt.Point p) {
+		this(p.x, p.y);
+	}
+	
 	public Point relTo(Point p) {
 		return new Point(x - p.x, y - p.y);
 	}

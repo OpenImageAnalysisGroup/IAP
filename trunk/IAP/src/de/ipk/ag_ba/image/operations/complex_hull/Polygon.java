@@ -17,7 +17,7 @@ import java.util.List;
  *      Public domain?!
  *      Removed all unneeded methods, added some new code.
  */
-class Polygon {
+public class Polygon {
 	private final int N; // number of points in the polygon
 	private final Point[] points; // the points, setting p[0] = p[N]
 	
