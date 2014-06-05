@@ -49,6 +49,11 @@ public class ConvexHullCalculator {
 		this.io = imageOperation;
 	}
 	
+	public Polygon getPolygon() {
+		calculate(-100);
+		return polygon;
+	}
+	
 	private void calculate(int borderColor) {
 		int[] in = io.getAs1D();
 		
