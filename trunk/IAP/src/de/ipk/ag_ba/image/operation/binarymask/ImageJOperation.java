@@ -52,7 +52,10 @@ public class ImageJOperation {
 	}
 	
 	public ImageJOperation erode(int size) {
-		return erode(BlMorphologicalOperations.getRoundMask(size));
+		if (size == 0)
+			return this;
+		else
+			return erode(BlMorphologicalOperations.getRoundMask(size));
 	}
 	
 	public ImageJOperation opening(int[][] mask1, int[][] mask2) {
@@ -134,7 +137,10 @@ public class ImageJOperation {
 	}
 	
 	public ImageJOperation dilate(int size) {
-		return dilate(BlMorphologicalOperations.getRoundMask(size));
+		if (size == 0)
+			return this;
+		else
+			return dilate(BlMorphologicalOperations.getRoundMask(size));
 	}
 	
 	/**

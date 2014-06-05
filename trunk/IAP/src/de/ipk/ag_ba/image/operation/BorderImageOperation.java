@@ -191,7 +191,7 @@ public class BorderImageOperation {
 	 * @return number of filled pixels
 	 * @author klukas
 	 */
-	private int floodFillToBoder(int[] image, int w, int h, int border, Integer startX, Integer startY) {
+	private int floodFillToBorder(int[] image, int w, int h, int border, Integer startX, Integer startY) {
 		int res = 0;
 		if (image[startX + w * startY] != border) {
 			Stack<Vector2i> toDo = new Stack<Vector2i>();
@@ -282,12 +282,12 @@ public class BorderImageOperation {
 		int filled = 0;
 		// StopWatch sw = new StopWatch("Flood-fill");
 		for (int x = 0; x < w; x++) {
-			filled += floodFillToBoder(out, w, h, border, x, 0);
-			filled += floodFillToBoder(out, w, h, border, x, h - 1);
+			filled += floodFillToBorder(out, w, h, border, x, 0);
+			filled += floodFillToBorder(out, w, h, border, x, h - 1);
 		}
 		for (int y = 0; y < h; y++) {
-			filled += floodFillToBoder(out, w, h, border, 0, y);
-			filled += floodFillToBoder(out, w, h, border, w - 1, y);
+			filled += floodFillToBorder(out, w, h, border, 0, y);
+			filled += floodFillToBorder(out, w, h, border, w - 1, y);
 		}
 		// sw.printTime(0);
 		ImageOperation res = new ImageOperation(new Image(w, h, out));
