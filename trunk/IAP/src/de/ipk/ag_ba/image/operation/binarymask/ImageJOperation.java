@@ -166,6 +166,10 @@ public class ImageJOperation {
 		return dilate(mask).erode(mask);
 	}
 	
+	public ImageJOperation closing(int size) {
+		return dilate(BlMorphologicalOperations.getRoundMask(size)).erode(BlMorphologicalOperations.getRoundMask(size));
+	}
+	
 	public ImageJOperation opening(int[][] mask) {
 		return erode(mask).dilate(mask);
 	}
@@ -208,5 +212,17 @@ public class ImageJOperation {
 	public FloatProcessor edmFloat() {
 		EDM edm = new EDM();
 		return edm.makeFloatEDM(image.getProcessor(), -1, false);
+	}
+	
+	public ImageJOperation show(String title, boolean doit) {
+		if (doit)
+			return show(title);
+		else
+			return this;
+	}
+	
+	public ImageJOperation invert() {
+		image.getProcessor().invert();
+		return this;
 	}
 }
