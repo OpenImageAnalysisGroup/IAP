@@ -80,6 +80,9 @@ public class ImageStack {
 	public void show(final String title) {
 		if (SystemAnalysis.isHeadless())
 			return;
+		for (int i = 1; i <= size(); i++) {
+			stack.setSliceLabel(title + ": " + stack.getSliceLabel(i), i);
+		}
 		final ImagePlus image = new ImagePlus();
 		image.setStack(stack);
 		if (!SwingUtilities.isEventDispatchThread()) {
