@@ -4446,10 +4446,16 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(res, getWidth(), getHeight());
 	}
 	
+	public ImageOperation removeSmallElements(int cutOffMinimumDimension) {
+		return ImageOperation.removeSmallPartsOfImage(
+				getImage(), BACKGROUND_COLORint, cutOffMinimumDimension * cutOffMinimumDimension, cutOffMinimumDimension,
+				NeighbourhoodSetting.NB4, CameraPosition.TOP, null, false).io();
+	}
+	
 	public ImageOperation removeSmallElements(int cutOffMinimumArea, int cutOffMinimumDimension) {
 		return ImageOperation.removeSmallPartsOfImage(
 				getImage(), BACKGROUND_COLORint, cutOffMinimumArea, cutOffMinimumDimension,
-				NeighbourhoodSetting.NB4, CameraPosition.TOP, null, false).io();
+				NeighbourhoodSetting.NB4, CameraPosition.TOP, null, true).io();
 	}
 	
 	public ImageOperation flipVert() {
@@ -5278,5 +5284,32 @@ public class ImageOperation implements MemoryHogInterface {
 			
 		}
 		return colors;
+	}
+	
+	public ImageOperation darken(Image img, double f) {
+		int[] res = new int[getWidth() * getHeight()];
+		int idx = 0;
+		int[] darken = img.getAs1A();
+		float[] hsb = new float[3];
+		float[] hsbDarken = new float[3];
+		for (int p : getAs1D()) {
+			int dp = darken[idx];
+			int rgb = p;
+			int r = ((rgb >> 16) & 0xff);
+			int g = ((rgb >> 8) & 0xff);
+			int b = (rgb & 0xff);
+			Color.RGBtoHSB(r, g, b, hsb);
+			rgb = dp;
+			r = ((rgb >> 16) & 0xff);
+			g = ((rgb >> 8) & 0xff);
+			b = (rgb & 0xff);
+			Color.RGBtoHSB(r, g, b, hsbDarken);
+			hsb[2] -= hsbDarken[2] * f;
+			if (hsb[2] < 0)
+				hsb[2] = 0;
+			res[idx] = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+			idx++;
+		}
+		return new ImageOperation(res, getWidth(), getHeight());
 	}
 }

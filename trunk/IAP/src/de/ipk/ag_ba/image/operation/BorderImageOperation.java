@@ -262,6 +262,38 @@ public class BorderImageOperation {
 		return res;
 	}
 	
+	public enum FillFromBorder {
+		LEFT, RIGHT, TOP, BOTTOM, NO_OP
+	}
+	
+	public BorderImageOperation floodFillFromOutside(int background, int fill, FillFromBorder side) {
+		int[] out = new ImageOperation(image, rt).getAs1D();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int filled = 0;
+		// StopWatch sw = new StopWatch("Flood-fill");
+		for (int x = 0; x < w; x++) {
+			if (side == FillFromBorder.TOP)
+				filled += floodFill(out, w, h, background, fill, x, 0);
+			if (side == FillFromBorder.BOTTOM)
+				filled += floodFill(out, w, h, background, fill, x, h - 1);
+		}
+		for (int y = 0; y < h; y++) {
+			if (side == FillFromBorder.LEFT)
+				filled += floodFill(out, w, h, background, fill, 0, y);
+			if (side == FillFromBorder.RIGHT)
+				filled += floodFill(out, w, h, background, fill, w - 1, y);
+		}
+		// sw.printTime(0);
+		ImageOperation res = new ImageOperation(new Image(w, h, out));
+		if (rt == null)
+			rt = new ResultsTableWithUnits();
+		rt.incrementCounter();
+		rt.addValue("filled", filled);
+		res.setResultsTable(rt);
+		return res.border();
+	}
+	
 	/**
 	 * Flood fill starting from the image borders (top, left, right, bottom).
 	 * The number of pixels is added to the ResultTable of the result (column 'filled').
@@ -297,6 +329,14 @@ public class BorderImageOperation {
 		rt.addValue("filled", filled);
 		res.setResultsTable(rt);
 		return res;
+	}
+	
+	public Image getImage() {
+		return image;
+	}
+	
+	public ImageOperation io() {
+		return image.io();
 	}
 	
 }

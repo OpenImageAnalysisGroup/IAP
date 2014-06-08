@@ -1,5 +1,8 @@
 package de.ipk.ag_ba.image.operation;
 
+import java.awt.Color;
+import java.util.HashSet;
+
 import org.Vector2d;
 
 /**
@@ -67,6 +70,26 @@ public class ImageCalculation {
 			return distanceSum / area;
 		else
 			return null;
+	}
+	
+	public ImageOperation io() {
+		return imageOperation;
+	}
+	
+	public ImageOperation printColorCodes(boolean doIt) {
+		if (!doIt)
+			return imageOperation;
+		int[] pix = imageOperation.getAs1D();
+		HashSet<Integer> printed = new HashSet<Integer>();
+		for (int i : pix) {
+			if (!printed.contains(i)) {
+				Color c = new Color(i);
+				System.out.println("INT=" + i + ", RGB=" + c.getRed() + "/" + c.getGreen() + "/" + c.getBlue() + ", IS IO BACKGROUND?: "
+						+ (i == ImageOperation.BACKGROUND_COLORint));
+				printed.add(i);
+			}
+		}
+		return imageOperation;
 	}
 	
 }
