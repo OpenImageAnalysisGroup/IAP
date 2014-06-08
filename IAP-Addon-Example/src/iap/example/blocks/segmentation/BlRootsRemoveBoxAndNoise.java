@@ -33,7 +33,7 @@ public class BlRootsRemoveBoxAndNoise extends AbstractSnapshotAnalysisBlock {
 		// remove pure white area inside the box
 		io = io.bm().erode().io()
 				.removeSmallElements(
-						getInt("Remove-Pure-White_Noise-Size-Area", 50),
+						getInt("Remove-Pure-White_Noise-Size-Area", 50 * 50),
 						getInt("Remove-Pure-White_Noise-Size-Dimension", 50))
 				.show("REMOVED WHITE AREA INSIDE THE BOX", debug);
 		io = io.replaceColor(optionsAndResults.getBackground(), blue);
