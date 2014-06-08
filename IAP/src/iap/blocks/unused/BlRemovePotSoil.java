@@ -46,7 +46,7 @@ public class BlRemovePotSoil extends AbstractSnapshotAnalysisBlock {
 						.threshold(100, optionsAndResults.getBackground(), new Color(100, 100, 100).getRGB())
 						.show("soil region", debug);
 				soilMask = mask.removeSmallElements(
-						getInt("remove-noise-area", 10),
+						getInt("remove-noise-area", 100),
 						getInt("remove-noise-dimension", 10));
 			}
 		}
