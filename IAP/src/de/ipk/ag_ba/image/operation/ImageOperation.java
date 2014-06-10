@@ -3810,7 +3810,7 @@ public class ImageOperation implements MemoryHogInterface {
 		double[] fac = { weight, weight, weight };
 		Image blured = new ImageOperation(image).blurImageJ(sigma).multiplicateImageChannelsWithFactors(fac).getImage();
 		blured.show("blured");
-		return new ImageOperation(inp).show("orig").imageCalculatorImageJ(blured, "").show("sub");
+		return new ImageOperation(inp).show("orig", false).imageCalculatorImageJ(blured, "").show("sub", false);
 	}
 	
 	public ImageOperation unsharpenMask() {
