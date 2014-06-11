@@ -931,8 +931,9 @@ public class SkeletonProcessor2d {
 			if (!found) {
 				skelImg[p.x][p.y] = colorBranches;
 				branches.add(new Point(p.x, p.y));
-			} else
-				System.out.println("Prevented problematic point creation!");
+			}
+			// else
+			// System.out.println("Prevented problematic point creation!");
 		}
 	}
 }
