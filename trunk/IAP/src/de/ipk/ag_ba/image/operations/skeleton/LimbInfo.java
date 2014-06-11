@@ -25,4 +25,13 @@ public class LimbInfo {
 	public int getLinearMx() {
 		return 0;
 	}
+	
+	@Override
+	public String toString() {
+		if (edgePoints == null)
+			return "edge points = null";
+		else
+			return "" + edgePoints.size() + " edge points";
+	}
+	
 }

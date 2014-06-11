@@ -7,6 +7,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.Vector2i;
+
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -909,5 +911,12 @@ public class SkeletonProcessor2d {
 		SkeletonProcessor2d s = new SkeletonProcessor2d(skeletonImage);
 		s.createEndpointsAndBranchesLists();
 		return s.endpoints.size();
+	}
+	
+	public void markAdditionalBranchpoints(ArrayList<Vector2i> cps) {
+		for (Vector2i p : cps) {
+			skelImg[p.x][p.y] = colorBranches;
+			branches.add(new Point(p.x, p.y));
+		}
 	}
 }
