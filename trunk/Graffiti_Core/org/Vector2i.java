@@ -33,6 +33,12 @@ public class Vector2i {
 		return "Vector2i[" + x + ", " + y + "]";
 	}
 	
+	@Override
+	public boolean equals(Object arg0) {
+		Vector2i a = (Vector2i) arg0;
+		return x == a.x && y == a.y;
+	}
+	
 	public Vector2i(Vector2i position) {
 		x = position.x;
 		y = position.y;
