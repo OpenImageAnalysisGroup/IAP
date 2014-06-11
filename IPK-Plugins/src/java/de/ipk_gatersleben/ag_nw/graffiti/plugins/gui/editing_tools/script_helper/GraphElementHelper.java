@@ -114,4 +114,13 @@ public class GraphElementHelper implements HelperClass {
 		}
 		return result;
 	}
+	
+	public boolean hasAttribute(String name) {
+		try {
+			Object o = ge.getAttribute(name);
+			return o != null;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }
