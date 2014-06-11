@@ -37,6 +37,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.EdgeF
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.WeightedShortestPathSelectionAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.MergeNodes;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.selectCommands.SelectEdgesAlgorithm;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.GraphElementHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.AttributePathNameSearchType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.SearchType;
@@ -89,7 +90,7 @@ public class SkeletonGraph {
 			debugImg = fi.copy();
 		}
 		if (DEBUG)
-			debugImg.show("MARKED POINTS");
+			debugImg.show("MARKED POINTS", false);
 		for (int x = 1; x < w - 1; x++) {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
@@ -124,7 +125,7 @@ public class SkeletonGraph {
 								System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: END POINT FOUND BY SURROUND SEARCH: " + e.x + " / " + e.y);
 						}
 						if (endNode == null) {
-							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: END POINT NOT FOUND: " + e.x + " / " + e.y);
+							// System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: END POINT NOT FOUND: " + e.x + " / " + e.y);
 							break;
 						}
 						if (startNode == endNode)
@@ -161,158 +162,176 @@ public class SkeletonGraph {
 				}
 			}
 		}
-		
-		for (int i = 0; i < 5; i++) {
-			ArrayList<Node> delN = new ArrayList<Node>();
-			for (Node leaf : GraphHelper.getLeafNodesUndir(graph)) {
-				int n = 0;
-				double lenS = 0;
-				for (Edge e : leaf.getEdges()) {
-					ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
-					lenS += edgePoints.size();
-					n++;
+		for (Node a : graph.getNodes()) {
+			for (Node b : graph.getNodes()) {
+				if (a == b)
+					continue;
+				Vector2i pa = new NodeHelper(a).getPosition2i();
+				Vector2i pb = new NodeHelper(b).getPosition2i();
+				if (pa.distance(pb) < 2) {
+					System.out.println("CONNECT " + pa.distance(pb));
+					graph.addEdge(a, b, false);
 				}
-				double len = lenS / n;
-				if (len < delteShortEndLimbsMinimumLength)
-					delN.add(leaf);
 			}
-			for (Node n : delN)
-				graph.deleteNode(n);
-			
-			deleteSelfLoops();
-			removeParallelEdges();
-			graph.numberGraphElements();
-			
-			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed short end-limbs (graph based), " +
-					"shorter than " + delteShortEndLimbsMinimumLength + ". Removed: " + delN.size());
-			if (!preventIntermediateNodeRemoval)
-				for (Node n : new ArrayList<Node>(graph.getNodes())) {
-					// remove nodes, with degree 2 (and merge pixel list)
-					if (n.getDegree() == 2) {
-						// add new edge, with edge pixel list from both edges, then delete that node
-						int nc = 0;
-						ArrayList<Vector2i> ep = new ArrayList<Vector2i>();
-						for (Edge e : n.getEdges()) {
-							nc++;
-							ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
-							ep.addAll(edgePoints);
-						}
-						if (nc != 2)
-							ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two returns different count of edges (" + nc + ")");
-						else {
-							Iterator<Node> it = n.getNeighborsIterator();
-							Node a = it.next();
-							if (!it.hasNext()) {
-								// ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has only one neighbour (self edges are deleted?!)");
-							} else {
-								Node b = it.next();
-								if (it.hasNext())
-									ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has more than two neighbours");
-								else {
-									Edge e01 = graph.addEdge(a, b, false);
-									e01.addAttribute(new ObjectAttribute("info", new LimbInfo(ep)), "");
-									graph.deleteNode(n);
+		}
+		if (!preventIntermediateNodeRemoval) {
+			for (int i = 0; i < 5; i++) {
+				ArrayList<Node> delN = new ArrayList<Node>();
+				for (Node leaf : GraphHelper.getLeafNodesUndir(graph)) {
+					int n = 0;
+					double lenS = 0;
+					for (Edge e : leaf.getEdges()) {
+						ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
+						lenS += edgePoints.size();
+						n++;
+					}
+					double len = lenS / n;
+					if (len < delteShortEndLimbsMinimumLength)
+						delN.add(leaf);
+				}
+				for (Node n : delN)
+					graph.deleteNode(n);
+				
+				deleteSelfLoops();
+				if (!preventIntermediateNodeRemoval)
+					removeParallelEdges();
+				graph.numberGraphElements();
+				
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed short end-limbs (graph based), " +
+						"shorter than " + delteShortEndLimbsMinimumLength + ". Removed: " + delN.size());
+				if (!preventIntermediateNodeRemoval)
+					for (Node n : new ArrayList<Node>(graph.getNodes())) {
+						// remove nodes, with degree 2 (and merge pixel list)
+						if (n.getDegree() == 2) {
+							// add new edge, with edge pixel list from both edges, then delete that node
+							int nc = 0;
+							ArrayList<Vector2i> ep = new ArrayList<Vector2i>();
+							for (Edge e : n.getEdges()) {
+								nc++;
+								ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
+								ep.addAll(edgePoints);
+							}
+							if (nc != 2)
+								ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two returns different count of edges (" + nc + ")");
+							else {
+								Iterator<Node> it = n.getNeighborsIterator();
+								Node a = it.next();
+								if (!it.hasNext()) {
+									// ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has only one neighbour (self edges are deleted?!)");
+								} else {
+									Node b = it.next();
+									if (it.hasNext())
+										ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has more than two neighbours");
+									else {
+										Edge e01 = graph.addEdge(a, b, false);
+										e01.addAttribute(new ObjectAttribute("info", new LimbInfo(ep)), "");
+										graph.deleteNode(n);
+									}
 								}
 							}
 						}
 					}
-				}
-		}
-		
-		for (Edge edge : graph.getEdges()) {
-			ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) edge.getAttribute("info")).getValue()).getEdgePoints();
+			}
 			
-			edge.setDouble("len", edgePoints.size());
-			if (optDistanceMap != null) {
-				DescriptiveStatistics statWidth = new DescriptiveStatistics();
-				DescriptiveStatistics statReveresed = new DescriptiveStatistics();
+			for (Edge edge : graph.getEdges()) {
+				if (!new GraphElementHelper(edge).hasAttribute("info"))
+					continue;
+				ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) edge.getAttribute("info")).getValue()).getEdgePoints();
 				
-				ArrayList<Vector2i> reversedList = new ArrayList<Vector2i>(edgePoints);
-				Collections.reverse(reversedList);
-				
-				for (Vector2i ep : edgePoints) {
-					double width = optDistanceMap[ep.x][ep.y] / 10d;
-					statWidth.addValue(width);
-					if (statWidth.getN() >= 20)
-						break;
-				}
-				for (Vector2i ep : reversedList) {
-					double width = optDistanceMap[ep.x][ep.y] / 10d;
-					statReveresed.addValue(width);
-					if (statReveresed.getN() >= 20)
-						break;
-				}
-				if (statReveresed.getMean() < statWidth.getMean()) {
-					statWidth = statReveresed;
-					edgePoints = reversedList;
-				}
-				int idx = 0;
-				for (Vector2i ep : edgePoints) {
-					if (idx == 40 || idx == edgePoints.size() - 1) {
-						// double width = statWidth.getPercentile(50);
-						ImageCanvas.markPoint(ep.x / 2, ep.y / 2, postProcessing, Color.YELLOW);
-						// ImageCanvas.text(ep.x / 2, ep.y / 2 - 20, "W=" +
-						// StringManipulationTools.formatNumber(width, 1)
-						// + ", L=" + edgePoints.size() / 2, Color.MAGENTA, postProcessing);
+				edge.setDouble("len", edgePoints.size());
+				if (optDistanceMap != null) {
+					DescriptiveStatistics statWidth = new DescriptiveStatistics();
+					DescriptiveStatistics statReveresed = new DescriptiveStatistics();
+					
+					ArrayList<Vector2i> reversedList = new ArrayList<Vector2i>(edgePoints);
+					Collections.reverse(reversedList);
+					
+					for (Vector2i ep : edgePoints) {
+						double width = optDistanceMap[ep.x][ep.y] / 10d;
+						statWidth.addValue(width);
+						if (statWidth.getN() >= 20)
+							break;
 					}
-					idx++;
-				}
-				
-				edge.setDouble("w_average", statWidth.getMean());
-				edge.setDouble("w_median", statWidth.getPercentile(50));
-				edge.setDouble("w_stddev", statWidth.getStandardDeviation());
-				edge.setDouble("w_kurtosis", statWidth.getKurtosis());
-				edge.setDouble("w_skewness", statWidth.getSkewness());
-				edge.setDouble("w_min", statWidth.getMin());
-				edge.setDouble("w_max", statWidth.getMax());
-				AttributeHelper.setLabel((GraphElement) edge, "W:" + StringManipulationTools.formatNumber(statWidth.getMean(), 1));
-			}
-		}
-		ArrayList<Node> delll = new ArrayList<Node>();
-		for (Node n : graph.getNodes()) {
-			if (n.getDegree() == 1) {
-				double limb_len = n.getEdges().iterator().next().getDouble("len") / 2;
-				if (limb_len < delteShortEndLimbsMinimumLength)
-					delll.add(n);
-			}
-		}
-		for (Node nooo : delll)
-			graph.deleteNode(nooo);
-		
-		boolean checkDist = minimumNodeDistance > 0;
-		if (checkDist) {
-			boolean mergeOccured;
-			do {
-				mergeOccured = false;
-				loop: for (Node n1 : graph.getNodes()) {
-					for (Node n2 : graph.getNodes()) {
-						if (n1 == n2)
-							continue;
-						if (!new NodeHelper(n1).getClusterID("-1").equals(new NodeHelper(n2).getClusterID("-1"))) {
-							continue;
+					for (Vector2i ep : reversedList) {
+						double width = optDistanceMap[ep.x][ep.y] / 10d;
+						statReveresed.addValue(width);
+						if (statReveresed.getN() >= 20)
+							break;
+					}
+					if (statReveresed.getMean() < statWidth.getMean()) {
+						statWidth = statReveresed;
+						edgePoints = reversedList;
+					}
+					int idx = 0;
+					for (Vector2i ep : edgePoints) {
+						if (idx == 40 || idx == edgePoints.size() - 1) {
+							// double width = statWidth.getPercentile(50);
+							ImageCanvas.markPoint(ep.x / 2, ep.y / 2, postProcessing, Color.YELLOW);
+							// ImageCanvas.text(ep.x / 2, ep.y / 2 - 20, "W=" +
+							// StringManipulationTools.formatNumber(width, 1)
+							// + ", L=" + edgePoints.size() / 2, Color.MAGENTA, postProcessing);
 						}
-						int x1 = n1.getInteger("x");
-						int y1 = n1.getInteger("y");
-						int x2 = n2.getInteger("x");
-						int y2 = n2.getInteger("y");
-						Vector2i a = new Vector2i(x1, y1);
-						Vector2i b = new Vector2i(x2, y2);
-						if (a.distance(b) < minimumNodeDistance) {
-							// System.out.println(SystemAnalysis.getCurrentTime() + ">Merge nearby skeleton graph nodes: " + x1 + "/" + y1 + " near to " + x2 + "/" +
-							// y2);
-							Collection<Node> workNodes = new ArrayList<Node>();
-							workNodes.add(n1);
-							workNodes.add(n2);
-							MergeNodes.mergeNodesIntoSingleNode(graph, workNodes);
-							mergeOccured = true;
-							break loop;
+						idx++;
+					}
+					
+					edge.setDouble("w_average", statWidth.getMean());
+					edge.setDouble("w_median", statWidth.getPercentile(50));
+					edge.setDouble("w_stddev", statWidth.getStandardDeviation());
+					edge.setDouble("w_kurtosis", statWidth.getKurtosis());
+					edge.setDouble("w_skewness", statWidth.getSkewness());
+					edge.setDouble("w_min", statWidth.getMin());
+					edge.setDouble("w_max", statWidth.getMax());
+					AttributeHelper.setLabel((GraphElement) edge, "W:" + StringManipulationTools.formatNumber(statWidth.getMean(), 1));
+				}
+			}
+			ArrayList<Node> delll = new ArrayList<Node>();
+			for (Node n : graph.getNodes()) {
+				if (n.getDegree() == 1) {
+					double limb_len = n.getEdges().iterator().next().getDouble("len") / 2;
+					if (limb_len < delteShortEndLimbsMinimumLength)
+						delll.add(n);
+				}
+			}
+			for (Node nooo : delll)
+				graph.deleteNode(nooo);
+			
+			boolean checkDist = minimumNodeDistance > 0;
+			if (checkDist) {
+				boolean mergeOccured;
+				do {
+					mergeOccured = false;
+					loop: for (Node n1 : graph.getNodes()) {
+						for (Node n2 : graph.getNodes()) {
+							if (n1 == n2)
+								continue;
+							if (!new NodeHelper(n1).getClusterID("-1").equals(new NodeHelper(n2).getClusterID("-1"))) {
+								continue;
+							}
+							int x1 = n1.getInteger("x");
+							int y1 = n1.getInteger("y");
+							int x2 = n2.getInteger("x");
+							int y2 = n2.getInteger("y");
+							Vector2i a = new Vector2i(x1, y1);
+							Vector2i b = new Vector2i(x2, y2);
+							if (a.distance(b) < minimumNodeDistance) {
+								// System.out.println(SystemAnalysis.getCurrentTime() + ">Merge nearby skeleton graph nodes: " + x1 + "/" + y1 + " near to " + x2 + "/"
+								// +
+								// y2);
+								Collection<Node> workNodes = new ArrayList<Node>();
+								workNodes.add(n1);
+								workNodes.add(n2);
+								MergeNodes.mergeNodesIntoSingleNode(graph, workNodes);
+								mergeOccured = true;
+								break loop;
+							}
 						}
 					}
-				}
-			} while (mergeOccured);
+				} while (mergeOccured);
+			}
 		}
 		deleteSelfLoops();
-		removeParallelEdges();
+		if (!preventIntermediateNodeRemoval)
+			removeParallelEdges();
 		graph.numberGraphElements();
 		
 		if (DEBUG)
