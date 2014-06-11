@@ -5312,4 +5312,35 @@ public class ImageOperation implements MemoryHogInterface {
 		}
 		return new ImageOperation(res, getWidth(), getHeight());
 	}
+	
+	public ImageOperation medianColorFilterForBackgroundPixels(int newBack, Image mask) {
+		int w = getWidth();
+		int[] in = getAs1D();
+		int[] res = new int[in.length];
+		for (int i = 0; i < in.length; i++) {
+			int c = in[i];
+			if (c != BACKGROUND_COLORint) {
+				res[i] = c;
+			} else {
+				ArrayList<Integer> aroundColors = new ArrayList<Integer>(8);
+				for (int idx : new int[] {
+						i - 1, i + 1, i - w, i + w,
+						i - 1 - w, i - 1 + w, i + 1 - w, i + 1 + w
+				}) {
+					if (idx >= 0 && idx < in.length) {
+						int ac = in[idx];
+						if (ac != BACKGROUND_COLORint)
+							aroundColors.add(ac);
+					}
+				}
+				if (aroundColors.size() > 2)
+					Collections.sort(aroundColors);
+				if (aroundColors.size() > 0)
+					res[i] = aroundColors.get(aroundColors.size() / 2);
+				else
+					res[i] = newBack;
+			}
+		}
+		return new ImageOperation(res, getWidth(), getHeight()).applyMask(mask);
+	}
 }

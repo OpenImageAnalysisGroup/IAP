@@ -48,8 +48,10 @@ public class SkeletonGraph {
 	private final int[][] skelImg;
 	Image debugImg;
 	private AdjListGraph graph;
-	private final int background = -16777216;
+	private int background = -16777216;
 	private final int visitedDuringSearch = Color.GRAY.getRGB();
+	private boolean c;
+	private boolean preventIntermediateNodeRemoval;
 	
 	public SkeletonGraph(int w, int h, int[][] skelImg) {
 		this.w = w;
@@ -92,6 +94,7 @@ public class SkeletonGraph {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches) {
+					System.out.println("FOUND BRANCH OR ENDPOINT POINT " + x + "/" + y);
 					Vector2i startPoint = new Vector2i(x, y);
 					if (DEBUG)
 						System.out.println("Start: " + startPoint);
@@ -133,9 +136,10 @@ public class SkeletonGraph {
 							System.out.println("Start cluster is different to end cluster:" + cS + " <=> " + cE + " // " + s + " -- " + e);
 							int i = 0;
 							del = true;
-							for (Vector2i ep : edgePoints)
-								if ((i++) % 20 == 0)
-									ImageCanvas.markPoint(ep.x / 2, ep.y / 2, postProcessing, Color.LIGHT_GRAY);
+							if (postProcessing != null)
+								for (Vector2i ep : edgePoints)
+									if ((i++) % 20 == 0)
+										ImageCanvas.markPoint(ep.x / 2, ep.y / 2, postProcessing, Color.LIGHT_GRAY);
 						}
 						if (DEBUG)
 							System.out.println("S: " + s + " ==> E: " + e + " //// " + startNode + " // " + endNode + " // "
@@ -181,37 +185,38 @@ public class SkeletonGraph {
 			
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed short end-limbs (graph based), " +
 					"shorter than " + delteShortEndLimbsMinimumLength + ". Removed: " + delN.size());
-			for (Node n : new ArrayList<Node>(graph.getNodes())) {
-				// remove nodes, with degree 2 (and merge pixel list)
-				if (n.getDegree() == 2) {
-					// add new edge, with edge pixel list from both edges, then delete that node
-					int nc = 0;
-					ArrayList<Vector2i> ep = new ArrayList<Vector2i>();
-					for (Edge e : n.getEdges()) {
-						nc++;
-						ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
-						ep.addAll(edgePoints);
-					}
-					if (nc != 2)
-						ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two returns different count of edges (" + nc + ")");
-					else {
-						Iterator<Node> it = n.getNeighborsIterator();
-						Node a = it.next();
-						if (!it.hasNext()) {
-							// ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has only one neighbour (self edges are deleted?!)");
-						} else {
-							Node b = it.next();
-							if (it.hasNext())
-								ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has more than two neighbours");
-							else {
-								Edge e01 = graph.addEdge(a, b, false);
-								e01.addAttribute(new ObjectAttribute("info", new LimbInfo(ep)), "");
-								graph.deleteNode(n);
+			if (!preventIntermediateNodeRemoval)
+				for (Node n : new ArrayList<Node>(graph.getNodes())) {
+					// remove nodes, with degree 2 (and merge pixel list)
+					if (n.getDegree() == 2) {
+						// add new edge, with edge pixel list from both edges, then delete that node
+						int nc = 0;
+						ArrayList<Vector2i> ep = new ArrayList<Vector2i>();
+						for (Edge e : n.getEdges()) {
+							nc++;
+							ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
+							ep.addAll(edgePoints);
+						}
+						if (nc != 2)
+							ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two returns different count of edges (" + nc + ")");
+						else {
+							Iterator<Node> it = n.getNeighborsIterator();
+							Node a = it.next();
+							if (!it.hasNext()) {
+								// ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has only one neighbour (self edges are deleted?!)");
+							} else {
+								Node b = it.next();
+								if (it.hasNext())
+									ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two has more than two neighbours");
+								else {
+									Edge e01 = graph.addEdge(a, b, false);
+									e01.addAttribute(new ObjectAttribute("info", new LimbInfo(ep)), "");
+									graph.deleteNode(n);
+								}
 							}
 						}
 					}
 				}
-			}
 		}
 		
 		for (Edge edge : graph.getEdges()) {
@@ -335,11 +340,12 @@ public class SkeletonGraph {
 		String dd = SkeletonProcessor2d.getColorDesc(p);
 		if (dd.equals("branch"))
 			dd = "____b";
-		if (dd.equals("endpoint")) {
+		if (dd.equals("endpoint") && postProcessing != null) {
 			ImageCanvas.markPoint2(x / 2, y / 2, postProcessing, delCheck);
 			dd = "_e";
 		}
-		ImageCanvas.text(x / 2 + 16, y / 2, dd, Color.BLACK, postProcessing, delCheck);
+		if (postProcessing != null)
+			ImageCanvas.text(x / 2 + 16, y / 2, dd, Color.BLACK, postProcessing, delCheck);
 		if (optClusterIDsPixels != null) {
 			// System.out.println("NEW NODE: " + n + ": " + cid);
 			new NodeHelper(n).setClusterID(cid);
@@ -919,4 +925,13 @@ public class SkeletonGraph {
 			if (SelectEdgesAlgorithm.parallelEdgeExists(e) || SelectEdgesAlgorithm.antiParallelEdgeExists(e))
 				graph.deleteEdge(e);
 	}
+	
+	public void setBackground(int back) {
+		this.background = back;
+	}
+	
+	public void setPreventIntermediateNodeRemoval(boolean b) {
+		this.preventIntermediateNodeRemoval = b;
+	}
+	
 }

@@ -56,4 +56,9 @@ public class Feature {
 		return featureMap;
 	}
 	
+	public void setPosition(int x, int y) {
+		featureMap.get("x").feature = x;
+		featureMap.get("y").feature = y;
+	}
+	
 }
