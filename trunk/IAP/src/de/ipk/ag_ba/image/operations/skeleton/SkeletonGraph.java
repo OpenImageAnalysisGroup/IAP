@@ -95,7 +95,7 @@ public class SkeletonGraph {
 			for (int y = 1; y < h - 1; y++) {
 				int p = skelImg[x][y];
 				if (p == SkeletonProcessor2d.colorEndpoints || p == SkeletonProcessor2d.colorBranches) {
-					System.out.println("FOUND BRANCH OR ENDPOINT POINT " + x + "/" + y);
+					// System.out.println("FOUND BRANCH OR ENDPOINT POINT " + x + "/" + y);
 					Vector2i startPoint = new Vector2i(x, y);
 					if (DEBUG)
 						System.out.println("Start: " + startPoint);
@@ -112,7 +112,7 @@ public class SkeletonGraph {
 						Node startNode = position2node.get(s.x + ";" + s.y);
 						Node endNode = position2node.get(e.x + ";" + e.y);
 						if (startNode == null) {
-							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: START POINT NOT FOUND: " + s.x + " / " + s.y);
+							// System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: START POINT NOT FOUND: " + s.x + " / " + s.y);
 							break;
 						}
 						if (endNode == null) {
@@ -121,8 +121,8 @@ public class SkeletonGraph {
 									if (endNode == null)
 										endNode = position2node.get((e.x + offX) + ";" + (e.y + offY));
 								}
-							if (endNode != null)
-								System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: END POINT FOUND BY SURROUND SEARCH: " + e.x + " / " + e.y);
+							// if (endNode != null)
+							// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: END POINT FOUND BY SURROUND SEARCH: " + e.x + " / " + e.y);
 						}
 						if (endNode == null) {
 							// System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: END POINT NOT FOUND: " + e.x + " / " + e.y);
@@ -134,7 +134,7 @@ public class SkeletonGraph {
 						String cS = new NodeHelper(startNode).getClusterID("");
 						String cE = new NodeHelper(endNode).getClusterID("");
 						if (!cS.equals(cE)) {
-							System.out.println("Start cluster is different to end cluster:" + cS + " <=> " + cE + " // " + s + " -- " + e);
+							// System.out.println("Start cluster is different to end cluster:" + cS + " <=> " + cE + " // " + s + " -- " + e);
 							int i = 0;
 							del = true;
 							if (postProcessing != null)
@@ -169,7 +169,7 @@ public class SkeletonGraph {
 				Vector2i pa = new NodeHelper(a).getPosition2i();
 				Vector2i pb = new NodeHelper(b).getPosition2i();
 				if (pa.distance(pb) < 2) {
-					System.out.println("CONNECT " + pa.distance(pb));
+					// System.out.println("CONNECT " + pa.distance(pb));
 					graph.addEdge(a, b, false);
 				}
 			}
