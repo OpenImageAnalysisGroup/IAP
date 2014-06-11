@@ -914,9 +914,25 @@ public class SkeletonProcessor2d {
 	}
 	
 	public void markAdditionalBranchpoints(ArrayList<Vector2i> cps) {
+		
+		Image i = new Image(skelImg);
+		int w = i.getWidth();
+		int h = i.getHeight();
 		for (Vector2i p : cps) {
-			skelImg[p.x][p.y] = colorBranches;
-			branches.add(new Point(p.x, p.y));
+			boolean found = false;
+			for (int x = p.x - 1; x <= p.x + 1; x++)
+				for (int y = p.y - 1; y <= p.y + 1; y++) {
+					if (x >= 0 && x < w && y >= 0 && y < h) {
+						int c = skelImg[x][y];
+						if (c == colorBranches || c == colorEndpoints)
+							found = true;
+					}
+				}
+			if (!found) {
+				skelImg[p.x][p.y] = colorBranches;
+				branches.add(new Point(p.x, p.y));
+			} else
+				System.out.println("Prevented problematic point creation!");
 		}
 	}
 }
