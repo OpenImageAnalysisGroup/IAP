@@ -948,7 +948,7 @@ public class IAPservice {
 								String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
 								ImageConfiguration ic = ImageConfiguration.get(subn);
 								String info = "+++" + substance.getInfo();
-								long urlId = urlManager != null ? urlManager.getId(useZIPexportFileNames ?
+								long urlId = urlManager != null ? urlManager.getId(i, useZIPexportFileNames ?
 										ActionDataExportZIP.getImageFileExportNameForZIPexport(gc, i) + info : i.getURL().toString() + info) : -1;
 								if (ic == ImageConfiguration.Unknown) {
 									ic = ImageConfiguration.get(i.getURL().getFileName());
@@ -982,7 +982,7 @@ public class IAPservice {
 								VolumeData i = (VolumeData) ii;
 								String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
 								ImageConfiguration ic = ImageConfiguration.get(subn);
-								long urlId = urlManager.getId(i.getURL().toString());
+								long urlId = urlManager.getId(i, i.getURL().toString());
 								if (ic == ImageConfiguration.Unknown) {
 									ic = ImageConfiguration.get(i.getURL().getFileName());
 								}

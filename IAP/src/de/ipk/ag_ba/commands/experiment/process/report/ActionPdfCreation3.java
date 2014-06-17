@@ -22,17 +22,21 @@ import javax.swing.JLabel;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.OpenFileDialogService;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.apache.poi.common.usermodel.Hyperlink;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ExportSetting;
@@ -46,12 +50,14 @@ import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 
 /**
  * @author klukas
@@ -322,7 +328,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			if (!xlsx)
 				return "Create CSV File" + add;
 			else
-				return "Create Spreadsheet (" + (xlsx ? "XLSX" : "CSV") + ")" + add;
+				return "Create Spreadsheet (" + (xlsx ? "XLSX+JPG" : "CSV") + ")" + add;
 		}
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
@@ -482,8 +488,17 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				if (status != null)
 					status.setCurrentStatusText2(xlsx ? "Fill Excel Sheet" : "Prepare CSV content");
 				experiment = null;
-				
-				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status, urlManager);
+				File target = OpenFileDialogService.getDirectoryFromUser("Select Target Directory");
+				String path = null;
+				if (target != null) {
+					customTargetFileName = target.getAbsolutePath() + "/" + StringManipulationTools.getFileSystemName(experimentReference.getExperimentName())
+							+ ".xlsx";
+					p.setCustomClusterTargetFile(customTargetFileName);
+					path = target.getAbsolutePath() + "/images";
+					if (!new File(path).exists())
+						new File(path).mkdirs();
+				}
+				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status, urlManager, path);
 				snapshots = null;
 			} else {
 				if (status != null)
@@ -777,7 +792,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			Sheet sheet,
 			ArrayList<String> excelColumnHeaders,
 			BackgroundTaskStatusProviderSupportingExternalCall status,
-			UrlCacheManager urlManager) {
+			UrlCacheManager urlManager, String outpath) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
 		int rowNum = 1;
 		Runtime r = Runtime.getRuntime();
@@ -788,6 +803,12 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		
 		CellStyle cellStylePercent = sheet.getWorkbook().createCellStyle();
 		cellStylePercent.setDataFormat(createHelper.createDataFormat().getFormat("0.00%"));
+		
+		CellStyle hlink_style = sheet.getWorkbook().createCellStyle();
+		org.apache.poi.ss.usermodel.Font hlink_font = sheet.getWorkbook().createFont();
+		hlink_font.setUnderline(org.apache.poi.ss.usermodel.Font.U_SINGLE);
+		hlink_font.setColor(IndexedColors.BLUE.getIndex());
+		hlink_style.setFont(hlink_font);
 		
 		HashSet<Integer> percentColumns = new HashSet<Integer>();
 		HashSet<Integer> dateColumns = new HashSet<Integer>();
@@ -826,9 +847,62 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				}
 				
 				for (DateDoubleString o : valueRow) {
-					if (o != null && o.getString() != null && !o.getString().isEmpty())
-						row.createCell(colNum++).setCellValue(o.getString());
-					else
+					if (o != null && o.getString() != null && !o.getString().isEmpty()) {
+						Cell c = row.createCell(colNum++);
+						c.setCellValue(o.getString());
+						if (outpath != null)
+							if (o.getLink() != null) {
+								ArrayList<BinaryMeasurement> bin = o.getBinaryData();
+								boolean ok = false;
+								if (bin != null && !bin.isEmpty() && bin.size() == 1) {
+									for (BinaryMeasurement bm : bin) {
+										if (bm.getURL() != null) {
+											if (o.getString().endsWith("jpg")) {
+												// direct copy
+												// StringManipulationTools.removeFileExtension(o.getString()) + ".jpg"
+												String of = outpath + "/" + o.getString();
+												FileOutputStream out;
+												try {
+													out = new FileOutputStream(new File(of));
+													ResourceIOManager.copyContent(bm.getURL().getInputStream(), out);
+													ok = true;
+												} catch (Exception e) {
+													System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not create image file in output directory: "
+															+ e.getMessage());
+												}
+											} else
+												if (o.getString().endsWith("png") || o.getString().endsWith("tiff") || o.getString().endsWith("tif")) {
+													// convert
+													String of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
+													try {
+														Image i = new Image(bm.getURL());
+														i.saveToFile(of);
+														ok = true;
+													} catch (Exception e) {
+														System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not create image file in output directory: "
+																+ e.getMessage());
+													}
+												} else {
+													// ignore
+												}
+										}
+									}
+								}
+								if (ok) {
+									// add link to image
+									org.apache.poi.ss.usermodel.Hyperlink file_link = createHelper.createHyperlink(Hyperlink.LINK_FILE);
+									String fn =
+											StringManipulationTools.stringReplace(
+													new File(StringManipulationTools.removeFileExtension(o.getString()) + ".jpg").toURI().toString(),
+													" ", "%20");
+									fn = fn.substring(fn.lastIndexOf("/") + 1);
+									file_link.setAddress("images/" + fn);
+									
+									c.setHyperlink(file_link);
+									c.setCellStyle(hlink_style);
+								}
+							}
+					} else
 						if (o != null && o.getDouble() != null) {
 							Cell cell = row.createCell(colNum++);
 							cell.setCellValue(o.getDouble());
@@ -862,7 +936,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			int scnt, int sidx) {
 		if (status != null) {
 			status.setCurrentStatusValueFine(100d * sidx / scnt);
-			status.setCurrentStatusText1("Filling worksheet, remaining rows: " + snapshotsToBeProcessed.size());
+			status.setCurrentStatusText1("Export data, remaining rows: " + snapshotsToBeProcessed.size());
 			status.setCurrentStatusText2("<small><font color='gray'>Memory status: "
 					+ r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 					+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB</font></small>");
