@@ -12,6 +12,7 @@ import org.StringManipulationTools;
 import de.ipk.ag_ba.commands.experiment.process.report.DateDoubleString;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 
 public class SnapshotDataIAP {
 	private static final Double NO_ANGLE = -720d;
@@ -236,7 +237,28 @@ public class SnapshotDataIAP {
 	
 	private String getConfigList(UrlCacheManager urlManager, CameraType ct, double angle) {
 		return getUrlInfo(urlManager, ct, angle, 1);
-		
+	}
+	
+	public ArrayList<BinaryMeasurement> getBinaryList(UrlCacheManager urlManager, CameraType ct, double angle) {
+		ArrayList<BinaryMeasurement> bms = new ArrayList<BinaryMeasurement>();
+		StringBuilder s = getUrlFromType(ct);
+		if (s.length() == 0)
+			return bms;
+		else {
+			StringBuilder sAngle = getUrlAngleFromType(ct);
+			
+			long[] urlArray = getLongArray(s);
+			int[] urlAngles = getIntArray(sAngle);
+			for (int i = 0; i < Math.min(urlArray.length, urlAngles.length); i++) {
+				String realUrl = urlManager.getUrl(urlArray[i]);
+				int urlAngle = urlAngles[i];
+				if (realUrl != null && Math.abs(urlAngle - angle) < 0.00001) {
+					BinaryMeasurement b = urlManager.getImage(urlArray[i]);
+					bms.add(b);
+				}
+			}
+		}
+		return bms;
 	}
 	
 	private String getUrlInfo(UrlCacheManager urlManager, CameraType ct, double angle, int infoIndex) {
@@ -703,11 +725,11 @@ public class SnapshotDataIAP {
 			row.add(new DateDoubleString(s.getWeightBefore() != null && s.getWeightOfWatering() != null ? s.getWeightBefore() + s.getWeightOfWatering() : null));
 			row.add(new DateDoubleString(s.getWeightOfWatering()));
 			row.add(new DateDoubleString(s.getWholeDayWaterAmount()));
-			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.VIS, NO_ANGLE)));
-			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.FLUO, NO_ANGLE)));
-			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.NIR, NO_ANGLE)));
-			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.IR, NO_ANGLE)));
-			row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.UNKNOWN, NO_ANGLE)));
+			row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.VIS, NO_ANGLE))));
+			row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.FLUO, NO_ANGLE))));
+			row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.NIR, NO_ANGLE))));
+			row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.IR, NO_ANGLE))));
+			row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.UNKNOWN, NO_ANGLE))));
 			row.add(new DateDoubleString(s.getConfigList(urlManager, CameraType.VIS, NO_ANGLE)));
 			row.add(new DateDoubleString(s.getConfigList(urlManager, CameraType.FLUO, NO_ANGLE)));
 			row.add(new DateDoubleString(s.getConfigList(urlManager, CameraType.NIR, NO_ANGLE)));
@@ -752,11 +774,11 @@ public class SnapshotDataIAP {
 						+ s.getWeightOfWatering() : null) : null);
 				row.add(addWater ? new DateDoubleString(s.getWeightOfWatering()) : null);
 				row.add(addWater ? new DateDoubleString(s.getWholeDayWaterAmount()) : null);
-				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.VIS, angle)));
-				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.FLUO, angle)));
-				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.NIR, angle)));
-				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.IR, angle)));
-				row.add(new DateDoubleString(s.getUrlList(urlManager, CameraType.UNKNOWN, angle)));
+				row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.VIS, angle), s.getBinaryList(urlManager, CameraType.VIS, angle))));
+				row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.FLUO, angle), s.getBinaryList(urlManager, CameraType.FLUO, angle))));
+				row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.NIR, angle), s.getBinaryList(urlManager, CameraType.NIR, angle))));
+				row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.IR, angle), s.getBinaryList(urlManager, CameraType.IR, angle))));
+				row.add(addLinks(new DateDoubleString(s.getUrlList(urlManager, CameraType.UNKNOWN, angle), s.getBinaryList(urlManager, CameraType.UNKNOWN, angle))));
 				row.add(new DateDoubleString(s.getConfigList(urlManager, CameraType.VIS, angle)));
 				row.add(new DateDoubleString(s.getConfigList(urlManager, CameraType.FLUO, angle)));
 				row.add(new DateDoubleString(s.getConfigList(urlManager, CameraType.NIR, angle)));
@@ -774,6 +796,11 @@ public class SnapshotDataIAP {
 			}
 		}
 		return result;
+	}
+	
+	private DateDoubleString addLinks(DateDoubleString dateDoubleString) {
+		dateDoubleString.checkForLink();
+		return dateDoubleString;
 	}
 	
 	public String getFieldValue(ConditionInfo param) {

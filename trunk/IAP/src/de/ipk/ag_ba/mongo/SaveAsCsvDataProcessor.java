@@ -128,7 +128,7 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 			
 			mappingData = null;
 			ActionPdfCreation3.setExcelSheetValues(
-					snapshots, sheet, excelColumnHeaders, status, urlManager);
+					snapshots, sheet, excelColumnHeaders, status, urlManager, new File(fn).getParent());
 			wb.write(new FileOutputStream(fn));
 			String tempDirectory = new File(fn).getParent();
 			AttributeHelper.showInFileBrowser(tempDirectory + "", new File(fn).getName());
