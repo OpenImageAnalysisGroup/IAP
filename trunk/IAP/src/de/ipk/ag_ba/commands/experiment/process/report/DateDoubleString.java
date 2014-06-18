@@ -12,6 +12,7 @@ public class DateDoubleString {
 	private final Date date;
 	private String link;
 	private ArrayList<BinaryMeasurement> bms;
+	private Boolean flag;
 	
 	public DateDoubleString(Double v) {
 		this.text = null;
@@ -48,6 +49,13 @@ public class DateDoubleString {
 		this.date = null;
 	}
 	
+	public DateDoubleString(Double v, Boolean flag) {
+		text = null;
+		this.value = v;
+		this.date = null;
+		this.flag = flag;
+	}
+	
 	public String getString() {
 		return text;
 	}
@@ -72,5 +80,9 @@ public class DateDoubleString {
 	
 	public ArrayList<BinaryMeasurement> getBinaryData() {
 		return bms;
+	}
+	
+	public Boolean getFlag() {
+		return flag;
 	}
 }

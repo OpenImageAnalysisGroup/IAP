@@ -121,6 +121,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
@@ -617,7 +618,35 @@ public class IAPservice {
 			boolean storeAllReplicates,
 			SnapshotFilter optSnapshotFilter,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ExportSetting optCustomSubsetDef, boolean useZIPexportFileNames) {
-		
+		return getSnapshotsFromExperiment(urlManager,
+				experiment,
+				optSubstanceIds,
+				prepareTransportToBrowser,
+				exportIndividualAngles,
+				storeAllReplicates,
+				optSnapshotFilter,
+				optStatus, optCustomSubsetDef, useZIPexportFileNames, null, null, null, null);
+	}
+	
+	public static LinkedList<SnapshotDataIAP> getSnapshotsFromExperiment(
+			UrlCacheManager urlManager,
+			ExperimentInterface experiment,
+			HashMap<String, Integer> optSubstanceIds,
+			boolean prepareTransportToBrowser,
+			boolean exportIndividualAngles,
+			boolean storeAllReplicates,
+			SnapshotFilter optSnapshotFilter,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ExportSetting optCustomSubsetDef, boolean useZIPexportFileNames,
+			HashSet<NumericMeasurement> lowerSingle, HashSet<NumericMeasurement> upperSingle,
+			HashSet<SampleInterface> lowerCombined, HashSet<SampleInterface> upperCombined) {
+		if (lowerSingle != null && lowerSingle.isEmpty())
+			lowerSingle = null;
+		if (upperSingle != null && upperSingle.isEmpty())
+			upperSingle = null;
+		if (lowerCombined != null && lowerCombined.isEmpty())
+			lowerCombined = null;
+		if (upperCombined != null && upperCombined.isEmpty())
+			upperCombined = null;
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set...");
 		System.out.println("Transport to browser? " + prepareTransportToBrowser);
 		System.out.println("Store all angles? " + exportIndividualAngles);
@@ -718,7 +747,6 @@ public class IAPservice {
 								double ggd = getGGD(unixDay, unixDay, timeDay2averageTemp);
 								s.setTime((int) Math.round(ggd));
 								s.setTimeUnit("GDD");
-								
 							}
 						}
 					}
@@ -740,7 +768,7 @@ public class IAPservice {
 				processConditions(urlManager, optSubstanceIds, exportIndividualAngles,
 						storeAllReplicates, optSnapshotFilter, optStatus,
 						timestampAndQuality2snapshot,
-						result, substance, useZIPexportFileNames);
+						result, substance, useZIPexportFileNames, lowerSingle, upperSingle, lowerCombined, upperCombined);
 				if (optStatus != null)
 					optStatus.setCurrentStatusValueFine(100d * sidx / scnt);
 			}
@@ -791,7 +819,9 @@ public class IAPservice {
 	private static void processConditions(UrlCacheManager urlManager, HashMap<String, Integer> optSubstanceIds, boolean exportIndividualAngles,
 			boolean storeAllReplicates, SnapshotFilter optSnapshotFilter, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot, Collection<SnapshotDataIAP> result, SubstanceInterface substance,
-			boolean useZIPexportFileNames) {
+			boolean useZIPexportFileNames,
+			HashSet<NumericMeasurement> lowerSingle, HashSet<NumericMeasurement> upperSingle,
+			HashSet<SampleInterface> lowerCombined, HashSet<SampleInterface> upperCombined) {
 		for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
 			for (SampleInterface sample : c) {
 				TreeSet<String> qualities = new TreeSet<String>();
@@ -876,7 +906,7 @@ public class IAPservice {
 								// sample.recalculateSampleAverage();
 								if (sample.getSampleAverage() != null && qualityFilter == null) {
 									double vvv = sample.calcMean();
-									sn.storeValue(idx, vvv);
+									sn.storeValue(idx, vvv, lowerCombined.contains(sample), upperCombined.contains(sample));
 								} else {
 									// find all values with OK quality and calculate average
 									double sum = 0;
@@ -890,7 +920,7 @@ public class IAPservice {
 											n++;
 										}
 									}
-									sn.storeValue(idx, sum / n);
+									sn.storeValue(idx, sum / n, lowerCombined.contains(sample), upperCombined.contains(sample));
 								}
 								if (exportIndividualAngles) {
 									for (NumericMeasurementInterface nmi : sample) {
@@ -898,7 +928,9 @@ public class IAPservice {
 											continue;
 										NumericMeasurement3D nmi3d = (NumericMeasurement3D) nmi;
 										Double p = nmi3d.getPosition();
-										sn.storeAngleValue(idx, p, nmi3d.getValue(), isTop);
+										sn.storeAngleValue(idx, p, nmi3d.getValue(), isTop,
+												lowerSingle != null && lowerSingle.contains(nmi),
+												upperSingle != null && upperSingle.contains(nmi));
 									}
 								}
 							}
@@ -1012,7 +1044,7 @@ public class IAPservice {
 							String sub = sample.getSubstanceNameWithUnit();
 							if (sub != null) {
 								int idx = optSubstanceIds.get(sub);
-								sn.storeValue(idx, (double) imageCount);
+								sn.storeValue(idx, (double) imageCount, false, false);
 							}
 						}
 					}
