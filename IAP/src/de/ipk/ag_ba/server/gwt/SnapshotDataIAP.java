@@ -32,7 +32,7 @@ public class SnapshotDataIAP {
 	public transient StringBuilder unknownUrlAngle = new StringBuilder();
 	
 	public String dataTransport;
-	public TreeMap<Double, LinkedList<Double>> storeAngleToValues;
+	public TreeMap<Double, LinkedList<BooleanDouble>> storeAngleToValues;
 	
 	public Long snapshotTime;
 	public int day;
@@ -46,6 +46,7 @@ public class SnapshotDataIAP {
 	public String species, genotype, variety, growthCondition, treatment, sequence;
 	
 	private transient TreeMap<Double, TreeMap<Integer, Double>> position2store;
+	private transient TreeMap<Double, TreeMap<Integer, Boolean>> position2isUpperTrueIsLowerFalse;
 	
 	public SnapshotDataIAP() {
 		// empty
@@ -391,15 +392,20 @@ public class SnapshotDataIAP {
 	}
 	
 	public void prepareStore() {
-		storeAngleToValues = new TreeMap<Double, LinkedList<Double>>();
+		storeAngleToValues = new TreeMap<Double, LinkedList<BooleanDouble>>();
 		if (position2store != null && !position2store.isEmpty())
 			for (Double angle : position2store.keySet())
 				for (Integer i : position2store.get(angle).keySet()) {
 					if (!storeAngleToValues.containsKey(angle))
-						storeAngleToValues.put(angle, new LinkedList<Double>());
+						storeAngleToValues.put(angle, new LinkedList<BooleanDouble>());
 					while (storeAngleToValues.get(angle).size() <= i)
 						storeAngleToValues.get(angle).add(null);
-					storeAngleToValues.get(angle).set(i, position2store.get(angle).get(i));
+					{
+						Boolean flag = null;
+						if (position2isUpperTrueIsLowerFalse != null && position2isUpperTrueIsLowerFalse.get(angle) != null)
+							flag = position2isUpperTrueIsLowerFalse.get(angle).get(i);
+						storeAngleToValues.get(angle).set(i, new BooleanDouble(position2store.get(angle).get(i), flag));
+					}
 				}
 		
 		for (CameraType ct : CameraType.values()) {
@@ -408,7 +414,7 @@ public class SnapshotDataIAP {
 				int[] ia = getIntArray(ar);
 				for (int angle : ia) {
 					if (!storeAngleToValues.containsKey((double) angle))
-						storeAngleToValues.put((double) angle, new LinkedList<Double>());
+						storeAngleToValues.put((double) angle, new LinkedList<BooleanDouble>());
 				}
 			}
 		}
@@ -443,9 +449,22 @@ public class SnapshotDataIAP {
 				position2store.put(angle, new TreeMap<Integer, Double>());
 				int n = storeAngleToValues.get(angle).size();
 				for (int i = 0; i < n; i++) {
-					Double d = storeAngleToValues.get(angle).get(i);
+					BooleanDouble d = storeAngleToValues.get(angle).get(i);
 					if (d != null)
-						position2store.get(angle).put(i, d);
+						position2store.get(angle).put(i, d.value);
+				}
+			}
+		}
+		
+		if (storeAngleToValues != null && storeAngleToValues.size() > 0) {
+			position2isUpperTrueIsLowerFalse = new TreeMap<>();
+			for (Double angle : storeAngleToValues.keySet()) {
+				position2isUpperTrueIsLowerFalse.put(angle, new TreeMap<Integer, Boolean>());
+				int n = storeAngleToValues.get(angle).size();
+				for (int i = 0; i < n; i++) {
+					BooleanDouble d = storeAngleToValues.get(angle).get(i);
+					if (d != null && d.flag != null)
+						position2isUpperTrueIsLowerFalse.get(angle).put(i, d.flag);
 				}
 			}
 		}
@@ -515,7 +534,7 @@ public class SnapshotDataIAP {
 				StringBuilder columnData = new StringBuilder();
 				for (int i = 0; i < nmax; i++) {
 					columnData.append(separator);
-					Double v = i < storeAngleToValues.get(angle).size() ? storeAngleToValues.get(angle).get(i) : null;
+					Double v = i < storeAngleToValues.get(angle).size() ? storeAngleToValues.get(angle).get(i).value : null;
 					if (v != null && !Double.isNaN(v) && !Double.isInfinite(v)) {
 						if (!numberFormat_deTrue_enFalse)
 							columnData.append(v);
@@ -534,7 +553,7 @@ public class SnapshotDataIAP {
 					if (Math.abs(-angle - 1) < 0.00001) {
 						rowType = "top" + separator + enDe(numberFormat_deTrue_enFalse, 0d + "");
 					} else
-						if (Math.abs(-angle - 720) < 0.00001) {
+						if (Math.abs(-angle + NO_ANGLE) < 0.00001) {
 							rowType = "combined" + separator;
 							addWater = true;
 						} else {
@@ -596,12 +615,20 @@ public class SnapshotDataIAP {
 			return v + "";
 	}
 	
-	public void storeValue(Integer idx, Double value) {
+	public void storeValue(Integer idx, Double value, boolean isLowerOutlier, boolean isUpperOutlier) {
 		if (position2store == null)
 			position2store = new TreeMap<Double, TreeMap<Integer, Double>>();
 		if (!position2store.containsKey(NO_ANGLE))
 			position2store.put(NO_ANGLE, new TreeMap<Integer, Double>());
 		position2store.get(NO_ANGLE).put(idx, value);
+		
+		if (isLowerOutlier || isUpperOutlier) {
+			if (position2isUpperTrueIsLowerFalse == null)
+				position2isUpperTrueIsLowerFalse = new TreeMap<Double, TreeMap<Integer, Boolean>>();
+			if (!position2isUpperTrueIsLowerFalse.containsKey(NO_ANGLE))
+				position2isUpperTrueIsLowerFalse.put(NO_ANGLE, new TreeMap<Integer, Boolean>());
+			position2isUpperTrueIsLowerFalse.get(NO_ANGLE).put(idx, isUpperOutlier);
+		}
 	}
 	
 	public Double getStoreValue(Integer idx) {
@@ -669,7 +696,7 @@ public class SnapshotDataIAP {
 		return sequence;
 	}
 	
-	public void storeAngleValue(int idx, Double position, double value, boolean isTop) {
+	public void storeAngleValue(int idx, Double position, double value, boolean isTop, boolean isLowerOutlier, boolean isUpperOutlier) {
 		if (position == null)
 			if (isTop)
 				position = -1d;
@@ -683,6 +710,13 @@ public class SnapshotDataIAP {
 		if (!position2store.containsKey(position))
 			position2store.put(position, new TreeMap<Integer, Double>());
 		position2store.get(position).put(idx, value);
+		if (isLowerOutlier || isUpperOutlier) {
+			if (position2isUpperTrueIsLowerFalse == null)
+				position2isUpperTrueIsLowerFalse = new TreeMap<Double, TreeMap<Integer, Boolean>>();
+			if (!position2isUpperTrueIsLowerFalse.containsKey(position))
+				position2isUpperTrueIsLowerFalse.put(position, new TreeMap<Integer, Boolean>());
+			position2isUpperTrueIsLowerFalse.get(position).put(idx, isUpperOutlier);
+		}
 	}
 	
 	public ArrayList<ArrayList<DateDoubleString>> getCSVobjects(UrlCacheManager urlManager) {
@@ -748,7 +782,7 @@ public class SnapshotDataIAP {
 						row.add(new DateDoubleString("top"));
 						row.add(new DateDoubleString(0));
 					} else
-						if (Math.abs(-angle - 720) < 0.00001) {
+						if (Math.abs(-angle + NO_ANGLE) < 0.00001) {
 							row.add(new DateDoubleString("combined"));
 							row.add(null);
 							addWater = true;
@@ -786,9 +820,9 @@ public class SnapshotDataIAP {
 				row.add(new DateDoubleString(s.getConfigList(urlManager, CameraType.UNKNOWN, angle)));
 				int n = storeAngleToValues.get(angle).size();
 				for (int i = 0; i < n; i++) {
-					Double v = storeAngleToValues.get(angle).get(i);
-					if (v != null && !Double.isNaN(v) && !Double.isInfinite(v)) {
-						row.add(new DateDoubleString(v));
+					BooleanDouble v = storeAngleToValues.get(angle).get(i);
+					if (v != null && !Double.isNaN(v.value) && !Double.isInfinite(v.value)) {
+						row.add(new DateDoubleString(v.value, v.flag));
 					} else
 						row.add(null);
 				}

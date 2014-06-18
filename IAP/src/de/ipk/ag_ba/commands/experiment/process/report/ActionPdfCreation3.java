@@ -51,12 +51,15 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.plugins.outlier.OutlierAnalysisGlobal;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 
 /**
@@ -85,7 +88,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	private ExperimentInterface ratioExperiment;
 	
 	private boolean ratioCalc;
-	
+	private boolean xlsxJPGdisabled = false;
 	private final boolean xlsx;
 	
 	private NavigationButton src;
@@ -328,7 +331,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			if (!xlsx)
 				return "Create CSV File" + add;
 			else
-				return "Create Spreadsheet (" + (xlsx ? "XLSX+JPG" : "CSV") + ")" + add;
+				return "Create Spreadsheet (" + (xlsx ?
+						(xlsxJPGdisabled ? "XLSX" : "XLSX+JPG")
+						: "CSV") + ")" + add;
 		}
 		if (SystemAnalysis.isHeadless()) {
 			return "Create Report" + (xlsx ? " (XLSX)" : "")
@@ -436,6 +441,32 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			if (!clustering)
 				row2col2value = null;
 			
+			HashSet<NumericMeasurement> lowerSingle = new HashSet<NumericMeasurement>();
+			HashSet<NumericMeasurement> upperSingle = new HashSet<NumericMeasurement>();
+			
+			HashSet<SampleInterface> lowerCombined = new HashSet<SampleInterface>();
+			HashSet<SampleInterface> upperCombined = new HashSet<SampleInterface>();
+			if (xlsx) {
+				if (SystemOptions.getInstance().getBoolean("Export", "XLSX-Outliers do Grubbs Test", true)) {
+					if (status != null)
+						status.setCurrentStatusText2("Analyse replicates (for outliers)");
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set");
+					double threshold = SystemOptions.getInstance().getDouble("Export", "XLSX-Outliers Threshold", 0.05);
+					boolean considerCondition = SystemOptions.getInstance().getBoolean("Export", "XLSX-Outliers Consider Metadata Condition", true);
+					{
+						OutlierAnalysisGlobal oa = new OutlierAnalysisGlobal(threshold, considerCondition, getExperimentReference(), lowerSingle, upperSingle, null,
+								null, false);
+						oa.analyse();
+					}
+					{
+						OutlierAnalysisGlobal oa = new OutlierAnalysisGlobal(threshold, considerCondition, getExperimentReference(), null, null, lowerCombined,
+								upperCombined,
+								true);
+						oa.analyse();
+					}
+				}
+			}
+			
 			if (status != null)
 				status.setCurrentStatusText2("Create snapshots");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set");
@@ -448,7 +479,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				snapshots = IAPservice.getSnapshotsFromExperiment(
 						urlManager, experiment, indexInfo, false,
 						exportIndividualAngles.getBval(0, false), exportIndividualReplicates.getBval(0, false), snFilter, status, optCustomSubsetDef,
-						exportCommand);
+						exportCommand, lowerSingle, upperSingle, lowerCombined, upperCombined);
 				if (snapshots != null && snaphotVisitor != null)
 					for (SnapshotDataIAP s : snapshots)
 						snaphotVisitor.visit(s);
@@ -497,7 +528,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					path = target.getAbsolutePath() + "/images";
 					if (!new File(path).exists())
 						new File(path).mkdirs();
-				}
+				} else
+					xlsxJPGdisabled = true;
 				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status, urlManager, path);
 				snapshots = null;
 			} else {
@@ -810,6 +842,25 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		hlink_font.setColor(IndexedColors.BLUE.getIndex());
 		hlink_style.setFont(hlink_font);
 		
+		org.apache.poi.ss.usermodel.Font upperOutlierFont = sheet.getWorkbook().createFont();
+		upperOutlierFont.setColor(IndexedColors.RED.getIndex());
+		org.apache.poi.ss.usermodel.Font lowerOutlierFont = sheet.getWorkbook().createFont();
+		lowerOutlierFont.setColor(IndexedColors.BLUE.getIndex());
+		
+		CellStyle upperOutlierPercentage = sheet.getWorkbook().createCellStyle();
+		upperOutlierPercentage.setDataFormat(createHelper.createDataFormat().getFormat("0.00%"));
+		upperOutlierPercentage.setFont(upperOutlierFont);
+		
+		CellStyle upperOutlierNoPercentage = sheet.getWorkbook().createCellStyle();
+		upperOutlierNoPercentage.setFont(upperOutlierFont);
+		
+		CellStyle lowerOutlierPercentage = sheet.getWorkbook().createCellStyle();
+		lowerOutlierPercentage.setDataFormat(createHelper.createDataFormat().getFormat("0.00%"));
+		lowerOutlierPercentage.setFont(lowerOutlierFont);
+		
+		CellStyle lowerOutlierNoPercentage = sheet.getWorkbook().createCellStyle();
+		lowerOutlierNoPercentage.setFont(lowerOutlierFont);
+		
 		HashSet<Integer> percentColumns = new HashSet<Integer>();
 		HashSet<Integer> dateColumns = new HashSet<Integer>();
 		for (int i = 0; i < excelColumnHeaders.size(); i++) {
@@ -908,6 +959,21 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 							cell.setCellValue(o.getDouble());
 							if (percentColumns.contains(colNum)) {
 								cell.setCellStyle(cellStylePercent);
+							}
+							if (o.getFlag() != null) {
+								boolean upper = o.getFlag();
+								if (upper) {
+									if (percentColumns.contains(colNum))
+										cell.setCellStyle(upperOutlierPercentage);
+									else
+										cell.setCellStyle(upperOutlierNoPercentage);
+								} else {
+									if (percentColumns.contains(colNum))
+										cell.setCellStyle(lowerOutlierPercentage);
+									else
+										cell.setCellStyle(lowerOutlierNoPercentage);
+									
+								}
 							}
 						} else
 							if (o != null && o.getDate() != null) {
