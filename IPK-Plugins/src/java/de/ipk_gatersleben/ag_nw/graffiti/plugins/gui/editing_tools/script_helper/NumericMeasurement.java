@@ -253,4 +253,10 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		else
 			return getValue() + sd + " " + (getUnit() != null ? getUnit() : "");
 	}
+	
+	public static NumericMeasurement getSimple(Double value) {
+		NumericMeasurement res = new NumericMeasurement(null);
+		res.value = value;
+		return res;
+	}
 }
