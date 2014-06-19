@@ -36,6 +36,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
+import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -46,6 +48,7 @@ import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -924,10 +927,27 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 											} else
 												if (o.getString().endsWith("png") || o.getString().endsWith("tiff") || o.getString().endsWith("tif")) {
 													// convert
-													String of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
+													final String of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
 													try {
-														Image i = new Image(bm.getURL());
-														i.saveToFile(of);
+														final MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+														ResourceIOManager.copyContent(bm.getURL().getInputStream(), out);
+														Runnable rr = new Runnable() {
+															@Override
+															public void run() {
+																MyByteArrayInputStream in = new MyByteArrayInputStream(out.getBuffTrimmed());
+																Image i;
+																try {
+																	i = new Image(in);
+																	i.saveToFile(of);
+																} catch (IOException e) {
+																	System.out.println(SystemAnalysis.getCurrentTime()
+																			+ ">WARNING: Could not create image file in output directory: "
+																			+ e.getMessage());
+																}
+															}
+														};
+														BackgroundThreadDispatcher.addTask(rr, "Convert Image to JPG");
+														
 														ok = true;
 													} catch (Exception e) {
 														System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not create image file in output directory: "
