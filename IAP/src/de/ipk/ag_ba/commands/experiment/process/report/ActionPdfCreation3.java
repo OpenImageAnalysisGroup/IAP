@@ -1043,6 +1043,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			// System.out.println("w=" + sheet.getColumnWidth(i));
 			if (sheet.getColumnWidth(i) > 10000)
 				sheet.setColumnWidth(i, 10000);
+			else
+				if (sheet.getColumnWidth(i) < 10)
+					sheet.setColumnWidth(i, 10000);
 		}
 	}
 	
