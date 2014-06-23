@@ -47,10 +47,21 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 			replaceImage = false;
 			replaceMask = true;
 		}
-		
+		// options for custom lab-filter settings
+		float[] labThresholds = new float[6];
+		if (getBoolean("Use Common Lab-Filter Settings", true)) {
+			labThresholds = new float[] { 0, 255, 0, 255, 0, 120 };
+		} else {
+			labThresholds[0] = (float) getDouble("Min L", 0);
+			labThresholds[1] = (float) getDouble("Max L", 255);
+			labThresholds[2] = (float) getDouble("Min a", 0);
+			labThresholds[3] = (float) getDouble("Max a", 255);
+			labThresholds[4] = (float) getDouble("Min b", 0);
+			labThresholds[5] = (float) getDouble("Max b", 120);
+		}
 		if (vis != null) {
 			if (!getBoolean("Use fixed marker distance", optionsAndResults.getCameraPosition() == CameraPosition.TOP))
-				markerMask = getMarkers(vis.copy(), numericResult);
+				markerMask = getMarkers(vis.copy(), numericResult, labThresholds);
 			
 			int w = vis.getWidth();
 			int h = vis.getHeight();
@@ -161,10 +172,10 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 		return max;
 	}
 	
-	private Image getMarkers(Image image, ArrayList<MarkerPair> result) {
+	private Image getMarkers(Image image, ArrayList<MarkerPair> result, float[] labThresholds) {
 		boolean clearBlueMarkers = getBoolean("Remove blue markers from image", true);
 		ImageOperation io = image.io().searchBlueMarkers(result, optionsAndResults.getCameraPosition(), true, clearBlueMarkers, getInt("Erode", 12),
-				getInt("Dilate", 18), debug);
+				getInt("Dilate", 18), labThresholds, debug);
 		return io != null ? io.getImage() : null;
 	}
 	

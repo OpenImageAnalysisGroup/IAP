@@ -2537,8 +2537,8 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation searchBlueMarkers(
 			ArrayList<MarkerPair> result, CameraPosition typ, boolean maize,
-			boolean clearBlueMarkers, int erode, int dilate, boolean debug) {
-		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), typ, maize, debug);
+			boolean clearBlueMarkers, int erode, int dilate, float[] labThresholds, boolean debug) {
+		BlueMarkerFinder bmf = new BlueMarkerFinder(getImage(), typ, maize, labThresholds, debug);
 		
 		bmf.findCoordinates(ImageOperation.BACKGROUND_COLORint, erode, dilate);
 		

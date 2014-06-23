@@ -24,13 +24,15 @@ public class BlueMarkerFinder {
 	private final int inputImageWidth;
 	private ImageOperation markerPositionsImage;
 	private Vector2i[] regionPositions;
+	private final float[] labThresholds;
 	
-	public BlueMarkerFinder(Image image, CameraPosition typ, boolean maize, boolean debug) {
+	public BlueMarkerFinder(Image image, CameraPosition typ, boolean maize, float[] labThresholds, boolean debug) {
 		this.input = image;
 		this.typ = typ;
 		this.maize = maize;
 		this.inputImageWidth = this.input.getWidth();
 		this.debug = debug;
+		this.labThresholds = labThresholds;
 	}
 	
 	public void findCoordinates(int background, int erode, int dilate) {
@@ -40,8 +42,16 @@ public class BlueMarkerFinder {
 		io1 = io1.canvas().fillRect((int) (w * 0.35d), 0, (int) ((1 - 2 * 0.35) * w), h, background).getImage()
 				.io();
 		
+		float lmin = labThresholds[0];
+		float lmax = labThresholds[1];
+		float amin = labThresholds[2];
+		float amax = labThresholds[3];
+		float bmin = labThresholds[4];
+		float bmax = labThresholds[5];
+		
+		// 0,255,110,140,0,110
 		markerPositionsImage = io1
-				.thresholdLAB(0, 255, 110, 140, 0, 110, background, typ, maize).show("nach lab", debug)
+				.thresholdLAB(lmin, lmax, amin, amax, bmin, bmax, background, typ, maize).show("nach lab", debug)
 				.bm().opening((erode), (dilate)).io()
 				.show("nach opening", debug);
 		
