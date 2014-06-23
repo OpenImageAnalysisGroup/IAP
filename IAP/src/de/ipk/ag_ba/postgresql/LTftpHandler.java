@@ -21,6 +21,7 @@ import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOConfigObject;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.vanted.plugin.VfsFileObject;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 import de.ipk.vanted.util.VfsFileObjectUtil;
@@ -32,6 +33,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
 public class LTftpHandler extends AbstractResourceIOHandler {
 	
 	public static final String PREFIX = "lt-ftp";
+	
+	private static boolean useMongoDB = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use MongoDB data if available", true);
 	
 	private static boolean useSCP = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use SCP instead of FTP", false);
 	private static String ftpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP host", "lemna-db.ipk-gatersleben.de");
@@ -52,6 +55,8 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 	
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
+		useMongoDB = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use MongoDB data if available", true);
+		
 		useSCP = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use SCP instead of FTP", false);
 		ftpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP directory prefix", "/../../data0/pgftp/");
 		ftpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP user", "");
@@ -88,6 +93,19 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 		} catch (Exception e) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not access local file copy for LT file transfer. Error: " + e.getMessage());
 		}
+		
+		try {
+			if (useMongoDB) {
+				for (MongoDB m : MongoDB.getMongos()) {
+					IOurl mu = m.getURLforStoredData(url);
+					if (mu != null)
+						return mu.getInputStream();
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not access MongoDB for cached LT file transfer. Error: " + e.getMessage());
+		}
+		
 		if (url.isEqualPrefix(getPrefix())) {
 			if (useSCP) {
 				String detail = url.getDetail();
@@ -135,6 +153,18 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 		
 		if (url.toString().contains(",")) {
 			url = new IOurl(url.toString().split(",")[0]);
+		}
+		
+		try {
+			if (useMongoDB) {
+				for (MongoDB m : MongoDB.getMongos()) {
+					InputStream muis = m.getURLforStoredData_PreviewStream(url);
+					if (muis != null)
+						return muis;
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not access MongoDB for cached LT file transfer. Error: " + e.getMessage());
 		}
 		
 		return null;
