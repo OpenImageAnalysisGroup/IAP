@@ -131,6 +131,7 @@ public class bUnwarpJ_ implements PlugIn
 				bUnwarpJ_.max_scale_deformation, bUnwarpJ_.divWeight, bUnwarpJ_.curlWeight,
 				bUnwarpJ_.landmarkWeight, bUnwarpJ_.imageWeight, bUnwarpJ_.consistencyWeight,
 				bUnwarpJ_.stopThreshold, bUnwarpJ_.richOutput, bUnwarpJ_.saveTransformation);
+		
 		dialog.showDialog();
 		
 		// If canceled
