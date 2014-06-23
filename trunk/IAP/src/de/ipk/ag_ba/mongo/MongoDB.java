@@ -137,6 +137,8 @@ public class MongoDB {
 		return null;
 	}
 	
+	private static HashMap<String, MongoDB> id2m = new HashMap<>();
+	
 	public static MongoDB getCloud(int idx) {
 		String sec = "GRID-STORAGE-" + (idx + 1);
 		
@@ -160,9 +162,21 @@ public class MongoDB {
 		// defaultCloudInstance.enabled = enabled;
 		// return defaultCloudInstance;
 		// } else {
+		
+		String id = enabled + ";" + displayName + ";" + databaseName + ";" + hostName + ";" + login + ";" + password;
+		synchronized (id2m) {
+			MongoDB mc = id2m.get(id);
+			if (mc != null)
+				return mc;
+			else
+				System.out.println("Cache miss (" + id2m.size() + " entries known): " + id);
+		}
 		MongoDB mm = new MongoDB(displayName, databaseName, hostName,
 				login, password, HashType.MD5);
 		mm.enabled = enabled;
+		synchronized (id2m) {
+			id2m.put(id, mm);
+		}
 		return mm;
 		// }
 	}
@@ -1502,9 +1516,9 @@ public class MongoDB {
 			@Override
 			public void run() {
 				try {
-					if (m!=null)
+					if (m != null)
 						m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
-							"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
+								"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
 				} catch (Exception e1) {
 					ErrorMsg.addErrorMessage(e1);
 				}

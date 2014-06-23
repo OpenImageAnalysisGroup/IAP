@@ -40,6 +40,8 @@ import de.ipk.ag_ba.commands.load_lt.TableDataHeadingRow;
 import de.ipk.ag_ba.datasources.ExperimentLoader;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -143,7 +145,8 @@ public class LTdataExchange implements ExperimentLoader {
 		return result;
 	}
 	
-	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database) throws ClassNotFoundException, SQLException {
+	public synchronized Collection<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database) throws ClassNotFoundException,
+			SQLException, InterruptedException {
 		return getExperimentsInDatabase(user, database, null);
 	}
 	
@@ -151,22 +154,35 @@ public class LTdataExchange implements ExperimentLoader {
 		return dbName != null && (dbName.startsWith("CGH_") || dbName.startsWith("BGH_") || dbName.startsWith("APH_"));
 	}
 	
-	public synchronized ArrayList<ExperimentHeaderInterface> getExperimentsInDatabase(String user, String database,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
-			throws SQLException, ClassNotFoundException {
+	public synchronized ArrayList<ExperimentHeaderInterface> getExperimentsInDatabase(final String user, final String database,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus)
+			throws SQLException, ClassNotFoundException, InterruptedException {
 		if (database == null || database.equals("null")) {
-			ArrayList<ExperimentHeaderInterface> resForAll = new ArrayList<ExperimentHeaderInterface>();
-			for (String db : getDatabases()) {
-				try {
-					ArrayList<ExperimentHeaderInterface> res = null;
-					res = getExperimentsInDatabaseIC(user, db, optStatus);
-					if (res != null && res.size() > 0)
-						resForAll.addAll(res);
-				} catch (Exception e) {
-					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not get list of experiments for LT database " + db + ". Error: "
-							+ e.getMessage());
-				}
+			final ArrayList<ExperimentHeaderInterface> resForAll = new ArrayList<ExperimentHeaderInterface>();
+			ArrayList<LocalComputeJob> jl = new ArrayList<>();
+			for (String dbi : getDatabases()) {
+				final String db = dbi;
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							ArrayList<ExperimentHeaderInterface> res = null;
+							res = getExperimentsInDatabaseIC(user, db, optStatus);
+							if (res != null && res.size() > 0) {
+								synchronized (resForAll) {
+									resForAll.addAll(res);
+								}
+							}
+						} catch (Exception e) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not get list of experiments for LT database " + db + ". Error: "
+									+ e.getMessage());
+						}
+					}
+					
+				};
+				jl.add(BackgroundThreadDispatcher.addTask(r, "check db content " + db));
 			}
+			BackgroundThreadDispatcher.waitFor(jl);
 			return resForAll;
 		} else {
 			ArrayList<ExperimentHeaderInterface> res = null;
