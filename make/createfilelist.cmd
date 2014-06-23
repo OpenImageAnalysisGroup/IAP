@@ -1,27 +1,30 @@
-#!/bin/bash
-cd $(dirname $0)
-echo "Current directory: $(pwd)"
+@echo off
+cd /d %~dp0
+echo Create XML plugin file list...
 
-echo "Create XML file lists..."
+cd ..\Graffiti_Core\build\classes
+echo Core...
+dir *.xml /s /b > plugins1.txt
+cd ..\..\..
 
-cd ../Graffiti_Core/build/classes
-find . | grep "\.xml$" > plugins1.txt
-cd ../../..
+cd Graffiti_Editor\build\classes
+echo Editor...
+dir *.xml /s /b > plugins2.txt
+cd ..\..\..
 
-cd Graffiti_Editor/build/classes/ 
-find . | grep "\.xml$" > plugins2.txt
-cd ../../..
+cd Graffiti_Plugins\build\classes
+echo Plugins...
+dir *.xml /s /b > plugins3.txt
+cd ..\..\..
 
-cd Graffiti_Plugins/build/classes 
-find . | grep "\.xml$" > plugins3.txt
-cd ../../..
+cd IPK-Plugins\build\classes
+echo IPK...
+dir *.xml /s /b > plugins4.txt
+cd ..\..\..
 
-cd IPK-Plugins/build/classes
-find . | grep "\.xml$" > plugins4.txt
-cd ../../..
-
-cd IAP/bin
-find . | grep "\.xml$" > pluginsIAP.txt
+cd IAP\bin
+echo IAP...
+dir *.xml /s /b > pluginsIAP.txt
 
 echo create Cluster Plugin List
 echo "./org/graffiti/plugins/views/defaults/plugin.xml" > plugins_cluster.txt
@@ -62,14 +65,9 @@ echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/gui/layout_control/pluginClust
 
 
 echo create Exclude-List for DBE-Gravisto
-echo "./org/graffiti/plugins/ios/gml/gmlWriter/plugin.xml" > plugins_exclude.txt
-#echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/algorithms/naive_pattern_finder/plugin.xml" >> plugins_exclude.txt
-#echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/layouters/copy_pattern_layout/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/layouters/random/plugin.xml" >> plugins_exclude.txt
 echo "./org/graffiti/plugins/ios/exporters/gmlxml/plugin.xml" >> plugins_exclude.txt
 echo "./org/graffiti/plugins/views/defaults/plugin.xml" >> plugins_exclude.txt
-echo "./org/graffiti/plugins/ios/gml/gmlReader/plugin.xml" >> plugins_exclude.txt
-echo "./org/graffiti/plugins/ios/gml/gmlReader/parser/build.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/gui/info_dialog/plugin.xml" >> plugins_exclude.txt
 echo "./org/graffiti/plugins/guis/switchselections/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/examples/random_node_resizer/plugin.xml" >> plugins_exclude.txt
@@ -86,8 +84,6 @@ echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/plugin.xml" >> plugins_exclude
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/gui/webstart/jarprefs.xml" >> plugins_exclude.txt
 echo "./org/graffiti/plugins/tools/enhancedzoomtool/plugin.xml" >> plugins_exclude.txt
 echo "./org/graffiti/plugins/views/matrix/plugin.xml" >> plugins_exclude.txt
-####echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/gui/fast_view/plugin.xml" >> plugins_exclude.txt
-#echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/misc/print/printer/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/misc/print/preview/plugin.xml" >> plugins_exclude.txt
 echo "./org/jfree/chart/demo/piedata.xml" >> plugins_exclude.txt
 echo "./org/jfree/chart/demo/categorydata.xml" >> plugins_exclude.txt
@@ -125,17 +121,16 @@ echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/gui/graph_colorer/plugin.xml" 
 echo "./org/graffiti/plugins/algorithms/generators/plugin.xml" >> plugins_exclude.txt
 echo "./org/graffiti/plugins/algorithms/randomizedlabeling/plugin.xml" >> plugins_exclude.txt
 echo "./org/graffiti/plugins/algorithms/numbernodes/plugin.xml" >> plugins_exclude.txt
-#echo "./org/graffiti/plugins/ios/importers/graphml/plugin.xml" >> plugins_exclude.txt
-#echo "./org/graffiti/plugins/ios/exporters/graphviz/plugin.xml" >> plugins_exclude.txt
-#echo "./org/graffiti/plugins/ios/exporters/graphml/plugin.xml" >> plugins_exclude.txt
+rem echo "./org/graffiti/plugins/ios/importers/graphml/plugin.xml" >> plugins_exclude.txt
+rem echo "./org/graffiti/plugins/ios/exporters/graphml/plugin.xml" >> plugins_exclude.txt
 echo "./org/graffiti/plugins/ios/exporters/gmlxml/plugin.xml" >> plugins_exclude.txt
-#echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/importers/xgmml/plugin.xml" >> plugins_exclude.txt
+echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/importers/xgmml/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/importers/matrix/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/importers/genophen/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/importers/flatfile/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/exporters/matrix/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/algorithms/collapsed_graph_producer/plugin.xml" >> plugins_exclude.txt
 
-cd ../..
+cd ..\..
 cd make
-echo "READY"
+echo READY
