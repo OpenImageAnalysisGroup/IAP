@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE plugin
+  PUBLIC "-//GRAFFITI/DTD Plugin Descriptin 1.0//EN"
+ "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
+
+<plugin>
+    <author>Christian Klukas, IPK</author>
+    <description>The IPK Default Graffiti View</description>
+
+    <plugindesc>
+        <name>IPK Default View</name>
+        <main>de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.IPKDefaultView</main>
+        <version>1.0.0</version>
+        <available>This plugin is part of the IPK PatternGraffiti Tool.</available>
+   </plugindesc>
+</plugin>

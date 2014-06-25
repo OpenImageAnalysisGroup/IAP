@@ -1,0 +1,59 @@
+// @Select graph-component(s)
+
+import org.graffiti.editor.MainFrame;
+import org.graffiti.help.HelpContext;
+import org.graffiti.plugin.actions.SelectionAction;
+import org.graffiti.selection.Selection;
+import org.graffiti.editor.GraffitiSingleton;
+import org.graffiti.graph.Node;
+import org.graffiti.plugin.algorithm.AbstractAlgorithm;
+import org.graffiti.plugin.parameter.BooleanParameter;
+import org.graffiti.plugin.parameter.Parameter;
+import org.graffiti.selection.Selection;
+import org.graffiti.session.EditorSession;
+
+import java.util.List;
+
+    private void addConnectedNodes(Vector nodes, Node n) {
+        nodes.add(n);
+        Collection neighbours = n.getNeighbors();
+        Iterator it = neighbours.iterator();
+        while (it.hasNext()) {
+           Node nx = (Node)it.next();
+           if (!nodes.contains(nx)) {
+              addConnectedNodes(nodes, nx);
+           }
+        }
+    }
+
+		MainFrame mainFrame = GraffitiSingleton.getInstance().getMainFrame();
+		EditorSession session = mainFrame.getActiveEditorSession();
+		selection = session.
+			getSelectionModel().getActiveSelection();
+			
+		graph = session.getGraph();
+			
+		
+		Collection nodes;
+		if (selection.isEmpty()) {
+			nodes = this.graph.getNodes();
+		} else {
+			nodes = selection.getNodes();
+		}
+
+        Vector toBeDeleted = new Vector();
+            
+        Iterator it = nodes.iterator();
+        while (it.hasNext()) {
+            addConnectedNodes(toBeDeleted, (Node)it.next());
+        }
+        
+        selection.clear();
+
+        for (int i=0; i<toBeDeleted.size(); i++) {
+            Node del = (Node)toBeDeleted.get(i);
+	        selection.add(del);
+	        selection.addAll(del.getEdges());
+        }
+        
+        mainFrame.getActiveEditorSession().getSelectionModel().selectionChanged();
