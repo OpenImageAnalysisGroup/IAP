@@ -17,8 +17,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.view.View;
 
@@ -111,7 +110,8 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 				">Snapshot data set has been created (" + snapshots.size() + " snapshots)");
 		status.setCurrentStatusText2("Snapshot data set has been created (" + snapshots.size() + " snapshots)");
 		
-		Workbook wb = xlsx ? new XSSFWorkbook() : null;
+		SXSSFWorkbook wb = xlsx ? new SXSSFWorkbook() : null;
+		wb.setCompressTempFiles(true);
 		Sheet sheet = xlsx ? wb.createSheet(ActionPdfCreation3.replaceInvalidChars(mappingData.getName())) : null;
 		ArrayList<String> excelColumnHeaders = new ArrayList<String>();
 		if (sheet != null) {
@@ -130,6 +130,7 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 			ActionPdfCreation3.setExcelSheetValues(
 					snapshots, sheet, excelColumnHeaders, status, urlManager, new File(fn).getParent());
 			wb.write(new FileOutputStream(fn));
+			wb.dispose();
 			String tempDirectory = new File(fn).getParent();
 			AttributeHelper.showInFileBrowser(tempDirectory + "", new File(fn).getName());
 		}

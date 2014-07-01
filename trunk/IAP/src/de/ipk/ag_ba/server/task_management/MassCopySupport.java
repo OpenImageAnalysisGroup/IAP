@@ -160,42 +160,42 @@ public class MassCopySupport {
 	private void makeCopyInnerCall(boolean onlyMerge) {
 		// if false, analysis is performed after copying all new experiments
 		// if true, only the newly copied experiments are analyzed
-		boolean analyzeEachCopiedExperiment = false;
+		boolean analyzeEachCopiedExperiment = SystemOptions.getInstance().getBoolean("Watch-Service", "Automatic Analysis After Copy", false);
 		try {
 			if (!onlyMerge)
 				copyMissingOrNewData(analyzeEachCopiedExperiment);
-			boolean analyzeAllExperiments = !analyzeEachCopiedExperiment;
-			if (analyzeAllExperiments) {
-				for (MongoDB m : MongoDB.getMongos()) {
-					status.setCurrentStatusText2("Merge task results");
-					m.processSplitResults().merge(false, getStatusProvider());
-					status.setCurrentStatusText2("Merged task results (" + SystemAnalysis.getCurrentTime() + ")");
-					
-					if (!onlyMerge) {
-						status.setCurrentStatusText2("Delete Experiment History");
-						ActionDeleteHistoryOfAllExperiments delete = new ActionDeleteHistoryOfAllExperiments(m);
-						delete.setStatusProvider(getStatusProvider());
-						delete.performActionCalculateResults(null);
-						status.setCurrentStatusText2("Deleted Experiment History (" + SystemAnalysis.getCurrentTime() + ")");
-						MongoDB.saveSystemMessage("Deleted experiment history (" + m.getDatabaseName() + ")");
-					}
-					
-					if (m.batch().getAll().size() == 0 && !onlyMerge) {
-						// on Saturday, if no analysis is running and no analysis has been scheduled,
-						// the database clean-up is called
-						if (new Date().getDay() == 6) {
-							MongoDB.saveSystemMessage("Database reorganization started (" + m.getDatabaseName() + ")");
-							long startTime = System.currentTimeMillis();
-							m.cleanUp(getStatusProvider(), false);
-							long processingTime = System.currentTimeMillis() - startTime;
-							status.setCurrentStatusText2("Database reorganization finished (took " +
-									SystemAnalysis.getWaitTime(processingTime) + ")");
-							MongoDB.saveSystemMessage("Database reorganization finished (" + m.getDatabaseName() + "), took "
-									+ SystemAnalysis.getWaitTime(processingTime));
-						}
+			// boolean analyzeAllExperiments = !analyzeEachCopiedExperiment;
+			// if (analyzeAllExperiments) {
+			for (MongoDB m : MongoDB.getMongos()) {
+				status.setCurrentStatusText2("Merge task results");
+				m.processSplitResults().merge(false, getStatusProvider());
+				status.setCurrentStatusText2("Merged task results (" + SystemAnalysis.getCurrentTime() + ")");
+				
+				if (!onlyMerge) {
+					status.setCurrentStatusText2("Delete Experiment History");
+					ActionDeleteHistoryOfAllExperiments delete = new ActionDeleteHistoryOfAllExperiments(m);
+					delete.setStatusProvider(getStatusProvider());
+					delete.performActionCalculateResults(null);
+					status.setCurrentStatusText2("Deleted Experiment History (" + SystemAnalysis.getCurrentTime() + ")");
+					MongoDB.saveSystemMessage("Deleted experiment history (" + m.getDatabaseName() + ")");
+				}
+				
+				if (m.batch().getAll().size() == 0 && !onlyMerge) {
+					// on Saturday, if no analysis is running and no analysis has been scheduled,
+					// the database clean-up is called
+					if (new Date().getDay() == 6) {
+						MongoDB.saveSystemMessage("Database reorganization started (" + m.getDatabaseName() + ")");
+						long startTime = System.currentTimeMillis();
+						m.cleanUp(getStatusProvider(), false);
+						long processingTime = System.currentTimeMillis() - startTime;
+						status.setCurrentStatusText2("Database reorganization finished (took " +
+								SystemAnalysis.getWaitTime(processingTime) + ")");
+						MongoDB.saveSystemMessage("Database reorganization finished (" + m.getDatabaseName() + "), took "
+								+ SystemAnalysis.getWaitTime(processingTime));
 					}
 				}
 			}
+			// }
 			if (!onlyMerge) {
 				status.setCurrentStatusText2("<html>Service tasks completed<br>(" + new Date() + ")");
 				status.setCurrentStatusText2("Next sync at 1 AM");
