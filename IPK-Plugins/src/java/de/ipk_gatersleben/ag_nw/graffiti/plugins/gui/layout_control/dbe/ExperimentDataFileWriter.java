@@ -23,8 +23,7 @@ import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -40,7 +39,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
  */
 public class ExperimentDataFileWriter {
 	
-	private Workbook workbook;
+	private SXSSFWorkbook workbook;
 	private Sheet worksheet;
 	private CreationHelper createHelper;
 	
@@ -62,7 +61,7 @@ public class ExperimentDataFileWriter {
 	 * Creates global objects for excel-java interaction, for instance cell styling: color, font.
 	 */
 	private void initHSSFObjects() {
-		workbook = new XSSFWorkbook();
+		workbook = new SXSSFWorkbook();
 		worksheet = workbook.createSheet("Numeric Experiment Data");
 		createHelper = workbook.getCreationHelper();
 		
@@ -547,6 +546,7 @@ public class ExperimentDataFileWriter {
 		OutputStream outStream = new FileOutputStream(excelfile);
 		workbook.write(outStream);
 		outStream.close();
+		workbook.dispose();
 	}
 	
 	private TableData getTableData() {
