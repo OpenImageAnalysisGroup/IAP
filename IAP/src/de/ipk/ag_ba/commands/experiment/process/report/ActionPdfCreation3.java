@@ -502,6 +502,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			System.out.println(SystemAnalysis.getCurrentTime() +
 					">Snapshot data set has been created (" + snapshots.size() + " snapshots)");
 			SXSSFWorkbook wb = xlsx ? new SXSSFWorkbook() : null;
+			wb.setCompressTempFiles(true);
 			Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experiment.getName())) : null;
 			
 			ArrayList<String> excelColumnHeaders = new ArrayList<String>();
@@ -885,6 +886,44 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		for (Integer dateCol : dateColumns)
 			sheet.setColumnWidth(dateCol, 5000);
 		
+		HashMap<String, org.apache.poi.ss.usermodel.Hyperlink> links = new HashMap<String, org.apache.poi.ss.usermodel.Hyperlink>();
+		for (SnapshotDataIAP s : snapshotsToBeProcessed) {
+			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager)) {
+				for (DateDoubleString o : valueRow) {
+					if (o != null && o.getString() != null && !o.getString().isEmpty()) {
+						if (outpath != null)
+							if (o.getLink() != null) {
+								ArrayList<BinaryMeasurement> bin = o.getBinaryData();
+								if (bin != null && !bin.isEmpty() && bin.size() == 1) {
+									for (BinaryMeasurement bm : bin) {
+										if (bm.getURL() != null) {
+											String of = null;
+											if (o.getString().endsWith("jpg")) {
+												of = outpath + "/" + o.getString();
+											} else
+												if (o.getString().endsWith("png") || o.getString().endsWith("tiff") || o.getString().endsWith("tif")) {
+													of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
+												}
+											if (of != null) {
+												org.apache.poi.ss.usermodel.Hyperlink l = createHelper.createHyperlink(Hyperlink.LINK_FILE);
+												
+												String fn = StringManipulationTools.stringReplace(
+														new File(StringManipulationTools.removeFileExtension(o.getString()) + ".jpg").toURI().toString(),
+														" ", "%20");
+												fn = fn.substring(fn.lastIndexOf("/") + 1);
+												l.setAddress("images/" + fn);
+												
+												links.put(of, l);
+											}
+										}
+									}
+								}
+							}
+					}
+				}
+			}
+		}
+		
 		while (!snapshotsToBeProcessed.isEmpty()) {
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
 			sidx++;
@@ -904,75 +943,95 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					if (o != null && o.getString() != null && !o.getString().isEmpty()) {
 						Cell c = row.createCell(colNum++);
 						c.setCellValue(o.getString());
-						if (outpath != null)
+						if (outpath != null) {
 							if (o.getLink() != null) {
 								ArrayList<BinaryMeasurement> bin = o.getBinaryData();
 								boolean ok = false;
 								if (bin != null && !bin.isEmpty() && bin.size() == 1) {
 									for (BinaryMeasurement bm : bin) {
+										String of = null;
 										if (bm.getURL() != null) {
 											if (o.getString().endsWith("jpg")) {
 												// direct copy
 												// StringManipulationTools.removeFileExtension(o.getString()) + ".jpg"
-												String of = outpath + "/" + o.getString();
-												FileOutputStream out;
-												try {
-													out = new FileOutputStream(new File(of));
-													ResourceIOManager.copyContent(bm.getURL().getInputStream(), out);
+												of = outpath + "/" + o.getString();
+												if (new File(of).exists()) {
 													ok = true;
-												} catch (Exception e) {
-													System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not create image file in output directory: "
-															+ e.getMessage());
-												}
-											} else
-												if (o.getString().endsWith("png") || o.getString().endsWith("tiff") || o.getString().endsWith("tif")) {
-													// convert
-													final String of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
+												} else {
+													FileOutputStream out;
 													try {
-														final MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+														out = new FileOutputStream(new File(of));
 														ResourceIOManager.copyContent(bm.getURL().getInputStream(), out);
-														Runnable rr = new Runnable() {
-															@Override
-															public void run() {
-																MyByteArrayInputStream in = new MyByteArrayInputStream(out.getBuffTrimmed());
-																Image i;
-																try {
-																	i = new Image(in);
-																	i.saveToFile(of);
-																} catch (IOException e) {
-																	System.out.println(SystemAnalysis.getCurrentTime()
-																			+ ">WARNING: Could not create image file in output directory: "
-																			+ e.getMessage());
-																}
-															}
-														};
-														BackgroundThreadDispatcher.addTask(rr, "Convert Image to JPG");
-														
 														ok = true;
 													} catch (Exception e) {
 														System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not create image file in output directory: "
 																+ e.getMessage());
 													}
+												}
+											} else
+												if (o.getString().endsWith("png") || o.getString().endsWith("tiff") || o.getString().endsWith("tif")) {
+													// convert
+													of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
+													final String off = of;
+													if (new File(of).exists()) {
+														ok = true;
+													} else {
+														try {
+															final MyByteArrayOutputStream out = new MyByteArrayOutputStream();
+															ResourceIOManager.copyContent(bm.getURL().getInputStream(), out);
+															Runnable rr = new Runnable() {
+																@Override
+																public void run() {
+																	MyByteArrayInputStream in = new MyByteArrayInputStream(out.getBuffTrimmed());
+																	Image i;
+																	try {
+																		i = new Image(in);
+																		i.saveToFile(off);
+																	} catch (IOException e) {
+																		System.out.println(SystemAnalysis.getCurrentTime()
+																				+ ">WARNING: Could not create image file in output directory: "
+																				+ e.getMessage());
+																	}
+																}
+															};
+															BackgroundThreadDispatcher.addTask(rr, "Convert Image to JPG");
+															
+															ok = true;
+														} catch (Exception e) {
+															System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not create image file in output directory: "
+																	+ e.getMessage());
+														}
+													}
 												} else {
 													// ignore
 												}
 										}
+										if (ok) {
+											// add link to image
+											if (of != null) {
+												org.apache.poi.ss.usermodel.Hyperlink file_link = links.get(of);
+												if (file_link != null) {
+													c.setHyperlink(file_link);
+													c.setCellStyle(hlink_style);
+												}
+											}
+										}
 									}
 								}
-								if (ok) {
-									// add link to image
-									org.apache.poi.ss.usermodel.Hyperlink file_link = createHelper.createHyperlink(Hyperlink.LINK_FILE);
-									String fn =
-											StringManipulationTools.stringReplace(
-													new File(StringManipulationTools.removeFileExtension(o.getString()) + ".jpg").toURI().toString(),
-													" ", "%20");
-									fn = fn.substring(fn.lastIndexOf("/") + 1);
-									file_link.setAddress("images/" + fn);
-									
-									c.setHyperlink(file_link);
-									c.setCellStyle(hlink_style);
-								}
+								
 							}
+						}
+						// } else {
+						// org.apache.poi.ss.usermodel.Hyperlink file_link = createHelper.createHyperlink(Hyperlink.LINK_FILE);
+						// String fn =
+						// StringManipulationTools.stringReplace(
+						// new File(StringManipulationTools.removeFileExtension(o.getString()) + ".jpg").toURI().toString(),
+						// " ", "%20");
+						// fn = fn.substring(fn.lastIndexOf("/") + 1);
+						// file_link.setAddress("images/" + fn);
+						// c.setHyperlink(file_link);
+						// c.setCellStyle(hlink_style);
+						// }
 					} else
 						if (o != null && o.getDouble() != null) {
 							Cell cell = row.createCell(colNum++);
