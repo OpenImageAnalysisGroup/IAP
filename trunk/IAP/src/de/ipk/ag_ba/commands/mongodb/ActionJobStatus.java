@@ -263,7 +263,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 				
 				String desc = "<html>" + ehi.getExperimentName() + "<br>"
 						+ " Job submission " + SystemAnalysis.getCurrentTime(b.getSubmissionTime()) + "<br>"
-						+ "(" + b.getRunStatus() + ")";
+						+ "(" + b.getRunStatus().toNiceString() + "";
 				
 				if (!set.containsKey(desc)) {
 					set.put(desc, new ArrayList<NavigationButton>());
@@ -275,14 +275,14 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			for (String desc : set.keySet()) {
 				final String fd = desc;
-				NavigationAction setCmd = new AbstractNavigationAction(desc) {
+				NavigationAction setCmd = new AbstractNavigationAction(desc + ")") {
 					@Override
 					public void performActionCalculateResults(NavigationButton src) throws Exception {
 					}
 					
 					@Override
 					public String getDefaultTitle() {
-						return "<html><center>" + fd + " (" + set.get(fd).size()
+						return "<html><center>" + fd + ": " + set.get(fd).size()
 								+ "/" + setMaxSize.get(fd) + ")";
 					}
 					
@@ -361,7 +361,6 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		}
 		return null;
 	}
-
 	
 	@Override
 	public boolean requestTitleUpdates() {
