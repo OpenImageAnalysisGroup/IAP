@@ -623,4 +623,9 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		s.append("</table></html>");
 		return s.toString();
 	}
+	
+	@Override
+	public boolean hasAnalysSettings() {
+		return settings != null && !settings.isEmpty();
+	}
 }

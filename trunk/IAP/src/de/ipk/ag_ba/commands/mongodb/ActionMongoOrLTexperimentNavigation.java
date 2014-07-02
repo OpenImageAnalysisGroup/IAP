@@ -165,7 +165,10 @@ public class ActionMongoOrLTexperimentNavigation extends
 					&& header.getExperimentType().equals(
 							IAPexperimentTypes.BarleyGreenhouse))
 				return "img/000Grad_3.png";
-			return "img/ext/image-x-generic-off.png";
+			if (!header.hasAnalysSettings())
+				return "img/ext/image-x-generic-off.png";
+			else
+				return "img/ext/image-x-generic-off-with-settings.png";
 		}
 	}
 	
@@ -194,7 +197,10 @@ public class ActionMongoOrLTexperimentNavigation extends
 					&& header.getExperimentType().equals(
 							IAPexperimentTypes.BarleyGreenhouse))
 				return "img/000Grad_3.png";
-			return "img/ext/image-x-generic.png";
+			if (!header.hasAnalysSettings())
+				return "img/ext/image-x-generic.png";
+			else
+				return "img/ext/image-x-generic-with-settings.png";
 		}
 	}
 	
