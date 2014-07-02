@@ -160,7 +160,7 @@ public class MassCopySupport {
 	private void makeCopyInnerCall(boolean onlyMerge) {
 		// if false, analysis is performed after copying all new experiments
 		// if true, only the newly copied experiments are analyzed
-		boolean analyzeEachCopiedExperiment = SystemOptions.getInstance().getBoolean("Watch-Service", "Automatic Analysis After Copy", false);
+		boolean analyzeEachCopiedExperiment = SystemOptions.getInstance().getBoolean("Watch-Service", "Automatic Copy//Automatic Analysis After Copy", false);
 		try {
 			if (!onlyMerge)
 				copyMissingOrNewData(analyzeEachCopiedExperiment);
