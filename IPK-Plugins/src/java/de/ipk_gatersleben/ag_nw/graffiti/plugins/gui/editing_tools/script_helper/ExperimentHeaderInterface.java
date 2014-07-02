@@ -154,4 +154,6 @@ public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderIn
 	public void setExperimentHeaderHelper(ExperimentHeaderHelper ehh);
 	
 	public String toHtmlString();
+	
+	public boolean hasAnalysSettings();
 }
