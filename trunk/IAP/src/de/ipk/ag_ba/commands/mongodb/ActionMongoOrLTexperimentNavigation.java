@@ -155,16 +155,20 @@ public class ActionMongoOrLTexperimentNavigation extends
 		else {
 			if (header.getExperimentType() != null
 					&& header.getExperimentType().equals(
-							IAPexperimentTypes.Phytochamber))
+							IAPexperimentTypes.Phytochamber.toString()))
 				return "img/ext/phyto.png";
 			if (header.getExperimentType() != null
 					&& header.getExperimentType().equals(
-							IAPexperimentTypes.MaizeGreenhouse))
+							IAPexperimentTypes.MaizeGreenhouse.toString()))
 				return "img/maisMultipleScaled.png";
 			if (header.getExperimentType() != null
 					&& header.getExperimentType().equals(
-							IAPexperimentTypes.BarleyGreenhouse))
+							IAPexperimentTypes.BarleyGreenhouse.toString()))
 				return "img/000Grad_3.png";
+			if (header.getExperimentType() != null
+					&& header.getExperimentType().equals(
+							IAPexperimentTypes.AnalysisResults.toString()))
+				return "img/ext/applications-office.png";
 			if (!header.hasAnalysSettings())
 				return "img/ext/image-x-generic-off.png";
 			else
@@ -187,16 +191,20 @@ public class ActionMongoOrLTexperimentNavigation extends
 		else {
 			if (header.getExperimentType() != null
 					&& header.getExperimentType().equals(
-							IAPexperimentTypes.Phytochamber))
+							IAPexperimentTypes.Phytochamber.toString()))
 				return "img/ext/phyto.png";
 			if (header.getExperimentType() != null
 					&& header.getExperimentType().equals(
-							IAPexperimentTypes.MaizeGreenhouse))
+							IAPexperimentTypes.MaizeGreenhouse.toString()))
 				return "img/maisMultipleScaled.png";
 			if (header.getExperimentType() != null
 					&& header.getExperimentType().equals(
-							IAPexperimentTypes.BarleyGreenhouse))
+							IAPexperimentTypes.BarleyGreenhouse.toString()))
 				return "img/000Grad_3.png";
+			if (header.getExperimentType() != null
+					&& header.getExperimentType().equals(
+							IAPexperimentTypes.AnalysisResults.toString()))
+				return "img/ext/applications-office.png";
 			if (!header.hasAnalysSettings())
 				return "img/ext/image-x-generic.png";
 			else
