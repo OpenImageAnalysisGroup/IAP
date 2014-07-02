@@ -56,8 +56,8 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProviderSuppo
 	public String getCurrentStatusMessage1() {
 		try {
 			return "<html>" + (cmd.getOwner() != null ? "Owner: " + cmd.getNiceOwner() + "<br>" : "") +
-					"Status: " + cmd.getRunStatus().toString()
-					+ (cmd.getCurrentStatusMessage1() != null ? "<br>" + cmd.getCurrentStatusMessage1() : "");
+					"Status: " + cmd.getRunStatus().toNiceString()
+					+ (cmd.getCurrentStatusMessage1() != null ? ", " + cmd.getCurrentStatusMessage1().toLowerCase() : "");
 		} catch (NullPointerException npe) {
 			return "";
 		}
@@ -89,7 +89,7 @@ public class MongoJobStatusProvider implements BackgroundTaskStatusProviderSuppo
 	
 	@Override
 	public void setCurrentStatusValueFine(double value) {
-		// 
+		//
 		
 	}
 	

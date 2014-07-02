@@ -261,6 +261,10 @@ public class NavigationButton implements StyleAware {
 				sm1 = action.getStatusProvider().getCurrentStatusMessage1();
 				sm2 = action.getStatusProvider().getCurrentStatusMessage2();
 				sm3 = action.getStatusProvider().getCurrentStatusMessage3();
+				if (sm2 != null && sm2.startsWith("<br>"))
+					sm2 = sm2.substring("<br>".length());
+				if (sm3 != null && sm3.startsWith("<br>"))
+					sm3 = sm3.substring("<br>".length());
 			}
 			if (sm1 != null && sm1.length() > 0)
 				line2 = sm1;
