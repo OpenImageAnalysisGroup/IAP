@@ -21,7 +21,7 @@ public class ActionMetaData extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		res.clear();
 		LTdataExchange lt = new LTdataExchange();
-		status.setCurrentStatusText1("Enumerate MetaData Information...");
+		status.setCurrentStatusText1("Enumerate Meta-Data Information...");
 		final TreeMap<String, ArrayList<NavigationButton>> db2el = new TreeMap<String, ArrayList<NavigationButton>>();
 		for (String db : lt.getDatabases()) {
 			try {
