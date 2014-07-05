@@ -54,6 +54,8 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_actions.SideGuiComponent;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.MyUtility;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -181,8 +183,49 @@ public class NavigationButton implements StyleAware {
 				return null;
 	}
 	
+	private String lastTitle = null;
+	private boolean requestingTitle = false;
+	private WeakReference<JButton> weakButtonReference;
+	
 	public String getTitle() {
-		String res = getTitle(false);
+		Runnable r = new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					NavigationButton.this.lastTitle = getTitle(false);
+				} finally {
+					synchronized (NavigationButton.this) {
+						requestingTitle = false;
+						final JButton jb = weakButtonReference != null ? weakButtonReference.get() : null;
+						if (jb != null)
+							SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									jb.setText(NavigationButton.this.lastTitle);
+									jb.revalidate();
+									jb.repaint();
+								}
+							});
+					}
+				}
+			}
+		};
+		LocalComputeJob l = null;
+		synchronized (NavigationButton.this) {
+			if (!requestingTitle) {
+				requestingTitle = true;
+				try {
+					l = BackgroundThreadDispatcher.addTask(r, "update button text");
+				} catch (InterruptedException e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+			}
+		}
+		if (l != null)
+			BackgroundThreadDispatcher.waitForResultWithTimeout(l, 100);
+		
+		String res = lastTitle != null ? lastTitle : "<html><font color='gray'>...";
 		return res != null ? res : res + "";
 	}
 	
@@ -758,7 +801,7 @@ public class NavigationButton implements StyleAware {
 		
 		final NavigationAction ac = n.action;
 		
-		final JButton n1 = new JButton("" + n.getTitle()) {
+		final JButton n1 = new JButton() {
 			private static final long serialVersionUID = 1L;
 			
 			boolean removeCalled = false;
@@ -788,6 +831,9 @@ public class NavigationButton implements StyleAware {
 			}
 			
 		};
+		n.setButton(new WeakReference<JButton>(n1));
+		n.getTitle();
+		
 		n1.setToolTipText(n.getToolTip());
 		
 		if (n.getAction() != null && !n.enabled)
@@ -1042,6 +1088,10 @@ public class NavigationButton implements StyleAware {
 		// return mc;
 		// } else
 		return rr;
+	}
+	
+	private void setButton(WeakReference<JButton> weakButtonReference) {
+		this.weakButtonReference = weakButtonReference;
 	}
 	
 	protected void setLastEvent(ActionEvent lastEvent) {
