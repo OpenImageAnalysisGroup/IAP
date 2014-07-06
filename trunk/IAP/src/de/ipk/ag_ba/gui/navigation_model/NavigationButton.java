@@ -55,7 +55,6 @@ import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_actions.SideGuiComponent;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.MyUtility;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -211,15 +210,12 @@ public class NavigationButton implements StyleAware {
 				}
 			}
 		};
-		LocalComputeJob l = null;
+		Thread l = null;
 		synchronized (NavigationButton.this) {
 			if (!requestingTitle) {
 				requestingTitle = true;
-				try {
-					l = BackgroundThreadDispatcher.addTask(r, "update button text");
-				} catch (InterruptedException e) {
-					ErrorMsg.addErrorMessage(e);
-				}
+				l = new Thread(r, "update button text");
+				l.start();
 			}
 		}
 		if (l != null)
