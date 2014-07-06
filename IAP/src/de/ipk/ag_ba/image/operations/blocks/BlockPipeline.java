@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
-import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.preprocessing.WellProcessor;
 import iap.pipelines.ImageProcessorOptionsAndResults;
@@ -262,16 +261,15 @@ public class BlockPipeline {
 	}
 	
 	private void updateBlockStatistics(int nBlocks) {
+		overallBlockExecutions += nBlocks;
 		Calendar calendar = new GregorianCalendar();
 		int minute = calendar.get(Calendar.MINUTE);
 		lastBlockUpdate = System.currentTimeMillis();
-		synchronized (BlockPipeline.class) {
-			blockExecutionsWithinCurrentMinute += nBlocks;
-			if (currentMinuteB != minute) {
-				blockExecutionWithinLastMinute = blockExecutionsWithinCurrentMinute;
-				blockExecutionsWithinCurrentMinute = 0;
-				currentMinuteB = minute;
-			}
+		blockExecutionsWithinCurrentMinute += nBlocks;
+		if (currentMinuteB != minute) {
+			blockExecutionWithinLastMinute = blockExecutionsWithinCurrentMinute;
+			blockExecutionsWithinCurrentMinute = 0;
+			currentMinuteB = minute;
 		}
 	}
 	
@@ -279,6 +277,11 @@ public class BlockPipeline {
 		return blockExecutionWithinLastMinute;
 	}
 	
+	public static long getBlockExecutionsOverall() {
+		return overallBlockExecutions;
+	}
+	
+	private static long overallBlockExecutions = 0;
 	private static int blockExecutionWithinLastMinute = 0;
 	private static int blockExecutionsWithinCurrentMinute = 0;
 	private static int currentMinuteB = -1;
