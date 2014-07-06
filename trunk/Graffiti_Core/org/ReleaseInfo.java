@@ -243,13 +243,13 @@ public class ReleaseInfo implements HelperClass {
 		String home = System.getProperty("user.home");
 		boolean windows = false;
 		if (SystemInfo.isMac())
-			home = home + getFileSeparator() + "Library" + getFileSeparator()
+			home = home + SystemAnalysis.getFileSeparator() + "Library" + SystemAnalysis.getFileSeparator()
 					+ "Preferences";
 		else {
-			if (new File(home + getFileSeparator() + "AppData"
-					+ getFileSeparator() + "Roaming").isDirectory()) {
-				home = home + getFileSeparator() + "AppData"
-						+ getFileSeparator() + "Roaming";
+			if (new File(home + SystemAnalysis.getFileSeparator() + "AppData"
+					+ SystemAnalysis.getFileSeparator() + "Roaming").isDirectory()) {
+				home = home + SystemAnalysis.getFileSeparator() + "AppData"
+						+ SystemAnalysis.getFileSeparator() + "Roaming";
 				windows = true;
 			} else {
 				String hhh = System.getenv("APPDATA");
@@ -264,32 +264,32 @@ public class ReleaseInfo implements HelperClass {
 		
 		if (SystemInfo.isMac() || windows) {
 			if (getRunningReleaseStatus() == Release.KGML_EDITOR)
-				return home + getFileSeparator() + "IAP_KGML_EDITOR";
+				return home + SystemAnalysis.getFileSeparator() + "IAP_KGML_EDITOR";
 			else
-				return home + getFileSeparator() + HomeFolder.WIN_MAC_HOMEFOLDER;
+				return home + SystemAnalysis.getFileSeparator() + HomeFolder.WIN_MAC_HOMEFOLDER;
 		} else {
 			if (getRunningReleaseStatus() == Release.KGML_EDITOR)
-				return home + getFileSeparator() + ".iap_kgml_editor";
+				return home + SystemAnalysis.getFileSeparator() + ".iap_kgml_editor";
 			else
-				return home + getFileSeparator() + HomeFolder.LINUX_HOMEFOLDER;
+				return home + SystemAnalysis.getFileSeparator() + HomeFolder.LINUX_HOMEFOLDER;
 		}
 	}
 	
 	private static String getAppFolderNameOldStyle() {
 		String home = System.getProperty("user.home");
 		if (getRunningReleaseStatus() == Release.KGML_EDITOR)
-			return home + getFileSeparator() + ".iap_kgml_editor";
+			return home + SystemAnalysis.getFileSeparator() + ".iap_kgml_editor";
 		else
-			return home + getFileSeparator() + HomeFolder.WIN_MAC_HOMEFOLDER_OLD;
+			return home + SystemAnalysis.getFileSeparator() + HomeFolder.WIN_MAC_HOMEFOLDER_OLD;
 	}
 	
 	public static String getFileSeparator() {
-		return System.getProperty("file.separator");
+		return SystemAnalysis.getFileSeparator();
 	}
 	
 	public static String getAppFolderWithFinalSep() {
 		String r = getAppFolder();
-		return r + getFileSeparator();
+		return r + SystemAnalysis.getFileSeparator();
 	}
 	
 	public static String getAppWebURL() {
@@ -407,7 +407,7 @@ public class ReleaseInfo implements HelperClass {
 	
 	public static String getAppSubdirFolder(String subDir1, String subDir2) {
 		String folder1 = getAppFolderWithFinalSep() + subDir1;
-		String folder2 = folder1 + getFileSeparator() + subDir2;
+		String folder2 = folder1 + SystemAnalysis.getFileSeparator() + subDir2;
 		File dir = new File(folder1);
 		if (!dir.exists())
 			dir.mkdir();
@@ -418,12 +418,12 @@ public class ReleaseInfo implements HelperClass {
 	}
 	
 	public static String getAppSubdirFolderWithFinalSep(String folderName) {
-		return getAppSubdirFolder(folderName) + getFileSeparator();
+		return getAppSubdirFolder(folderName) + SystemAnalysis.getFileSeparator();
 	}
 	
 	public static String getAppSubdirFolderWithFinalSep(String folderName,
 			String folderName2) {
-		return getAppSubdirFolder(folderName, folderName2) + getFileSeparator();
+		return getAppSubdirFolder(folderName, folderName2) + SystemAnalysis.getFileSeparator();
 	}
 	
 	/**
@@ -434,8 +434,7 @@ public class ReleaseInfo implements HelperClass {
 	}
 	
 	public static String getDesktopFolder() {
-		String home = System.getProperty("user.home");
-		return home + File.separator + "Desktop";
+		return SystemAnalysis.getDesktopFolder();
 	}
 	
 	public static void setPreventSystemExitUponWindowClose(boolean preventSystemExit) {

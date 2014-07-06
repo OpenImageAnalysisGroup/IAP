@@ -486,4 +486,13 @@ public class SystemAnalysis {
 			return false;
 		}
 	}
+
+	public static String getDesktopFolder() {
+		String home = System.getProperty("user.home");
+		return home + File.separator + "Desktop";
+	}
+
+	public static String getFileSeparator() {
+		return System.getProperty("file.separator");
+	}
 }
