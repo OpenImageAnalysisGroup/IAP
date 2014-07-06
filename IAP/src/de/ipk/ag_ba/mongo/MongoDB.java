@@ -31,6 +31,7 @@ import javax.imageio.ImageIO;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -69,7 +70,6 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
-import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -1378,7 +1378,14 @@ public class MongoDB {
 					Date l = (Date) newsItem.get("date");
 					String text = (String) newsItem.get("text");
 					String user = (String) newsItem.get("user");
-					res.add(sdf.format(l) + ": " + text + " (" + user + ")");
+					String systemuser = (String) newsItem.get("systemuser");
+					String systemhost = (String) newsItem.get("systemhost");
+					String systemiap = (String) newsItem.get("systemiap");
+					String inf = "";
+					if (systemuser != null || systemhost != null)
+						inf = " (" + systemuser + "@" + systemhost + ")";
+					res.add("<b>" + sdf.format(l) + inf + ":</b> " + StringManipulationTools.removeHTMLtags(text) + " (" + user
+							+ ")" + (systemiap != null ? " // " + systemiap : ""));
 				}
 			}
 			
@@ -1401,7 +1408,14 @@ public class MongoDB {
 				ni.put("date", new Date());
 				ni.put("text", text);
 				ni.put("user", user);
-				db.getCollection("news").insert(ni, WriteConcern.JOURNALED);
+				ni.put("systemiap", ReleaseInfo.IAP_VERSION_STRING);
+				ni.put("systemuser", SystemAnalysis.getUserName());
+				try {
+					ni.put("systemhost", SystemAnalysis.getLocalHost().getCanonicalHostName());
+				} catch (UnknownHostException e) {
+					ni.put("systemhost", "error=" + e.getMessage());
+				}
+				db.getCollection("news").insert(ni, WriteConcern.ACKNOWLEDGED);
 			}
 			
 			@Override
@@ -1517,8 +1531,8 @@ public class MongoDB {
 			public void run() {
 				try {
 					if (m != null)
-						m.addNewsItem(SystemAnalysis.getCurrentTime() + ">" + msg,
-								"system-msg/" + SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameNiceNoError());
+						m.addNewsItem(msg,
+								"system-msg");
 				} catch (Exception e1) {
 					ErrorMsg.addErrorMessage(e1);
 				}

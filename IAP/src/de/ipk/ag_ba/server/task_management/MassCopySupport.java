@@ -318,7 +318,7 @@ public class MassCopySupport {
 			if (!simulate)
 				copyAction.performActionCalculateResults(null);
 			print("Copied " + toBeSaved.Id + " to " + m.getDatabaseName());
-			MongoDB.saveSystemMessage(SystemAnalysisExt.getHostNameNiceNoError() + ": Copied " + toBeSaved.Id + " to " + m.getDatabaseName());
+			MongoDB.saveSystemMessage("Copied " + toBeSaved.Id + " to " + m.getDatabaseName());
 			done++;
 			status.setCurrentStatusValueFine(100d * done / toSave.size());
 			

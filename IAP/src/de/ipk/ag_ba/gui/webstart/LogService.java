@@ -2,7 +2,6 @@ package de.ipk.ag_ba.gui.webstart;
 
 import java.util.Stack;
 
-import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.IAPoptions;
@@ -10,14 +9,16 @@ import de.ipk.ag_ba.mongo.MongoDB;
 
 public class LogService {
 	
-	private static boolean ba13reachable = MongoDB.getDefaultCloud() == null ? false : MongoDB.getDefaultCloud().isDbHostReachable();
+	private static boolean isDefaultCloudReachable() {
+		return MongoDB.getDefaultCloud() == null ? false : MongoDB.getDefaultCloud().isDbHostReachable();
+	}
 	
 	public String getLatestNews(final int n, String pre, final String preLine, String lineBreak, String follow) {
 		if (n < 1)
 			return "";
 		StringBuilder res = new StringBuilder();
 		final Stack<String> news = new Stack<String>();
-		if (!ba13reachable) {
+		if (!isDefaultCloudReachable()) {
 			news.add(preLine
 					+ SystemAnalysis.getCurrentTime()
 					+ ": Data Processing database is not reachable at network level (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
@@ -28,21 +29,12 @@ public class LogService {
 					public void run() {
 						MongoDB dc = MongoDB.getDefaultCloud();
 						try {
-							Thread.sleep(100);
 							if (dc != null)
 								for (String item : dc.getNews(n)) {
-									news.push(preLine + StringManipulationTools.removeHTMLtags(item));
+									news.push(preLine + item);// StringManipulationTools.removeHTMLtags(item));
 								}
-						} catch (Exception e) {
-							try {
-								Thread.sleep(250);
-								if (dc != null)
-									for (String item : dc.getNews(n)) {
-										news.push(preLine + StringManipulationTools.removeHTMLtags(item));
-									}
-							} catch (Exception e2) {
-								// error
-							}
+						} catch (Exception e2) {
+							// error
 						}
 					}
 				};
