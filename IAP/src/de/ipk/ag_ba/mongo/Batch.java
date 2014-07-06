@@ -34,6 +34,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class Batch {
 	
+	public static final String COMPUTE_HOSTS_COLLECTION = "compute_hosts_" + ReleaseInfo.IAP_VERSION_STRING;
 	public static final String SCHEDULE_COLLECTRION_NAME = "schedule_" + ReleaseInfo.IAP_VERSION_STRING;
 	private final MongoDB mongoDB;
 	
@@ -237,7 +238,7 @@ public class Batch {
 			@Override
 			public void run() {
 				try {
-					DBCollection dbc = db.getCollection("compute_hosts");
+					DBCollection dbc = db.getCollection(COMPUTE_HOSTS_COLLECTION);
 					dbc.setObjectClass(CloudHost.class);
 					
 					ArrayList<CloudHost> del = new ArrayList<CloudHost>();
@@ -460,7 +461,7 @@ public class Batch {
 			
 			@Override
 			public void run() {
-				DBCollection dbc = db.getCollection("compute_hosts");
+				DBCollection dbc = db.getCollection(COMPUTE_HOSTS_COLLECTION);
 				dbc.setObjectClass(CloudHost.class);
 				
 				BasicDBObject query = new BasicDBObject();
@@ -491,7 +492,7 @@ public class Batch {
 			
 			@Override
 			public void run() {
-				DBCollection dbc = db.getCollection("compute_hosts");
+				DBCollection dbc = db.getCollection(COMPUTE_HOSTS_COLLECTION);
 				dbc.setObjectClass(CloudHost.class);
 				
 				BasicDBObject query = new BasicDBObject();
