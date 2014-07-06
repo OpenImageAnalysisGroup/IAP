@@ -37,6 +37,7 @@ import org.JMButton;
 import org.ReleaseInfo;
 import org.SettingsHelperDefaultIsFalse;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.SystemInfo;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
@@ -517,7 +518,7 @@ public class NewsHelper implements HelperClass {
 										b = new JButton("<html><small>Addon-Manager<br>not loaded");
 										b.setEnabled(false);
 									} else {
-										b = GUIhelper.getWebsiteDownloadButton(title, null, System.getProperty("java.io.tmpdir") + ReleaseInfo.getFileSeparator(),
+										b = GUIhelper.getWebsiteDownloadButton(title, null, System.getProperty("java.io.tmpdir") + SystemAnalysis.getFileSeparator(),
 												"<html>" +
 														"Please manually download the following file(s):<br><br>" +
 														"<code>" + AttributeHelper.getStringList(urls, "<br>") + "</code><br><br>" +

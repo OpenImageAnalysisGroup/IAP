@@ -32,7 +32,6 @@ import javax.xml.transform.TransformerException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
-import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.XMLHelper;
@@ -771,7 +770,7 @@ public class Experiment implements ExperimentInterface {
 			}
 		} else
 			try {
-				TextFile.write(targetDir.getAbsolutePath() + ReleaseInfo.getFileSeparator() + getName() + ".xml", toString());
+				TextFile.write(targetDir.getAbsolutePath() + SystemAnalysis.getFileSeparator() + getName() + ".xml", toString());
 			} catch (IOException e) {
 				ErrorMsg.addErrorMessage(e);
 			}
