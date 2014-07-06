@@ -194,7 +194,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					status.setCurrentStatusText1("Create result dataset");
 				statisticsResult.setHeader(experimentToBeAnalysed.getHeader().clone());
 				statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
-				statisticsResult.getHeader().setImportusergroup(getDefaultTitle());
+				statisticsResult.getHeader().setImportusergroup("Analysis Job");
 				for (SubstanceInterface s : statisticsResult) {
 					for (ConditionInterface c : s) {
 						c.setExperimentInfo(statisticsResult.getHeader());
