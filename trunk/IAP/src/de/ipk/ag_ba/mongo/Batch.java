@@ -209,7 +209,7 @@ public class Batch {
 					// System.out.println("---");
 					DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
 					collection.setObjectClass(BatchCmd.class);
-					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", -1))) {
+					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
 						BatchCmd batch = (BatchCmd) dbo;
 						res.add(batch);
 					}
@@ -447,7 +447,7 @@ public class Batch {
 						return res;
 					Integer m = o1.getPartIdx();
 					Integer n = o2.getPartIdx();
-					return m.compareTo(n);
+					return m < n ? -1 : (m == n ? 0 : 1);
 				}
 			});
 		}

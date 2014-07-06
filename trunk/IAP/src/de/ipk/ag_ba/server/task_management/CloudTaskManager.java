@@ -82,6 +82,9 @@ public class CloudTaskManager {
 	}
 	
 	private void run() throws Exception {
+		if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE) {
+			installWatchDog();
+		}
 		long startTime = System.currentTimeMillis();
 		boolean disallownewtasks = false; // in batch mode only one task is allowed to be started
 		try {
@@ -253,6 +256,55 @@ public class CloudTaskManager {
 		} catch (InterruptedException e) {
 			MongoDB.saveSystemErrorMessage("Cloud task manager interrupted exception.", e);
 		}
+	}
+
+	private void installWatchDog() {
+		Runnable r = new Runnable() {
+			long lastN = -1;
+			long lastNt = -1;
+			
+			@Override
+			public void run() {
+				try {
+					while (true) {
+						if (lastNt < 0)
+							lastNt = System.currentTimeMillis();
+						long nowBE = BlockPipeline.getBlockExecutionsWithinLastMinute();
+						if (nowBE > lastN) {
+							lastNt = System.currentTimeMillis();
+							lastN = nowBE;
+						}
+						if (lastN > 0 && System.currentTimeMillis() - lastNt > 15 * 60 * 1000) {
+							Runnable r = new Runnable() {
+								@Override
+								public void run() {
+									try {
+										Batch.pingHost(m, hostName, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN,
+												"system.exit (no block execution within 15 min)");
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+							};
+							Thread msg = new Thread(r);
+							msg.start();
+							System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 15 MIN");
+							System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
+							try {
+								Thread.sleep(9000);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							System.exit(0);
+						}
+						Thread.sleep(60 * 1000); // every minute
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		new Thread(r, "WATCH-DOG KILL TIMER").start();
 	}
 	
 	public void setDisableProcess(boolean fixedDisableProcess) {
