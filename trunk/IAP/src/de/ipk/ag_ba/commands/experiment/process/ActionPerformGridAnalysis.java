@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.ErrorMsg;
+import org.ReleaseInfo;
 
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
@@ -61,7 +62,7 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 	protected ImageAnalysisTask getImageAnalysisTask() {
 		if (pd == null)
 			return new UserDefinedImageAnalysisPipelineTask(
-					new PipelineDesc(null, experiment.getIniIoProvider(), null, null));
+					new PipelineDesc(null, experiment.getIniIoProvider(), null, null, null));
 		else
 			return new UserDefinedImageAnalysisPipelineTask(pd);
 	}
@@ -78,8 +79,11 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 	public String getDefaultTitle() {
 		if (m == null)
 			return "Analysis Job";
-		else
-			return "<html><center>Submit " + numberOfJobs + " analysis jobs to " + (m != null ? m.getDatabaseName() : "(database instance is null)") + "";
+		else {
+			String warning = ReleaseInfo.IAP_VERSION_STRING.equals(pd.getTestedIAPversion()) ? "" :
+					"<br><small><font color='red'>Settings not tested with IAP V" + ReleaseInfo.IAP_VERSION_STRING + "!";
+			return "<html><center>Submit " + numberOfJobs + " analysis jobs to " + (m != null ? m.getDatabaseName() : "(database instance is null)") + warning;
+		}
 	}
 	
 	@Override

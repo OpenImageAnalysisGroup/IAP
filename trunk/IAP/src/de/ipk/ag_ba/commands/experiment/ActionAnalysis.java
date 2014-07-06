@@ -75,7 +75,7 @@ public class ActionAnalysis extends AbstractNavigationAction implements ActionDa
 				if (enableRemoteTaskExecution)
 					actions.add(new NavigationButton(
 							new ActionPerformGridAnalysis(
-									new PipelineDesc(null, ioStringProvider, null, null),
+									new PipelineDesc(null, ioStringProvider, null, null, "(unknown legacy IAP version)"),
 									experimentReference.m, experimentReference),
 							src.getGUIsetting()));
 		}

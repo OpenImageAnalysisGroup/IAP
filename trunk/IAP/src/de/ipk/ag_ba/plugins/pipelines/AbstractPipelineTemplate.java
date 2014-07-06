@@ -15,7 +15,13 @@ public abstract class AbstractPipelineTemplate implements AnalysisPipelineTempla
 				StringManipulationTools.getFileSystemName(getTitle()) + ".pipeline.ini",
 				null,
 				getTitle(),
-				getDescription());
+				getDescription(),
+				getTestedIAPversion());
 		return pd;
+	}
+	
+	@Override
+	public String getTestedIAPversion() {
+		return "(not tested)";
 	}
 }

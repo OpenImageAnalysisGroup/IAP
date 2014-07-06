@@ -326,7 +326,7 @@ public class MassCopySupport {
 			if (analyzeEachCopiedExperiment) {
 				String settings = er.getHeader().getSettings();
 				if (settings != null && !settings.trim().isEmpty()) {
-					PipelineDesc pd = new PipelineDesc(null, er.getIniIoProvider(), null, null);
+					PipelineDesc pd = new PipelineDesc(null, er.getIniIoProvider(), null, null, null);
 					if (enableRemoteTaskExecution) {
 						ActionPerformGridAnalysis ga = new ActionPerformGridAnalysis(pd, m, er);
 						RemoteExecutionWrapperAction ra = new RemoteExecutionWrapperAction(ga, null);
