@@ -1374,7 +1374,14 @@ public class MongoDB {
 			@Override
 			public void run() {
 				SimpleDateFormat sdf = new SimpleDateFormat();
-				for (DBObject newsItem : db.getCollection("news").find().sort(new BasicDBObject("date", -1)).limit(limit)) {
+				// Pattern regex = Pattern.compile("/system/");
+				
+				for (DBObject newsItem : db.getCollection("news")
+						.find()
+						// new BasicDBObject()
+						// .append("text", regex))
+						.sort(new BasicDBObject("date", -1))
+						.limit(limit)) {
 					Date l = (Date) newsItem.get("date");
 					String text = (String) newsItem.get("text");
 					String user = (String) newsItem.get("user");
@@ -1387,6 +1394,7 @@ public class MongoDB {
 					res.add("<b>" + sdf.format(l) + inf + ":</b> " + StringManipulationTools.removeHTMLtags(text) + " (" + user
 							+ ")" + (systemiap != null ? " // " + systemiap : ""));
 				}
+				
 			}
 			
 			@Override

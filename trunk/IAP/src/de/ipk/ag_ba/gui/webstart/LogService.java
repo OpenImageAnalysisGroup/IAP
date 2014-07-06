@@ -13,7 +13,7 @@ public class LogService {
 		return MongoDB.getDefaultCloud() == null ? false : MongoDB.getDefaultCloud().isDbHostReachable();
 	}
 	
-	public String getLatestNews(final int n, String pre, final String preLine, String lineBreak, String follow) {
+	public String getLatestNews(final int n, String pre, final String preSystemLine, final String preLine, String lineBreak, String follow) {
 		if (n < 1)
 			return "";
 		StringBuilder res = new StringBuilder();
@@ -59,13 +59,17 @@ public class LogService {
 						+ "). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");
 			}
 		}
+		StringBuilder resSystem = new StringBuilder(preSystemLine);
 		while (!news.empty()) {
 			String item = news.pop();
-			res.append(item);
+			if (item != null && !item.contains("system-msg"))
+				res.append(item);
+			else
+				resSystem.append(item);
 		}
-		if (res != null && res.length() > 0)
-			return pre + res.toString() + follow;
-		else
+		if (res != null && res.length() + resSystem.length() > 0) {
+			return pre + res.toString() + follow + (resSystem.length() == 0 ? "" : resSystem.toString() + follow);
+		} else
 			return res.toString();
 	}
 	
