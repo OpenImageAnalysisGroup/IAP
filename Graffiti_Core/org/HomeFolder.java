@@ -12,7 +12,7 @@ import java.io.OutputStream;
 public class HomeFolder implements HelperClass {
 	
 	public static String getTemporaryFolder() {
-		String s = ReleaseInfo.getAppFolder() + ReleaseInfo.getFileSeparator() + "tmp";
+		String s = ReleaseInfo.getAppFolder() + SystemAnalysis.getFileSeparator() + "tmp";
 		File f = new File(s);
 		f.mkdirs();
 		f.deleteOnExit();
@@ -24,7 +24,7 @@ public class HomeFolder implements HelperClass {
 	}
 	
 	public static String getTemporaryFolderWithFinalSep() {
-		return getTemporaryFolder() + ReleaseInfo.getFileSeparator();
+		return getTemporaryFolder() + SystemAnalysis.getFileSeparator();
 	}
 	
 	public static boolean copyFileToTemporaryFolder(File f) {
@@ -36,10 +36,10 @@ public class HomeFolder implements HelperClass {
 			String outfile = getTemporaryFolderWithFinalSep() + f.getName();
 			
 			if (subfolder != null && !subfolder.equalsIgnoreCase("")) {
-				File newDir = new File(getTemporaryFolderWithFinalSep() + ReleaseInfo.getFileSeparator() + subfolder);
+				File newDir = new File(getTemporaryFolderWithFinalSep() + SystemAnalysis.getFileSeparator() + subfolder);
 				newDir.mkdirs();
 				newDir.deleteOnExit();
-				outfile = newDir + ReleaseInfo.getFileSeparator() + f.getName();
+				outfile = newDir + SystemAnalysis.getFileSeparator() + f.getName();
 			}
 			
 			copyFile(f, new File(outfile));
