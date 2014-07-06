@@ -157,8 +157,10 @@ public class IAPgui {
 					+ "Use the first row of buttons to go back to any previously selected command or to return to this 'Start'-screen." +
 					new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 0),
 							"<br>" +
-									"<p>Latest system messages:<br><br><ul>",
-							"<li>", "", "<br><br>") + "</font>";
+									"<p>Latest user-posted news:<br><br><ul>",
+							"<br>" +
+									"<p>Latest system-messages:<br><br><ul>",
+							"<li>", "", "</ul>") + "";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "<html><h2>Exception while getting intro-text: " + e.getMessage() + "</h2>";
