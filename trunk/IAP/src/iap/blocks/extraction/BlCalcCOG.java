@@ -40,7 +40,10 @@ public class BlCalcCOG extends AbstractBlock {
 				RunnableOnImage runnableOnMask = new RunnableOnImage() {
 					@Override
 					public Image postProcess(Image in) {
-						return in.io().canvas().drawCircle((int) cog.x, (int) cog.y, 5, Color.BLACK.getRGB(), 0.5d, 1).getImage();
+						if (in != null & cog != null)
+							return in.io().canvas().drawCircle((int) cog.x, (int) cog.y, 5, Color.BLACK.getRGB(), 0.5d, 1).getImage();
+						else
+							return in;
 					}
 				};
 				getResultSet().addImagePostProcessor(img.getCameraType(), null, runnableOnMask);

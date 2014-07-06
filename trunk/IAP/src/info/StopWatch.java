@@ -55,7 +55,7 @@ public class StopWatch {
 	 * last {@link #reset()} operation.
 	 */
 	public void printTime() {
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO:" + desc + " took " + getTime() + " ms");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: " + desc + " took " + getTime() + " ms");
 	}
 	
 	public String getDescription() {
@@ -64,7 +64,7 @@ public class StopWatch {
 	
 	public void printTime(int minTime) {
 		if (minTime == 0 || getTime() - start > minTime)
-			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO:" + desc + " took " + getTime() + " ms");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: " + desc + " took " + getTime() + " ms");
 	}
 	
 	public String getTimeString() {
