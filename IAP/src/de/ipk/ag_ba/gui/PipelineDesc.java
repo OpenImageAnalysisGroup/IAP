@@ -18,12 +18,13 @@ public class PipelineDesc {
 	private final SystemOptions so;
 	
 	public PipelineDesc(String iniFileName, IniIoProvider iniIO, String defName,
-			String defDescription) {
+			String defDescription, String defTestedIAPversion) {
 		this.iniFileName = iniFileName;
 		this.iniIO = iniIO;
 		so = SystemOptions.getInstance(iniFileName, iniIO);
 		so.getString("DESCRIPTION", "pipeline_name", defName);
 		so.getString("DESCRIPTION", "pipeline_description", defDescription);
+		so.getString("DESCRIPTION", "tuned_for_IAP_version", defTestedIAPversion);
 	}
 	
 	public String getTooltip() {
@@ -51,7 +52,7 @@ public class PipelineDesc {
 		};
 		for (String fn : new File(ReleaseInfo.getAppFolder()).list(ff)) {
 			String fnt = StringManipulationTools.stringReplace(fn, ".pipeline.ini", "");
-			res.add(new PipelineDesc(fn, null, fnt, fnt));
+			res.add(new PipelineDesc(fn, null, fnt, fnt, "(not tested with specific IAP version)"));
 		}
 		return res;
 	}
@@ -66,5 +67,11 @@ public class PipelineDesc {
 	
 	public IniIoProvider getIniIO() {
 		return iniIO;
+	}
+	
+	public String getTestedIAPversion() {
+		SystemOptions so = SystemOptions.getInstance(iniFileName, iniIO);
+		String name = so.getString("DESCRIPTION", "tuned_for_IAP_version", "(unknown legacy IAP version)");
+		return name;
 	}
 }

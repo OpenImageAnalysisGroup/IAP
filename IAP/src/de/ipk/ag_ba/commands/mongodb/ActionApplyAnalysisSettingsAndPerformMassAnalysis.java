@@ -197,7 +197,7 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 											ExperimentReference er = new ExperimentReference(noS, m);
 											String settings = noS.getSettings();
 											if (settings != null && !settings.trim().isEmpty()) {
-												PipelineDesc pd = new PipelineDesc(null, er.getIniIoProvider(), null, null);
+												PipelineDesc pd = new PipelineDesc(null, er.getIniIoProvider(), null, null, null);
 												ActionPerformGridAnalysis ga = new ActionPerformGridAnalysis(pd, m, er);
 												RemoteExecutionWrapperAction ra = new RemoteExecutionWrapperAction(ga, null);
 												Date newestImportDate = null;

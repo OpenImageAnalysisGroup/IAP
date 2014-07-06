@@ -55,6 +55,11 @@ public class MaizePipeline extends AbstractPipelineTemplate {
 	}
 	
 	@Override
+	public String getTestedIAPversion() {
+		return "1.2.0";
+	}
+	
+	@Override
 	public ImageAnalysisBlock[] getBlockList(ImageProcessorOptionsAndResults options) {
 		return new ImageAnalysisBlock[] {
 				// acquisition

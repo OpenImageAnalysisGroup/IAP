@@ -31,4 +31,6 @@ public interface AnalysisPipelineTemplate {
 	public boolean analyzeSideImages();
 	
 	public PipelineDesc getDefaultPipelineDesc();
+	
+	public String getTestedIAPversion();
 }

@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.experiment.process;
 
 import org.IniIoProvider;
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -36,8 +37,12 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Process " + StringManipulationTools
-				.removeHTMLtags(so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true));
+		String vv = so.getString("DESCRIPTION", "tuned_for_IAP_version", "(unknown legacy IAP version)");
+		String warning = ReleaseInfo.IAP_VERSION_STRING.equals(vv) ? "" :
+				"<br><small><font color='red'>Settings not tested with IAP V" + ReleaseInfo.IAP_VERSION_STRING + "!</font>";
+		
+		return (warning.isEmpty() ? "" : "<html><center>") + "Process " + StringManipulationTools
+				.removeHTMLtags(so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true)) + warning;
 	}
 	
 	@Override
@@ -60,7 +65,8 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 		PipelineDesc pd = new PipelineDesc(
 				null, iniIO,
 				so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true),
-				so.getString("DESCRIPTION", "pipeline_description", "(no description specified)", true));
+				so.getString("DESCRIPTION", "pipeline_description", "(no description specified)", true),
+				null);
 		return new UserDefinedImageAnalysisPipelineTask(pd);
 	}
 	

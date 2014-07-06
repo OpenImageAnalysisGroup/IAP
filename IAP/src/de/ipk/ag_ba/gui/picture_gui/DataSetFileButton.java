@@ -381,7 +381,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								mi.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(16, 16,
 										java.awt.Image.SCALE_SMOOTH)));
 								jp.add(mi);
-								PipelineDesc pd = new PipelineDesc(null, iop, null, null);
+								PipelineDesc pd = new PipelineDesc(null, iop, null, null, null);
 								UserDefinedImageAnalysisPipelineTask iat =
 										new UserDefinedImageAnalysisPipelineTask(pd);
 								if (!targetTreeNode.getExperiment().getHeader().getExperimentType().equalsIgnoreCase("Analysis Results")) {

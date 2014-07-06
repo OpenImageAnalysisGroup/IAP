@@ -28,11 +28,13 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import org.ErrorMsg;
 import org.FolderPanel;
 import org.GuiRow;
 import org.JMButton;
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -254,6 +256,8 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		} else {
 			if (jTextField instanceof JTextField)
 				((JTextField) jTextField).setEditable(false);
+			if (jTextField instanceof JTextPane)
+				((JTextPane) jTextField).setEditable(false);
 			jTextField.setBorder(null);
 			jTextField.setBackground(Color.WHITE);
 		}
@@ -366,17 +370,29 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("History"), disable(new JTextField(getVersionString(experimentHeader))), false);
 		try {
 			ExperimentAnalysisSettingsIOprovder nnn = new ExperimentAnalysisSettingsIOprovder(experimentHeader, m);
-			String so = nnn != null ? SystemOptions.getInstance(null,
-					nnn).getString("DESCRIPTION",
-					"pipeline_name", "(unnamed)", false) : null;
+			String so = null;
+			if (nnn != null) {
+				SystemOptions soi = SystemOptions.getInstance(null, nnn);
+				so = soi.getString("DESCRIPTION",
+						"pipeline_name", "[pipeline name unknown]", false);
+				String v = soi.getString("DESCRIPTION",
+						"tuned_for_IAP_version", "[unknown legacy, &lt;V1.2.0]", false);
+				if (!ReleaseInfo.IAP_VERSION_STRING.equals(v))
+					v = v + " - <b><font color='red'>version mismatch</font></b>";
+				so = so + ", tuned for IAP " + v;
+			}
+			JTextPane jtp = new JTextPane();
+			jtp.setContentType("text/html");
+			jtp.setText(experimentHeader == null || experimentHeader.getSettings() == null
+					|| experimentHeader.getSettings().isEmpty() ?
+					"<html><font size='2' face='Arial'>(not assigned)" :
+					"<html><font size='2' face='Arial'>"
+							+ so + ", "
+							+ (StringManipulationTools.count(experimentHeader.getSettings(), "\n") + (experimentHeader.getSettings().isEmpty() ? 0 : 1))
+							+ " setting-definition lines");
 			fp.addGuiComponentRow(
 					new JLabel("Analysis Settings"),
-					disable(new JTextField(
-							experimentHeader == null || experimentHeader.getSettings() == null || experimentHeader.getSettings().isEmpty() ? "(not assigned)" :
-									""
-											+ so + " ("
-											+ (StringManipulationTools.count(experimentHeader.getSettings(), "\n") + (experimentHeader.getSettings().isEmpty() ? 0 : 1))
-											+ " lines)")), false);
+					disable(jtp), false);
 		} catch (Exception err) {
 			fp.addGuiComponentRow(new JLabel("Analysis Settings"),
 					disable(new JTextField("(improperly defined: error " + err.getMessage() + ")")), false);
