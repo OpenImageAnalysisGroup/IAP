@@ -203,6 +203,24 @@ public class BackgroundThreadDispatcher {
 		return l.isFinished();
 	}
 	
+	public static boolean waitForResultWithTimeout(Thread l, long timeout) {
+		if (!l.isAlive())
+			return true;
+		long start = System.currentTimeMillis();
+		while (l.isAlive()) {
+			if (System.currentTimeMillis() - start > timeout) {
+				return false;
+			} else {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// empty
+				}
+			}
+		}
+		return true;
+	}
+	
 	public static void waitFor(ArrayList<LocalComputeJob> wait, Runnable runnable) throws InterruptedException {
 		Thread t = new Thread(runnable);
 		t.setName("Waiting for threads, idle task");
