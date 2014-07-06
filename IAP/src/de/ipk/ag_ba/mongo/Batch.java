@@ -334,9 +334,10 @@ public class Batch {
 						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
 							if (addCnt < maxTasks)
 								for (DBObject dbo : collection.find(rm)
-										.sort(new BasicDBObject("part_idx", 1))
-										.sort(new BasicDBObject("part_cnt", 1))
-										.sort(new BasicDBObject("submission", 1)).limit(maxTasks)) {
+										.sort(new BasicDBObject("submission", 1))
+										.sort(new BasicDBObject("part_idx", 1)
+										// .sort(new BasicDBObject("part_cnt", 1)
+										).limit(maxTasks)) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
 										continue;
@@ -356,9 +357,10 @@ public class Batch {
 						int claimed = 0;
 						if (addCnt < maxTasks && claimed < maxTasks) {
 							loop: for (DBObject dbo : collection.find()
+									.sort(new BasicDBObject("submission", 1))
 									.sort(new BasicDBObject("part_idx", 1))
-									.sort(new BasicDBObject("part_cnt", 1))
-									.sort(new BasicDBObject("submission", 1))) {
+							// .sort(new BasicDBObject("part_cnt", 1))
+							) {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
 									continue;
@@ -383,9 +385,10 @@ public class Batch {
 						for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.STARTING)) {
 							if (addCnt < maxTasks) {
 								for (DBObject dbo : collection.find(sm)
+										.sort(new BasicDBObject("submission", 1))
 										.sort(new BasicDBObject("part_idx", 1))
-										.sort(new BasicDBObject("part_cnt", 1))
-										.sort(new BasicDBObject("submission", 1))) {
+								// .sort(new BasicDBObject("part_cnt", 1))
+								) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
 										continue;
@@ -404,9 +407,10 @@ public class Batch {
 						if (addCnt < maxTasks && !added) {
 							for (DBObject sm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.FINISHED_INCOMPLETE)) {
 								for (DBObject dbo : collection.find(sm)
+										.sort(new BasicDBObject("submission", 1))
 										.sort(new BasicDBObject("part_idx", 1))
-										.sort(new BasicDBObject("part_cnt", 1))
-										.sort(new BasicDBObject("submission", 1))) {
+								// .sort(new BasicDBObject("part_cnt", 1))
+								) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
 										continue;
@@ -440,14 +444,14 @@ public class Batch {
 			java.util.Collections.sort(res, new Comparator<BatchCmd>() {
 				@Override
 				public int compare(BatchCmd o1, BatchCmd o2) {
-					Long a = o1.getSubmissionTime();
-					Long b = o2.getSubmissionTime();
-					int res = a.compareTo(b);
-					if (res != 0)
-						return res;
+					// Long a = o1.getSubmissionTime();
+					// Long b = o2.getSubmissionTime();
+					// int res = a.compareTo(b);
+					// if (res != 0)
+					// return res;
 					Integer m = o1.getPartIdx();
 					Integer n = o2.getPartIdx();
-					return m < n ? -1 : (m == n ? 0 : 1);
+					return m < n ? -11 : (m == n ? 0 : 1);
 				}
 			});
 		}
