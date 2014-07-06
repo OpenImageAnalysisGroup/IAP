@@ -36,13 +36,12 @@ public class LogService {
 						} catch (Exception e) {
 							try {
 								Thread.sleep(250);
-								e.printStackTrace();
 								if (dc != null)
 									for (String item : dc.getNews(n)) {
 										news.push(preLine + StringManipulationTools.removeHTMLtags(item));
 									}
 							} catch (Exception e2) {
-								e2.printStackTrace();
+								// error
 							}
 						}
 					}
