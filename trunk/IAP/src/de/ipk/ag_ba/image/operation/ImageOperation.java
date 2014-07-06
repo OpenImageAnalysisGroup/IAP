@@ -45,6 +45,7 @@ import javax.vecmath.Point2d;
 
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.Vector2d;
@@ -2104,9 +2105,13 @@ public class ImageOperation implements MemoryHogInterface {
 					ama = af > ama ? af : ama;
 					bma = bf > bma ? bf : bma;
 				}
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Calculated Lab-Cube. Value Ranges: L:[" + lmi + "," + lma + "], A:[" + ami + "," + ama
-				+ "], B:["
-				+ bmi + "," + bma + "]");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Calculated Lab-Cube. Value Ranges: L:["
+				+ StringManipulationTools.formatNumber(lmi, 1) + ","
+				+ StringManipulationTools.formatNumber(lma, 1) + "], A:["
+				+ StringManipulationTools.formatNumber(ami, 1) + ","
+				+ StringManipulationTools.formatNumber(ama, 1) + "], B:["
+				+ StringManipulationTools.formatNumber(bmi, 1) + ","
+				+ StringManipulationTools.formatNumber(bma, 1) + "]");
 	}
 	
 	private static boolean isGray(float li, float ai, float bi, float maxDiffAleftBright, float maxDiffArightBleft) {
