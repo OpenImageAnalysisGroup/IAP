@@ -14,7 +14,6 @@ import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
-import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -233,7 +232,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 							}
 							if (getBoolean("Debug - Save 3D-Render to Desktop", false)) {
 								try {
-									File f = new File(ReleaseInfo.getDesktopFolder() + "/render_" + time + "_" + volume.getURL().getFileName() + ".gif");
+									File f = new File(SystemAnalysis.getDesktopFolder() + "/render_" + time + "_" + volume.getURL().getFileName() + ".gif");
 									MyByteArrayInputStream cnt = volume.getSideViewGif(800, 600, optStatus);
 									ResourceIOManager.copyContent(cnt, new FileOutputStream(f));
 								} catch (Exception e) {

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.AttributeHelper;
-import org.ReleaseInfo;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -25,7 +25,7 @@ public class ActionSaveHTMLfile extends AbstractNavigationAction {
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		TextFile tf = new TextFile();
 		tf.add(content);
-		String desktop = ReleaseInfo.getDesktopFolder();
+		String desktop = SystemAnalysis.getDesktopFolder();
 		tf.write(desktop + File.separator + fileName);
 		AttributeHelper.showInFileBrowser(desktop, fileName);
 	}
