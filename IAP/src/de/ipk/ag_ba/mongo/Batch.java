@@ -8,6 +8,7 @@ import java.util.Comparator;
 
 import org.ErrorMsg;
 import org.ObjectRef;
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -33,6 +34,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 
 public class Batch {
 	
+	public static final String SCHEDULE_COLLECTRION_NAME = "schedule_" + ReleaseInfo.IAP_VERSION_STRING;
 	private final MongoDB mongoDB;
 	
 	public Batch(MongoDB mongoDB) {
@@ -50,7 +52,7 @@ public class Batch {
 				@Override
 				public void run() {
 					try {
-						DBCollection collection = db.getCollection("schedule");
+						DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
 						collection.setObjectClass(BatchCmd.class);
 						DBObject dbo = new BasicDBObject();
 						dbo.put("_id", batch.get("_id"));
@@ -114,7 +116,7 @@ public class Batch {
 				
 				@Override
 				public void run() {
-					DBCollection collection = db.getCollection("schedule");
+					DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
 					collection.setObjectClass(BatchCmd.class);
 					DBObject dbo = new BasicDBObject();
 					dbo.put("_id", batch.get("_id"));
@@ -156,8 +158,8 @@ public class Batch {
 							delete(c);
 					
 				} else {
-					res.setLong(db.getCollection("schedule").count());
-					db.getCollection("schedule").drop();
+					res.setLong(db.getCollection(SCHEDULE_COLLECTRION_NAME).count());
+					db.getCollection(SCHEDULE_COLLECTRION_NAME).drop();
 				}
 			}
 			
@@ -183,7 +185,7 @@ public class Batch {
 			
 			@Override
 			public void run() {
-				DBCollection dbc = db.getCollection("schedule");
+				DBCollection dbc = db.getCollection(SCHEDULE_COLLECTRION_NAME);
 				dbc.setObjectClass(BatchCmd.class);
 				dbc.insert(cmd);
 			}
@@ -204,7 +206,7 @@ public class Batch {
 				@Override
 				public void run() {
 					// System.out.println("---");
-					DBCollection collection = db.getCollection("schedule");
+					DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
 					collection.setObjectClass(BatchCmd.class);
 					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", -1))) {
 						BatchCmd batch = (BatchCmd) dbo;
@@ -278,7 +280,7 @@ public class Batch {
 				
 				@Override
 				public void run() {
-					DBCollection collection = db.getCollection("schedule");
+					DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
 					collection.setObjectClass(BatchCmd.class);
 					DBObject dbo = new BasicDBObject();
 					if (batch != null && batch.get("_id") != null && collection != null) {
@@ -309,7 +311,7 @@ public class Batch {
 				public void run() {
 					String hostName;
 					try {
-						DBCollection collection = db.getCollection("schedule");
+						DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
 						collection.setObjectClass(BatchCmd.class);
 						for (BasicDBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.IN_PROGRESS)) {
 							rm.append("lastupdate", new BasicDBObject("$lt", System.currentTimeMillis() - 30 * 60000));

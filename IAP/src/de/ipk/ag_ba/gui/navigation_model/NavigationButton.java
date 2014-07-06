@@ -185,6 +185,7 @@ public class NavigationButton implements StyleAware {
 	private String lastTitle = null;
 	private boolean requestingTitle = false;
 	private WeakReference<JButton> weakButtonReference;
+	private long lastGetTitleTime = Long.MAX_VALUE;
 	
 	public String getTitle() {
 		Runnable r = new Runnable() {
@@ -192,7 +193,9 @@ public class NavigationButton implements StyleAware {
 			@Override
 			public void run() {
 				try {
+					long start = System.currentTimeMillis();
 					NavigationButton.this.lastTitle = getTitle(false);
+					lastGetTitleTime = System.currentTimeMillis() - start;
 				} finally {
 					synchronized (NavigationButton.this) {
 						requestingTitle = false;
@@ -215,7 +218,10 @@ public class NavigationButton implements StyleAware {
 			if (!requestingTitle) {
 				requestingTitle = true;
 				l = new Thread(r, "update button text");
-				l.start();
+				if (lastGetTitleTime > 20)
+					l.start();
+				else
+					l.run();
 			}
 		}
 		if (l != null)
