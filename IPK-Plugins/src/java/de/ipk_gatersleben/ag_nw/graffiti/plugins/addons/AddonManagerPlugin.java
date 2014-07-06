@@ -29,6 +29,7 @@ import org.HomeFolder;
 import org.ObjectRef;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.UpdateInfoResult;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.managers.pluginmgr.PluginDescription;
@@ -515,7 +516,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 		
 		try {
 			
-			File toBeInstalledAddonJarfile = new File(jardir + ReleaseInfo.getFileSeparator() + jarname);
+			File toBeInstalledAddonJarfile = new File(jardir + SystemAnalysis.getFileSeparator() + jarname);
 			URL jarfileurl = toBeInstalledAddonJarfile.toURI().toURL();
 			
 			expandClasspathByJarfile(new URL[] { jarfileurl });
