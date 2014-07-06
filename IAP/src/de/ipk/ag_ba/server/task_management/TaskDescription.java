@@ -41,6 +41,8 @@ public class TaskDescription {
 	
 	private final String systemIP;
 	
+	protected boolean allowSystemExit = true;
+	
 	public static String getTaskDescriptionText(String hostIPs, String task, String params, String startTime) {
 		return task + "$" + params + "$" + startTime;
 	}
@@ -180,7 +182,7 @@ public class TaskDescription {
 					ErrorMsg.addErrorMessage(e);
 					finishedIncomplete = true;
 				}
-				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE) {
+				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE && allowSystemExit) {
 					System.out.println(">Cluster Execution Mode is active // FINISHED COMPUTE TASK");
 					try {
 						if (m.batch().getAll().size() > 0) {

@@ -146,6 +146,7 @@ public class CloudTaskManager {
 							ExperimentHeaderInterface header = batch.getExperimentHeader();
 							if (header != null) {
 								TaskDescription task = new TaskDescription(batch, new ExperimentReference(header, m), hostName);
+								task.allowSystemExit = maxTasks < 2;
 								int tu = batch.getCpuTargetUtilization();
 								boolean stop = false;
 								if (cpuDesire < Integer.MAX_VALUE) {
