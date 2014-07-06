@@ -9,6 +9,7 @@ package de.ipk.ag_ba.server.task_management;
 import java.util.ArrayList;
 
 import org.ErrorMsg;
+import org.ReleaseInfo;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
@@ -36,7 +37,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	public CloundManagerNavigationAction(MongoDB m,
 			boolean showMonitoringNodes) {
-		super("Task- and Server-Management");
+		super("Task- and Server-Management for IAP V" + ReleaseInfo.IAP_VERSION_STRING);
 		this.showMonitoringNodes = showMonitoringNodes;
 		this.m = m != null ? m : MongoDB.getDefaultCloud();
 	}
