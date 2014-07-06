@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
-import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
@@ -77,7 +77,7 @@ public abstract class VirtualFileSystem {
 			String user = SystemOptions.getInstance().getString("VFS-" + idx, "user", idx < 2 ? "null" : "");
 			String pass = SystemOptions.getInstance().getString("VFS-" + idx, "password", idx < 2 ? "null" : "");
 			String dir = SystemOptions.getInstance().getString("VFS-" + idx, "directory",
-					idx == 1 ? "datasets" : (idx < 3 ? ReleaseInfo.getDesktopFolder() + File.separator + "IAP" : "#/subdir"));
+					idx == 1 ? "datasets" : (idx < 3 ? SystemAnalysis.getDesktopFolder() + File.separator + "IAP" : "#/subdir"));
 			boolean useForMongoFileStorage = SystemOptions.getInstance().getBoolean("VFS-" + idx, "Store Mongo-DB files", false);
 			boolean useOnlyForMongoFileStorage = SystemOptions.getInstance().getBoolean("VFS-" + idx, "Use only for Mongo-DB storage", false);
 			String useForMongoFileStorageCloudName = SystemOptions.getInstance().getString("VFS-" + idx, "Mongo-DB database name", "");
