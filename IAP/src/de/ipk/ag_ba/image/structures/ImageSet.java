@@ -174,7 +174,7 @@ public class ImageSet {
 	
 	public void setIr(Image ir) {
 		if (ir != null)
-			ir.setCameraType(CameraType.NIR);
+			ir.setCameraType(CameraType.IR);
 		this.ir = ir;
 	}
 	
