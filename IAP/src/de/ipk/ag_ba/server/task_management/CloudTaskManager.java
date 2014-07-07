@@ -257,7 +257,7 @@ public class CloudTaskManager {
 			MongoDB.saveSystemErrorMessage("Cloud task manager interrupted exception.", e);
 		}
 	}
-
+	
 	private void installWatchDog() {
 		Runnable r = new Runnable() {
 			long lastN = -1;
@@ -274,7 +274,7 @@ public class CloudTaskManager {
 							lastNt = System.currentTimeMillis();
 							lastN = nowBE;
 						}
-						if (lastN > 0 && System.currentTimeMillis() - lastNt > 15 * 60 * 1000) {
+						if (lastN == nowBE && lastN > 0 && System.currentTimeMillis() - lastNt > 15 * 60 * 1000) {
 							Runnable r = new Runnable() {
 								@Override
 								public void run() {

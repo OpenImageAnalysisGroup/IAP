@@ -1554,6 +1554,12 @@ public class MongoDB {
 			IAPmain.errorCheck(error);
 			return;
 		}
+		if (e.getCause() != null && e.getCause() instanceof Exception)
+			e = (Exception) e.getCause();
+		if (e.getCause() != null && e.getCause() instanceof Exception)
+			e = (Exception) e.getCause();
+		if (e.getCause() != null && e.getCause() instanceof Exception)
+			e = (Exception) e.getCause();
 		System.err.println(SystemAnalysis.getCurrentTime() + ">" + error);
 		e.printStackTrace();
 		saveSystemMessage("System eror message: " + error + " - Exception: " + e.getMessage() +
