@@ -279,6 +279,7 @@ public class CloudTaskManager {
 								@Override
 								public void run() {
 									try {
+										MongoDB.saveSystemErrorMessage("Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 15 MIN // SYSTEM.EXIT", null);
 										Batch.pingHost(m, hostName, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN,
 												"system.exit (no block execution within 15 min)");
 									} catch (Exception e) {
