@@ -269,7 +269,7 @@ public class CloudTaskManager {
 					while (true) {
 						if (lastNt < 0)
 							lastNt = System.currentTimeMillis();
-						long nowBE = BlockPipeline.getBlockExecutionsWithinLastMinute();
+						long nowBE = BlockPipeline.getBlockExecutionsOverall();
 						if (nowBE > lastN) {
 							lastNt = System.currentTimeMillis();
 							lastN = nowBE;
