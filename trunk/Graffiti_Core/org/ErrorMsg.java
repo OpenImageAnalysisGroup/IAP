@@ -313,6 +313,13 @@ public class ErrorMsg implements HelperClass {
 	}
 	
 	public static void addErrorMessage(Exception e) {
+		if (e != null && e.getCause() != null && e.getCause() instanceof Exception)
+			e = (Exception) e.getCause();
+		if (e != null && e.getCause() != null && e.getCause() instanceof Exception)
+			e = (Exception) e.getCause();
+		if (e != null && e.getCause() != null && e.getCause() instanceof Exception)
+			e = (Exception) e.getCause();
+		
 		if (customErrorHandler != null)
 			customErrorHandler.reportError(e);
 		e.printStackTrace();
@@ -322,7 +329,7 @@ public class ErrorMsg implements HelperClass {
 		if (rethrowErrorMessages)
 			throw new UnsupportedOperationException(e);
 		
-		addErrorMessage(e.getLocalizedMessage());
+		addErrorMessage(e.getMessage());
 	}
 	
 	public static void addOnAddonLoadingFinishedAction(Runnable runnable) {
