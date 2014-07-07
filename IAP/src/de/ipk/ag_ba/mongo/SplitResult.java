@@ -58,7 +58,7 @@ public class SplitResult {
 				if (!processedSubmissionTimes.contains(submTime)) {
 					availableTempDatasets.add(new TempDataSetDescription(
 							className, partCnt, submTime, i.getOriginDbId(), mergeWithDBid));
-					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Found temp dataset: " + i.getExperimentName());
+					// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Found temp dataset: " + i.getExperimentName());
 				}
 				processedSubmissionTimes.add(submTime);
 			}
@@ -310,8 +310,7 @@ public class SplitResult {
 					}
 				}
 			}
-			System.out.println(SystemAnalysis.getCurrentTime() + "> T=" + IAPservice.getCurrentTimeAsNiceString());
-			System.out.println(SystemAnalysis.getCurrentTime() + "> TODO: " + tempDataSetDescription.getPartCntI() + ", FINISHED: "
+			System.out.println(SystemAnalysis.getCurrentTime() + ">Analysis jobs: " + tempDataSetDescription.getPartCntI() + ", finished: "
 					+ knownResults.size());
 			{
 				// check if source data is still available
