@@ -1392,7 +1392,7 @@ public class MongoDB {
 					if (systemuser != null || systemhost != null)
 						inf = " (" + systemuser + "@" + systemhost + ")";
 					res.add("<b>" + sdf.format(l) + inf + ":</b> " + StringManipulationTools.removeHTMLtags(text) + " (" + user
-							+ ")" + (systemiap != null ? " // " + systemiap : ""));
+							+ ")" + (systemiap != null ? " <small><font color='gray'>IAP V" + systemiap + "</font></small>" : ""));
 				}
 				
 			}
@@ -1562,10 +1562,10 @@ public class MongoDB {
 			e = (Exception) e.getCause();
 		System.err.println(SystemAnalysis.getCurrentTime() + ">" + error);
 		e.printStackTrace();
-		saveSystemMessage("System eror message: " + error + " - Exception: " + e.getMessage() +
-				".<br>Stack-trace:<br>" +
+		saveSystemMessage("System eror message " + error + " - Exception " + e.getMessage() +
+				". Stack-trace: " +
 				e.getStackTrace() != null ?
-				StringManipulationTools.getStringList(e.getStackTrace(), "<br>") : "(no stacktrace)");
+				StringManipulationTools.getStringList(e.getStackTrace(), " // ") : "(no stacktrace)");
 		IAPmain.errorCheck(error);
 	}
 	
