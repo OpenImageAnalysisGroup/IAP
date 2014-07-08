@@ -533,7 +533,10 @@ public class SkeletonGraph {
 	 * @param postProcessors
 	 * @return map from cluster ID 2 size, -1 to largest size
 	 */
-	public HashMap<Integer, Double> calculateDiameter(boolean saveGraphFiles, ArrayList<RunnableOnImage> postProcessing, boolean thinned) {
+	public HashMap<Integer, Double> calculateDiameter(
+			boolean saveGraphFiles,
+			boolean findAndProcessMostLefAndRightEndPointsOnly,
+			ArrayList<RunnableOnImage> postProcessing, boolean thinned) {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
 		System.out.println("Skeleton graph created. Number of components: " + gl.size());
@@ -550,7 +553,7 @@ public class SkeletonGraph {
 				System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Determine graph diameter: ");
 			ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
 			List<GraphElement> elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
-					gg.getGraphElements(),
+					findAndProcessMostLefAndRightEndPointsOnly ? filterMostLeftAndRightEndpoints(gg.getGraphElements()) : gg.getGraphElements(),
 					new AttributePathNameSearchType("", "len", SearchType.searchDouble, "len"),
 					optLengthReturn, false);
 			graphComponent2shortestPathElements.put(gg, elem);
@@ -608,6 +611,32 @@ public class SkeletonGraph {
 			}
 		}
 		return id2size;
+	}
+	
+	private Collection<GraphElement> filterMostLeftAndRightEndpoints(Collection<GraphElement> graphElements) {
+		ArrayList<GraphElement> res = new ArrayList<>();
+		int mostLeft = Integer.MAX_VALUE;
+		int mostRight = -1;
+		Node ml = null;
+		Node mr = null;
+		for (GraphElement g : graphElements) {
+			if (g instanceof Node) {
+				Vector2i pos = new NodeHelper((Node) g).getPosition2i();
+				if (pos.x < mostLeft) {
+					mostLeft = pos.x;
+					ml = (Node) g;
+				}
+				if (pos.x > mostRight) {
+					mostRight = pos.x;
+					mr = (Node) g;
+				}
+			}
+		}
+		if (ml != null)
+			res.add(ml);
+		if (mr != null)
+			res.add(mr);
+		return res;
 	}
 	
 	/**
