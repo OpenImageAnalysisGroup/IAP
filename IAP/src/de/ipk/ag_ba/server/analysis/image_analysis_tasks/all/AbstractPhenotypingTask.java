@@ -677,26 +677,28 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	public ExperimentInterface getOutput() {
 		ExperimentInterface result = output;
 		if (result != null) {
-			for (SubstanceInterface si : result) {
-				if (si == null)
-					continue;
-				boolean onlyImages = true;
-				for (ConditionInterface ci : si) {
-					for (SampleInterface sai : ci) {
-						if (sai != null) {
-							for (NumericMeasurementInterface nmi : sai) {
-								if (nmi != null)
-									if (!(nmi instanceof BinaryMeasurement))
-										onlyImages = false;
+			if (result.isEmpty())
+				for (SubstanceInterface si : result) {
+					if (si == null)
+						continue;
+					boolean onlyImages = true;
+					for (ConditionInterface ci : si) {
+						if (ci != null && !ci.isEmpty())
+							for (SampleInterface sai : ci) {
+								if (sai != null) {
+									for (NumericMeasurementInterface nmi : sai) {
+										if (nmi != null)
+											if (!(nmi instanceof BinaryMeasurement))
+												onlyImages = false;
+									}
+									sai.setSampleAverage(null);
+									sai.recalculateSampleAverage(false);
+								}
 							}
-							sai.setSampleAverage(null);
-							sai.recalculateSampleAverage(false);
-						}
 					}
+					if (!onlyImages)
+						si.setInfo(null);
 				}
-				if (!onlyImages)
-					si.setInfo(null);
-			}
 		}
 		output = null;
 		ImageOperation.setLabCubeInstanceToNull();

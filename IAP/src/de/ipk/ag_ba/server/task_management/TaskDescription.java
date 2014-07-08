@@ -89,9 +89,9 @@ public class TaskDescription {
 			timeInfo = " Partial calculation will be performed on data newer than " + batch.getAvailableResultImportDate()
 					+ ". Available partial result data set: " + batch.getAvailableResultDatabaseId() + ".";
 		
-		MongoDB.saveSystemMessage("Host " + SystemAnalysisExt.getHostNameNiceNoError()
-				+ " is starting analysis of " + batch.getExperimentHeader().getExperimentName()
-				+ " (task " + (batch.getPartIdx() + 1) + "/" + batch.getPartCnt() + ").");
+		// MongoDB.saveSystemMessage("Host " + SystemAnalysisExt.getHostNameNiceNoError()
+		// + " is starting analysis of " + batch.getExperimentHeader().getExperimentName()
+		// + " (task " + (batch.getPartIdx() + 1) + "/" + batch.getPartCnt() + ").");
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall statusProvider = action.getStatusProvider();
 		
@@ -153,8 +153,8 @@ public class TaskDescription {
 							m.saveExperiment(experiment, statusProvider, true, true);
 							sw.printTime();
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
-							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
-									+ " has completed analysis and saving of " + experiment.getName());
+							// MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
+							// + " has completed analysis and saving of " + experiment.getName());
 							
 							boolean saveOverallDatasetIfPossible = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_merge_batch_results", true);
 							if (saveOverallDatasetIfPossible)
