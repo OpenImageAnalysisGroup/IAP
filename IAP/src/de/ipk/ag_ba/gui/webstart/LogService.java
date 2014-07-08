@@ -2,6 +2,7 @@ package de.ipk.ag_ba.gui.webstart;
 
 import java.util.Stack;
 
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.IAPoptions;
@@ -65,7 +66,7 @@ public class LogService {
 			if (item != null && !item.contains("system-msg"))
 				res.append(item);
 			else
-				resSystem.append(item);
+				resSystem.append(StringManipulationTools.stringReplace(item, "(system-msg)", "").trim());
 		}
 		if (res != null && res.length() + resSystem.length() > 0) {
 			return pre + res.toString() + follow + (resSystem.length() == 0 ? "" : resSystem.toString() + follow);
