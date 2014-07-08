@@ -89,9 +89,8 @@ public class TaskDescription {
 			timeInfo = " Partial calculation will be performed on data newer than " + batch.getAvailableResultImportDate()
 					+ ". Available partial result data set: " + batch.getAvailableResultDatabaseId() + ".";
 		
-		// MongoDB.saveSystemMessage("Host " + SystemAnalysisExt.getHostNameNiceNoError()
-		// + " is starting analysis of " + batch.getExperimentHeader().getExperimentName()
-		// + " (task " + (batch.getPartIdx() + 1) + "/" + batch.getPartCnt() + ").");
+		MongoDB.saveSystemMessage("Start analysis of " + batch.getExperimentHeader().getExperimentName()
+				+ " (" + (batch.getPartIdx() + 1) + "/" + batch.getPartCnt() + ").");
 		
 		final BackgroundTaskStatusProviderSupportingExternalCall statusProvider = action.getStatusProvider();
 		
@@ -153,8 +152,7 @@ public class TaskDescription {
 							m.saveExperiment(experiment, statusProvider, true, true);
 							sw.printTime();
 							// ExperimentInterface experiment2 = m.getExperiment(experiment.getHeader());
-							// MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
-							// + " has completed analysis and saving of " + experiment.getName());
+							MongoDB.saveSystemMessage("Analysis results have been saved (" + (bcmd.getPartIdx() + 1) + "/" + bcmd.getPartCnt() + ")");
 							
 							boolean saveOverallDatasetIfPossible = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_merge_batch_results", true);
 							if (saveOverallDatasetIfPossible)
@@ -188,14 +186,12 @@ public class TaskDescription {
 						if (m.batch().getAll().size() > 0) {
 							System.out.println(">SYSTEM.EXIT(1) (batch queue not empty)");
 							Batch.pingHost(m, SystemAnalysisExt.getHostName(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN, "system.exit");
-							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
-									+ " finished compute task - SYSTEM.EXIT(1)");
+							MongoDB.saveSystemMessage("Finished compute task, job queue is not empty - SYSTEM.EXIT(1)");
 							System.exit(1);
 						} else {
 							System.out.println(">SYSTEM.EXIT(0) (batch queue is empty)");
 							Batch.pingHost(m, SystemAnalysisExt.getHostName(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN, "system.exit");
-							MongoDB.saveSystemMessage("INFO: Host " + SystemAnalysisExt.getHostNameNiceNoError()
-									+ " finished compute task - SYSTEM.EXIT(0)");
+							MongoDB.saveSystemMessage("Finished compute task, job queue is empty - SYSTEM.EXIT(0)");
 							System.exit(0);
 						}
 					} catch (Exception e) {
