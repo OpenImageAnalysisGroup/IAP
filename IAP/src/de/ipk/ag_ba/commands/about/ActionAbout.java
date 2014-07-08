@@ -12,7 +12,9 @@ import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.workflow.WorkflowHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author Christian Klukas
@@ -54,6 +56,16 @@ public class ActionAbout extends AbstractNavigationAction {
 				"It can not be guaranteed, that the functions contained in this software will meet <br>" +
 				"your requirements, that the operation of IAP will be uninterrupted or error free, <br>" +
 				"or that errors in the software will be corrected.</font>");
+		String f = "<font face=\"Sans,Tohama,Arial\">";
+		String fe = "</font>";
+		ll.add("<html><font face=\"Sans,Tohama,Arial\">System Environment</font>"
+				+ "<hr>"
+				+ "<table><tr><td>" + f + "Java Version" + fe + "</td><td>" + f + System.getProperty("java.version") + fe + "</td></tr>"
+				+ "<tr><td>" + f + "Operating System" + fe + "</td><td>" + f + SystemAnalysis.getOperatingSystem() + fe + "</td></tr>"
+				+ "<tr><td>" + f + "User Name" + fe + "</td><td>" + f + SystemAnalysis.getUserName() + fe + "</td></tr>"
+				+ "<tr><td>" + f + "Instance Network Name" + fe + "</td><td>" + f + SystemAnalysisExt.getHostNameNiceNoError() + fe + "</td></tr>"
+				+ "<tr><td>" + f + "System Load" + fe + "</td><td>" + f + StringManipulationTools.formatNumber(SystemAnalysisExt.getRealSystemCpuLoad(), 1) + fe
+				+ "</td></tr></table>");
 		MainPanelComponent mp = new MainPanelComponent(ll);// , new Color(0, 0, 20));
 		return mp;
 	}
