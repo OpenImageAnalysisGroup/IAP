@@ -57,7 +57,7 @@ public class ActionAbout extends AbstractNavigationAction {
 				"your requirements, that the operation of IAP will be uninterrupted or error free, <br>" +
 				"or that errors in the software will be corrected.</font>");
 		String f = "<font face=\"Sans,Tohama,Arial\">";
-		String fe = "</font>";
+		String fe = "</font>"; // + " / " + Runtime.class.getPackage().getImplementationVersion()
 		ll.add("<html><font face=\"Sans,Tohama,Arial\">System Environment</font>"
 				+ "<hr>"
 				+ "<table><tr><td>" + f + "Java Version" + fe + "</td><td>" + f + System.getProperty("java.version") + fe + "</td></tr>"
