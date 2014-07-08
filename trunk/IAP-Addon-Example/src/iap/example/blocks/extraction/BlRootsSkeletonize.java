@@ -151,9 +151,13 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 				{
 					DescriptiveStatistics limbs = new DescriptiveStatistics();
 					for (Edge e : sg.getGraph().getEdges()) {
-						Double val = e.getDouble("len");
-						if (val != null) {
-							limbs.addValue(val / 2);
+						try {
+							Double val = e.getDouble("len");
+							if (val != null) {
+								limbs.addValue(val / 2);
+							}
+						} catch (Exception e2) {
+							// TODO: handle exception
 						}
 					}
 					if (resultPrefix.isEmpty())
