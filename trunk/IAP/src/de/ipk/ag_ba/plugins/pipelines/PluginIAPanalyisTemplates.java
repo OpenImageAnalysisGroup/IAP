@@ -5,6 +5,7 @@ import iap.blocks.acquisition.BlFilterImagesByAngle;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
+import iap.blocks.auto.BlAdaptiveSegmentationVis;
 import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
 import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
 import iap.blocks.auto.BlWarpImages;
@@ -13,6 +14,7 @@ import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
 import iap.blocks.extraction.BlCalcConvexHull;
+import iap.blocks.extraction.BlCalcIntensityFeature3DHistogram;
 import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcMoments;
 import iap.blocks.extraction.BlCalcVolumes;
@@ -90,6 +92,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlOverlayMasksOnImages(),
 				new BlAdaptiveRemoveSmallObjectsVisFluo(),
 				new BlAdaptiveSegmentationFluo(),
+				new BlAdaptiveSegmentationVis(),
 				new BlAdaptiveThresholdNir(),
 				new BlAdaptiveUseFluoMaskToClearOther(),
 				new BlAutoAdaptiveThresholdNir(),
@@ -144,6 +147,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlFilterImagesByAngle(),
 				new BlWarpImages(),
 				new BlDetectLeafCenterPoints(),
+				new BlCalcIntensityFeature3DHistogram(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
