@@ -122,7 +122,7 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Auto-tuning Fluo Segmentation";
+		return "Auto-tuning FLUO-Segmentation";
 	}
 	
 	@Override
