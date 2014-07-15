@@ -2129,6 +2129,14 @@ public class TableLayout implements java.awt.LayoutManager2, java.io.Serializabl
 		return getMultiSplit(ge, componentsWidth, spaceT, spaceL, spaceB, spaceR);
 	}
 	
+	public static JComponent getMultiSplit(JComponent[] guiElements, double componentsWidth, double height, int spaceT,
+			int spaceL, int spaceB, int spaceR) {
+		ArrayList<JComponent> ge = new ArrayList<JComponent>();
+		for (JComponent j : guiElements)
+			ge.add(j);
+		return getMultiSplit(ge, componentsWidth, height, spaceT, spaceL, spaceB, spaceR);
+	}
+	
 	public static JComponent getMultiSplit(ArrayList<JComponent> guiElements, double componentsWidth, int spaceT,
 			int spaceL, int spaceB, int spaceR) {
 		JPanel result = new JPanel();
@@ -2137,6 +2145,23 @@ public class TableLayout implements java.awt.LayoutManager2, java.io.Serializabl
 		for (int i = 0; i < width.length; i++)
 			width[i] = componentsWidth;
 		result.setLayout(getLayout(width, TableLayoutConstants.PREFERRED));
+		int idx = 0;
+		for (JComponent jc : guiElements) {
+			result.add(FolderPanel.getBorderedComponent(jc, spaceT, spaceL, spaceB, spaceR), idx + ",0");
+			idx++;
+		}
+		result.validate();
+		return result;
+	}
+	
+	public static JComponent getMultiSplit(ArrayList<JComponent> guiElements, double componentsWidth, double height, int spaceT,
+			int spaceL, int spaceB, int spaceR) {
+		JPanel result = new JPanel();
+		result.setOpaque(false);
+		double[] width = new double[guiElements.size()];
+		for (int i = 0; i < width.length; i++)
+			width[i] = componentsWidth;
+		result.setLayout(getLayout(width, height));
 		int idx = 0;
 		for (JComponent jc : guiElements) {
 			result.add(FolderPanel.getBorderedComponent(jc, spaceT, spaceL, spaceB, spaceR), idx + ",0");
