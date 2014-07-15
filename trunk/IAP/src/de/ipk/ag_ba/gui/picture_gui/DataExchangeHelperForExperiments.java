@@ -171,19 +171,19 @@ public class DataExchangeHelperForExperiments {
 	}
 	
 	public static void fillFilePanel(final DataSetFilePanel filePanel,
-			final MongoTreeNode mtdbe, final JTree expTree)
+			final MongoTreeNode mtdbe, final JTree expTree, final boolean isAnnotationSavePossible)
 			throws InterruptedException {
 		LocalComputeJob r = new LocalComputeJob(new Runnable() {
 			@Override
 			public void run() {
-				addFilesToPanel(filePanel, mtdbe, expTree);
+				addFilesToPanel(filePanel, mtdbe, expTree, isAnnotationSavePossible);
 			}
 		}, "add files to panel");
 		BackgroundThreadDispatcher.addTask(r);
 	}
 	
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel,
-			final MongoTreeNode mt, final JTree expTree) {
+			final MongoTreeNode mt, final JTree expTree, boolean isAnnotationSavePossible) {
 		if (!mt.mayContainData())
 			return;
 		final StopObject stop = new StopObject(false);
@@ -344,7 +344,7 @@ public class DataExchangeHelperForExperiments {
 					cleared = true;
 					clearPanel(filePanel, mt, expTree);
 				}
-				processChartGenerator(executeLater, con != null ? con : sub, sub, mt, expTree, filePanel, bbb.isEmpty(), stop);
+				processChartGenerator(executeLater, con != null ? con : sub, sub, mt, expTree, filePanel, bbb.isEmpty(), stop, isAnnotationSavePossible);
 			}
 			
 			BinaryFileInfo lastBBB = null;
@@ -400,7 +400,7 @@ public class DataExchangeHelperForExperiments {
 				
 				SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
 						stop, executeLater, binaryFileInfo, imageButton,
-						previewLoadAndConstructNeededF, fIsLast));
+						previewLoadAndConstructNeededF, fIsLast, isAnnotationSavePossible));
 			}
 			
 		} catch (Exception e) {
@@ -409,7 +409,7 @@ public class DataExchangeHelperForExperiments {
 	}
 	
 	private static void processChartGenerator(ArrayList<LocalComputeJob> executeLater, final MappingDataEntity mde, final Substance3D sub,
-			MongoTreeNode mt, JTree expTree, DataSetFilePanel filePanel, boolean isLast, StopObject stop) {
+			MongoTreeNode mt, JTree expTree, DataSetFilePanel filePanel, boolean isLast, StopObject stop, boolean isAnnotationSavePossible) {
 		if (mt != expTree.getSelectionPath().getLastPathComponent())
 			return;
 		boolean addDataChart = true;
@@ -493,7 +493,7 @@ public class DataExchangeHelperForExperiments {
 			chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
 			
 			SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
-					stop, executeLater, null, chartingButton, false, false));
+					stop, executeLater, null, chartingButton, false, false, isAnnotationSavePossible));
 		}
 		if (addDataChart) {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
@@ -560,7 +560,7 @@ public class DataExchangeHelperForExperiments {
 			chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
 			
 			SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
-					stop, executeLater, null, chartingButton, false, isLast));
+					stop, executeLater, null, chartingButton, false, isLast, isAnnotationSavePossible));
 		}
 	}
 	
@@ -569,7 +569,8 @@ public class DataExchangeHelperForExperiments {
 			final ArrayList<LocalComputeJob> executeLater,
 			final BinaryFileInfo binaryFileInfo,
 			final DataSetFileButton imageButton,
-			final boolean previewLoadAndConstructNeededF, final boolean fIsLast) {
+			final boolean previewLoadAndConstructNeededF, final boolean fIsLast,
+			final boolean isAnnotationSavePossible) {
 		final int tw = DataSetFileButton.ICON_WIDTH;
 		return new Runnable() {
 			@Override
@@ -586,8 +587,12 @@ public class DataExchangeHelperForExperiments {
 							: TableLayout.getSplitVertical(imageButton, aip,
 									TableLayout.PREFERRED,
 									TableLayout.PREFERRED);
-					imageButton.addMouseListener(getML(aip));
-					buttonAndInfo.addMouseListener(getML(aip));
+					
+					if (isAnnotationSavePossible) {
+						imageButton.addMouseListener(getML(aip));
+						buttonAndInfo.addMouseListener(getML(aip));
+					}
+					
 					filePanel.add(buttonAndInfo);
 					filePanel.validate();
 					filePanel.repaint();

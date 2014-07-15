@@ -6,8 +6,11 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Stack;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,6 +33,7 @@ import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.IAPservice;
 
 public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListener, StatusDisplay {
 	private static final long serialVersionUID = 2171413300210427409L;
@@ -101,9 +105,10 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	
 	DataSetFilePanel currentFilePanel = null;
 	
-	public SupplementaryFilePanelMongoDB(ExperimentReference doc,
+	private final DataSetFilePanel buttonView;
+	
+	public SupplementaryFilePanelMongoDB(final ExperimentReference doc,
 			String experimentName) {
-		
 		final SupplementaryFilePanelMongoDB thisPanel = this;
 		
 		BackgroundThreadDispatcher.setFrameInstance(this);
@@ -116,8 +121,19 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 			}
 		});
 		
-		final FilePanelHeader filePanelHeader = new FilePanelHeader(addButton);
-		final DataSetFilePanel filePanel = new DataSetFilePanel(filePanelHeader);
+		final DataSetFilePanel filePanel = new DataSetFilePanel();
+		
+		buttonView = filePanel;
+		ArrayList<JButton> knownButtons = new ArrayList<JButton>();
+		JButton[] actions = buttonView == null ? null : new JButton[] {
+				new JButton(getAction("<html><u>Small", 128, knownButtons)),
+				new JButton(getAction("<html>Middle", 256, knownButtons)),
+				new JButton(getAction("<html>Large", 512, knownButtons))
+		};
+		for (JButton jb : actions)
+			knownButtons.add(jb);
+		final FilePanelHeader filePanelHeader = new FilePanelHeader(addButton, actions, "Icon Size >");
+		filePanel.init(filePanelHeader, knownButtons);
 		
 		currentFilePanel = filePanel;
 		
@@ -128,6 +144,8 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		// todo if mongo knows this ID as an experiment ID
 		boolean readOnly = !(doc != null && doc.getHeader() != null
 				&& doc.getHeader().getDatabaseId() != null);
+		
+		readOnly = !IAPservice.getIsAnnotationSavePossible(doc);
 		
 		expTree = new JTree(new ExperimentTreeModel(this, doc, readOnly));
 		
@@ -166,11 +184,16 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							filePanel.removeAll();
 							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
 							if (!((MongoTreeNodeBasis) mt).readOnly) {
-								String msg = "<font color='black'>You may also use drag+drop to add files to the currently selected entity of the experiment";
+								String msg = "<font color='black'>You may also use drag+drop to add files to the currently selected entity of the experiment.<br>"
+										+ "<b>Use left-click to download, right-click to show or manipulate files.</b>";
 								filePanel.setHeader(true, msg, false, true);
 							} else {
-								filePanel.setHeader(false,
-										"<font color='black'>Additional files can't be assigned to this entity", true, true);
+								filePanel
+										.setHeader(
+												false,
+												"<font color='black'>Additional files can't be assigned to this entity.<br>"
+														+ "<b>Use left-click to download, right-click to show or manipulate files.</b>",
+												true, true);
 							}
 							
 							filePanel.validate();
@@ -178,7 +201,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							
 							removeTempFiles();
 							try {
-								DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree);
+								DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, IAPservice.getIsAnnotationSavePossible(doc));
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -199,11 +222,15 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 								filePanel
 										.setHeader(
 												false,
-												"<font color='black'>To assign data, please select the experiment-node, a condition, timepoint or measurement value",
+												"<font color='black'>To assign data, please select the experiment-node, a condition, timepoint or measurement value.",
 												true, true);
 							else
-								filePanel.setHeader(false,
-										"<font color='black'>Additional files can't be assigned to this entity", true, true);
+								filePanel
+										.setHeader(
+												false,
+												"<font color='black'>Additional files can't be assigned to this entity.<br>"
+														+ "<b>Use left-click to download, right-click to show or manipulate files.</b>",
+												true, true);
 							
 							filePanel.validate();
 							filePanel.repaint();
@@ -238,6 +265,24 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		add(splitPane);
 		
 		validate();
+	}
+	
+	private Action getAction(String string, final int size, final ArrayList<JButton> knownButtons) {
+		return new AbstractAction(string) {
+			
+			@Override
+			public boolean isEnabled() {
+				return DataSetFileButton.ICON_WIDTH != size;
+			}
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				buttonView.getModifyButtonSize(size).actionPerformed(arg0);
+				for (JButton jb : knownButtons) {
+					jb.setEnabled(jb.getAction().isEnabled());
+				}
+			}
+		};
 	}
 	
 	public static void addTempFileToBeDeletedLater(File tempFile) {
