@@ -163,9 +163,12 @@ public class ThreadManager {
 	
 	public void memTask(LocalComputeJob t, boolean forceMem, int maxWait) {
 		boolean run = false;
+		boolean addForDelayedExecution = maxWait < 0;
+		if (maxWait < 0)
+			maxWait = -maxWait;
 		if (forceMem) {
 			jobModification.acquireUninterruptibly();
-			jobs.add(t);
+			jobs.addFirst(t);
 			jobModification.release();
 		} else {
 			runIdx++;

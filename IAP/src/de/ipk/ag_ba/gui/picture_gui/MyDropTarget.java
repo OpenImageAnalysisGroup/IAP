@@ -272,7 +272,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					file.delete();
 			}
 		}, "store image in database");
-		BackgroundThreadDispatcher.addTask(t);
+		BackgroundThreadDispatcher.addTask(t, true, -Integer.MAX_VALUE);
 	}
 	
 	public void processDirectory(File file) throws InterruptedException {

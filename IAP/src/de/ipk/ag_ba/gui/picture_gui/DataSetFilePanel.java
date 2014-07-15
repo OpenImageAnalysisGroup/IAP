@@ -5,7 +5,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -26,11 +28,17 @@ public class DataSetFilePanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JScrollPane scrollpane;
-	private final FilePanelHeader header;
+	private FilePanelHeader header;
 	private PopupListener popupListener;
+	private ArrayList<JButton> knownZoomButtons;
 	
-	public DataSetFilePanel(FilePanelHeader filePanelHeader) {
+	public DataSetFilePanel() {
+		// empty
+	}
+	
+	public void init(FilePanelHeader filePanelHeader, ArrayList<JButton> knownButtons) {
 		this.header = filePanelHeader;
+		this.knownZoomButtons = knownButtons;
 		
 		JPopupMenu popup = getPopupMenu();
 		
@@ -42,15 +50,15 @@ public class DataSetFilePanel extends JPanel {
 		int sz = DataSetFileButton.ICON_WIDTH;
 		JPopupMenu popup = new JPopupMenu("Button Size");
 		
-		JMenuItem menuItemCompact = new JCheckBoxMenuItem("Default Size", sz == 128);
+		JMenuItem menuItemCompact = new JCheckBoxMenuItem("Small Sized Buttons (Default)", sz == 128);
 		menuItemCompact.addActionListener(getModifyButtonSize(128));
 		popup.add(menuItemCompact);
 		
-		JMenuItem menuItemLarge = new JCheckBoxMenuItem("Large Buttons", sz == 256);
+		JMenuItem menuItemLarge = new JCheckBoxMenuItem("Middle Sized Buttons", sz == 256);
 		menuItemLarge.addActionListener(getModifyButtonSize(256));
 		popup.add(menuItemLarge);
 		
-		JMenuItem menuItemExtraLarge = new JCheckBoxMenuItem("Extra Large Buttons", sz == 512);
+		JMenuItem menuItemExtraLarge = new JCheckBoxMenuItem("Large Sized Buttons", sz == 512);
 		menuItemExtraLarge.addActionListener(getModifyButtonSize(512));
 		popup.add(menuItemExtraLarge);
 		return popup;
@@ -69,6 +77,10 @@ public class DataSetFilePanel extends JPanel {
 				removeMouseListener(DataSetFilePanel.this.popupListener);
 				DataSetFilePanel.this.popupListener = new PopupListener(popup);
 				addMouseListener(DataSetFilePanel.this.popupListener);
+				
+				for (JButton jb : knownZoomButtons) {
+					jb.setEnabled(jb.getAction().isEnabled());
+				}
 			}
 		};
 	}

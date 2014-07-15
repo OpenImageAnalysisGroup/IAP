@@ -366,8 +366,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					
 					if (targetTreeNode.getExperiment().getIniIoProvider() != null) {
 						try {
-							final IniIoProvider iop = targetTreeNode.getExperiment().getIniIoProvider();
-							if (iop != null) {
+							final IniIoProvider iop = targetTreeNode.isReadOnly() ? null : targetTreeNode.getExperiment().getIniIoProvider();
+							if (iop != null
+									&& targetTreeNode != null
+									&& targetTreeNode.getExperiment() != null
+									&& targetTreeNode.getExperiment().getHeader() != null
+									&& targetTreeNode.getExperiment().getHeader().getSettings() != null
+									&& !targetTreeNode.getExperiment().getHeader().getSettings().isEmpty()) {
 								Action action = new AbstractAction("Change Analysis Settings") {
 									@Override
 									public void actionPerformed(ActionEvent e) {
@@ -426,38 +431,39 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					}
 					
-					JMenu ta = new JMenu("Analysis Templates");
-					ta.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/book_object2.png")
-							.getScaledInstance(16, 16,
-									java.awt.Image.SCALE_SMOOTH)));
-					
-					ArrayList<AbstractPhenotypingTask> pl = new ArrayList<AbstractPhenotypingTask>();
-					try {
-						pl = new ImageAnalysisTasks().getKnownImageAnalysisTasks();
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						ErrorMsg.addErrorMessage(e1);
-					}
-					
-					boolean added = false;
-					
-					for (final AbstractPhenotypingTask iat : pl) {
-						JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
-						JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
+					if (!targetTreeNode.isReadOnly()) {
+						JMenu ta = new JMenu("Analysis Templates");
+						ta.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/book_object2.png")
+								.getScaledInstance(16, 16,
+										java.awt.Image.SCALE_SMOOTH)));
 						
-						ta.add(debugPipelineTest0a);
-						ta.add(debugPipelineTest00a);
-						added = true;
+						ArrayList<AbstractPhenotypingTask> pl = new ArrayList<AbstractPhenotypingTask>();
+						try {
+							pl = new ImageAnalysisTasks().getKnownImageAnalysisTasks();
+						} catch (Exception e1) {
+							e1.printStackTrace();
+							ErrorMsg.addErrorMessage(e1);
+						}
+						
+						boolean added = false;
+						
+						for (final AbstractPhenotypingTask iat : pl) {
+							JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
+							JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
+							
+							ta.add(debugPipelineTest0a);
+							ta.add(debugPipelineTest00a);
+							added = true;
+						}
+						
+						if (added)
+							jp.add(ta);
+						jp.addSeparator();
+						
+						JMenu fm = getAnnotationChangerSubmenu();
+						
+						jp.add(fm);
 					}
-					
-					if (added)
-						jp.add(ta);
-					jp.addSeparator();
-					
-					JMenu fm = getAnnotationChangerSubmenu();
-					
-					jp.add(fm);
-					
 					jp.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}

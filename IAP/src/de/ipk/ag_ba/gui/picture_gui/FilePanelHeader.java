@@ -12,8 +12,10 @@ package de.ipk.ag_ba.gui.picture_gui;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -23,14 +25,14 @@ public class FilePanelHeader extends JPanel {
 	JLabel header;
 	JButton button;
 	
-	public FilePanelHeader(JButton button) {
+	public FilePanelHeader(JButton button, JButton[] actions, String desc) {
 		setBackground(new Color(240, 245, 240));
 		setOpaque(true);
 		
 		this.button = button;
 		
-		double[][] size = new double[][] { { 3, TableLayout.PREFERRED, 6, TableLayout.FILL, 3 },
-							{ 3, TableLayout.PREFERRED, 3 } };
+		double[][] size = new double[][] { { 3, TableLayout.PREFERRED, 6, TableLayout.FILL, 6, TableLayout.PREFERRED, 3 },
+				{ 3, TableLayout.PREFERRED, 3 } };
 		
 		setLayout(new TableLayout(size));
 		
@@ -43,6 +45,15 @@ public class FilePanelHeader extends JPanel {
 		// header.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		
 		add(header, "3,1");
+		
+		if (actions != null && actions.length > 0) {
+			ArrayList<JComponent> jl = new ArrayList<JComponent>();
+			jl.add(new JLabel(desc));
+			for (JButton jb : actions)
+				jl.add(jb);
+			JComponent bg = TableLayout.getMultiSplit(jl, TableLayout.PREFERRED, TableLayout.FILL, 0, 3, 0, 3);
+			add(bg, "5,1");
+		}
 	}
 	
 	public void setText(String msg) {
