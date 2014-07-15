@@ -34,9 +34,9 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 	
 	private final HashMap<String, GridFS> cachedCollection = new HashMap<String, GridFS>();
 	
-	public MongoDBhandler(String ip, MongoDB m) {
+	public MongoDBhandler(String ip, int port, MongoDB m) {
 		this.m = m;
-		this.prefix = "mongo_" + ip + "_" + m.getDatabaseName();
+		this.prefix = "mongo_" + ip + "_" + port + "_" + m.getDatabaseName();
 	}
 	
 	@Override
@@ -68,6 +68,27 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 			
 			@Override
 			public void run() {
+				
+				if (m != null && m.lastHitGridFS != null) {
+					GridFSDBFile faf = m.lastHitGridFS.findOne(url.getDetail());
+					if (faf != null) {
+						try {
+							InputStream is = faf.getInputStream();
+							if (is != null && is instanceof MyByteArrayInputStream) {
+								VirtualFileSystemVFS2.readCounter.addLong(((MyByteArrayInputStream) is).getCount());
+							} else
+								if (is != null) {
+									is = ResourceIOManager.getInputStreamMemoryCached(is);
+									VirtualFileSystemVFS2.readCounter.addLong(((MyByteArrayInputStream) is).getCount());
+								}
+							// is = decompressStream(is);
+							or.setObject(is);
+							return;
+						} catch (Exception e) {
+							// emppty
+						}
+					}
+				}
 				if (getRemoteLTdataNotSavedInMongo) {
 					try {
 						if (url.getDetail().indexOf(".") > 0) {
@@ -116,6 +137,7 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 					GridFSDBFile fff = gridfs.findOne(url.getDetail());
 					if (fff != null) {
 						try {
+							m.lastHitGridFS = gridfs;
 							InputStream is = fff.getInputStream();
 							if (is != null && is instanceof MyByteArrayInputStream) {
 								VirtualFileSystemVFS2.readCounter.addLong(((MyByteArrayInputStream) is).getCount());

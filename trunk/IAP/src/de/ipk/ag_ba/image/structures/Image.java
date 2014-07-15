@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.WeakHashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -73,50 +74,48 @@ public class Image {
 		this.cameraType = type;
 	}
 	
-	// private static WeakHashMap<String, Image> url2image = new WeakHashMap<String, Image>();
+	private static WeakHashMap<String, Image> url2image = new WeakHashMap<String, Image>();
 	
 	public Image(IOurl url) throws IOException, Exception {
 		if (url != null && url.getFileName() != null)
 			this.fileName = url.getFileName();
 		
-		// Image img = null;
-		// synchronized (url2image) {
-		// img = url2image.get(url + "");
-		// }
-		// if (img == null) {
-		BufferedImage inpimg;
-		InputStream is = url.getInputStream();
-		if (is == null)
-			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
-		try {
-			if (".tiff".equalsIgnoreCase(url.getFileNameExtension()) || ".tif".equalsIgnoreCase(url.getFileNameExtension())) {
-				inpimg = new Opener().openTiff(is, url.getFileName()).getBufferedImage();
-			} else
-				inpimg = ImageIO.read(is);
-		} finally {
-			is.close();
+		Image img = null;
+		synchronized (url2image) {
+			img = url2image.get(url + "");
 		}
-		if (inpimg == null)
-			throw new Exception("Image could not be read: " + url);
-		try {
-			image = processTransparency(url.getFileName(), inpimg);
-		} catch (Exception e) {
-			System.out
-					.println(SystemAnalysis.getCurrentTime() + ">WARNING: Quick-load didn't work correctly, revert to save-conversion. Error: " + e.getMessage());
-			image = new ImagePlus(url.getFileName(), new ColorProcessor(inpimg));
+		if (img == null) {
+			BufferedImage inpimg;
+			InputStream is = url.getInputStream();
+			if (is == null)
+				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
+			try {
+				if (".tiff".equalsIgnoreCase(url.getFileNameExtension()) || ".tif".equalsIgnoreCase(url.getFileNameExtension())) {
+					inpimg = new Opener().openTiff(is, url.getFileName()).getBufferedImage();
+				} else
+					inpimg = ImageIO.read(is);
+			} finally {
+				is.close();
+			}
+			if (inpimg == null)
+				throw new Exception("Image could not be read: " + url);
+			try {
+				image = processTransparency(url.getFileName(), inpimg);
+			} catch (Exception e) {
+				System.out
+						.println(SystemAnalysis.getCurrentTime() + ">WARNING: Quick-load didn't work correctly, revert to save-conversion. Error: " + e.getMessage());
+				image = new ImagePlus(url.getFileName(), new ColorProcessor(inpimg));
+			}
+			synchronized (url2image) {
+				w = image.getWidth();
+				h = image.getHeight();
+				url2image.put(url + "", this.copy());
+			}
+		} else {
+			image = img.copy().getAsImagePlus();
+			w = image.getWidth();
+			h = image.getHeight();
 		}
-		// }
-		// synchronized (url2image) {
-		w = image.getWidth();
-		h = image.getHeight();
-		// url2image.put(url + "", this.copy());
-		// }
-		// } else {
-		// image = img.copy().getAsImagePlus();
-		// w = image.getWidth();
-		// h = image.getHeight();
-		// }
-		
 	}
 	
 	public static ImagePlus processTransparency(String optName, BufferedImage inpimg) {

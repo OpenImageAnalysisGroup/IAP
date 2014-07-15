@@ -45,38 +45,6 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
-						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
-						try {
-							processedImages.setVis(processVISimage());
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
-						} catch (Error er) {
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
-							reportError(er, "could not process VIS image - error");
-						} catch (Exception e) {
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
-							reportError(e, "could not process VIS image - exception");
-						}
-					}
-				}, name + " process VIS image", false),
-				BackgroundThreadDispatcher.addTask(new Runnable() {
-					@Override
-					public void run() {
-						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
-						try {
-							processedImages.setFluo(processFLUOimage());
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
-						} catch (Error er) {
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
-							reportError(er, "could not process FLUO image - error");
-						} catch (Exception e) {
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
-							reportError(e, "could not process FLUO image - exception");
-						}
-					}
-				}, name + " process FLU image", false),
-				BackgroundThreadDispatcher.addTask(new Runnable() {
-					@Override
-					public void run() {
 						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_NIR + "");
 						try {
 							processedImages.setNir(processNIRimage());
@@ -105,39 +73,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process IR image - exception");
 						}
 					}
-				}, name + " process NIR image", false),
-				BackgroundThreadDispatcher.addTask(new Runnable() {
-					@Override
-					public void run() {
-						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
-						try {
-							processedMasks.setVis(processVISmask());
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
-						} catch (Error er) {
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
-							reportError(er, "could not process VIS mask - error");
-						} catch (Exception e) {
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
-							reportError(e, "could not process VIS mask - exception");
-						}
-					}
-				}, name + " process VIS mask", false),
-				BackgroundThreadDispatcher.addTask(new Runnable() {
-					@Override
-					public void run() {
-						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
-						try {
-							processedMasks.setFluo(processFLUOmask());
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
-						} catch (Error er) {
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
-							reportError(er, "could not process FLUO mask - error");
-						} catch (Exception e) {
-							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
-							reportError(e, "could not process FLUO mask - exception");
-						}
-					}
-				}, name + " process FLU mask", false),
+				}, name + " process IR image", false),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -169,7 +105,71 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process IR mask - exception");
 						}
 					}
-				}, name + " process IR mask", false) };
+				}, name + " process IR mask", false),
+				BackgroundThreadDispatcher.addTask(new Runnable() {
+					@Override
+					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
+						try {
+							processedImages.setVis(processVISimage());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
+							reportError(er, "could not process VIS image - error");
+						} catch (Exception e) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
+							reportError(e, "could not process VIS image - exception");
+						}
+					}
+				}, name + " process VIS image", false),
+				BackgroundThreadDispatcher.addTask(new Runnable() {
+					@Override
+					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
+						try {
+							processedMasks.setVis(processVISmask());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
+							reportError(er, "could not process VIS mask - error");
+						} catch (Exception e) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
+							reportError(e, "could not process VIS mask - exception");
+						}
+					}
+				}, name + " process VIS mask", false),
+				BackgroundThreadDispatcher.addTask(new Runnable() {
+					@Override
+					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
+						try {
+							processedImages.setFluo(processFLUOimage());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
+							reportError(er, "could not process FLUO image - error");
+						} catch (Exception e) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
+							reportError(e, "could not process FLUO image - exception");
+						}
+					}
+				}, name + " process FLU image", false),
+				BackgroundThreadDispatcher.addTask(new Runnable() {
+					@Override
+					public void run() {
+						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
+						try {
+							processedMasks.setFluo(processFLUOmask());
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
+						} catch (Error er) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
+							reportError(er, "could not process FLUO mask - error");
+						} catch (Exception e) {
+							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
+							reportError(e, "could not process FLUO mask - exception");
+						}
+					}
+				}, name + " process FLU mask", false) };
 		
 		BackgroundThreadDispatcher.waitFor(work);
 		

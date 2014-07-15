@@ -279,7 +279,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			while (!workLoad.isEmpty() && !status.wantsToStop()) {
 				Runnable t = workLoad.poll();
 				String d = workLoad_desc.poll();
-				wait.add(BackgroundThreadDispatcher.addTask(t, d, true));
+				wait.add(BackgroundThreadDispatcher.addTask(t, d, false));
 				progr.addInt(1);
 				String plantName = d;
 				if (plantName.contains(";"))

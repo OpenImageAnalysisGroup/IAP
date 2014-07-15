@@ -29,6 +29,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  */
 public class CloudTaskManager {
 	
+	public static boolean disableWatchDog;
+	
 	private String hostName;
 	
 	private boolean process = false;
@@ -142,7 +144,7 @@ public class CloudTaskManager {
 							}
 						}
 					}
-					if (!fixedDisableProcess && cpuDesire < maxTasks && !disallownewtasks) { // if (runningTasks.size() < maxTasks) {
+					if (!fixedDisableProcess && cpuDesire < maxTasks && !disallownewtasks) {
 						if (m == null)
 							return;
 						for (BatchCmd batch : m.batch().getScheduledForStart(maxTasks - cpuDesire)) {
@@ -274,30 +276,31 @@ public class CloudTaskManager {
 							lastNt = System.currentTimeMillis();
 							lastN = nowBE;
 						}
-						if (lastN == nowBE && lastN > 0 && System.currentTimeMillis() - lastNt > 15 * 60 * 1000) {
-							Runnable r = new Runnable() {
-								@Override
-								public void run() {
-									try {
-										MongoDB.saveSystemErrorMessage("Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 15 MIN // SYSTEM.EXIT", null);
-										Batch.pingHost(m, hostName, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN,
-												"system.exit (no block execution within 15 min)");
-									} catch (Exception e) {
-										e.printStackTrace();
+						if (!CloudTaskManager.disableWatchDog)
+							if (lastN == nowBE && lastN > 0 && System.currentTimeMillis() - lastNt > 15 * 60 * 1000) {
+								Runnable r = new Runnable() {
+									@Override
+									public void run() {
+										try {
+											MongoDB.saveSystemErrorMessage("Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 15 MIN // SYSTEM.EXIT", null);
+											Batch.pingHost(m, hostName, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN,
+													"system.exit (no block execution within 15 min)");
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
 									}
+								};
+								Thread msg = new Thread(r);
+								msg.start();
+								System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 15 MIN");
+								System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
+								try {
+									Thread.sleep(9000);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
 								}
-							};
-							Thread msg = new Thread(r);
-							msg.start();
-							System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 15 MIN");
-							System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
-							try {
-								Thread.sleep(9000);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
+								System.exit(0);
 							}
-							System.exit(0);
-						}
 						Thread.sleep(60 * 1000); // every minute
 					}
 				} catch (InterruptedException e) {
@@ -314,5 +317,10 @@ public class CloudTaskManager {
 	
 	public boolean isDisableProces() {
 		return fixedDisableProcess;
+	}
+	
+	public static void enableWatchDog() {
+		BlockPipeline.ping();
+		disableWatchDog = false;
 	}
 }
