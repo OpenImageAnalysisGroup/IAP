@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -13,6 +14,7 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.PixelGrabber;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 
 import javax.imageio.ImageIO;
@@ -24,6 +26,9 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
+
+import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.image.operation.ImageOperation;
 
 /**
  * @author Christian Klukas
@@ -50,7 +55,10 @@ public class MyImageIcon extends ImageIcon {
 		initImageData(observer, width, height, fileMain, fileLabel, bfi);
 	}
 	
-	public synchronized void initImageData(Component observer, int width, int height, IOurl fileMain, IOurl fileLabel, BinaryFileInfo bfi)
+	public static final de.ipk.ag_ba.image.structures.Image loadingIcon = IAPimages.getImageIAP("img/ext/gpl2/Gnome-Image-Loading-64.png", 64).io()
+			.replaceColor(0, ImageOperation.BACKGROUND_COLORint).getImage();
+	
+	public synchronized void initImageData(final Component observer, int width, int height, IOurl fileMain, IOurl fileLabel, BinaryFileInfo bfi)
 			throws MalformedURLException {
 		this.bfi = bfi;
 		String description = fileMain.getFileName();
@@ -61,22 +69,60 @@ public class MyImageIcon extends ImageIcon {
 		
 		try {
 			BufferedImage i = null;
-			// if (width == 128 && height == 128) {
 			ResourceIOHandler ioh = ResourceIOManager.getHandlerFromPrefix(fileURLmain.getPrefix());
-			try {
-				i = ImageIO.read(ioh.getPreviewInputStream(fileURLmain, width));
-			} catch (Exception e) {
-				//
+			InputStream ins = ioh.getPreviewInputStream(fileURLmain, width);
+			i = ins != null ? ImageIO.read(ins) : null;
+			if (i != null && width != 128) {
+				i = new de.ipk.ag_ba.image.structures.Image(i).io().grayscale().border_4sides(4, java.awt.Color.RED.getRGB())
+						.canvas().drawImage(loadingIcon, i.getWidth() - 64 - 4, i.getHeight() - 64 - 6).getImage().getAsBufferedImage();
 			}
-			if (i == null) {
-				i = new de.ipk.ag_ba.image.structures.Image(fileURLmain).getAsBufferedImage();
-				int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
-				double factor = DataSetFileButton.ICON_HEIGHT / (double) maxS;
-				i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
+			if (i == null || width != 128) {
+				BackgroundThreadDispatcher.addTask(new Runnable() {
+					
+					@Override
+					public void run() {
+						BufferedImage i;
+						try {
+							i = new de.ipk.ag_ba.image.structures.Image(fileURLmain).getAsBufferedImage();
+							int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
+							double factor = DataSetFileButton.ICON_HEIGHT / (double) maxS;
+							i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
+							setImage(i);
+							observer.repaint();
+						} catch (Exception e) {
+							imageAvailable = 0;
+							
+							i = null;
+							
+							try {
+								sun.awt.shell.ShellFolder sf = sun.awt.shell.ShellFolder.getShellFolder(FileSystemHandler.getFile(fileURLmain));
+								i = toBufferedImage(sf.getIcon(true));
+							} catch (Exception err) {
+								ImageIcon ic;
+								try {
+									ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
+											FileSystemHandler.getFile(fileURLmain));
+									if (ic == null) {
+										i = toBufferedImage(new ImageIcon(MainFrame.getInstance().getIconImage()).getImage());
+									} else
+										i = toBufferedImage(ic.getImage());
+								} catch (Exception err2) {
+									i = null;
+								}
+								
+							}
+							if (i != null) {
+								int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
+								double factor = 128 / maxS;
+								i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
+								setImage(i);
+							}
+						}
+					}
+				}, "Load full res image", true, Integer.MAX_VALUE);
+				imageAvailable = 1;
+				setImage(i);
 			}
-			imageAvailable = 1;
-			setImage(i);
-			
 		} catch (Exception e1) {
 			imageAvailable = 0;
 			
@@ -91,7 +137,7 @@ public class MyImageIcon extends ImageIcon {
 					ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
 							FileSystemHandler.getFile(fileURLmain));
 					if (ic == null) {
-						i = toBufferedImage(new ImageIcon(MainFrame.getInstance().getIconImage()).getImage());
+						i = loadingIcon.io().replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).getAsBufferedImage();
 					} else
 						i = toBufferedImage(ic.getImage());
 				} catch (Exception e2) {
@@ -101,7 +147,7 @@ public class MyImageIcon extends ImageIcon {
 			}
 			if (i != null) {
 				int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
-				double factor = 128 / maxS;
+				double factor = width / maxS;
 				i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
 				setImage(i);
 			}
@@ -179,20 +225,24 @@ public class MyImageIcon extends ImageIcon {
 	}
 	
 	public static BufferedImage resize(BufferedImage image, int width, int height) {
-		int type = image.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : image.getType();
-		BufferedImage resizedImage = new BufferedImage(width, height, type);
-		Graphics2D g = resizedImage.createGraphics();
-		g.setComposite(AlphaComposite.Src);
-		
-		// g.setRenderingHint(RenderingHints.KEY_RENDERING,
-		// RenderingHints.VALUE_RENDER_QUALITY);
-		//
-		// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		// RenderingHints.VALUE_ANTIALIAS_ON);
-		
-		g.drawImage(image, 0, 0, width, height, null);
-		g.dispose();
-		return resizedImage;
+		if (true)
+			return new de.ipk.ag_ba.image.structures.Image(image).io().resize(width, height).getAsBufferedImage();
+		else {
+			int type = image.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : image.getType();
+			BufferedImage resizedImage = new BufferedImage(width, height, type);
+			Graphics2D g = resizedImage.createGraphics();
+			g.setComposite(AlphaComposite.Src);
+			
+			// g.setRenderingHint(RenderingHints.KEY_RENDERING,
+			// RenderingHints.VALUE_RENDER_QUALITY);
+			//
+			// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			// RenderingHints.VALUE_ANTIALIAS_ON);
+			
+			g.drawImage(image, 0, 0, width, height, null);
+			g.dispose();
+			return resizedImage;
+		}
 	}
 	
 	/*

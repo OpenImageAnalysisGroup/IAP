@@ -920,7 +920,8 @@ public class ImageOperation implements MemoryHogInterface {
 			for (int y = 0; y < height; y++) {
 				int i = (x + offX) + (y + offY) * ww;
 				if (i >= 0 && i < bigImage.length)
-					bigImage[i] = fillValue[x][y];
+					if (fillValue[x][y] != ImageOperation.BACKGROUND_COLORint)
+						bigImage[i] = fillValue[x][y];
 			}
 		
 		return new ImageOperation(bigImage, ww, image.getHeight());
@@ -3139,6 +3140,34 @@ public class ImageOperation implements MemoryHogInterface {
 		 * }
 		 * }
 		 */
+		return new ImageOperation(in, w, h);
+	}
+	
+	public ImageOperation border_4sides(int bb, int color) {
+		int[] in = getAs1D();
+		
+		int w = getImage().getWidth();
+		int h = getImage().getHeight();
+		
+		int backgroundColor = color;
+		
+		if (w > bb)
+			for (int y = 0; y < h; y++) {
+				for (int d = 0; d < bb; d++) {
+					in[d + y * w] = backgroundColor;
+					in[w - 1 - d + y * w] = backgroundColor;
+				}
+			}
+		
+		// top side:
+		if (h > bb)
+			for (int x = 0; x < w; x++) {
+				for (int d = 0; d < bb; d++) {
+					in[x + d * w] = backgroundColor;
+					in[x + (h - 1 - d) * w] = backgroundColor;
+				}
+			}
+		
 		return new ImageOperation(in, w, h);
 	}
 	

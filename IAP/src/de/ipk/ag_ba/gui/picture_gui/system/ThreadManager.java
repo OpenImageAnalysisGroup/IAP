@@ -158,6 +158,10 @@ public class ThreadManager {
 	private static long runIdx = 0;
 	
 	public void memTask(LocalComputeJob t, boolean forceMem) {
+		memTask(t, forceMem, SystemAnalysis.getRealNumberOfCPUs() * 4);
+	}
+	
+	public void memTask(LocalComputeJob t, boolean forceMem, int maxWait) {
 		boolean run = false;
 		if (forceMem) {
 			jobModification.acquireUninterruptibly();
@@ -189,7 +193,6 @@ public class ThreadManager {
 						.getMemoryMB() + " MB)");
 			}
 		}
-		int maxWait = SystemAnalysis.getRealNumberOfCPUs() * 4;
 		jobModification.acquireUninterruptibly();
 		if (jobs.size() > maxWait)
 			run = true;

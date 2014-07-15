@@ -43,8 +43,21 @@ public class BackgroundThreadDispatcher {
 		return addTask(new LocalComputeJob(r, name), forceMem);
 	}
 	
+	public static LocalComputeJob addTask(Runnable r, String name, boolean forceMem, int maxJobsWaiting) throws InterruptedException {
+		return addTask(new LocalComputeJob(r, name), forceMem, maxJobsWaiting);
+	}
+	
 	public static LocalComputeJob addTask(LocalComputeJob t) {
 		return addTask(t, false);
+	}
+	
+	public static LocalComputeJob addTask(LocalComputeJob t, boolean forceMem, int maxJobsWaiting) {
+		if (t == null)
+			return null;
+		
+		ThreadManager.getInstance().memTask(t, forceMem, maxJobsWaiting);
+		
+		return t;
 	}
 	
 	public static LocalComputeJob addTask(LocalComputeJob t, boolean forceMem) {

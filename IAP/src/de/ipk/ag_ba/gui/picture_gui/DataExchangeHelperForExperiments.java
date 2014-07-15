@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -64,6 +65,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -369,7 +371,7 @@ public class DataExchangeHelperForExperiments {
 						previewLoadAndConstructNeeded = true;
 					}
 				} else {
-					previewImage = null;
+					previewImage = new ImageIcon(MyImageIcon.loadingIcon.getAsBufferedImage());
 					previewLoadAndConstructNeeded = true;
 				}
 				final DataSetFileButton imageButton = new DataSetFileButton(
@@ -411,6 +413,33 @@ public class DataExchangeHelperForExperiments {
 		if (mt != expTree.getSelectionPath().getLastPathComponent())
 			return;
 		boolean addDataChart = true;
+		if (mde != null && mde instanceof SubstanceInterface) {
+			SubstanceInterface si = (SubstanceInterface) mde;
+			boolean foundNumericValues = false;
+			mainLoop: for (ConditionInterface ci : si)
+				for (SampleInterface sai : ci)
+					for (NumericMeasurementInterface nmi : sai) {
+						if (!(nmi instanceof BinaryMeasurement)) {
+							foundNumericValues = true;
+							break mainLoop;
+						}
+					}
+			if (!foundNumericValues)
+				addDataChart = false;
+		} else
+			if (mde != null && mde instanceof ConditionInterface) {
+				boolean foundNumericValues = false;
+				mainLoop: for (SampleInterface sai : (ConditionInterface) mde)
+					for (NumericMeasurementInterface nmi : sai) {
+						if (!(nmi instanceof BinaryMeasurement)) {
+							foundNumericValues = true;
+							break mainLoop;
+						}
+					}
+				if (!foundNumericValues)
+					addDataChart = false;
+			}
+		
 		if (addDataChart) {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
 			
@@ -466,7 +495,7 @@ public class DataExchangeHelperForExperiments {
 			SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
 					stop, executeLater, null, chartingButton, false, false));
 		}
-		{
+		if (addDataChart) {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
 			
 			final DataSetFileButton chartingButton = new DataSetFileButton(
@@ -553,7 +582,7 @@ public class DataExchangeHelperForExperiments {
 					final AnnotationInfoPanel aip = new AnnotationInfoPanel(
 							imageButton, mt, mf);
 					imageButton.setAnnotationInfoPanel(aip);
-					JComponent buttonAndInfo = binaryFileInfo == null || !binaryFileInfo.isPrimary() ? imageButton
+					final JComponent buttonAndInfo = binaryFileInfo == null || !binaryFileInfo.isPrimary() ? imageButton
 							: TableLayout.getSplitVertical(imageButton, aip,
 									TableLayout.PREFERRED,
 									TableLayout.PREFERRED);
@@ -575,7 +604,7 @@ public class DataExchangeHelperForExperiments {
 										final MyImageIcon myImage;
 										try {
 											myImage = new MyImageIcon(
-													MainFrame.getInstance(),
+													buttonAndInfo, // MainFrame.getInstance(),
 													DataSetFileButton.ICON_WIDTH,
 													DataSetFileButton.ICON_HEIGHT,
 													binaryFileInfo
@@ -613,6 +642,7 @@ public class DataExchangeHelperForExperiments {
 						}
 						
 					}
+					Collections.reverse(executeLater);
 					BackgroundTaskHelper.executeLaterOnSwingTask(10,
 							new Runnable() {
 								@Override
@@ -620,8 +650,7 @@ public class DataExchangeHelperForExperiments {
 									boolean isLast = fIsLast;
 									if (isLast)
 										for (LocalComputeJob ttt : executeLater)
-											BackgroundThreadDispatcher.addTask(
-													ttt);
+											BackgroundThreadDispatcher.addTask(ttt, true, Integer.MAX_VALUE);
 								}
 							});
 				} else
