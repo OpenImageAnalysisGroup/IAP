@@ -1938,4 +1938,8 @@ public class MongoDB {
 	public SplitResult processSplitResults() {
 		return new SplitResult(this);
 	}
+	
+	public int getDefaultPort() {
+		return 27017;
+	}
 }
