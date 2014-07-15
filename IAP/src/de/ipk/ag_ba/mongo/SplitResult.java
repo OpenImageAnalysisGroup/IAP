@@ -16,8 +16,10 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
 import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
+import de.ipk.ag_ba.server.task_management.CloudTaskManager;
 import de.ipk.ag_ba.server.task_management.TempDataSetDescription;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -448,7 +450,10 @@ public class SplitResult {
 					try {
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("About to merge split result datasets");
+						CloudTaskManager.disableWatchDog = true;
 						doMerge(tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
+						BlockPipeline.ping();
+						CloudTaskManager.disableWatchDog = false;
 					} catch (Exception e) {
 						MongoDB.saveSystemErrorMessage("Could not properly merge temporary datasets.", e);
 					}

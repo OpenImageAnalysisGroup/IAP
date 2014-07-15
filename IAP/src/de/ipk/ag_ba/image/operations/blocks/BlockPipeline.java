@@ -35,6 +35,8 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
@@ -111,28 +113,37 @@ public class BlockPipeline {
 		final ObjectRef exception = new ObjectRef();
 		if (status != null)
 			status.setCurrentStatusValue(0);
+		ArrayList<LocalComputeJob> jobs = new ArrayList<LocalComputeJob>();
 		for (int idx = 0; idx < executionTrayCount; idx++) {
 			if (debugValidTrays != null && !debugValidTrays.contains(idx))
 				continue;
 			final int well = idx;
 			final int wellCnt = executionTrayCount;
-			ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
-			try {
-				BlockResultSet res = executeInnerCall(well, wellCnt, options, new StringAndFlexibleMaskAndImageSet(null, input), ds, status);
-				if (options.forceDebugStack)
-					synchronized (options.forcedDebugStacks) {
-						options.forcedDebugStacks.add(ds);
+			Runnable r = new Runnable() {
+				
+				@Override
+				public void run() {
+					ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
+					try {
+						BlockResultSet res = executeInnerCall(well, wellCnt, options, new StringAndFlexibleMaskAndImageSet(null, input), ds, status);
+						if (options.forceDebugStack)
+							synchronized (options.forcedDebugStacks) {
+								options.forcedDebugStacks.add(ds);
+							}
+						res.clearStoredPostprocessors();
+						res.clearNotUsedResults();
+						synchronized (blockResults) {
+							blockResults.put(well, res);
+						}
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+						exception.setObject(e);
 					}
-				res.clearStoredPostprocessors();
-				res.clearNotUsedResults();
-				synchronized (blockResults) {
-					blockResults.put(well, res);
 				}
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-				exception.setObject(e);
-			}
+			};
+			jobs.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + idx));
 		}
+		BackgroundThreadDispatcher.waitFor(jobs);
 		if (exception.getObject() != null)
 			throw ((Exception) exception.getObject());
 	}
@@ -140,7 +151,6 @@ public class BlockPipeline {
 	private BlockResultSet executeInnerCall(int well, int executionWellCount,
 			ImageProcessorOptionsAndResults options,
 			StringAndFlexibleMaskAndImageSet input, ImageStack debugStack,
-			
 			BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
 		BlockResultSet results = new BlockResults(options.getCameraAngle());
@@ -456,5 +466,9 @@ public class BlockPipeline {
 	
 	public int getSize() {
 		return blocks.size();
+	}
+	
+	public static void ping() {
+		overallBlockExecutions++;
 	}
 }

@@ -108,6 +108,7 @@ public class MongoDB {
 	private final MongoDBhandler mh;
 	
 	WeakHashMap<MongoClient, HashSet<String>> authenticatedDBs = new WeakHashMap<MongoClient, HashSet<String>>();
+	private final int databasePort;
 	
 	public static ArrayList<MongoDB> getMongos() {
 		return initMongoList();
@@ -150,6 +151,7 @@ public class MongoDB {
 				"database_name", "cloud" + (idx + 1));
 		String hostName = IAPoptions.getInstance().getString(sec,
 				"host", "ba-13.ipk-gatersleben.de");
+		Integer port = IAPoptions.getInstance().getInteger(sec, "port", 27017);
 		String login = IAPoptions.getInstance().getString(sec,
 				"login", null);
 		String password = IAPoptions.getInstance().getString(sec,
@@ -163,7 +165,8 @@ public class MongoDB {
 		// return defaultCloudInstance;
 		// } else {
 		
-		String id = enabled + ";" + displayName + ";" + databaseName + ";" + hostName + ";" + login + ";" + password;
+		String id = enabled + ";" + displayName + ";" + databaseName + ";" + hostName + ";" + port
+				+ ";" + login + ";" + password;
 		synchronized (id2m) {
 			MongoDB mc = id2m.get(id);
 			if (mc != null)
@@ -171,7 +174,7 @@ public class MongoDB {
 			else
 				System.out.println("Cache miss (" + id2m.size() + " entries known): " + id);
 		}
-		MongoDB mm = new MongoDB(displayName, databaseName, hostName,
+		MongoDB mm = new MongoDB(displayName, databaseName, hostName, port,
 				login, password, HashType.MD5);
 		mm.enabled = enabled;
 		synchronized (id2m) {
@@ -194,17 +197,18 @@ public class MongoDB {
 	// substances
 	// conditions
 	
-	private MongoDB(String displayName, String databaseName, String hostName, String login, String password, HashType hashType) {
+	private MongoDB(String displayName, String databaseName, String hostName, int port, String login, String password, HashType hashType) {
 		if (databaseName == null || databaseName.contains("/")) // databaseName.contains("_") ||
 			throw new UnsupportedOperationException("Database name may not be NULL and may not contain special characters!");
 		this.displayName = displayName;
 		this.databaseName = databaseName;
 		this.databaseHost = hostName;
+		this.databasePort = port;
 		this.databaseLogin = login;
 		this.databasePass = password;
 		this.hashType = hashType;
 		
-		mh = new MongoDBhandler(databaseHost, this);
+		mh = new MongoDBhandler(databaseHost, port, this);
 		
 		for (VirtualFileSystem vfs : VirtualFileSystem.getKnown(false)) {
 			if (vfs instanceof VirtualFileSystemVFS2) {
@@ -245,16 +249,16 @@ public class MongoDB {
 	// private static int dbMaxCon = SystemOptions.getInstance().getInteger("GRID-STORAGE", "connections per host", 5);
 	// private static Semaphore runningOps = new Semaphore(dbMaxCon, true);
 	
-	private void processDB(String database, String optHosts, String optLogin, String optPass,
+	private void processDB(String database, String optHosts, int optPort, String optLogin, String optPass,
 			RunnableOnDB runnableOnDB) throws Exception {
 		int repeats = SystemOptions.getInstance().getInteger("GRID-STORAGE", "retry-count in case of error", 0) + 1;
-		processDB(database, optHosts, optLogin, optPass, runnableOnDB, repeats);
+		processDB(database, optHosts, optPort, optLogin, optPass, runnableOnDB, repeats);
 	}
 	
-	private void processDB(String database, String optHosts, String optLogin, String optPass,
+	private void processDB(String database, String optHosts, int optPort, String optLogin, String optPass,
 			RunnableOnDB runnableOnDB, int repeats) throws Exception {
 		Exception e = null;
-		String key = optHosts + ";" + database;
+		String key = optHosts + ";" + optPort + ";" + database;
 		
 		boolean ok = false;
 		int nrep = 0;
@@ -262,7 +266,7 @@ public class MongoDB {
 			try {
 				DB db;
 				// synchronized (this.getClass()) {
-				createMongoConnection(database, optHosts, optLogin, optPass, key);
+				createMongoConnection(database, optHosts, optPort, optLogin, optPass, key);
 				db = m.getDB(database);
 				// }
 				if (authenticatedDBs.get(m) == null || !authenticatedDBs.get(m).contains(database))
@@ -289,6 +293,13 @@ public class MongoDB {
 					dbsAnalyzedForCollectionSettings.add(database);
 				}
 				
+				boolean ensureIndex = MongoDB.getEnsureIndex();
+				if (ensureIndex)
+					for (String fs : MongoGridFS.getFileCollections()) {
+						DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
+						collectionChunks.ensureIndex("files_id");
+					}
+				
 				runnableOnDB.setDB(db);
 				runnableOnDB.run();
 				ok = true;
@@ -307,7 +318,7 @@ public class MongoDB {
 			throw e;
 	}
 	
-	private void createMongoConnection(String database, String optHosts, String optLogin, String optPass, String key) throws UnknownHostException {
+	private void createMongoConnection(String database, String optHosts, int optPort, String optLogin, String optPass, String key) throws UnknownHostException {
 		if (m == null) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Establish DB connection (" + key + ")");
 			Builder mob = new MongoClientOptions.Builder();
@@ -326,12 +337,12 @@ public class MongoDB {
 			
 			StopWatch s = new StopWatch("INFO: new MongoClient(...)", false);
 			if (optHosts == null || optHosts.length() == 0) {
-				MongoClient mc = new MongoClient("localhost", mco);
+				MongoClient mc = new MongoClient("localhost:" + optPort, mco);
 				m = mc;
 			} else {
 				List<ServerAddress> seeds = new ArrayList<ServerAddress>();
 				for (String h : optHosts.split(","))
-					seeds.add(new ServerAddress(h));
+					seeds.add(new ServerAddress(h, optPort));
 				MongoClient mc = new MongoClient(seeds, mco);
 				m = mc;
 			}
@@ -373,15 +384,15 @@ public class MongoDB {
 	}
 	
 	public void processDB(RunnableOnDB runnableOnDB) throws Exception {
-		processDB(getDatabaseName(), databaseHost, databaseLogin, databasePass, runnableOnDB);
+		processDB(getDatabaseName(), databaseHost, databasePort, databaseLogin, databasePass, runnableOnDB);
 	}
 	
 	public void processDB(RunnableOnDB runnableOnDB, int repeats) throws Exception {
-		processDB(getDatabaseName(), databaseHost, databaseLogin, databasePass, runnableOnDB, repeats);
+		processDB(getDatabaseName(), databaseHost, databasePort, databaseLogin, databasePass, runnableOnDB, repeats);
 	}
 	
 	public void processDB(long timeout, RunnableOnDB runnableOnDB) throws Exception {
-		processDB(getDatabaseName(), databaseHost, databaseLogin, databasePass, runnableOnDB);
+		processDB(getDatabaseName(), databaseHost, databasePort, databaseLogin, databasePass, runnableOnDB);
 	}
 	
 	public void deleteUnusedBinaryFiles() {
@@ -1793,6 +1804,7 @@ public class MongoDB {
 	
 	HashMap<String, VirtualFileSystem> lastHit = new HashMap<String, VirtualFileSystem>();
 	private CollectionStorage colls;
+	protected GridFS lastHitGridFS;
 	
 	public InputStream getVFSinputStream(String bucket, String detail) {
 		if (vfs_file_storage != null) {
