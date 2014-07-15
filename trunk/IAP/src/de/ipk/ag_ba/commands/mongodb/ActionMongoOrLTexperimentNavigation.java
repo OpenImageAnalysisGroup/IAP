@@ -94,10 +94,7 @@ public class ActionMongoOrLTexperimentNavigation extends
 		if (header != null && header.getDatabaseId() != null
 				&& !header.getDatabaseId().startsWith("lt:")
 				&& (header.getImportusername() == null
-						|| header.getImportusername().equals("tomcat") || header
-						.getImportusername().equals(
-								SystemAnalysis.getUserName()))
-				|| !SystemAnalysis.isHeadless()) {
+				|| header.getImportusername().equals("tomcat"))) {
 			// if (experimentReference.m != null)
 			if (header.inTrash()) {
 				actions.add(ActionTrash.getTrashEntity(header,
