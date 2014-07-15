@@ -20,6 +20,12 @@ public class IAPimages {
 		return f.resize(maxSize, maxSize, true).io().replaceColor(Color.BLACK.getRGB(), Color.WHITE.getRGB()).getAsBufferedImage();
 	}
 	
+	public static Image getImageIAP(String image, int maxSize) {
+		java.awt.Image img = IAPservice.getImage(IAPmain.class, image);
+		Image f = new Image(img);
+		return f.resize(maxSize, maxSize, true).io().replaceColor(Color.BLACK.getRGB(), Color.WHITE.getRGB()).getImage();
+	}
+	
 	public static String saveAsArchive() {
 		return "img/ext/gpl2/Add-Files-To-Archive-64.png";
 	}
