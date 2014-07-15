@@ -5377,4 +5377,46 @@ public class ImageOperation implements MemoryHogInterface {
 		}
 		return new ImageOperation(res, getWidth(), getHeight()).applyMask(mask);
 	}
+	
+	public float[] getHSVChannel(HSVChannel channel, boolean ignoreBackground) {
+		float[] hsb = new float[3];
+		int r, g, b, rgb;
+		
+		int[] pixels = getAs1D();
+		float[] res = new float[pixels.length];
+		float val = -1f;
+		
+		for (int index = 0; index < pixels.length; index++) {
+			rgb = pixels[index];
+			if (ignoreBackground && rgb == BACKGROUND_COLORint)
+				val = -1f;
+			else {
+				// int a = ((rgb >> 24) & 0xff);
+				r = ((rgb >> 16) & 0xff);
+				g = ((rgb >> 8) & 0xff);
+				b = (rgb & 0xff);
+				
+				Color.RGBtoHSB(r, g, b, hsb);
+				
+				switch (channel) {
+					case H:
+						val = hsb[0];
+						break;
+					case S:
+						val = hsb[1];
+						break;
+					case V:
+						val = hsb[2];
+						break;
+				}
+			}
+			
+			res[index] = val;
+		}
+		return res;
+	}
+	
+	public enum HSVChannel {
+		H, S, V
+	}
 }

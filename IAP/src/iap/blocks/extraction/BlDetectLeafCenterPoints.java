@@ -49,24 +49,27 @@ public class BlDetectLeafCenterPoints extends AbstractBlock {
 		}
 		
 		if (saveResults) {
+			String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					"RESULT_" + getBlockPosition() + "." + img.getCameraType() + ".leaf.count", pointList.size(), "leaves|CENTERPOINTS");
+					pos + img.getCameraType() + ".leaf.count", pointList.size(), "leaves|CENTERPOINTS");
 			
 			// save x and y position
+			int num = 0;
 			for (Feature p : pointList) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						"RESULT_" + getBlockPosition() + "." + img.getCameraType() + ".leaf.x", (int) p.getPosition().getX(), "leaves|CENTERPOINTS");
+						pos + img.getCameraType() + ".leaf.x." + num, (int) p.getPosition().getX(), "leaves|CENTERPOINTS");
 				
 				getResultSet().setNumericResult(getBlockPosition(),
-						"RESULT_" + getBlockPosition() + "." + img.getCameraType() + ".leaf.x", (int) p.getPosition().getY(), "leaves|CENTERPOINTS");
+						pos + img.getCameraType() + ".leaf.y." + num, (int) p.getPosition().getY(), "leaves|CENTERPOINTS");
+				num++;
 			}
 		}
 		
 		if (saveResultObject) {
 			String name = this.getClass().getSimpleName();
 			name = name.toLowerCase();
-			getResultSet().setObjectResult(getBlockPosition(), "name" + "_" + img.getCameraType(), pointList);
+			getResultSet().setObjectResult(getBlockPosition(), "leaftiplist" + "_" + img.getCameraType(), pointList);
 		}
 		
 		return img;

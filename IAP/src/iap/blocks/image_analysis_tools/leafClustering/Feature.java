@@ -25,6 +25,10 @@ public class Feature {
 		featureMap.put(key, new FeatureObject(i, FeatureObjectType.NUMERIC));
 	}
 	
+	public Feature(double i, String key) {
+		featureMap.put(key, new FeatureObject(i, FeatureObjectType.NUMERIC));
+	}
+	
 	public Feature() {
 	}
 	
