@@ -148,7 +148,7 @@ public class IAPgui {
 		if (optCustomIntroText != null)
 			return optCustomIntroText;
 		try {
-			return "<html><h2><font face='Arial'>Welcome to IAP - the Integrated Analysis Platform! <small>V" + ReleaseInfo.IAP_VERSION_STRING
+			return "<html><h2><font face='Arial'>Welcome to IAP - The Integrated Analysis Platform! <small>V" + ReleaseInfo.IAP_VERSION_STRING
 					+ "</small></font></h2>"
 					+ "<font face='Arial'>The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system. "
 					+ "It is focused on high-throughput plant phenotyping and developed by the IPK research group 'image analysis'.<br>"
