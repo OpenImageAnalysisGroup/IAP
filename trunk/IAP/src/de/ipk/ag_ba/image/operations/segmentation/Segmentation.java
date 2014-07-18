@@ -2,6 +2,8 @@ package de.ipk.ag_ba.image.operations.segmentation;
 
 import org.Vector2i;
 
+import de.ipk.ag_ba.image.structures.Image;
+
 public interface Segmentation {
 	
 	public abstract void detectClusters();
@@ -25,4 +27,6 @@ public interface Segmentation {
 	public abstract void printOriginalImage();
 	
 	public abstract void printClusterIds();
+	
+	public Image getClusterImage();
 }

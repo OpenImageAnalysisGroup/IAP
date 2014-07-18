@@ -1,6 +1,11 @@
 package de.ipk.ag_ba.image.operation;
 
+import iap.blocks.extraction.ColorMode;
+
+import java.awt.Color;
 import java.awt.Point;
+
+import javax.vecmath.Point2d;
 
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -16,6 +21,18 @@ public class ImageMoments {
 	static Point centerOfGravity;
 	static int background;
 	
+	private double my20;
+	
+	private double my02;
+	
+	private double my11;
+	
+	private double my00;
+	
+	private double my10;
+	
+	private double my01;
+	
 	/**
 	 * Constructor uses background from Class ImageOperation.
 	 */
@@ -23,6 +40,7 @@ public class ImageMoments {
 		this.img = img;
 		this.background = ImageOperation.BACKGROUND_COLORint;
 		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
+		clacMys();
 	}
 	
 	/**
@@ -32,6 +50,16 @@ public class ImageMoments {
 		this.img = img;
 		this.background = background;
 		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
+		clacMys();
+	}
+	
+	private void clacMys() {
+		my20 = this.calcCentralMoment(2.0, 0.0, background);
+		my02 = this.calcCentralMoment(0.0, 2.0, background);
+		my11 = this.calcCentralMoment(1, 1, background);
+		my00 = this.calcCentralMoment(0, 0, background);
+		my10 = this.calcCentralMoment(1, 0, background);
+		my01 = this.calcCentralMoment(0, 1, background);
 	}
 	
 	/**
@@ -200,5 +228,78 @@ public class ImageMoments {
 	
 	public static Point getCenterOfGravity() {
 		return centerOfGravity;
+	}
+	
+	public Point getCenterOfGravityWeigthed(ColorMode cm) {
+		int[][] img = this.img.getAs2A();
+		int w = img.length;
+		int h = img[1].length;
+		int sumX = 0;
+		int sumY = 0;
+		double area = 0;
+		int sumGray = 0;
+		
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (img[x][y] != background) {
+					int pix = img[x][y];
+					int color = -1;
+					switch (cm) {
+						case RED:
+							color = (pix & 0xff0000) >> 16;
+							break;
+						case GREEN:
+							color = (pix & 0x00ff00) >> 8;
+							break;
+						case BLUE:
+							color = (pix & 0x0000ff);
+							break;
+						default:
+							System.out.println("Unsupported color mode in image moments.");
+							break;
+					}
+					sumX += x * color;
+					sumY += y * color;
+					sumGray += color;
+					area++;
+				}
+			}
+		}
+		return new Point((int) (sumX / (sumGray + area)), (int) (sumY / (sumGray + area)));
+	}
+	
+	public double getEccentricity() {
+		double[] lambdas = ImageMoments.eigenValues(background);
+		return Math.sqrt(1 - lambdas[1] / lambdas[0]);
+	}
+	
+	public Image drawMoments() {
+		final Point centerOfGravity = this.getCenterOfGravity();
+		final double omega = this.calcOmega(background);
+		
+		// calc length for the axes (see Image Moments-Based Structuring and Tracking of Objects L OURENA ROCHA , L UIZ V ELHO , PAULO C EZAR P. C ARVALHO)
+		double xc = my10 / my00;
+		double yc = my01 / my00;
+		double a = my20 / my00 - xc * xc;
+		double b = 2 * (my11 / my00 - xc * yc);
+		double c = my02 / my00 - yc * yc;
+		final double length_major = Math.sqrt(1 * (a + c + Math.sqrt(b * b + (a - c) * (a - c)))); // orig 1 = 3
+		final double length_minor = Math.sqrt(1 * (a + c - Math.sqrt(b * b + (a - c) * (a - c))));
+		
+		Point2d p1_start = new Point2d((centerOfGravity.x + length_major * Math.cos(omega)), (centerOfGravity.y + length_major * Math.sin(omega)));
+		Point2d p2_start = new Point2d((centerOfGravity.x + length_minor * -Math.sin(omega)), (centerOfGravity.y + length_minor * Math.cos(omega)));
+		
+		Point2d p1_end = new Point2d((centerOfGravity.x - length_major * Math.cos(omega)), (centerOfGravity.y - length_major * Math.sin(omega)));
+		Point2d p2_end = new Point2d((centerOfGravity.x - length_minor * -Math.sin(omega)), (centerOfGravity.y - length_minor * Math.cos(omega)));
+		
+		// draw moments
+		return img.copy()
+				.io()
+				.canvas()
+				.drawLine((int) p1_start.x, (int) p1_start.y, centerOfGravity.x, centerOfGravity.y, Color.PINK.getRGB(), 0, 1)
+				.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p1_end.x, (int) p1_end.y, Color.PINK.getRGB(), 0, 1)
+				.drawLine((int) p2_start.x, (int) p2_start.y, centerOfGravity.x, centerOfGravity.y, Color.GREEN.getRGB(), 0, 1)
+				.drawLine(centerOfGravity.x, centerOfGravity.y, (int) p2_end.x, (int) p2_end.y, Color.GREEN.getRGB(), 0, 1)
+				.getImage();
 	}
 }
