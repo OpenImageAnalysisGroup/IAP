@@ -1,9 +1,17 @@
 package de.ipk.ag_ba.image.operations.segmentation;
 
+import java.awt.Color;
+import java.util.ArrayList;
+
+import org.Colors;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.structures.Image;
 
+/**
+ * @author klukas & pape
+ *         For 8-neighbor connected pixel -> enable option by function "enableNeighbourMode".
+ */
 public class ClusterDetection implements Segmentation {
 	
 	private final int[] img;
@@ -208,6 +216,21 @@ public class ClusterDetection implements Segmentation {
 	@Override
 	public int[] getImageClusterIdMask() {
 		return clu;
+	}
+	
+	@Override
+	public Image getClusterImage() {
+		// 0 is background
+		ArrayList<Color> colors = Colors.get(numberOfClusters + 1, 1);
+		int[] cluImage = new int[clu.length];
+		int idx = 0;
+		for (int pix : clu) {
+			if (pix == 0)
+				cluImage[idx++] = back;
+			else
+				cluImage[idx++] = colors.get(pix).getRGB();
+		}
+		return new Image(w, h, cluImage);
 	}
 	
 	@Override

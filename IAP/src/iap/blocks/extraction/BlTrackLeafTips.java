@@ -5,8 +5,8 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.image_analysis_tools.leafClustering.Feature;
 import iap.blocks.image_analysis_tools.leafClustering.Leaf;
-import iap.blocks.image_analysis_tools.leafClustering.LeafTip;
 import iap.blocks.image_analysis_tools.leafClustering.LeafMatcher;
+import iap.blocks.image_analysis_tools.leafClustering.LeafTip;
 import iap.blocks.image_analysis_tools.leafClustering.Plant;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 

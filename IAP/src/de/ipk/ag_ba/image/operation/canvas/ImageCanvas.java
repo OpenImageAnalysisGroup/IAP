@@ -428,4 +428,8 @@ public class ImageCanvas {
 		return i.io().canvas().text(20, 65, message, Color.GRAY, 25).getImage().getAs2A();
 	}
 	
+	public ImageCanvas drawLine(java.awt.Point p1, java.awt.Point p2, int color, double alpha, int size) {
+		return drawLine(p1.x, p1.y, p2.x, p2.y, color, alpha, size);
+	}
+	
 }

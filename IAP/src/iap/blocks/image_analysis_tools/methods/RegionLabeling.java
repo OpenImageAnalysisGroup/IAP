@@ -9,6 +9,7 @@ import org.Colors;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.operation.PositionAndColor;
+import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -23,6 +24,11 @@ public class RegionLabeling implements Segmentation {
 	Image labeledImage;
 	int[][] visitedImage;
 	LinkedList<ArrayList<PositionAndColor>> regionList;
+	int numberOfClusters;
+	private Vector2i[] centerPoints;
+	private Vector2i[] clusterDimension;
+	int[] clusterSize;
+	private TopBottomLeftRight[] boundingBox;
 	
 	public LinkedList<ArrayList<PositionAndColor>> getRegionList() {
 		return regionList;
@@ -31,7 +37,7 @@ public class RegionLabeling implements Segmentation {
 	/**
 	 * Converts integer values to real gray values.
 	 */
-	public LinkedList<ArrayList<PositionAndColor>> getRegionListConverted() {
+	public LinkedList<ArrayList<PositionAndColor>> getRegionListConvertedToGrayValues() {
 		for (ArrayList<PositionAndColor> list : regionList)
 			for (PositionAndColor pix : list)
 				pix.setIntensityInt((pix.intensityInt & 0xff0000) >> 16);
@@ -46,24 +52,31 @@ public class RegionLabeling implements Segmentation {
 		this.borderColor = borderColor;
 		this.visitedImage = img.getAs2A();
 		this.background = background;
+		centerPoints = null;
+		labeledImage = null;
+		clusterSize = null;
+		clusterDimension = null;
 	}
 	
-	public Image getLabeledImage() {
-		int[][] labeled = image.copy().getAs2A();
-		ArrayList<Color> colors = Colors.get(regionList.size(), 1);
-		int idx = 0;
-		for (ArrayList<PositionAndColor> clu : regionList) {
-			int cluColor = colors.get(idx).getRGB();
-			for (PositionAndColor pix : clu) {
-				labeled[pix.x][pix.y] = cluColor;
+	@Override
+	public Image getClusterImage() {
+		if (labeledImage == null) {
+			int[][] labeled = image.copy().getAs2A();
+			ArrayList<Color> colors = Colors.get(regionList.size(), 1);
+			int idx = 0;
+			for (ArrayList<PositionAndColor> clu : regionList) {
+				int cluColor = colors.get(idx).getRGB();
+				for (PositionAndColor pix : clu) {
+					labeled[pix.x][pix.y] = cluColor;
+				}
+				idx++;
 			}
-			idx++;
+			labeledImage = new Image(labeled);
 		}
-		
-		return new Image(labeled);
+		return labeledImage;
 	}
 	
-	public ArrayList<PositionAndColor> regionGrowing(int x, int y, int background, double radius, int geometricThresh, boolean debug) {
+	private ArrayList<PositionAndColor> regionGrowing(int x, int y, int background, double radius, int geometricThresh, boolean debug) {
 		radius = radius * radius;
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -232,30 +245,77 @@ public class RegionLabeling implements Segmentation {
 				}
 			}
 		}
+		numberOfClusters = regionList.size();
 	}
 	
 	@Override
 	public Vector2i[] getClusterCenterPoints() {
-		// TODO Auto-generated method stub
-		return null;
+		if (centerPoints == null) {
+			centerPoints = new Vector2i[numberOfClusters];
+			int idx = 0;
+			for (ArrayList<PositionAndColor> cluster : regionList) {
+				int minX = Integer.MAX_VALUE;
+				int maxX = Integer.MIN_VALUE;
+				int minY = Integer.MAX_VALUE;
+				int maxY = Integer.MIN_VALUE;
+				for (PositionAndColor pix : cluster) {
+					if (pix.x > maxX)
+						maxX = pix.x;
+					if (pix.x < minX)
+						minX = pix.x;
+					if (pix.y > maxY)
+						maxY = pix.y;
+					if (pix.y < minY)
+						minY = pix.y;
+				}
+				centerPoints[idx] = new Vector2i((maxX - minX) / 2 + minX, (maxY - minY) / 2 + minY);
+				idx++;
+			}
+		}
+		return centerPoints;
 	}
 	
 	@Override
 	public Vector2i[] getClusterDimension() {
-		// TODO Auto-generated method stub
-		return null;
+		if (clusterDimension == null) {
+			clusterDimension = new Vector2i[numberOfClusters];
+			int idx = 0;
+			for (ArrayList<PositionAndColor> cluster : regionList) {
+				int minX = Integer.MAX_VALUE;
+				int maxX = Integer.MIN_VALUE;
+				int minY = Integer.MAX_VALUE;
+				int maxY = Integer.MIN_VALUE;
+				for (PositionAndColor pix : cluster) {
+					if (pix.x > maxX)
+						maxX = pix.x;
+					if (pix.x < minX)
+						minX = pix.x;
+					if (pix.y > maxY)
+						maxY = pix.y;
+					if (pix.y < minY)
+						minY = pix.y;
+				}
+				clusterDimension[idx] = new Vector2i((maxX - minX), (maxY - minY));
+				idx++;
+			}
+		}
+		return clusterDimension;
 	}
 	
 	@Override
 	public int[] getClusterSize() {
-		// TODO Auto-generated method stub
-		return null;
+		if (clusterSize == null) {
+			clusterSize = new int[numberOfClusters];
+			int idx = 0;
+			for (ArrayList<PositionAndColor> cluster : regionList)
+				clusterSize[idx++] = cluster.size();
+		}
+		return clusterSize;
 	}
 	
 	@Override
 	public int getClusterCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return regionList.size();
 	}
 	
 	@Override
@@ -292,5 +352,31 @@ public class RegionLabeling implements Segmentation {
 	public void printClusterIds() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public TopBottomLeftRight[] getBoundingBox() {
+		if (boundingBox == null) {
+			boundingBox = new TopBottomLeftRight[numberOfClusters];
+			int idx = 0;
+			for (ArrayList<PositionAndColor> cluster : regionList) {
+				int minX = Integer.MAX_VALUE;
+				int maxX = Integer.MIN_VALUE;
+				int minY = Integer.MAX_VALUE;
+				int maxY = Integer.MIN_VALUE;
+				for (PositionAndColor pix : cluster) {
+					if (pix.x > maxX)
+						maxX = pix.x;
+					if (pix.x < minX)
+						minX = pix.x;
+					if (pix.y > maxY)
+						maxY = pix.y;
+					if (pix.y < minY)
+						minY = pix.y;
+				}
+				boundingBox[idx] = new TopBottomLeftRight(minY, maxY, minX, maxX);
+				idx++;
+			}
+		}
+		return boundingBox;
 	}
 }
