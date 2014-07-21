@@ -309,16 +309,16 @@ public class MassCopySupport {
 					m = MongoDB.getMongos().get(MongoDB.getMongos().size() - 1);
 			}
 			ExperimentHeaderInterface src = toBeSaved.getExperimentHeader();
-			print("Copy " + toBeSaved.Id + " to " + m.getDatabaseName());
+			print("Copy " + toBeSaved.Id + " to " + m.getDisplayName());
 			ExperimentReference er = new ExperimentReference(src);
 			ActionCopyToMongo copyAction = new ActionCopyToMongo(m, er, true);
-			status.setPrefix1("<html>Copying " + (done + 1) + "/" + toSave.size() + " (" + toBeSaved.Id + ") to " + m.getDatabaseName() + "<br>");
+			status.setPrefix1("<html>Copying " + (done + 1) + "/" + toSave.size() + " (" + toBeSaved.Id + ") to " + m.getDisplayName()
+					+ "<br>");
 			copyAction.setStatusProvider(status);
 			boolean simulate = false;
 			if (!simulate)
 				copyAction.performActionCalculateResults(null);
-			print("Copied " + toBeSaved.Id + " to " + m.getDatabaseName());
-			MongoDB.saveSystemMessage("Copied " + toBeSaved.Id + " to " + m.getDatabaseName());
+			print("Copied " + toBeSaved.Id + " to " + m.getDisplayName());
 			done++;
 			status.setCurrentStatusValueFine(100d * done / toSave.size());
 			
