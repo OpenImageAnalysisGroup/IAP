@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.all;
 
+import iap.blocks.postprocessing.WellProcessing;
 import iap.pipelines.ImageProcessor;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
@@ -730,7 +731,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					m.setValue(bpv.getValue());
 					m.setUnit(bpv.getUnit());
 					if (multiTray)
-						m.setQualityAnnotation(m.getQualityAnnotation() + "_" + tray);
+						m.setQualityAnnotation(m.getQualityAnnotation() + "_" + WellProcessing.getWellID(tray, tray2analysisResults.keySet().size(), m));
 					
 					outputAdd(m);
 				}
@@ -918,8 +919,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		HashMap<Integer, BlockResultSet> well2analysisResults = null;
 		
+		ImageProcessor imageProcessor = getImageProcessor();
 		{
-			ImageProcessor imageProcessor = getImageProcessor();
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
 			imageProcessor.setValidTrays(debugValidTrays);
