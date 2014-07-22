@@ -83,7 +83,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private int[] debugValidTrays;
 	private final PipelineDesc pd;
 	private String debugLastSystemOptionStorageGroup;
-	private int DEBUG_SINGLE_ANGLE;
+	private int DEBUG_SINGLE_ANGLE1, DEBUG_SINGLE_ANGLE2, DEBUG_SINGLE_ANGLE3;
 	private boolean filterAngle;
 	
 	public AbstractPhenotypingTask(PipelineDesc pd) {
@@ -542,7 +542,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							double p = id.getPosition() != null ? id.getPosition() : 0d;
 							int pi = (int) p;
 							
-							if (pi != DEBUG_SINGLE_ANGLE) {
+							if (pi != DEBUG_SINGLE_ANGLE1 && pi != DEBUG_SINGLE_ANGLE2 && pi != DEBUG_SINGLE_ANGLE3) {
 								continue;
 							}
 						}
@@ -1078,8 +1078,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void setValidSideAngle(int DEBUG_SINGLE_ANGLE) {
-		this.DEBUG_SINGLE_ANGLE = DEBUG_SINGLE_ANGLE;
+	public void setValidSideAngle(int DEBUG_SINGLE_ANGLE1, int DEBUG_SINGLE_ANGLE2, int DEBUG_SINGLE_ANGLE3) {
+		this.DEBUG_SINGLE_ANGLE1 = DEBUG_SINGLE_ANGLE1;
+		this.DEBUG_SINGLE_ANGLE2 = DEBUG_SINGLE_ANGLE2;
+		this.DEBUG_SINGLE_ANGLE3 = DEBUG_SINGLE_ANGLE3;
 		this.filterAngle = true;
 	}
 }
