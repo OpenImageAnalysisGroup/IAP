@@ -32,6 +32,6 @@ public interface ImageAnalysisTask {
 	
 	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps);
 	
-	public void setValidSideAngle(int dEBUG_SINGLE_ANGLE);
+	public void setValidSideAngle(int dEBUG_SINGLE_ANGLE1, int dEBUG_SINGLE_ANGLE2, int DEBUG_SINGLE_ANGLE3);
 	
 }

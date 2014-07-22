@@ -147,7 +147,7 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void setValidSideAngle(int dEBUG_SINGLE_ANGLE) {
+	public void setValidSideAngle(int dEBUG_SINGLE_ANGLE1, int dEBUG_SINGLE_ANGLE2, int dEBUG_SINGLE_ANGLE3) {
 		// TODO Auto-generated method stub
 		
 	}
