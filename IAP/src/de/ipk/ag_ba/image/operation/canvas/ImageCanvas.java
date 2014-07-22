@@ -424,7 +424,7 @@ public class ImageCanvas {
 	}
 	
 	public static int[][] getTextImage(int w, int h, String message) {
-		Image i = new Image(w, h, new int[w * h]);
+		Image i = new Image(w, h, ImageOperation.BACKGROUND_COLORint);
 		return i.io().canvas().text(20, 65, message, Color.GRAY, 25).getImage().getAs2A();
 	}
 	
