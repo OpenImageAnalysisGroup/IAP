@@ -144,6 +144,8 @@ public class OutlierAnalysis extends AbstractNavigationAction implements ActionD
 					continue;
 				if (trait.endsWith(".sum"))
 					continue;
+				if (trait.contains(".marker."))
+					continue;
 				if (trait.startsWith("RESULT_"))
 					continue;
 				if (trait.startsWith("mark"))
