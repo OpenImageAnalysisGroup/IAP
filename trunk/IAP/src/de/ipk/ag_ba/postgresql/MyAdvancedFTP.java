@@ -72,12 +72,26 @@ public class MyAdvancedFTP {
 			ftp = (FTPClient) tso.getParam(0, null);
 		}
 		status.setCurrentStatusValue(0);
-		boolean res;
+		boolean res = false;
 		
 		status.setCurrentStatusValue(-1);
 		status.setCurrentStatusText1(downloadURL);
 		status.setCurrentStatusText2("FTP DOWNLOAD...");
-		res = processDownload(status, downloadURL, target, thisRun, server, remote, ftp);
+		try {
+			res = processDownload(status, downloadURL, target, thisRun, server, remote, ftp);
+		} catch (Exception e) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Problem during FTP download: " + e.getMessage());
+		}
+		if (!res) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Re-try FTP download");
+			status.setCurrentStatusText2("FTP DOWNLOAD (2nd try)...");
+			try {
+				Thread.sleep(30000);
+				res = processDownload(status, downloadURL, target, thisRun, server, remote, ftp);
+			} catch (Exception e) {
+				System.err.println(SystemAnalysis.getCurrentTime() + ">INFO: Error during 2nd try of FTP download: " + e.getMessage());
+			}
+		}
 		return res;
 	}
 	
@@ -172,7 +186,6 @@ public class MyAdvancedFTP {
 				});
 			return result;
 		} catch (Exception err) {
-			ErrorMsg.addErrorMessage(err);
 			if (ftp != null && ftp.isConnected()) {
 				try {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Disconnect FTP connection");
