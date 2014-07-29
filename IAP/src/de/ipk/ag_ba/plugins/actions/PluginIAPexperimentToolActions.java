@@ -7,6 +7,7 @@ import de.ipk.ag_ba.commands.experiment.tools.ActionPerformanceTest;
 import de.ipk.ag_ba.commands.experiment.tools.ActionRemerge;
 import de.ipk.ag_ba.commands.experiment.tools.ActionResetConditionFromImageName;
 import de.ipk.ag_ba.commands.experiment.tools.ActionSaveWebCamImagesSelectSource;
+import de.ipk.ag_ba.commands.experiment.tools.ActionSetTimes;
 import de.ipk.ag_ba.commands.experiment.tools.ActionShowXML;
 import de.ipk.ag_ba.commands.experiment.tools.ActionSortSubstances;
 import de.ipk.ag_ba.commands.experiment.tools.ActionTestMongoIoReadSpeed;
@@ -32,6 +33,7 @@ public class PluginIAPexperimentToolActions extends AbstractIAPplugin {
 		res.add(new ActionPerformanceTest());
 		res.add(new ActionSortSubstances());
 		res.add(new ActionRemerge());
+		res.add(new ActionSetTimes());
 		res.add(new ActionResetConditionFromImageName());
 		res.add(new ActionShowXML());
 		res.add(new ActionObjectStatistics());
