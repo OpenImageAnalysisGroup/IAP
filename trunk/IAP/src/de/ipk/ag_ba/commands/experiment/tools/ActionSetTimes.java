@@ -121,6 +121,10 @@ public class ActionSetTimes extends AbstractNavigationAction implements ActionDa
 					break;
 				case 2:
 					c.set(Calendar.YEAR, (Integer) parameters[i]);
+					c.set(Calendar.HOUR_OF_DAY, 0);
+					c.set(Calendar.MINUTE, 0);
+					c.set(Calendar.SECOND, 0);
+					c.set(Calendar.MILLISECOND, 0);
 					this.referenceDay1 = c.getTime();
 					break;
 				case 3:
@@ -151,7 +155,7 @@ public class ActionSetTimes extends AbstractNavigationAction implements ActionDa
 		try {
 			ExperimentInterface res = experiment.getData(false, getStatusProvider());
 			getStatusProvider().setCurrentStatusText1("Process Time Data...");
-			Date sd = res.getHeader().getStartdate();
+			Date sd = referenceDay1;
 			for (SubstanceInterface si : res)
 				for (ConditionInterface ci : si)
 					for (SampleInterface sai : ci) {
