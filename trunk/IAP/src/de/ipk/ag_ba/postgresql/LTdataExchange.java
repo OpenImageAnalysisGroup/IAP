@@ -1177,9 +1177,17 @@ public class LTdataExchange implements ExperimentLoader {
 			experiment.getHeader().setDatabaseId("lt:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
 			experiment.getHeader().setOriginDbId("lt:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
 		}
+		setDateValuesAccordingToSeedDate(experiment, seq);
+		if (optStatus != null)
+			optStatus.setCurrentStatusValue(100);
+		
+		return experiment;
+	}
+	
+	public static void setDateValuesAccordingToSeedDate(ExperimentInterface experiment, String seq) {
 		for (SubstanceInterface si : experiment)
 			for (ConditionInterface ci : si) {
-				String sq = ci.getSequence() + "//" + seq;
+				String sq = seq + "//" + ci.getSequence();
 				if (sq != null && StringManipulationTools.containsAny(sq, getMetaNamesSeedDates())) {
 					String[] values = sq.split("//");
 					seedDateLookupLoop: for (String v : values) {
@@ -1207,13 +1215,9 @@ public class LTdataExchange implements ExperimentLoader {
 					}
 				}
 			}
-		if (optStatus != null)
-			optStatus.setCurrentStatusValue(100);
-		
-		return experiment;
 	}
 	
-	private HashSet<String> getMetaNamesSeedDates() {
+	public static HashSet<String> getMetaNamesSeedDates() {
 		HashSet<String> res = new HashSet<String>();
 		String[] seedDataIDs = SystemOptions.getInstance().getStringAll("Metadata",
 				"Seed Date IDs", new String[] { "SEEDDATE", "seed date", "Aussaat", "Sowing", "Seeddate", "SeedDate" });
@@ -1224,7 +1228,7 @@ public class LTdataExchange implements ExperimentLoader {
 		return res;
 	}
 	
-	private void updateSnapshotTimes(ExperimentInterface experiment, int add, String newTimeUnit) {
+	public static void updateSnapshotTimes(ExperimentInterface experiment, int add, String newTimeUnit) {
 		for (SubstanceInterface si : experiment) {
 			for (ConditionInterface ci : si) {
 				updateSnapshotTimes(ci, add, newTimeUnit);
@@ -1232,7 +1236,7 @@ public class LTdataExchange implements ExperimentLoader {
 		}
 	}
 	
-	private void updateSnapshotTimes(ConditionInterface ci, int add, String newTimeUnit) {
+	public static void updateSnapshotTimes(ConditionInterface ci, int add, String newTimeUnit) {
 		for (SampleInterface s : ci) {
 			int day = s.getTime() - 1;
 			s.setTime(day + add);
