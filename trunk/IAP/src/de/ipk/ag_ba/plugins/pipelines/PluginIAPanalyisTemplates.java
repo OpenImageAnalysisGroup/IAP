@@ -2,6 +2,7 @@ package de.ipk.ag_ba.plugins.pipelines;
 
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlFilterImagesByAngle;
+import iap.blocks.acquisition.BlFilterImagesByTopOrSide;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
@@ -145,6 +146,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlDetectLeafTips(),
 				new BlRemoveLevitatingObjects(),
 				new BlFilterImagesByAngle(),
+				new BlFilterImagesByTopOrSide(),
 				new BlWarpImages(),
 				new BlDetectLeafCenterPoints(),
 				// new BlCalcIntensityFeature3DHistogram(),

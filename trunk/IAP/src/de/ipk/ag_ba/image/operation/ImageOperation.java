@@ -4109,6 +4109,8 @@ public class ImageOperation implements MemoryHogInterface {
 		int[] valuesMask = new int[sizeOfRegion * sizeOfRegion];
 		for (int j = 0; j < h; j++) {
 			for (int i = 0; i < w; i++) {
+				for (int ii = 0; ii < valuesMask.length; ii++)
+					valuesMask[ii] = ImageOperation.BACKGROUND_COLORint;
 				// Check the local neighbourhood
 				temp = img[i][j] & 0x0000ff;
 				if (Math.abs(temp - assumedBackground) <= 2) {
@@ -4134,8 +4136,18 @@ public class ImageOperation implements MemoryHogInterface {
 				}
 				// Find the threshold value
 				// thresh = median(mean);
-				mean = mean(valuesMask);
-				double sd = standardDerivation(valuesMask, mean);
+				int correctFilled = 0;
+				for (int c : valuesMask)
+					if (c != ImageOperation.BACKGROUND_COLORint)
+						correctFilled++;
+				int[] valuesMaskCorrect = new int[correctFilled];
+				int idx = 0;
+				for (int c : valuesMask)
+					if (c != ImageOperation.BACKGROUND_COLORint)
+						valuesMaskCorrect[idx++] = c;
+				
+				mean = mean(valuesMaskCorrect);
+				double sd = standardDerivation(valuesMaskCorrect, mean);
 				double maxStandardDerivation = 128.; // for grayscale image with intensity g(x,y) in [0-255]
 				thresh = (int) (mean * (1 + K * (sd / maxStandardDerivation - 1))); // http://www.dfki.uni-kl.de/~shafait/papers/Shafait-efficient-binarization-SPIE08.pdf
 				

@@ -41,7 +41,7 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 						getInt("Noise-Size-Vis-Dimension-Absolute", 20),
 						optionsAndResults.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
 						optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", true)).getImage();
-		res = input().images().vis().io().applyMask(res.io().bm().erode(getInt("dilation vis", 0)).getImage()).getImage();
+		res = input().images().vis().copy().io().applyMask(res.io().bm().erode(getInt("dilation vis", 0)).getImage()).getImage();
 		res.show("vis result", debugValues);
 		
 		return res;
@@ -62,7 +62,7 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 						getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debugValues)
 				.getImage();
 		
-		res = input().images().fluo().io().applyMask(res.io().bm().erode(getInt("dilation fluo", 0)).getImage())
+		res = input().images().fluo().copy().io().applyMask(res.io().bm().erode(getInt("dilation fluo", 0)).getImage())
 				.getImage();
 		
 		return res;

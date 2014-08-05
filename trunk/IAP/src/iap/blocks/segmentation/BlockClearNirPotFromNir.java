@@ -11,6 +11,7 @@ import java.util.HashSet;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.image.structures.ImageSet;
 
 /**
  * @author Klukas
@@ -18,23 +19,23 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
-	protected Image processNIRimage() {
-		
-		boolean debug = getBoolean("debug", false);
-		
-		Image nir = input().images().nir();
+	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
+		Image nir = processedImages.nir();
+		Image nirMask = processedMasks.nir();
 		
 		if (nir == null || nir.getWidth() < 10 || nir.getHeight() < 10)
-			return nir;
+			return;
 		
-		nir.show("NIR pot analysis IN", debug);
+		if (nirMask == null || nirMask.getWidth() < 10 || nirMask.getHeight() < 10)
+			return;
 		
 		int[][] nirArray = nir.getAs2A();
+		int[][] nirArrayMask = nirMask.getAs2A();
 		
 		int w = nirArray.length;
 		int h = nirArray[0].length;
 		
-		if (h > 22)
+		if (h > 22) {
 			for (int y = h - 1; y >= 21; y--) {
 				int maxContinousBlack = 0;
 				int currentlyBlack = 0;
@@ -59,6 +60,7 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlock {
 				if (maxContinousBlack > co * w) {
 					for (int x = 0; x < w; x++) {
 						nirArray[x][y] = gray;
+						nirArrayMask[x][y] = gray;
 					}
 				} else {
 					int cut = y - 3;
@@ -66,13 +68,15 @@ public class BlockClearNirPotFromNir extends AbstractSnapshotAnalysisBlock {
 						if (y > 0)
 							for (int x = 0; x < w; x++) {
 								nirArray[x][y] = gray;
+								nirArrayMask[x][y] = gray;
 							}
 					}
 					break;
 				}
 			}
-		
-		return new Image(nirArray).show("NIR pot removed", debug);
+			processedImages.setNir(new Image(nirArray));
+			processedMasks.setNir(new Image(nirArrayMask));
+		}
 	}
 	
 	@Override

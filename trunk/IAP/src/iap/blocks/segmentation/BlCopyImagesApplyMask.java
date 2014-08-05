@@ -35,10 +35,30 @@ public class BlCopyImagesApplyMask extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	@Override
+	protected Image processNIRmask() {
+		Image nirMask = input().masks().nir();
+		if (nirMask != null)
+			return new ImageOperation(input().images().nir()).applyMask_ResizeSourceIfNeeded(nirMask, optionsAndResults.getBackground()).getImage();
+		else
+			return nirMask;
+	}
+	
+	@Override
+	protected Image processIRmask() {
+		Image irMask = input().masks().ir();
+		if (irMask != null)
+			return new ImageOperation(input().images().fluo()).applyMask_ResizeSourceIfNeeded(irMask, optionsAndResults.getBackground()).getImage();
+		else
+			return irMask;
+	}
+	
+	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	
