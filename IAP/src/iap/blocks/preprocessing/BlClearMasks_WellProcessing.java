@@ -120,6 +120,13 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 						img.getWidth() / 2 + offX,
 						img.getHeight() / 2 + offY);
 				icc = icc.drawRectangle((int) r.getMinX(), (int) r.getMinY(), (int) r.getWidth(), (int) r.getHeight(), Color.YELLOW, 2);
+				
+				int dle = (int) ((int) r.getMinX() + well_border * r.getWidth());
+				int dto = (int) ((int) r.getMinY() + well_border * r.getHeight());
+				int dri = (int) ((int) r.getMaxX() - well_border * r.getWidth());
+				int dbo = (int) ((int) r.getMaxY() - well_border * r.getHeight());
+				icc = icc.drawRectangle(dle, dto, dri - dle, dbo - dto, Color.BLUE, 1);
+				
 			}
 			res = icc.getImage();
 		}
@@ -259,7 +266,7 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 		
 		return n;
 	}
-
+	
 	@Override
 	public boolean isEnabled(ImageProcessorOptionsAndResults options) {
 		return options.getBooleanSetting(this, "enabled", true);

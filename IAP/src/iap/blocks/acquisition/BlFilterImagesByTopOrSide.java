@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
  * @author klukas
  */
 
-public class BlFilterImagesByAngle extends AbstractSnapshotAnalysisBlock {
+public class BlFilterImagesByTopOrSide extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -35,7 +35,7 @@ public class BlFilterImagesByAngle extends AbstractSnapshotAnalysisBlock {
 			u = "";
 		else
 			u = " " + u;
-		boolean process = getBoolean("Process " + p.intValue() + u, true);
+		boolean process = getBoolean("Process " + optionsAndResults.getCameraPosition() + " view images", true);
 		if (!process) {
 			processedImages.setVis(null);
 			processedImages.setFluo(null);
@@ -53,9 +53,9 @@ public class BlFilterImagesByAngle extends AbstractSnapshotAnalysisBlock {
 	public HashSet<CameraType> getCameraOutputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		res.add(CameraType.NIR);
 		res.add(CameraType.IR);
-		res.add(CameraType.FLUO);
 		return res;
 	}
 	
@@ -66,11 +66,11 @@ public class BlFilterImagesByAngle extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Filter Images By Angle";
+		return "Filter Images by Camera Position";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Removes images with specific side or top rotation angle.";
+		return "Removes images from side or top.";
 	}
 }

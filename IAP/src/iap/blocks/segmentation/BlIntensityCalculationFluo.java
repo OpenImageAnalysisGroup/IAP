@@ -53,7 +53,7 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 		
 		getResultSet().setImage(getBlockPosition(), BlAdaptiveSegmentationFluo.RESULT_OF_FLUO_INTENSITY, r, true);
 		
-		return r;
+		return input().masks().fluo().io().applyMask(r).getImage();
 	}
 	
 	@Override

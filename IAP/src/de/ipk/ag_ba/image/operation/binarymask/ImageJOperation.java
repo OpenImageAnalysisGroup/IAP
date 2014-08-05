@@ -176,18 +176,19 @@ public class ImageJOperation {
 	
 	public int countFilledPixels() {
 		int res = 0;
-		int background = -1;
-		int[] img1d = getAs1A();
+		byte background = -1;
+		byte[] img1d = getAs1A();
 		
-		for (int c : img1d) {
+		for (byte c : img1d) {
 			if (c != background)
 				res++;
 		}
 		return res;
 	}
 	
-	public int[] getAs1A() {
-		return (int[]) image.getProcessor().getPixels();
+	public byte[] getAs1A() {
+		Object o = image.getProcessor().getPixels();
+		return (byte[]) o;
 	}
 	
 	public ImageJOperation skeletonize() {
