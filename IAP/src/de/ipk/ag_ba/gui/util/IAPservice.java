@@ -1491,9 +1491,10 @@ public class IAPservice {
 						
 						@Override
 						public void run() {
+							long ms = System.currentTimeMillis();
 							GridFS gridfs_webcam_files = new GridFS(db, "fs_webcam_" + cam.toString());
-							GridFSInputFile inputFile = gridfs_webcam_files.createFile(inp, cam.getFileName());
-							inputFile.setMetaData(new BasicDBObject("time", System.currentTimeMillis()));
+							GridFSInputFile inputFile = gridfs_webcam_files.createFile(inp, ms + "_" + cam.getFileName());
+							inputFile.setMetaData(new BasicDBObject("time", ms));
 							inputFile.save();
 							System.out.println(SystemAnalysis.getCurrentTime() + ">SAVED WEBCAM SNAPSHOT FROM " + cam + " IN DB " + db.getName());
 							cam2lastSnapshot.put(cam, System.currentTimeMillis());
