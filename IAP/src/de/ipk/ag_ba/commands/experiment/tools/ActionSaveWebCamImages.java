@@ -22,6 +22,8 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.gui.util.WebCamInfo;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 public class ActionSaveWebCamImages extends AbstractNavigationAction {
@@ -34,15 +36,31 @@ public class ActionSaveWebCamImages extends AbstractNavigationAction {
 	private MongoDB m;
 	private Date startdate;
 	private Date enddate;
+	private String desc;
 	
 	public ActionSaveWebCamImages(String tooltip) {
 		super(tooltip);
 	}
 	
 	public ActionSaveWebCamImages(MongoDB m, String fs, long numberOfImagesInRange, Date startdate, Date enddate) {
-		this("Save " + numberOfImagesInRange + " from camera " + fs);
+		this("Save " + numberOfImagesInRange + " from " + fs);
 		this.m = m;
 		this.fs = fs;
+		String desc = null;
+		for (WebCamInfo wc : IAPservice.getActiveWebCamURLs()) {
+			String d = "fs_webcam_" + wc.getUrl();
+			if (d.equals(fs.replace(".files", ""))) {
+				desc = wc.getName();
+				break;
+			}
+		}
+		if (desc == null) {
+			String aa = StringManipulationTools.stringReplace(fs, "fs_", "");
+			aa = StringManipulationTools.stringReplace(aa, ".files", "");
+			aa = StringManipulationTools.stringReplace(aa, "_", " ");
+			desc = aa;
+		}
+		this.desc = desc;
 		this.numberOfImagesInRange = numberOfImagesInRange;
 		this.startdate = startdate;
 		this.enddate = enddate;
@@ -85,7 +103,7 @@ public class ActionSaveWebCamImages extends AbstractNavigationAction {
 				String fn = f.getFilename();
 				status.setCurrentStatusText1("Save image " + idx + " \"" + fn + "\"");
 				File target = new File(tf.getCanonicalPath() + File.separator + "img" + StringManipulationTools.getFileSystemName(
-						StringManipulationTools.formatNumber(idx, "000000") + fn.substring(fn.lastIndexOf("."))));
+						StringManipulationTools.formatNumber(idx, "000000") + (fn.indexOf(".") > 0 ? fn.substring(fn.lastIndexOf(".")) : ".jpg")));
 				OutputStream fos = new FileOutputStream(target);
 				long stored = ResourceIOManager.copyContent(f.getInputStream(), fos);
 				target.setLastModified(f.getUploadDate().getTime());
@@ -117,7 +135,7 @@ public class ActionSaveWebCamImages extends AbstractNavigationAction {
 		String fsn = StringManipulationTools.stringReplace(fs, "fs_", "");
 		fsn = StringManipulationTools.stringReplace(fsn, ".files", "");
 		fsn = StringManipulationTools.stringReplace(fsn, "_", " ");
-		return "Save images from " + fsn + " (" + numberOfImagesInRange + ")";
+		return "Save images from " + desc + " (" + numberOfImagesInRange + ")";
 	}
 	
 	@Override
