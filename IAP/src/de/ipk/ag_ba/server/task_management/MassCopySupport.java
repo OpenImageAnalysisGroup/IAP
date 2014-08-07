@@ -318,6 +318,9 @@ public class MassCopySupport {
 			boolean simulate = false;
 			if (!simulate)
 				copyAction.performActionCalculateResults(null);
+			
+			er.resetStoredHeader();
+			
 			print("Copied " + toBeSaved.Id + " to " + m.getDisplayName());
 			done++;
 			status.setCurrentStatusValueFine(100d * done / toSave.size());

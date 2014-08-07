@@ -302,4 +302,8 @@ public class ExperimentReference {
 	public ExperimentIoHelper getIoHelper() {
 		return new ExperimentIoHelper(m);
 	}
+	
+	public void resetStoredHeader() {
+		this.header = null;
+	}
 }
