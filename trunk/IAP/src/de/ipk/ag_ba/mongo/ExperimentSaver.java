@@ -148,6 +148,7 @@ public class ExperimentSaver implements RunnableOnDB {
 					}
 				}
 				experiment.getHeader().setExperimenttype(ehi.getExperimentType());
+				break;
 			}
 		}
 		

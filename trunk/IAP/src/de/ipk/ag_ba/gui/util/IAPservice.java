@@ -1237,13 +1237,14 @@ public class IAPservice {
 		
 		boolean containsAutoTimingSetting = false;
 		HashMap<IOurl, Long> cam2lastSnapshot = new HashMap<IOurl, Long>();
+		HashMap<IOurl, String> cam2mimeType = new HashMap<IOurl, String>();
 		HashMap<String, BitSet> experimentId2minutesWithDataFromLastDay = new HashMap<String, BitSet>();
 		int autoTimeingLastInfoDay = -1;
 		while (true) {
-			cam2lastSnapshot = initWebCamURLlist(cam2lastSnapshot);
+			cam2lastSnapshot = initWebCamURLlist(cam2lastSnapshot, cam2mimeType);
 			
 			if (SystemOptions.getInstance().getBoolean("Watch-Service", "IP cameras//Store Webcam Images", false)) {
-				storeImages(cam2lastSnapshot);
+				storeImages(cam2lastSnapshot, cam2mimeType);
 			}
 			boolean saveDesktopSnapshot = SystemOptions.getInstance().getBoolean("Watch-Service", "Screenshot//Publish Desktop", true);
 			if (saveDesktopSnapshot)
@@ -1508,15 +1509,17 @@ public class IAPservice {
 			"http://ba-17.ipk-gatersleben.de/SnapshotJPEG?Resolution=640x480&Quality=Clarity"
 	};
 	
-	protected static HashMap<IOurl, Long> initWebCamURLlist(HashMap<IOurl, Long> cam2lastSnapshot) {
+	protected static HashMap<IOurl, Long> initWebCamURLlist(HashMap<IOurl, Long> cam2lastSnapshot, HashMap<IOurl, String> cam2fileExt) {
 		ArrayList<WebCamInfo> urls = getActiveWebCamURLs();
 		HashMap<IOurl, Long> newCam2lastSnapshot = new HashMap<IOurl, Long>(urls.size());
 		for (WebCamInfo wi : urls) {
 			String u = wi.getUrl();
+			IOurl ur = new IOurl(u);
 			if (cam2lastSnapshot.containsKey(new IOurl(u)))
-				newCam2lastSnapshot.put(new IOurl(u), cam2lastSnapshot.get(new IOurl(u)));
+				newCam2lastSnapshot.put(ur, cam2lastSnapshot.get(new IOurl(u)));
 			else
-				newCam2lastSnapshot.put(new IOurl(u), 0l);
+				newCam2lastSnapshot.put(ur, 0l);
+			cam2fileExt.put(ur, wi.getContentType("image/jpeg"));
 		}
 		cam2lastSnapshot = newCam2lastSnapshot;
 		return cam2lastSnapshot;
@@ -1539,7 +1542,7 @@ public class IAPservice {
 		return urls;
 	}
 	
-	private synchronized static void storeImages(final HashMap<IOurl, Long> cam2lastSnapshot) {
+	private synchronized static void storeImages(final HashMap<IOurl, Long> cam2lastSnapshot, final HashMap<IOurl, String> cam2mimeType) {
 		long t = System.currentTimeMillis();
 		for (final IOurl cam : cam2lastSnapshot.keySet()) {
 			try {
@@ -1552,9 +1555,15 @@ public class IAPservice {
 						
 						@Override
 						public void run() {
+							String mime = cam2mimeType.get(cam);
+							String ext = ".jpg";
+							if (mime.toUpperCase().contains("PNG"))
+								ext = ".png";
+							if (mime.toUpperCase().contains("TIF"))
+								ext = ".tif";
 							long ms = System.currentTimeMillis();
 							GridFS gridfs_webcam_files = new GridFS(db, "fs_webcam_" + cam.toString());
-							GridFSInputFile inputFile = gridfs_webcam_files.createFile(inp, ms + "_" + cam.getFileName());
+							GridFSInputFile inputFile = gridfs_webcam_files.createFile(inp, StringManipulationTools.formatNumberAddZeroInFront(ms, 19) + ext);
 							inputFile.setMetaData(new BasicDBObject("time", ms));
 							inputFile.save();
 							System.out.println(SystemAnalysis.getCurrentTime() + ">SAVED WEBCAM SNAPSHOT FROM " + cam + " IN DB " + db.getName());

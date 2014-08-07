@@ -15,6 +15,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
@@ -94,26 +95,27 @@ public class ActionSaveWebCamImages extends AbstractNavigationAction {
 			});
 			HashSet<Long> known = new HashSet<Long>();
 			for (GridFSDBFile f : fll) {
-				if (known.contains(f.getUploadDate().getTime()))
-					continue;
-				else
-					known.add(f.getUploadDate().getTime());
 				idx++;
-				status.setCurrentStatusValueFine(100d * idx / fnl.size());
-				String fn = f.getFilename();
-				status.setCurrentStatusText1("Save image " + idx + " \"" + fn + "\"");
-				File target = new File(tf.getCanonicalPath() + File.separator + "img" + StringManipulationTools.getFileSystemName(
-						StringManipulationTools.formatNumber(idx, "000000") + (fn.indexOf(".") > 0 ? fn.substring(fn.lastIndexOf(".")) : ".jpg")));
-				OutputStream fos = new FileOutputStream(target);
-				long stored = ResourceIOManager.copyContent(f.getInputStream(), fos);
-				target.setLastModified(f.getUploadDate().getTime());
-				long curr = System.currentTimeMillis();
-				storageSize += stored;
-				status.setCurrentStatusText2(storageSize / 1024 / 1024 + " MB (" +
-						StringManipulationTools.formatNumber(
-								storageSize / 1024d / 1024d / (curr - start) * 1000d,
-								"#.#") + " MB/s)");
-				saved = idx;
+				if (known.contains(f.getUploadDate().getTime())) {
+					gfs.remove(new BasicDBObject("_id", f.get("_id")));
+				} else {
+					known.add(f.getUploadDate().getTime());
+					status.setCurrentStatusValueFine(100d * idx / fnl.size());
+					String fn = f.getFilename();
+					status.setCurrentStatusText1("Save image " + idx + " \"" + fn + "\"");
+					File target = new File(tf.getCanonicalPath() + File.separator + "img" + StringManipulationTools.getFileSystemName(
+							StringManipulationTools.formatNumber(idx, "000000") + ".jpg"));
+					OutputStream fos = new FileOutputStream(target);
+					long stored = ResourceIOManager.copyContent(f.getInputStream(), fos);
+					target.setLastModified(f.getUploadDate().getTime());
+					long curr = System.currentTimeMillis();
+					storageSize += stored;
+					status.setCurrentStatusText2(storageSize / 1024 / 1024 + " MB (" +
+							StringManipulationTools.formatNumber(
+									storageSize / 1024d / 1024d / (curr - start) * 1000d,
+									"#.#") + " MB/s)");
+					saved++;
+				}
 			}
 			status.setCurrentStatusText1("Processing completed");
 			status.setCurrentStatusText2("Saved " + storageSize / 1024 / 1024 + " MB");

@@ -222,12 +222,12 @@ public class MongoDB {
 		}
 	}
 	
-	public void saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
+	public ExperimentInterface saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
-		saveExperiment(experiment, status, false, false);
+		return saveExperiment(experiment, status, false, false);
 	}
 	
-	public void saveExperiment(final ExperimentInterface experiment,
+	public ExperimentInterface saveExperiment(final ExperimentInterface experiment,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final boolean keepDataLinksToDataSource_safe_space,
 			final boolean filesAreAlreadySavedSkipStorage)
@@ -243,6 +243,8 @@ public class MongoDB {
 		processDB(r);
 		if (err.getParam(0, null) != null)
 			throw (Exception) err.getParam(0, null);
+		
+		return experiment;
 	}
 	
 	// private static ThreadSafeOptions dbLastAccess = new ThreadSafeOptions();
@@ -1742,7 +1744,7 @@ public class MongoDB {
 			public void run() {
 				res.setLong(db.getCollection(fs).count(
 						new BasicDBObject("uploadDate",
-								new BasicDBObject("$gt", startdate).append("$lt", importdate))));
+								new BasicDBObject("$gte", startdate).append("$lte", importdate))));
 			}
 			
 			@Override
