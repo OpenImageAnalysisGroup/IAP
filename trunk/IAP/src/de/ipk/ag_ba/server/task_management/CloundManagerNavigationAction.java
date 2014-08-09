@@ -21,6 +21,8 @@ import de.ipk.ag_ba.commands.mongodb.ActionJobStatus;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -34,6 +36,8 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	private NavigationButton src;
 	private final MongoDB m;
 	private final boolean showMonitoringNodes;
+	
+	final ArrayList<CloudHost> hl = new ArrayList<>();
 	
 	public CloundManagerNavigationAction(MongoDB m,
 			boolean showMonitoringNodes) {
@@ -70,7 +74,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		}
 		
 		try {
-			ArrayList<CloudHost> hl = m.batch().getAvailableHosts(3 * 60 * 1000);
+			
 			boolean clusterAvailable = false;
 			for (CloudHost ip : hl) {
 				if (!ip.isClusterExecutionMode()) {
@@ -103,7 +107,6 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
-		
 		return res;
 	}
 	
@@ -116,7 +119,22 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		hl.clear();
 		this.src = src;
+		LocalComputeJob job = BackgroundThreadDispatcher.addTask(new LocalComputeJob(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					ArrayList<CloudHost> hll = m.batch().getAvailableHosts(3 * 60 * 1000);
+					hl.addAll(hll);
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+			}
+		}, "Get compute host list"));
+		
+		BackgroundThreadDispatcher.waitFor(new LocalComputeJob[] { job });
 	}
 	
 }
