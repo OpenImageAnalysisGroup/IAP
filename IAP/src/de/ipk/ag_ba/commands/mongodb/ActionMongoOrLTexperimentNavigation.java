@@ -92,9 +92,7 @@ public class ActionMongoOrLTexperimentNavigation extends
 		}
 		
 		if (header != null && header.getDatabaseId() != null
-				&& !header.getDatabaseId().startsWith("lt:")
-				&& (header.getImportusername() == null
-				|| header.getImportusername().equals("tomcat"))) {
+				&& !header.getDatabaseId().startsWith("lt:")) {
 			// if (experimentReference.m != null)
 			if (header.inTrash()) {
 				actions.add(ActionTrash.getTrashEntity(header,
