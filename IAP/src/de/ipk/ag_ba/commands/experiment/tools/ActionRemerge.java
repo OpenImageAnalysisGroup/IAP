@@ -71,7 +71,7 @@ public class ActionRemerge extends AbstractNavigationAction implements ActionDat
 					optStatus.setCurrentStatusText2("Process substance " + +idx + "/" + max);
 				if (optStatus != null)
 					optStatus.setCurrentStatusValueFine(100d / max * idx);
-				Substance3D.addAndMerge(e, s, false);
+				Substance3D.addAndMergeA(e, s, false);
 			}
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Created unified experiment");

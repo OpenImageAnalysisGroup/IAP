@@ -670,7 +670,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void outputAdd(NumericMeasurementInterface meas) {
 		// MappingData3DPath mp = new MappingData3DPath(meas, true);
-		Substance3D.addAndMerge(output, meas, false, !(meas instanceof BinaryMeasurement));
+		Substance3D.addAndMergeC(output, meas, false, !(meas instanceof BinaryMeasurement));
 		// Substance3D.addAndMerge(output, mp.getSubstance(), false);
 	}
 	
