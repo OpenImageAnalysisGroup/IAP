@@ -43,6 +43,12 @@ public class MappingData3DPath {
 		return mdnew;
 	}
 	
+	public SubstanceInterface getSubstance(boolean resetInfoField) {
+		if (resetInfoField)
+			mdnew.setInfo(null);
+		return mdnew;
+	}
+	
 	public ConditionInterface getConditionData() {
 		return condnew;
 	}
@@ -100,23 +106,30 @@ public class MappingData3DPath {
 		}
 		
 		// final Semaphore lock = BackgroundTaskHelper.lockGetSemaphore(null, SystemAnalysis.getNumberOfCPUs());
-		for (String substance : data.keySet()) {
-			// System.out.println("MERGE SUBSET SUBSTANCE " + substance + " (" + data.get(substance).size() + " values)...");
-			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Process " + substance);
-			try {
+		try {
+			for (String substance : data.keySet()) {
+				// System.out.println("MERGE SUBSET SUBSTANCE " + substance + " (" + data.get(substance).size() + " values)...");
+				if (optStatus != null)
+					optStatus.setCurrentStatusText1("Process " + substance);
 				while (!data.get(substance).isEmpty()) {
 					MappingData3DPath p = data.get(substance).poll();
-					Substance.addAndMerge(experiment, p.getSubstance(), ignoreSnapshotFineTime);
 					idx.addInt(1);
+					if (optStatus != null)
+						optStatus.setCurrentStatusText2("Create subset " + idx.getInt() + "/" + max);
+					// SubstanceInterface ff = p.getSubstance();
+					if (optStatus != null)
+						optStatus.setCurrentStatusText2("Merge subset " + idx.getInt() + "/" + max);
+					Substance.addAndMergeC(experiment, p.measnew, ignoreSnapshotFineTime, false);
 					if (optStatus != null)
 						optStatus.setCurrentStatusValueFine(100d / max * idx.getInt());
 					if (optStatus != null)
-						optStatus.setCurrentStatusText2("Path Object " + idx.getInt() + "/" + max);
+						optStatus.setCurrentStatusText2("Finished subset " + idx.getInt() + "/" + max);
+					if (optStatus != null && optStatus.wantsToStop())
+						break;
 				}
-			} finally {
-				// lock.release();
 			}
+		} finally {
+			// lock.release();
 		}
 		for (SubstanceInterface si : experiment)
 			for (ConditionInterface ci : si)
@@ -124,6 +137,11 @@ public class MappingData3DPath {
 					s.recalculateSampleAverage(true);
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Merged Mapping Paths");
+		
+		if (optStatus != null && optStatus.wantsToStop()) {
+			optStatus.setCurrentStatusText2("Stop requested");
+			return null;
+		}
 		return experiment;
 	}
 	
@@ -148,10 +166,15 @@ public class MappingData3DPath {
 	}
 	
 	public static ExperimentInterface merge(Collection<NumericMeasurementInterface> md, boolean ignoreSnapshotFineTime) {
+		return merge(md, ignoreSnapshotFineTime, null);
+	}
+	
+	public static ExperimentInterface merge(Collection<NumericMeasurementInterface> md, boolean ignoreSnapshotFineTime,
+			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		ArrayList<MappingData3DPath> mmd = new ArrayList<MappingData3DPath>();
 		for (NumericMeasurementInterface nmi : md)
-			mmd.add(new MappingData3DPath(nmi));
-		return merge(mmd, ignoreSnapshotFineTime);
+			mmd.add(new MappingData3DPath(nmi, false));
+		return merge(mmd, ignoreSnapshotFineTime, status);
 	}
 	
 }

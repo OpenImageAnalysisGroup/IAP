@@ -214,21 +214,21 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	@Override
 	public void fillAttributeMap(Map<String, Object> attributes) {
-		attributes.put("replicates", getReplicateID());
-		attributes.put("unit", getUnit());
-		attributes.put("value", getValue());
-		attributes.put("quality", getQualityAnnotation());
-		attributes.put("files", getFiles());
+		attributes.put("replicates", replicateID);
+		attributes.put("unit", unit);
+		attributes.put("value", value);
+		attributes.put("quality", quality);
+		attributes.put("files", files);
 	}
 	
 	@Override
 	public NumericMeasurementInterface clone(SampleInterface parent) {
-		NumericMeasurementInterface m = Experiment.getTypeManager().getNewMeasurement(parent);
-		m.setValue(getValue());
-		m.setReplicateID(getReplicateID());
-		m.setUnit(getUnit());
-		m.setQualityAnnotation(getQualityAnnotation());
-		m.setFiles(getFiles());
+		NumericMeasurementInterface m = Experiment.typemanager.getNewMeasurement(parent);
+		m.setValue(value);
+		m.setReplicateID(replicateID);
+		m.setUnit(unit);
+		m.setQualityAnnotation(quality);
+		m.setFiles(files);
 		return m;
 	}
 	

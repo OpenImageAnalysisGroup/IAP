@@ -208,7 +208,7 @@ public class Experiment implements ExperimentInterface {
 						samnew.add(mnew);
 					}
 				}
-				Substance.addAndMerge(e, sub, false);
+				Substance.addAndMergeA(e, sub, false);
 			}
 			result.put(expn, e);
 		}
@@ -842,7 +842,7 @@ public class Experiment implements ExperimentInterface {
 			header = toBeAdded.getHeader().clone();
 		else
 			for (SubstanceInterface tobeMerged : toBeAdded)
-				Substance.addAndMerge(this, tobeMerged, false);
+				Substance.addAndMergeA(this, tobeMerged, false);
 	}
 	
 	public static String[] getTimes(ExperimentInterface experimentData) {

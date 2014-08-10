@@ -258,7 +258,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 				sample.add(getMeasurementData(tabledata, sample, columnMeasurement, columnList, row, od));
 			condition.add(sample);
 			substancecopy.add(condition);
-			Substance.addAndMerge(experiment, substancecopy, false);
+			Substance.addAndMergeA(experiment, substancecopy, false);
 		}
 		return experiment;
 	}

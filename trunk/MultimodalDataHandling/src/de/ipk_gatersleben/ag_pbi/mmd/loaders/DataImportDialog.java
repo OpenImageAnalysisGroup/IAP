@@ -186,7 +186,7 @@ public class DataImportDialog {
 			
 			if (e1 != null) {
 				sample.addAll(e1);
-				Substance3D.addAndMerge(experiment, md, false);
+				Substance3D.addAndMergeA(experiment, md, false);
 				File f = idf.getFile();
 				if (f != null && f.exists() && f.canRead()) {
 					fs += f.length();
