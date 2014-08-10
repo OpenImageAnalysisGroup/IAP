@@ -57,7 +57,7 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	public ExperimentInterface getOutput() {
 		Experiment res = new Experiment();
 		for (NumericMeasurementInterface nmi : output) {
-			Substance3D.addAndMerge(res, new MappingData3DPath(nmi, false).getSubstance(), false);
+			Substance3D.addAndMergeA(res, new MappingData3DPath(nmi, false).getSubstance(), false);
 		}
 		output.clear();
 		return res;

@@ -4,21 +4,25 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
+import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.PerformanceAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverageInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
@@ -40,10 +44,22 @@ public class ActionPerformanceTest extends AbstractNavigationAction implements A
 	private RunnableWithMappingData resultReceiver;
 	private int workOnSubset;
 	private int numberOfSubsets;
+	private Integer numberOfThreads;
 	
 	public ActionPerformanceTest() {
 		super("Test performance by reading experiment content");
 		this.experimentResult = null;
+	}
+	
+	@Override
+	public ParameterOptions getParameters() {
+		return new ParameterOptions("All images from the experiment will be loaded for measuring the I/O and processing speed.",
+				new Object[] { "Threads", SystemAnalysis.getNumberOfCPUs() });
+	}
+	
+	@Override
+	public void setParameters(Object[] parameters) {
+		this.numberOfThreads = (Integer) parameters[0];
 	}
 	
 	@Override
@@ -91,10 +107,28 @@ public class ActionPerformanceTest extends AbstractNavigationAction implements A
 			task.setInput(
 					AbstractPhenotypingTask.getWateringInfo(res),
 					workload, null, m, 0, 1);
-			task.performAnalysis(1, 1, status);
+			task.performAnalysis(numberOfThreads, 1, status);
 			long t2 = System.currentTimeMillis();
-			
+			if (status != null)
+				status.setCurrentStatusText1("Process Results");
 			final ExperimentInterface statisticsResult = task.getOutput();
+			
+			for (SubstanceInterface si : statisticsResult)
+				for (ConditionInterface ci : si)
+					for (SampleInterface sai : ci) {
+						if (sai.size() > 0) {
+							NumericMeasurementInterface nmi = sai.iterator().next();
+							sai.recalculateSampleAverage(false);
+							SampleAverageInterface saii = sai.getSampleAverage();
+							sai.clear();
+							sai.recalculateSampleAverage(false);
+							nmi.setValue(saii.getValue());
+							sai.add(nmi);
+						}
+					}
+			
+			if (status != null)
+				status.setCurrentStatusText1("Results Available");
 			statisticsResult.getHeader().setExperimentname(statisticsResult.getName() + " " + getDefaultTitle());
 			
 			statisticsResult.getHeader().setDatabaseId("");

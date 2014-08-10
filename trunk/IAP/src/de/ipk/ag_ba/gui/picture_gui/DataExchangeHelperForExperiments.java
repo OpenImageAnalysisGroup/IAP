@@ -65,6 +65,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
@@ -450,43 +451,61 @@ public class DataExchangeHelperForExperiments {
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					ExperimentInterface exp;
-					if (mde instanceof Condition3D) {
-						exp = Experiment.copyAndExtractSubtanceInclusiveData(sub, (ConditionInterface) mde);
-						Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
-						ArrayList<MappingData3DPath> mmd = new ArrayList<MappingData3DPath>();
-						for (NumericMeasurementInterface nmi : md) {
-							MappingData3DPath mp = new MappingData3DPath(nmi, true);
-							mp.getConditionData().setVariety(mp.getConditionData().getVariety() != null && !mp.getConditionData().getVariety().isEmpty() ?
-									mp.getConditionData().getVariety() + "/" + mp.getMeasurement().getQualityAnnotation()
-									: mp.getMeasurement().getQualityAnnotation());
+					final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+							"Process data...", "");
+					Runnable r = new Runnable() {
+						@Override
+						public void run() {
+							final ExperimentInterface expf;
+							if (mde instanceof Condition3D) {
+								ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub, (ConditionInterface) mde);
+								Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
+								ArrayList<MappingData3DPath> mmd = new ArrayList<MappingData3DPath>();
+								for (NumericMeasurementInterface nmi : md) {
+									MappingData3DPath mp = new MappingData3DPath(nmi, true);
+									mp.getConditionData().setVariety(mp.getConditionData().getVariety() != null && !mp.getConditionData().getVariety().isEmpty() ?
+											mp.getConditionData().getVariety() + "/" + mp.getMeasurement().getQualityAnnotation()
+											: mp.getMeasurement().getQualityAnnotation());
+									
+									mmd.add(mp);
+								}
+								expf = MappingData3DPath.merge(mmd, true, status);
+								
+							} else {
+								status.setCurrentStatusText1("Extract subset " + sub.getName());
+								ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
+								if (status.wantsToStop())
+									return;
+								Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
+								status.setCurrentStatusText1("Create dataset for plotting");
+								expf = MappingData3DPath.merge(md, true, status);
+							}
+							if (status.wantsToStop())
+								return;
+							HashSet<String> speciesNames = new HashSet<String>();
+							for (SubstanceInterface si : expf)
+								for (ConditionInterface ci : si) {
+									speciesNames.add(ci.getSpecies());
+								}
+							int idx = 1;
+							for (SubstanceInterface si : expf)
+								for (ConditionInterface ci : si)
+									ci.setRowId(idx++);
+							if (speciesNames.size() == 1)
+								for (SubstanceInterface si : expf)
+									for (ConditionInterface ci : si)
+										ci.setSpecies(null);
+							BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
+								@Override
+								public void run() {
+									DataChartComponentWindow dccw = new DataChartComponentWindow(expf);
+									dccw.setVisible(true);
+								}
+							});
 							
-							mmd.add(mp);
 						}
-						exp = MappingData3DPath.merge(mmd, true);
-						
-					} else {
-						exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
-						Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
-						exp = MappingData3DPath.merge(md, true);
-					}
-					
-					HashSet<String> speciesNames = new HashSet<String>();
-					for (SubstanceInterface si : exp)
-						for (ConditionInterface ci : si) {
-							speciesNames.add(ci.getSpecies());
-						}
-					int idx = 1;
-					for (SubstanceInterface si : exp)
-						for (ConditionInterface ci : si)
-							ci.setRowId(idx++);
-					if (speciesNames.size() == 1)
-						for (SubstanceInterface si : exp)
-							for (ConditionInterface ci : si)
-								ci.setSpecies(null);
-					
-					DataChartComponentWindow dccw = new DataChartComponentWindow(exp);
-					dccw.setVisible(true);
+					};
+					BackgroundTaskHelper.issueSimpleTaskInWindow("Plot data", "Process data...", r, null, status, true, true);
 				}
 			});
 			chartingButton.setVerticalTextPosition(SwingConstants.BOTTOM);

@@ -273,12 +273,12 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 													tsoLoadDataErrorsVIStop.getInt() + tsoLoadDataErrorsVIStop.getLong();
 									
 									long okCnt =
-											tsoLoadDataOkFLUOside.getInt() + tsoLoadDataOkFLUOside.getLong() +
-													tsoLoadDataOkFLUOtop.getInt() + tsoLoadDataOkFLUOtop.getLong() +
-													tsoLoadDataOkNIRside.getInt() + tsoLoadDataOkNIRside.getLong() +
-													tsoLoadDataOkNIRtop.getInt() + tsoLoadDataOkNIRtop.getLong() +
-													tsoLoadDataOkVISside.getInt() + tsoLoadDataOkVISside.getLong() +
-													tsoLoadDataOkVIStop.getInt() + tsoLoadDataOkVIStop.getLong();
+											tsoLoadDataOkFLUOside.getLong() +
+													tsoLoadDataOkFLUOtop.getLong() +
+													tsoLoadDataOkNIRside.getLong() +
+													tsoLoadDataOkNIRtop.getLong() +
+													tsoLoadDataOkVISside.getLong() +
+													tsoLoadDataOkVIStop.getLong();
 									
 									status.setCurrentStatusText1("Image " + tso.getInt() + "/" + wl + ", " + (int) mbs
 											+ " MB/s" +
@@ -446,7 +446,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	public ExperimentInterface getOutput() {
 		Experiment res = new Experiment();
 		for (NumericMeasurementInterface nmi : output) {
-			Substance3D.addAndMerge(res, new MappingData3DPath(nmi, false).getSubstance(), false);
+			Substance3D.addAndMergeA(res, new MappingData3DPath(nmi, true).getSubstance(true), true);
 		}
 		output.clear();
 		return res;
