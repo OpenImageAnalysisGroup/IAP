@@ -185,7 +185,11 @@ public class ReleaseInfo implements HelperClass {
 		}
 	}
 	
+	private static String savedAppFolder = null;
+	
 	public static String getAppFolder() {
+		if (savedAppFolder != null)
+			return savedAppFolder;
 		String appFolder = getAppFolderName();
 		try {
 			if (!new File(appFolder).isDirectory()) {
@@ -203,7 +207,8 @@ public class ReleaseInfo implements HelperClass {
 		} catch (Exception e) {
 			// empty
 		}
-		return appFolder;
+		savedAppFolder = appFolder;
+		return savedAppFolder;
 	}
 	
 	private static String getAppFolderName() {
@@ -287,9 +292,14 @@ public class ReleaseInfo implements HelperClass {
 		return SystemAnalysis.getFileSeparator();
 	}
 	
+	private static String savedAppFolderWithFinalSep = null;
+	
 	public static String getAppFolderWithFinalSep() {
+		if (savedAppFolderWithFinalSep != null)
+			return savedAppFolderWithFinalSep;
 		String r = getAppFolder();
-		return r + SystemAnalysis.getFileSeparator();
+		savedAppFolderWithFinalSep = r + SystemAnalysis.getFileSeparator();
+		return savedAppFolderWithFinalSep;
 	}
 	
 	public static String getAppWebURL() {
