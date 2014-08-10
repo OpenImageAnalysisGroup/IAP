@@ -267,7 +267,7 @@ public class FluxExperimentDataLoader extends TemplateLoader {
 					sample.add(getMeasurementData(tabledata, sample, col, row, od, quality, fr));
 				condition.add(sample);
 				substancecopy.add(condition);
-				Substance.addAndMerge(experiment, substancecopy, false);
+				Substance.addAndMergeA(experiment, substancecopy, false);
 			}
 		}
 		return experiment;

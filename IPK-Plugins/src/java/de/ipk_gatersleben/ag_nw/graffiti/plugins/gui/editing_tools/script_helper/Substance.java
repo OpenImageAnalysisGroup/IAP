@@ -178,7 +178,7 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
-	public static void addAndMerge(ExperimentInterface result, Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample,
+	public static void addAndMergeB(ExperimentInterface result, Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample,
 			boolean ignoreSnapshotFineTime) {
 		SubstanceInterface targetSubstance = null;
 		SubstanceInterface substanceWithNewData;
@@ -201,11 +201,11 @@ public class Substance implements SubstanceInterface {
 				ignoreSnapshotFineTime, true, newMeasurementsOfSingleSample);
 	}
 	
-	public static void addAndMerge(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime) {
-		addAndMerge(result, newMeasurement, ignoreSnapshotFineTime, false);
+	public static void addAndMergeD(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime) {
+		addAndMergeC(result, newMeasurement, ignoreSnapshotFineTime, false);
 	}
 	
-	public static void addAndMerge(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime,
+	public static void addAndMergeC(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime,
 			boolean ignoreSubstanceInfo) {
 		SubstanceInterface targetSubstance = null;
 		SubstanceInterface substanceWithNewData;
@@ -233,10 +233,10 @@ public class Substance implements SubstanceInterface {
 		processCondition(result, targetSubstance, newMeasurement.getParentSample().getParentCondition(), ignoreSnapshotFineTime, true, newMeasurement);
 	}
 	
-	public static void addAndMerge(ExperimentInterface result, SubstanceInterface substanceWithNewData, boolean ignoreSnapshotFineTime) {
+	public static void addAndMergeA(ExperimentInterface result, SubstanceInterface substanceWithNewData, boolean ignoreSnapshotFineTime) {
 		for (ConditionInterface ci : substanceWithNewData)
 			for (SampleInterface si : ci)
-				addAndMerge(result, si, ignoreSnapshotFineTime);
+				addAndMergeB(result, si, ignoreSnapshotFineTime);
 	}
 	
 	private static void processCondition(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
@@ -324,7 +324,19 @@ public class Substance implements SubstanceInterface {
 	private static void processSample(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
 			ConditionInterface targetCondition,
 			SampleInterface sample, boolean ignoreSnapshotFineTime, boolean forSureNewMeasurement, NumericMeasurementInterface newMeasurement) {
-		SampleInterface targetSample = null;
+		SampleInterface targetSample = aa(targetCondition, sample, ignoreSnapshotFineTime, null);
+		bb(sample, forSureNewMeasurement, newMeasurement, targetSample);
+	}
+	
+	private static void bb(SampleInterface sample, boolean forSureNewMeasurement, NumericMeasurementInterface newMeasurement, SampleInterface targetSample) {
+		synchronized (targetSample) {
+			newMeasurement.setParentSample(targetSample);
+			if (targetSample != sample && (forSureNewMeasurement || !targetSample.contains(newMeasurement)))
+				targetSample.add(newMeasurement);
+		}
+	}
+	
+	private static SampleInterface aa(ConditionInterface targetCondition, SampleInterface sample, boolean ignoreSnapshotFineTime, SampleInterface targetSample) {
 		synchronized (targetCondition) {
 			for (SampleInterface s : targetCondition)
 				if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
@@ -341,11 +353,7 @@ public class Substance implements SubstanceInterface {
 			}
 			targetSample.setParent(targetCondition);
 		}
-		synchronized (targetSample) {
-			newMeasurement.setParentSample(targetSample);
-			if (targetSample != sample && (forSureNewMeasurement || !targetSample.contains(newMeasurement)))
-				targetSample.add(newMeasurement);
-		}
+		return targetSample;
 	}
 	
 	@Override
