@@ -286,4 +286,10 @@ public class RegionLabeling implements Segmentation {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public Image getClusterImage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
