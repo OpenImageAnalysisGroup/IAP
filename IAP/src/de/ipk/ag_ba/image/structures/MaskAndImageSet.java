@@ -43,6 +43,20 @@ public class MaskAndImageSet {
 	}
 	
 	public Image getOverviewImage(int width) {
+		return getOverviewImage(width, null);
+	}
+	
+	public Image getOverviewImage(int width, ImageStack debugStack) {
+		
+		ImageSetConfig conf = debugStack.getDebugConfig();
+		if (conf.knownImages == 0) {
+			conf.dVis = (imageset != null && imageset.vis() != null) || (maskset != null && masks().vis() != null);
+			conf.dFluo = (imageset != null && imageset.fluo() != null) || (maskset != null && masks().fluo() != null);
+			conf.dNir = (imageset != null && imageset.nir() != null) || (maskset != null && masks().nir() != null);
+			conf.dIr = (imageset != null && imageset.ir() != null) || (maskset != null && masks().ir() != null);
+		}
+		conf.knownImages++;
+		
 		ImageSet resizedImages = imageset.equalize();
 		int targetHeight;
 		{
@@ -50,7 +64,7 @@ public class MaskAndImageSet {
 			double h = resizedImages.getLargestHeight();
 			int b_ = width;
 			int h_ = (int) (b_ / b * h);
-			int wn = b_ / 4;
+			int wn = b_ / debugStack.getDebugConfig().getN();
 			int hn = h_ / 2;
 			double s1 = (double) wn / resizedImages.getLargestWidth();
 			double s2 = (double) hn / resizedImages.getLargestHeight();
@@ -60,7 +74,7 @@ public class MaskAndImageSet {
 		
 		int b_ = width;
 		int h_ = targetHeight;
-		int wn = b_ / 4;
+		int wn = b_ / debugStack.getDebugConfig().getN();
 		int hn = h_ / 2;
 		
 		double s1 = (double) wn / resizedImages.getLargestWidth();
@@ -76,14 +90,15 @@ public class MaskAndImageSet {
 		
 		ImageOperation io = new Image(b_, h_, ImageOperation.BACKGROUND_COLORint).io();
 		
-		if (imgVis != null)
-			io = io.drawAndFillRect(0 * wn, 0, imgVis);
-		if (imgFluo != null)
-			io = io.drawAndFillRect(1 * wn, 0, imgFluo);
-		if (imgNir != null)
-			io = io.drawAndFillRect(2 * wn, 0, imgNir);
-		if (imgIr != null)
-			io = io.drawAndFillRect(3 * wn, 0, imgIr);
+		int idxX = 0;
+		if (imgVis != null && debugStack.getDebugConfig().doVis())
+			io = io.drawAndFillRect(0 * wn, idxX++, imgVis);
+		if (imgFluo != null && debugStack.getDebugConfig().doFluo())
+			io = io.drawAndFillRect(1 * wn, idxX++, imgFluo);
+		if (imgNir != null && debugStack.getDebugConfig().doNir())
+			io = io.drawAndFillRect(2 * wn, idxX++, imgNir);
+		if (imgIr != null && debugStack.getDebugConfig().doIr())
+			io = io.drawAndFillRect(3 * wn, idxX++, imgIr);
 		
 		if (maskset != null) {
 			ImageSet resizedMasks = maskset.equalize();
@@ -99,14 +114,15 @@ public class MaskAndImageSet {
 			int[][] imgNirMask = resizedMasks.nir() != null ? resizedMasks.nir().getAs2A() : null;
 			int[][] imgIrMask = resizedMasks.ir() != null ? resizedMasks.ir().getAs2A() : null;
 			
-			if (imgVisMask != null)
-				io = io.drawAndFillRect(0 * wn, hn, imgVisMask);
-			if (imgFluoMask != null)
-				io = io.drawAndFillRect(1 * wn, hn, imgFluoMask);
-			if (imgNirMask != null)
-				io = io.drawAndFillRect(2 * wn, hn, imgNirMask);
-			if (imgIrMask != null)
-				io = io.drawAndFillRect(3 * wn, hn, imgIrMask);
+			idxX = 0;
+			if (imgVisMask != null && debugStack.getDebugConfig().doVis())
+				io = io.drawAndFillRect((idxX++) * wn, hn, imgVisMask);
+			if (imgFluoMask != null && debugStack.getDebugConfig().doFluo())
+				io = io.drawAndFillRect((idxX++) * wn, hn, imgFluoMask);
+			if (imgNirMask != null && debugStack.getDebugConfig().doNir())
+				io = io.drawAndFillRect((idxX++) * wn, hn, imgNirMask);
+			if (imgIrMask != null && debugStack.getDebugConfig().doIr())
+				io = io.drawAndFillRect((idxX++) * wn, hn, imgIrMask);
 		}
 		return io.getImage();
 	}

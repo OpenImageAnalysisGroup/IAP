@@ -197,8 +197,9 @@ public class SkeletonGraph {
 					removeParallelEdges();
 				graph.numberGraphElements();
 				
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed short end-limbs (graph based), " +
-						"shorter than " + delteShortEndLimbsMinimumLength + ". Removed: " + delN.size());
+				if (delN.size() > 0)
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed short end-limbs (graph based), " +
+							"shorter than " + delteShortEndLimbsMinimumLength + ". Removed: " + delN.size());
 				if (!preventIntermediateNodeRemoval)
 					for (Node n : new ArrayList<Node>(graph.getNodes())) {
 						// remove nodes, with degree 2 (and merge pixel list)
@@ -208,8 +209,12 @@ public class SkeletonGraph {
 							ArrayList<Vector2i> ep = new ArrayList<Vector2i>();
 							for (Edge e : n.getEdges()) {
 								nc++;
-								ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
-								ep.addAll(edgePoints);
+								try {
+									ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
+									ep.addAll(edgePoints);
+								} catch (Exception err) {
+									// some edge has no edge point list
+								}
 							}
 							if (nc != 2)
 								ErrorMsg.addErrorMessage("Internal Error: Graph node with degree two returns different count of edges (" + nc + ")");
@@ -539,14 +544,15 @@ public class SkeletonGraph {
 			ArrayList<RunnableOnImage> postProcessing, boolean thinned) {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
-		System.out.println("Skeleton graph created. Number of components: " + gl.size());
+		if (gl.size() != 1)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Skeleton graph with more than one component created. Number of components: " + gl.size());
 		Graph lcgg = null;
 		double largestDiameter = 0;
 		String optGMLoutputFileName = !saveGraphFiles ? null : ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
 				+ System.currentTimeMillis() + ".gml";
 		final HashMap<Graph, List<GraphElement>> graphComponent2shortestPathElements = new HashMap<Graph, List<GraphElement>>();
 		for (final Graph gg : gl) {
-			if (gg.getNumberOfNodes() == 0)
+			if (gg.getNumberOfNodes() < 2)
 				continue;
 			Integer id = Integer.parseInt(new NodeHelper(gg.getNodes().iterator().next()).getClusterID(null));
 			if (optGMLoutputFileName != null)
@@ -590,7 +596,7 @@ public class SkeletonGraph {
 							Point2D p = nh.getPosition();
 							canv.drawCircle(
 									(int) p.getX() / 2,
-									(int) p.getY() / 2, 12, Color.GREEN.getRGB(), 0, 1).getImage();
+									(int) p.getY() / 2, 22, Color.GREEN.getRGB(), 0, 2).getImage();
 						}
 					}
 					return canv.getImage();
