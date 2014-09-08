@@ -1016,4 +1016,14 @@ public class StringManipulationTools implements HelperClass {
 			fileName = fileName.substring(0, fileName.lastIndexOf("."));
 		return fileName;
 	}
+	
+	public static boolean isNumeric(String substring) {
+		try {
+			int a = Integer.parseInt(substring);
+			return a < Integer.MAX_VALUE;
+		} catch (Exception e) {
+			//
+		}
+		return false;
+	}
 }
