@@ -13,6 +13,7 @@ public class ActionFolder extends AbstractNavigationAction {
 	private GUIsetting guIsetting;
 	private NavigationButton src;
 	private String title;
+	private String customIcon;
 	
 	public ActionFolder(String tooltip) {
 		super(tooltip);
@@ -22,7 +23,7 @@ public class ActionFolder extends AbstractNavigationAction {
 			String title,
 			String tooltip, NavigationAction[] navigationActions, GUIsetting guIsetting) {
 		this(tooltip);
-		this.title = title;
+		this.setTitle(title);
 		this.navigationActions = navigationActions;
 		this.guIsetting = guIsetting;
 	}
@@ -42,18 +43,34 @@ public class ActionFolder extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		for (NavigationAction na : navigationActions)
-			res.add(new NavigationButton(na, guIsetting));
+		if (navigationActions != null)
+			for (NavigationAction na : navigationActions)
+				res.add(new NavigationButton(na, guIsetting));
 		return res;
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return IAPimages.getToolbox();
+		if (customIcon == null)
+			return IAPimages.getToolbox();
+		else
+			return customIcon;
 	}
 	
 	@Override
 	public String getDefaultTitle() {
+		return getTitle();
+	}
+	
+	public void setIcon(String icon) {
+		this.customIcon = icon;
+	}
+	
+	private String getTitle() {
 		return title;
+	}
+	
+	public void setTitle(String title) {
+		this.title = title;
 	}
 }

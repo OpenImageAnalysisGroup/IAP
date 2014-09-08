@@ -206,9 +206,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		if (res != null)
 			if (optionsAndResults.forceDebugStack && debugStack != null && isChangingImages())
 				if (getBoolean("enabled", true))
-					debugStack.addImage("Result of " + task, res.getOverviewImage(
-							SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680)
-							), null);
+					debugStack.addImage("Result of " + task,
+							res.getOverviewImage(SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680),
+									debugStack), null);
 	}
 	
 	public MaskAndImageSet input() {

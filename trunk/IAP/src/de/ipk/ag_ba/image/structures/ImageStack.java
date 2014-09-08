@@ -25,6 +25,9 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.IAPservice;
 
+/**
+ * @author klukas
+ */
 public class ImageStack {
 	
 	ij.ImageStack stack;
@@ -36,6 +39,8 @@ public class ImageStack {
 	private int h;
 	
 	private final ArrayList<String> settingsPaths = new ArrayList<String>();
+	
+	private ImageSetConfig debugConfig;
 	
 	public void addImage(String label, Image image) {
 		addImage(label, image, null);
@@ -173,5 +178,11 @@ public class ImageStack {
 	
 	public int size() {
 		return stack == null ? 0 : stack.getSize();
+	}
+	
+	public synchronized ImageSetConfig getDebugConfig() {
+		if (this.debugConfig == null)
+			debugConfig = new ImageSetConfig();
+		return debugConfig;
 	}
 }

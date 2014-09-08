@@ -73,11 +73,28 @@ public class ActionSettings extends AbstractNavigationAction {
 		
 		ArrayList<String> ss = SystemOptions.getInstance(iniFileName, iniIO).getSectionTitles();
 		Collections.sort(ss);
+		String currentPrefix = "";
+		ArrayList<NavigationButton> toBeAdded = new ArrayList<>();
 		for (String s : ss) {
+			if (s == null)
+				s = "";
 			final ActionSettingsEditor ac = new ActionSettingsEditor(iniFileName, iniIO,
 					"Change settings of section " + s, s);
 			final NavigationButton nb = new NavigationButton(ac, src.getGUIsetting());
-			res.add(nb);
+			String prefix = s;
+			if (s != null && s.contains("-") && StringManipulationTools.isNumeric(s.substring(s.lastIndexOf("-")))) {
+				prefix = s.substring(0, s.lastIndexOf("-"));
+			}
+			if (!currentPrefix.equals(prefix)) {
+				if (toBeAdded.size() > 1) {
+					groupAdd(res, toBeAdded);
+				} else
+					res.addAll(toBeAdded);
+				toBeAdded.clear();
+				toBeAdded.add(nb);
+			} else
+				toBeAdded.add(nb);
+			currentPrefix = prefix;
 			
 			if (!clickedOnce)
 				if (s != null && debugLastSystemOptionStorageGroup != null && !s.isEmpty() && s.equals(debugLastSystemOptionStorageGroup)) {
@@ -92,17 +109,44 @@ public class ActionSettings extends AbstractNavigationAction {
 					});
 				}
 		}
+		if (toBeAdded.size() > 1)
+			groupAdd(res, toBeAdded);
+		else
+			res.addAll(toBeAdded);
 		
 		if (iniIO == null)
-			if (iniFileName == null)
-				for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates())
-					res.add(new NavigationButton(
+			if (iniFileName == null) {
+				ActionFolder af = new ActionFolder("Analysis Template Settings");
+				int n = 0;
+				for (PipelineDesc pd : PipelineDesc.getSavedPipelineTemplates()) {
+					af.addAdditionalEntity(new NavigationButton(
 							new ActionSettings(pd.getIniFileName(), null,
 									"Change settings of " + StringManipulationTools.removeHTMLtags(pd.getName()) + " analysis pipeline",
-									"Settings of " + StringManipulationTools.removeHTMLtags(pd.getName()) + " template"),
+									"" + StringManipulationTools.removeHTMLtags(pd.getName()) + ""),
 							src.getGUIsetting()));
-		
+					n++;
+				}
+				if (n > 0) {
+					af.setTitle("Analysis Templates (" + n + ")");
+					af.setIcon("img/ext/gpl2/collection_settings.png");
+					res.add(new NavigationButton(af, src.getGUIsetting()));
+				}
+			}
 		clickedOnce = true;
+	}
+	
+	private void groupAdd(ArrayList<NavigationButton> res2, ArrayList<NavigationButton> toBeAdded) {
+		ActionFolder af = new ActionFolder("Analysis Template Settings");
+		int n = 0;
+		for (NavigationButton nb : toBeAdded) {
+			af.addAdditionalEntity(nb);
+			n++;
+		}
+		if (n > 0) {
+			af.setTitle(toBeAdded.iterator().next().getTitle() + "...");
+			af.setIcon("img/ext/gpl2/collection_settings_box.png");
+			res.add(new NavigationButton(af, src.getGUIsetting()));
+		}
 	}
 	
 	@Override

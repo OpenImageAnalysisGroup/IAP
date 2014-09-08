@@ -83,30 +83,34 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			int minimumPixelCount = (int) (clusteredPixels.length * minimumSize);
 			int nValidClusters = 0;
 			boolean first = true;
-			for (int cs : clusterSize) {
-				if (first) {
-					first = false;
-					continue;
+			if (clusterSize != null)
+				for (int cs : clusterSize) {
+					if (first) {
+						first = false;
+						continue;
+					}
+					if (cs >= minimumPixelCount)
+						nValidClusters++;
 				}
-				if (cs >= minimumPixelCount)
-					nValidClusters++;
-			}
 			if (nValidClusters > maxN)
 				nValidClusters = maxN;
 			
 			ArrayList<Integer> sortedClusterProperties = new ArrayList<Integer>();
-			for (Integer cs : clusterSize)
-				sortedClusterProperties.add(cs);
-			sortedClusterProperties.remove(0); // remove background ID (0)
-			Collections.sort(sortedClusterProperties);
-			while (sortedClusterProperties.size() > nValidClusters)
-				sortedClusterProperties.remove(0);
-			Collections.reverse(sortedClusterProperties);
-			
+			if (clusterSize != null)
+				for (Integer cs : clusterSize)
+					sortedClusterProperties.add(cs);
+			if (sortedClusterProperties.size() > 0) {
+				sortedClusterProperties.remove(0); // remove background ID (0)
+				Collections.sort(sortedClusterProperties);
+				while (sortedClusterProperties.size() > nValidClusters)
+					sortedClusterProperties.remove(0);
+				Collections.reverse(sortedClusterProperties);
+			}
 			ArrayList<Integer> orderOfIds = new ArrayList<Integer>(nValidClusters);
 			ArrayList<Integer> targetIdxList = new ArrayList<Integer>(sortCriteria.length);
-			for (int id = 0; id < clusterSize.length; id++)
-				targetIdxList.add(id);
+			if (clusterSize != null)
+				for (int id = 0; id < clusterSize.length; id++)
+					targetIdxList.add(id);
 			
 			for (Integer sortedClusterProperty : sortedClusterProperties) {
 				for (Integer clusterID : targetIdxList) {
