@@ -211,20 +211,28 @@ public class OutlierAnalysisGlobal {
 							plantIDs.remove(indexOfMaxValue);
 							NumericMeasurement nm = numericValues.remove(indexOfMaxValue);
 							if (!processAveragePlantData)
-								upperValues.add(nm);
+								synchronized (upperValues) {
+									upperValues.add(nm);
+								}
 						} else {
 							plantID = plantIDs.get(indexOfMinValue);
 							plantIDs.remove(indexOfMinValue);
 							NumericMeasurement nm = numericValues.remove(indexOfMinValue);
 							if (!processAveragePlantData)
-								lowerValues.add(nm);
+								synchronized (lowerValues) {
+									lowerValues.add(nm);
+								}
 						}
 						if (processAveragePlantData) {
 							for (NumericMeasurement nmi : plantId2values.get(plantID)) {
 								if (isMaxPotentialOutlier)
-									upperSamples.add(nmi.getParentSample());
+									synchronized (upperSamples) {
+										upperSamples.add(nmi.getParentSample());
+									}
 								else
-									lowerSamples.add(nmi.getParentSample());
+									synchronized (lowerSamples) {
+										lowerSamples.add(nmi.getParentSample());
+									}
 							}
 						}
 						removedPoints++;
