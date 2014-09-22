@@ -7,6 +7,8 @@ import java.util.HashSet;
 import org.ErrorMsg;
 import org.apache.commons.math3.distribution.TDistribution;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -47,10 +49,21 @@ public class OutlierAnalysisGlobal {
 	}
 	
 	public void analyse() throws Exception {
-		
+		ArrayList<LocalComputeJob> wait = new ArrayList<>();
 		for (String t : Experiment.getTimes(experimentReference.getData())) {
-			processData(t);
+			final String tf = t;
+			wait.add(BackgroundThreadDispatcher.addTask(new LocalComputeJob(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						processData(tf);
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}
+			}, "Outlier analysis, time " + t)));
 		}
+		BackgroundThreadDispatcher.waitFor(wait);
 	}
 	
 	private void processData(String selTimepoint) throws Exception {
