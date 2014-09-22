@@ -11,6 +11,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.bson.types.ObjectId;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -241,8 +242,9 @@ public class ExperimentLoader implements RunnableOnDB {
 	}
 	
 	private boolean valid(Substance3D sub) {
-		if (sub.getName().contains("histo") || sub.getName().contains("sect"))
-			return false;
+		if (SystemOptions.getInstance().getBoolean("IAP", "Debug - Prevent Section and Histogram Data Loading", false))
+			if (sub.getName().contains("histo") || sub.getName().contains("sect"))
+				return false;
 		return true;
 	}
 	
