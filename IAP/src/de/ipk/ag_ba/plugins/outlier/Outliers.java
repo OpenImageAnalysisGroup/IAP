@@ -6,6 +6,9 @@ import org.ErrorMsg;
 import org.Vector2d;
 import org.apache.commons.math3.distribution.TDistribution;
 
+/**
+ * @author Christian Klukas
+ */
 public class Outliers {
 	public Vector2d getThresholds(ArrayList<Double> values, double alpha) {
 		boolean outlierIdentified;
