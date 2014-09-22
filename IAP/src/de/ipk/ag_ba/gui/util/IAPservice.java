@@ -104,6 +104,8 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.structures.Image;
@@ -620,7 +622,8 @@ public class IAPservice {
 			boolean exportIndividualAngles,
 			boolean storeAllReplicates,
 			SnapshotFilter optSnapshotFilter,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ExportSetting optCustomSubsetDef, boolean useZIPexportFileNames) {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ExportSetting optCustomSubsetDef, boolean useZIPexportFileNames)
+			throws InterruptedException {
 		return getSnapshotsFromExperiment(urlManager,
 				experiment,
 				optSubstanceIds,
@@ -632,24 +635,34 @@ public class IAPservice {
 	}
 	
 	public static LinkedList<SnapshotDataIAP> getSnapshotsFromExperiment(
-			UrlCacheManager urlManager,
-			ExperimentInterface experiment,
-			HashMap<String, Integer> optSubstanceIds,
-			boolean prepareTransportToBrowser,
-			boolean exportIndividualAngles,
-			boolean storeAllReplicates,
-			SnapshotFilter optSnapshotFilter,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ExportSetting optCustomSubsetDef, boolean useZIPexportFileNames,
-			HashSet<NumericMeasurement> lowerSingle, HashSet<NumericMeasurement> upperSingle,
-			HashSet<SampleInterface> lowerCombined, HashSet<SampleInterface> upperCombined) {
-		if (lowerSingle != null && lowerSingle.isEmpty())
-			lowerSingle = null;
-		if (upperSingle != null && upperSingle.isEmpty())
-			upperSingle = null;
-		if (lowerCombined != null && lowerCombined.isEmpty())
-			lowerCombined = null;
-		if (upperCombined != null && upperCombined.isEmpty())
-			upperCombined = null;
+			final UrlCacheManager urlManager,
+			ExperimentInterface experimentNF,
+			final HashMap<String, Integer> optSubstanceIds,
+			final boolean prepareTransportToBrowser,
+			final boolean exportIndividualAngles,
+			final boolean storeAllReplicates,
+			final SnapshotFilter optSnapshotFilter,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			final ExportSetting optCustomSubsetDef,
+			final boolean useZIPexportFileNames,
+			HashSet<NumericMeasurement> lowerSingleNF,
+			HashSet<NumericMeasurement> upperSingleNF,
+			HashSet<SampleInterface> lowerCombinedNF,
+			HashSet<SampleInterface> upperCombinedNF) throws InterruptedException {
+		if (lowerSingleNF != null && lowerSingleNF.isEmpty())
+			lowerSingleNF = null;
+		if (upperSingleNF != null && upperSingleNF.isEmpty())
+			upperSingleNF = null;
+		if (lowerCombinedNF != null && lowerCombinedNF.isEmpty())
+			lowerCombinedNF = null;
+		if (upperCombinedNF != null && upperCombinedNF.isEmpty())
+			upperCombinedNF = null;
+		
+		final HashSet<NumericMeasurement> lowerSingle = lowerSingleNF;
+		final HashSet<NumericMeasurement> upperSingle = upperSingleNF;
+		final HashSet<SampleInterface> lowerCombined = lowerCombinedNF;
+		final HashSet<SampleInterface> upperCombined = upperCombinedNF;
+		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Create snapshot data set...");
 		System.out.println("Transport to browser? " + prepareTransportToBrowser);
 		System.out.println("Store all angles? " + exportIndividualAngles);
@@ -658,12 +671,12 @@ public class IAPservice {
 		StopWatch sw = new StopWatch("Create Snapshots");
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Rename substances");
-		HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot = new HashMap<String, SnapshotDataIAP>();
+		final HashMap<String, SnapshotDataIAP> timestampAndQuality2snapshot = new HashMap<String, SnapshotDataIAP>();
 		
-		LinkedList<SnapshotDataIAP> result = new LinkedList<SnapshotDataIAP>();
+		final LinkedList<SnapshotDataIAP> result = new LinkedList<SnapshotDataIAP>();
 		
-		if (experiment != null) {
-			for (SubstanceInterface substance : experiment) {
+		if (experimentNF != null) {
+			for (SubstanceInterface substance : experimentNF) {
 				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
 					continue;
 				if (substance.getName() != null && substance.getName().contains(".bin.")) {
@@ -681,7 +694,7 @@ public class IAPservice {
 					substance.setName(oldName);
 				}
 			}
-			Experiment e = (Experiment) experiment;
+			Experiment e = (Experiment) experimentNF;
 			e.sortSubstances();
 		}
 		
@@ -691,8 +704,8 @@ public class IAPservice {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Process Climate Data");
 		
-		if (experiment != null) {
-			String type = experiment.getHeader().getExperimentType();
+		if (experimentNF != null) {
+			String type = experimentNF.getHeader().getExperimentType();
 			if (type == null)
 				type = "";
 			double ggd_baseline;
@@ -711,7 +724,7 @@ public class IAPservice {
 							+ ggd_baseline + " °C");
 				}
 			GregorianCalendar gc = new GregorianCalendar();
-			for (SubstanceInterface substance : experiment) {
+			for (SubstanceInterface substance : experimentNF) {
 				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
 					continue;
 				if (substance.getName() != null && substance.getName().equals("temp.air.avg")) {
@@ -729,8 +742,8 @@ public class IAPservice {
 			}
 			
 			if (hasTemperatureData) {
-				experiment = experiment.clone();
-				for (SubstanceInterface substance : experiment) {
+				experimentNF = experimentNF.clone();
+				for (SubstanceInterface substance : experimentNF) {
 					if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
 						continue;
 					for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
@@ -759,22 +772,31 @@ public class IAPservice {
 		
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Create Snapshots");
-		int sidx = 0;
-		if (experiment != null) {
-			int scnt = experiment.size();
+		final ThreadSafeOptions sidx = new ThreadSafeOptions();
+		if (experimentNF != null) {
+			final ExperimentInterface experiment = experimentNF;
+			final int scnt = experiment.size();
+			ArrayList<LocalComputeJob> threads = new ArrayList<>();
 			for (SubstanceInterface substance : experiment) {
-				sidx++;
-				if (optStatus != null)
-					optStatus.setCurrentStatusText1("Process subset " + sidx + "/" + scnt);
+				sidx.addInt(1);
 				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
 					continue;
-				processConditions(urlManager, optSubstanceIds, exportIndividualAngles,
-						storeAllReplicates, optSnapshotFilter, optStatus,
-						timestampAndQuality2snapshot,
-						result, substance, useZIPexportFileNames, lowerSingle, upperSingle, lowerCombined, upperCombined);
-				if (optStatus != null)
-					optStatus.setCurrentStatusValueFine(100d * sidx / scnt);
+				final SubstanceInterface substanceF = substance;
+				BackgroundThreadDispatcher.addTask(new Runnable() {
+					@Override
+					public void run() {
+						if (optStatus != null)
+							optStatus.setCurrentStatusText1("Process subset " + sidx.getInt() + "/" + scnt);
+						processConditions(urlManager, optSubstanceIds, exportIndividualAngles,
+								storeAllReplicates, optSnapshotFilter, optStatus,
+								timestampAndQuality2snapshot,
+								result, substanceF, useZIPexportFileNames, lowerSingle, upperSingle, lowerCombined, upperCombined);
+						if (optStatus != null)
+							optStatus.setCurrentStatusValueFine(100d * sidx.getInt() / scnt);
+					}
+				}, "Process substance " + substance.getName());
 			}
+			BackgroundThreadDispatcher.waitFor(threads);
 		}
 		sw.printTime(100);
 		
@@ -842,71 +864,75 @@ public class IAPservice {
 					if (snapshotTimeIndex == null)
 						snapshotTimeIndex = (long) sample.getTime();
 					
+					SnapshotDataIAP sn;
 					boolean addSN = false;
-					if (!timestampAndQuality2snapshot.containsKey(snapshotTimeIndex + "//" + qualityFilter)) {
-						SnapshotDataIAP ns = new SnapshotDataIAP();
-						timestampAndQuality2snapshot.put(snapshotTimeIndex + "//" + qualityFilter, ns);
-						addSN = true;
-					}
-					
-					SnapshotDataIAP sn = timestampAndQuality2snapshot.get(snapshotTimeIndex + "//" + qualityFilter);
-					
-					// set fields
-					if (sn.getCondition() == null)
-						sn.setCondition(c.getConditionName());
-					// species, genotype, variety, growthCondition, treatment, sequence;
-					if (sn.getSpecies() == null)
-						sn.setSpecies(c.getSpecies());
-					if (sn.getGenotype() == null)
-						sn.setGenotype(c.getGenotype());
-					if (sn.getVariety() == null)
-						sn.setVariety(c.getVariety());
-					if (sn.getGrowthCondition() == null)
-						sn.setGrowthCondition(c.getGrowthconditions());
-					if (sn.getTreatment() == null)
-						sn.setTreatment(c.getTreatment());
-					if (sn.getSequence() == null)
-						sn.setSequence(c.getSequence());
-					
-					if (sn.getTimePoint() == null)
-						sn.setTimePoint(sample.getSampleTime());
-					if (sn.getSnapshotTime() == null)
-						sn.setSnapshotTime(sample.getSampleFineTimeOrRowId());
-					sn.setDay(sample.getTime());
-					
-					if (sample.size() > 0) {
-						for (NumericMeasurementInterface mm : sample) {
-							if (!isOKquality(qualityFilter, mm))
-								continue;
-							if (sn.getPlantId() == null) {
-								if (mm.getQualityAnnotation() != null && mm.getQualityAnnotation().length() > 0)
-									sn.setPlantId("" + mm.getQualityAnnotation());
-								else
-									sn.setPlantId("" + mm.getReplicateID());
-							}
-							// if (storeAllReplicates) {
-							// System.out.println("Plant ID: " + sn.getPlantId());
-							// if (mm.getQualityAnnotation() != null && sn.getPlantId() != null && !sn.getPlantId().contains(mm.getQualityAnnotation())) {
-							// sn.setPlantId(sn.getPlantId() + "//" + mm.getQualityAnnotation());
-							// System.out.println("-> Plant ID: " + sn.getPlantId());
-							// }
-							// sn.setPlantId(sn.getPlantId() + "//" + mm.getReplicateID());
-							// System.out.println("--> Plant ID: " + sn.getPlantId());
-							// }
-							
-							break;
+					synchronized (timestampAndQuality2snapshot) {
+						if (!timestampAndQuality2snapshot.containsKey(snapshotTimeIndex + "//" + qualityFilter)) {
+							SnapshotDataIAP ns = new SnapshotDataIAP();
+							timestampAndQuality2snapshot.put(snapshotTimeIndex + "//" + qualityFilter, ns);
+							addSN = true;
 						}
-						String sub = sample.getParentCondition().getParentSubstance().getName();
-						boolean isTop = sub != null && sub.startsWith("top.");
-						if (optSubstanceIds != null &&
-								!sub.equals("water_sum") && !sub.equals("weight_before") && !sub.equals("water_weight")) {
-							sub = sample.getSubstanceNameWithUnit();
-							synchronized (optSubstanceIds) {
-								if (!optSubstanceIds.containsKey(sub)) {
-									optSubstanceIds.put(sub, optSubstanceIds.size());
+						sn = timestampAndQuality2snapshot.get(snapshotTimeIndex + "//" + qualityFilter);
+					}
+					synchronized (sn) {
+						// set fields
+						if (sn.getCondition() == null)
+							sn.setCondition(c.getConditionName());
+						// species, genotype, variety, growthCondition, treatment, sequence;
+						if (sn.getSpecies() == null)
+							sn.setSpecies(c.getSpecies());
+						if (sn.getGenotype() == null)
+							sn.setGenotype(c.getGenotype());
+						if (sn.getVariety() == null)
+							sn.setVariety(c.getVariety());
+						if (sn.getGrowthCondition() == null)
+							sn.setGrowthCondition(c.getGrowthconditions());
+						if (sn.getTreatment() == null)
+							sn.setTreatment(c.getTreatment());
+						if (sn.getSequence() == null)
+							sn.setSequence(c.getSequence());
+						
+						if (sn.getTimePoint() == null)
+							sn.setTimePoint(sample.getSampleTime());
+						if (sn.getSnapshotTime() == null)
+							sn.setSnapshotTime(sample.getSampleFineTimeOrRowId());
+						sn.setDay(sample.getTime());
+						
+						if (sample.size() > 0) {
+							for (NumericMeasurementInterface mm : sample) {
+								if (!isOKquality(qualityFilter, mm))
+									continue;
+								if (sn.getPlantId() == null) {
+									if (mm.getQualityAnnotation() != null && mm.getQualityAnnotation().length() > 0)
+										sn.setPlantId("" + mm.getQualityAnnotation());
+									else
+										sn.setPlantId("" + mm.getReplicateID());
 								}
-								int idx = optSubstanceIds.get(sub);
-								// sample.recalculateSampleAverage();
+								// if (storeAllReplicates) {
+								// System.out.println("Plant ID: " + sn.getPlantId());
+								// if (mm.getQualityAnnotation() != null && sn.getPlantId() != null && !sn.getPlantId().contains(mm.getQualityAnnotation())) {
+								// sn.setPlantId(sn.getPlantId() + "//" + mm.getQualityAnnotation());
+								// System.out.println("-> Plant ID: " + sn.getPlantId());
+								// }
+								// sn.setPlantId(sn.getPlantId() + "//" + mm.getReplicateID());
+								// System.out.println("--> Plant ID: " + sn.getPlantId());
+								// }
+								
+								break;
+							}
+							String sub = sample.getParentCondition().getParentSubstance().getName();
+							boolean isTop = sub != null && sub.startsWith("top.");
+							if (optSubstanceIds != null &&
+									!sub.equals("water_sum") && !sub.equals("weight_before") && !sub.equals("water_weight")) {
+								sub = sample.getSubstanceNameWithUnit();
+								int idx;
+								synchronized (optSubstanceIds) {
+									if (!optSubstanceIds.containsKey(sub)) {
+										optSubstanceIds.put(sub, optSubstanceIds.size());
+									}
+									idx = optSubstanceIds.get(sub);
+									// sample.recalculateSampleAverage();
+								}
 								if (sample.getSampleAverage() != null && qualityFilter == null) {
 									double vvv = sample.calcMean();
 									sn.storeValue(idx, vvv, lowerCombined.contains(sample), upperCombined.contains(sample));
@@ -936,135 +962,136 @@ public class IAPservice {
 												upperSingle != null && upperSingle.contains(nmi));
 									}
 								}
-							}
-						} else {
-							double mmSum = 0;
-							double mmLowest = Double.MAX_VALUE;
-							for (NumericMeasurementInterface mmm : sample) {
-								if (qualityFilter != null && !isOKquality(qualityFilter, mmm))
-									continue;
-								double mmmValue = mmm.getValue();
-								if (!Double.isNaN(mmmValue) && !Double.isInfinite(mmmValue)) {
-									if (mmmValue > 0) {
-										mmSum += mmmValue;
-										if (mmmValue < mmLowest)
-											mmLowest = mmmValue;
+							} else {
+								double mmSum = 0;
+								double mmLowest = Double.MAX_VALUE;
+								for (NumericMeasurementInterface mmm : sample) {
+									if (qualityFilter != null && !isOKquality(qualityFilter, mmm))
+										continue;
+									double mmmValue = mmm.getValue();
+									if (!Double.isNaN(mmmValue) && !Double.isInfinite(mmmValue)) {
+										if (mmmValue > 0) {
+											mmSum += mmmValue;
+											if (mmmValue < mmLowest)
+												mmLowest = mmmValue;
+										}
 									}
 								}
-							}
-							if (sub.equals("water_sum")) {
-								if (mmSum > 0)
-									sn.setWholeDayWaterAmount((int) mmSum);
-							} else
-								if (sub.equals("weight_before")) {
-									if (mmLowest < Double.MAX_VALUE)
-										sn.setWeightBefore(mmLowest);
+								if (sub.equals("water_sum")) {
+									if (mmSum > 0)
+										sn.setWholeDayWaterAmount((int) mmSum);
 								} else
-									if (sub.equals("water_weight")) {
-										if (mmSum > 0)
-											sn.setWeightAfter(mmSum);
-									}
+									if (sub.equals("weight_before")) {
+										if (mmLowest < Double.MAX_VALUE)
+											sn.setWeightBefore(mmLowest);
+									} else
+										if (sub.equals("water_weight")) {
+											if (mmSum > 0)
+												sn.setWeightAfter(mmSum);
+										}
+							}
 						}
-					}
-					
-					if (sample instanceof Sample3D && exportIndividualAngles) {
-						Sample3D s3d = (Sample3D) sample;
 						
-						Collection<NumericMeasurementInterface> sl = sortImages(s3d.getMeasurements(MeasurementNodeType.IMAGE,
-								MeasurementNodeType.VOLUME));
-						int imageCount = 0;
-						GregorianCalendar gc = new GregorianCalendar();
-						for (NumericMeasurementInterface ii : sl) {
-							if (qualityFilter != null && !isOKquality(qualityFilter, ii))
-								continue;
-							imageCount++;
-							if (ii instanceof ImageData) {
-								ImageData i = (ImageData) ii;
-								String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
-								ImageConfiguration ic = ImageConfiguration.get(subn);
-								String info = "+++" + substance.getInfo();
-								long urlId = urlManager != null ? urlManager.getId(i, useZIPexportFileNames ?
-										ActionDataExportZIP.getImageFileExportNameForZIPexport(gc, i) + info : i.getURL().toString() + info) : -1;
-								if (ic == ImageConfiguration.Unknown) {
-									ic = ImageConfiguration.get(i.getURL().getFileName());
+						if (sample instanceof Sample3D && exportIndividualAngles) {
+							Sample3D s3d = (Sample3D) sample;
+							
+							Collection<NumericMeasurementInterface> sl = sortImages(s3d.getMeasurements(MeasurementNodeType.IMAGE,
+									MeasurementNodeType.VOLUME));
+							int imageCount = 0;
+							GregorianCalendar gc = new GregorianCalendar();
+							for (NumericMeasurementInterface ii : sl) {
+								if (qualityFilter != null && !isOKquality(qualityFilter, ii))
+									continue;
+								imageCount++;
+								if (ii instanceof ImageData) {
+									ImageData i = (ImageData) ii;
+									String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
+									ImageConfiguration ic = ImageConfiguration.get(subn);
+									String info = "+++" + substance.getInfo();
+									long urlId = urlManager != null ? urlManager.getId(i, useZIPexportFileNames ?
+											ActionDataExportZIP.getImageFileExportNameForZIPexport(gc, i) + info : i.getURL().toString() + info) : -1;
+									if (ic == ImageConfiguration.Unknown) {
+										ic = ImageConfiguration.get(i.getURL().getFileName());
+									}
+									Integer p = i.getPosition() != null ? i.getPosition().intValue() : null;
+									if (p == null)
+										p = 0;
+									if (ic == ImageConfiguration.Unknown) {
+										sn.addUnknown(urlId, p);
+									} else {
+										if (ic == ImageConfiguration.VisSide)
+											sn.addRgb(urlId, p);
+										if (ic == ImageConfiguration.FluoSide)
+											sn.addFluo(urlId, p);
+										if (ic == ImageConfiguration.NirSide)
+											sn.addNir(urlId, p);
+										if (ic == ImageConfiguration.IrSide)
+											sn.addIr(urlId, p);
+										
+										if (ic == ImageConfiguration.VisTop)
+											sn.addRgb(urlId, p < 1 ? -1 : -p);
+										if (ic == ImageConfiguration.FluoTop)
+											sn.addFluo(urlId, p < 1 ? -1 : -p);
+										if (ic == ImageConfiguration.NirTop)
+											sn.addNir(urlId, p < 1 ? -1 : -p);
+										if (ic == ImageConfiguration.IrTop)
+											sn.addIr(urlId, p < 1 ? -1 : -p);
+									}
 								}
-								Integer p = i.getPosition() != null ? i.getPosition().intValue() : null;
-								if (p == null)
-									p = 0;
-								if (ic == ImageConfiguration.Unknown) {
-									sn.addUnknown(urlId, p);
-								} else {
-									if (ic == ImageConfiguration.VisSide)
-										sn.addRgb(urlId, p);
-									if (ic == ImageConfiguration.FluoSide)
-										sn.addFluo(urlId, p);
-									if (ic == ImageConfiguration.NirSide)
-										sn.addNir(urlId, p);
-									if (ic == ImageConfiguration.IrSide)
-										sn.addIr(urlId, p);
-									
-									if (ic == ImageConfiguration.VisTop)
-										sn.addRgb(urlId, p < 1 ? -1 : -p);
-									if (ic == ImageConfiguration.FluoTop)
-										sn.addFluo(urlId, p < 1 ? -1 : -p);
-									if (ic == ImageConfiguration.NirTop)
-										sn.addNir(urlId, p < 1 ? -1 : -p);
-									if (ic == ImageConfiguration.IrTop)
-										sn.addIr(urlId, p < 1 ? -1 : -p);
+								if (ii instanceof VolumeData) {
+									VolumeData i = (VolumeData) ii;
+									String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
+									ImageConfiguration ic = ImageConfiguration.get(subn);
+									long urlId = urlManager.getId(i, i.getURL().toString());
+									if (ic == ImageConfiguration.Unknown) {
+										ic = ImageConfiguration.get(i.getURL().getFileName());
+									}
+									Integer p = i.getPosition() != null ? i.getPosition().intValue() : null;
+									if (p == null)
+										p = 0;
+									if (ic == ImageConfiguration.Unknown) {
+										sn.addUnknown(urlId, p);
+									} else {
+										if (ic == ImageConfiguration.VisSide)
+											sn.addRgb(urlId, p);
+										if (ic == ImageConfiguration.FluoSide)
+											sn.addFluo(urlId, p);
+										if (ic == ImageConfiguration.NirSide)
+											sn.addNir(urlId, p);
+										
+										if (ic == ImageConfiguration.VisTop)
+											sn.addRgb(urlId, p < 1 ? -1 : -p);
+										if (ic == ImageConfiguration.FluoTop)
+											sn.addFluo(urlId, p < 1 ? -1 : -p);
+										if (ic == ImageConfiguration.NirTop)
+											sn.addNir(urlId, p < 1 ? -1 : -p);
+									}
 								}
 							}
-							if (ii instanceof VolumeData) {
-								VolumeData i = (VolumeData) ii;
-								String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
-								ImageConfiguration ic = ImageConfiguration.get(subn);
-								long urlId = urlManager.getId(i, i.getURL().toString());
-								if (ic == ImageConfiguration.Unknown) {
-									ic = ImageConfiguration.get(i.getURL().getFileName());
+							if (imageCount > 0 && optSubstanceIds != null) {
+								String sub = sample.getSubstanceNameWithUnit();
+								if (sub != null) {
+									int idx = optSubstanceIds.get(sub);
+									sn.storeValue(idx, (double) imageCount, false, false);
 								}
-								Integer p = i.getPosition() != null ? i.getPosition().intValue() : null;
-								if (p == null)
-									p = 0;
-								if (ic == ImageConfiguration.Unknown) {
-									sn.addUnknown(urlId, p);
-								} else {
-									if (ic == ImageConfiguration.VisSide)
-										sn.addRgb(urlId, p);
-									if (ic == ImageConfiguration.FluoSide)
-										sn.addFluo(urlId, p);
-									if (ic == ImageConfiguration.NirSide)
-										sn.addNir(urlId, p);
-									
-									if (ic == ImageConfiguration.VisTop)
-										sn.addRgb(urlId, p < 1 ? -1 : -p);
-									if (ic == ImageConfiguration.FluoTop)
-										sn.addFluo(urlId, p < 1 ? -1 : -p);
-									if (ic == ImageConfiguration.NirTop)
-										sn.addNir(urlId, p < 1 ? -1 : -p);
-								}
-							}
-						}
-						if (imageCount > 0 && optSubstanceIds != null) {
-							String sub = sample.getSubstanceNameWithUnit();
-							if (sub != null) {
-								int idx = optSubstanceIds.get(sub);
-								sn.storeValue(idx, (double) imageCount, false, false);
 							}
 						}
 					}
 					
 					if (addSN) {
-						if (optSnapshotFilter == null)
-							result.add(sn);
-						else
-							if (!optSnapshotFilter.filterOut(sn))
+						synchronized (result) {
+							if (optSnapshotFilter == null)
 								result.add(sn);
-							else {
-								// System.out.println("About to filter out a snapshot: " + sn);
-								// System.out.println("RES=" + optSnapshotFilter.filterOut(sn));
-							}
-						if (optStatus != null)
-							optStatus.setCurrentStatusText2("Create Snapshots (" + result.size() + ")");
-						
+							else
+								if (!optSnapshotFilter.filterOut(sn))
+									result.add(sn);
+								else {
+									// System.out.println("About to filter out a snapshot: " + sn);
+									// System.out.println("RES=" + optSnapshotFilter.filterOut(sn));
+								}
+							if (optStatus != null)
+								optStatus.setCurrentStatusText2("Create Snapshots (" + result.size() + ")");
+						}
 					}
 				}
 			}

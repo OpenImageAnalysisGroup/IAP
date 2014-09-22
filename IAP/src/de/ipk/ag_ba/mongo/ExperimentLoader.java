@@ -123,114 +123,106 @@ public class ExperimentLoader implements RunnableOnDB {
 					final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
 					final int n = l.size();
 					
-					Runnable r = new Runnable() {
-						@Override
-						public void run() {
-							if (optStatusProvider != null)
-								optStatusProvider.setCurrentStatusText1("Load substance objects");
-							BasicDBList ll = new BasicDBList();
-							for (Object o : l) {
-								if (o != null)
-									ll.add(new ObjectId(o + ""));
-							}
-							DBCursor subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", ll)))
-									.hint(new BasicDBObject("_id", 1)).batchSize(Math.min(100, ll.size()));
-							LinkedList<DBObject> sl = new LinkedList<DBObject>();
-							for (DBObject substance : subList) {
-								sl.add(substance);
-							}
-							subList.close();
-							
-							if (optStatusProvider != null)
-								optStatusProvider.setCurrentStatusText1("Enumerate conditions");
-							// load all conditions
-							HashMap<String, Substance3D> condId2substanceId = new HashMap<String, Substance3D>();
-							ll = new BasicDBList();
-							int idx = 0;
-							int max = subList.size();
-							for (DBObject s : subList) {
-								DBObject substance = s;
-								if (substance != null) {
-									if (optDBPbjectsOfSubstances != null)
-										optDBPbjectsOfSubstances.add(substance);
-									tsoIdxS.addInt(1);
-									Substance3D sub = processSubstance(db, experiment, substance);
-									
-									BasicDBList condIdList = (BasicDBList) s.get("condition_ids");
-									for (Object o : condIdList) {
-										if (o != null) {
-											String id = o + "";
-											ll.add(new ObjectId(id));
-											condId2substanceId.put(id, sub);
-										}
-										if (optStatusProvider != null)
-											optStatusProvider.setCurrentStatusText1("Enumerate conditions (" + condId2substanceId.size() + ")");
-									}
-									idx++;
-									if (optStatusProvider != null)
-										optStatusProvider.setCurrentStatusValueFine(100d * idx / max);
+					if (optStatusProvider != null)
+						optStatusProvider.setCurrentStatusText1("Load substance objects");
+					BasicDBList ll = new BasicDBList();
+					for (Object o : l) {
+						if (o != null)
+							ll.add(new ObjectId(o + ""));
+					}
+					DBCursor subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", ll)))
+							.hint(new BasicDBObject("_id", 1)).batchSize(Math.min(100, ll.size()));
+					LinkedList<DBObject> sl = new LinkedList<DBObject>();
+					for (DBObject substance : subList) {
+						sl.add(substance);
+					}
+					subList.close();
+					
+					if (optStatusProvider != null)
+						optStatusProvider.setCurrentStatusText1("Enumerate conditions");
+					// load all conditions
+					HashMap<String, Substance3D> condId2substanceId = new HashMap<String, Substance3D>();
+					ll = new BasicDBList();
+					int idx = 0;
+					int max = subList.size();
+					for (DBObject s : subList) {
+						DBObject substance = s;
+						if (substance != null) {
+							if (optDBPbjectsOfSubstances != null)
+								optDBPbjectsOfSubstances.add(substance);
+							tsoIdxS.addInt(1);
+							Substance3D sub = processSubstance(db, experiment, substance);
+							if (!valid(sub))
+								continue;
+							BasicDBList condIdList = (BasicDBList) s.get("condition_ids");
+							for (Object o : condIdList) {
+								if (o != null) {
+									String id = o + "";
+									ll.add(new ObjectId(id));
+									condId2substanceId.put(id, sub);
 								}
-							}
-							
-							if (optStatusProvider != null)
-								optStatusProvider.setCurrentStatusText1("Load conditions (" + condId2substanceId.size() + ")");
-							
-							BasicDBObject fields = new BasicDBObject("settings", 0);
-							fields.put("remark", 0);
-							fields.put("startdate", 0);
-							fields.put("experimenttype", 0);
-							fields.put("importdate", 0);
-							fields.put("experimentname", 0);
-							fields.put("coordinator", 0);
-							fields.put("storagedate", 0);
-							
-							DBCursor condL = collCond.find(
-									new BasicDBObject("_id", new BasicDBObject("$in", ll)), fields)
-									.hint(new BasicDBObject("_id", 1)).batchSize(Math.min(ll.size(), 200));
-							idx = 0;
-							max = condId2substanceId.size();
-							for (DBObject cond : condL) {
-								String id = cond.get("_id") + "";
-								Substance3D subID = condId2substanceId.get(id);
-								
-								processCondition(subID, cond, optStatusProvider, max);
-								
-								idx++;
 								if (optStatusProvider != null)
-									optStatusProvider.setCurrentStatusValueFine(100d * idx / max);
-								if (optStatusProvider != null) {
-									long sysmem = SystemAnalysis.getMemoryMB();
-									long usedmem = SystemAnalysis.getUsedMemoryInMB();
-									String memInfo = StringManipulationTools.formatNumber(usedmem * 100d / sysmem, 0) + "%";
-									optStatusProvider.setCurrentStatusText1("Load condition data (" + idx + "/" + condId2substanceId.size() + ")");
-									optStatusProvider.setCurrentStatusText2("<font color='gray'><small>(" + usedmem + " / " + sysmem + " MB RAM used [" + memInfo
-											+ "])</small></font>");
-								}
+									optStatusProvider.setCurrentStatusText1("Enumerate conditions (" + condId2substanceId.size() + ")");
 							}
-							condL.close();
-							
-							if (optStatusProvider != null) {
-								optStatusProvider.setCurrentStatusText1("Dataset loaded");
-							}
-							
+							idx++;
+							if (optStatusProvider != null)
+								optStatusProvider.setCurrentStatusValueFine(100d * idx / max);
 						}
-					};
+					}
+					
+					if (optStatusProvider != null)
+						optStatusProvider.setCurrentStatusText1("Load conditions (" + condId2substanceId.size() + ")");
+					
+					BasicDBObject fields = new BasicDBObject("settings", 0);
+					fields.put("remark", 0);
+					fields.put("startdate", 0);
+					fields.put("experimenttype", 0);
+					fields.put("importdate", 0);
+					fields.put("experimentname", 0);
+					fields.put("coordinator", 0);
+					fields.put("storagedate", 0);
+					
+					DBCursor condL = collCond.find(
+							new BasicDBObject("_id", new BasicDBObject("$in", ll)), fields)
+							.hint(new BasicDBObject("_id", 1)).batchSize(Math.min(ll.size(), 200));
+					idx = 0;
+					max = condId2substanceId.size();
+					ArrayList<LocalComputeJob> threads = new ArrayList<>();
+					for (DBObject cond : condL) {
+						String id = cond.get("_id") + "";
+						Substance3D subID = condId2substanceId.get(id);
+						
+						LocalComputeJob res;
+						try {
+							res = processCondition(subID, cond, optStatusProvider, max);
+							if (res != null)
+								threads.add(res);
+						} catch (InterruptedException e) {
+							ErrorMsg.addErrorMessage(e);
+						}
+						idx++;
+						if (optStatusProvider != null)
+							optStatusProvider.setCurrentStatusValueFine(100d * idx / max);
+						if (optStatusProvider != null) {
+							long sysmem = SystemAnalysis.getMemoryMB();
+							long usedmem = SystemAnalysis.getUsedMemoryInMB();
+							String memInfo = StringManipulationTools.formatNumber(usedmem * 100d / sysmem, 0) + "%";
+							optStatusProvider.setCurrentStatusText1("Load condition data (" + idx + "/" + condId2substanceId.size() + ")");
+							optStatusProvider.setCurrentStatusText2("<font color='gray'><small>(" + usedmem + " / " + sysmem + " MB RAM used [" + memInfo
+									+ "])</small></font>");
+						}
+					}
+					condL.close();
 					try {
-						if (SystemAnalysis.getUsedMemoryInMB() * 2 > SystemAnalysis.getMemoryMB()) // more than 50% utilized?
-							r.run();
-						else
-							wait.add(BackgroundThreadDispatcher.addTask(r, "Load Substances"));
+						BackgroundThreadDispatcher.waitFor(threads);
 					} catch (InterruptedException e) {
 						ErrorMsg.addErrorMessage(e);
 					}
+					if (optStatusProvider != null) {
+						optStatusProvider.setCurrentStatusText1("Dataset loaded");
+					}
 					
 				}
-			}
-			
-			try {
-				BackgroundThreadDispatcher.waitFor(wait);
-			} catch (InterruptedException e) {
-				ErrorMsg.addErrorMessage(e);
 			}
 		}
 		
@@ -246,6 +238,12 @@ public class ExperimentLoader implements RunnableOnDB {
 			mongoDB.updateExperimentSize(db, experiment, optStatusProvider);
 		}
 		// }
+	}
+	
+	private boolean valid(Substance3D sub) {
+		if (sub.getName().contains("histo") || sub.getName().contains("sect"))
+			return false;
+		return true;
 	}
 	
 	Substance3D processSubstance(DB db, ExperimentInterface experiment, DBObject substance) {
@@ -271,75 +269,84 @@ public class ExperimentLoader implements RunnableOnDB {
 		return s3d;
 	}
 	
-	private void processCondition(Substance3D s3d, DBObject cond, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double max) {
-		Condition3D condition = new Condition3D(s3d, fv((Map) cond));
+	private LocalComputeJob processCondition(Substance3D s3d, DBObject cond, BackgroundTaskStatusProviderSupportingExternalCall optStatusProvider, double max)
+			throws InterruptedException {
+		final Condition3D condition = new Condition3D(s3d, fv((Map) cond));
 		condition.setExperimentHeader(header);
 		s3d.add(condition);
-		BasicDBList sampList = (BasicDBList) cond.get("samples");
+		final BasicDBList sampList = (BasicDBList) cond.get("samples");
 		cond = null;
 		if (sampList != null) {
-			for (Object so : sampList) {
-				DBObject sam = (DBObject) so;
-				Sample3D sample = new Sample3D(condition, fv((Map) sam));// .toMap()));
-				condition.add(sample);
-				// average
-				BasicDBObject avg = (BasicDBObject) sam.get("average");
-				if (avg != null) {
-					SampleAverage average = new SampleAverage(sample, fv(avg));
-					sample.setSampleAverage(average);
-				}
-				// measurements
-				BasicDBList measList = (BasicDBList) sam.get("measurements");
-				if (measList != null) {
-					for (Object m : measList) {
-						DBObject meas = (DBObject) m;
-						NumericMeasurement3D nm = new NumericMeasurement3D(sample, fv((Map) meas));
-						sample.add(nm);
+			Runnable r = new Runnable() {
+				
+				@Override
+				public void run() {
+					for (Object so : sampList) {
+						DBObject sam = (DBObject) so;
+						Sample3D sample = new Sample3D(condition, fv((Map) sam));// .toMap()));
+						condition.add(sample);
+						// average
+						BasicDBObject avg = (BasicDBObject) sam.get("average");
+						if (avg != null) {
+							SampleAverage average = new SampleAverage(sample, fv(avg));
+							sample.setSampleAverage(average);
+						}
+						// measurements
+						BasicDBList measList = (BasicDBList) sam.get("measurements");
+						if (measList != null) {
+							for (Object m : measList) {
+								DBObject meas = (DBObject) m;
+								NumericMeasurement3D nm = new NumericMeasurement3D(sample, fv((Map) meas));
+								sample.add(nm);
+							}
+						}
+						// images
+						BasicDBList imgList = (BasicDBList) sam.get(MongoCollection.IMAGES.toString());
+						if (imgList != null) {
+							for (Object m : imgList) {
+								DBObject img = (DBObject) m;
+								@SuppressWarnings("unchecked")
+								ImageData image = new ImageData(sample, filter(fv((Map) img)));
+								image.getURL().setPrefix(mh.getPrefix());
+								if (image.getLabelURL() != null)
+									image.getLabelURL().setPrefix(mh.getPrefix());
+								sample.add(image);
+							}
+						}
+						// volumes
+						BasicDBList volList = (BasicDBList) sam.get(MongoCollection.VOLUMES.toString());
+						if (volList != null) {
+							for (Object v : volList) {
+								DBObject vol = (DBObject) v;
+								@SuppressWarnings("unchecked")
+								VolumeData volume = new VolumeData(sample, fv((Map) vol));
+								if (volume.getURL() != null)
+									volume.getURL().setPrefix(mh.getPrefix());
+								if (volume.getLabelURL() != null)
+									volume.getLabelURL().setPrefix(mh.getPrefix());
+								sample.add(volume);
+							}
+						}
+						// networks
+						BasicDBList netList = (BasicDBList) sam.get(MongoCollection.NETWORKS.toString());
+						if (netList != null) {
+							for (Object n : netList) {
+								DBObject net = (DBObject) n;
+								@SuppressWarnings("unchecked")
+								NetworkData network = new NetworkData(sample, fv((Map) net));
+								if (network.getURL() != null)
+									network.getURL().setPrefix(mh.getPrefix());
+								if (network.getLabelURL() != null)
+									network.getLabelURL().setPrefix(mh.getPrefix());
+								sample.add(network);
+							}
+						}
 					}
 				}
-				// images
-				BasicDBList imgList = (BasicDBList) sam.get(MongoCollection.IMAGES.toString());
-				if (imgList != null) {
-					for (Object m : imgList) {
-						DBObject img = (DBObject) m;
-						@SuppressWarnings("unchecked")
-						ImageData image = new ImageData(sample, filter(fv((Map) img)));
-						image.getURL().setPrefix(mh.getPrefix());
-						if (image.getLabelURL() != null)
-							image.getLabelURL().setPrefix(mh.getPrefix());
-						sample.add(image);
-					}
-				}
-				// volumes
-				BasicDBList volList = (BasicDBList) sam.get(MongoCollection.VOLUMES.toString());
-				if (volList != null) {
-					for (Object v : volList) {
-						DBObject vol = (DBObject) v;
-						@SuppressWarnings("unchecked")
-						VolumeData volume = new VolumeData(sample, fv((Map) vol));
-						if (volume.getURL() != null)
-							volume.getURL().setPrefix(mh.getPrefix());
-						if (volume.getLabelURL() != null)
-							volume.getLabelURL().setPrefix(mh.getPrefix());
-						sample.add(volume);
-					}
-				}
-				// networks
-				BasicDBList netList = (BasicDBList) sam.get(MongoCollection.NETWORKS.toString());
-				if (netList != null) {
-					for (Object n : netList) {
-						DBObject net = (DBObject) n;
-						@SuppressWarnings("unchecked")
-						NetworkData network = new NetworkData(sample, fv((Map) net));
-						if (network.getURL() != null)
-							network.getURL().setPrefix(mh.getPrefix());
-						if (network.getLabelURL() != null)
-							network.getLabelURL().setPrefix(mh.getPrefix());
-						sample.add(network);
-					}
-				}
-			}
+			};
+			return BackgroundThreadDispatcher.addTask(new LocalComputeJob(r, "Process condition loading"));
 		}
+		return null;
 	}
 	
 	private static final WeakHashMap<String, String> known2sameValue = new WeakHashMap<String, String>();
