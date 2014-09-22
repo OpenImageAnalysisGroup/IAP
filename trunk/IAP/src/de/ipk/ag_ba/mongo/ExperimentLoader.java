@@ -184,7 +184,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					
 					DBCursor condL = collCond.find(
 							new BasicDBObject("_id", new BasicDBObject("$in", ll)), fields)
-							.hint(new BasicDBObject("_id", 1)).batchSize(Math.min(ll.size(), 200));
+							.hint(new BasicDBObject("_id", 1));// .batchSize(Math.min(ll.size(), 500));
 					idx = 0;
 					max = condId2substanceId.size();
 					ArrayList<LocalComputeJob> threads = new ArrayList<>();

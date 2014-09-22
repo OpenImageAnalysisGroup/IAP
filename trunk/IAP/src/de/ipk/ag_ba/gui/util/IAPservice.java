@@ -782,7 +782,7 @@ public class IAPservice {
 				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
 					continue;
 				final SubstanceInterface substanceF = substance;
-				BackgroundThreadDispatcher.addTask(new Runnable() {
+				threads.add(BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
 						if (optStatus != null)
@@ -794,7 +794,7 @@ public class IAPservice {
 						if (optStatus != null)
 							optStatus.setCurrentStatusValueFine(100d * sidx.getInt() / scnt);
 					}
-				}, "Process substance " + substance.getName());
+				}, "Process substance " + substance.getName()));
 			}
 			BackgroundThreadDispatcher.waitFor(threads);
 		}
