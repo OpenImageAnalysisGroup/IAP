@@ -436,7 +436,7 @@ public class Image {
 				else
 					return resize((int) (getWidth() * rW), (int) (getHeight() * rW));
 			} else {
-				if (rW < rH)
+				if (rW > rH)
 					return resize((int) (getWidth() * rH), (int) (getHeight() * rH));
 				else
 					return resize((int) (getWidth() * rW), (int) (getHeight() * rW));
