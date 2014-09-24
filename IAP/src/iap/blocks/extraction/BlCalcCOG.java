@@ -36,6 +36,18 @@ public class BlCalcCOG extends AbstractBlock {
 					if (averageDistance != null)
 						getResultSet().setNumericResult(0, pos + img.getCameraType() + ".cog.avg_distance_to_center", averageDistance, "px");
 					
+					if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
+						double centerX = img.getWidth() / 2d;
+						getResultSet().setNumericResult(getBlockPosition(),
+								pos + img.getCameraType() + ".cog.avg_distance_to_vertical_image_center_line", Math.abs(cog.x - centerX), "px");
+					}
+					if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
+						double centerX = img.getWidth() / 2d;
+						double centerY = img.getHeight() / 2d;
+						getResultSet().setNumericResult(getBlockPosition(),
+								pos + img.getCameraType() + ".cog.avg_distance_to_image_center_point",
+								Math.sqrt(Math.abs(cog.x - centerX) * Math.abs(cog.x - centerX) + Math.abs(cog.y - centerY) * Math.abs(cog.y - centerY)), "px");
+					}
 				}
 				RunnableOnImage runnableOnMask = new RunnableOnImage() {
 					@Override
