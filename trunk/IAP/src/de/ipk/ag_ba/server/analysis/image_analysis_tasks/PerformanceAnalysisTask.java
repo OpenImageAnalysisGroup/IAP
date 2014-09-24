@@ -45,6 +45,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	private int workLoadIndex;
 	
 	private final TextFile errors = new TextFile();
+	private boolean loadImages = true;
 	
 	public PerformanceAnalysisTask() {
 		// empty
@@ -220,41 +221,7 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 										break;
 								}
 							}
-							final byte[] imgData = imgDataNF;
-							if (imgData != null) {
-								run2.submit(new Runnable() {
-									
-									@Override
-									public void run() {
-										try {
-											boolean ok = true;
-											BufferedImage img = ImageIO.read(new MyByteArrayInputStream(imgData));
-											if (img == null) {
-												imgReadError("read error, image is NULL", id, ic, tsoLoadDataErrorsFLUOside,
-														tsoLoadDataErrorsFLUOtop, tsoLoadDataErrorsNIRside, tsoLoadDataErrorsNIRtop,
-														tsoLoadDataErrorsVISside, tsoLoadDataErrorsVIStop);
-												ok = false;
-											} else {
-												if (img.getWidth() < 10 || img.getHeight() < 10) {
-													imgReadError("read error, image size is small: " + img.getWidth() + "x" + img.getHeight(), id, ic,
-															tsoLoadDataErrorsFLUOside,
-															tsoLoadDataErrorsFLUOtop, tsoLoadDataErrorsNIRside, tsoLoadDataErrorsNIRtop,
-															tsoLoadDataErrorsVISside, tsoLoadDataErrorsVIStop);
-													ok = false;
-												}
-											}
-											if (ok)
-												imgReadOk(id, ic, tsoLoadDataOkFLUOside,
-														tsoLoadDataOkFLUOtop, tsoLoadDataOkNIRside, tsoLoadDataOkNIRtop,
-														tsoLoadDataOkVISside, tsoLoadDataOkVIStop);
-										} catch (Exception e2) {
-											imgReadError(e2.getMessage(), id, ic, tsoLoadDataErrorsFLUOside,
-													tsoLoadDataErrorsFLUOtop, tsoLoadDataErrorsNIRside, tsoLoadDataErrorsNIRtop,
-													tsoLoadDataErrorsVISside, tsoLoadDataErrorsVIStop);
-										}
-									}
-								});
-							}
+							
 							tso.addInt(1);
 							{
 								long time = System.currentTimeMillis();
@@ -300,6 +267,45 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 									}
 								}
 							}
+							
+							final byte[] imgData = imgDataNF;
+							if (imgData != null) {
+								run2.submit(new Runnable() {
+									
+									@Override
+									public void run() {
+										try {
+											boolean ok = true;
+											if (PerformanceAnalysisTask.this.loadImages) {
+												BufferedImage img = ImageIO.read(new MyByteArrayInputStream(imgData));
+												if (img == null) {
+													imgReadError("read error, image is NULL", id, ic, tsoLoadDataErrorsFLUOside,
+															tsoLoadDataErrorsFLUOtop, tsoLoadDataErrorsNIRside, tsoLoadDataErrorsNIRtop,
+															tsoLoadDataErrorsVISside, tsoLoadDataErrorsVIStop);
+													ok = false;
+												} else {
+													if (img.getWidth() < 10 || img.getHeight() < 10) {
+														imgReadError("read error, image size is small: " + img.getWidth() + "x" + img.getHeight(), id, ic,
+																tsoLoadDataErrorsFLUOside,
+																tsoLoadDataErrorsFLUOtop, tsoLoadDataErrorsNIRside, tsoLoadDataErrorsNIRtop,
+																tsoLoadDataErrorsVISside, tsoLoadDataErrorsVIStop);
+														ok = false;
+													}
+												}
+											}
+											if (ok)
+												imgReadOk(id, ic, tsoLoadDataOkFLUOside,
+														tsoLoadDataOkFLUOtop, tsoLoadDataOkNIRside, tsoLoadDataOkNIRtop,
+														tsoLoadDataOkVISside, tsoLoadDataOkVIStop);
+										} catch (Exception e2) {
+											imgReadError(e2.getMessage(), id, ic, tsoLoadDataErrorsFLUOside,
+													tsoLoadDataErrorsFLUOtop, tsoLoadDataErrorsNIRside, tsoLoadDataErrorsNIRtop,
+													tsoLoadDataErrorsVISside, tsoLoadDataErrorsVIStop);
+										}
+									}
+								});
+							}
+							
 						}
 					}
 				});
@@ -446,7 +452,8 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	public ExperimentInterface getOutput() {
 		Experiment res = new Experiment();
 		for (NumericMeasurementInterface nmi : output) {
-			Substance3D.addAndMergeA(res, new MappingData3DPath(nmi, true).getSubstance(true), true);
+			if (nmi != null)
+				Substance3D.addAndMergeA(res, new MappingData3DPath(nmi, true).getSubstance(true), true);
 		}
 		output.clear();
 		return res;
@@ -515,6 +522,10 @@ public class PerformanceAnalysisTask implements ImageAnalysisTask {
 	public void setValidSideAngle(int dEBUG_SINGLE_ANGLE1, int dEBUG_SINGLE_ANGLE2, int dEBUG_SINGLE_ANGLE3) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void setLoadImages(boolean f) {
+		loadImages = f;
 	}
 	
 }
