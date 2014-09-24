@@ -502,7 +502,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			System.out.println(SystemAnalysis.getCurrentTime() +
 					">Snapshot data set has been created (" + snapshots.size() + " snapshots)");
 			SXSSFWorkbook wb = xlsx ? new SXSSFWorkbook() : null;
-			wb.setCompressTempFiles(true);
+			if (wb != null)
+				wb.setCompressTempFiles(true);
 			Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experiment.getName())) : null;
 			
 			ArrayList<String> excelColumnHeaders = new ArrayList<String>();

@@ -949,7 +949,9 @@ public class IAPservice {
 											n++;
 										}
 									}
-									sn.storeValue(idx, sum / n, lowerCombined.contains(sample), upperCombined.contains(sample));
+									sn.storeValue(idx, sum / n,
+											lowerCombined != null && lowerCombined.contains(sample),
+											upperCombined != null && upperCombined.contains(sample));
 								}
 								if (exportIndividualAngles) {
 									for (NumericMeasurementInterface nmi : sample) {
