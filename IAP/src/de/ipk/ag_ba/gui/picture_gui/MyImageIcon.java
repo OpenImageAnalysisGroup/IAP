@@ -74,7 +74,11 @@ public class MyImageIcon extends ImageIcon {
 			i = ins != null ? ImageIO.read(ins) : null;
 			if (i != null && width != 128) {
 				i = new de.ipk.ag_ba.image.structures.Image(i).io().grayscale().border_4sides(4, java.awt.Color.RED.getRGB())
-						.canvas().drawImage(loadingIcon, i.getWidth() - 64 - 4, i.getHeight() - 64 - 6).getImage().getAsBufferedImage();
+						.canvas().drawImage(loadingIcon, i.getWidth() - 64 - 4, i.getHeight() - 64 - 6).getImage()
+						.resize(DataSetFileButton.ICON_HEIGHT, DataSetFileButton.ICON_HEIGHT, true)
+						.io().replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint)
+						.getImage()
+						.getAsBufferedImage();
 			}
 			if (i == null || width != 128) {
 				BackgroundThreadDispatcher.addTask(new Runnable() {
@@ -83,10 +87,8 @@ public class MyImageIcon extends ImageIcon {
 					public void run() {
 						BufferedImage i;
 						try {
-							i = new de.ipk.ag_ba.image.structures.Image(fileURLmain).getAsBufferedImage();
-							int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
-							double factor = DataSetFileButton.ICON_HEIGHT / (double) maxS;
-							i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
+							i = new de.ipk.ag_ba.image.structures.Image(fileURLmain).resize(DataSetFileButton.ICON_HEIGHT, DataSetFileButton.ICON_HEIGHT, true)
+									.getAsBufferedImage();
 							setImage(i);
 							observer.repaint();
 						} catch (Exception e) {

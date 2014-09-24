@@ -41,7 +41,7 @@ if (n>0) {
 
 	
 
-	pdf("clusters.pdf", width=15, height=15)
+	pdf("clusters.pdf", width=150, height=150)
 	plot(result)
 	
 	ask.bak <- par()$ask
