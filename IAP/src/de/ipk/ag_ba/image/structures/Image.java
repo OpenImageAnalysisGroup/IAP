@@ -277,6 +277,38 @@ public class Image {
 	}
 	
 	/**
+	 * Handles separate 2d-arrays for each rgb component.
+	 * 
+	 * @param R
+	 *           image
+	 * @param B
+	 *           image
+	 * @param G
+	 *           image
+	 */
+	public Image(int[][] r, int[][] g, int[][] b) {
+		int[] res = new int[r.length * r[0].length];
+		int back = ImageOperation.BACKGROUND_COLORint;
+		for (int i = 0; i < r.length; i++) {
+			for (int j = 0; j < r[0].length; j++) {
+				int ci, ri, gi, bi;
+				if (r[i][j] == back || g[i][j] == back || b[i][j] == back) {
+					res[i + r.length * j] = back;
+					continue;
+				}
+				ri = r[i][j] & 0xFF;
+				gi = g[i][j] & 0xFF;
+				bi = b[i][j] & 0xFF;
+				ci = (0xFF << 24 | ri << 16) | (gi << 8) | (bi << 0);
+				res[i + r.length * j] = ci;
+			}
+		}
+		this.w = r.length;
+		this.h = r[0].length;
+		this.image = new ImagePlus("from 1d array", new ColorProcessor(w, h, res));
+	}
+	
+	/**
 	 * @return Composed rgb image from the three input gray images.
 	 *         If any input pixel is background, the output will also be a background pixel.
 	 */
