@@ -55,6 +55,8 @@ public class ActionMongoOrLTexperimentNavigation extends
 				+ exp.getHeader().getImportusername() + "</td></tr>"
 				+ "<tr><td>Import Time</td><td>" + exp.getHeader().getImportdate()
 				+ "</td></tr>" + "<tr><td>Remark</td><td>" + StringManipulationTools.stringReplace(exp.getHeader().getRemark(), " // ", "<br>")
+				+ "</td></tr>" + "<tr><td>Files</td><td>"
+				+ exp.getHeader().getNumberOfFiles() + "</td></tr>"
 				+ "</td></tr>";
 		
 		if (exp.getHeader().getRemark() != null && exp.getHeader().getRemark().contains("IAP image analysis")) {
