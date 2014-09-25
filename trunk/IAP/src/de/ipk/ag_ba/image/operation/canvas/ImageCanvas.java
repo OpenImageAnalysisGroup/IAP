@@ -9,6 +9,8 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import org.Vector2i;
+
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.complex_hull.Line;
 import de.ipk.ag_ba.image.operations.complex_hull.Point;
@@ -430,6 +432,10 @@ public class ImageCanvas {
 	
 	public ImageCanvas drawLine(java.awt.Point p1, java.awt.Point p2, int color, double alpha, int size) {
 		return drawLine(p1.x, p1.y, p2.x, p2.y, color, alpha, size);
+	}
+	
+	public ImageCanvas drawLine(Vector2i v1, Vector2i v2, int rgb, double alpha, int size) {
+		return drawLine(v1.x, v1.y, v2.x, v2.y, rgb, alpha, size);
 	}
 	
 }
