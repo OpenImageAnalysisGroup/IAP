@@ -67,24 +67,24 @@ public class ImageCanvas {
 		int colorRedRect = (color & 0xff0000) >> 16;
 		int colorGreenRect = (color & 0x00ff00) >> 8;
 		int colorBlueRect = (color & 0x0000ff);
-		boolean doAlpha = Math.abs(alpha) < 0.00001;
+		boolean doAlpha = Math.abs(alpha) > 0.00001;
 		for (int xi = x; xi <= x + w; xi++)
 			for (int yi = y; yi <= y + h; yi++) {
 				if (xi >= 0 && xi < wi) {
 					int i = xi + yi * wi;
 					if (i >= 0 && i < img.length) {
-						c = img[i];
-						r = (c & 0xff0000) >> 16;
-						g = (c & 0x00ff00) >> 8;
-						b = (c & 0x0000ff);
 						if (doAlpha) {
+							c = img[i];
+							r = (c & 0xff0000) >> 16;
+							g = (c & 0x00ff00) >> 8;
+							b = (c & 0x0000ff);
 							red = (int) (alpha * r + (1 - alpha) * colorRedRect);
 							green = (int) (alpha * g + (1 - alpha) * colorGreenRect);
 							blue = (int) (alpha * b + (1 - alpha) * colorBlueRect);
 						} else {
-							red = r;
-							green = g;
-							blue = b;
+							red = colorRedRect;
+							green = colorGreenRect;
+							blue = colorBlueRect;
 						}
 						img[i] = (0xFF << 24 | (red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
 					}
