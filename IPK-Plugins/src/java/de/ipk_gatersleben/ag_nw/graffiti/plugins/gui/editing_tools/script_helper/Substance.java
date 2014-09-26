@@ -1073,12 +1073,107 @@ public class Substance implements SubstanceInterface {
 		if (!(obj instanceof Substance))
 			return false;
 		
-		String s1 = rowId + ";" + name + ";" + funcat + ";" + info + ";" + formula + ";" + substancegroup + ";" + cluster_id + ";" + spot + ";" +
-				new_blast + ";" + new_blast_e_val + ";" + new_blast_score + ";" + affy_hit + ";" + score + ";" + secure;
 		Substance s = (Substance) obj;
-		String s2 = s.rowId + ";" + s.name + ";" + s.funcat + ";" + s.info + ";" + s.formula + ";" + s.substancegroup + ";" + s.cluster_id + ";" + s.spot + ";" +
-				s.new_blast + ";" + s.new_blast_e_val + ";" + s.new_blast_score + ";" + s.affy_hit + ";" + s.score + ";" + s.secure;
-		return s1.equals(s2);
+		
+		if (rowId != null || s.rowId != null)
+			if (rowId != null) {
+				if (!rowId.equals(s.rowId))
+					return false;
+			} else
+				return false;
+		
+		if (name != null || s.name != null)
+			if (name != null) {
+				if (!name.equals(s.name))
+					return false;
+			} else
+				return false;
+		
+		if (funcat != null || s.funcat != null)
+			if (funcat != null) {
+				if (!funcat.equals(s.funcat))
+					return false;
+			} else
+				return false;
+		
+		if (info != null || s.info != null)
+			if (info != null) {
+				if (!info.equals(s.info))
+					return false;
+			} else
+				return false;
+		
+		if (formula != null || s.formula != null)
+			if (formula != null) {
+				if (!formula.equals(s.formula))
+					return false;
+			} else
+				return false;
+		
+		if (substancegroup != null || s.substancegroup != null)
+			if (substancegroup != null) {
+				if (!substancegroup.equals(s.substancegroup))
+					return false;
+			} else
+				return false;
+		
+		if (cluster_id != null || s.cluster_id != null)
+			if (cluster_id != null) {
+				if (!cluster_id.equals(s.cluster_id))
+					return false;
+			} else
+				return false;
+		
+		if (spot != null || s.spot != null)
+			if (spot != null) {
+				if (!spot.equals(s.spot))
+					return false;
+			} else
+				return false;
+		
+		if (new_blast != null || s.new_blast != null)
+			if (new_blast != null) {
+				if (!new_blast.equals(s.new_blast))
+					return false;
+			} else
+				return false;
+		
+		if (new_blast_e_val != null || s.new_blast_e_val != null)
+			if (new_blast_e_val != null) {
+				if (!new_blast_e_val.equals(s.new_blast_e_val))
+					return false;
+			} else
+				return false;
+		
+		if (new_blast_score != null || s.new_blast_score != null)
+			if (new_blast_score != null) {
+				if (!new_blast_score.equals(s.new_blast_score))
+					return false;
+			} else
+				return false;
+		
+		if (affy_hit != null || s.affy_hit != null)
+			if (affy_hit != null) {
+				if (!affy_hit.equals(s.affy_hit))
+					return false;
+			} else
+				return false;
+		
+		if (score != null || s.score != null)
+			if (score != null) {
+				if (!score.equals(s.score))
+					return false;
+			} else
+				return false;
+		
+		if (secure != null || s.secure != null)
+			if (secure != null) {
+				if (!secure.equals(s.secure))
+					return false;
+			} else
+				return false;
+		
+		return true;
 	}
 	
 	@Override
