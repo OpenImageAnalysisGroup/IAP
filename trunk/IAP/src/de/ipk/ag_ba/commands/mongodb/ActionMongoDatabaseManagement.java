@@ -87,6 +87,7 @@ public class ActionMongoDatabaseManagement extends AbstractNavigationAction {
 		result.add(new NavigationButton(new ActionDataExportCSVfileList(m, experimentList), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionCreateImageConfigurationList(m, experimentList), src.getGUIsetting()));
 		result.add(new NavigationButton(new ActionApplyAnalysisSettingsAndPerformMassAnalysis(m, experimentList), src.getGUIsetting()));
+		result.add(new NavigationButton(new ActionPerformMassAnalysis(m, experimentList), src.getGUIsetting()));
 		
 		return result;
 	}
