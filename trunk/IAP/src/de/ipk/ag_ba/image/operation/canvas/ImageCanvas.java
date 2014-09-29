@@ -58,6 +58,10 @@ public class ImageCanvas {
 	 *           - opacity of the filled rectangle, Wikipedia: Alpha_Blending C = αAA + (1 − αA)B
 	 */
 	public ImageCanvas fillRect(int x, int y, int w, int h, int color, double alpha) {
+		if (alpha == 1d) {
+			System.out.println("Alpha value 1.0 used, skip drawing.");
+			return this;
+		}
 		int wi = image.getWidth();
 		int hi = image.getHeight();
 		if (hi <= 1)
@@ -90,7 +94,6 @@ public class ImageCanvas {
 					}
 				}
 			}
-		// image = new Image(wi, hi, img);
 		return this;
 	}
 	
