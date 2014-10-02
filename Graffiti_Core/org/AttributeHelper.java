@@ -2631,6 +2631,7 @@ public class AttributeHelper implements HelperClass {
 	/**
 	 * @deprecated Use {@link StringManipulationTools#formatNumber(double,String)} instead
 	 */
+	@Deprecated
 	public static String formatNumber(double d, String pattern) {
 		return StringManipulationTools.formatNumber(d, pattern);
 	}

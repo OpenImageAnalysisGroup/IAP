@@ -40,8 +40,8 @@ import org.graffiti.plugin.view.Zoomable;
  * @version $Revision: 1.1 $
  */
 public abstract class AbstractGraphElementComponent
-					extends GraphElementComponent
-					implements GraffitiViewComponent, GraphicAttributeConstants {
+		extends GraphElementComponent
+		implements GraffitiViewComponent, GraphicAttributeConstants {
 	// ~ Instance fields ========================================================
 	private static final long serialVersionUID = 1L;
 	
@@ -91,6 +91,7 @@ public abstract class AbstractGraphElementComponent
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public GraphElementShape getShape() {
 		return this.shape;
 	}
@@ -106,6 +107,7 @@ public abstract class AbstractGraphElementComponent
 	 * @param ac
 	 *           the component that will be used to display the attribute.
 	 */
+	@Override
 	public synchronized void addAttributeComponent(Attribute attr, GraffitiViewComponent ac) {
 		attributeComponents.put(attr, ac);
 	}
@@ -119,6 +121,7 @@ public abstract class AbstractGraphElementComponent
 	 *           the <code>GraphElementComponent</code> that is added to the
 	 *           list of dependent components.
 	 */
+	@Override
 	public void addDependentComponent(GraphElementComponent comp) {
 		this.dependentComponents.add(comp);
 	}
@@ -132,8 +135,9 @@ public abstract class AbstractGraphElementComponent
 	 * @throws ShapeNotFoundException
 	 *            DOCUMENT ME!
 	 */
+	@Override
 	public void attributeChanged(Attribute attr)
-						throws ShapeNotFoundException {
+			throws ShapeNotFoundException {
 		
 		if (attr.getPath().startsWith(Attribute.SEPARATOR + GraphicAttributeConstants.GRAPHICS)) {
 			if (!attr.getId().equals("cluster"))
@@ -174,6 +178,7 @@ public abstract class AbstractGraphElementComponent
 	/**
 	 * Removes a <code>GraphElementComponent</code> from the list of dependent <code>GraphElementComponent</code>s.
 	 */
+	@Override
 	public void clearDependentComponentList() {
 		this.dependentComponents = new ArrayList<GraphElementComponent>();
 	}
@@ -186,8 +191,9 @@ public abstract class AbstractGraphElementComponent
 	 *               thrown when the shape class couldn't be
 	 *               resolved.
 	 */
+	@Override
 	public void createNewShape(CoordinateSystem coordSys)
-						throws ShapeNotFoundException {
+			throws ShapeNotFoundException {
 		this.coordinateSystem = coordSys;
 		recreate();
 	}
@@ -196,6 +202,7 @@ public abstract class AbstractGraphElementComponent
 	 * Called to initialize and draw a standard shape, if the specified
 	 * shape class could not be found.
 	 */
+	@Override
 	public abstract void createStandardShape();
 	
 	/**
@@ -204,6 +211,7 @@ public abstract class AbstractGraphElementComponent
 	 * @param attr
 	 * @return Map
 	 */
+	@Override
 	public synchronized AttributeComponent getAttributeComponent(Attribute attr) {
 		return (AttributeComponent) attributeComponents.get(attr);
 	}
@@ -213,10 +221,12 @@ public abstract class AbstractGraphElementComponent
 	 * 
 	 * @return Map
 	 */
+	@Override
 	public synchronized Iterator<GraffitiViewComponent> getAttributeComponentIterator() {
 		return attributeComponents.values().iterator();
 	}
 	
+	@Override
 	public synchronized Collection<GraffitiViewComponent> getAttributeComponents() {
 		return attributeComponents.values();
 	}
@@ -226,6 +236,7 @@ public abstract class AbstractGraphElementComponent
 	 * 
 	 * @return GraphElement
 	 */
+	@Override
 	public GraphElement getGraphElement() {
 		return graphElement;
 	}
@@ -233,6 +244,7 @@ public abstract class AbstractGraphElementComponent
 	/**
 	 * Removes all entries in the attributeComponent list.
 	 */
+	@Override
 	public synchronized void clearAttributeComponentList() {
 		attributeComponents = new HashMap<Attribute, GraffitiViewComponent>();
 	}
@@ -273,8 +285,9 @@ public abstract class AbstractGraphElementComponent
 	 * @throws ShapeNotFoundException
 	 *            DOCUMENT ME!
 	 */
+	@Override
 	public synchronized void graphicAttributeChanged(Attribute attr)
-						throws ShapeNotFoundException {
+			throws ShapeNotFoundException {
 		/*
 		 * if the type of the shape or the size changed then we have to
 		 * rebuild the shape
@@ -304,11 +317,12 @@ public abstract class AbstractGraphElementComponent
 	 * @throws ShapeNotFoundException
 	 *            DOCUMENT ME!
 	 */
+	@Override
 	public synchronized void nonGraphicAttributeChanged(Attribute attr)
-						throws ShapeNotFoundException {
+			throws ShapeNotFoundException {
 		Attribute runAttr = attr;
 		
-		while (!(attr == null) && !runAttr.getPath().equals("")) {
+		while (!(runAttr == null) && runAttr.getPath() != null && !runAttr.getPath().equals("")) {
 			if (attributeComponents.containsKey(runAttr)) {
 				(attributeComponents.get(runAttr)).attributeChanged(attr);
 				break;
@@ -338,6 +352,7 @@ public abstract class AbstractGraphElementComponent
 	 * @param attr
 	 *           the attribute that has to be removed
 	 */
+	@Override
 	public synchronized void removeAttributeComponent(Attribute attr) {
 		attributeComponents.remove(attr);
 	}
@@ -349,6 +364,7 @@ public abstract class AbstractGraphElementComponent
 	 *           the <code>GraphElementComponent</code> that is removed from
 	 *           the list of dependent components.
 	 */
+	@Override
 	public void removeDependentComponent(GraphElementComponent comp) {
 		this.dependentComponents.remove(comp);
 	}
@@ -383,7 +399,7 @@ public abstract class AbstractGraphElementComponent
 	 * create a new shape.
 	 */
 	protected abstract void recreate()
-						throws ShapeNotFoundException;
+			throws ShapeNotFoundException;
 	
 }
 
