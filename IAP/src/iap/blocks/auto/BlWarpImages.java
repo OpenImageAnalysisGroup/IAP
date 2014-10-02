@@ -6,7 +6,6 @@ import iap.blocks.image_analysis_tools.imageJ.externalPlugins.bUnwarpJ.Param;
 import iap.blocks.image_analysis_tools.imageJ.externalPlugins.bUnwarpJ.bUnwarpJ_;
 import ij.ImagePlus;
 
-import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -20,6 +19,24 @@ import de.ipk.ag_ba.image.structures.Image;
  * @author pape
  */
 public class BlWarpImages extends AbstractBlock {
+	
+	@Override
+	protected Image processFLUOmask() {
+		// TODO Auto-generated method stub
+		return super.processFLUOmask();
+	}
+	
+	@Override
+	protected Image processNIRmask() {
+		// TODO Auto-generated method stub
+		return super.processNIRmask();
+	}
+	
+	@Override
+	protected Image processIRmask() {
+		// TODO Auto-generated method stub
+		return super.processIRmask();
+	}
 	
 	@Override
 	protected Image processMask(Image mask) {
@@ -40,7 +57,7 @@ public class BlWarpImages extends AbstractBlock {
 		if (nir == null && mask.getCameraType() == CameraType.NIR)
 			return null;
 		
-		if (ir == null && mask.getCameraType() == CameraType.NIR)
+		if (ir == null && mask.getCameraType() == CameraType.IR)
 			return null;
 		
 		int back = ImageOperation.BACKGROUND_COLORint;
@@ -57,21 +74,21 @@ public class BlWarpImages extends AbstractBlock {
 		// imageWeight image similarity weight
 		// consistencyWeight consistency weight
 		// stopThreshold stopping threshold
-		Param parm = new Param(0, 0, 0, 3, 0.0, 0.0, 0.0, 1.0, 10.0, 0.5);
+		Param parm = new Param(1, 0, 3, 4, 0.0, 0.0, 0.0, 1.0, 10.0, 0.5);
 		
-		// change background to black and re-scale
-		ImagePlus visWork = vis.copy().io().replaceColor(back, Color.BLACK.getRGB()).getImageAsImagePlus();
+		// change background to white and re-scale
+		ImagePlus visWork = vis.copy().io().getImageAsImagePlus();
 		
 		if (mask.getCameraType() == CameraType.FLUO) {
 			mask = getWarpedImage(fluo, back, Vwidth, Vheight, parm, visWork);
 		}
 		
 		if (mask.getCameraType() == CameraType.NIR) {
-			mask = getWarpedImage(fluo, back, Vwidth, Vheight, parm, visWork);
+			mask = getWarpedImage(nir, back, Vwidth, Vheight, parm, visWork);
 		}
 		
 		if (mask.getCameraType() == CameraType.IR) {
-			mask = getWarpedImage(fluo, back, Vwidth, Vheight, parm, visWork);
+			mask = getWarpedImage(ir, back, Vwidth, Vheight, parm, visWork);
 		}
 		// replace imagej background (BLACK = -16777216) and black border
 		mask = mask.io().replaceColor(0, back).getImage();
@@ -81,8 +98,13 @@ public class BlWarpImages extends AbstractBlock {
 	
 	private Image getWarpedImage(Image img, int back, int Vwidth, int Vheight, Param parm, ImagePlus visWork) {
 		Image mask;
-		ImagePlus imgCopy = img.io().copy().resize(Vwidth, Vheight).replaceColor(back, Color.BLACK.getRGB()).getImageAsImagePlus();
+		ImagePlus imgCopy = img.io().copy().resize(Vwidth, Vheight).getImageAsImagePlus();
 		ImagePlus[] warped = bUnwarpJ_.alignImagesBatch(visWork, imgCopy, visWork.getProcessor(), imgCopy.getProcessor(), parm);
+		if (true)
+			for (ImagePlus i : warped) {
+				i.setTitle(img.getCameraType().name());
+				i.show();
+			}
 		mask = new Image(Vwidth, Vheight, (int[]) warped[0].getStack().getPixels(1));
 		return mask;
 	}
@@ -93,6 +115,7 @@ public class BlWarpImages extends AbstractBlock {
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
 		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
 		return res;
 	}
 	

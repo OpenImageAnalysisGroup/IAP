@@ -29,9 +29,18 @@ public class RegionLabeling implements Segmentation {
 	private Vector2i[] clusterDimension;
 	int[] clusterSize;
 	private TopBottomLeftRight[] boundingBox;
+	boolean eightNeighbourhood = true;
 	
 	public LinkedList<ArrayList<PositionAndColor>> getRegionList() {
 		return regionList;
+	}
+	
+	public void setNeigbourhoodFour() {
+		eightNeighbourhood = false;
+	}
+	
+	public ArrayList<PositionAndColor> getCluster(int idx) {
+		return regionList.get(idx);
 	}
 	
 	/**
@@ -116,29 +125,52 @@ public class RegionLabeling implements Segmentation {
 			find = false;
 			
 			if (dist < radius) {
-				inside = rx - 1 >= 0 && ry - 1 >= 0;
-				if (inside)
-					if (visitedImage[rx - 1][ry - 1] != background) {
-						find = true;
-						rx = rx - 1;
-						ry = ry - 1;
-					}
-				
+				// 8-Neighbourhood
+				if (eightNeighbourhood) {
+					inside = rx - 1 >= 0 && ry - 1 >= 0;
+					if (inside)
+						if (visitedImage[rx - 1][ry - 1] != background) {
+							find = true;
+							rx = rx - 1;
+							ry = ry - 1;
+						}
+					
+					inside = ry - 1 >= 0 && rx + 1 < w;
+					if (inside)
+						if (visitedImage[rx + 1][ry - 1] != background) {
+							if (!find) {
+								find = true;
+								rx = rx + 1;
+								ry = ry - 1;
+							}
+						}
+					
+					inside = rx - 1 >= 0 && ry + 1 < h;
+					if (inside)
+						if (visitedImage[rx - 1][ry + 1] != background) {
+							if (!find) {
+								find = true;
+								rx = rx - 1;
+								ry = ry + 1;
+							}
+						}
+					
+					inside = rx + 1 < w && ry + 1 < h;
+					if (inside)
+						if (visitedImage[rx + 1][ry + 1] != background) {
+							if (!find) {
+								find = true;
+								rx = rx + 1;
+								ry = ry + 1;
+							}
+						}
+				}
+				// 4-Neighbourhood
 				inside = ry - 1 >= 0;
 				if (inside)
 					if (visitedImage[rx][ry - 1] != background) {
 						if (!find) {
 							find = true;
-							ry = ry - 1;
-						}
-					}
-				
-				inside = ry - 1 >= 0 && rx + 1 < w;
-				if (inside)
-					if (visitedImage[rx + 1][ry - 1] != background) {
-						if (!find) {
-							find = true;
-							rx = rx + 1;
 							ry = ry - 1;
 						}
 					}
@@ -161,31 +193,11 @@ public class RegionLabeling implements Segmentation {
 						}
 					}
 				
-				inside = rx - 1 >= 0 && ry + 1 < h;
-				if (inside)
-					if (visitedImage[rx - 1][ry + 1] != background) {
-						if (!find) {
-							find = true;
-							rx = rx - 1;
-							ry = ry + 1;
-						}
-					}
-				
 				inside = ry + 1 < h;
 				if (inside)
 					if (visitedImage[rx][ry + 1] != background) {
 						if (!find) {
 							find = true;
-							ry = ry + 1;
-						}
-					}
-				
-				inside = rx + 1 < w && ry + 1 < h;
-				if (inside)
-					if (visitedImage[rx + 1][ry + 1] != background) {
-						if (!find) {
-							find = true;
-							rx = rx + 1;
 							ry = ry + 1;
 						}
 					}

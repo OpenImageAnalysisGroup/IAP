@@ -4222,7 +4222,7 @@ public class ImageOperation implements MemoryHogInterface {
 		Lab labAvg;
 		boolean color;
 		int[] res = new int[lenght];
-		int rf, gf, bf, li, ai, bi, center, above, left, right, below;
+		int center, above, left, right, below;
 		
 		for (int index = 0; index < lenght; index++) {
 			if (index > width && index < index - width) {
@@ -4251,11 +4251,11 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(res, inp.getWidth(), inp.getHeight());
 	}
 	
-	private Lab getLabAverage(int[] is) {
+	public static Lab getLabAverage(int[] is) {
 		int rf, gf, bf;
-		int sumL = 0;
-		int sumA = 0;
-		int sumB = 0;
+		long sumL = 0;
+		long sumA = 0;
+		long sumB = 0;
 		int length = is.length;
 		float[][][] lab = ImageOperation.getLabCubeInstance();
 		for (int i = 0; i < length; i++) {
