@@ -318,6 +318,14 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2config2summaryResult, int blockPosition,
 			String[] desiredProperties) {
+		
+		boolean relRaw = getBoolean(null, "Calculate Relative Values (Raw)", true);
+		boolean relPer = getBoolean(null, "Calculate Relative Values (Percent)", true);
+		boolean relLog = getBoolean(null, "Calculate Relative Values (Log)", true);
+		
+		if (!relRaw && !relPer && !relLog)
+			return;
+		
 		final double timeForOneDayD = 1000 * 60 * 60 * 24d;
 		
 		HashMap<String, TreeMap<String, TreeMap<Integer, Long>>> prop2config2tray2lastTime = new HashMap<String, TreeMap<String, TreeMap<Integer, Long>>>();
@@ -367,7 +375,14 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 									double ratio = currentPropertyValue / lastPropertyValue;
 									double days = (time - prop2config2tray2lastTime.get(property).get(configName).get(tray)) / timeForOneDayD;
 									double ratioPerDay = Math.pow(ratio, 1d / days);
-									summaryResult.setNumericResult(blockPosition, property + ".relative", ratioPerDay, "relative/day");
+									if (relRaw)
+										summaryResult.setNumericResult(blockPosition, property + ".relative", ratioPerDay, "relative/day");
+									double perc = (ratioPerDay - 1) * 100d;
+									if (relPer)
+										summaryResult.setNumericResult(blockPosition, property + ".relative_percent", perc, "percent change/day");
+									double growth = (Math.log(currentPropertyValue) - Math.log(lastPropertyValue)) / days;
+									if (relLog)
+										summaryResult.setNumericResult(blockPosition, property + ".relative_log", growth, "relative/day");
 								}
 							}
 							

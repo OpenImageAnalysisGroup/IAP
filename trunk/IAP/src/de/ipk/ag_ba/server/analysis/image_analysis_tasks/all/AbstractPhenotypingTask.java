@@ -749,6 +749,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		
 		for (Long time : analysisResults.keySet())
 			for (String configName : analysisResults.get(time).keySet()) {
+				int trays = analysisResults.get(time).get(configName).keySet().size();
+				boolean multiTray = trays > 1;
+				
 				for (Integer tray : analysisResults.get(time).get(configName).keySet()) {
 					boolean multipleTrays = analysisResults.get(time).get(configName).keySet().size() > 1;
 					for (String volumeID : analysisResults.get(time).get(configName).get(tray).getVolumeNames()) {
@@ -816,7 +819,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 									NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
 									m.setReplicateID(template.getReplicateID());
 									m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-									m.setQualityAnnotation(template.getQualityAnnotation() + (multipleTrays ? "_" + tray : ""));
+									
+									if (multiTray)
+										m.setQualityAnnotation(template.getQualityAnnotation() + "_" + WellProcessing.getWellID(tray, trays, m));
+									else
+										m.setQualityAnnotation(template.getQualityAnnotation());
+									
 									// rotation angle needs to be determined from the config-name
 									if (bpv.getPosition() != null)
 										m.setPosition(bpv.getPosition());
