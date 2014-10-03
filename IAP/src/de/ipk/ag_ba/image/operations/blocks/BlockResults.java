@@ -28,6 +28,9 @@ import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
+/**
+ * @author Christian Klukas
+ */
 public class BlockResults implements BlockResultSet {
 	
 	private final TreeMap<Integer, TreeMap<String, Double>> storedNumerics = new TreeMap<Integer, TreeMap<String, Double>>();
