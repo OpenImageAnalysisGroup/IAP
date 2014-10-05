@@ -816,6 +816,13 @@ public class StringManipulationTools implements HelperClass {
 		}
 	}
 	
+	public static String getStringList(String pre, Object[] elemarr, String div) {
+		ArrayList<Object> elements = new ArrayList<>(elemarr.length);
+		for (Object o : elemarr)
+			elements.add(o);
+		return getStringList(pre, elements, div, false);
+	}
+	
 	public static String getStringList(String pre, Collection<?> elements, String div) {
 		return getStringList(pre, elements, div, false);
 	}
