@@ -107,7 +107,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	volatile boolean downloadInProgress = false;
 	boolean downloadNeeded = false;
 	private ActionListener sizeChangedListener;
-	private Collection<DataSetFileButton> buttonsInThisView;
+	private final Collection<DataSetFileButton> buttonsInThisView;
 	
 	public int getIsJavaImage() {
 		if (myImage == null)
@@ -155,321 +155,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				if (e.getButton() == MouseEvent.BUTTON3 || !primary) {
 					ActionEvent ae = new ActionEvent(e.getSource(), 0, null);
 					processMouseClick(ae);
-				} else
-					if (e.getButton() == MouseEvent.BUTTON1 && primary) {
-						JPopupMenu jp = new JPopupMenu("Debug");
-						
-						JMenuItem debugPipelineTestShowMainImage = new JMenuItem(
-								"Show Image");
-						
-						debugPipelineTestShowMainImage.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png").getScaledInstance(16, 16,
-								java.awt.Image.SCALE_SMOOTH)));
-						
-						debugPipelineTestShowMainImage
-								.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										try {
-											IOurl s = imageResult
-													.getBinaryFileInfo()
-													.getFileNameMain();
-											Image fi = new Image(s);
-											fi.show("Main Image");
-										} catch (Exception err) {
-											JOptionPane
-													.showMessageDialog(
-															null,
-															"Error: "
-																	+ err.getLocalizedMessage()
-																	+ ". Command execution error.",
-															"Error",
-															JOptionPane.INFORMATION_MESSAGE);
-											return;
-										}
-									}
-								});
-						
-						JMenuItem debugPipelineTestShowReferenceImage = new JMenuItem(
-								"Show Reference");
-						debugPipelineTestShowReferenceImage
-								.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										try {
-											IOurl s = imageResult
-													.getBinaryFileInfo()
-													.getFileNameLabel();
-											Image fi = new Image(s);
-											fi.show("Reference Image");
-										} catch (Exception err) {
-											MainFrame.getInstance().showMessageDialog("Reference image could not be loaded: " + err.getMessage());
-											return;
-										}
-									}
-								});
-						
-						JMenuItem debugPipelineTestShowImage = new JMenuItem(
-								"Show Annotation");
-						debugPipelineTestShowImage
-								.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										try {
-											IOurl s = imageResult
-													.getBinaryFileInfo()
-													.getFileNameMain();
-											Collection<NumericMeasurementInterface> match = IAPservice
-													.getMatchFor(s, targetTreeNode
-															.getExperiment().getExperiment(), false);
-											
-											for (NumericMeasurementInterface nmi : match) {
-												ImageData id = (ImageData) nmi;
-												if (id.getURL().getDetail()
-														.equals(s.getDetail())) {
-													String oldRef = id
-															.getAnnotationField("oldreference");
-													
-													if (oldRef != null) {
-														IOurl u = new IOurl(oldRef);
-														Image fi = new Image(
-																u);
-														fi.show("Annotation Image");
-													} else
-														MainFrame.getInstance().showMessageDialog("Annotation image is undefined");
-												}
-											}
-										} catch (Exception err) {
-											JOptionPane
-													.showMessageDialog(
-															null,
-															"Error: "
-																	+ err.getLocalizedMessage()
-																	+ ". Command execution error.",
-															"Error",
-															JOptionPane.INFORMATION_MESSAGE);
-											ErrorMsg.addErrorMessage(err);
-											return;
-										}
-									}
-								});
-						
-						JMenuItem debugShowSnapshot = new JMenuItem(
-								"Main, Reference, Annotation (Stack)");
-						
-						debugShowSnapshot.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								try {
-									Collection<NumericMeasurementInterface> match = IAPservice
-											.getMatchFor(imageResult
-													.getBinaryFileInfo()
-													.getFileNameMain(),
-													targetTreeNode.getExperiment().getExperiment(), false);
-									if (match.size() > 0) {
-										ImageStack snapshot = new ImageStack();
-										for (NumericMeasurementInterface nmi : match) {
-											if (nmi instanceof ImageData) {
-												ImageData id = (ImageData) nmi;
-												if (id.getURL() != null) {
-													Image fi = new Image(
-															id.getURL());
-													snapshot.addImage(
-															id.getSubstanceName(),
-															fi);
-												}
-											}
-										}
-										for (NumericMeasurementInterface nmi : match) {
-											if (nmi instanceof ImageData) {
-												ImageData id = (ImageData) nmi;
-												if (id.getLabelURL() != null) {
-													Image fi = new Image(
-															id.getLabelURL());
-													snapshot.addImage(
-															"Reference "
-																	+ id.getSubstanceName(),
-															fi);
-												}
-											}
-										}
-										for (NumericMeasurementInterface nmi : match) {
-											if (nmi instanceof ImageData) {
-												ImageData id = (ImageData) nmi;
-												if (id.getAnnotationField("oldreference") != null) {
-													Image fi = new Image(
-															new IOurl(
-																	id.getAnnotationField("oldreference")));
-													snapshot.addImage(
-															"Annotation "
-																	+ id.getSubstanceName(),
-															fi);
-												}
-											}
-										}
-										
-										NumericMeasurementInterface a = match
-												.iterator().next();
-										snapshot.show("Snapshot "
-												+ a.getQualityAnnotation()
-												+ " "
-												+ a.getParentSample()
-														.getSampleTime()
-												+ " "
-												+ a.getParentSample()
-														.getParentCondition()
-														.getConditionName());
-									}
-								} catch (Exception err) {
-									JOptionPane.showMessageDialog(null, "Error: "
-											+ err.getLocalizedMessage()
-											+ ". Command execution error.",
-											"Error",
-											JOptionPane.INFORMATION_MESSAGE);
-									ErrorMsg.addErrorMessage(err);
-									return;
-								}
-							}
-						});
-						
-						jp.add(debugPipelineTestShowMainImage);
-						if (imageResult.getBinaryFileInfo().getFileNameLabel() != null)
-							jp.add(debugPipelineTestShowReferenceImage);
-						jp.add(debugPipelineTestShowImage);
-						
-						JMenuItem stl = new JMenuItem("Show Image Timeline");
-						stl.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Appointment-Soon-64.png").getScaledInstance(16, 16,
-								java.awt.Image.SCALE_SMOOTH)));
-						stl.addActionListener(getListener(targetTreeNode, true,
-								false, false, true));
-						jp.add(stl);
-						
-						JMenu sn = new JMenu("Show Complete Snapshot Set");
-						sn.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Photos-64.png").getScaledInstance(16, 16,
-								java.awt.Image.SCALE_SMOOTH)));
-						
-						JMenuItem a = new JMenuItem("Main");
-						a.addActionListener(getListener(targetTreeNode, true,
-								false, false, false));
-						sn.add(a);
-						JMenuItem b = new JMenuItem("Reference");
-						b.addActionListener(getListener(targetTreeNode, false,
-								true, false, false));
-						sn.add(b);
-						JMenuItem c = new JMenuItem("Annotation");
-						c.addActionListener(getListener(targetTreeNode, false,
-								false, true, false));
-						sn.add(c);
-						
-						JMenuItem debugShowSnapshotNoStack = new JMenuItem(
-								"Main, Reference, Annotation");
-						debugShowSnapshotNoStack.addActionListener(getListener(
-								targetTreeNode, true, true, true, false));
-						sn.add(debugShowSnapshotNoStack);
-						sn.add(debugShowSnapshot);
-						jp.add(sn);
-						
-						if (targetTreeNode.getExperiment().getIniIoProvider() != null) {
-							try {
-								final IniIoProvider iop = targetTreeNode.isReadOnly() ? null : targetTreeNode.getExperiment().getIniIoProvider();
-								if (iop != null
-										&& targetTreeNode != null
-										&& targetTreeNode.getExperiment() != null
-										&& targetTreeNode.getExperiment().getHeader() != null
-										&& targetTreeNode.getExperiment().getHeader().getSettings() != null
-										&& !targetTreeNode.getExperiment().getHeader().getSettings().isEmpty()) {
-									Action action = new AbstractAction("Change Analysis Settings") {
-										@Override
-										public void actionPerformed(ActionEvent e) {
-											IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
-											NavigationAction ac = new ActionSettings(null, iop, "Change analysis settings", "Modify settings");
-											mnp.getNewWindowListener(ac).actionPerformed(null);
-										}
-									};
-									jp.add(new JSeparator());
-									JMenuItem mi = new JMenuItem(action);
-									mi.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(16, 16,
-											java.awt.Image.SCALE_SMOOTH)));
-									jp.add(mi);
-									PipelineDesc pd = new PipelineDesc(null, iop, null, null, null);
-									UserDefinedImageAnalysisPipelineTask iat =
-											new UserDefinedImageAnalysisPipelineTask(pd);
-									if (!targetTreeNode.getExperiment().getHeader().getExperimentType().equalsIgnoreCase("Analysis Results")) {
-										JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
-										debugPipelineTest0a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png")
-												.getScaledInstance(16, 16,
-														java.awt.Image.SCALE_SMOOTH)));
-										jp.add(debugPipelineTest0a);
-									} else {
-										JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
-										debugPipelineTest00a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png")
-												.getScaledInstance(16, 16,
-														java.awt.Image.SCALE_SMOOTH)));
-										jp.add(debugPipelineTest00a);
-									}
-									jp.add(new JSeparator());
-									Action action2 = new AbstractAction("Close All Image Windows") {
-										@Override
-										public void actionPerformed(ActionEvent e) {
-											WindowManager.closeAllWindows();
-										}
-										
-										@Override
-										public boolean isEnabled() {
-											return WindowManager.getImageCount() > 0;
-										}
-										
-									};
-									JMenuItem jmc = new JMenuItem(action2);
-									jmc.setIcon(new ImageIcon(IAPimages.getImage("img/close_frame.png")));
-									jp.add(jmc);
-									
-									jp.add(new JSeparator());
-								}
-							} catch (Exception err) {
-								if (err.getCause() != null && err.getCause() instanceof NullPointerException)
-									System.out.println(SystemAnalysis.getCurrentTime()
-											+ ">INFO: No analysis pipeline assigned. Debug menu items are not added to menu list.");
-								else
-									System.out.println(SystemAnalysis.getCurrentTime()
-											+ ">ERROR: Could not analyze assigned pipeline info. Debug menu items are not added to menu list. Error: " + err.getMessage());
-							}
-						}
-						
-						if (!targetTreeNode.isReadOnly()) {
-							JMenu ta = new JMenu("Analysis Templates");
-							ta.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/book_object2.png")
-									.getScaledInstance(16, 16,
-											java.awt.Image.SCALE_SMOOTH)));
-							
-							ArrayList<AbstractPhenotypingTask> pl = new ArrayList<AbstractPhenotypingTask>();
-							try {
-								pl = new ImageAnalysisTasks().getKnownImageAnalysisTasks();
-							} catch (Exception e1) {
-								e1.printStackTrace();
-								ErrorMsg.addErrorMessage(e1);
-							}
-							
-							boolean added = false;
-							
-							for (final AbstractPhenotypingTask iat : pl) {
-								JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
-								JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
-								
-								ta.add(debugPipelineTest0a);
-								ta.add(debugPipelineTest00a);
-								added = true;
-							}
-							
-							if (added)
-								jp.add(ta);
-							jp.addSeparator();
-							
-							JMenu fm = getAnnotationChangerSubmenu();
-							
-							jp.add(fm);
-						}
-						jp.show(e.getComponent(), e.getX(), e.getY());
-					}
+				}
 			}
 		});
 	}
@@ -587,8 +273,321 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-	public void actionPerformed(final ActionEvent evt) {
-		//
+	public void actionPerformed(final ActionEvent e) {
+		if (primary) {
+			JPopupMenu jp = new JPopupMenu("Debug");
+			
+			JMenuItem debugPipelineTestShowMainImage = new JMenuItem(
+					"Show Image");
+			
+			debugPipelineTestShowMainImage.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png").getScaledInstance(16, 16,
+					java.awt.Image.SCALE_SMOOTH)));
+			
+			debugPipelineTestShowMainImage
+					.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								IOurl s = imageResult
+										.getBinaryFileInfo()
+										.getFileNameMain();
+								Image fi = new Image(s);
+								fi.show("Main Image");
+							} catch (Exception err) {
+								JOptionPane
+										.showMessageDialog(
+												null,
+												"Error: "
+														+ err.getLocalizedMessage()
+														+ ". Command execution error.",
+												"Error",
+												JOptionPane.INFORMATION_MESSAGE);
+								return;
+							}
+						}
+					});
+			
+			JMenuItem debugPipelineTestShowReferenceImage = new JMenuItem(
+					"Show Reference");
+			debugPipelineTestShowReferenceImage
+					.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								IOurl s = imageResult
+										.getBinaryFileInfo()
+										.getFileNameLabel();
+								Image fi = new Image(s);
+								fi.show("Reference Image");
+							} catch (Exception err) {
+								MainFrame.getInstance().showMessageDialog("Reference image could not be loaded: " + err.getMessage());
+								return;
+							}
+						}
+					});
+			
+			JMenuItem debugPipelineTestShowImage = new JMenuItem(
+					"Show Annotation");
+			debugPipelineTestShowImage
+					.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								IOurl s = imageResult
+										.getBinaryFileInfo()
+										.getFileNameMain();
+								Collection<NumericMeasurementInterface> match = IAPservice
+										.getMatchFor(s, targetTreeNode
+												.getExperiment().getExperiment(), false);
+								
+								for (NumericMeasurementInterface nmi : match) {
+									ImageData id = (ImageData) nmi;
+									if (id.getURL().getDetail()
+											.equals(s.getDetail())) {
+										String oldRef = id
+												.getAnnotationField("oldreference");
+										
+										if (oldRef != null) {
+											IOurl u = new IOurl(oldRef);
+											Image fi = new Image(
+													u);
+											fi.show("Annotation Image");
+										} else
+											MainFrame.getInstance().showMessageDialog("Annotation image is undefined");
+									}
+								}
+							} catch (Exception err) {
+								JOptionPane
+										.showMessageDialog(
+												null,
+												"Error: "
+														+ err.getLocalizedMessage()
+														+ ". Command execution error.",
+												"Error",
+												JOptionPane.INFORMATION_MESSAGE);
+								ErrorMsg.addErrorMessage(err);
+								return;
+							}
+						}
+					});
+			
+			JMenuItem debugShowSnapshot = new JMenuItem(
+					"Main, Reference, Annotation (Stack)");
+			
+			debugShowSnapshot.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						Collection<NumericMeasurementInterface> match = IAPservice
+								.getMatchFor(imageResult
+										.getBinaryFileInfo()
+										.getFileNameMain(),
+										targetTreeNode.getExperiment().getExperiment(), false);
+						if (match.size() > 0) {
+							ImageStack snapshot = new ImageStack();
+							for (NumericMeasurementInterface nmi : match) {
+								if (nmi instanceof ImageData) {
+									ImageData id = (ImageData) nmi;
+									if (id.getURL() != null) {
+										Image fi = new Image(
+												id.getURL());
+										snapshot.addImage(
+												id.getSubstanceName(),
+												fi);
+									}
+								}
+							}
+							for (NumericMeasurementInterface nmi : match) {
+								if (nmi instanceof ImageData) {
+									ImageData id = (ImageData) nmi;
+									if (id.getLabelURL() != null) {
+										Image fi = new Image(
+												id.getLabelURL());
+										snapshot.addImage(
+												"Reference "
+														+ id.getSubstanceName(),
+												fi);
+									}
+								}
+							}
+							for (NumericMeasurementInterface nmi : match) {
+								if (nmi instanceof ImageData) {
+									ImageData id = (ImageData) nmi;
+									if (id.getAnnotationField("oldreference") != null) {
+										Image fi = new Image(
+												new IOurl(
+														id.getAnnotationField("oldreference")));
+										snapshot.addImage(
+												"Annotation "
+														+ id.getSubstanceName(),
+												fi);
+									}
+								}
+							}
+							
+							NumericMeasurementInterface a = match
+									.iterator().next();
+							snapshot.show("Snapshot "
+									+ a.getQualityAnnotation()
+									+ " "
+									+ a.getParentSample()
+											.getSampleTime()
+									+ " "
+									+ a.getParentSample()
+											.getParentCondition()
+											.getConditionName());
+						}
+					} catch (Exception err) {
+						JOptionPane.showMessageDialog(null, "Error: "
+								+ err.getLocalizedMessage()
+								+ ". Command execution error.",
+								"Error",
+								JOptionPane.INFORMATION_MESSAGE);
+						ErrorMsg.addErrorMessage(err);
+						return;
+					}
+				}
+			});
+			
+			jp.add(debugPipelineTestShowMainImage);
+			if (imageResult.getBinaryFileInfo().getFileNameLabel() != null)
+				jp.add(debugPipelineTestShowReferenceImage);
+			jp.add(debugPipelineTestShowImage);
+			
+			JMenuItem stl = new JMenuItem("Show Image Timeline");
+			stl.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Appointment-Soon-64.png").getScaledInstance(16, 16,
+					java.awt.Image.SCALE_SMOOTH)));
+			stl.addActionListener(getListener(targetTreeNode, true,
+					false, false, true));
+			jp.add(stl);
+			
+			JMenu sn = new JMenu("Show Complete Snapshot Set");
+			sn.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Photos-64.png").getScaledInstance(16, 16,
+					java.awt.Image.SCALE_SMOOTH)));
+			
+			JMenuItem a = new JMenuItem("Main");
+			a.addActionListener(getListener(targetTreeNode, true,
+					false, false, false));
+			sn.add(a);
+			JMenuItem b = new JMenuItem("Reference");
+			b.addActionListener(getListener(targetTreeNode, false,
+					true, false, false));
+			sn.add(b);
+			JMenuItem c = new JMenuItem("Annotation");
+			c.addActionListener(getListener(targetTreeNode, false,
+					false, true, false));
+			sn.add(c);
+			
+			JMenuItem debugShowSnapshotNoStack = new JMenuItem(
+					"Main, Reference, Annotation");
+			debugShowSnapshotNoStack.addActionListener(getListener(
+					targetTreeNode, true, true, true, false));
+			sn.add(debugShowSnapshotNoStack);
+			sn.add(debugShowSnapshot);
+			jp.add(sn);
+			
+			if (targetTreeNode.getExperiment().getIniIoProvider() != null) {
+				try {
+					final IniIoProvider iop = targetTreeNode.isReadOnly() ? null : targetTreeNode.getExperiment().getIniIoProvider();
+					if (iop != null
+							&& targetTreeNode != null
+							&& targetTreeNode.getExperiment() != null
+							&& targetTreeNode.getExperiment().getHeader() != null
+							&& targetTreeNode.getExperiment().getHeader().getSettings() != null
+							&& !targetTreeNode.getExperiment().getHeader().getSettings().isEmpty()) {
+						Action action = new AbstractAction("Change Analysis Settings") {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
+								NavigationAction ac = new ActionSettings(null, iop, "Change analysis settings", "Modify settings");
+								mnp.getNewWindowListener(ac).actionPerformed(null);
+							}
+						};
+						jp.add(new JSeparator());
+						JMenuItem mi = new JMenuItem(action);
+						mi.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(16, 16,
+								java.awt.Image.SCALE_SMOOTH)));
+						jp.add(mi);
+						PipelineDesc pd = new PipelineDesc(null, iop, null, null, null);
+						UserDefinedImageAnalysisPipelineTask iat =
+								new UserDefinedImageAnalysisPipelineTask(pd);
+						if (!targetTreeNode.getExperiment().getHeader().getExperimentType().equalsIgnoreCase("Analysis Results")) {
+							JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
+							debugPipelineTest0a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png")
+									.getScaledInstance(16, 16,
+											java.awt.Image.SCALE_SMOOTH)));
+							jp.add(debugPipelineTest0a);
+						} else {
+							JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
+							debugPipelineTest00a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png")
+									.getScaledInstance(16, 16,
+											java.awt.Image.SCALE_SMOOTH)));
+							jp.add(debugPipelineTest00a);
+						}
+						jp.add(new JSeparator());
+						Action action2 = new AbstractAction("Close All Image Windows") {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								WindowManager.closeAllWindows();
+							}
+							
+							@Override
+							public boolean isEnabled() {
+								return WindowManager.getImageCount() > 0;
+							}
+							
+						};
+						JMenuItem jmc = new JMenuItem(action2);
+						jmc.setIcon(new ImageIcon(IAPimages.getImage("img/close_frame.png")));
+						jp.add(jmc);
+						
+						jp.add(new JSeparator());
+					}
+				} catch (Exception err) {
+					if (err.getCause() != null && err.getCause() instanceof NullPointerException)
+						System.out.println(SystemAnalysis.getCurrentTime()
+								+ ">INFO: No analysis pipeline assigned. Debug menu items are not added to menu list.");
+					else
+						System.out.println(SystemAnalysis.getCurrentTime()
+								+ ">ERROR: Could not analyze assigned pipeline info. Debug menu items are not added to menu list. Error: " + err.getMessage());
+				}
+			}
+			
+			if (!targetTreeNode.isReadOnly()) {
+				JMenu ta = new JMenu("Analysis Templates");
+				ta.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/book_object2.png")
+						.getScaledInstance(16, 16,
+								java.awt.Image.SCALE_SMOOTH)));
+				
+				ArrayList<AbstractPhenotypingTask> pl = new ArrayList<AbstractPhenotypingTask>();
+				try {
+					pl = new ImageAnalysisTasks().getKnownImageAnalysisTasks();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					ErrorMsg.addErrorMessage(e1);
+				}
+				
+				boolean added = false;
+				
+				for (final AbstractPhenotypingTask iat : pl) {
+					JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
+					JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
+					
+					ta.add(debugPipelineTest0a);
+					ta.add(debugPipelineTest00a);
+					added = true;
+				}
+				
+				if (added)
+					jp.add(ta);
+				jp.addSeparator();
+				
+				JMenu fm = getAnnotationChangerSubmenu();
+				
+				jp.add(fm);
+			}
+			jp.show(this, getX() + 5, getY() + 5);
+		}
 	}
 	
 	private void processMouseClick(final ActionEvent evt) {
