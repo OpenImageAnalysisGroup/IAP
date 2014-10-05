@@ -3,6 +3,8 @@ package iap.blocks.data_structures;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 public class CalculatedProperty implements CalculatedPropertyDescription {
@@ -56,6 +58,10 @@ public class CalculatedProperty implements CalculatedPropertyDescription {
 			si = (SubstanceInterface) targetEntity;
 		if (targetEntity instanceof ConditionInterface)
 			si = ((ConditionInterface) targetEntity).getParentSubstance();
+		if (targetEntity instanceof SampleInterface)
+			si = ((SampleInterface) targetEntity).getParentCondition().getParentSubstance();
+		if (targetEntity instanceof Measurement)
+			si = ((Measurement) targetEntity).getParentSample().getParentCondition().getParentSubstance();
 		if (si != null && si.getName() != null && !si.getName().isEmpty()) {
 			res = IAPpluginManager.getInstance().getDescriptionForCalculatedProperty(si.getName());
 		}
