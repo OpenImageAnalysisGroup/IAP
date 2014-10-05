@@ -2,6 +2,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashMap;
@@ -17,11 +20,14 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * Calculates the top and side area values for visible and florescence images (by default) and if enabled, from NIR and IR images as well.
+ * Calculates the top and side area values for visible and fluorescence images (by default) and if enabled, from NIR and IR images as well.
  * 
  * @author klukas
  */
-public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
+public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
+	
+	private static final String AREA = "area";
+	private static final String AREA_NORM = "area.norm";
 	
 	@Override
 	protected Image processVISmask() {
@@ -71,9 +77,9 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 		String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
 		int filledArea = image.io().countFilledPixels();
 		if (distHorizontal != null) {
-			getResultSet().setNumericResult(getBlockPosition(), pos + prefix + "area.norm", filledArea * normFactorArea, "mm^2");
+			getResultSet().setNumericResult(getBlockPosition(), pos + prefix + AREA_NORM, filledArea * normFactorArea, "mm^2", this);
 		}
-		getResultSet().setNumericResult(getBlockPosition(), pos + prefix + "area", filledArea, "px^2");
+		getResultSet().setNumericResult(getBlockPosition(), pos + prefix + AREA, filledArea, "px^2", this);
 	}
 	
 	@Override
@@ -83,7 +89,8 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			CalculatesProperties propertyCalculator) {
 		
 		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
 				new String[] {
@@ -91,7 +98,7 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 						"RESULT_side.fluo.area", "RESULT_top.fluo.area", "RESULT_side.fluo.area.norm", "RESULT_top.fluo.area.norm",
 						"RESULT_side.nir.area", "RESULT_top.nir.area", "RESULT_side.nir.area.norm", "RESULT_top.nir.area.norm",
 						"RESULT_side.ir.area", "RESULT_top.ir.area", "RESULT_side.fluo.ir.norm", "RESULT_top.ir.area.norm",
-				});
+				}, this);
 		
 	}
 	
@@ -129,5 +136,13 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock {
 	public String getDescription() {
 		return "Calculates the top and side area values for visible and florescence images (by default) " +
 				"and if enabled, from NIR and IR images as well.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty(AREA, "Number of foreground pixels. Therefore, projected plant area in pixels."),
+				new CalculatedProperty(AREA_NORM, "Normalized area of foreground pixels according to real-world coordinates.")
+		};
 	}
 }

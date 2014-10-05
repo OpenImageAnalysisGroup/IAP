@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
@@ -113,7 +114,7 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized void setNumericResult(int position, String name,
-			double value) {
+			double value, CalculatesProperties descriptionProvider) {
 		if (!storedNumerics.containsKey(position))
 			storedNumerics.put(position, new TreeMap<String, Double>());
 		
@@ -122,7 +123,10 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized void setNumericResult(int position, String name,
-			double value, String unit) {
+			double value, String unit, CalculatesProperties description) {
+		if (description == null)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No valid property-calculator object provided. "
+					+ "Indicating possibly incomplete trait description.");
 		if (!storedNumerics.containsKey(position))
 			storedNumerics.put(position, new TreeMap<String, Double>());
 		
@@ -332,20 +336,23 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized void storeResults(String id_prefix,
-			ResultsTableWithUnits numericResults, int position) {
-		storeResults(id_prefix, null, numericResults, position);
+			ResultsTableWithUnits numericResults, int position, CalculatesProperties description) {
+		storeResults(id_prefix, null, numericResults, position, description);
 	}
 	
 	@Override
 	public synchronized void storeResults(String id_prefix, String id_postfix,
-			ResultsTableWithUnits numericResults, int position) {
+			ResultsTableWithUnits numericResults, int position, CalculatesProperties description) {
+		if (description == null)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No valid property-calculator object provided. "
+					+ "Indicating possibly incomplete trait description.");
 		for (int row = 0; row < numericResults.getCounter(); row++) {
 			for (int col = 0; col <= numericResults.getLastColumn(); col++) {
 				String id = numericResults.getColumnHeading(col);
 				double val = numericResults.getValueAsDouble(col, row);
 				String unit = numericResults.getColumnHeadingUnit(col);
 				if (!Double.isNaN(val))
-					setNumericResult(position, id_prefix + id + (id_postfix != null ? id_postfix : ""), val, unit);
+					setNumericResult(position, id_prefix + id + (id_postfix != null ? id_postfix : ""), val, unit, description);
 			}
 		}
 	}

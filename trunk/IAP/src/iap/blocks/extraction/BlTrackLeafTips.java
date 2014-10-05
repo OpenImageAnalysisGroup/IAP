@@ -2,6 +2,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.image_analysis_tools.leafClustering.Feature;
 import iap.blocks.image_analysis_tools.leafClustering.Leaf;
@@ -30,7 +33,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author pape, klukas
  */
-public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
+public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
 	double maxDistBetweenLeafTips;
 	
@@ -125,11 +128,11 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 		final ArrayList<Color> colors = Colors.get(leafList.size() + 1, 1);
 		
 		getResultSet().setNumericResult(getBlockPosition(),
-				"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count", leafList.size(), "tracked leaves|SUSAN");
+				"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count", leafList.size(), "tracked leaves|SUSAN", this);
 		
 		if (isBestAngle())
 			getResultSet().setNumericResult(getBlockPosition(),
-					"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count.best_angle", leafList.size(), "tracked leaves|SUSAN");
+					"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count.best_angle", leafList.size(), "tracked leaves|SUSAN", this);
 		
 		// calculate leaf parameter
 		for (Leaf l : plant.getLeafList()) {
@@ -155,15 +158,15 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 				
 				getResultSet().setNumericResult(0,
 						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".orientation",
-						angle, "degree");
+						angle, "degree", this);
 				
 				getResultSet().setNumericResult(0,
 						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".span.norm",
-						span_norm, "mm");
+						span_norm, "mm", this);
 				
 				getResultSet().setNumericResult(0,
 						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".span",
-						span, "px");
+						span, "px", this);
 			}
 			
 			final int xPos_norm = ltLast.getRealWorldX();
@@ -174,10 +177,10 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 			
 			getResultSet().setNumericResult(0,
 					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".x",
-					xPos_norm, "px");
+					xPos_norm, "px", this);
 			getResultSet().setNumericResult(0,
 					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".y",
-					yPos_norm, "px");
+					yPos_norm, "px", this);
 			
 			if (angle != null) {
 				getResultSet()
@@ -185,7 +188,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 								0,
 								"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num
 										+ ".angle",
-								angle, "degree");
+								angle, "degree", this);
 			}
 			
 			boolean saveDistToCenter = true;
@@ -206,7 +209,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 					
 					getResultSet().setNumericResult(0,
 							"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".dist_to_cog",
-							distToCenter, "px");
+							distToCenter, "px", this);
 				}
 			}
 		}
@@ -303,5 +306,22 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getDescription() {
 		return "Tracks Leaf Tips (prior processing of block 'Detect Leaf-Tips' is nessessary)";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("leaf.count", "!todo"),
+				new CalculatedProperty("leaf.count.best_angle", "!todo"),
+				new CalculatedProperty("leaf.*.orientation", "!todo"),
+				new CalculatedProperty("leaf.*.span.norm", "!todo"),
+				new CalculatedProperty("leaf.*.span", "!todo"),
+				new CalculatedProperty("leaf.*.x", "!todo"),
+				new CalculatedProperty("leaf.*.y", "!todo"),
+				new CalculatedProperty("leaf.*.angle", "!todo"),
+				new CalculatedProperty("cog.x", "!todo"),
+				new CalculatedProperty("cog.y", "!todo"),
+				new CalculatedProperty("leaf.*.dist_to_cog", "!todo"),
+		};
 	}
 }

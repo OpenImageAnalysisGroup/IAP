@@ -2,6 +2,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.image_analysis_tools.leafClustering.BorderAnalysis;
 import iap.blocks.image_analysis_tools.leafClustering.Feature;
@@ -27,7 +30,7 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * @author pape, klukas
  */
-public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
+public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
 	boolean ignore = false;
 	boolean debug_borderDetection;
@@ -167,10 +170,10 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 				
 				getResultSet().setNumericResult(0,
 						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".x",
-						pos_fin.getX(), "px");
+						pos_fin.getX(), "px", this);
 				getResultSet().setNumericResult(0,
 						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".y",
-						pos_fin.getY(), "px");
+						pos_fin.getY(), "px", this);
 				
 				if (angle != null)
 					getResultSet()
@@ -178,7 +181,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 									0,
 									"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index)
 											+ ".angle",
-									angle, "degree");
+									angle, "degree", this);
 				index++;
 				
 				if (searchRadius > 0) {
@@ -219,12 +222,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	private void saveLeafCount(CameraType cameraType, CameraPosition cameraPosition, int count) {
 		// save leaf count
 		getResultSet().setNumericResult(getBlockPosition(),
-				"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", count, "leaftips|SUSAN");
+				"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", count, "leaftips|SUSAN", this);
 		
 		// save leaf count for best angle
 		if (isBestAngle)
 			getResultSet().setNumericResult(getBlockPosition(),
-					"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count.best_angle", count, "leaftips|SUSAN");
+					"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count.best_angle", count, "leaftips|SUSAN", this);
 	}
 	
 	private void saveLeafTipList(LinkedList<Feature> peakList, CameraType cameraType, int maxValidY) {
@@ -325,5 +328,17 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getDescription() {
 		return "Detect leaf-tips of a plant. (e.g. could be used for calculation of leaf number)";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("leaftip.*.x", "X-coordinate of a certain leaf-tip."),
+				new CalculatedProperty("leaftip.*.y", "Y-coordinate of a certain leaf-tip."),
+				new CalculatedProperty("leaftip.*.angle", "Leaf-tip angle of a certain leaf."),
+				new CalculatedProperty("leaftip.count|SUSAN", "Number of leaves."),
+				new CalculatedProperty("leaftip.count.best_angle", "Number of leaves for the 'best' side view angle "
+						+ "(as determined from the main growth orientation observed from top-view.")
+		};
 	}
 }

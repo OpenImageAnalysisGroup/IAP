@@ -5,6 +5,9 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
@@ -24,7 +27,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 /**
  * @author pape, klukas
  */
-public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
+public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
 	boolean debug;
 	ArrayList<MarkerPair> numericResult;
@@ -74,16 +77,16 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 				for (MarkerPair mp : numericResult) {
 					if (mp.getLeft() != null) {
 						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(optionsAndResults.getCameraPosition()),
-								mp.getLeft().x / w);
+								mp.getLeft().x / w, this);
 						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(optionsAndResults.getCameraPosition()),
-								mp.getLeft().y / h);
+								mp.getLeft().y / h, this);
 					}
 					i += 2;
 					if (mp.getRight() != null) {
 						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(optionsAndResults.getCameraPosition()),
-								mp.getRight().x / w);
+								mp.getRight().x / w, this);
 						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(optionsAndResults.getCameraPosition()),
-								mp.getRight().y / h);
+								mp.getRight().y / h, this);
 					}
 					i += 2;
 					n++;
@@ -108,8 +111,9 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 		if (getBoolean("Use fixed marker distance", optionsAndResults.getCameraPosition() == CameraPosition.TOP)) {
 			if (cameraConfig == null || cameraConfig.trim().isEmpty())
 				cameraConfig = "unknown camera config";
-			getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px");
-			getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance.predefined", 1, "0/1");
+			getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px", this);
+			getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance.predefined", 1, "0/1",
+					this);
 			optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);
 		} else
 			if (!numericResult.isEmpty()) {
@@ -123,7 +127,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 							* imageWidth;
 					
 					getResultSet().setNumericResult(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_LEFT.getName(optionsAndResults.getCameraPosition()),
-							Math.abs(markerPosTwoLeft - markerPosOneLeft));
+							Math.abs(markerPosTwoLeft - markerPosOneLeft), this);
 					if (debug)
 						System.out.println("dist_vertical: " + (markerPosTwoLeft - markerPosOneLeft));
 				}
@@ -138,7 +142,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 							* imageWidth;
 					
 					getResultSet().setNumericResult(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_RIGHT.getName(optionsAndResults.getCameraPosition()),
-							Math.abs(markerPosTwoRight - markerPosOneRight));
+							Math.abs(markerPosTwoRight - markerPosOneRight), this);
 					if (debug)
 						System.out.println("dist_vertical: " + (markerPosTwoRight - markerPosOneRight));
 				}
@@ -154,7 +158,8 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 				}
 				
 				maxDist = max(distances);
-				getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px");
+				getResultSet()
+						.setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px", this);
 				
 				if (maxDist > 0)
 					optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);
@@ -276,5 +281,61 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock {
 	public String getDescription() {
 		return "Detects blue side markers and uses the provided real-world distance to calculate a conversion factor from px to mm. " +
 				"Optionally a fixed objects distance can be entered and used, instead.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(1).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the top left blue marker (X-coordinate)."),
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(2).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the top left blue marker (Y-coordinate)."),
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(3).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the top right blue marker (X-coordinate)."),
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(4).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the top right blue marker (Y-coordinate)."),
+				
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(5).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the middle left blue marker (X-coordinate)."),
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(6).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the middle left blue marker (Y-coordinate)."),
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(7).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the middle right blue marker (X-coordinate)."),
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(8).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the middle right blue marker (Y-coordinate)."),
+				
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(9).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the bottom left blue marker (X-coordinate)."),
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(10).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the bottom left blue marker (Y-coordinate)."),
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(11).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the bottom right blue marker (X-coordinate)."),
+				new CalculatedProperty(PropertyNames.getMarkerPropertyNameFromIndex(12).getName(null),
+						"If three blue marker points are located in the image at the left and right, "
+								+ "this value indicates the position of the bottom right blue marker (Y-coordinate)."),
+				
+				new CalculatedProperty("optics.blue_marker_distance", "User-provided horizontal distance "
+						+ "of blue markers of another real-world object in case the usage of a fixed marker distance has been enabled."),
+				new CalculatedProperty("optics.blue_marker_distance.predefined", "In case the option for the usage of a fixed "
+						+ "marker distance has been enabled, the value of this property will 1, otherwise it will be 0."),
+				
+				new CalculatedProperty(PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_LEFT.getName(null),
+						"If at least two blue markers are located in the image at the left and right, this value "
+								+ "represents the vertical distance between the first left and second left markers."),
+				new CalculatedProperty(PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_RIGHT.getName(null),
+						"If at least two blue markers are located in the image at the left and right, this value "
+								+ "represents the vertical distance between the first right and second right markers."),
+		};
 	}
 }

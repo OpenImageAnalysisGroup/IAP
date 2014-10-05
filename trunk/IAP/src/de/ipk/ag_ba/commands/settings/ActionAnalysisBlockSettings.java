@@ -1,6 +1,8 @@
 package de.ipk.ag_ba.commands.settings;
 
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 
 import java.util.ArrayList;
@@ -79,7 +81,6 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	@Override
 	public String getDefaultImage() {
 		boolean disabled = false;
-		boolean enabled = false;
 		boolean debug = false;
 		SystemOptions inst = SystemOptions.getInstance(iniFileName, iniIO);
 		for (final String setting : inst.getSectionSettings(section)) {
@@ -88,8 +89,6 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 			if (setting != null && setting.endsWith("//enabled")) {
 				if (!inst.getBoolean(section, setting, false)) {
 					disabled = true;
-				} else {
-					enabled = true;
 				}
 			}
 			if (setting != null && setting.endsWith("//debug")) {
@@ -123,6 +122,17 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	public MainPanelComponent getResultMainPanel() {
 		try {
 			ImageAnalysisBlock inst = (ImageAnalysisBlock) InstanceLoader.createInstance(group);
+			String calc = "";
+			if (inst instanceof CalculatesProperties) {
+				CalculatesProperties c = (CalculatesProperties) inst;
+				CalculatedPropertyDescription[] cp = c.getCalculatedProperties();
+				if (cp != null && cp.length > 0) {
+					calc = "Calculated Properties:<br><br>" +
+							"<li>Input/Output:<code><ul><li>In:&nbsp;&nbsp;" +
+							StringManipulationTools.getStringList("<li>", cp, "") +
+							"</ul>";
+				}
+			}
 			return new MainPanelComponent("<html><b>" + inst.getName() + "</b><br><br>" +
 					"Description:" +
 					"<ul><li>" +
@@ -135,7 +145,7 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 					+ "<br>" +
 					"<li>Out:&nbsp;" +
 					StringManipulationTools.getStringList(inst.getCameraOutputTypes(), ", ")
-					+ "<br></ul></code></ul>");
+					+ "<br></ul></code></ul>" + calc);
 		} catch (Exception e) {
 			return super.getResultMainPanel();
 		}

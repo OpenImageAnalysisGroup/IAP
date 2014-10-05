@@ -2,6 +2,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
@@ -33,8 +36,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * Requires the FLUO image for bloom detection.
  * 
  * @author pape, klukas
+ *         ToDo: Traits should be named according to image source type. side.vis.xy instead of side.xy.
  */
-public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
+public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
 	private boolean debug = false;
 	private boolean debug2 = false;
@@ -283,7 +287,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 				/ distHorizontal : 1;
 		
 		if (specialSkeletonBasedLeafWidthCalculation) {
-			Image inputImage = inpFLUOunchanged.copy().show(" inp img 2", false);
+			Image inputImage = inpFLUOunchanged.copy().show("inp img 2", false);
 			int clear = ImageOperation.BACKGROUND_COLORint;
 			int[][] inp2d = inputImage.getAs2A();
 			int wf = inputImage.getWidth();
@@ -375,11 +379,11 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && rt != null)
 			getResultSet().storeResults(
 					"RESULT_side." + cameraType + ".", "|skeleton", rt,
-					getBlockPosition());
+					getBlockPosition(), this);
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && rt != null)
 			getResultSet().storeResults(
 					"RESULT_top." + cameraType + ".", "|skeleton", rt,
-					getBlockPosition());
+					getBlockPosition(), this);
 		
 		if (addPostProcessor) {
 			final Image skel2d_fin = skel2d.getAsImage();
@@ -489,7 +493,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			CalculatesProperties propertyCalculator) {
 		
 		for (Long time : new ArrayList<Long>(time2inSamples.keySet())) {
 			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
@@ -506,7 +511,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 					Integer a = null;
 					searchLoop: for (String key : allResultsForSnapshot.keySet()) {
 						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-						for (BlockResultValue v : rt.searchResults("RESULT_top.main.axis.rotation")) {
+						for (BlockResultValue v : rt.searchResults("main.axis.rotation")) {
 							if (v.getValue() != null) {
 								a = v.getValue().intValue();
 								// System.out.println("main.axis.rotation: " + a);
@@ -537,31 +542,31 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 						if (bestAngle != null && keyC.equals(bestAngle)) {
 							// System.out.println("Best side angle: " + bestAngle);
 							Double cnt = null;
-							for (BlockResultValue v : rt.get(tray).searchResults("RESULT_side.leaf.count")) {
+							for (BlockResultValue v : rt.get(tray).searchResults("leaf.count")) {
 								if (v.getValue() != null)
 									cnt = v.getValue();
 							}
 							if (cnt != null && summaryResult != null) {
 								summaryResult.setNumericResult(getBlockPosition(),
-										"RESULT_side.leaf.count.best", cnt, null);
+										"RESULT_side.leaf.count.best", cnt, this);
 								// System.out.println("Leaf count for best side image: " + cnt);
 							}
 						}
 						
-						for (BlockResultValue v : rt.get(tray).searchResults("RESULT_side.leaf.count")) {
+						for (BlockResultValue v : rt.get(tray).searchResults("side.leaf.count")) {
 							if (v.getValue() != null) {
 								if (v.getValue() > maxLeafcount)
 									maxLeafcount = v.getValue();
 								lc.add(v.getValue());
 							}
 						}
-						for (BlockResultValue v : rt.get(tray).searchResults("RESULT_side.leaf.length.sum")) {
+						for (BlockResultValue v : rt.get(tray).searchResults("leaf.length.sum")) {
 							if (v.getValue() != null) {
 								if (v.getValue() > maxLeaflength)
 									maxLeaflength = v.getValue();
 							}
 						}
-						for (BlockResultValue v : rt.get(tray).searchResults("RESULT_side.leaf.length.sum.norm")) {
+						for (BlockResultValue v : rt.get(tray).searchResults("leaf.length.sum.norm")) {
 							if (v.getValue() != null) {
 								if (v.getValue() > maxLeaflengthNorm)
 									maxLeaflengthNorm = v.getValue();
@@ -571,26 +576,26 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 					
 					if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
 						summaryResult.setNumericResult(getBlockPosition(),
-								"RESULT_side.leaf.count.max", maxLeafcount, null);
+								"RESULT_side.leaf.count.max", maxLeafcount, this);
 						// System.out.println("MAX leaf count: " + maxLeafcount);
 						Double[] lca = lc.toArray(new Double[] {});
 						Arrays.sort(lca);
 						Double median = lca[lca.length / 2];
 						summaryResult.setNumericResult(getBlockPosition(),
-								"RESULT_side.leaf.count.median", median, null);
+								"RESULT_side.leaf.count.median", median, this);
 					}
 					if (maxLeaflength != null && maxLeaflength > 0)
 						summaryResult.setNumericResult(getBlockPosition(),
-								"RESULT_side.leaf.length.sum.max", maxLeaflength, "px");
+								"RESULT_side.leaf.length.sum.max", maxLeaflength, "px", this);
 					if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
 						summaryResult.setNumericResult(getBlockPosition(),
-								"RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm, "mm");
+								"RESULT_side.leaf.length.sum.norm.max", maxLeaflengthNorm, "mm", this);
 					
 				}
 		}
 		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
 				new String[] { "RESULT_side.leaf.length.sum.max", "RESULT_leaf.length.sum.norm.max", "RESULT_side.leaf.length.sum",
-						"RESULT_leaf.length.sum.norm" });
+						"RESULT_leaf.length.sum.norm" }, this);
 	}
 	
 	@Override
@@ -622,6 +627,44 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getDescription() {
 		return "Skeletonize VIS and FLUO images and extract according skeleton features.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("fluo.bloom.area.size",
+						"Detected probable bloom area in the fluo image."),
+				new CalculatedProperty("leaf.width.whole.max",
+						"Average of the maximum width of the whole leaf segments."),
+				new CalculatedProperty("leaf.width.whole.max.norm",
+						"Average of the maximum width of the whole leaf segments, normalized to real-world coordinates."),
+				new CalculatedProperty("bloom.count",
+						"Detect (maize) bloom skeleton endpoints."),
+				new CalculatedProperty("leaf.count",
+						"Leaf count."),
+				new CalculatedProperty("leaf.length.sum",
+						"Skeleton length."),
+				new CalculatedProperty("leaf.length.sum.norm",
+						"Skeleton length, , normalized to real-world coordinates."),
+				new CalculatedProperty("leaf.width.outer.max",
+						"Average of the maximum width of detected leaf-segments. Leaf-segments are shortened and cut, by calculating a "
+								+ "convex hull around all skeleton branch points."),
+				new CalculatedProperty("leaf.width.outer.max.norm",
+						"Average of the maximum width (normalized to real-world coordinates) of detected leaf-segments. "
+								+ "Leaf-segments are shortened and cut, by calculating a "
+								+ "convex hull around all skeleton branch points."),
+				new CalculatedProperty("bloom", "0/1, depending on if a (maize) bloom could be detected in the image."),
+				new CalculatedProperty("leaf.length.average",
+						"Skeleton length dividied by the number of detected leaves."),
+				new CalculatedProperty("leaf.length.average.norm",
+						"Skeleton length dividied by the number of detected leaves, normalized to real-world coordinates."),
+				new CalculatedProperty("leaf.width.average",
+						"Projected plant area divided by skeleton length."),
+				new CalculatedProperty("leaf.width.average.norm",
+						"Projected plant area divided by skeleton length, normalized to real-world coordinates."),
+				new CalculatedProperty("leaf.count.best",
+						"Number of detected leaves from the 'best' side view, according to the main axis as observed from top.")
+		};
 	}
 	
 }

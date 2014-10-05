@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.data_structures.RunnableOnImageSet;
 
@@ -39,7 +40,7 @@ public interface BlockResultSet {
 	 * @param position
 	 *           0 == current block property
 	 */
-	public void setNumericResult(int currentPositionInPipeline, String name, double value);
+	public void setNumericResult(int currentPositionInPipeline, String name, double value, CalculatesProperties descriptionProvider);
 	
 	public int getBlockPosition();
 	
@@ -54,15 +55,15 @@ public interface BlockResultSet {
 	
 	public ArrayList<BlockResultValue> searchResults(boolean exact, String search, boolean removeReturnedValue);
 	
-	void setNumericResult(int currentPositionInPipeline, String name, double value, String unit);
+	void setNumericResult(int currentPositionInPipeline, String name, double value, String unit, CalculatesProperties descriptionProvider);
 	
 	void storeResults(String id_prefix,
 			ResultsTableWithUnits numericResults,
-			int position);
+			int position, CalculatesProperties description);
 	
 	void storeResults(String id_prefix, String id_postfix,
 			ResultsTableWithUnits numericResults,
-			int position);
+			int position, CalculatesProperties description);
 	
 	public void printAnalysisResults();
 	

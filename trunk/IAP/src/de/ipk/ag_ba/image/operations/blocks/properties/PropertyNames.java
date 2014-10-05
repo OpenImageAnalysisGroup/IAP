@@ -5,27 +5,10 @@ import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import java.util.HashMap;
 
 public enum PropertyNames {
-	TRANSLATION_FLUO_X, TRANSLATION_FLUO_Y, TRANSLATION_NIR_X, TRANSLATION_NIR_Y, ROTATION_FLUO,
-	ROTATION_NIR, SCALING_FLUO_X, SCALING_FLUO_Y, SCALING_NIR_X, SCALING_NIR_Y, HEIGHT_FLUO_IMAGE,
-	HEIGHT_FLUO_MASK, HEIGHT_NIR_IMAGE, HEIGHT_NIR_MASK, HEIGHT_VIS_IMAGE, HEIGHT_VIS_MASK, WIDTH_FLUO_IMAGE,
-	WIDTH_FLUO_MASK, WIDTH_NIR_IMAGE, WIDTH_NIR_MASK, WIDTH_VIS_IMAGE, WIDTH_VIS_MASK, END_HEIGHT_FLUO_IMAGE,
-	END_WIDTH_FLUO_IMAGE, END_HEIGHT_FLUO_MASK, END_WIDTH_FLUO_MASK, END_HEIGHT_NIR_IMAGE, END_WIDTH_NIR_IMAGE,
-	END_HEIGHT_NIR_MASK, END_WIDTH_NIR_MASK, END_HEIGHT_VIS_IMAGE, END_WIDTH_VIS_IMAGE, END_HEIGHT_VIS_MASK, END_WIDTH_VIS_MASK,
-	
-	// VIS_MARKER_POS_LEFT_1, VIS_MARKER_POS_LEFT_2, VIS_MARKER_POS_LEFT_3,
-	// VIS_MARKER_POS_RIGHT_1, VIS_MARKER_POS_RIGHT_2, VIS_MARKER_POS_RIGHT_3,
-	
-	RESULT_MAXIMUM_SEARCH_COUNT,
 	RESULT_VIS_MARKER_POS_1_LEFT_X, RESULT_VIS_MARKER_POS_1_LEFT_Y, RESULT_VIS_MARKER_POS_1_RIGHT_X, RESULT_VIS_MARKER_POS_1_RIGHT_Y, RESULT_VIS_MARKER_POS_2_LEFT_X, RESULT_VIS_MARKER_POS_2_LEFT_Y,
 	RESULT_VIS_MARKER_POS_3_LEFT_X, RESULT_VIS_MARKER_POS_3_LEFT_Y, RESULT_VIS_MARKER_POS_3_RIGHT_X, RESULT_VIS_MARKER_POS_3_RIGHT_Y, RESULT_VIS_MARKER_POS_2_RIGHT_X, RESULT_VIS_MARKER_POS_2_RIGHT_Y,
 	
-	COUNT_PIXEL_VIS, COUNT_PIXEL_FLUO, COUNT_PIXEL_NIR, RESULT_TOP_MAIN_AXIS_ROTATION, RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE,
-	
-	RESULT_TOP_WIDTH, RESULT_TOP_HEIGHT, RESULT_SIDE_WIDTH, RESULT_SIDE_HEIGHT,
-	
-	MARKER_DISTANCE_BOTTOM_TOP_LEFT, MARKER_DISTANCE_BOTTOM_TOP_RIGHT,
-	
-	INTERNAL_CROP_BOTTOM_POT_POSITION_VIS, INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO, INTERNAL_CROP_BOTTOM_POT_POSITION_NIR;
+	MARKER_DISTANCE_BOTTOM_TOP_LEFT, MARKER_DISTANCE_BOTTOM_TOP_RIGHT;
 	
 	public static PropertyNames getMarkerPropertyNameFromIndex(int i) {
 		
@@ -54,56 +37,53 @@ public enum PropertyNames {
 				return RESULT_VIS_MARKER_POS_3_RIGHT_X;
 			case 12:
 				return RESULT_VIS_MARKER_POS_3_RIGHT_Y;
-				
 		}
 		
 		return null;
-		
 	}
 	
 	public String getName(CameraPosition pos) {
 		switch (this) {
-			case RESULT_MAXIMUM_SEARCH_COUNT:
-				return "pollen count";
-				
 			case RESULT_VIS_MARKER_POS_1_LEFT_Y:
-				return "RESULT_" + pos + ".vis.marker.1.left.y";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.1.left.y";
 			case RESULT_VIS_MARKER_POS_1_RIGHT_Y:
-				return "RESULT_" + pos + ".vis.marker.1.right.y";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.1.right.y";
 				
 			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
-				return "RESULT_" + pos + ".vis.marker.2.left.y";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.2.left.y";
 			case RESULT_VIS_MARKER_POS_2_RIGHT_Y:
-				return "RESULT_" + pos + ".vis.marker.2.right.y";
+				return (pos != null ? "RESULT_" + pos + "." : "") + ".vis.marker.2.right.y";
 				
 			case RESULT_VIS_MARKER_POS_3_LEFT_Y:
-				return "RESULT_" + pos + ".vis.marker.3.left.y";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.3.left.y";
 			case RESULT_VIS_MARKER_POS_3_RIGHT_Y:
-				return "RESULT_" + pos + ".vis.marker.3.right.y";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.3.right.y";
 				
 			case RESULT_VIS_MARKER_POS_1_LEFT_X:
-				return "RESULT_" + pos + ".vis.marker.1.left.x";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.1.left.x";
 			case RESULT_VIS_MARKER_POS_1_RIGHT_X:
-				return "RESULT_" + pos + ".vis.marker.1.right.x";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.1.right.x";
 				
 			case RESULT_VIS_MARKER_POS_2_LEFT_X:
-				return "RESULT_" + pos + ".vis.marker.2.left.x";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.2.left.x";
 			case RESULT_VIS_MARKER_POS_2_RIGHT_X:
-				return "RESULT_" + pos + ".vis.marker.2.right.x";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.2.right.x";
 				
 			case RESULT_VIS_MARKER_POS_3_LEFT_X:
-				return "RESULT_" + pos + ".vis.marker.3.left.x";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.3.left.x";
 			case RESULT_VIS_MARKER_POS_3_RIGHT_X:
-				return "RESULT_" + pos + ".vis.marker.3.right.x";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.3.right.x";
+				
+			case MARKER_DISTANCE_BOTTOM_TOP_LEFT:
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.vertical_distance.left_1_2";
+			case MARKER_DISTANCE_BOTTOM_TOP_RIGHT:
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.vertical_distance.right_1_2";
 		}
 		return toString();
 	}
 	
 	public String getUnit() {
 		switch (this) {
-			case RESULT_MAXIMUM_SEARCH_COUNT:
-				return "maxima";
-				
 			case RESULT_VIS_MARKER_POS_1_LEFT_Y:
 			case RESULT_VIS_MARKER_POS_1_RIGHT_Y:
 			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
@@ -116,9 +96,10 @@ public enum PropertyNames {
 			case RESULT_VIS_MARKER_POS_2_RIGHT_X:
 			case RESULT_VIS_MARKER_POS_3_LEFT_X:
 			case RESULT_VIS_MARKER_POS_3_RIGHT_X:
-			case RESULT_SIDE_WIDTH:
-			case RESULT_SIDE_HEIGHT:
 				return "percent";
+			case MARKER_DISTANCE_BOTTOM_TOP_LEFT:
+			case MARKER_DISTANCE_BOTTOM_TOP_RIGHT:
+				return "px";
 		}
 		return "";
 	}

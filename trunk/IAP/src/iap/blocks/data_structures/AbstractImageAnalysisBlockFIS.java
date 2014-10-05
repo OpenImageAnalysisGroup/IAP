@@ -233,7 +233,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			CalculatesProperties propertyCalculator) throws InterruptedException {
 		
 		PostProcessor pp = getPostProcessor(time2allResultsForSnapshot);
 		if (pp != null)
@@ -254,7 +255,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 							ArrayList<BlockResultValue> rl = pp.postProcessCalculatedProperties(time, tray);
 							if (rl != null)
 								for (BlockResultValue bpv : rl) {
-									summaryResult.setNumericResult(getBlockPosition(), bpv.getName(), bpv.getValue(), bpv.getUnit());
+									summaryResult.setNumericResult(getBlockPosition(),
+											bpv.getName(), bpv.getValue(), bpv.getUnit(), propertyCalculator);
 								}
 						}
 					}
@@ -317,7 +319,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	protected void calculateRelativeValues(TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2config2summaryResult, int blockPosition,
-			String[] desiredProperties) {
+			String[] desiredProperties, CalculatesProperties propertyCalculator) {
 		
 		boolean relRaw = getBoolean(null, "Calculate Relative Values (Raw)", true);
 		boolean relPer = getBoolean(null, "Calculate Relative Values (Percent)", true);
@@ -376,13 +378,13 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 									double days = (time - prop2config2tray2lastTime.get(property).get(configName).get(tray)) / timeForOneDayD;
 									double ratioPerDay = Math.pow(ratio, 1d / days);
 									if (relRaw)
-										summaryResult.setNumericResult(blockPosition, property + ".relative", ratioPerDay, "relative/day");
+										summaryResult.setNumericResult(blockPosition, property + ".relative.raw", ratioPerDay, "relative/day", propertyCalculator);
 									double perc = (ratioPerDay - 1) * 100d;
 									if (relPer)
-										summaryResult.setNumericResult(blockPosition, property + ".relative_percent", perc, "percent change/day");
+										summaryResult.setNumericResult(blockPosition, property + ".relative.percent", perc, "percent change/day", propertyCalculator);
 									double growth = (Math.log(currentPropertyValue) - Math.log(lastPropertyValue)) / days;
 									if (relLog)
-										summaryResult.setNumericResult(blockPosition, property + ".relative_log", growth, "relative/day");
+										summaryResult.setNumericResult(blockPosition, property + ".relative.log", growth, "relative/day", propertyCalculator);
 								}
 							}
 							
@@ -571,11 +573,6 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		// else {
 		return (getName() + " ").compareToIgnoreCase(o.getName() + "");
 		// }
-	}
-	
-	@Override
-	public String getDescriptionForParameters() {
-		return null;
 	}
 	
 	public static LinkedHashMap<String, ThreadSafeOptions> getBlockStatistics() {

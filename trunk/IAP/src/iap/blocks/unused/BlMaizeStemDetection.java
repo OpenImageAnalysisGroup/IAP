@@ -2,6 +2,9 @@ package iap.blocks.unused;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -31,7 +34,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
+public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	boolean debug = false;
 	
 	@Override
@@ -107,7 +110,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 		}
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
-		getResultSet().storeResults("RESULT_", rt, getBlockPosition());
+		getResultSet().storeResults("RESULT_", rt, getBlockPosition(), this);
 		Image ress = ioClusteredSkeltonImage.bm().dilate(20).getImage();
 		return ress;
 	}
@@ -355,5 +358,13 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getDescription() {
 		return "Experimental function, which later aims in detecting the maize stem from the images.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("part.count", "!todo"),
+				new CalculatedProperty(".part.*.skeleton.length", "!todo")
+		};
 	}
 }

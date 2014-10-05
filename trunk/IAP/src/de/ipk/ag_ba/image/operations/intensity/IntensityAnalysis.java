@@ -187,34 +187,34 @@ public class IntensityAnalysis {
 				for (int i = 0; i < this.n; i++) {
 					if (histHue.getOther1avg(i) != null)
 						result.addValue(
-								"hsv.normalized.h.histogram.s_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+								"hsv.h.histogram.s_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
 										+ histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
 								histHue.getOther1avg(i));
 					if (histHue.getOther2avg(i) != null)
 						result.addValue(
-								"hsv.normalized.h.histogram.v_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+								"hsv.h.histogram.v_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
 										+ histHue.getBorderLeft(i, 255) + "_" + histHue.getBorderRight(i, 255),
 								histHue.getOther2avg(i));
 					
 					if (histSat.getOther1avg(i) != null)
 						result.addValue(
-								"hsv.normalized.s.histogram.h_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+								"hsv.s.histogram.h_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
 										+ histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
 								histSat.getOther1avg(i));
 					if (histSat.getOther2avg(i) != null)
 						result.addValue(
-								"hsv.normalized.s.histogram.v_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+								"hsv.s.histogram.v_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
 										+ histSat.getBorderLeft(i, 255) + "_" + histSat.getBorderRight(i, 255),
 								histSat.getOther2avg(i));
 					
 					if (histVal.getOther1avg(i) != null)
 						result.addValue(
-								"hsv.normalized.v.histogram.h_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+								"hsv.v.histogram.h_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
 										+ histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
 								histVal.getOther1avg(i));
 					if (histVal.getOther2avg(i) != null)
 						result.addValue(
-								"hsv.normalized.v.histogram.s_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+								"hsv.v.histogram.s_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
 										+ histVal.getBorderLeft(i, 255) + "_" + histVal.getBorderRight(i, 255),
 								histVal.getOther2avg(i));
 				}
@@ -241,9 +241,9 @@ public class IntensityAnalysis {
 					double red1and2togreen5to8 = (histHue.getFreqAt(1 - 1) + histHue.getFreqAt(2 - 1)) / green5to8;
 					double brown3togreen5to8 = histHue.getFreqAt(3 - 1) / green5to8;
 					
-					result.addValue("stress.hue.yellow2green", yello4togreen5to8);
-					result.addValue("stress.hue.red2green", red1and2togreen5to8);
-					result.addValue("stress.hue.brown2green", brown3togreen5to8);
+					result.addValue("hsv.h.yellow2green", yello4togreen5to8);
+					result.addValue("hsv.h.red2green", red1and2togreen5to8);
+					result.addValue("hsv.h.brown2green", brown3togreen5to8);
 				}
 			}
 			

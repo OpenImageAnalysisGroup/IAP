@@ -2,6 +2,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.image_analysis_tools.leafClustering.Feature;
 import iap.blocks.image_analysis_tools.leafClustering.FeatureObject.FeatureObjectType;
 import iap.blocks.image_analysis_tools.methods.RegionLabeling;
@@ -27,7 +30,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * @author pape
  *         Block for object detection, includes possibility to save results for tracking.
  */
-public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnalysisBlock {
+public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
 	int background = ImageOperation.BACKGROUND_COLORint;
 	
@@ -257,16 +260,16 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					pos + img.getCameraType() + ".flower.count", featureList.size(), "flower|CENTERPOINTS");
+					pos + img.getCameraType() + ".flower.count", featureList.size(), "flower|CENTERPOINTS", this);
 			
 			// save x and y position
 			int num = 1;
 			for (Feature p : featureList) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						pos + img.getCameraType() + ".flower.x" + "." + num, (int) p.getPosition().getX(), "flower|CENTERPOINTS");
+						pos + img.getCameraType() + ".flower.x" + "." + num, (int) p.getPosition().getX(), "flower|CENTERPOINTS", this);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
-						pos + img.getCameraType() + ".flower.y" + "." + num, (int) p.getPosition().getY(), "flower|CENTERPOINTS");
+						pos + img.getCameraType() + ".flower.y" + "." + num, (int) p.getPosition().getY(), "flower|CENTERPOINTS", this);
 				num++;
 			}
 		}
@@ -305,5 +308,14 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 	@Override
 	public String getDescription() {
 		return "Detects Flowers and extract Features. Before flowers should be segmented by a segmentation block.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("flower.count", "!todo"),
+				new CalculatedProperty("flower.x", "!todo"),
+				new CalculatedProperty("flower.y", "!todo")
+		};
 	}
 }

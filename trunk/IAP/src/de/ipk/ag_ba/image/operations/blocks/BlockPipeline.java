@@ -448,7 +448,8 @@ public class BlockPipeline {
 			block.postProcessResultsForAllTimesAndAngles(
 					plandID2time2waterData,
 					inSample, inImages,
-					analysisResults, summaryResult, optStatus);
+					analysisResults, summaryResult, optStatus,
+					null);
 		}
 		
 		return summaryResult;

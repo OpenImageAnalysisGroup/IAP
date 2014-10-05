@@ -2,6 +2,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.image_analysis_tools.imageJ.externalPlugins.MaximumFinder;
 import iap.blocks.image_analysis_tools.leafClustering.Feature;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
@@ -17,7 +20,7 @@ import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
-public class BlDetectLeafCenterPoints extends AbstractBlock {
+public class BlDetectLeafCenterPoints extends AbstractBlock implements CalculatesProperties {
 	
 	@Override
 	protected Image processMask(Image mask) {
@@ -52,16 +55,16 @@ public class BlDetectLeafCenterPoints extends AbstractBlock {
 			String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					pos + img.getCameraType() + ".leaf.count", pointList.size(), "leaves|CENTERPOINTS");
+					pos + img.getCameraType() + ".leaf.count", pointList.size(), "leaves|CENTERPOINTS", this);
 			
 			// save x and y position
 			int num = 0;
 			for (Feature p : pointList) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						pos + img.getCameraType() + ".leaf.x." + num, (int) p.getPosition().getX(), "leaves|CENTERPOINTS");
+						pos + img.getCameraType() + ".leaf.x." + num, (int) p.getPosition().getX(), "leaves|CENTERPOINTS", this);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
-						pos + img.getCameraType() + ".leaf.y." + num, (int) p.getPosition().getY(), "leaves|CENTERPOINTS");
+						pos + img.getCameraType() + ".leaf.y." + num, (int) p.getPosition().getY(), "leaves|CENTERPOINTS", this);
 				num++;
 			}
 		}
@@ -132,6 +135,15 @@ public class BlDetectLeafCenterPoints extends AbstractBlock {
 	@Override
 	public String getDescription() {
 		return "Detects leaf center points from top view (for arabidopsis, tobacco)";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("leaf.count", "!todo"),
+				new CalculatedProperty("leaf.x", "!todo"),
+				new CalculatedProperty("leaf.y", "!todo"),
+		};
 	}
 	
 }
