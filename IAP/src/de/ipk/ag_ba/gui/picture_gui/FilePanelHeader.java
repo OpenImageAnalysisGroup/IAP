@@ -36,7 +36,7 @@ public class FilePanelHeader extends JPanel {
 		
 		setLayout(new TableLayout(size));
 		
-		add(button, "1,1");
+		add(TableLayout.getSplitVertical(button, null, TableLayout.PREFERRED, TableLayout.FILL), "1,1");
 		
 		header = new JLabel();
 		header.setText("");

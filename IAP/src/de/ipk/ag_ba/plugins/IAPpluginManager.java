@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.plugins;
 
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 
@@ -10,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 
 import org.ErrorMsg;
+import org.StringManipulationTools;
 import org.graffiti.managers.pluginmgr.DefaultPluginManager;
 import org.graffiti.managers.pluginmgr.PluginEntry;
 
@@ -196,5 +199,61 @@ public class IAPpluginManager {
 			}
 		});
 		return blocks;
+	}
+	
+	public String getDescriptionForCalculatedProperty(String substanceName) {
+		ArrayList<String> res = new ArrayList<String>();
+		int maxMatchN = 0;
+		for (ImageAnalysisBlock iab : getKnownAnalysisBlocks()) {
+			if (iab instanceof CalculatesProperties) {
+				CalculatesProperties cp = (CalculatesProperties) iab;
+				CalculatedPropertyDescription[] calp = cp.getCalculatedProperties();
+				if (calp != null) {
+					for (CalculatedPropertyDescription cd : calp) {
+						int n = 0;
+						String desc = cd.getName();
+						for (String d : desc.split("\\*")) {
+							if (!substanceName.contains(d))
+								;
+							else {
+								n += d.length();
+							}
+						}
+						if (n > maxMatchN)
+							maxMatchN = n;
+					}
+				}
+			}
+		}
+		for (ImageAnalysisBlock iab : getKnownAnalysisBlocks()) {
+			if (iab instanceof CalculatesProperties) {
+				CalculatesProperties cp = (CalculatesProperties) iab;
+				CalculatedPropertyDescription[] calp = cp.getCalculatedProperties();
+				if (calp != null) {
+					for (CalculatedPropertyDescription cd : calp) {
+						int n = 0;
+						String desc = cd.getName();
+						boolean allMatch = true;
+						boolean oneMatch = false;
+						for (String d : desc.split("\\*")) {
+							if (!substanceName.contains(d))
+								allMatch = false;
+							else {
+								oneMatch = true;
+								n += d.length();
+							}
+						}
+						if (oneMatch && allMatch) {
+							if (n == maxMatchN)
+								res.add(cd.getDescription() + "<br><small><font color='gray'>Source: documentation for trait "
+										+ "<b>" + cd.getName() + "</b>, calculated by analysis block <b>"
+										+ iab.getName()
+										+ "</b>.</font></small>");
+						}
+					}
+				}
+			}
+		}
+		return "" + StringManipulationTools.getStringList("", res, "<br>") + "";
 	}
 }

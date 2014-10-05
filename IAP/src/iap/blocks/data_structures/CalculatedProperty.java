@@ -1,5 +1,10 @@
 package iap.blocks.data_structures;
 
+import de.ipk.ag_ba.plugins.IAPpluginManager;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+
 public class CalculatedProperty implements CalculatedPropertyDescription {
 	
 	private final String name;
@@ -42,5 +47,21 @@ public class CalculatedProperty implements CalculatedPropertyDescription {
 			res.append("<li><b>" + d.getName() + "</b><br>" + d.getDescription());
 		res.append("</ul>");
 		return res.toString();
+	}
+	
+	public static String getDescriptionFor(MappingDataEntity targetEntity) {
+		String res = null;
+		SubstanceInterface si = null;
+		if (targetEntity instanceof SubstanceInterface)
+			si = (SubstanceInterface) targetEntity;
+		if (targetEntity instanceof ConditionInterface)
+			si = ((ConditionInterface) targetEntity).getParentSubstance();
+		if (si != null && si.getName() != null && !si.getName().isEmpty()) {
+			res = IAPpluginManager.getInstance().getDescriptionForCalculatedProperty(si.getName());
+		}
+		if (res != null && !res.isEmpty())
+			return res;
+		else
+			return null;
 	}
 }

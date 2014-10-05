@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
+import iap.blocks.data_structures.CalculatedProperty;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.FlowLayout;
@@ -34,6 +35,8 @@ import org.graffiti.editor.MainFrame;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListener, StatusDisplay {
 	private static final long serialVersionUID = 2171413300210427409L;
@@ -181,18 +184,32 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 					filePanel.setFiller(new Runnable() {
 						@Override
 						public void run() {
+							String desc = "";
+							String dd = CalculatedProperty.getDescriptionFor(mtdbe.getTargetEntity());
+							if (dd != null) {
+								SubstanceInterface si = null;
+								if (mtdbe.getTargetEntity() instanceof SubstanceInterface)
+									si = (SubstanceInterface) mtdbe.getTargetEntity();
+								if (mtdbe.getTargetEntity() instanceof ConditionInterface)
+									si = ((ConditionInterface) mtdbe.getTargetEntity()).getParentSubstance();
+								desc = "<table cellspacing=0 cellpadding=2 border=0><tr><td bgcolor='FFDDDD'>Reference Information for <b>" + si.getName()
+										+ "</b></td></tr><tr><td bgcolor='#FFEEEE '>"
+										+ dd + "</td></tr></table>";
+							}
 							filePanel.removeAll();
 							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
 							if (!((MongoTreeNodeBasis) mt).readOnly) {
-								String msg = "<font color='black'>You may also use drag+drop to add files to the currently selected entity of the experiment.<br>"
-										+ "<b>Use left-click to download, right-click to show or manipulate files.</b>";
+								String msg = "<font color='black'>"
+										+ (desc.isEmpty() ? "You may also use drag+drop to add files to the currently selected entity of the experiment.<br>"
+												+ "<b>Use left-click to download, right-click to show or manipulate files.</b>" : "") + desc;
 								filePanel.setHeader(true, msg, false, true);
 							} else {
 								filePanel
 										.setHeader(
 												false,
-												"<font color='black'>Additional files can't be assigned to this entity.<br>"
-														+ "<b>Use left-click to download, right-click to show or manipulate files.</b>",
+												"<font color='black'>"
+														+ (desc.isEmpty() ? "Additional files can't be assigned to this entity.<br>"
+																+ "<b>Use left-click to download, right-click to show or manipulate files.</b>" : "") + desc,
 												true, true);
 							}
 							
