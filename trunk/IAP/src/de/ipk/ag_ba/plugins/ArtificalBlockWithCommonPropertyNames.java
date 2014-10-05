@@ -46,14 +46,14 @@ public class ArtificalBlockWithCommonPropertyNames extends AbstractBlock impleme
 						"water_sum",
 						"Calculated property from watering information. May not be accurate as it depends on calibration data and other factors which influence this value."),
 				new CalculatedProperty("weight_before", "Imported property, weight data observed before a possible watering."),
-				new CalculatedProperty("top.vis", "Data categorized as being sourced from a visible-light camera image oriented as top-view."),
-				new CalculatedProperty("top.fluo", "Data categorized as being sourced from a fluorescence camera image oriented as top-view."),
-				new CalculatedProperty("top.nir", "Data categorized as being sourced from a near-infrared camera image oriented as top-view."),
-				new CalculatedProperty("top.ir", "Data categorized as being sourced from a infrared camera image oriented as top-view."),
-				new CalculatedProperty("side.vis", "Data categorized as being sourced from a visible-light camera image oriented as side-view."),
-				new CalculatedProperty("side.fluo", "Data categorized as being sourced from a fluorescence camera image oriented as side-view."),
-				new CalculatedProperty("side.nir", "Data categorized as being sourced from a near-infrared camera image oriented as side-view."),
-				new CalculatedProperty("side.ir", "Data categorized as being sourced from a infrared camera image oriented as side-view."),
+				new CalculatedProperty("top.vis", "Data categorized as being sourced from a visible-light camera from top-view."),
+				new CalculatedProperty("top.fluo", "Data categorized as being sourced from a fluorescence camera from top-view."),
+				new CalculatedProperty("top.nir", "Data categorized as being sourced from a near-infrared camera from top-view."),
+				new CalculatedProperty("top.ir", "Data categorized as being sourced from a infrared camera from top-view."),
+				new CalculatedProperty("side.vis", "Data categorized as being sourced from a visible-light camera from side-view."),
+				new CalculatedProperty("side.fluo", "Data categorized as being sourced from a fluorescence camera from side-view."),
+				new CalculatedProperty("side.nir", "Data categorized as being sourced from a near-infrared camera from side-view."),
+				new CalculatedProperty("side.ir", "Data categorized as being sourced from a infrared camera from side-view."),
 		};
 	}
 	
