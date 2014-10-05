@@ -51,8 +51,8 @@ import org.graffiti.core.StringBundle;
  * @version $Revision: 1.1 $
  */
 public class OptionsDialog
-					extends JDialog
-					implements ActionListener, TreeSelectionListener {
+		extends JDialog
+		implements ActionListener, TreeSelectionListener {
 	// ~ Static fields/initializers =============================================
 	
 	/**
@@ -69,25 +69,25 @@ public class OptionsDialog
 	// private Hashtable panes;
 	
 	/** The <code>ImageBundle</code> of this options dialog. */
-	private ImageBundle iBundle = ImageBundle.getInstance();
+	private final ImageBundle iBundle = ImageBundle.getInstance();
 	
 	/** DOCUMENT ME! */
-	private JButton apply;
+	private final JButton apply;
 	
 	/** DOCUMENT ME! */
-	private JButton cancel;
+	private final JButton cancel;
 	
 	/** DOCUMENT ME! */
-	private JButton ok;
+	private final JButton ok;
 	
 	/** DOCUMENT ME! */
-	private JLabel currentLabel;
+	private final JLabel currentLabel;
 	
 	/** DOCUMENT ME! */
-	private JPanel cardPanel;
+	private final JPanel cardPanel;
 	
 	/** DOCUMENT ME! */
-	private JTree paneTree;
+	private final JTree paneTree;
 	
 	/** DOCUMENT ME! */
 	// private OptionGroup editGroup;
@@ -106,7 +106,7 @@ public class OptionsDialog
 	 *            DOCUMENT ME!
 	 */
 	public OptionsDialog(Frame parent)
-						throws HeadlessException {
+			throws HeadlessException {
 		super(parent, sBundle.getString("options.dialog.title"), true);
 		
 		JPanel content = new JPanel(new BorderLayout());
@@ -126,7 +126,7 @@ public class OptionsDialog
 		currentLabel = new JLabel();
 		currentLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		currentLabel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
-							Color.black));
+				Color.black));
 		stage.add(currentLabel, BorderLayout.NORTH);
 		
 		cardPanel = new JPanel(new CardLayout());
@@ -140,8 +140,8 @@ public class OptionsDialog
 		paneTree.setShowsRootHandles(true);
 		paneTree.setRootVisible(false);
 		content.add(new JScrollPane(paneTree,
-							ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-							ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.WEST);
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.WEST);
 		
 		JPanel buttons = new JPanel();
 		buttons.setBorder(new EmptyBorder(12, 0, 0, 0));
@@ -188,6 +188,7 @@ public class OptionsDialog
 	 * @param e
 	 *           the action event.
 	 */
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		
@@ -247,7 +248,7 @@ public class OptionsDialog
 		((OptionGroup) m.getRoot()).save();
 		
 		/* This will fire the PROPERTIES_CHANGED event */
-		// editor.propertiesChanged(); 
+		// editor.propertiesChanged();
 		// Save settings to disk
 		// editor.prefs.sync();
 		// get rid of this dialog if necessary
@@ -262,11 +263,12 @@ public class OptionsDialog
 	 * @param e
 	 *           the tree selection event.
 	 */
+	@Override
 	public void valueChanged(TreeSelectionEvent e) {
 		TreePath path = e.getPath();
 		
 		if ((path == null) ||
-							!(path.getLastPathComponent() instanceof OptionPane)) {
+				!(path.getLastPathComponent() instanceof OptionPane)) {
 			return;
 		}
 		
@@ -369,7 +371,7 @@ public class OptionsDialog
 		// addOptionPane(new LoadSaveOptionPane(), editGroup);
 		
 		/* add other default option panes above this line. */
-
+		
 		// OptionGroup browserGroup = new OptionGroup("browser");
 		// addOptionPane(new BrowserOptionPane(), browserGroup);
 		// addOptionPane(new BrowserColorsOptionPane(), browserGroup);
@@ -404,12 +406,12 @@ public class OptionsDialog
 	 * @version $Revision: 1.1 $
 	 */
 	class OptionTreeModel
-						implements TreeModel {
+			implements TreeModel {
 		/** The list of event listeners. */
-		private EventListenerList listenerList = new EventListenerList();
+		private final EventListenerList listenerList = new EventListenerList();
 		
 		/** The root node. */
-		private OptionGroup root = new OptionGroup(null);
+		private final OptionGroup root = new OptionGroup(null);
 		
 		/**
 		 * Returns the child of parent at index index.
@@ -420,6 +422,7 @@ public class OptionsDialog
 		 *           DOCUMENT ME!
 		 * @return DOCUMENT ME!
 		 */
+		@Override
 		public Object getChild(Object parent, int index) {
 			if (parent instanceof OptionGroup) {
 				return ((OptionGroup) parent).getMember(index);
@@ -435,6 +438,7 @@ public class OptionsDialog
 		 *           DOCUMENT ME!
 		 * @return DOCUMENT ME!
 		 */
+		@Override
 		public int getChildCount(Object parent) {
 			if (parent instanceof OptionGroup) {
 				return ((OptionGroup) parent).getMemberCount();
@@ -452,6 +456,7 @@ public class OptionsDialog
 		 *           DOCUMENT ME!
 		 * @return DOCUMENT ME!
 		 */
+		@Override
 		public int getIndexOfChild(Object parent, Object child) {
 			if (parent instanceof OptionGroup) {
 				return ((OptionGroup) parent).getMemberIndex(child);
@@ -461,13 +466,14 @@ public class OptionsDialog
 		}
 		
 		/**
-		 * Returns <code>true</code>, iff the specified node is a leaf. Leafs
+		 * Returns <code>true</code>, if the specified node is a leaf. Leaves
 		 * are option panes.
 		 * 
 		 * @param node
 		 *           DOCUMENT ME!
 		 * @return DOCUMENT ME!
 		 */
+		@Override
 		public boolean isLeaf(Object node) {
 			return node instanceof OptionPane;
 		}
@@ -477,6 +483,7 @@ public class OptionsDialog
 		 * 
 		 * @return DOCUMENT ME!
 		 */
+		@Override
 		public Object getRoot() {
 			return root;
 		}
@@ -487,6 +494,7 @@ public class OptionsDialog
 		 * @param l
 		 *           DOCUMENT ME!
 		 */
+		@Override
 		public void addTreeModelListener(TreeModelListener l) {
 			listenerList.add(TreeModelListener.class, l);
 		}
@@ -497,6 +505,7 @@ public class OptionsDialog
 		 * @param l
 		 *           DOCUMENT ME!
 		 */
+		@Override
 		public void removeTreeModelListener(TreeModelListener l) {
 			listenerList.remove(TreeModelListener.class, l);
 		}
@@ -509,6 +518,7 @@ public class OptionsDialog
 		 * @param newValue
 		 *           DOCUMENT ME!
 		 */
+		@Override
 		public void valueForPathChanged(TreePath path, Object newValue) {
 			/* this model may not be changed by the TableCellEditor */
 		}
@@ -526,7 +536,7 @@ public class OptionsDialog
 		 *           DOCUMENT ME!
 		 */
 		protected void fireNodesChanged(Object source, Object[] path,
-							int[] childIndices, Object[] children) {
+				int[] childIndices, Object[] children) {
 			Object[] listeners = listenerList.getListenerList();
 			
 			TreeModelEvent modelEvent = null;
@@ -537,7 +547,7 @@ public class OptionsDialog
 				
 				if (modelEvent == null) {
 					modelEvent = new TreeModelEvent(source, path, childIndices,
-										children);
+							children);
 				}
 				
 				((TreeModelListener) listeners[i + 1]).treeNodesChanged(modelEvent);
@@ -557,7 +567,7 @@ public class OptionsDialog
 		 *           DOCUMENT ME!
 		 */
 		protected void fireNodesInserted(Object source, Object[] path,
-							int[] childIndices, Object[] children) {
+				int[] childIndices, Object[] children) {
 			Object[] listeners = listenerList.getListenerList();
 			
 			TreeModelEvent modelEvent = null;
@@ -569,7 +579,7 @@ public class OptionsDialog
 				
 				if (modelEvent == null) {
 					modelEvent = new TreeModelEvent(source, path, childIndices,
-										children);
+							children);
 				}
 				
 				((TreeModelListener) listeners[i + 1]).treeNodesInserted(modelEvent);
@@ -589,7 +599,7 @@ public class OptionsDialog
 		 *           DOCUMENT ME!
 		 */
 		protected void fireNodesRemoved(Object source, Object[] path,
-							int[] childIndices, Object[] children) {
+				int[] childIndices, Object[] children) {
 			Object[] listeners = listenerList.getListenerList();
 			
 			TreeModelEvent modelEvent = null;
@@ -600,7 +610,7 @@ public class OptionsDialog
 				
 				if (modelEvent == null) {
 					modelEvent = new TreeModelEvent(source, path, childIndices,
-										children);
+							children);
 				}
 				
 				((TreeModelListener) listeners[i + 1]).treeNodesRemoved(modelEvent);
@@ -620,7 +630,7 @@ public class OptionsDialog
 		 *           DOCUMENT ME!
 		 */
 		protected void fireTreeStructureChanged(Object source, Object[] path,
-							int[] childIndices, Object[] children) {
+				int[] childIndices, Object[] children) {
 			Object[] listeners = listenerList.getListenerList();
 			
 			TreeModelEvent modelEvent = null;
@@ -632,7 +642,7 @@ public class OptionsDialog
 				
 				if (modelEvent == null) {
 					modelEvent = new TreeModelEvent(source, path, childIndices,
-										children);
+							children);
 				}
 				
 				((TreeModelListener) listeners[i + 1]).treeStructureChanged(modelEvent);
@@ -647,17 +657,17 @@ public class OptionsDialog
 	 * @version $Revision: 1.1 $ $Date: 2011-01-31 09:04:55 $
 	 */
 	class PaneNameRenderer
-						extends DefaultTreeCellRenderer {
+			extends DefaultTreeCellRenderer {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
 		
 		/** DOCUMENT ME! */
-		private Font groupFont;
+		private final Font groupFont;
 		
 		/** DOCUMENT ME! */
-		private Font paneFont;
+		private final Font paneFont;
 		
 		/**
 		 * Creates a new PaneNameRenderer object.
@@ -688,10 +698,10 @@ public class OptionsDialog
 		 */
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value,
-							boolean selected, boolean expanded, boolean leaf, int row,
-							boolean hasFocus) {
+				boolean selected, boolean expanded, boolean leaf, int row,
+				boolean hasFocus) {
 			super.getTreeCellRendererComponent(tree, value, selected, expanded,
-								leaf, row, hasFocus);
+					leaf, row, hasFocus);
 			
 			String name = null;
 			
