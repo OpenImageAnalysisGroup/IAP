@@ -527,7 +527,7 @@ public class DataExchangeHelperForExperiments {
 					String defaultFileName = StringManipulationTools.getFileSystemName(
 							sub.iterator().next().getExperimentHeader().getExperimentName()
 									+ "_" + sub.getName() + ".xlsx");
-					String fn = FileHelper.getFileName(".xlsx", "Create File", defaultFileName);
+					String fn = FileHelper.getFileName(".xlsx", "Excel File", defaultFileName);
 					if (fn != null) {
 						boolean xlsx = true;
 						ActionPdfCreation3 action = new ActionPdfCreation3(
