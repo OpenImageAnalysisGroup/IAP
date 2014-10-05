@@ -46,28 +46,42 @@ public class Substance implements SubstanceInterface {
 		StringBuilder res = new StringBuilder();
 		res.append("<html><table border='1'>");
 		res.append("<tr><th>Property</th><th>Value</th></tr>");
-		res.append("<tr><td>name</td><td>" + name + "</td></tr>");
-		res.append("<tr><td>funcat</td><td>" + funcat + "</td></tr>");
-		res.append("<tr><td>info</td><td>" + info + "</td></tr>");
-		res.append("<tr><td>formula</td><td>" + formula + "</td></tr>");
-		res.append("<tr><td>group</td><td>" + substancegroup + "</td></tr>");
-		res.append("<tr><td>cluster ID</td><td>" + cluster_id + "</td></tr>");
-		res.append("<tr><td>spot</td><td>" + spot + "</td></tr>");
-		res.append("<tr><td>new_blast</td><td>" + new_blast + "</td></tr>");
-		res.append("<tr><td>new_blast_e_val</td><td>" + new_blast_e_val + "</td></tr>");
-		res.append("<tr><td>new_blast_score</td><td>" + new_blast_score + "</td></tr>");
-		res.append("<tr><td>affy_hit</td><td>" + new_blast_score + "</td></tr>");
-		res.append("<tr><td>score</td><td>" + score + "</td></tr>");
-		res.append("<tr><td>secure</td><td>" + secure + "</td></tr>");
-		res.append("<tr><td>row ID</td><td>" + rowId + "</td></tr>");
+		if (name != null)
+			res.append("<tr><td>name</td><td>" + name + "</td></tr>");
+		if (funcat != null)
+			res.append("<tr><td>funcat</td><td>" + funcat + "</td></tr>");
+		if (info != null)
+			res.append("<tr><td>info</td><td>" + info + "</td></tr>");
+		if (formula != null)
+			res.append("<tr><td>formula</td><td>" + formula + "</td></tr>");
+		if (substancegroup != null)
+			res.append("<tr><td>group</td><td>" + substancegroup + "</td></tr>");
+		if (cluster_id != null)
+			res.append("<tr><td>cluster ID</td><td>" + cluster_id + "</td></tr>");
+		if (spot != null)
+			res.append("<tr><td>spot</td><td>" + spot + "</td></tr>");
+		if (new_blast != null)
+			res.append("<tr><td>new_blast</td><td>" + new_blast + "</td></tr>");
+		if (new_blast_e_val != null)
+			res.append("<tr><td>new_blast_e_val</td><td>" + new_blast_e_val + "</td></tr>");
+		if (new_blast_score != null)
+			res.append("<tr><td>new_blast_score</td><td>" + new_blast_score + "</td></tr>");
+		if (affy_hit != null)
+			res.append("<tr><td>affy_hit</td><td>" + affy_hit + "</td></tr>");
+		if (score != null)
+			res.append("<tr><td>score</td><td>" + score + "</td></tr>");
+		if (secure != null)
+			res.append("<tr><td>secure</td><td>" + secure + "</td></tr>");
+		if (rowId != null)
+			res.append("<tr><td>row ID</td><td>" + rowId + "</td></tr>");
 		res.append("</table></html>");
 		return res.toString();
 	}
 	
 	/**
 	 * Whole XML dataset: <experimentdata> <experiment experimentid="-1">
-	 * <experimentname>Gerstenentwicklung-Frühjahr 2003</experimentname>
-	 * <remark/> <coordinator>Hardy Rolletschek</coordinator> <excelfileid/>
+	 * <experimentname>experiment name</experimentname>
+	 * <remark/> <coordinator>name</coordinator> <excelfileid/>
 	 * <importusername/> <importdate>Fri Apr 08 12:32:35 CEST 2005</importdate>
 	 * <startdate>Tue Apr 01 00:00:00 CEST 2003</startdate>
 	 * <measurements>1057</measurements> <imagefiles>0</imagefiles>
