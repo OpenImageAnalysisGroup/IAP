@@ -2,6 +2,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
@@ -19,7 +22,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlCalcConvexHull extends AbstractBlock {
+public class BlCalcConvexHull extends AbstractBlock implements CalculatesProperties {
 	
 	@Override
 	protected Image processMask(Image mask) {
@@ -58,10 +61,10 @@ public class BlCalcConvexHull extends AbstractBlock {
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
 			getResultSet().storeResults(
 					"RESULT_side." + prefix, numericResults,
-					getBlockPosition());
+					getBlockPosition(), this);
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && numericResults != null)
 			getResultSet().storeResults(
-					"RESULT_top." + prefix, numericResults, getBlockPosition());
+					"RESULT_top." + prefix, numericResults, getBlockPosition(), this);
 		
 		res.getImage().show("output image", debug);
 		
@@ -104,5 +107,53 @@ public class BlCalcConvexHull extends AbstractBlock {
 				"results as numeric values (size of hull, centroid). The complex hull, the image borders and the " +
 				"centroid are drawn on the result (input and result is the mask). If enabled from the settings " +
 				"also the NIR and IR masks are processed.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("hull.points", "Number of edge points of the convex hull around the plant."),
+				new CalculatedProperty("hull.length", "Length of the convex hull."),
+				new CalculatedProperty("hull.length.norm", "Length of the convex hull, normalized to real-world coordinates."),
+				new CalculatedProperty("compactness.01", "4 * Math.PI / (borderPixels * borderPixels / filledArea)"),
+				new CalculatedProperty("compactness.16", "borderPixels * borderPixels / filledArea"),
+				new CalculatedProperty("hull.compactness.01", "4 * Math.PI / (borderPixels * borderPixels / filledArea) (all of convex hull)"),
+				new CalculatedProperty("hull.compactness.16", "borderPixels * borderPixels / filledArea (all of convex hull)"),
+				new CalculatedProperty("hull.area", "Area (in pixels) of the convex hull, which is the shortest convex line drawing around the plant."),
+				new CalculatedProperty("hull.area.norm",
+						"Normalized area (in real-world coordinates) of the convex hull, which is the shortest convex line drawing around the plant."),
+				new CalculatedProperty("border.length",
+						"Number of pixels of the plant, connected by at least one side of the pixel to the background (4-neighbourhood)."),
+				new CalculatedProperty("border.length.norm",
+						"Plant outline length, normalized to real-world coordinates."),
+				new CalculatedProperty("hull.circularity",
+						"Indicates similarity of the convex hull to a circle, ranges between 0 and 1. A circular object has value 1."),
+				new CalculatedProperty("hull.circumcircle.d", "Diameter of the smallest circle drawn around the plant."),
+				new CalculatedProperty("hull.circumcircle.d.norm", "Diameter of the smallest circle drawn around the plant, normalized to real-world coordinates."),
+				new CalculatedProperty("hull.minrectangle.area", "Area of the smallest enclosing rectangle, which fits around the plant."),
+				new CalculatedProperty("hull.minrectangle.area.norm",
+						"Area of the smallest enclosing rectangle, which fits around the plant, normalized to real-world coordinates."),
+				new CalculatedProperty("hull.minrectangle.length.a", "Length of one side of the smallest enclosing rectangle, which fits around the plant."),
+				new CalculatedProperty("hull.minrectangle.length.a.norm",
+						"Length of one side of the smallest enclosing rectangle, which fits around the plant, normalized to real-world coordinates."),
+				new CalculatedProperty("hull.minrectangle.length.b",
+						"Length of the second side of the smallest enclosing rectangle, which fits around the plant."),
+				new CalculatedProperty("hull.minrectangle.length.b.norm",
+						"Length of the second side of the smallest enclosing rectangle, which fits around the plant, normalized to real-world coordinates."),
+				new CalculatedProperty("hull.fillgrade",
+						"Number of pixels of the plant relative to the area of the convex hull. May be formatted as percentage values in Excel (e.g. 20%), "
+								+ "CSV exported data is displayed unformatted, e.g. 0.2."),
+				new CalculatedProperty("hull.pc1", "Largest distance (in pixels) of any two pixels of the plant."),
+				new CalculatedProperty("hull.pc1.norm", "Largest distance of any two pixels of the plant, normalized to real-world coordinates."),
+				new CalculatedProperty("hull.pc2",
+						"If a line connects the two most far from each other situated plant pixels is drawn, this number indicates the sum of "
+								+ "the maximum distances of other plant pixels from the left and right of this line."),
+				new CalculatedProperty("hull.pc2.norm",
+						"If a line connects the two most far from each other situated plant pixels is drawn, this number indicates the sum of "
+								+ "the maximum distances of other plant pixels from the left and right of this line. This value is normalized "
+								+ "to real-world coordniates."),
+				new CalculatedProperty("hull.centroid.x", "Center of mass coordinate (X-axis) of the convex hull area."),
+				new CalculatedProperty("hull.centroid.y", "Center of mass coordinate (Y-axis) of the convex hull area."),
+		};
 	}
 }

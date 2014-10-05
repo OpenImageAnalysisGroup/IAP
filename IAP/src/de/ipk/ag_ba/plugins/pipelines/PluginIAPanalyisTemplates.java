@@ -20,7 +20,6 @@ import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcMoments;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
-import iap.blocks.extraction.BlCalcWidthAndHeightLR;
 import iap.blocks.extraction.BlDetectLeafCenterPoints;
 import iap.blocks.extraction.BlDetectLeafTips;
 import iap.blocks.extraction.BlLeafCurlingAnalysis;
@@ -103,7 +102,6 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlCalcMoments(),
 				new BlCalcVolumes(),
 				new BlCalcWidthAndHeight(),
-				new BlCalcWidthAndHeightLR(),
 				new BlClearMasks_WellProcessing(),
 				// new BlClosing(),
 				// new BlColorBalanceCircularVisNir(),

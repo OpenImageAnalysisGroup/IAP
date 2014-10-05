@@ -3,6 +3,9 @@ package iap.blocks.extraction;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
@@ -23,9 +26,8 @@ import de.ipk.ag_ba.image.structures.Image;
  * Does not need any input parameters.
  * 
  * @author klukas, pape
- *         status: ok, 23.11.2011, c. klukas
  */
-public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
+public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
 	private boolean debug = false;
 	private boolean debugRegionParts = false;
@@ -99,7 +101,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 				optionsAndResults.getREAL_MARKER_DISTANCE(), Histogram.Mode.MODE_HUE_VIS_ANALYSIS,
 				isSection ? addHistogramValuesForSections : addHistogramValues,
 				getBoolean("Calculate Kurtosis Values", false), true);
-		getResultSet().storeResults(resultPrefix + "vis.", rt1, getBlockPosition());
+		getResultSet().storeResults(resultPrefix + "vis.", rt1, getBlockPosition(), this);
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
@@ -117,7 +119,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 			rt.addValue("ndvi", ndvi);
 		}
 		
-		getResultSet().storeResults(resultPrefix, rt, getBlockPosition());
+		getResultSet().storeResults(resultPrefix, rt, getBlockPosition(), this);
 	}
 	
 	@Override
@@ -135,7 +137,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 						getBoolean("Add Fluo Color Bins", false),
 						getBoolean("Calculate Kurtosis Values", false), false);
 				if (rt != null)
-					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
+					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition(), this);
 			}
 			
 			{ // blue color fluo image
@@ -158,7 +160,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 									addHistogramValues,
 									getBoolean("Calculate Kurtosis Values", false), false); // markerDistanceHorizontally
 					if (rt != null)
-						getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition());
+						getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".fluo.", rt, getBlockPosition(), this);
 				}
 			}
 			return input().masks().fluo();// io.getImage();
@@ -232,7 +234,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
 				if (rt != null)
 					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".nir.",
-							rt, getBlockPosition());
+							rt, getBlockPosition(), this);
 			}
 			return io.getImage();
 		} else
@@ -269,7 +271,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 					System.err.println(SystemAnalysis.getCurrentTime() + ">SEVERE INTERNAL ERROR: OPTIONS IS NULL!");
 				if (rt != null)
 					getResultSet().storeResults("RESULT_" + optionsAndResults.getCameraPosition() + ".ir.",
-							rt, getBlockPosition());
+							rt, getBlockPosition(), this);
 			}
 			return io.getImage();
 		} else
@@ -298,11 +300,186 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Calculate Color and Intensity Histograms";
+		return "Calculate Color- and Intensity-Histograms";
 	}
 	
 	@Override
 	public String getDescription() {
 		return "Calculates overall properties of the vis, fluo and nir images, such as number of pixels, intensities, NDVI and more.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("hsv.normalized.s.histogram.bin", ""),
+				new CalculatedProperty("hsv.normalized.s.histogram.bin", ""),
+				new CalculatedProperty("hsv.normalized.s.histogram.bin", ""),
+				
+				new CalculatedProperty("hsv.s.histogram.bin", ""),
+				new CalculatedProperty("hsv.s.histogram.bin", ""),
+				new CalculatedProperty("hsv.s.histogram.bin", ""),
+				
+				new CalculatedProperty("hsv.h.histogram.s_avg.bin", ""),
+				new CalculatedProperty("hsv.h.histogram.v_avg.bin", ""),
+				new CalculatedProperty("hsv.s.histogram.h_avg.bin", ""),
+				new CalculatedProperty("hsv.s.histogram.v_avg.bin", ""),
+				new CalculatedProperty("hsv.v.histogram.h_avg.bin", ""),
+				new CalculatedProperty("hsv.v.histogram.s_avg.bin", ""),
+				
+				new CalculatedProperty("hsv.h.average",
+						"The plant average hue in the HSV/HSB colour space. The value range is normalized to a minimum of 0 and a maximum of 1. "
+								+ "Value one corresponds to non-technical descriptions of 360 degrees for this colour space."),
+				new CalculatedProperty("hsv.s.average",
+						"The plant average saturation in the HSV/HSB colour space. A high value indicates more 'intensive' colours, "
+								+ "low values indicate pale colours. This value ranges from 0 to 1, other software or references may utilize "
+								+ "different ranges, e.g. a maximum of 100."),
+				new CalculatedProperty("hsv.v.average",
+						"The plant average brightness in the HSV/HSB colour space. This value ranges from 0 to 1, other software or references "
+								+ "may utilize different ranges, e.g. a maximum of 100."),
+				
+				new CalculatedProperty("hsv.dgci.average",
+						"Numeric indication on how 'dark green' the plant appears, taking into account hue, saturation and brightness. Differs from "
+								+ "calculation in other sources in that the higher the saturation, the assumption is that the plant appears greener, and thus "
+								+ "the value is increasing in this case. The column 'side.vis.hsv.dgci_orig.average' Page 32corresponds to the unintuitive "
+								+ "but documented calculation of this trait."),
+				
+				new CalculatedProperty("hsv.h.yellow2green",
+						"Proportion of yellow colour plant pixels (histogram bin 3) divided by the count of green colour pixels (bins 4 to 7). "
+								+ "This value is only valid if the bin count has not been changed from 20, otherwise the involved bins represent different colors."),
+				new CalculatedProperty("hsv.h.red2green",
+						"Proportion of red colour plant pixels (histogram bins 0 and 1) divided by the count of green colour pixels (bins 4 to 7)."
+								+ "This value is only valid if the bin count has not been changed from 20, otherwise the involved bins represent different colors."),
+				new CalculatedProperty("hsv.h.brown2green",
+						"Proportion of brown colour plant pixels (histogram bin 2) divided by the count of green colour pixels (bins 4 to 7). "
+								+ "This value is only valid if the bin count has not been changed from 20, otherwise the involved bins represent different colors."),
+				
+				new CalculatedProperty("hsv.h.stddev",
+						"The standard deviation of the hue values of the plant pixels. The lower this value, the more uniform is the plant colour."),
+				new CalculatedProperty("hsv.s.stddev",
+						"The standard deviation of the saturation values of the plant pixels. The lower this value, the more uniform is the "
+								+ "saturation of the plant colours."),
+				new CalculatedProperty("hsv.v.stddev",
+						"The standard deviation of the brightness values of the plant pixels. The lower this value, the more uniform is the plant brightness."),
+				
+				new CalculatedProperty("hsv.h.skewness",
+						"The 'skewness' of the hue values of the plant pixels. 'skewness' is a statistical term, indicating the tendency of the "
+								+ "value distribution to lean to one side of the value range. The documentation will include a more complete description "
+								+ "of this trait in the future; see reference literature for full details."),
+				new CalculatedProperty("hsv.s.skewness",
+						"The 'skewness' of the saturation values of the plant pixels. 'skewness' is a statistical term, indicating the tendency of the "
+								+ "value distribution to lean to one side of the value range. The documentation will include a more complete description of "
+								+ "this trait in the future; see reference literature for full details."),
+				new CalculatedProperty("hsv.v.skewness",
+						"The 'skewness' of the brightness values of the plant pixels. 'skewness' is a statistical term, indicating the tendency of the "
+								+ "value distribution to lean to one side of the value range. The documentation will include a more complete description of "
+								+ "this trait in the future; see reference literature for full details."),
+				
+				new CalculatedProperty("hsv.h.kurtosis",
+						"The 'kurtosis' of the hue values of the plant pixels. 'kurtosis' is a statistical term, indicating the 'peakedness' "
+								+ "of the value distribution. The documentation will include a more complete description of this trait in the future; "
+								+ "see reference literature for full details."),
+				new CalculatedProperty("hsv.s.kurtosis",
+						"The 'kurtosis' of the saturation values of the plant pixels. 'kurtosis' is a statistical term, indicating the 'peakedness' "
+								+ "of the value distribution. The Page 33documentation will include a more complete description of this trait in the future; "
+								+ "see reference literature for full details."),
+				new CalculatedProperty("hsv.v.kurtosis",
+						"The 'kurtosis' of the brightness values of the plant pixels. 'kurtosis' is a statistical term, indicating the 'peakedness' "
+								+ "of the value distribution. The documentation will include a more complete description of this trait in the future; "
+								+ "see reference literature for full details."),
+				
+				new CalculatedProperty("lab.l.mean",
+						"The plant average brightness value of the plant pixel colours in the L*a*b* colour space. Small values "
+								+ "indicate low and high values high brightness. This value ranges from 0 to 255, other software or references "
+								+ "may utilize different ranges."),
+				new CalculatedProperty("lab.a.mean",
+						"The plant average a-value of the plant pixel colours in the L*a*b* colour space. Small values indicate green "
+								+ "while high values indicate magenta. This value ranges from 26 to 225, other software or references may "
+								+ "utilize different ranges, e.g. higher negative together with higher positive values."),
+				new CalculatedProperty("lab.b.mean",
+						"The plant average b-value of the plant pixel colours in the L*a*b* colour space. Small values indicate blue and "
+								+ "high values indicate yellow. This value ranges from 8 to 223, other software or references may utilize "
+								+ "different ranges, e.g. higher negative values together with higher positive values."),
+				
+				new CalculatedProperty("lab.l.stddev",
+						"The standard deviation of the brightness values L in the L*a*b* colour space of the plant pixels. "
+								+ "The lower this value, the more uniform is the plant brightness."),
+				new CalculatedProperty("lab.a.stddev",
+						"The standard deviation of the a-values in the L*a*b* colour space of the plant pixels. "
+								+ "The lower this value, the more uniform is the plant colour."),
+				new CalculatedProperty("lab.b.stddev",
+						"The standard deviation of the b values in the L*a*b* colour space of the plant pixels. "
+								+ "The lower this value, the more uniform is the plant colour"),
+				
+				new CalculatedProperty("lab.l.skewness",
+						"The 'skewness' of the brightness values L in the L*a*b* colour space of the plant pixels. 'skewness' "
+								+ "is a statistical term, indicating the tendency of the value distribution to lean to one side of the value range."),
+				new CalculatedProperty("lab.a.skewness",
+						"The 'skewness' of the a-values in the L*a*b* colour space of the plant pixels. 'skewness' is a "
+								+ "statistical term, indicating the tendency of the value distribution to lean to one side of the value range. "),
+				new CalculatedProperty("lab.b.skewness",
+						"The 'skewness' of the b values in the L*a*b* colour space of the plant pixels. 'skewness' is a statistical term, "
+								+ "indicating the tendency of the value distribution to lean to one side of the value range."),
+				
+				new CalculatedProperty("lab.l.kurtosis",
+						"The 'kurtosis' of the brightness values L in the L*a*b* colour space of the plant pixels. 'kurtosis' is a "
+								+ "statistical term, indicating the 'peakedness' of the value distribution. "),
+				new CalculatedProperty("lab.a.kurtosis",
+						"The 'kurtosis' of the a-values in the L*a*b* colour space of the plant pixels. 'kurtosis' is a statistical term, "
+								+ "indicating the 'peakedness' of the value distribution. The documentation will include a more complete "
+								+ "description of this trait in thefuture; see reference literature for full details."),
+				new CalculatedProperty("lab.b.kurtosis",
+						"The 'kurtosis' of the b-values in the L*a*b* colour space of the plant pixels. 'kurtosis' is a statistical term, "
+								+ "indicating the 'peakedness' of the value distribution. "),
+				new CalculatedProperty("intensity.phenol.plant_weight", ""),
+				new CalculatedProperty("intensity.phenol.plant_weight_drought_loss", ""),
+				
+				new CalculatedProperty("filled.pixels",
+						"Number of plant pixels."),
+				new CalculatedProperty("filled.percent",
+						"Number of plant pixels divided by number of overall pixels in the near-infrared image. If half of the "
+								+ "image is filled by the plant, the value would be 0.5. If 10% of the image is filled by the plant, the "
+								+ "value would be 0.1. Excel table display may be formatted to show percentage values (ranging from 0 to 100)."),
+				
+				new CalculatedProperty("intensity.stddev", ""),
+				new CalculatedProperty("intensity.skewness", ""),
+				new CalculatedProperty("intensity.kurtosis", ""),
+				
+				new CalculatedProperty("intensity.chlorophyl.sum", ""),
+				new CalculatedProperty("intensity.chlorophyl.average",
+						"A relative indicator of the red fluorescence intensity, not taking into account brightness but only "
+								+ "the color hue (red = highest intensity, yellow = no intensity). Detailed information will "
+								+ "be added to the documentation. "),
+				new CalculatedProperty("intensity.phenol.sum",
+						"The sum of the yellow fluorescence intensities of each pixel, calculated as described for 'intensity.phenol.average'."),
+				new CalculatedProperty("intensity.phenol.average",
+						"A relative indicator of the yellow fluorescence intensity, not taking into account brightness but only the color hue "
+								+ "(red = no intensity, yellow = high intensity). Detailed information will be added to the documentation. "),
+				new CalculatedProperty("intensity.classic.sum", ""),
+				new CalculatedProperty("intensity.classic.average",
+						"A relative indicator of the red fluorescence intensity, taking into account brightness and colour hue "
+								+ "(red = highest intensity, yellow = no intensity, bright = high intensity, dark = low intensity). "
+								+ "Detailed information will be added to the documentation. Calculation formula: ( 1 - red / (255 + green) ) / 0.825"),
+				new CalculatedProperty("intensity.phenol.chlorophyl.ratio",
+						"The ratio of trait 'intensity.chlorophyl.sum' and 'intensity.phenol.sum'."),
+				new CalculatedProperty("intensity.sum", ""),
+				new CalculatedProperty("intensity.average",
+						"Deprecated. The same as 'intensity.chlorophyl.average'. Trait may be removed at a later time point."),
+				
+				new CalculatedProperty("normalized.histogram.bin", ""),
+				new CalculatedProperty("histogram.bin", ""),
+				
+				new CalculatedProperty("normalized.histogram.phenol.bin", ""),
+				new CalculatedProperty("histogram.phenol.bin", ""),
+				
+				new CalculatedProperty("ndvi", "ndvi = (averageNir - averageVisR) / (averageNir + averageVisR))"),
+				
+				new CalculatedProperty("rgb.red.intensity.average",
+						"Average intensity of the red channel of the plant pixels in the visible light image."),
+				new CalculatedProperty("rgb.green.intensity.average",
+						"Average intensity of the green channel of the plant pixels in the visible light image."),
+				new CalculatedProperty("rgb.blue.intensity.average",
+						"Average intensity of the blue channel of the plant pixels in the visible light image.")
+		
+		};
 	}
 }

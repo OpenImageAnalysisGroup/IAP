@@ -15,6 +15,9 @@ import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
+/**
+ * @author Christian Klukas
+ */
 public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	
 	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptionsAndResults options, BlockResultSet settings,
@@ -29,7 +32,8 @@ public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 			TreeMap<Long, TreeMap<String, ImageData>> inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> allResultsForSnapshot,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> summaryResult,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus)
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			CalculatesProperties propertyCalculator)
 			throws InterruptedException;
 	
 	public void setPreventDebugValues(boolean preventSecondShowingOfDebugWindows);
@@ -63,4 +67,5 @@ public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	 * @return Extended parameter description help.
 	 */
 	public String getDescriptionForParameters();
+	
 }

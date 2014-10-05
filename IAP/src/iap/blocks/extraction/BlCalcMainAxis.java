@@ -5,6 +5,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
@@ -21,8 +24,9 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author pape, klukas
  */
-public class BlCalcMainAxis extends
-		AbstractSnapshotAnalysisBlock {
+public class BlCalcMainAxis
+		extends AbstractSnapshotAnalysisBlock
+		implements CalculatesProperties {
 	
 	@Override
 	protected boolean isChangingImages() {
@@ -50,22 +54,13 @@ public class BlCalcMainAxis extends
 				if (angle > 180)
 					angle = angle - 180;
 				
-				// getProperties().setNumericProperty(0,
-				// PropertyNames.RESULT_TOP_MAIN_AXIS_ROTATION, angle);
 				double normalizedDistanceToMainAxis = macr.getMinResult()
 						.getDistanceSum()
 						/ macr.getMinResult().getPixelCount()
 						/ macr.getMinResult().getPixelCount();
-				// getProperties().setNumericProperty(0,
-				// PropertyNames.RESULT_TOP_MAIN_AXIS_NORMALIZED_DISTANCE,
-				// normalizedDistanceToMainAxis);
-				getResultSet().setNumericResult(0, "RESULT_top.fluo.centroid.x",
-						macr.getCentroid().x, "px");
-				getResultSet().setNumericResult(0, "RESULT_top.fluo.centroid.y",
-						macr.getCentroid().y, "px");
 				
-				getResultSet().setNumericResult(getBlockPosition(), "RESULT_top.fluo.main.axis.rotation", angle, "degree");
-				getResultSet().setNumericResult(getBlockPosition(), "RESULT_top.fluo.main.axis.normalized.distance.avg", normalizedDistanceToMainAxis);
+				getResultSet().setNumericResult(getBlockPosition(), "RESULT_top.fluo.main.axis.rotation", angle, "degree", this);
+				getResultSet().setNumericResult(getBlockPosition(), "RESULT_top.fluo.main.axis.normalized.distance.avg", normalizedDistanceToMainAxis, this);
 			}
 		}
 		return input().masks().fluo();
@@ -102,5 +97,24 @@ public class BlCalcMainAxis extends
 	public String getDescription() {
 		return "Calculates the main axis rotation for fluo top images. All other image " +
 				"types and configurations are ignored.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("main.axis.rotation",
+						"The orientation of the line (in degree), 0 indicates horizontal orientation "
+								+ "(when looking at the top-image), 90 means orientation from top to bottom "
+								+ "(when looking at the image)."),
+				new CalculatedProperty("main.axis.normalized.distance.avg",
+						"A centre line is calculated by detecting a line crossing the "
+								+ "centre of the image. This line is oriented so that the sum of "
+								+ "the distances of the plant pixels to this line is minimal. For "
+								+ "maize plants this line orientation corresponds to the main "
+								+ "leaf orientation. This value indicates the average distance "
+								+ "of the plant pixels to this line. The higher this value, the "
+								+ "less oriented are the plant leaves relative to the centre"
+								+ "line.")
+		};
 	}
 }

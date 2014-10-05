@@ -50,4 +50,9 @@ public class BlMoveImagesToMasks extends AbstractImageAnalysisBlockFIS {
 		return "Copies image set to mask set.";
 	}
 	
+	@Override
+	public String getDescriptionForParameters() {
+		return null;
+	}
+	
 }

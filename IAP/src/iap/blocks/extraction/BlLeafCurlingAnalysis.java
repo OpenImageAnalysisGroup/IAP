@@ -2,6 +2,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -17,7 +20,10 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import flanagan.math.FourierTransform;
 
-public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock {
+/**
+ * @author Christian Klukas
+ */
+public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	@Override
 	protected Image processVISmask() {
 		
@@ -83,7 +89,7 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock {
 			rt.addValue("leaf.curling.amplitude.stddev", statsFFTamplitude.getStandardDeviation());
 			
 			String pre = "RESULT_" + optionsAndResults.getCameraPosition();
-			getResultSet().storeResults(pre + ".", rt, getBlockPosition());
+			getResultSet().storeResults(pre + ".vis.", rt, getBlockPosition(), this);
 		}
 		
 		return input().masks().vis();
@@ -137,5 +143,21 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getDescription() {
 		return "Analyzes the leaf curling structure.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("leaf.curling.n",
+						"Number of considered leaves (with length above the minimum-length threshold) for curling analysis."),
+				new CalculatedProperty("leaf.curling.frequency.avg",
+						"Average curling frequency."),
+				new CalculatedProperty("leaf.curling.frequency.stddev",
+						"Standard deviation of the curling frequencies, based on the frequency of the considered leaves."),
+				new CalculatedProperty("leaf.curling.amplitude.avg",
+						"Average curling amplitude."),
+				new CalculatedProperty("leaf.curling.amplitude.stddev",
+						"Standard deviation of the curling amplitudes, based on the amplitudes of the considered leaves.")
+		};
 	}
 }

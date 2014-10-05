@@ -2,6 +2,9 @@ package iap.blocks.threeD;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import info.StopWatch;
 
 import java.io.File;
@@ -40,7 +43,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.ByteShortIntArray;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeColorDepth;
 
-public class BlThreeDreconstruction extends AbstractBlock {
+/**
+ * @author Christian Klukas
+ *         Todo: Calculated properties should be renamed from volume.xy to vis.volume.xy or fluo.volume.xy.
+ */
+public class BlThreeDreconstruction extends AbstractBlock implements CalculatesProperties {
 	
 	@Override
 	protected Image processMask(Image mask) {
@@ -50,7 +57,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	@Override
 	protected Image processVISmask() {
 		Image fi = input().masks() != null ? input().masks().vis() : null;
-		if (!getBoolean("Process Fluo Instead of Vis", true)) {
+		if (!getBoolean("Process Fluo Instead of Vis", false)) {
 			if (fi != null) {
 				getResultSet().setImage(getBlockPosition(), "img.3D", fi, false);
 			}
@@ -61,7 +68,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	@Override
 	protected Image processFLUOmask() {
 		Image fi = input().masks() != null ? input().masks().fluo() : null;
-		if (getBoolean("Process Fluo Instead of Vis", true)) {
+		if (getBoolean("Process Fluo Instead of Vis", false)) {
 			if (fi != null) {
 				getResultSet().setImage(getBlockPosition(), "img.3D", fi, false);
 			}
@@ -76,7 +83,7 @@ public class BlThreeDreconstruction extends AbstractBlock {
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, CalculatesProperties propertyCalculator) throws InterruptedException {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("3D-Generation in progress, waiting");
 		synchronized (this.getClass()) {
@@ -177,13 +184,13 @@ public class BlThreeDreconstruction extends AbstractBlock {
 							}
 							double vv = 1;
 							double plantVolume = vv * solidVoxels;
-							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.volume", plantVolume, "voxel");
-							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.x", cogX / solidVoxels, "voxel");
-							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.y", cogY / solidVoxels, "voxel");
-							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.z", cogZ / solidVoxels, "voxel");
+							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.volume", plantVolume, "voxel", this);
+							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.x", cogX / solidVoxels, "voxel", this);
+							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.y", cogY / solidVoxels, "voxel", this);
+							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.z", cogZ / solidVoxels, "voxel", this);
 							if (distHorizontal != null) {
 								double corr = realMarkerDistHorizontal / distHorizontal;
-								summaryResult.setNumericResult(0, "RESULT_volume.plant3d.volume.norm", plantVolume * corr * corr * corr, "mm^3");
+								summaryResult.setNumericResult(0, "RESULT_volume.plant3d.volume.norm", plantVolume * corr * corr * corr, "mm^3", this);
 							}
 							
 							boolean saveVolumeDataset = getBoolean("Save Volume Dataset", false);
@@ -339,16 +346,16 @@ public class BlThreeDreconstruction extends AbstractBlock {
 			}
 		}
 		summaryResult.setNumericResult(0,
-				"RESULT_volume.plant3d.skeleton.length", skeletonLength, "px");
+				"RESULT_volume.plant3d.skeleton.length", skeletonLength, "px", this);
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericResult(0,
 					"RESULT_volume.plant3d.skeleton.length.norm",
-					skeletonLength * corr, "mm");
+					skeletonLength * corr, "mm", this);
 		}
-		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.x", skeletonX / skeletonLength, "voxel");
-		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.y", skeletonY / skeletonLength, "voxel");
-		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.z", skeletonZ / skeletonLength, "voxel");
+		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.x", skeletonX / skeletonLength, "voxel", this);
+		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.y", skeletonY / skeletonLength, "voxel", this);
+		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.z", skeletonZ / skeletonLength, "voxel", this);
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
 		lve.setVolume(new ByteShortIntArray(cube));
@@ -432,12 +439,12 @@ public class BlThreeDreconstruction extends AbstractBlock {
 			}
 		}
 		summaryResult.setNumericResult(0,
-				"RESULT_volume.plant3d.probability.skeleton.length", skeletonLength, "px");
+				"RESULT_volume.plant3d.probability.skeleton.length", skeletonLength, "px", this);
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericResult(0,
 					"RESULT_volume.plant3d.probability.skeleton.length.norm",
-					skeletonLength * corr, "mm");
+					skeletonLength * corr, "mm", this);
 		}
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
@@ -490,5 +497,40 @@ public class BlThreeDreconstruction extends AbstractBlock {
 	@Override
 	public String getDescription() {
 		return "Perform space carving operation on fluo (default) or visible light side images.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("volume.plant3d.volume",
+						"Estimated plant volume in voxels, obtained by applying the space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.volume.norm",
+						"Estimated plant volume in real-world coordinates, obtained by applying the space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.cog.x",
+						"Center of gravity (X-axis) of the plant volume, obtained by applying the space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.cog.y",
+						"Center of gravity (Y-axis) of the plant volume, obtained by applying the space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.cog.z",
+						"Center of gravity (Z-axis) of the plant volume, obtained by applying the space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.cube",
+						"Calculated plant volume (colored voxel cube)."),
+				new CalculatedProperty("volume.plant3d.skeleton.length",
+						"Length of the 3-D-skeleton, based on the plant volume cube, obtained by applying the space-carving algorithm "
+								+ "to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.skeleton.length.norm",
+						"Length (normalized to real-world coordinates) of the 3-D-skeleton, based on the plant volume cube, "
+								+ "obtained by applying the space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.skeleton.cog.x",
+						"Center of gravity (X-axis) of the plant volume skeleton, obtained by applying the space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.skeleton.cog.y",
+						"Center of gravity (Y-axis) of the plant volume skeleton, obtained by applying the space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.skeleton.cog.z",
+						"Center of gravity (Z-axis) of the plant volume skeleton, obtained by applying the space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.probability.skeleton.length",
+						"Length plant volume skeleton, obtained by applying a special probability-based space-carving algorithm to multiple side-view images."),
+				new CalculatedProperty("volume.plant3d.probability.skeleton.length.norm",
+						"Length plant volume skeleton in real-world coordinates, obtained by applying a special probability-based space-carving "
+								+ "algorithm to multiple side-view images.")
+		};
 	}
 }

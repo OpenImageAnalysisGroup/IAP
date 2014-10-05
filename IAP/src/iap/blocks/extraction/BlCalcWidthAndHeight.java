@@ -2,6 +2,9 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
@@ -16,7 +19,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
-import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -28,8 +30,12 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas
  */
 public class BlCalcWidthAndHeight extends
-		AbstractSnapshotAnalysisBlock {
+		AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
+	private static final String HEIGHT = "height";
+	private static final String WIDTH = "width";
+	private static final String HEIGHT_NORM = "height.norm";
+	private static final String WIDTH_NORM = "width.norm";
 	boolean debug = false;
 	
 	@Override
@@ -57,36 +63,13 @@ public class BlCalcWidthAndHeight extends
 		if (visRes == null)
 			return null;
 		
-		int vertYsoilLevel = -1;
-		
-		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
-			if (useFluo) {
-				if (getResultSet().searchNumericResult(0, 1,
-						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO.getName(optionsAndResults.getCameraPosition())) != null)
-					vertYsoilLevel = (int) getResultSet()
-							.searchNumericResult(
-									0,
-									1,
-									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_FLUO.getName(optionsAndResults.getCameraPosition()))
-							.getValue();
-			} else {
-				if (getResultSet().searchNumericResult(0, 1,
-						PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS.getName(optionsAndResults.getCameraPosition())) != null)
-					vertYsoilLevel = (int) getResultSet()
-							.searchNumericResult(
-									0,
-									1,
-									PropertyNames.INTERNAL_CROP_BOTTOM_POT_POSITION_VIS.getName(optionsAndResults.getCameraPosition()))
-							.getValue();
-			}
-		}
-		final int vertYsoilLevelF = vertYsoilLevel;
+		final int vertYsoilLevelF = -1;
 		
 		Image img = useFluo ? input().masks().fluo()
 				: input().masks().vis();
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && img != null) {
 			final TopBottomLeftRight temp = getWidthAndHeightSide(img,
-					background, vertYsoilLevel);
+					background, vertYsoilLevelF);
 			
 			double resf = useFluo ? (double) input().masks().vis()
 					.getWidth()
@@ -181,20 +164,20 @@ public class BlCalcWidthAndHeight extends
 					getResultSet()
 							.setNumericResult(
 									getBlockPosition(),
-									"RESULT_side.width.norm",
+									"RESULT_side.vis." + WIDTH_NORM,
 									values.x
-											* (realMarkerDistHorizontal / distHorizontal) * resf, "mm");
+											* (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this);
 					getResultSet()
 							.setNumericResult(
 									getBlockPosition(),
-									"RESULT_side.height.norm",
+									"RESULT_side.vis." + HEIGHT_NORM,
 									values.y
-											* (realMarkerDistHorizontal / distHorizontal) * resf, "mm");
+											* (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this);
 				}
 				getResultSet().setNumericResult(getBlockPosition(),
-						"RESULT_side.width", values.x, "px");
+						"RESULT_side.vis." + WIDTH, values.x, "px", this);
 				getResultSet().setNumericResult(getBlockPosition(),
-						"RESULT_side.height", values.y, "px");
+						"RESULT_side.vis." + HEIGHT, values.y, "px", this);
 				
 			}
 		}
@@ -220,12 +203,13 @@ public class BlCalcWidthAndHeight extends
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
-			BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws InterruptedException {
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			CalculatesProperties propertyCalculator) throws InterruptedException {
 		super.postProcessResultsForAllTimesAndAngles(plandID2time2waterData,
-				time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus);
+				time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus, this);
 		
 		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
-				new String[] { "RESULT_side.width", "RESULT_side.width.norm", "RESULT_side.height.norm" });
+				new String[] { "RESULT_side.width", "RESULT_side.width.norm", "RESULT_side.height.norm" }, this);
 	}
 	
 	@Override
@@ -253,5 +237,23 @@ public class BlCalcWidthAndHeight extends
 	@Override
 	public String getDescription() {
 		return "Calculates the plant width and height properties from the visible light image mask.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty(WIDTH,
+						"Width of the plant, measured as the horizontal distance in pixels "
+								+ "from the most left plant pixel to the most right plant pixel."),
+				new CalculatedProperty(WIDTH_NORM,
+						"Width of the plant, measured as the horizontal distance in pixels "
+								+ "from the most left plant pixel to the most right plant pixel normalized to mm."),
+				new CalculatedProperty(HEIGHT,
+						"Height of the plant, measured as the vertical distance in pixels "
+								+ "from the most top plant pixel to the most bottom plant pixel."),
+				new CalculatedProperty(HEIGHT_NORM,
+						"Height of the plant, measured as the vertical distance in pixels "
+								+ "from the most top plant pixel to the most bottom plant pixel normalized to mm.")
+		};
 	}
 }

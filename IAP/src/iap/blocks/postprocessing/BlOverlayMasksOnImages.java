@@ -68,4 +68,9 @@ public class BlOverlayMasksOnImages extends AbstractImageAnalysisBlockFIS {
 	public String getDescription() {
 		return "Replaces the main image set with the mask images.";
 	}
+	
+	@Override
+	public String getDescriptionForParameters() {
+		return null;
+	}
 }
