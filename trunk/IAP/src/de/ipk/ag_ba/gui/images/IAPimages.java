@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.gui.images;
 
-import java.awt.Color;
-
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.structures.Image;
@@ -17,13 +15,13 @@ public class IAPimages {
 	public static java.awt.Image getImage(String image, int maxSize) {
 		java.awt.Image img = IAPservice.getImage(IAPmain.class, image);
 		Image f = new Image(img);
-		return f.resize(maxSize, maxSize, true).io().replaceColor(Color.BLACK.getRGB(), Color.WHITE.getRGB()).getAsBufferedImage();
+		return f.resize(maxSize, maxSize, true).getAsBufferedImage();
 	}
 	
 	public static Image getImageIAP(String image, int maxSize) {
 		java.awt.Image img = IAPservice.getImage(IAPmain.class, image);
 		Image f = new Image(img);
-		return f.resize(maxSize, maxSize, true).io().replaceColor(Color.BLACK.getRGB(), Color.WHITE.getRGB()).getImage();
+		return f.resize(maxSize, maxSize, true);
 	}
 	
 	public static String saveAsArchive() {

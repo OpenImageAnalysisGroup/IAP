@@ -401,7 +401,7 @@ public class DataExchangeHelperForExperiments {
 				
 				SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
 						stop, executeLater, binaryFileInfo, imageButton,
-						previewLoadAndConstructNeededF, fIsLast, isAnnotationSavePossible));
+						previewLoadAndConstructNeededF, fIsLast, isAnnotationSavePossible, true));
 			}
 			
 		} catch (Exception e) {
@@ -512,7 +512,7 @@ public class DataExchangeHelperForExperiments {
 			chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
 			
 			SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
-					stop, executeLater, null, chartingButton, false, false, isAnnotationSavePossible));
+					stop, executeLater, null, chartingButton, false, false, isAnnotationSavePossible, true));
 		}
 		if (addDataChart) {
 			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
@@ -579,7 +579,7 @@ public class DataExchangeHelperForExperiments {
 			chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
 			
 			SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
-					stop, executeLater, null, chartingButton, false, isLast, isAnnotationSavePossible));
+					stop, executeLater, null, chartingButton, false, isLast, isAnnotationSavePossible, true));
 		}
 	}
 	
@@ -589,7 +589,7 @@ public class DataExchangeHelperForExperiments {
 			final BinaryFileInfo binaryFileInfo,
 			final DataSetFileButton imageButton,
 			final boolean previewLoadAndConstructNeededF, final boolean fIsLast,
-			final boolean isAnnotationSavePossible) {
+			final boolean isAnnotationSavePossible, final boolean addInfoPanel) {
 		final int tw = DataSetFileButton.ICON_WIDTH;
 		return new Runnable() {
 			@Override
@@ -611,8 +611,10 @@ public class DataExchangeHelperForExperiments {
 						imageButton.addMouseListener(getML(aip));
 						buttonAndInfo.addMouseListener(getML(aip));
 					}
-					
-					filePanel.add(buttonAndInfo);
+					if (addInfoPanel)
+						filePanel.add(buttonAndInfo);
+					else
+						filePanel.add(imageButton);
 					filePanel.validate();
 					filePanel.repaint();
 					filePanel.getScrollpane().validate();

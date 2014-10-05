@@ -119,11 +119,11 @@ public class BlCalcCOG extends AbstractBlock implements CalculatesProperties {
 				new CalculatedProperty(COG_Y,
 						"Y-coordinate of the center of gravity of the foreground pixels"),
 				new CalculatedProperty(COG_AVG_DISTANCE_TO_CENTER,
-						"Average distance of foreground pixels to the center of gravity of the foreground pixels"),
+						"Average distance of foreground pixels to the center of gravity of the foreground pixels."),
 				new CalculatedProperty(COG_AVG_DISTANCE_TO_VERTICAL_IMAGE_CENTER_LINE,
-						"Average distance of foreground pixels to a vertical line along the middle axis of the image"),
+						"Average distance of foreground pixels to a vertical line along the middle axis of the image."),
 				new CalculatedProperty(COG_AVG_DISTANCE_TO_IMAGE_CENTER_POINT,
-						"Average distance of foreground pixels to the center of the image")
+						"Average distance of foreground pixels to the center of the image.")
 		};
 	}
 }
