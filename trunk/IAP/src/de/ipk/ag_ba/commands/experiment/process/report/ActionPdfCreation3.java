@@ -555,6 +555,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 								Sheet settingsSheet = wb.createSheet("Analysis Settings");
 								int rn = 0;
 								for (String line : values.split("\\n")) {
+									line = line.trim();
 									Row r = settingsSheet.createRow(rn++);
 									Cell c = r.createCell(0);
 									c.setCellValue(line);
@@ -578,8 +579,29 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 									// empty
 								}
 							}
-							
-							r.createCell(0).setCellValue(v);
+							if (field.equals("remark")) {
+								try {
+									String s = "" + attributeValueMap.get(field);
+									s = StringManipulationTools.stringReplace(s, " // ", "\n");
+									attributeValueMap.put(field, s);
+									val = attributeValueMap.get(field);
+								} catch (Exception nfe) {
+									// empty
+								}
+							}
+							if (field.equals("outliers")) {
+								try {
+									String s = "" + attributeValueMap.get(field);
+									s = StringManipulationTools.stringReplace(s, "//", "\n");
+									attributeValueMap.put(field, s);
+									val = attributeValueMap.get(field);
+								} catch (Exception nfe) {
+									// empty
+								}
+							}
+							Cell nc = r.createCell(0);
+							nc.setCellValue(v);
+							nc.setCellStyle(styleTL);
 							if (val != null && val instanceof Date) {
 								Cell cc = r.createCell(1);
 								cc.setCellStyle(cellStyleDate);
@@ -594,8 +616,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 										if (val != null && val instanceof Long)
 											r.createCell(1).setCellValue((Long) val);
 										else
-											if (val != null && !("" + val).isEmpty())
-												r.createCell(1).setCellValue("" + val);
+											if (val != null && !("" + val).isEmpty()) {
+												Cell c = r.createCell(1);
+												c.setCellValue("" + val);
+												c.setCellStyle(styleTL);
+											}
 						}
 					}
 				}
