@@ -447,7 +447,7 @@ public class DataExchangeHelperForExperiments {
 			final DataSetFileButton chartingButton = new DataSetFileButton(
 					mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
 							"<html><center>Create Data Chart<br>"
-									+ "(for specific condition)" : "<html><center>Create Data Chart<br>(for&nbsp;selected&nbsp;property)", null);
+									+ "(specific condition)" : "<html><center>Create Data Chart<br>(selected&nbsp;property)", null);
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -520,7 +520,7 @@ public class DataExchangeHelperForExperiments {
 			final DataSetFileButton chartingButton = new DataSetFileButton(
 					mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
 							"<html><center>Export Data (XLSX)<br>"
-									+ "(for specific condition)" : "<html><center>Export Data (XLSX)<br>(for&nbsp;selected&nbsp;property)", null);
+									+ "(specific condition)" : "<html><center>Export Data (XLSX)<br>(selected&nbsp;property)", null);
 			chartingButton.setAdditionalActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {

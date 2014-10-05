@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.plugins;
 
+import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.ImageAnalysisBlock;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
@@ -204,7 +206,8 @@ public class IAPpluginManager {
 	public String getDescriptionForCalculatedProperty(String substanceName) {
 		ArrayList<String> res = new ArrayList<String>();
 		int maxMatchN = 0;
-		for (ImageAnalysisBlock iab : getKnownAnalysisBlocks()) {
+		Collection<ImageAnalysisBlock> bl = addArtificalBlock(getKnownAnalysisBlocks());
+		for (ImageAnalysisBlock iab : bl) {
 			if (iab instanceof CalculatesProperties) {
 				CalculatesProperties cp = (CalculatesProperties) iab;
 				CalculatedPropertyDescription[] calp = cp.getCalculatedProperties();
@@ -225,7 +228,7 @@ public class IAPpluginManager {
 				}
 			}
 		}
-		for (ImageAnalysisBlock iab : getKnownAnalysisBlocks()) {
+		for (ImageAnalysisBlock iab : bl) {
 			if (iab instanceof CalculatesProperties) {
 				CalculatesProperties cp = (CalculatesProperties) iab;
 				CalculatedPropertyDescription[] calp = cp.getCalculatedProperties();
@@ -246,7 +249,9 @@ public class IAPpluginManager {
 						if (oneMatch && allMatch) {
 							if (n == maxMatchN)
 								res.add(cd.getDescription() + "<br><small><font color='gray'>Source: documentation for trait "
-										+ "<b>" + cd.getName() + "</b>, calculated by analysis block <b>"
+										+ "<b>" + cd.getName() + "</b>, "
+										+ (iab.getBlockType() == BlockType.UNDEFINED ? "defined as a" : "calculated by analysis block")
+										+ " <b>"
 										+ iab.getName()
 										+ "</b>.</font></small>");
 						}
@@ -255,5 +260,11 @@ public class IAPpluginManager {
 			}
 		}
 		return "" + StringManipulationTools.getStringList("", res, "<br>") + "";
+	}
+	
+	private Collection<ImageAnalysisBlock> addArtificalBlock(Collection<ImageAnalysisBlock> knownAnalysisBlocks) {
+		LinkedList<ImageAnalysisBlock> res = new LinkedList<ImageAnalysisBlock>(knownAnalysisBlocks);
+		res.addFirst(new ArtificalBlockWithCommonPropertyNames());
+		return res;
 	}
 }

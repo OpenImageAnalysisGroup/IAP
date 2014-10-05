@@ -110,9 +110,9 @@ public class DataSetFilePanel extends JPanel {
 		header.enableButton(enableButton);
 		this.warning = warning;
 		if (warning) {
-			header.setBackground(new Color(255, 220, 220));
-		} else {
-			header.setBackground(new Color(240, 245, 240));
+			header.setBackground(new Color(255, 221, 221));
+		} else { // FFEEEE
+			header.setBackground(new Color(255, 238, 238));
 		}
 	}
 	

@@ -200,16 +200,14 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
 							if (!((MongoTreeNodeBasis) mt).readOnly) {
 								String msg = "<font color='black'>"
-										+ (desc.isEmpty() ? "You may also use drag+drop to add files to the currently selected entity of the experiment.<br>"
-												+ "<b>Use left-click to download, right-click to show or manipulate files.</b>" : "") + desc;
+										+ (desc.isEmpty() ? "You may also use drag+drop to add files to the currently selected entity of the experiment." : "") + desc;
 								filePanel.setHeader(true, msg, false, true);
 							} else {
 								filePanel
 										.setHeader(
 												false,
 												"<font color='black'>"
-														+ (desc.isEmpty() ? "Additional files can't be assigned to this entity.<br>"
-																+ "<b>Use left-click to download, right-click to show or manipulate files.</b>" : "") + desc,
+														+ (desc.isEmpty() ? "Additional files can't be assigned to this entity." : "") + desc,
 												true, true);
 							}
 							
@@ -245,8 +243,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 								filePanel
 										.setHeader(
 												false,
-												"<font color='black'>Additional files can't be assigned to this entity.<br>"
-														+ "<b>Use left-click to download, right-click to show or manipulate files.</b>",
+												"<font color='black'>Additional files can't be assigned to this entity.",
 												true, true);
 							
 							filePanel.validate();
