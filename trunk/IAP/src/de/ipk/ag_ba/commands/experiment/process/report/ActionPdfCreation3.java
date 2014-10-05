@@ -13,9 +13,12 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JLabel;
@@ -30,6 +33,7 @@ import org.apache.poi.common.usermodel.Hyperlink;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -54,12 +58,14 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk.ag_ba.plugins.outlier.OutlierAnalysisGlobal;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -504,7 +510,165 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			SXSSFWorkbook wb = xlsx ? new SXSSFWorkbook() : null;
 			if (wb != null)
 				wb.setCompressTempFiles(true);
-			Sheet sheet = xlsx ? wb.createSheet(replaceInvalidChars(experiment.getName())) : null;
+			CellStyle style = null;
+			CellStyle styleTL = null;
+			
+			CellStyle cellStyleDate = null;
+			
+			if (xlsx) {
+				Sheet infoSheet = wb.createSheet("Experiment Info");
+				Row header = infoSheet.createRow(0);
+				style = wb.createCellStyle();
+				styleTL = wb.createCellStyle();
+				styleTL.setAlignment(CellStyle.ALIGN_LEFT);
+				styleTL.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+				styleTL.setWrapText(true);
+				
+				wb.createCellStyle();
+				
+				CreationHelper createHelper = wb.getCreationHelper();
+				cellStyleDate = wb.createCellStyle();
+				cellStyleDate.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy h:mm"));
+				
+				Font font = wb.createFont();
+				font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+				style.setFont(font);
+				{
+					Cell c = header.createCell(0);
+					c.setCellValue("Property");
+					c.setCellStyle(style);
+				}
+				{
+					Cell c = header.createCell(1);
+					c.setCellValue("Value");
+					c.setCellStyle(style);
+				}
+				Map<String, Object> attributeValueMap = new LinkedHashMap<>();
+				experiment.getHeader().fillAttributeMap(attributeValueMap, experiment.getNumberOfMeasurementValues());
+				int row = 1;
+				for (String field : attributeValueMap.keySet()) {
+					Object val = attributeValueMap.get(field);
+					if (val != null && !("" + val).isEmpty()) {
+						if (field.equals("settings")) {
+							String values = "" + attributeValueMap.get(field);
+							if (!values.equals("null") && !values.isEmpty()) {
+								Sheet settingsSheet = wb.createSheet("Analysis Settings");
+								int rn = 0;
+								for (String line : values.split("\\n")) {
+									Row r = settingsSheet.createRow(rn++);
+									Cell c = r.createCell(0);
+									c.setCellValue(line);
+									if (line != null && line.startsWith("[") && line.endsWith("]"))
+										c.setCellStyle(style);
+								}
+								settingsSheet.autoSizeColumn(0);
+							}
+						} else {
+							
+							Row r = infoSheet.createRow(row++);
+							String v = StringManipulationTools.removeHTMLtags(ExperimentHeader.getNiceHTMLfieldNameMapping().get(field));
+							
+							if (field.equals("sizekb")) {
+								try {
+									String s = "" + attributeValueMap.get(field);
+									attributeValueMap.put(field, Long.parseLong(s) / 1024 / 1024);
+									val = attributeValueMap.get(field);
+									v = StringManipulationTools.stringReplace(v, " (KB)", " (GB)");
+								} catch (Exception nfe) {
+									// empty
+								}
+							}
+							
+							r.createCell(0).setCellValue(v);
+							if (val != null && val instanceof Date) {
+								Cell cc = r.createCell(1);
+								cc.setCellStyle(cellStyleDate);
+								cc.setCellValue((Date) val);
+							} else
+								if (val != null && val instanceof Double)
+									r.createCell(1).setCellValue((Double) val);
+								else
+									if (val != null && val instanceof Integer)
+										r.createCell(1).setCellValue((Integer) val);
+									else
+										if (val != null && val instanceof Long)
+											r.createCell(1).setCellValue((Long) val);
+										else
+											if (val != null && !("" + val).isEmpty())
+												r.createCell(1).setCellValue("" + val);
+						}
+					}
+				}
+				infoSheet.autoSizeColumn(0);
+				infoSheet.autoSizeColumn(1);
+				
+				Sheet columnSheet = wb.createSheet("Data Columns");
+				
+				columnSheet.createFreezePane(0, 1, 0, 1);
+				
+				String c = (csvHeader + indexHeader.toString()).trim();
+				c = StringManipulationTools.stringReplace(c, "\r\n", "");
+				c = StringManipulationTools.stringReplace(c, "\n", "");
+				int rr = 0;
+				header = columnSheet.createRow(0);
+				{
+					Cell cc = header.createCell(0);
+					cc.setCellValue("Analysis Result Column");
+					cc.setCellStyle(style);
+				}
+				{
+					Cell cc = header.createCell(1);
+					cc.setCellValue("Description");
+					cc.setCellStyle(style);
+				}
+				{
+					Cell cc = header.createCell(2);
+					cc.setCellValue("Additional Info and/or Documentation Source");
+					cc.setCellStyle(style);
+				}
+				
+				for (String h : c.split(separator)) {
+					rr++;
+					Row rrrr = columnSheet.createRow(rr);
+					Cell cc = rrrr.createCell(0);
+					cc.setCellValue(h);
+					cc.setCellStyle(styleTL);
+					
+					cc = rrrr.createCell(1);
+					String origH = h;
+					if (h != null && h.endsWith(")") && h.contains("("))
+						h = h.substring(0, h.indexOf("("));
+					String desc = IAPpluginManager.getInstance().getDescriptionForCalculatedProperty(h);
+					if (desc == null || desc.isEmpty())
+						desc = IAPpluginManager.getInstance().getDescriptionForCalculatedProperty(origH);
+					String source = null;
+					if (desc != null && desc.contains("Source:")) {
+						source = desc.substring(desc.indexOf("Source:") + "Source:".length()).trim();
+						if (!source.isEmpty() && source.length() > 1)
+							source = source.substring(0, 1).toUpperCase() + source.substring(1);
+						desc = desc.substring(0, desc.indexOf("Source:")).trim();
+					}
+					cc.setCellValue(desc != null && !desc.isEmpty() ?
+							StringManipulationTools.stringReplace(
+									StringManipulationTools.getWordWrapString(StringManipulationTools.removeHTMLtags(desc), 70),
+									"<br>", "\n")
+							: "- no description available -");
+					cc.setCellStyle(styleTL);
+					if (source != null) {
+						cc = rrrr.createCell(2);
+						cc.setCellValue(StringManipulationTools.stringReplace(
+								StringManipulationTools.getWordWrapString(StringManipulationTools.removeHTMLtags(source), 50),
+								"<br>", "\n"));
+						cc.setCellStyle(styleTL);
+					}
+				}
+				
+				columnSheet.autoSizeColumn(0);
+				columnSheet.autoSizeColumn(1);
+				columnSheet.autoSizeColumn(2);
+			}
+			
+			Sheet sheet = xlsx ? wb.createSheet("Analysis Results") : null;
 			
 			ArrayList<String> excelColumnHeaders = new ArrayList<String>();
 			if (sheet != null) {
@@ -515,8 +679,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				c = StringManipulationTools.stringReplace(c, "\r\n", "");
 				c = StringManipulationTools.stringReplace(c, "\n", "");
 				for (String h : c.split(separator)) {
-					row.createCell(col++).setCellValue(h);
+					Cell cc = row.createCell(col++);
+					cc.setCellValue(h);
 					excelColumnHeaders.add(h);
+					if (style != null)
+						cc.setCellStyle(style);
 				}
 			}
 			
