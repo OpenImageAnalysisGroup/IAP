@@ -2,6 +2,9 @@ package iap.example.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.unused.ClusterSizeAndClusterId;
 import ij.process.FloatProcessor;
@@ -37,7 +40,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
  * 
  * @author klukas
  */
-public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
+public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	boolean debug = false;
 	
 	@Override
@@ -69,7 +72,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		int clusters = cd.getClusterCount();
 		rt.addValue("roots.part.count", clusters);
 		ArrayList<RunnableOnImage> postProcessing = new ArrayList<RunnableOnImage>();
-		img = skeletonizeImage("", background, img, origImage, rt, postProcessing, getBoolean("Calculate Width-Histogram", false),
+		img = skeletonizeImage("", background, img, origImage, rt, postProcessing,
+				getBoolean("Calculate Width-Histogram", false),
 				getInt("Minimum Hair-Root-Length", 10));
 		
 		int[] unchangedSkeletonPixels = img.getAs1D();
@@ -120,7 +124,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 		}
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
-		getResultSet().storeResults("RESULT_", rt, getBlockPosition());
+		getResultSet().storeResults("RESULT_", rt, getBlockPosition(), this);
 		// Image skel = ioClusteredSkeltonImage.bm().dilate(getInt("Dilate for section detection", 5)).getImage();
 		for (RunnableOnImage roi : postProcessing) {
 			getResultSet().addImagePostProcessor(CameraType.VIS, null, roi);
@@ -450,6 +454,42 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getDescription() {
 		return "Skeletonize the roots and store root lengths, and other parameters.";
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return new CalculatedPropertyDescription[] {
+				new CalculatedProperty("roots.part.count",
+						"Number of detected seperate rooot segments."),
+				new CalculatedProperty("roots.part.*.skeleton.length",
+						"Skeleton-length of the individual detected root segments."),
+				new CalculatedProperty("graph.leafnodes", "Number of end-points (leaf-nodes) in the skeleton graph."),
+				new CalculatedProperty("graph.nodes", "Number of nodes (leaf-nodes and 'branch'-nodes) in the skeleton graph."),
+				new CalculatedProperty("graph.edges", "Number of edges (root segments) in the skeleton graph."),
+				new CalculatedProperty("graph.edges.length.average", "Average length of skeleton-graph segments."),
+				new CalculatedProperty("graph.edges.length.stddev", "Standard deviation of the lengths of skeleton-graph segments."),
+				new CalculatedProperty("graph.edges.length.skewness", "'Skewness' of the lengths of skeleton-graph segments."),
+				new CalculatedProperty("graph.edges.length.kurtosis", "'Kurtosis' deviation of the lengths of skeleton-graph segments."),
+				new CalculatedProperty("graph.analysis_performed", "1, if the graph analysis has been performed."),
+				new CalculatedProperty("graph.parts", "Number of individual graph segments."),
+				new CalculatedProperty("graph.diameter_part.*.length",
+						"Maximum skeleton-length from any end-point to any other end-point within the particular subgraph."),
+				new CalculatedProperty("graph.diameter.max",
+						"Maximum of the maximum skeleton-length from any end-point to any other end-point for all subgraphs."),
+				new CalculatedProperty("root.graph", "Stored graph structure."),
+				new CalculatedProperty("roots.filled.pixels", "Number of foreground pixels."),
+				new CalculatedProperty("roots.filled.gray_scale_sum", "Sum of the gray scale values from the foreground pixels."),
+				new CalculatedProperty("roots.filled.avg_gray", "Average gray value intensity of the foreground pixels."),
+				new CalculatedProperty("roots.skeleton.length", "Skeleton length of the foreground area."),
+				new CalculatedProperty("roots.skeleton.branchpoints", "Number of branchpoints of the skeleton."),
+				new CalculatedProperty("roots.skeleton.endpoints", "Number of endpoints of the skeleton."),
+				new CalculatedProperty("roots.width.area_based.average", "Foreground area divided by skeleton length."),
+				new CalculatedProperty("roots.width.fractional.average", "!todo"),
+				new CalculatedProperty("roots.volume.skeleton_dist_based", "!todo"),
+				new CalculatedProperty("roots.width.skeleton_based.average", "!todo"),
+				new CalculatedProperty("roots.skeleton.width.*.length", "!todo"),
+				new CalculatedProperty("roots.volume.histogram_based", "!todo")
+		};
 	}
 	
 }
