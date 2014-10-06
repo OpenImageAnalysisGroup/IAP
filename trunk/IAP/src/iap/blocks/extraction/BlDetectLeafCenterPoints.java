@@ -39,7 +39,7 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 	}
 	
 	private Image saveAndMarkResults(Image img, LinkedList<Feature> pointList) {
-		boolean markResults = false;
+		boolean markResults = getBoolean("Mark Center Points in Result Image", false);
 		boolean saveResults = true;
 		boolean saveResultObject = true;
 		
@@ -79,16 +79,19 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 	}
 	
 	private LinkedList<Feature> detectCenterPoints(Image img) {
+		img = img.io().bm().dilate(getInt("Mask Size for Dilate", 5)).getImage();
 		FloatProcessor edmfp = img.io().bm().edmFloat();
 		
-		if (debugValues)
+		if (debugValues) {
+			img.show("input");
 			new Image(edmfp.getBufferedImage()).show("distmap");
+		}
 		
 		MaximumFinder mf = new MaximumFinder();
 		int maxTolerance = getInt("Maximum Tolerance", 5);
 		ByteProcessor bp = mf.findMaxima(edmfp, maxTolerance, 1, mf.LIST, true, true);
 		
-		if (debugValues)
+		if (debugValues && bp != null)
 			new Image(bp.getBufferedImage()).show("Maximas");
 		
 		ResultsTable rt = mf.getRt();
