@@ -3,13 +3,10 @@ package de.ipk.ag_ba.commands.experiment;
 import java.util.ArrayList;
 
 import org.ErrorMsg;
-import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportTar;
-import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.vfs.ActionDataExportToVfs;
@@ -121,7 +118,9 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 				}
 			}
 		}
-			
+		
+		res.add(new NavigationButton("Add Marked Outliers to Global Outlier List", new ActionSetGlobalOutliers(experiment), src.getGUIsetting()));
+		
 		return res;
 	}
 	
