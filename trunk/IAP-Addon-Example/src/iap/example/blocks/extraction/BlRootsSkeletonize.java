@@ -72,8 +72,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 		int clusters = cd.getClusterCount();
 		rt.addValue("roots.part.count", clusters);
 		ArrayList<RunnableOnImage> postProcessing = new ArrayList<RunnableOnImage>();
-		img = skeletonizeImage("", background, img, origImage, rt, postProcessing,
-				getBoolean("Calculate Width-Histogram", false),
+		img = skeletonizeImage("", background, img, origImage, rt, postProcessing, getBoolean("Calculate Width-Histogram", false),
 				getInt("Minimum Hair-Root-Length", 10));
 		
 		int[] unchangedSkeletonPixels = img.getAs1D();
@@ -140,7 +139,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 		if (graphAnalysis) {
 			SkeletonProcessor2d skel = new SkeletonProcessor2d(in.getImage());
 			skel.background = SkeletonProcessor2d.getDefaultBackground();
-			skel.createEndpointsAndBranchesLists();
+			// skel.createEndpointsAndBranchesLists();
+			skel.markEndpointsAndBranches();
 			in = skel.getImageOperation();
 			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
 			sg.createGraph(optClusterIDsPixels, optDistanceMap, 0, postProcessing, getInt("Remove root segments shorter than", 20));
@@ -251,13 +251,14 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 			rt.addValue(pre + "roots.skeleton.length", len);
 		
 		SkeletonProcessor2d skel = inp.replaceColor(Color.BLACK.getRGB(), Color.MAGENTA.getRGB()).skel2d();
-		skel.createEndpointsAndBranchesLists(null);
+		// skel.createEndpointsAndBranchesLists(null);
+		skel.markEndpointsAndBranches();
 		skel.show("before hair-root removal", debug);
 		skel.deleteShortEndLimbs(minlen, false, new HashSet<Point>());
 		skel.createEndpointsAndBranchesLists(postProcessing);
 		skel.calculateEndlimbsRecursive();
 		skel.show("after hair-root removal", debug);
-		
+		// skel.createEndpointsAndBranchesLists(null);
 		img = skel.getImageOperation().show("THE SKELETON", debug);
 		
 		ArrayList<Point> branchPoints = skel.getBranches();
