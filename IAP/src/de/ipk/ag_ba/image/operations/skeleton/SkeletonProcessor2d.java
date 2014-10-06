@@ -408,6 +408,8 @@ public class SkeletonProcessor2d {
 					if (matchMask3x3(dot, area))
 						skelImg[x][y] = background;
 					
+					skelImg[x][y] = foreground;
+					
 					// endpoints
 					for (int index = 0; index < listEndpointMasks.length; index++) {
 						if (matchMask3x3(listEndpointMasks[index], area)) {
