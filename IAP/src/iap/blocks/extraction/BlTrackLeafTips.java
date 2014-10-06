@@ -157,7 +157,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 				double span = Math.sqrt(c * c + d * d);
 				
 				getResultSet().setNumericResult(0,
-						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".orientation",
+						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".span.orientation",
 						angle, "degree", this);
 				
 				getResultSet().setNumericResult(0,
@@ -311,17 +311,17 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("leaf.count", "!todo"),
-				new CalculatedProperty("leaf.count.best_angle", "!todo"),
-				new CalculatedProperty("leaf.*.orientation", "!todo"),
-				new CalculatedProperty("leaf.*.span.norm", "!todo"),
-				new CalculatedProperty("leaf.*.span", "!todo"),
-				new CalculatedProperty("leaf.*.x", "!todo"),
-				new CalculatedProperty("leaf.*.y", "!todo"),
-				new CalculatedProperty("leaf.*.angle", "!todo"),
-				new CalculatedProperty("cog.x", "!todo"),
-				new CalculatedProperty("cog.y", "!todo"),
-				new CalculatedProperty("leaf.*.dist_to_cog", "!todo"),
+				new CalculatedProperty("leaf.tip.count", "Number of detected leafs."),
+				new CalculatedProperty("leaf.tip.count.best_angle", "Number of detected leafs for best side view."),
+				new CalculatedProperty("leaf.tip.*.span.orientation",
+						"Orientation of the movement vector from first appearance of a leaf to current leaf tip position."),
+				new CalculatedProperty("leaf.tip.*.span.norm",
+						"Normalised distance from from first appearance of a leaf to the current detected leaf tip position."),
+				new CalculatedProperty("leaf.tip.*.span", "Distance from from first appearance of a leaf to the current detected leaf tip position."),
+				new CalculatedProperty("leaf.tip.*.x", "X position of the leaf tip center point."),
+				new CalculatedProperty("leaf.tip.*.y", "Y position of the leaf tip center point."),
+				new CalculatedProperty("leaf.tip.*.angle", "Leaf tip orientation."),
+				new CalculatedProperty("leaf.tip.*.dist_to_cog", "Distance from the leaf tip position to the center of gravity of the whole plant."),
 		};
 	}
 }
