@@ -52,7 +52,7 @@ public enum PropertyNames {
 			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
 				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.2.left.y";
 			case RESULT_VIS_MARKER_POS_2_RIGHT_Y:
-				return (pos != null ? "RESULT_" + pos + "." : "") + ".vis.marker.2.right.y";
+				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.2.right.y";
 				
 			case RESULT_VIS_MARKER_POS_3_LEFT_Y:
 				return (pos != null ? "RESULT_" + pos + "." : "") + "vis.marker.3.left.y";
