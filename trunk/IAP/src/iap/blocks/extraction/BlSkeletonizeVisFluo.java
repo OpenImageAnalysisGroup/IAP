@@ -58,13 +58,13 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		Image res = vis;
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && getResultSet() != null) {
-			Image viswork = vis.copy().io().show("orig", debug)
-					// .border(5)
+			Image viswork = vis.show("orig", debug).copy().io()
+					.border(5)
 					.dilateHorizontal(getInt("Dilate-Cnt-Vis-Hor", 25)) // 10
 					.bm().erode(getInt("Erode-Cnt-Vis", 5))
 					.dilate(getInt("Dilate-Cnt-Vis", 10)).io()
 					.blurImageJ(getDouble("Blur-Vis", 0))
-					.getImage().show("vis", debug);
+					.getImage().show("vis preprocessed", debug);
 			
 			if (viswork != null)
 				if (vis != null) {
