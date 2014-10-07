@@ -164,18 +164,18 @@ public class BlCalcWidthAndHeight extends
 					getResultSet()
 							.setNumericResult(
 									getBlockPosition(),
-									new Trait(cp(), CameraType.VIS, WIDTH_NORM),
+									new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, WIDTH_NORM),
 									values.x * (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this);
 					getResultSet()
 							.setNumericResult(
 									getBlockPosition(),
-									new Trait(cp(), CameraType.VIS, HEIGHT_NORM),
+									new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, HEIGHT_NORM),
 									values.y * (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this);
 				}
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cp(), CameraType.VIS, WIDTH), values.x, "px", this);
+						new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, WIDTH), values.x, "px", this);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cp(), CameraType.VIS, HEIGHT), values.y, "px", this);
+						new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, HEIGHT), values.y, "px", this);
 				
 			}
 		}

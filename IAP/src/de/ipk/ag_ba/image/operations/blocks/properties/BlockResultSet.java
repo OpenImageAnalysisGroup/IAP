@@ -4,6 +4,7 @@ import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.ArrayList;
@@ -61,11 +62,11 @@ public interface BlockResultSet {
 	
 	void setNumericResult(int currentPositionInPipeline, Trait name, double value, String unit, CalculatesProperties descriptionProvider);
 	
-	void storeResults(CameraPosition cp, CameraType ct,
+	void storeResults(CameraPosition cp, CameraType ct, TraitCategory cat,
 			ResultsTableWithUnits numericResults,
 			int position, CalculatesProperties description);
 	
-	void storeResults(CameraPosition cp, CameraType ct, String id_postfix,
+	void storeResults(CameraPosition cp, CameraType ct, TraitCategory cat, String id_postfix,
 			ResultsTableWithUnits numericResults,
 			int position, CalculatesProperties description);
 	

@@ -6,6 +6,7 @@ import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
 import info.StopWatch;
 
 import java.io.File;
@@ -136,7 +137,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 									
 									if (distHorizontal == null)
 										if (angle.startsWith("2nd_side")) {
-											BlockResult val = bp.searchNumericResult(0, 0, new Trait(cp(), ct, "optics.blue_marker_distance"));
+											BlockResult val = bp.searchNumericResult(0, 0, new Trait(cp(), ct, TraitCategory.OPTICS, "blue_marker_distance"));
 											if (val != null)
 												distHorizontal = val.getValue();
 										}
@@ -185,13 +186,14 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 								}
 								double vv = 1;
 								double plantVolume = vv * solidVoxels;
-								summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.volume"), plantVolume, "voxel", this);
-								summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.cog.x"), cogX / solidVoxels, "voxel", this);
-								summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.cog.y"), cogY / solidVoxels, "voxel", this);
-								summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.cog.z"), cogZ / solidVoxels, "voxel", this);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.volume"), plantVolume, "voxel", this);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.cog.x"), cogX / solidVoxels, "voxel", this);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.cog.y"), cogY / solidVoxels, "voxel", this);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.cog.z"), cogZ / solidVoxels, "voxel", this);
 								if (distHorizontal != null) {
 									double corr = realMarkerDistHorizontal / distHorizontal;
-									summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.volume.norm"), plantVolume * corr * corr * corr, "mm^3", this);
+									summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.volume.norm"), plantVolume * corr * corr
+											* corr, "mm^3", this);
 								}
 								
 								boolean saveVolumeDataset = getBoolean("Save Volume Dataset", false);
@@ -348,16 +350,16 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 			}
 		}
 		summaryResult.setNumericResult(0,
-				new Trait(cp(), ct, "plant3d.skeleton.length"), skeletonLength, "px", this);
+				new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.length"), skeletonLength, "px", this);
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericResult(0,
-					new Trait(cp(), ct, "plant3d.skeleton.length.norm"),
+					new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.length.norm"),
 					skeletonLength * corr, "mm", this);
 		}
-		summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.skeleton.cog.x"), skeletonX / skeletonLength, "voxel", this);
-		summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.skeleton.cog.y"), skeletonY / skeletonLength, "voxel", this);
-		summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.skeleton.cog.z"), skeletonZ / skeletonLength, "voxel", this);
+		summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.cog.x"), skeletonX / skeletonLength, "voxel", this);
+		summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.cog.y"), skeletonY / skeletonLength, "voxel", this);
+		summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.cog.z"), skeletonZ / skeletonLength, "voxel", this);
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
 		lve.setVolume(new ByteShortIntArray(cube));
@@ -441,11 +443,11 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 			}
 		}
 		summaryResult.setNumericResult(0,
-				new Trait(cp(), ct, "plant3d.probability.skeleton.length"), skeletonLength, "px", this);
+				new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.probability.skeleton.length"), skeletonLength, "px", this);
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericResult(0,
-					new Trait(cp(), ct, "plant3d.probability.skeleton.length.norm"),
+					new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.probability.skeleton.length.norm"),
 					skeletonLength * corr, "mm", this);
 		}
 		

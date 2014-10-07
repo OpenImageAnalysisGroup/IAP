@@ -5,7 +5,6 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,13 +73,14 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 				/ (distHorizontal * distHorizontal)
 				: 1;
 		// double normFactor = distHorizontal != null && realMarkerDist != null ? realMarkerDist / distHorizontal : 1;
-		String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
 		int filledArea = image.io().countFilledPixels();
 		if (distHorizontal != null) {
-			getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), ct, AREA_NORM), filledArea * normFactorArea,
+			getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), ct, TraitCategory.GEOMETRY, AREA_NORM),
+					filledArea * normFactorArea,
 					"mm^2", this);
 		}
-		getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), ct, AREA), filledArea, "px^2", this);
+		getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), ct, TraitCategory.GEOMETRY, AREA), filledArea,
+				"px^2", this);
 	}
 	
 	@Override

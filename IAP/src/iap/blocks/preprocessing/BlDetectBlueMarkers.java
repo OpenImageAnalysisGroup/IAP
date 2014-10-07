@@ -9,6 +9,7 @@ import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
@@ -112,9 +113,11 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 		if (getBoolean("Use fixed marker distance", optionsAndResults.getCameraPosition() == CameraPosition.TOP)) {
 			if (cameraConfig == null || cameraConfig.trim().isEmpty())
 				cameraConfig = "unknown camera config";
-			getResultSet().setNumericResult(0, new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, "optics.blue_marker_distance"), maxDist, "px",
+			getResultSet().setNumericResult(0,
+					new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "blue_marker_distance"), maxDist, "px",
 					this);
-			getResultSet().setNumericResult(0, new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, "optics.blue_marker_distance.predefined"), 1,
+			getResultSet().setNumericResult(0,
+					new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "blue_marker_distance.predefined"), 1,
 					"0/1",
 					this);
 			optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);
@@ -163,7 +166,9 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 				
 				maxDist = max(distances);
 				getResultSet()
-						.setNumericResult(0, new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, "optics.blue_marker_distance"), maxDist, "px", this);
+						.setNumericResult(0,
+								new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "blue_marker_distance"), maxDist,
+								"px", this);
 				
 				if (maxDist > 0)
 					optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);

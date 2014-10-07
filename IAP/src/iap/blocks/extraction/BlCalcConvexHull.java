@@ -60,11 +60,11 @@ public class BlCalcConvexHull extends AbstractBlock implements CalculatesPropert
 		numericResults = res.getResultsTable();
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
 			getResultSet().storeResults(
-					cp, ct, numericResults,
+					cp, ct, TraitCategory.GEOMETRY, numericResults,
 					getBlockPosition(), this);
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && numericResults != null)
 			getResultSet().storeResults(
-					cp, ct, numericResults, getBlockPosition(), this);
+					cp, ct, TraitCategory.GEOMETRY, numericResults, getBlockPosition(), this);
 		
 		res.getImage().show("output image", debug);
 		

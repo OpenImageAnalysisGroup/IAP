@@ -88,7 +88,7 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock impleme
 			rt.addValue("leaf.curling.amplitude.avg", statsFFTamplitude.getMean());
 			rt.addValue("leaf.curling.amplitude.stddev", statsFFTamplitude.getStandardDeviation());
 			
-			getResultSet().storeResults(optionsAndResults.getCameraPosition(), CameraType.VIS, rt, getBlockPosition(), this);
+			getResultSet().storeResults(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.GEOMETRY, rt, getBlockPosition(), this);
 		}
 		
 		return input().masks().vis();
