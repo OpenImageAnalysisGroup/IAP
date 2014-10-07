@@ -3,7 +3,7 @@ package de.ipk.ag_ba.image.structures;
 import java.util.HashSet;
 
 public enum CameraType {
-	VIS, FLUO, NIR, IR, UNKNOWN;
+	VIS, FLUO, NIR, IR, UNKNOWN, MULTI;
 	
 	@Override
 	public String toString() {
@@ -21,6 +21,8 @@ public enum CameraType {
 			case IR:
 				s = "ir";
 				break;
+			case MULTI:
+				s = "multi";
 		}
 		return s;
 	}

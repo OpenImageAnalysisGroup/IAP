@@ -21,11 +21,11 @@ import de.ipk.ag_ba.image.structures.Image;
  */
 public class BlCalcCOG extends AbstractBlock implements CalculatesProperties {
 	
-	private static final String COG_Y = ".cog.y";
-	private static final String COG_X = ".cog.x";
-	private static final String COG_AVG_DISTANCE_TO_IMAGE_CENTER_POINT = ".cog.avg_distance_to_image_center_point";
-	private static final String COG_AVG_DISTANCE_TO_VERTICAL_IMAGE_CENTER_LINE = ".cog.avg_distance_to_vertical_image_center_line";
-	private static final String COG_AVG_DISTANCE_TO_CENTER = ".cog.avg_distance_to_center";
+	private static final String COG_Y = "cog.y";
+	private static final String COG_X = "cog.x";
+	private static final String COG_AVG_DISTANCE_TO_IMAGE_CENTER_POINT = "cog.avg_distance_to_image_center_point";
+	private static final String COG_AVG_DISTANCE_TO_VERTICAL_IMAGE_CENTER_LINE = "cog.avg_distance_to_vertical_image_center_line";
+	private static final String COG_AVG_DISTANCE_TO_CENTER = "cog.avg_distance_to_center";
 	
 	@Override
 	protected Image processMask(Image img) {

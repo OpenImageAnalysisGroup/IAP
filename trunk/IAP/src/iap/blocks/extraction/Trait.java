@@ -8,7 +8,8 @@ public class Trait {
 	private final String name;
 	
 	public Trait(CameraPosition cameraPosition, CameraType ct, String trait) {
-		this.name = "RESULT_" + cameraPosition + "." + ct + "." + trait;
+		// this.name = "RESULT_" + cameraPosition + "." + ct + "." + trait;
+		this.name = "RESULT_" + trait + "." + ct + "." + cameraPosition;
 	}
 	
 	public Trait(String name) {

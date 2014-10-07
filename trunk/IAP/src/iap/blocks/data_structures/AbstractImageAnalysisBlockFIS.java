@@ -45,6 +45,7 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -620,5 +621,51 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected CameraPosition cp() {
 		return getCameraPosition();
+	}
+	
+	protected boolean isBestAngle(CameraType ct) {
+		HashMap<String, ArrayList<BlockResultValue>> previousResults = optionsAndResults
+				.searchResultsOfCurrentSnapshot(new Trait(CameraPosition.TOP, ct, "main_axis.rotation").toString(), true, getWellIdx(), null, false, null);
+		
+		double sum = 0;
+		int count = 0;
+		
+		for (ArrayList<BlockResultValue> b : previousResults.values()) {
+			for (BlockResultValue c : b) {
+				count++;
+				sum += c.getValue();
+			}
+		}
+		
+		if (count == 0) {
+			return true;
+		}
+		
+		ImageData currentImage = input().images().getAnyInfo();
+		
+		double mainRotationFromTopView = sum / count;
+		double mindist = Double.MAX_VALUE;
+		boolean currentImageIsBest = false;
+		
+		for (NumericMeasurementInterface nmi : currentImage.getParentSample()) {
+			if (nmi instanceof ImageData) {
+				Double r = ((ImageData) nmi).getPosition();
+				if (r == null)
+					r = 0d;
+				double dist = Math.abs(mainRotationFromTopView - r);
+				if (dist < mindist) {
+					mindist = dist;
+					if ((((ImageData) nmi).getPosition() + "").equals((currentImage.getPosition() + "")))
+						currentImageIsBest = true;
+					else
+						currentImageIsBest = false;
+				}
+			}
+		}
+		
+		if (!currentImageIsBest)
+			return false;
+		
+		return true;
 	}
 }

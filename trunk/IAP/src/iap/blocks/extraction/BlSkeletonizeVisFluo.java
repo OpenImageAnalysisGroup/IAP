@@ -364,15 +364,15 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		
 		if (leafcount > 0) {
 			if (distHorizontal != null)
-				rt.addValue("leaf.length.average.norm", leaflength * normFactor / leafcount);
-			rt.addValue("leaf.length.average", leaflength / leafcount);
+				rt.addValue("leaf.length.mean.norm", leaflength * normFactor / leafcount);
+			rt.addValue("leaf.length.mean", leaflength / leafcount);
 		}
 		
 		if (leafcount > 0) {
 			double filled = inp.io().countFilledPixels();
 			if (distHorizontal != null)
-				rt.addValue("leaf.width.average.norm", (filled / leaflength) * normFactor);
-			rt.addValue("leaf.width.average", filled / leaflength);
+				rt.addValue("leaf.width.mean.norm", (filled / leaflength) * normFactor);
+			rt.addValue("leaf.width.mean", filled / leaflength);
 			// System.out.println(" // " + (int) (filled / leaflength));
 		}
 		
@@ -547,7 +547,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 										}
 										if (cnt != null && summaryResult != null) {
 											summaryResult.setNumericResult(getBlockPosition(),
-													new Trait(cp(), ct, "leaf.count.best"), cnt, this);
+													new Trait(cp(), ct, "leaf.count.best_angle"), cnt, this);
 											// System.out.println("Leaf count for best side image: " + cnt);
 										}
 									}
@@ -654,15 +654,15 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 								+ "Leaf-segments are shortened and cut, by calculating a "
 								+ "convex hull around all skeleton branch points."),
 				new CalculatedProperty("bloom", "0/1, depending on if a (maize) bloom could be detected in the image."),
-				new CalculatedProperty("leaf.length.average",
+				new CalculatedProperty("leaf.length.mean",
 						"Skeleton length dividied by the number of detected leaves."),
-				new CalculatedProperty("leaf.length.average.norm",
+				new CalculatedProperty("leaf.length.mean.norm",
 						"Skeleton length dividied by the number of detected leaves, normalized to real-world coordinates."),
-				new CalculatedProperty("leaf.width.average",
+				new CalculatedProperty("leaf.width.mean",
 						"Projected plant area divided by skeleton length."),
-				new CalculatedProperty("leaf.width.average.norm",
+				new CalculatedProperty("leaf.width.mean.norm",
 						"Projected plant area divided by skeleton length, normalized to real-world coordinates."),
-				new CalculatedProperty("leaf.count.best",
+				new CalculatedProperty("leaf.count.best_angle",
 						"Number of detected leaves from the 'best' side view, according to the main axis as observed from top.")
 		};
 	}
