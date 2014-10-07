@@ -360,7 +360,7 @@ public class BlockResults implements BlockResultSet {
 				double val = numericResults.getValueAsDouble(col, row);
 				String unit = numericResults.getColumnHeadingUnit(col);
 				if (!Double.isNaN(val))
-					setNumericResult(position, new Trait(cp, ct, id + (id_postfix != null ? id_postfix : "")), val, unit, description);
+					setNumericResult(position, new Trait(cp, ct, id + (id_postfix != null && !id_postfix.isEmpty() ? "." + id_postfix : "")), val, unit, description);
 			}
 		}
 	}
