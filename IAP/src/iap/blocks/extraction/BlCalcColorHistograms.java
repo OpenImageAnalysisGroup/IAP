@@ -70,16 +70,16 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 					for (int r = 0; r < regions; r++)
 						processVisibleImage(io.getBottom(r, regions).show("Side Part " + r + "/" + regions, debugRegionParts),
 								optionsAndResults.getCameraPosition(),
-								"section_" + (r + 1) + "_" + regions + ".", true);
+								"section_" + (r + 1) + "_" + regions, true);
 				}
 				if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 					for (int r = 0; r < regions; r++)
 						processVisibleImage(io.getInnerCircle(r, regions).show("Top Part " + r + "/" + regions, debugRegionParts),
-								optionsAndResults.getCameraPosition(), "section_" + (r + 1) + "_" + regions + ".", true);
+								optionsAndResults.getCameraPosition(), "section_" + (r + 1) + "_" + regions, true);
 				}
 			}
 			
-			processVisibleImage(io, optionsAndResults.getCameraPosition(), "", false);
+			processVisibleImage(io, optionsAndResults.getCameraPosition(), null, false);
 			
 			return input().masks().vis();
 		} else
@@ -102,24 +102,28 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				isSection ? addHistogramValuesForSections : addHistogramValues,
 				getBoolean("Calculate Kurtosis Values", false), true);
 		getResultSet().storeResults(cp, CameraType.VIS, resultPrefix, rt1, getBlockPosition(), this);
-		
-		ResultsTableWithUnits rt = new ResultsTableWithUnits();
-		rt.incrementCounter();
-		rt.addValue("intensity.rgb.red", averageVisR);
-		rt.addValue("intensity.rgb.green", averageVisG);
-		rt.addValue("intensity.rgb.blue", averageVisB);
+		{
+			ResultsTableWithUnits rt = new ResultsTableWithUnits();
+			rt.incrementCounter();
+			rt.addValue("rgb.red", averageVisR);
+			rt.addValue("rgb.green", averageVisG);
+			rt.addValue("rgb.blue", averageVisB);
+			getResultSet().storeResults(cp, CameraType.VIS, resultPrefix, rt, getBlockPosition(), this);
+		}
 		
 		if (input().masks().nir() != null) {
 			double nirIntensitySum = input().masks().nir().io().intensitySumOfChannel(false, true, false, false);
 			int nirFilledPixels = input().masks().nir().io().countFilledPixels();
 			double averageNir = 1 - nirIntensitySum / nirFilledPixels;
-			// rt.addValue("ndvi.nir.intensity.average", averageNir);
+			// rt.addValue("ndvi.nir.intensity.mean", averageNir);
 			
 			double ndvi = (averageNir - averageVisR) / (averageNir + averageVisR);
+			ResultsTableWithUnits rt = new ResultsTableWithUnits();
+			rt.incrementCounter();
 			rt.addValue("ndvi", ndvi);
+			getResultSet().storeResults(cp, CameraType.MULTI, resultPrefix, rt, getBlockPosition(), this);
 		}
 		
-		getResultSet().storeResults(cp, CameraType.VIS, resultPrefix, rt, getBlockPosition(), this);
 	}
 	
 	@Override
@@ -176,7 +180,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 			double nirSkeletonIntensitySum = nirSkel.io().intensitySumOfChannel(false, true, false, false);
 			double avgNirSkel = 1 - nirSkeletonIntensitySum / nirSkeletonFilledPixels;
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(optionsAndResults.getCameraPosition(), CameraType.NIR, "skeleton.intensity.average"), avgNirSkel,
+					new Trait(optionsAndResults.getCameraPosition(), CameraType.NIR, "skeleton.intensity.mean"), avgNirSkel,
 					null);
 		}
 		
@@ -187,7 +191,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				double nirIntensitySum = input().masks().nir().io().intensitySumOfChannel(false, true, false, false);
 				double avgNir = 1 - nirIntensitySum / nirFilledPixels;
 				getResultSet().setNumericResult(
-						getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), CameraType.NIR, "intensity.average"),
+						getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), CameraType.NIR, "intensity.mean"),
 						avgNir, null);
 				boolean wetnessAnalysis = false;
 				if (wetnessAnalysis) {
@@ -220,10 +224,10 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 							filled - weightOfPlant,
 							null);
 					if (filled > 0) {
-						getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), CameraType.NIR, "wetness.average"),
+						getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), CameraType.NIR, "wetness.mean"),
 								fSum / filled, null);
 					} else
-						getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), CameraType.NIR, "wetness.average"), 0d,
+						getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), CameraType.NIR, "wetness.mean"), 0d,
 								null);
 				}
 				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-NIR", 20))
@@ -251,7 +255,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 			double irSkeletonIntensitySum = irSkel.io().intensitySumOfChannel(false, true, false, false);
 			double avgIrSkel = 1 - irSkeletonIntensitySum / irSkeletonFilledPixels;
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(optionsAndResults.getCameraPosition(), CameraType.IR, "skeleton.intensity.average"), avgIrSkel, null);
+					new Trait(optionsAndResults.getCameraPosition(), CameraType.IR, "skeleton.intensity.mean"), avgIrSkel, null);
 		}
 		
 		if (input().masks().ir() != null) {
@@ -261,7 +265,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				double irIntensitySum = input().masks().ir().io().intensitySumOfChannel(false, true, false, false);
 				double avgIr = 1 - irIntensitySum / irFilledPixels;
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(optionsAndResults.getCameraPosition(), CameraType.IR, "intensity.average"), avgIr, null);
+						new Trait(optionsAndResults.getCameraPosition(), CameraType.IR, "intensity.mean"), avgIr, null);
 				ResultsTableWithUnits rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
 						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_IR_ANALYSIS, addHistogramValues,
 						getBoolean("Calculate Kurtosis Values", false), false); // markerDistanceHorizontally
@@ -324,21 +328,21 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				new CalculatedProperty("hsv.v.histogram.h_avg.bin", ""),
 				new CalculatedProperty("hsv.v.histogram.s_avg.bin", ""),
 				
-				new CalculatedProperty("hsv.h.average",
+				new CalculatedProperty("hsv.h.mean",
 						"The plant average hue in the HSV/HSB colour space. The value range is normalized to a minimum of 0 and a maximum of 1. "
 								+ "Value one corresponds to non-technical descriptions of 360 degrees for this colour space."),
-				new CalculatedProperty("hsv.s.average",
+				new CalculatedProperty("hsv.s.mean",
 						"The plant average saturation in the HSV/HSB colour space. A high value indicates more 'intensive' colours, "
 								+ "low values indicate pale colours. This value ranges from 0 to 1, other software or references may utilize "
 								+ "different ranges, e.g. a maximum of 100."),
-				new CalculatedProperty("hsv.v.average",
+				new CalculatedProperty("hsv.v.mean",
 						"The plant average brightness in the HSV/HSB colour space. This value ranges from 0 to 1, other software or references "
 								+ "may utilize different ranges, e.g. a maximum of 100."),
 				
-				new CalculatedProperty("hsv.dgci.average",
+				new CalculatedProperty("hsv.dgci.mean",
 						"Numeric indication on how 'dark green' the plant appears, taking into account hue, saturation and brightness. Differs from "
 								+ "calculation in other sources in that the higher the saturation, the assumption is that the plant appears greener, and thus "
-								+ "the value is increasing in this case. The column 'side.vis.hsv.dgci_orig.average' Page 32corresponds to the unintuitive "
+								+ "the value is increasing in this case. The column 'side.vis.hsv.dgci_orig.mean' corresponds to the unintuitive "
 								+ "but documented calculation of this trait."),
 				
 				new CalculatedProperty("hsv.h.yellow2green",
@@ -443,25 +447,25 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				new CalculatedProperty("intensity.kurtosis", ""),
 				
 				new CalculatedProperty("intensity.chlorophyl.sum", ""),
-				new CalculatedProperty("intensity.chlorophyl.average",
+				new CalculatedProperty("intensity.chlorophyl.mean",
 						"A relative indicator of the red fluorescence intensity, not taking into account brightness but only "
 								+ "the color hue (red = highest intensity, yellow = no intensity). Detailed information will "
 								+ "be added to the documentation. "),
 				new CalculatedProperty("intensity.phenol.sum",
-						"The sum of the yellow fluorescence intensities of each pixel, calculated as described for 'intensity.phenol.average'."),
-				new CalculatedProperty("intensity.phenol.average",
+						"The sum of the yellow fluorescence intensities of each pixel, calculated as described for 'intensity.phenol.mean'."),
+				new CalculatedProperty("intensity.phenol.mean",
 						"A relative indicator of the yellow fluorescence intensity, not taking into account brightness but only the color hue "
 								+ "(red = no intensity, yellow = high intensity). Detailed information will be added to the documentation. "),
 				new CalculatedProperty("intensity.classic.sum", ""),
-				new CalculatedProperty("intensity.classic.average",
+				new CalculatedProperty("intensity.classic.mean",
 						"A relative indicator of the red fluorescence intensity, taking into account brightness and colour hue "
 								+ "(red = highest intensity, yellow = no intensity, bright = high intensity, dark = low intensity). "
 								+ "Detailed information will be added to the documentation. Calculation formula: ( 1 - red / (255 + green) ) / 0.825"),
 				new CalculatedProperty("intensity.phenol.chlorophyl.ratio",
 						"The ratio of trait 'intensity.chlorophyl.sum' and 'intensity.phenol.sum'."),
 				new CalculatedProperty("intensity.sum", ""),
-				new CalculatedProperty("intensity.average",
-						"Deprecated. The same as 'intensity.chlorophyl.average'. Trait may be removed at a later time point."),
+				new CalculatedProperty("intensity.mean",
+						"Deprecated. The same as 'intensity.chlorophyl.mean'. Trait may be removed at a later time point."),
 				
 				new CalculatedProperty("normalized.histogram.bin", ""),
 				new CalculatedProperty("histogram.bin", ""),
@@ -471,11 +475,11 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				
 				new CalculatedProperty("ndvi", "ndvi = (averageNir - averageVisR) / (averageNir + averageVisR))"),
 				
-				new CalculatedProperty("rgb.red.intensity.average",
+				new CalculatedProperty("rgb.red.intensity.mean",
 						"Average intensity of the red channel of the plant pixels in the visible light image."),
-				new CalculatedProperty("rgb.green.intensity.average",
+				new CalculatedProperty("rgb.green.intensity.mean",
 						"Average intensity of the green channel of the plant pixels in the visible light image."),
-				new CalculatedProperty("rgb.blue.intensity.average",
+				new CalculatedProperty("rgb.blue.intensity.mean",
 						"Average intensity of the blue channel of the plant pixels in the visible light image.")
 		
 		};

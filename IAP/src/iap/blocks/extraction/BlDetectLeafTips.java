@@ -35,17 +35,10 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	boolean ignore = false;
 	boolean debug_borderDetection;
 	double borderSize;
-	private boolean isBestAngle;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
-		this.isBestAngle = isBestAngle();
-		// search for best side image
-		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
-			if (!isBestAngle)
-				ignore = true;
-		}
 		
 		// calculation for side
 		if (!getBoolean("Process Side", true) && optionsAndResults.getCameraPosition() == CameraPosition.SIDE)
@@ -67,6 +60,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	protected Image processVISmask() {
 		if (input().masks().vis() == null)
 			return null;
+		boolean isBestAngle = isBestAngle(CameraType.VIS);
+		// search for best side image
+		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
+			if (!isBestAngle)
+				ignore = true;
+		}
 		if (getBoolean("Calculate on Visible Image", true) && !ignore) {
 			Image workimg = input().masks().vis().copy();
 			
@@ -102,6 +101,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	protected Image processFLUOmask() {
 		if (input().masks().fluo() == null)
 			return null;
+		boolean isBestAngle = isBestAngle(CameraType.FLUO);
+		// search for best side image
+		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
+			if (!isBestAngle)
+				ignore = true;
+		}
 		if (getBoolean("Calculate on Fluorescence Image", false) && !ignore) {
 			Image workimg = input().masks().fluo().copy();
 			int searchRadius = getInt("Search-radius (Fluo)", 40);
@@ -122,6 +127,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	protected Image processNIRmask() {
 		if (input().masks().nir() == null)
 			return null;
+		boolean isBestAngle = isBestAngle(CameraType.NIR);
+		// search for best side image
+		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
+			if (!isBestAngle)
+				ignore = true;
+		}
 		if (getBoolean("Calculate on Near-infrared Image", false) && !ignore) {
 			Image workimg = input().masks().nir().copy();
 			int searchRadius = getInt("Search-radius (Nir)", 15);
@@ -169,17 +180,17 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				final Vector2D direction_fin = direction.add(sub);
 				
 				getResultSet().setNumericResult(0,
-						new Trait(cameraPosition, cameraType_fin, "leaftip." + StringManipulationTools.formatNumber(index) + ".position.x"),
+						new Trait(cameraPosition, cameraType_fin, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2) + ".position.x"),
 						pos_fin.getX(), "px", this);
 				getResultSet().setNumericResult(0,
-						new Trait(cameraPosition, cameraType_fin, "leaftip." + StringManipulationTools.formatNumber(index) + ".position.y"),
+						new Trait(cameraPosition, cameraType_fin, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2) + ".position.y"),
 						pos_fin.getY(), "px", this);
 				
 				if (angle != null)
 					getResultSet()
 							.setNumericResult(
 									0,
-									new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumber(index)
+									new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2)
 											+ ".angle"),
 									angle, "degree", this);
 				index++;
@@ -224,6 +235,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		getResultSet().setNumericResult(getBlockPosition(),
 				new Trait(cameraPosition, cameraType, "leaftip.count"), count, "leaftips|SUSAN", this);
 		
+		boolean isBestAngle = isBestAngle(cameraType);
+		// search for best side image
+		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
+			if (!isBestAngle)
+				ignore = true;
+		}
 		// save leaf count for best angle
 		if (isBestAngle)
 			getResultSet().setNumericResult(getBlockPosition(),

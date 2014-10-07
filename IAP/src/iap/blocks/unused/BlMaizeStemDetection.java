@@ -167,7 +167,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock implemen
 					}
 					if (resultPrefix.isEmpty())
 						if (limbs.getN() > 0) {
-							rt.addValue(prefix + resultPrefix + ".graph.limb.length.average", limbs.getMean());
+							rt.addValue(prefix + resultPrefix + ".graph.limb.length.mean", limbs.getMean());
 							rt.addValue(prefix + resultPrefix + ".graph.limb.length.stddev", limbs.getStandardDeviation());
 							rt.addValue(prefix + resultPrefix + ".graph.limb.length.skewness", limbs.getSkewness());
 							rt.addValue(prefix + resultPrefix + ".graph.limb.length.kurtosis", limbs.getKurtosis());

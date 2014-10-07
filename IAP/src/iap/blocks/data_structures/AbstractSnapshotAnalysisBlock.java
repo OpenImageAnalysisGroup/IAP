@@ -1,18 +1,11 @@
 package iap.blocks.data_structures;
 
 import info.StopWatch;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
-import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author Christian Klukas
@@ -237,49 +230,4 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 		return null;
 	}
 	
-	public boolean isBestAngle() {
-		HashMap<String, ArrayList<BlockResultValue>> previousResults = optionsAndResults
-				.searchResultsOfCurrentSnapshot("RESULT_top.fluo.main.axis.rotation", true, getWellIdx(), null, false, null);
-		
-		double sum = 0;
-		int count = 0;
-		
-		for (ArrayList<BlockResultValue> b : previousResults.values()) {
-			for (BlockResultValue c : b) {
-				count++;
-				sum += c.getValue();
-			}
-		}
-		
-		if (count == 0) {
-			return true;
-		}
-		
-		ImageData currentImage = input().images().getAnyInfo();
-		
-		double mainRotationFromTopView = sum / count;
-		double mindist = Double.MAX_VALUE;
-		boolean currentImageIsBest = false;
-		
-		for (NumericMeasurementInterface nmi : currentImage.getParentSample()) {
-			if (nmi instanceof ImageData) {
-				Double r = ((ImageData) nmi).getPosition();
-				if (r == null)
-					r = 0d;
-				double dist = Math.abs(mainRotationFromTopView - r);
-				if (dist < mindist) {
-					mindist = dist;
-					if ((((ImageData) nmi).getPosition() + "").equals((currentImage.getPosition() + "")))
-						currentImageIsBest = true;
-					else
-						currentImageIsBest = false;
-				}
-			}
-		}
-		
-		if (!currentImageIsBest)
-			return false;
-		
-		return true;
-	}
 }

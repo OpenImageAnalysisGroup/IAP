@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.Colors;
+import org.StringManipulationTools;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
@@ -130,7 +131,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 		getResultSet().setNumericResult(getBlockPosition(),
 				new Trait(cameraPosition, cameraType, "leaftip.count"), leafList.size(), "tracked leaves|SUSAN", this);
 		
-		if (isBestAngle())
+		if (isBestAngle(cameraType))
 			getResultSet().setNumericResult(getBlockPosition(),
 					new Trait(cameraPosition, cameraType, "leaftip.count.best_angle"), leafList.size(), "tracked leaves|SUSAN", this);
 		
@@ -157,15 +158,15 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 				double span = Math.sqrt(c * c + d * d);
 				
 				getResultSet().setNumericResult(0,
-						new Trait(cameraPosition, cameraType, "leaftip." + num + ".span.orientation"),
+						new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".span.orientation"),
 						angle, "degree", this);
 				
 				getResultSet().setNumericResult(0,
-						new Trait(cameraPosition, cameraType, "leaftip." + num + ".span.norm"),
+						new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".span.norm"),
 						span_norm, "mm", this);
 				
 				getResultSet().setNumericResult(0,
-						new Trait(cameraPosition, cameraType, "leaftip." + num + ".span"),
+						new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".span"),
 						span, "px", this);
 			}
 			
@@ -176,17 +177,17 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 				angle = (Double) ltLast.getFeature("angle");
 			
 			getResultSet().setNumericResult(0,
-					new Trait(cameraPosition, cameraType, "leaftip." + num + ".position.x"),
+					new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".position.x"),
 					xPos_norm, "px", this);
 			getResultSet().setNumericResult(0,
-					new Trait(cameraPosition, cameraType, "leaftip." + num + ".position.y"),
+					new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".position.y"),
 					yPos_norm, "px", this);
 			
 			if (angle != null) {
 				getResultSet()
 						.setNumericResult(
 								0,
-								new Trait(cameraPosition, cameraType, "leaftip." + num + ".angle"),
+								new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".angle"),
 								angle, "degree", this);
 			}
 			
@@ -205,7 +206,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 					double distToCenter = Math.sqrt((cogX - lx) * (cogX - lx) + (cogY - ly) * (cogY - ly));
 					
 					getResultSet().setNumericResult(0,
-							new Trait(cameraPosition, cameraType, "leaftip." + num + ".dist_to_cog"),
+							new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".dist_to_cog"),
 							distToCenter, "px", this);
 				}
 			}
