@@ -85,7 +85,7 @@ public class GetSubstances implements Runnable {
 				String title = substanceName;
 				if (validPrefix != null && title.contains("."))
 					title = title.substring(projectNode.getTooltipInfo().length() + ".".length());
-				if (substance.getName() != null && substance.getName().contains("|"))
+				if (substance.getName() != null && title.contains("|"))
 					title = "<html>" + title.substring(0, title.lastIndexOf("|")) + " <font color='gray'><small>["
 							+ title.substring(title.lastIndexOf("|") + "|".length()) + "]";
 				if (substance.getInfo() != null && !substance.getInfo().isEmpty())

@@ -92,16 +92,18 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			CameraPosition pos = optionsAndResults.getCameraPosition();
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, img.getCameraType(), "flower.count"), featureList.size(), "flower|CENTERPOINTS", this);
+					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower.count|CENTERPOINTS"), featureList.size(), "flower", this);
 			
 			// save x and y position
 			int num = 1;
 			for (Feature p : featureList) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), "flower." + num + ".position.x"), (int) p.getPosition().getX(), "flower|CENTERPOINTS", this);
+						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".position.x|CENTERPOINTS"),
+						(int) p.getPosition().getX(), "flower", this);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), "flower." + num + ".position.y"), (int) p.getPosition().getY(), "flower|CENTERPOINTS", this);
+						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".position.y|CENTERPOINTS"),
+						(int) p.getPosition().getY(), "flower", this);
 				num++;
 			}
 		}

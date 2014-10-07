@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks.properties;
 
 import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashMap;
@@ -48,39 +49,39 @@ public enum PropertyNames {
 	public Trait getName(CameraPosition pos) {
 		switch (this) {
 			case RESULT_VIS_MARKER_POS_1_LEFT_Y:
-				return new Trait(pos, CameraType.VIS, "marker.1.left.y");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.1.left.y");
 			case RESULT_VIS_MARKER_POS_1_RIGHT_Y:
-				return new Trait(pos, CameraType.VIS, "marker.1.right.y");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.1.right.y");
 				
 			case RESULT_VIS_MARKER_POS_2_LEFT_Y:
-				return new Trait(pos, CameraType.VIS, "marker.2.left.y");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.2.left.y");
 			case RESULT_VIS_MARKER_POS_2_RIGHT_Y:
-				return new Trait(pos, CameraType.VIS, "marker.2.right.y");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.2.right.y");
 				
 			case RESULT_VIS_MARKER_POS_3_LEFT_Y:
-				return new Trait(pos, CameraType.VIS, "marker.3.left.y");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.3.left.y");
 			case RESULT_VIS_MARKER_POS_3_RIGHT_Y:
-				return new Trait(pos, CameraType.VIS, "marker.3.right.y");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.3.right.y");
 				
 			case RESULT_VIS_MARKER_POS_1_LEFT_X:
-				return new Trait(pos, CameraType.VIS, "marker.1.left.x");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.1.left.x");
 			case RESULT_VIS_MARKER_POS_1_RIGHT_X:
-				return new Trait(pos, CameraType.VIS, "marker.1.right.x");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.1.right.x");
 				
 			case RESULT_VIS_MARKER_POS_2_LEFT_X:
-				return new Trait(pos, CameraType.VIS, "marker.2.left.x");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.2.left.x");
 			case RESULT_VIS_MARKER_POS_2_RIGHT_X:
-				return new Trait(pos, CameraType.VIS, "marker.2.right.x");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.2.right.x");
 				
 			case RESULT_VIS_MARKER_POS_3_LEFT_X:
-				return new Trait(pos, CameraType.VIS, "marker.3.left.x");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.3.left.x");
 			case RESULT_VIS_MARKER_POS_3_RIGHT_X:
-				return new Trait(pos, CameraType.VIS, "marker.3.right.x");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.3.right.x");
 				
 			case MARKER_DISTANCE_BOTTOM_TOP_LEFT:
-				return new Trait(pos, CameraType.VIS, "marker.vertical_distance.left_1_2");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.vertical_distance.left_1_2");
 			case MARKER_DISTANCE_BOTTOM_TOP_RIGHT:
-				return new Trait(pos, CameraType.VIS, "marker.vertical_distance.right_1_2");
+				return new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "marker.vertical_distance.right_1_2");
 		}
 		return null;
 	}

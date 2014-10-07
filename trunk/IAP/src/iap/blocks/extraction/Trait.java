@@ -7,9 +7,16 @@ public class Trait {
 	
 	private final String name;
 	
-	public Trait(CameraPosition cameraPosition, CameraType ct, String trait) {
-		// this.name = "RESULT_" + cameraPosition + "." + ct + "." + trait;
-		this.name = "RESULT_" + trait + "." + ct + "." + cameraPosition;
+	public Trait(CameraPosition cameraPosition, CameraType ct, TraitCategory cat, String trait) {
+		boolean v1 = true;
+		if (v1)
+			this.name = "RESULT_" + cat + "." + cameraPosition + "." + ct + "." + trait;
+		else
+			if (trait.contains("|"))
+				this.name = "RESULT_" + trait.split("\\|")[0] + "." + ct + "."
+						+ cameraPosition + "|" + trait.split("\\|")[1];
+			else
+				this.name = "RESULT_" + trait + "." + ct + "." + cameraPosition + "." + cat;
 	}
 	
 	public Trait(String name) {

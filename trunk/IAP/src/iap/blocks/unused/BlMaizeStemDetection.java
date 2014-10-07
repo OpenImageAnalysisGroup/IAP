@@ -5,6 +5,7 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.extraction.TraitCategory;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -110,7 +111,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock implemen
 		}
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
-		getResultSet().storeResults(cp(), CameraType.VIS, rt, getBlockPosition(), this);
+		getResultSet().storeResults(cp(), CameraType.VIS, TraitCategory.GEOMETRY, rt, getBlockPosition(), this);
 		Image ress = ioClusteredSkeltonImage.bm().dilate(20).getImage();
 		return ress;
 	}

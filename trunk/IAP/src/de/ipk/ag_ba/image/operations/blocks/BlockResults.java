@@ -4,6 +4,7 @@ import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
@@ -343,13 +344,13 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized void storeResults(CameraPosition cp, CameraType ct,
+	public synchronized void storeResults(CameraPosition cp, CameraType ct, TraitCategory cat,
 			ResultsTableWithUnits numericResults, int position, CalculatesProperties description) {
-		storeResults(cp, ct, null, numericResults, position, description);
+		storeResults(cp, ct, cat, null, numericResults, position, description);
 	}
 	
 	@Override
-	public synchronized void storeResults(CameraPosition cp, CameraType ct, String id_postfix,
+	public synchronized void storeResults(CameraPosition cp, CameraType ct, TraitCategory cat, String id_postfix,
 			ResultsTableWithUnits numericResults, int position, CalculatesProperties description) {
 		if (description == null)
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No valid property-calculator object provided. "
@@ -360,7 +361,8 @@ public class BlockResults implements BlockResultSet {
 				double val = numericResults.getValueAsDouble(col, row);
 				String unit = numericResults.getColumnHeadingUnit(col);
 				if (!Double.isNaN(val))
-					setNumericResult(position, new Trait(cp, ct, id + (id_postfix != null && !id_postfix.isEmpty() ? "." + id_postfix : "")), val, unit, description);
+					setNumericResult(position, new Trait(cp, ct, cat, id + (id_postfix != null && !id_postfix.isEmpty() ?
+							(id_postfix.startsWith("|") ? "" : ".") + id_postfix : "")), val, unit, description);
 			}
 		}
 	}

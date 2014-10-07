@@ -1,6 +1,7 @@
 package iap.blocks.data_structures;
 
 import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import ij.WindowManager;
@@ -625,7 +626,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected boolean isBestAngle(CameraType ct) {
 		HashMap<String, ArrayList<BlockResultValue>> previousResults = optionsAndResults
-				.searchResultsOfCurrentSnapshot(new Trait(CameraPosition.TOP, ct, "main_axis.rotation").toString(), true, getWellIdx(), null, false, null);
+				.searchResultsOfCurrentSnapshot(new Trait(CameraPosition.TOP, ct, TraitCategory.GEOMETRY, "main_axis.rotation").toString(), true, getWellIdx(),
+						null, false, null);
 		
 		double sum = 0;
 		int count = 0;

@@ -6,6 +6,7 @@ import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
@@ -124,9 +125,10 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 					optionsAndResults.setCalculatedBlueMarkerDistance(clusterDimensions[minRatioPositionInClusterArray].x
 							/ optionsAndResults.getREAL_MARKER_DISTANCE() * valrs);
 					getResultSet()
-							.setNumericResult(getBlockPosition(), new Trait(pos, CameraType.VIS, "optics.ruler_length.detected"),
+							.setNumericResult(getBlockPosition(), new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "ruler_length.detected"),
 									clusterDimensions[minRatioPositionInClusterArray].x, "px", this);
-					getResultSet().setNumericResult(getBlockPosition(), new Trait(pos, CameraType.VIS, "optics.ruler_length.real"), valrs, "mm", this);
+					getResultSet().setNumericResult(getBlockPosition(), new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "ruler_length.real"),
+							valrs, "mm", this);
 				}
 			}
 			

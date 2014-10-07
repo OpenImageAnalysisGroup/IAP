@@ -59,10 +59,12 @@ public class BlCalcMainAxis
 						/ macr.getMinResult().getPixelCount()
 						/ macr.getMinResult().getPixelCount();
 				
-				getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, "main.axis.rotation"), angle,
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, TraitCategory.GEOMETRY, "main_axis.rotation"), angle,
 						"degree", this);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, "main.axis.normalized.distance.avg"), normalizedDistanceToMainAxis, this);
+						new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, TraitCategory.GEOMETRY, "main_axis.normalized.distance.avg"),
+						normalizedDistanceToMainAxis, this);
 			}
 		}
 		return input().masks().fluo();
@@ -104,11 +106,11 @@ public class BlCalcMainAxis
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("main.axis.rotation",
+				new CalculatedProperty("main_axis.rotation",
 						"The orientation of the line (in degree), 0 indicates horizontal orientation "
 								+ "(when looking at the top-image), 90 means orientation from top to bottom "
 								+ "(when looking at the image)."),
-				new CalculatedProperty("main.axis.normalized.distance.avg",
+				new CalculatedProperty("main_axis.normalized.distance.avg",
 						"A centre line is calculated by detecting a line crossing the "
 								+ "centre of the image. This line is oriented so that the sum of "
 								+ "the distances of the plant pixels to this line is minimal. For "
