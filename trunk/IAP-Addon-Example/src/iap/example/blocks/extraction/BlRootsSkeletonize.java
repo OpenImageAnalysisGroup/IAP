@@ -123,7 +123,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 		}
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
-		getResultSet().storeResults("RESULT_", rt, getBlockPosition(), this);
+		getResultSet().storeResults(optionsAndResults.getCameraPosition(), CameraType.VIS, rt, getBlockPosition(), this);
 		// Image skel = ioClusteredSkeltonImage.bm().dilate(getInt("Dilate for section detection", 5)).getImage();
 		for (RunnableOnImage roi : postProcessing) {
 			getResultSet().addImagePostProcessor(CameraType.VIS, null, roi);
