@@ -166,7 +166,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 					}
 					if (resultPrefix.isEmpty())
 						if (limbs.getN() > 0) {
-							rt.addValue("roots" + resultPrefix + ".graph.edges.length.average", limbs.getMean());
+							rt.addValue("roots" + resultPrefix + ".graph.edges.length.mean", limbs.getMean());
 							rt.addValue("roots" + resultPrefix + ".graph.edges.length.stddev", limbs.getStandardDeviation());
 							rt.addValue("roots" + resultPrefix + ".graph.edges.length.skewness", limbs.getSkewness());
 							rt.addValue("roots" + resultPrefix + ".graph.edges.length.kurtosis", limbs.getKurtosis());
@@ -268,9 +268,9 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 		if (rt != null)
 			rt.addValue(pre + "roots.skeleton.endpoints", eps.size());
 		if (rt != null && len > 0)
-			rt.addValue(pre + "roots.width.area_based.average", n / (double) len);
+			rt.addValue(pre + "roots.width.area_based.mean", n / (double) len);
 		if (rt != null)
-			rt.addValue(pre + "roots.width.fractional.average", sumGray / len);
+			rt.addValue(pre + "roots.width.fractional.mean", sumGray / len);
 		return img;
 	}
 	
@@ -318,7 +318,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 							int endTipps = SkeletonProcessor2d.countEndPoints(skeletonImage.copy().getImage());
 							rt.addValue("roots.volume.skeleton_dist_based", Math.PI * (1 + skelStat.getMean()) * (1 + skelStat.getMean())
 									* (endTipps * skelStat.getMean() + skelStat.getN() / 2d));
-							rt.addValue("roots.width.skeleton_based.average", (1 + skelStat.getMean()));
+							rt.addValue("roots.width.skeleton_based.mean", (1 + skelStat.getMean()));
 							if (getBoolean("Calculate Graph Diameters", false)) {
 								graphAnalysis(getClusterIDarray(image.copy().bm().dilate(5).io()),
 										new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
@@ -467,7 +467,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 				new CalculatedProperty("graph.leafnodes", "Number of end-points (leaf-nodes) in the skeleton graph."),
 				new CalculatedProperty("graph.nodes", "Number of nodes (leaf-nodes and 'branch'-nodes) in the skeleton graph."),
 				new CalculatedProperty("graph.edges", "Number of edges (root segments) in the skeleton graph."),
-				new CalculatedProperty("graph.edges.length.average", "Average length of skeleton-graph segments."),
+				new CalculatedProperty("graph.edges.length.mean", "Average length of skeleton-graph segments."),
 				new CalculatedProperty("graph.edges.length.stddev", "Standard deviation of the lengths of skeleton-graph segments."),
 				new CalculatedProperty("graph.edges.length.skewness", "'Skewness' of the lengths of skeleton-graph segments."),
 				new CalculatedProperty("graph.edges.length.kurtosis", "'Kurtosis' deviation of the lengths of skeleton-graph segments."),
@@ -484,10 +484,10 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 				new CalculatedProperty("roots.skeleton.length", "Skeleton length of the foreground area."),
 				new CalculatedProperty("roots.skeleton.branchpoints", "Number of branchpoints of the skeleton."),
 				new CalculatedProperty("roots.skeleton.endpoints", "Number of endpoints of the skeleton."),
-				new CalculatedProperty("roots.width.area_based.average", "Foreground area divided by skeleton length."),
-				new CalculatedProperty("roots.width.fractional.average", "!todo"),
+				new CalculatedProperty("roots.width.area_based.mean", "Foreground area divided by skeleton length."),
+				new CalculatedProperty("roots.width.fractional.mean", "!todo"),
 				new CalculatedProperty("roots.volume.skeleton_dist_based", "!todo"),
-				new CalculatedProperty("roots.width.skeleton_based.average", "!todo"),
+				new CalculatedProperty("roots.width.skeleton_based.mean", "!todo"),
 				new CalculatedProperty("roots.skeleton.width.*.length", "!todo"),
 				new CalculatedProperty("roots.volume.histogram_based", "!todo")
 		};
