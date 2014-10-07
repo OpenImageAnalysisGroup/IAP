@@ -169,18 +169,18 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				final Vector2D direction_fin = direction.add(sub);
 				
 				getResultSet().setNumericResult(0,
-						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".x",
+						new Trait(cameraPosition, cameraType_fin, "leaftip." + StringManipulationTools.formatNumber(index) + ".position.x"),
 						pos_fin.getX(), "px", this);
 				getResultSet().setNumericResult(0,
-						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index) + ".y",
+						new Trait(cameraPosition, cameraType_fin, "leaftip." + StringManipulationTools.formatNumber(index) + ".position.y"),
 						pos_fin.getY(), "px", this);
 				
 				if (angle != null)
 					getResultSet()
 							.setNumericResult(
 									0,
-									"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaftip." + StringManipulationTools.formatNumber(index)
-											+ ".angle",
+									new Trait(cameraPosition, cameraType, "leaftip." + StringManipulationTools.formatNumber(index)
+											+ ".angle"),
 									angle, "degree", this);
 				index++;
 				
@@ -222,12 +222,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	private void saveLeafCount(CameraType cameraType, CameraPosition cameraPosition, int count) {
 		// save leaf count
 		getResultSet().setNumericResult(getBlockPosition(),
-				"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count", count, "leaftips|SUSAN", this);
+				new Trait(cameraPosition, cameraType, "leaftip.count"), count, "leaftips|SUSAN", this);
 		
 		// save leaf count for best angle
 		if (isBestAngle)
 			getResultSet().setNumericResult(getBlockPosition(),
-					"RESULT_" + cameraPosition + "." + cameraType + ".leaftip.count.best_angle", count, "leaftips|SUSAN", this);
+					new Trait(cameraPosition, cameraType, "leaftip.count.best_angle"), count, "leaftips|SUSAN", this);
 	}
 	
 	private void saveLeafTipList(LinkedList<Feature> peakList, CameraType cameraType, int maxValidY) {

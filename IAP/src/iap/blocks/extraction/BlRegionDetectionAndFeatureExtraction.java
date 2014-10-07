@@ -89,19 +89,19 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		}
 		
 		if (saveResults) {
-			String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
+			CameraPosition pos = optionsAndResults.getCameraPosition();
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					pos + img.getCameraType() + ".flower.count", featureList.size(), "flower|CENTERPOINTS", this);
+					new Trait(pos, img.getCameraType(), "flower.count"), featureList.size(), "flower|CENTERPOINTS", this);
 			
 			// save x and y position
 			int num = 1;
 			for (Feature p : featureList) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						pos + img.getCameraType() + ".flower.x" + "." + num, (int) p.getPosition().getX(), "flower|CENTERPOINTS", this);
+						new Trait(pos, img.getCameraType(), "flower." + num + ".position.x"), (int) p.getPosition().getX(), "flower|CENTERPOINTS", this);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
-						pos + img.getCameraType() + ".flower.y" + "." + num, (int) p.getPosition().getY(), "flower|CENTERPOINTS", this);
+						new Trait(pos, img.getCameraType(), "flower." + num + ".position.y"), (int) p.getPosition().getY(), "flower|CENTERPOINTS", this);
 				num++;
 			}
 		}
@@ -145,9 +145,9 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("flower.count", "!todo"),
-				new CalculatedProperty("flower.x", "!todo"),
-				new CalculatedProperty("flower.y", "!todo"),
+				new CalculatedProperty("flower.count", "Number of detected flowers."),
+				new CalculatedProperty("flower.*.position.x", "Position (X-axis) of a detected flower."),
+				new CalculatedProperty("flower.*.position.y", "Position (Y-axis) of a detected flower."),
 		};
 	}
 }

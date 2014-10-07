@@ -1,5 +1,6 @@
 package iap.blocks.data_structures;
 
+import iap.blocks.extraction.Trait;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
@@ -22,6 +23,12 @@ public class CalculatedProperty implements CalculatedPropertyDescription {
 	public CalculatedProperty(String name, String desc) {
 		this.isAbsolute = false;
 		this.name = name;
+		this.desc = desc;
+	}
+	
+	public CalculatedProperty(Trait trait, String desc) {
+		this.isAbsolute = false;
+		this.name = trait.toString();
 		this.desc = desc;
 	}
 	

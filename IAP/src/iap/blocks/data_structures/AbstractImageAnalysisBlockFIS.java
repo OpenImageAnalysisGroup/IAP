@@ -1,6 +1,8 @@
 package iap.blocks.data_structures;
 
+import iap.blocks.extraction.Trait;
 import iap.pipelines.ImageProcessorOptionsAndResults;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import ij.WindowManager;
 import info.StopWatch;
 import info.clearthought.layout.TableLayout;
@@ -256,7 +258,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 							if (rl != null)
 								for (BlockResultValue bpv : rl) {
 									summaryResult.setNumericResult(getBlockPosition(),
-											bpv.getName(), bpv.getValue(), bpv.getUnit(), propertyCalculator);
+											new Trait(bpv.getName()), bpv.getValue(), bpv.getUnit(), propertyCalculator);
 								}
 						}
 					}
@@ -378,13 +380,15 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 									double days = (time - prop2config2tray2lastTime.get(property).get(configName).get(tray)) / timeForOneDayD;
 									double ratioPerDay = Math.pow(ratio, 1d / days);
 									if (relRaw)
-										summaryResult.setNumericResult(blockPosition, property + ".relative.raw", ratioPerDay, "relative/day", propertyCalculator);
+										summaryResult.setNumericResult(blockPosition, new Trait(property + ".relative.raw"), ratioPerDay, "relative/day",
+												propertyCalculator);
 									double perc = (ratioPerDay - 1) * 100d;
 									if (relPer)
-										summaryResult.setNumericResult(blockPosition, property + ".relative.percent", perc, "percent change/day", propertyCalculator);
+										summaryResult.setNumericResult(blockPosition, new Trait(property + ".relative.percent"), perc, "percent change/day",
+												propertyCalculator);
 									double growth = (Math.log(currentPropertyValue) - Math.log(lastPropertyValue)) / days;
 									if (relLog)
-										summaryResult.setNumericResult(blockPosition, property + ".relative.log", growth, "relative/day", propertyCalculator);
+										summaryResult.setNumericResult(blockPosition, new Trait(property + ".relative.log"), growth, "relative/day", propertyCalculator);
 								}
 							}
 							
@@ -608,5 +612,13 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				}
 			}
 		}
+	}
+	
+	protected CameraPosition getCameraPosition() {
+		return optionsAndResults.getCameraPosition();
+	}
+	
+	protected CameraPosition cp() {
+		return getCameraPosition();
 	}
 }

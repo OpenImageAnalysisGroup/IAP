@@ -29,12 +29,12 @@ public class BlCalcConvexHull extends AbstractBlock implements CalculatesPropert
 		if (mask == null)
 			return mask;
 		if (getBoolean("process " + mask.getCameraType().name() + " mask", mask.getCameraType() == CameraType.VIS || mask.getCameraType() == CameraType.FLUO))
-			return processImage(mask.getCameraType().name().toLowerCase() + ".", mask);
+			return processImage(optionsAndResults.getCameraPosition(), mask.getCameraType(), mask);
 		else
 			return mask;
 	}
 	
-	private Image processImage(String prefix, Image image) {
+	private Image processImage(CameraPosition cp, CameraType ct, Image image) {
 		boolean debug = getBoolean("debug", false);
 		
 		ResultsTableWithUnits numericResults;
@@ -47,7 +47,7 @@ public class BlCalcConvexHull extends AbstractBlock implements CalculatesPropert
 		boolean drawMinRect = getBoolean("draw_retangle", true);
 		boolean drawCircle = getBoolean("draw_circle", true);
 		
-		ImageOperation res = new ImageOperation(image).show(prefix + " input image", debug).hull()
+		ImageOperation res = new ImageOperation(image).show(ct + " input image", debug).hull()
 				.find(getResultSet(), true, false,
 						drawHull, drawPCLine, drawHull, drawMinRect, drawCircle,
 						Color.RED.getRGB(),
@@ -60,11 +60,11 @@ public class BlCalcConvexHull extends AbstractBlock implements CalculatesPropert
 		numericResults = res.getResultsTable();
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
 			getResultSet().storeResults(
-					"RESULT_side." + prefix, numericResults,
+					cp, ct, numericResults,
 					getBlockPosition(), this);
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && numericResults != null)
 			getResultSet().storeResults(
-					"RESULT_top." + prefix, numericResults, getBlockPosition(), this);
+					cp, ct, numericResults, getBlockPosition(), this);
 		
 		res.getImage().show("output image", debug);
 		

@@ -5,6 +5,7 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.extraction.Trait;
 import info.StopWatch;
 
 import java.io.File;
@@ -59,7 +60,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 		Image fi = input().masks() != null ? input().masks().vis() : null;
 		if (!getBoolean("Process Fluo Instead of Vis", false)) {
 			if (fi != null) {
-				getResultSet().setImage(getBlockPosition(), "img.3D", fi, false);
+				getResultSet().setImage(getBlockPosition(), "img.3D." + CameraType.VIS, fi, false);
 			}
 		}
 		return fi;
@@ -70,7 +71,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 		Image fi = input().masks() != null ? input().masks().fluo() : null;
 		if (getBoolean("Process Fluo Instead of Vis", false)) {
 			if (fi != null) {
-				getResultSet().setImage(getBlockPosition(), "img.3D", fi, false);
+				getResultSet().setImage(getBlockPosition(), "img.3D." + CameraType.FLUO, fi, false);
 			}
 		}
 		return fi;
@@ -89,185 +90,186 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 		synchronized (this.getClass()) {
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Generate 3D-Model");
-			
-			for (Long time : time2inSamples.keySet()) {
-				Sample3D inSample = time2inSamples.get(time);
-				TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
-				if (!time2summaryResult.containsKey(time)) {
-					time2summaryResult.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-					time2summaryResult.get(time).put("-720", new HashMap<Integer, BlockResultSet>());
-				}
-				TreeSet<Integer> allTrays = new TreeSet<Integer>();
-				for (String key : allResultsForSnapshot.keySet()) {
-					allTrays.addAll(allResultsForSnapshot.get(key).keySet());
-				}
-				if (time2summaryResult.get(time).get("-720").isEmpty())
-					for (Integer knownTray : allTrays)
-						time2summaryResult.get(time).get("-720").put(knownTray, new BlockResults(null));
-				for (Integer tray : time2summaryResult.get(time).get("-720").keySet()) {
+			for (CameraType ct : new CameraType[] { CameraType.VIS, CameraType.FLUO })
+				for (Long time : time2inSamples.keySet()) {
+					Sample3D inSample = time2inSamples.get(time);
+					TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+					if (!time2summaryResult.containsKey(time)) {
+						time2summaryResult.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+						time2summaryResult.get(time).put("-720", new HashMap<Integer, BlockResultSet>());
+					}
+					TreeSet<Integer> allTrays = new TreeSet<Integer>();
 					for (String key : allResultsForSnapshot.keySet()) {
-						BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-						if (rt == null || rt.isNumericStoreEmpty())
-							continue;
-						BlockResultSet summaryResult = time2summaryResult.get(time).get("-720").get(tray);
-						
-						int voxelresolution = getInt("Voxel Resolution", 500);
-						int widthFactor = getInt("Content Width", 40);
-						GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
-						
-						ThreeDmodelGenerator mg = new ThreeDmodelGenerator(voxelresolution, widthFactor,
-								getInt("Probability Threshold", 100));
-						mg.setCameraDistance(getInt("Camera Distance", 3200));
-						mg.setCubeSideLength(getInt("Visible Box Size X", 300), getInt("Visible Box Size Y", 300), getInt("Visible Box Size Z", 300));
-						
-						ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
-						Double distHorizontal = null;
-						Double realMarkerDistHorizontal = null;
-						if (allResultsForSnapshot != null && allResultsForSnapshot.keySet() != null)
-							for (String angle : allResultsForSnapshot.keySet()) {
-								if (allResultsForSnapshot.get(angle) == null)
-									continue;
-								BlockResultSet bp = allResultsForSnapshot.get(angle).get(tray);
-								if (bp == null)
-									continue;
-								if (distHorizontal == null)
-									distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
-								
-								if (distHorizontal == null)
-									if (angle.startsWith("2nd_side")) {
-										BlockResult val = bp.searchNumericResult(0, 0, "side" + ".optics.blue_marker_distance");
-										if (val != null)
-											distHorizontal = val.getValue();
-									}
-								realMarkerDistHorizontal = optionsAndResults.getREAL_MARKER_DISTANCE();
-								Image vis = bp.getImage("img.3D");
-								bp.setImage(getBlockPosition(), "img.3D", (Image) null, true);
-								if (angle.startsWith("2nd_side"))
-									if (vis != null) {
-										MyPicture p = new MyPicture();
-										double ang = Double.parseDouble(angle.substring(angle.indexOf(";") + ";".length()));
-										p.setPictureData(vis, ang / 180d * Math.PI, mg);
-										pictures.add(p);
-									}
-							}
-						if (pictures.size() > 2) {
-							mg.setRoundViewImages(pictures);
-							mg.calculateModel(null/* optStatus */, modeOfOperation, 0, false);
-							// the cube is a true cube (dim X,Y,Z are equal), the
-							// input images are stretched to the target square
-							// therefore, the actual volume calculation needs to consider
-							// the source dimensions of the voxels, and therefore a un-stretch
-							// calculation needs to be performed to error-correct the calculated volume
-							int[][][] cube = mg.getRGBcubeResult();
+						allTrays.addAll(allResultsForSnapshot.get(key).keySet());
+					}
+					if (time2summaryResult.get(time).get("-720").isEmpty())
+						for (Integer knownTray : allTrays)
+							time2summaryResult.get(time).get("-720").put(knownTray, new BlockResults(null));
+					for (Integer tray : time2summaryResult.get(time).get("-720").keySet()) {
+						for (String key : allResultsForSnapshot.keySet()) {
+							BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
+							if (rt == null || rt.isNumericStoreEmpty())
+								continue;
+							BlockResultSet summaryResult = time2summaryResult.get(time).get("-720").get(tray);
 							
-							int solidVoxels = 0;
-							long cogX = 0;
-							long cogY = 0;
-							long cogZ = 0;
-							for (int x = 0; x < voxelresolution; x++) {
-								int[][] cubeYZ = cube[x];
-								for (int y = 0; y < voxelresolution; y++) {
-									int[] cubeZ = cubeYZ[y];
-									for (int z = 0; z < voxelresolution; z++) {
-										int c = cubeZ[z];
-										// if voxel can be considered not transparent (solid)
-										// add voxel volume to the result
-										boolean solid = c != ImageOperation.BACKGROUND_COLORint;
-										if (solid) {
-											solidVoxels++;
-											cogX += x;
-											cogY += y;
-											cogZ += z;
+							int voxelresolution = getInt("Voxel Resolution", 500);
+							int widthFactor = getInt("Content Width", 40);
+							GenerationMode modeOfOperation = GenerationMode.COLORED_RGBA;
+							
+							ThreeDmodelGenerator mg = new ThreeDmodelGenerator(voxelresolution, widthFactor,
+									getInt("Probability Threshold", 100));
+							mg.setCameraDistance(getInt("Camera Distance", 3200));
+							mg.setCubeSideLength(getInt("Visible Box Size X", 300), getInt("Visible Box Size Y", 300), getInt("Visible Box Size Z", 300));
+							
+							ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
+							Double distHorizontal = null;
+							Double realMarkerDistHorizontal = null;
+							if (allResultsForSnapshot != null && allResultsForSnapshot.keySet() != null)
+								for (String angle : allResultsForSnapshot.keySet()) {
+									if (allResultsForSnapshot.get(angle) == null)
+										continue;
+									BlockResultSet bp = allResultsForSnapshot.get(angle).get(tray);
+									if (bp == null)
+										continue;
+									if (distHorizontal == null)
+										distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
+									
+									if (distHorizontal == null)
+										if (angle.startsWith("2nd_side")) {
+											BlockResult val = bp.searchNumericResult(0, 0, new Trait(cp(), ct, "optics.blue_marker_distance"));
+											if (val != null)
+												distHorizontal = val.getValue();
+										}
+									realMarkerDistHorizontal = optionsAndResults.getREAL_MARKER_DISTANCE();
+									Image vis = bp.getImage("img.3D." + ct);
+									bp.setImage(getBlockPosition(), "img.3D." + ct, (Image) null, true);
+									if (angle.startsWith("2nd_side"))
+										if (vis != null) {
+											MyPicture p = new MyPicture();
+											double ang = Double.parseDouble(angle.substring(angle.indexOf(";") + ";".length()));
+											p.setPictureData(vis, ang / 180d * Math.PI, mg);
+											pictures.add(p);
+										}
+								}
+							if (pictures.size() > 2) {
+								mg.setRoundViewImages(pictures);
+								mg.calculateModel(null/* optStatus */, modeOfOperation, 0, false);
+								// the cube is a true cube (dim X,Y,Z are equal), the
+								// input images are stretched to the target square
+								// therefore, the actual volume calculation needs to consider
+								// the source dimensions of the voxels, and therefore a un-stretch
+								// calculation needs to be performed to error-correct the calculated volume
+								int[][][] cube = mg.getRGBcubeResult();
+								
+								int solidVoxels = 0;
+								long cogX = 0;
+								long cogY = 0;
+								long cogZ = 0;
+								for (int x = 0; x < voxelresolution; x++) {
+									int[][] cubeYZ = cube[x];
+									for (int y = 0; y < voxelresolution; y++) {
+										int[] cubeZ = cubeYZ[y];
+										for (int z = 0; z < voxelresolution; z++) {
+											int c = cubeZ[z];
+											// if voxel can be considered not transparent (solid)
+											// add voxel volume to the result
+											boolean solid = c != ImageOperation.BACKGROUND_COLORint;
+											if (solid) {
+												solidVoxels++;
+												cogX += x;
+												cogY += y;
+												cogZ += z;
+											}
 										}
 									}
 								}
-							}
-							double vv = 1;
-							double plantVolume = vv * solidVoxels;
-							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.volume", plantVolume, "voxel", this);
-							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.x", cogX / solidVoxels, "voxel", this);
-							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.y", cogY / solidVoxels, "voxel", this);
-							summaryResult.setNumericResult(0, "RESULT_volume.plant3d.cog.z", cogZ / solidVoxels, "voxel", this);
-							if (distHorizontal != null) {
-								double corr = realMarkerDistHorizontal / distHorizontal;
-								summaryResult.setNumericResult(0, "RESULT_volume.plant3d.volume.norm", plantVolume * corr * corr * corr, "mm^3", this);
-							}
-							
-							boolean saveVolumeDataset = getBoolean("Save Volume Dataset", false);
-							LoadedVolumeExtension volume = null;
-							Sample sample = inSample;
-							volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResultCopy());
-							
-							HashSet<Integer> replicateIDsOfSampleMeasurements = new HashSet<Integer>();
-							for (Measurement m : sample) {
-								replicateIDsOfSampleMeasurements.add(m.getReplicateID());
-								if (volume.getQualityAnnotation() == null && m instanceof NumericMeasurement3D
-										&& ((NumericMeasurement3D) m).getQualityAnnotation() != null)
-									volume.setQualityAnnotation(((NumericMeasurement3D) m).getQualityAnnotation());
-							}
-							
-							int replicateID = -1;
-							if (replicateIDsOfSampleMeasurements.size() == 1)
-								replicateID = replicateIDsOfSampleMeasurements.iterator().next();
-							else
-								System.out.println(SystemAnalysis.getCurrentTime()
-										+ ">ERROR: 3D Volume generation block didn't find the expected single sample measurement replicate ID. It found "
-										+ replicateIDsOfSampleMeasurements.size() + " differing replicate IDs, instead! The generated volume possibly can't be related" +
-										"to a single set of side views of a single Snapshot. This is a internal error.");
-							volume.setReplicateID(replicateID);
-							
-							volume.setVoxelsizeX(25f * 400 / voxelresolution);
-							volume.setVoxelsizeY(25f * 400 / voxelresolution * (100d / widthFactor));
-							volume.setVoxelsizeZ(25f * 400 / voxelresolution);
-							
-							volume.setDimensionX(voxelresolution);
-							volume.setDimensionY(voxelresolution);
-							volume.setDimensionZ(voxelresolution);
-							
-							if (volume.getURL() == null)
-								volume.setURL(new IOurl(LoadedDataHandler.PREFIX, "", ""));
-							volume.getURL().setFileName(
-									""
-											+ volume.getQualityAnnotation()
-											+ "_"
-											+ StringManipulationTools.getFileSystemName(SystemAnalysis.getCurrentTimeInclSec(volume.getParentSample()
-													.getSampleFineTimeOrRowId())) + ".argb_volume");
-							
-							volume.setColorDepth(VolumeColorDepth.RGBA.toString());
-							if (saveVolumeDataset) {
-								summaryResult.setVolume("RESULT_volume.plant3d.cube", volume);
-							}
-							if (getBoolean("Debug - Save 3D-Render to Desktop", false)) {
-								try {
-									File f = new File(SystemAnalysis.getDesktopFolder() + "/render_" + time + "_" + volume.getURL().getFileName() + ".gif");
-									MyByteArrayInputStream cnt = volume.getSideViewGif(800, 600, optStatus);
-									ResourceIOManager.copyContent(cnt, new FileOutputStream(f));
-								} catch (Exception e) {
-									ErrorMsg.addErrorMessage(e);
+								double vv = 1;
+								double plantVolume = vv * solidVoxels;
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.volume"), plantVolume, "voxel", this);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.cog.x"), cogX / solidVoxels, "voxel", this);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.cog.y"), cogY / solidVoxels, "voxel", this);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.cog.z"), cogZ / solidVoxels, "voxel", this);
+								if (distHorizontal != null) {
+									double corr = realMarkerDistHorizontal / distHorizontal;
+									summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.volume.norm"), plantVolume * corr * corr * corr, "mm^3", this);
 								}
-							}
-							boolean create3Dskeleton = getBoolean("Calculate 3D Skeleton", true);
-							boolean save3Dskeleton = getBoolean("Save 3D Skeleton", false);
-							if (create3Dskeleton) {
-								if (optStatus != null)
-									optStatus.setCurrentStatusText1("Create 3-D skeleton");
-								createSimpleDefaultSkeleton(summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube,
-										(LoadedVolume) volume.clone(volume.getParentSample()), save3Dskeleton);
-							}
-							boolean create3DadvancedProbabilitySkeleton = getBoolean("Calculate 3-D probability skeleton", true);
-							boolean save3DadvancedProbabilitySkeleton = getBoolean("Save 3-D probability skeleton", false);
-							if (create3DadvancedProbabilitySkeleton) {
-								if (optStatus != null)
-									optStatus.setCurrentStatusText1("Calculate 3-D probability skeleton");
-								int[][][] probabilityCube = mg.getByteCubeResult();
-								createAdvancedProbabilitySkeleton(
-										summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube,
-										(LoadedVolume) volume.clone(volume.getParentSample()), save3DadvancedProbabilitySkeleton);
+								
+								boolean saveVolumeDataset = getBoolean("Save Volume Dataset", false);
+								LoadedVolumeExtension volume = null;
+								Sample sample = inSample;
+								volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResultCopy());
+								
+								HashSet<Integer> replicateIDsOfSampleMeasurements = new HashSet<Integer>();
+								for (Measurement m : sample) {
+									replicateIDsOfSampleMeasurements.add(m.getReplicateID());
+									if (volume.getQualityAnnotation() == null && m instanceof NumericMeasurement3D
+											&& ((NumericMeasurement3D) m).getQualityAnnotation() != null)
+										volume.setQualityAnnotation(((NumericMeasurement3D) m).getQualityAnnotation());
+								}
+								
+								int replicateID = -1;
+								if (replicateIDsOfSampleMeasurements.size() == 1)
+									replicateID = replicateIDsOfSampleMeasurements.iterator().next();
+								else
+									System.out.println(SystemAnalysis.getCurrentTime()
+											+ ">ERROR: 3D Volume generation block didn't find the expected single sample measurement replicate ID. It found "
+											+ replicateIDsOfSampleMeasurements.size()
+											+ " differing replicate IDs, instead! The generated volume possibly can't be related" +
+											"to a single set of side views of a single Snapshot. This is a internal error.");
+								volume.setReplicateID(replicateID);
+								
+								volume.setVoxelsizeX(25f * 400 / voxelresolution);
+								volume.setVoxelsizeY(25f * 400 / voxelresolution * (100d / widthFactor));
+								volume.setVoxelsizeZ(25f * 400 / voxelresolution);
+								
+								volume.setDimensionX(voxelresolution);
+								volume.setDimensionY(voxelresolution);
+								volume.setDimensionZ(voxelresolution);
+								
+								if (volume.getURL() == null)
+									volume.setURL(new IOurl(LoadedDataHandler.PREFIX, "", ""));
+								volume.getURL().setFileName(
+										""
+												+ volume.getQualityAnnotation()
+												+ "_"
+												+ StringManipulationTools.getFileSystemName(SystemAnalysis.getCurrentTimeInclSec(volume.getParentSample()
+														.getSampleFineTimeOrRowId())) + ".argb_volume");
+								
+								volume.setColorDepth(VolumeColorDepth.RGBA.toString());
+								if (saveVolumeDataset) {
+									summaryResult.setVolume("RESULT_volume.plant3d.cube", volume);
+								}
+								if (getBoolean("Debug - Save 3D-Render to Desktop", false)) {
+									try {
+										File f = new File(SystemAnalysis.getDesktopFolder() + "/render_" + time + "_" + volume.getURL().getFileName() + ".gif");
+										MyByteArrayInputStream cnt = volume.getSideViewGif(800, 600, optStatus);
+										ResourceIOManager.copyContent(cnt, new FileOutputStream(f));
+									} catch (Exception e) {
+										ErrorMsg.addErrorMessage(e);
+									}
+								}
+								boolean create3Dskeleton = getBoolean("Calculate 3D Skeleton", true);
+								boolean save3Dskeleton = getBoolean("Save 3D Skeleton", false);
+								if (create3Dskeleton) {
+									if (optStatus != null)
+										optStatus.setCurrentStatusText1("Create 3-D skeleton");
+									createSimpleDefaultSkeleton(ct, summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube,
+											(LoadedVolume) volume.clone(volume.getParentSample()), save3Dskeleton);
+								}
+								boolean create3DadvancedProbabilitySkeleton = getBoolean("Calculate 3-D probability skeleton", true);
+								boolean save3DadvancedProbabilitySkeleton = getBoolean("Save 3-D probability skeleton", false);
+								if (create3DadvancedProbabilitySkeleton) {
+									if (optStatus != null)
+										optStatus.setCurrentStatusText1("Calculate 3-D probability skeleton");
+									int[][][] probabilityCube = mg.getByteCubeResult();
+									createAdvancedProbabilitySkeleton(ct,
+											summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube,
+											(LoadedVolume) volume.clone(volume.getParentSample()), save3DadvancedProbabilitySkeleton);
+								}
 							}
 						}
 					}
 				}
-			}
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Finished construction");
 		} // synchronized
@@ -276,7 +278,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 	/**
 	 * The "fire" burns down each solid voxel with fixed speed.
 	 */
-	private void createSimpleDefaultSkeleton(BlockResultSet summaryResult, int voxelresolution,
+	private void createSimpleDefaultSkeleton(CameraType ct, BlockResultSet summaryResult, int voxelresolution,
 			ThreeDmodelGenerator mg,
 			Double distHorizontal,
 			Double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume, boolean save3Dskeleton) {
@@ -346,16 +348,16 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 			}
 		}
 		summaryResult.setNumericResult(0,
-				"RESULT_volume.plant3d.skeleton.length", skeletonLength, "px", this);
+				new Trait(cp(), ct, "plant3d.skeleton.length"), skeletonLength, "px", this);
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericResult(0,
-					"RESULT_volume.plant3d.skeleton.length.norm",
+					new Trait(cp(), ct, "plant3d.skeleton.length.norm"),
 					skeletonLength * corr, "mm", this);
 		}
-		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.x", skeletonX / skeletonLength, "voxel", this);
-		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.y", skeletonY / skeletonLength, "voxel", this);
-		summaryResult.setNumericResult(0, "RESULT_volume.plant3d.skeleton.cog.z", skeletonZ / skeletonLength, "voxel", this);
+		summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.skeleton.cog.x"), skeletonX / skeletonLength, "voxel", this);
+		summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.skeleton.cog.y"), skeletonY / skeletonLength, "voxel", this);
+		summaryResult.setNumericResult(0, new Trait(cp(), ct, "plant3d.skeleton.cog.z"), skeletonZ / skeletonLength, "voxel", this);
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
 		lve.setVolume(new ByteShortIntArray(cube));
@@ -373,7 +375,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 	/**
 	 * The "fire" slowly burns down the cube, based on each voxel's probability
 	 */
-	private void createAdvancedProbabilitySkeleton(BlockResultSet summaryResult, int voxelresolution,
+	private void createAdvancedProbabilitySkeleton(CameraType ct, BlockResultSet summaryResult, int voxelresolution,
 			ThreeDmodelGenerator mg,
 			Double distHorizontal,
 			Double realMarkerDistHorizontal,
@@ -439,11 +441,11 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 			}
 		}
 		summaryResult.setNumericResult(0,
-				"RESULT_volume.plant3d.probability.skeleton.length", skeletonLength, "px", this);
+				new Trait(cp(), ct, "plant3d.probability.skeleton.length"), skeletonLength, "px", this);
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericResult(0,
-					"RESULT_volume.plant3d.probability.skeleton.length.norm",
+					new Trait(cp(), ct, "plant3d.probability.skeleton.length.norm"),
 					skeletonLength * corr, "mm", this);
 		}
 		

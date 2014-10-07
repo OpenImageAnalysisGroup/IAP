@@ -8,6 +8,7 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.extraction.Trait;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
@@ -111,13 +112,16 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 		if (getBoolean("Use fixed marker distance", optionsAndResults.getCameraPosition() == CameraPosition.TOP)) {
 			if (cameraConfig == null || cameraConfig.trim().isEmpty())
 				cameraConfig = "unknown camera config";
-			getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px", this);
-			getResultSet().setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance.predefined", 1, "0/1",
+			getResultSet().setNumericResult(0, new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, "optics.blue_marker_distance"), maxDist, "px",
+					this);
+			getResultSet().setNumericResult(0, new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, "optics.blue_marker_distance.predefined"), 1,
+					"0/1",
 					this);
 			optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);
 		} else
 			if (!numericResult.isEmpty()) {
-				if (getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName(optionsAndResults.getCameraPosition())) != null
+				if (getResultSet().searchNumericResult(0, 1,
+						PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName(optionsAndResults.getCameraPosition())) != null
 						&& getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(optionsAndResults.getCameraPosition())) != null) {
 					double markerPosOneLeft = getResultSet().searchNumericResult(0, 1,
 							PropertyNames.RESULT_VIS_MARKER_POS_2_LEFT_Y.getName(optionsAndResults.getCameraPosition())).getValue()
@@ -159,7 +163,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 				
 				maxDist = max(distances);
 				getResultSet()
-						.setNumericResult(0, optionsAndResults.getCameraPosition().name().toLowerCase() + ".optics.blue_marker_distance", maxDist, "px", this);
+						.setNumericResult(0, new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, "optics.blue_marker_distance"), maxDist, "px", this);
 				
 				if (maxDist > 0)
 					optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);

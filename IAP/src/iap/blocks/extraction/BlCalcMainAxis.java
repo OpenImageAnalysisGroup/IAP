@@ -59,8 +59,10 @@ public class BlCalcMainAxis
 						/ macr.getMinResult().getPixelCount()
 						/ macr.getMinResult().getPixelCount();
 				
-				getResultSet().setNumericResult(getBlockPosition(), "RESULT_top.fluo.main.axis.rotation", angle, "degree", this);
-				getResultSet().setNumericResult(getBlockPosition(), "RESULT_top.fluo.main.axis.normalized.distance.avg", normalizedDistanceToMainAxis, this);
+				getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, "main.axis.rotation"), angle,
+						"degree", this);
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, "main.axis.normalized.distance.avg"), normalizedDistanceToMainAxis, this);
 			}
 		}
 		return input().masks().fluo();

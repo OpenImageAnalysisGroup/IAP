@@ -128,11 +128,11 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 		final ArrayList<Color> colors = Colors.get(leafList.size() + 1, 1);
 		
 		getResultSet().setNumericResult(getBlockPosition(),
-				"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count", leafList.size(), "tracked leaves|SUSAN", this);
+				new Trait(cameraPosition, cameraType, "leaftip.count"), leafList.size(), "tracked leaves|SUSAN", this);
 		
 		if (isBestAngle())
 			getResultSet().setNumericResult(getBlockPosition(),
-					"RESULT_" + cameraPosition + "." + cameraType + ".leaf.count.best_angle", leafList.size(), "tracked leaves|SUSAN", this);
+					new Trait(cameraPosition, cameraType, "leaftip.count.best_angle"), leafList.size(), "tracked leaves|SUSAN", this);
 		
 		// calculate leaf parameter
 		for (Leaf l : plant.getLeafList()) {
@@ -157,15 +157,15 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 				double span = Math.sqrt(c * c + d * d);
 				
 				getResultSet().setNumericResult(0,
-						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".span.orientation",
+						new Trait(cameraPosition, cameraType, "leaftip." + num + ".span.orientation"),
 						angle, "degree", this);
 				
 				getResultSet().setNumericResult(0,
-						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".span.norm",
+						new Trait(cameraPosition, cameraType, "leaftip." + num + ".span.norm"),
 						span_norm, "mm", this);
 				
 				getResultSet().setNumericResult(0,
-						"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".span",
+						new Trait(cameraPosition, cameraType, "leaftip." + num + ".span"),
 						span, "px", this);
 			}
 			
@@ -176,28 +176,25 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 				angle = (Double) ltLast.getFeature("angle");
 			
 			getResultSet().setNumericResult(0,
-					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".x",
+					new Trait(cameraPosition, cameraType, "leaftip." + num + ".position.x"),
 					xPos_norm, "px", this);
 			getResultSet().setNumericResult(0,
-					"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".y",
+					new Trait(cameraPosition, cameraType, "leaftip." + num + ".position.y"),
 					yPos_norm, "px", this);
 			
 			if (angle != null) {
 				getResultSet()
 						.setNumericResult(
 								0,
-								"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num
-										+ ".angle",
+								new Trait(cameraPosition, cameraType, "leaftip." + num + ".angle"),
 								angle, "degree", this);
 			}
 			
 			boolean saveDistToCenter = true;
 			
 			if (saveDistToCenter) {
-				String searchX = "RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".cog.x";
-				String searchY = "RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".cog.y";
-				BlockResult cogXBR = getResultSet().searchNumericResult(getBlockPosition(), 1, searchX);
-				BlockResult cogYBR = getResultSet().searchNumericResult(getBlockPosition(), 1, searchY);
+				BlockResult cogXBR = getResultSet().searchNumericResult(getBlockPosition(), 1, new Trait(cameraPosition, cameraType, "cog.x"));
+				BlockResult cogYBR = getResultSet().searchNumericResult(getBlockPosition(), 1, new Trait(cameraPosition, cameraType, "cog.y"));
 				
 				if (cogXBR != null && cogYBR != null) {
 					int cogX = (int) cogXBR.getValue();
@@ -208,7 +205,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 					double distToCenter = Math.sqrt((cogX - lx) * (cogX - lx) + (cogY - ly) * (cogY - ly));
 					
 					getResultSet().setNumericResult(0,
-							"RESULT_" + cameraPosition.toString() + "." + cameraType.toString() + ".leaf." + num + ".dist_to_cog",
+							new Trait(cameraPosition, cameraType, "leaftip." + num + ".dist_to_cog"),
 							distToCenter, "px", this);
 				}
 			}
@@ -311,17 +308,17 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("leaf.tip.count", "Number of detected leafs."),
-				new CalculatedProperty("leaf.tip.count.best_angle", "Number of detected leafs for best side view."),
-				new CalculatedProperty("leaf.tip.*.span.orientation",
+				new CalculatedProperty("leaftip.count", "Number of detected leafs."),
+				new CalculatedProperty("leaftip.count.best_angle", "Number of detected leafs for best side view."),
+				new CalculatedProperty("leaftip.*.span.orientation",
 						"Orientation of the movement vector from first appearance of a leaf to current leaf tip position."),
-				new CalculatedProperty("leaf.tip.*.span.norm",
+				new CalculatedProperty("leaftip.*.span.norm",
 						"Normalised distance from from first appearance of a leaf to the current detected leaf tip position."),
-				new CalculatedProperty("leaf.tip.*.span", "Distance from from first appearance of a leaf to the current detected leaf tip position."),
-				new CalculatedProperty("leaf.tip.*.x", "X position of the leaf tip center point."),
-				new CalculatedProperty("leaf.tip.*.y", "Y position of the leaf tip center point."),
-				new CalculatedProperty("leaf.tip.*.angle", "Leaf tip orientation."),
-				new CalculatedProperty("leaf.tip.*.dist_to_cog", "Distance from the leaf tip position to the center of gravity of the whole plant."),
+				new CalculatedProperty("leaftip.*.span", "Distance from from first appearance of a leaf to the current detected leaf tip position."),
+				new CalculatedProperty("leaftip.*.x", "X position of the leaf tip center point."),
+				new CalculatedProperty("leaftip.*.y", "Y position of the leaf tip center point."),
+				new CalculatedProperty("leaftip.*.angle", "Leaf tip orientation."),
+				new CalculatedProperty("leaftip.*.dist_to_cog", "Distance from the leaf tip position to the center of gravity of the whole plant."),
 		};
 	}
 }

@@ -35,28 +35,28 @@ public class BlCalcCOG extends AbstractBlock implements CalculatesProperties {
 			if (img != null) {
 				final Vector2d cog = img.io().stat().getCOG();
 				if (cog != null) {
-					String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
+					CameraPosition pos = optionsAndResults.getCameraPosition();
 					getResultSet().setNumericResult(getBlockPosition(),
-							pos + img.getCameraType() + COG_X, cog.x, "px", this);
+							new Trait(pos, img.getCameraType(), COG_X), cog.x, "px", this);
 					getResultSet().setNumericResult(getBlockPosition(),
-							pos + img.getCameraType() + COG_Y, cog.y, "px", this);
+							new Trait(pos, img.getCameraType(), COG_Y), cog.y, "px", this);
 					
 					Double averageDistance = img.io().stat().calculateAverageDistanceTo(cog);
 					if (averageDistance != null)
-						getResultSet().setNumericResult(0, pos + img.getCameraType() + COG_AVG_DISTANCE_TO_CENTER,
+						getResultSet().setNumericResult(0, new Trait(pos, img.getCameraType(), COG_AVG_DISTANCE_TO_CENTER),
 								averageDistance, "px", this);
 					
 					if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
 						double centerX = img.getWidth() / 2d;
 						getResultSet().setNumericResult(getBlockPosition(),
-								pos + img.getCameraType() + COG_AVG_DISTANCE_TO_VERTICAL_IMAGE_CENTER_LINE,
+								new Trait(pos, img.getCameraType(), COG_AVG_DISTANCE_TO_VERTICAL_IMAGE_CENTER_LINE),
 								Math.abs(cog.x - centerX), "px", this);
 					}
 					if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 						double centerX = img.getWidth() / 2d;
 						double centerY = img.getHeight() / 2d;
 						getResultSet().setNumericResult(getBlockPosition(),
-								pos + img.getCameraType() + COG_AVG_DISTANCE_TO_IMAGE_CENTER_POINT,
+								new Trait(pos, img.getCameraType(), COG_AVG_DISTANCE_TO_IMAGE_CENTER_POINT),
 								Math.sqrt(Math.abs(cog.x - centerX) * Math.abs(cog.x - centerX)
 										+ Math.abs(cog.y - centerY) * Math.abs(cog.y - centerY)), "px", this);
 					}
