@@ -421,7 +421,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				if (status != null)
 					status.setCurrentStatusText2("Calculate 3-segment linear model");
 				System.out.println("Substance-Count 2: " + experiment.size());
-				experiment.calc().fitThreeStepLinearModel("side.area.norm", "side.nir.intensity.average", "side.hull.pc2.norm");
+				experiment.calc().fitThreeStepLinearModel("side.area.norm", "side.nir.intensity.mean", "side.hull.pc2.norm");
 				System.out.println("Substance-Count 3: " + experiment.size());
 				if (status != null)
 					status.setCurrentStatusText2("Stress model calculated");
