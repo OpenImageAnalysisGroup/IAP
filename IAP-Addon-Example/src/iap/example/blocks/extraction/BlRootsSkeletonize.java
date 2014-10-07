@@ -6,6 +6,7 @@ import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImage;
+import iap.blocks.extraction.TraitCategory;
 import iap.blocks.unused.ClusterSizeAndClusterId;
 import ij.process.FloatProcessor;
 
@@ -123,7 +124,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 		}
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
-		getResultSet().storeResults(optionsAndResults.getCameraPosition(), CameraType.VIS, rt, getBlockPosition(), this);
+		getResultSet().storeResults(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.GEOMETRY, rt, getBlockPosition(), this);
 		// Image skel = ioClusteredSkeltonImage.bm().dilate(getInt("Dilate for section detection", 5)).getImage();
 		for (RunnableOnImage roi : postProcessing) {
 			getResultSet().addImagePostProcessor(CameraType.VIS, null, roi);
