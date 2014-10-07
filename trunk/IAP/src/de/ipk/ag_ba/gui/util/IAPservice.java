@@ -596,21 +596,21 @@ public class IAPservice {
 		HashMap<String, String> res = new HashMap<String, String>();
 		res.put("weight_before", "Weight before watering");
 		res.put("water_weight", "Water weight");
-		res.put("side.height.norm", "Height (normalized)");
-		res.put("side.height", "Height");
+		res.put("side.vis.height.norm", "Height (normalized)");
+		res.put("side.vis.height", "Height");
 		res.put("side.vis.area.norm", "Side Vis Area (normalized)");
 		res.put("side.vis.area", "Side Vis Area");
-		res.put("side.fluo.intensity.average", "Fluo intensity (side)");
-		res.put("side.nir.intensity.average", "NIR intensity (side)");
-		res.put("top.fluo.intensity.average", "Fluo intensity (top)");
-		res.put("top.nir.intensity.average", "NIR intensity (top)");
-		res.put("side.vis.hsv.h.average", "Average hue (side)");
-		res.put("top.vis.hsv.h.average", "Average hue (top)");
-		res.put("side.width.norm", "Width (normalized)");
-		res.put("side.width", "Width");
+		res.put("side.fluo.intensity.mean", "Fluo intensity (side)");
+		res.put("side.nir.intensity.mean", "NIR intensity (side)");
+		res.put("top.fluo.intensity.mean", "Fluo intensity (top)");
+		res.put("top.nir.intensity.mean", "NIR intensity (top)");
+		res.put("side.vis.hsv.h.mean", "Average hue (side)");
+		res.put("top.vis.hsv.h.mean", "Average hue (top)");
+		res.put("side.vis.width.norm", "Width (normalized)");
+		res.put("side.vis.width", "Width");
 		res.put("top.vis.area.norm", "Top Vis Area (normalized)");
 		res.put("top.vis.area", "Top Vis Area");
-		res.put("volume.fluo.iap", "Volume estimation (fluo)");
+		res.put("combined.fluo.volume.iap", "Volume estimation (fluo)");
 		return res;
 	}
 	
