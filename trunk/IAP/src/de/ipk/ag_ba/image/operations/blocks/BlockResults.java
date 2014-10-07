@@ -3,8 +3,10 @@ package de.ipk.ag_ba.image.operations.blocks;
 import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.data_structures.RunnableOnImageSet;
+import iap.blocks.extraction.Trait;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.pipelines.ImageProcessorOptionsAndResults;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -47,8 +49,8 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized BlockResult searchNumericResult(
-			int currentPositionInPipeline, int searchIndex, String pName) {
-		return searchNumericResult(currentPositionInPipeline, searchIndex, pName, true);
+			int currentPositionInPipeline, int searchIndex, Trait pName) {
+		return searchNumericResult(currentPositionInPipeline, searchIndex, pName.toString(), true);
 	}
 	
 	@Override
@@ -58,8 +60,8 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	public synchronized BlockResult searchNumericResult(
-			int currentPositionInPipeline, int searchIndex, String pName, boolean searchNumericValue_true_searchObject_false) {
-		String name = pName;
+			int currentPositionInPipeline, int searchIndex, String trait, boolean searchNumericValue_true_searchObject_false) {
+		String name = trait;
 		if (searchIndex <= 0 &&
 				((searchNumericValue_true_searchObject_false && !storedNumerics.containsKey(currentPositionInPipeline + searchIndex))
 				|| (!searchNumericValue_true_searchObject_false && !storedObjects.containsKey(currentPositionInPipeline + searchIndex))))
@@ -113,17 +115,18 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized void setNumericResult(int position, String name,
+	public synchronized void setNumericResult(int position, Trait name,
 			double value, CalculatesProperties descriptionProvider) {
 		if (!storedNumerics.containsKey(position))
 			storedNumerics.put(position, new TreeMap<String, Double>());
 		
-		storedNumerics.get(position).put(name, value);
+		storedNumerics.get(position).put(name.toString(), value);
 	}
 	
 	@Override
-	public synchronized void setNumericResult(int position, String name,
+	public synchronized void setNumericResult(int position, Trait trait,
 			double value, String unit, CalculatesProperties description) {
+		String name = trait.toString();
 		if (description == null)
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No valid property-calculator object provided. "
 					+ "Indicating possibly incomplete trait description.");
@@ -231,7 +234,7 @@ public class BlockResults implements BlockResultSet {
 									}
 								} else {
 									BlockResultValue p = new BlockResultValue(
-											pn.getName(null), pn.getUnit(), tm.get(key), cameraAngle);
+											pn.getName(null).toString(), pn.getUnit(), tm.get(key), cameraAngle);
 									result.add(p);
 									toRemove = key;
 								}
@@ -266,7 +269,7 @@ public class BlockResults implements BlockResultSet {
 										toRemove = key;
 									}
 								} else {
-									BlockResultValue p = new BlockResultValue(pn.getName(null), tm.get(key));
+									BlockResultValue p = new BlockResultValue(pn.getName(null).toString(), tm.get(key));
 									result.add(p);
 									toRemove = key;
 								}
@@ -301,7 +304,7 @@ public class BlockResults implements BlockResultSet {
 										toRemove = key;
 									}
 								} else {
-									BlockResultValue p = new BlockResultValue(pn.getName(null), tm.get(key));
+									BlockResultValue p = new BlockResultValue(pn.getName(null).toString(), tm.get(key));
 									result.add(p);
 									toRemove = key;
 								}
@@ -312,6 +315,11 @@ public class BlockResults implements BlockResultSet {
 				}
 		}
 		return result;
+	}
+	
+	@Override
+	public synchronized ArrayList<BlockResultValue> searchResults(Trait trait) {
+		return searchResults(false, trait.toString(), false);
 	}
 	
 	@Override
@@ -335,13 +343,13 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public synchronized void storeResults(String id_prefix,
+	public synchronized void storeResults(CameraPosition cp, CameraType ct,
 			ResultsTableWithUnits numericResults, int position, CalculatesProperties description) {
-		storeResults(id_prefix, null, numericResults, position, description);
+		storeResults(cp, ct, null, numericResults, position, description);
 	}
 	
 	@Override
-	public synchronized void storeResults(String id_prefix, String id_postfix,
+	public synchronized void storeResults(CameraPosition cp, CameraType ct, String id_postfix,
 			ResultsTableWithUnits numericResults, int position, CalculatesProperties description) {
 		if (description == null)
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No valid property-calculator object provided. "
@@ -352,7 +360,7 @@ public class BlockResults implements BlockResultSet {
 				double val = numericResults.getValueAsDouble(col, row);
 				String unit = numericResults.getColumnHeadingUnit(col);
 				if (!Double.isNaN(val))
-					setNumericResult(position, id_prefix + id + (id_postfix != null ? id_postfix : ""), val, unit, description);
+					setNumericResult(position, new Trait(cp, ct, id + (id_postfix != null ? id_postfix : "")), val, unit, description);
 			}
 		}
 	}

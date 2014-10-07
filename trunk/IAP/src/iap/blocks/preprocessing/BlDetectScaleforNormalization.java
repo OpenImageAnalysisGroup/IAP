@@ -5,6 +5,7 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.extraction.Trait;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
@@ -118,13 +119,14 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 						ic.getImage().show("Detected bar");
 					}
 					
-					String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
+					CameraPosition pos = optionsAndResults.getCameraPosition();
 					
 					optionsAndResults.setCalculatedBlueMarkerDistance(clusterDimensions[minRatioPositionInClusterArray].x
 							/ optionsAndResults.getREAL_MARKER_DISTANCE() * valrs);
 					getResultSet()
-							.setNumericResult(getBlockPosition(), pos + "vis.detected_ruler_length", clusterDimensions[minRatioPositionInClusterArray].x, "px", this);
-					getResultSet().setNumericResult(getBlockPosition(), pos + "vis.real_ruler_length", valrs, "mm", this);
+							.setNumericResult(getBlockPosition(), new Trait(pos, CameraType.VIS, "optics.ruler_length.detected"),
+									clusterDimensions[minRatioPositionInClusterArray].x, "px", this);
+					getResultSet().setNumericResult(getBlockPosition(), new Trait(pos, CameraType.VIS, "optics.ruler_length.real"), valrs, "mm", this);
 				}
 			}
 			
@@ -244,8 +246,8 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("vis.optics.detected_ruler_length", "If scale is visible in the image, this value saves the length in pixel."),
-				new CalculatedProperty("vis.optics.real_ruler_length",
+				new CalculatedProperty("optics.ruler_length.detected", "If scale is visible in the image, this value saves the length in pixel."),
+				new CalculatedProperty("optics.ruler_length.real",
 						"If scale is visible in the image, this value saves the detected real length (for example 3 mm).")
 		};
 	}

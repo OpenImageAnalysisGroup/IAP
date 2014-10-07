@@ -33,7 +33,7 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 	protected Image processVISmask() {
 		Image image = input().masks().vis();
 		if (getBoolean("process VIS mask", true))
-			processImage("vis.", image);
+			processImage(CameraType.VIS, image);
 		return image;
 	}
 	
@@ -41,7 +41,7 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 	protected Image processFLUOmask() {
 		Image image = input().masks().fluo();
 		if (getBoolean("process FLUO mask", true))
-			processImage("fluo.", image);
+			processImage(CameraType.FLUO, image);
 		return image;
 	}
 	
@@ -49,7 +49,7 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 	protected Image processNIRmask() {
 		Image image = input().masks().nir();
 		if (getBoolean("process NIR mask", false))
-			processImage("nir.", image);
+			processImage(CameraType.NIR, image);
 		return image;
 	}
 	
@@ -57,11 +57,11 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 	protected Image processIRmask() {
 		Image image = input().masks().ir();
 		if (getBoolean("process IR mask", false))
-			processImage("ir.", image);
+			processImage(CameraType.IR, image);
 		return image;
 	}
 	
-	private void processImage(String prefix, Image image) {
+	private void processImage(CameraType ct, Image image) {
 		if (image == null)
 			return;
 		
@@ -77,9 +77,10 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 		String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
 		int filledArea = image.io().countFilledPixels();
 		if (distHorizontal != null) {
-			getResultSet().setNumericResult(getBlockPosition(), pos + prefix + AREA_NORM, filledArea * normFactorArea, "mm^2", this);
+			getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), ct, AREA_NORM), filledArea * normFactorArea,
+					"mm^2", this);
 		}
-		getResultSet().setNumericResult(getBlockPosition(), pos + prefix + AREA, filledArea, "px^2", this);
+		getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), ct, AREA), filledArea, "px^2", this);
 	}
 	
 	@Override

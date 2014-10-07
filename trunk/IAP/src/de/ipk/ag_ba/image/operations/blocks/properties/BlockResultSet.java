@@ -3,6 +3,8 @@ package de.ipk.ag_ba.image.operations.blocks.properties;
 import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImage;
 import iap.blocks.data_structures.RunnableOnImageSet;
+import iap.blocks.extraction.Trait;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -34,13 +36,13 @@ public interface BlockResultSet {
 	 *         value.
 	 */
 	public BlockResult searchNumericResult(int currentPositionInPipeline,
-			int searchIndex, String name);
+			int searchIndex, Trait name);
 	
 	/**
 	 * @param position
 	 *           0 == current block property
 	 */
-	public void setNumericResult(int currentPositionInPipeline, String name, double value, CalculatesProperties descriptionProvider);
+	public void setNumericResult(int currentPositionInPipeline, Trait name, double value, CalculatesProperties descriptionProvider);
 	
 	public int getBlockPosition();
 	
@@ -53,15 +55,17 @@ public interface BlockResultSet {
 	 */
 	public ArrayList<BlockResultValue> searchResults(String search);
 	
+	public ArrayList<BlockResultValue> searchResults(Trait trait);
+	
 	public ArrayList<BlockResultValue> searchResults(boolean exact, String search, boolean removeReturnedValue);
 	
-	void setNumericResult(int currentPositionInPipeline, String name, double value, String unit, CalculatesProperties descriptionProvider);
+	void setNumericResult(int currentPositionInPipeline, Trait name, double value, String unit, CalculatesProperties descriptionProvider);
 	
-	void storeResults(String id_prefix,
+	void storeResults(CameraPosition cp, CameraType ct,
 			ResultsTableWithUnits numericResults,
 			int position, CalculatesProperties description);
 	
-	void storeResults(String id_prefix, String id_postfix,
+	void storeResults(CameraPosition cp, CameraType ct, String id_postfix,
 			ResultsTableWithUnits numericResults,
 			int position, CalculatesProperties description);
 	

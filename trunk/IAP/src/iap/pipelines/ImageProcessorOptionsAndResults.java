@@ -57,7 +57,7 @@ public class ImageProcessorOptionsAndResults {
 	}
 	
 	public enum CameraPosition {
-		UNKNOWN, TOP, SIDE;
+		UNKNOWN, TOP, SIDE, COMBINED;
 		
 		@Override
 		public String toString() {
@@ -66,8 +66,14 @@ public class ImageProcessorOptionsAndResults {
 					return "top";
 				case SIDE:
 					return "side";
+				case COMBINED:
+					return "combined";
 			}
 			return "unknown";
+		}
+		
+		public static CameraPosition[] getSideAndTop() {
+			return new CameraPosition[] { CameraPosition.SIDE, CameraPosition.TOP };
 		}
 	}
 	

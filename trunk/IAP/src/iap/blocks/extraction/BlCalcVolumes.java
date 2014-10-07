@@ -5,6 +5,7 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -41,33 +42,39 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			CalculatesProperties propertyCalculator) {
 		if (getBoolean("process VIS", true))
-			calculatePlantVolumeMeasures("vis", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, false);
+			calculatePlantVolumeMeasures(CameraType.VIS, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+					false);
 		if (getBoolean("process VIS normalized", true))
-			calculatePlantVolumeMeasures("vis", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
+			calculatePlantVolumeMeasures(CameraType.VIS, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+					true);
 		
 		if (getBoolean("process FLUO", false))
-			calculatePlantVolumeMeasures("fluo", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, false);
+			calculatePlantVolumeMeasures(CameraType.FLUO, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+					false);
 		if (getBoolean("process FLUO normalized", false))
-			calculatePlantVolumeMeasures("fluo", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
+			calculatePlantVolumeMeasures(CameraType.FLUO, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+					true);
 		
 		if (getBoolean("process NIR", false))
-			calculatePlantVolumeMeasures("nir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, false);
+			calculatePlantVolumeMeasures(CameraType.NIR, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+					false);
 		if (getBoolean("process NIR normalized", false))
-			calculatePlantVolumeMeasures("nir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
+			calculatePlantVolumeMeasures(CameraType.NIR, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+					true);
 		
 		if (getBoolean("process IR", false))
-			calculatePlantVolumeMeasures("ir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, false);
+			calculatePlantVolumeMeasures(CameraType.IR, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+					false);
 		if (getBoolean("process IR normalized", false))
-			calculatePlantVolumeMeasures("ir", plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, true);
+			calculatePlantVolumeMeasures(CameraType.IR, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+					true);
 	}
 	
 	private void calculatePlantVolumeMeasures(
-			String cameraType,
+			CameraType cameraType,
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData, TreeMap<Long, Sample3D> time2inSamples,
 			TreeMap<Long, TreeMap<String, ImageData>> time2inImages, TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
 			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult, boolean normalized) {
-		
-		String sideVisTraitName = "RESULT_side." + cameraType + ".area";
 		
 		String plantID = null;
 		
@@ -119,7 +126,8 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 					}
 					if (rt == null || rt.isNumericStoreEmpty())
 						continue;
-					for (BlockResultValue v : rt.searchResults(true, sideVisTraitName + (normalized ? ".norm" : ""), false)) {
+					for (BlockResultValue v : rt.searchResults(true, new Trait(optionsAndResults.getCameraPosition(), cameraType, "area"
+							+ (normalized ? ".norm" : "")).toString(), false)) {
 						if (v.getValue() != null) {
 							double area = v.getValue().doubleValue();
 							areaStat.addValue(area);
@@ -160,11 +168,14 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 				if (areaStat.getN() > 0) {
 					if (getBoolean("Store additional area statistics values", false)) {
 						summaryResult.setNumericResult(getBlockPosition(),
-								sideVisTraitName + ".min" + (normalized ? ".norm" : ""), areaStat.getMin(), normalized ? "mm^2" : "px", this);
+								new Trait(optionsAndResults.getCameraPosition(), cameraType, "area.min" + (normalized ? ".norm" : "")), areaStat.getMin(),
+								normalized ? "mm^2" : "px", this);
 						summaryResult.setNumericResult(getBlockPosition(),
-								sideVisTraitName + ".max" + (normalized ? ".norm" : ""), areaStat.getMax(), normalized ? "mm^2" : "px", this);
+								new Trait(optionsAndResults.getCameraPosition(), cameraType, "area.max" + (normalized ? ".norm" : "")), areaStat.getMax(),
+								normalized ? "mm^2" : "px", this);
 						summaryResult.setNumericResult(getBlockPosition(),
-								sideVisTraitName + ".median" + (normalized ? ".norm" : ""), areaStat.getPercentile(50), normalized ? "mm^2" : "px", this);
+								new Trait(optionsAndResults.getCameraPosition(), cameraType, "area.median" + (normalized ? ".norm" : "")), areaStat.getPercentile(50),
+								normalized ? "mm^2" : "px", this);
 					}
 				}
 				
@@ -208,7 +219,8 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 								double wue = absoluteGrowthPerDay / waterUsePerDay;
 								if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
 									summaryResult.setNumericResult(getBlockPosition(),
-											"RESULT_side." + cameraType + ".area.avg.wue" + (normalized ? ".norm" : ""), wue, "px/ml/day", this);
+											new Trait(optionsAndResults.getCameraPosition(), cameraType, "area.avg.wue" + (normalized ? ".norm" : "")), wue, "px/ml/day",
+											this);
 									
 								}
 							}
@@ -216,7 +228,8 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 								double wue = (relativeGrowthPerDay - 1) * 100 / waterUsePerDay;
 								if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
 									summaryResult.setNumericResult(getBlockPosition(),
-											"RESULT_side." + cameraType + ".area.avg.wue.relative" + (normalized ? ".norm" : ""), wue, "percent growth/ml/day", this);
+											new Trait(optionsAndResults.getCameraPosition(), cameraType, "area.avg.wue.relative" + (normalized ? ".norm" : "")), wue,
+											"percent growth/ml/day", this);
 									
 								}
 							}
@@ -233,15 +246,16 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 					double side = areaStat.getMax();
 					double volume_iap_max = Math.sqrt(side * side * avgTopArea);
 					summaryResult.setNumericResult(getBlockPosition(),
-							"RESULT_" + cameraType + ".volume.iap" + (normalized ? ".norm" : ""), volume_iap, "voxel", this);
+							new Trait(CameraPosition.COMBINED, cameraType, "volume.iap" + (normalized ? ".norm" : "")), volume_iap, "voxel", this);
 					summaryResult.setNumericResult(getBlockPosition(),
-							"RESULT_" + cameraType + ".volume.iap_max" + (normalized ? ".norm" : ""), volume_iap_max, "voxel", this);
+							new Trait(CameraPosition.COMBINED, cameraType, "volume.iap_max" + (normalized ? ".norm" : "")), volume_iap_max, "voxel", this);
 					
 					if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
 						double ratio = volume_iap / lastVolumeIAP;
 						double ratioPerDay = (Math.pow(ratio, timeForOneDayD / ((time - lastTimeVolumeIAP))) - 1) * 100;
 						summaryResult.setNumericResult(getBlockPosition(),
-								"RESULT_" + cameraType + ".volume.iap.relative_percent" + (normalized ? ".norm" : ""), ratioPerDay, "percent/day", this);
+								new Trait(CameraPosition.COMBINED, cameraType, "volume.iap.relative_percent" + (normalized ? ".norm" : "")), ratioPerDay,
+								"percent/day", this);
 						double days = (time - lastTimeVolumeIAP) / timeForOneDayD;
 						double absoluteGrowthPerDay = (volume_iap - lastVolumeIAP) / days;
 						
@@ -252,7 +266,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 						if (waterUsePerDay != null && waterUsePerDay > 0 && !Double.isInfinite(waterUsePerDay) && !Double.isNaN(waterUsePerDay)) {
 							double wue = absoluteGrowthPerDay / waterUsePerDay;
 							summaryResult.setNumericResult(getBlockPosition(),
-									"RESULT_" + cameraType + ".volume.iap.wue" + (normalized ? ".norm" : ""), wue, "px^3/ml/day", this);
+									new Trait(CameraPosition.COMBINED, cameraType, "volume.iap.wue" + (normalized ? ".norm" : "")), wue, "px^3/ml/day", this);
 						}
 					}
 					
@@ -262,13 +276,16 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 					if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo90)) {
 						double volume_lt = Math.sqrt(sideArea_for_angleNearestTo0 * sideArea_for_angleNearestTo90 * avgTopArea);
 						summaryResult.setNumericResult(getBlockPosition(),
-								"RESULT_" + cameraType + ".volume.lt" + (normalized ? ".norm" : ""), volume_lt, normalized ? "mm^3" : "px^3", this);
+								new Trait(CameraPosition.COMBINED, cameraType, "volume.lt" + (normalized ? ".norm" : "")), volume_lt, normalized ? "mm^3" : "px^3",
+								this);
 						double area = sideArea_for_angleNearestTo0 + sideArea_for_angleNearestTo90 + avgTopArea;
 						summaryResult.setNumericResult(getBlockPosition(),
-								"RESULT_" + cameraType + ".volume.area090T" + (normalized ? ".norm" : ""), area, normalized ? "mm^2" : "px^2", this);
+								new Trait(CameraPosition.COMBINED, cameraType, "volume.area090T" + (normalized ? ".norm" : "")), area, normalized ? "mm^2" : "px^2",
+								this);
 						double areaLog = sideArea_for_angleNearestTo0 + sideArea_for_angleNearestTo90 + Math.log(avgTopArea) / 3;
 						summaryResult.setNumericResult(getBlockPosition(),
-								"RESULT_" + cameraType + ".volume.area090LogT" + (normalized ? ".norm" : ""), areaLog, normalized ? "mm^2" : "px^2", this);
+								new Trait(CameraPosition.COMBINED, cameraType, "volume.area090LogT" + (normalized ? ".norm" : "")), areaLog, normalized ? "mm^2"
+										: "px^2", this);
 					}
 					
 					if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo45) && !Double.isNaN(sideArea_for_angleNearestTo90)) {
@@ -279,7 +296,8 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 						s3 = sideArea_for_angleNearestTo90;
 						double volume_prism = Math.sqrt(t1 * s2 * s3 / 2d * Math.sqrt(1 - Math.pow((s2 * s2 + s3 * s3 - s1 * s1) / (2d * s2 * s3), 2)));
 						summaryResult.setNumericResult(getBlockPosition(),
-								"RESULT_" + cameraType + ".volume.prism" + (normalized ? ".norm" : ""), volume_prism, normalized ? "mm^3" : "px^3", this);
+								new Trait(CameraPosition.COMBINED, cameraType, "volume.prism" + (normalized ? ".norm" : "")), volume_prism, normalized ? "mm^3"
+										: "px^3", this);
 					}
 				}
 			}

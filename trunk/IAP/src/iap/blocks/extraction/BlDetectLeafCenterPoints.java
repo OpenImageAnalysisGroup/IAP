@@ -52,19 +52,19 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		}
 		
 		if (saveResults) {
-			String pos = optionsAndResults.getCameraPosition() == CameraPosition.SIDE ? "RESULT_side." : "RESULT_top.";
+			CameraPosition pos = optionsAndResults.getCameraPosition();
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					pos + img.getCameraType() + ".leaf.count", pointList.size(), "leaves|CENTERPOINTS", this);
+					new Trait(pos, img.getCameraType(), "leaf.count"), pointList.size(), "leaves|CENTERPOINTS", this);
 			
 			// save x and y position
 			int num = 0;
 			for (Feature p : pointList) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						pos + img.getCameraType() + ".leaf.x." + num, (int) p.getPosition().getX(), "leaves|CENTERPOINTS", this);
+						new Trait(pos, img.getCameraType(), "leaf." + num + ".position.x"), (int) p.getPosition().getX(), "leaves|CENTERPOINTS", this);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
-						pos + img.getCameraType() + ".leaf.y." + num, (int) p.getPosition().getY(), "leaves|CENTERPOINTS", this);
+						new Trait(pos, img.getCameraType(), "leaf." + num + ".position.y"), (int) p.getPosition().getY(), "leaves|CENTERPOINTS", this);
 				num++;
 			}
 		}
@@ -143,9 +143,9 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("leaf.count", "!todo"),
-				new CalculatedProperty("leaf.x", "!todo"),
-				new CalculatedProperty("leaf.y", "!todo"),
+				new CalculatedProperty("leaf.count", "Number of detected leaves."),
+				new CalculatedProperty("leaf.*.position.x", "Center position (X-axis) of a leaf."),
+				new CalculatedProperty("leaf.*.position.y", "Center position (Y-axis) of a leaf."),
 		};
 	}
 	
