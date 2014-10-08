@@ -214,9 +214,9 @@ public class ConvexHullCalculator {
 			final Circle circumcircle = polygon.calculateminimalcircumcircle();
 			
 			if (circumcircle != null) {
-				rt.addValue("hull.circumcircle.d", circumcircle.d);
+				rt.addValue("circumcircle.d", circumcircle.d);
 				if (distHorizontal != null) {
-					rt.addValue("hull.circumcircle.d.norm", circumcircle.d
+					rt.addValue("circumcircle.d.norm", circumcircle.d
 							* normFactor);
 				}
 				if (drawCircle) {
@@ -244,13 +244,13 @@ public class ConvexHullCalculator {
 				for (java.awt.geom.Point2D.Double p : mr)
 					pl[idx++] = new Point(p.x, p.y);
 				Polygon p = new Polygon(pl);
-				rt.addValue("hull.minrectangle.area", p.area(), "px");
-				rt.addValue("hull.minrectangle.length.a", pl[0].distEuclid(pl[1]), "px");
-				rt.addValue("hull.minrectangle.length.b", pl[1].distEuclid(pl[2]), "px");
+				rt.addValue("minrectangle.area", p.area(), "px");
+				rt.addValue("minrectangle.length.a", pl[0].distEuclid(pl[1]), "px");
+				rt.addValue("minrectangle.length.b", pl[1].distEuclid(pl[2]), "px");
 				if (distHorizontal != null) {
-					rt.addValue("hull.minrectangle.area.norm", p.area() * normFactorArea, "mm^2");
-					rt.addValue("hull.minrectangle.length.a.norm", pl[0].distEuclid(pl[1]) * normFactor, "mm");
-					rt.addValue("hull.minrectangle.length.b.norm", pl[1].distEuclid(pl[2]) * normFactor, "mm");
+					rt.addValue("minrectangle.area.norm", p.area() * normFactorArea, "mm^2");
+					rt.addValue("minrectangle.length.a.norm", pl[0].distEuclid(pl[1]) * normFactor, "mm");
+					rt.addValue("minrectangle.length.b.norm", pl[1].distEuclid(pl[2]) * normFactor, "mm");
 				}
 				if (drawMinRect && pl.length == 4) {
 					RunnableOnImage runnableOnMask = new RunnableOnImage() {

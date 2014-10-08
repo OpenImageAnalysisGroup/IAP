@@ -137,7 +137,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 									
 									if (distHorizontal == null)
 										if (angle.startsWith("2nd_side")) {
-											BlockResult val = bp.searchNumericResult(0, 0, new Trait(cp(), ct, TraitCategory.OPTICS, "blue_marker_distance"));
+											BlockResult val = bp.searchNumericResult(0, 0, new Trait(cp(), ct, TraitCategory.OPTICS, "marker.horizontal_distance"));
 											if (val != null)
 												distHorizontal = val.getValue();
 										}

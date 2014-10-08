@@ -302,8 +302,8 @@ public class IntensityAnalysis {
 			}
 			
 			if (mode != Mode.MODE_IR_ANALYSIS) {
-				result.addValue("filled.pixels", plantImagePixelCnt);
-				result.addValue("filled.percent", (100d * plantImagePixelCnt) / pixels.length);
+				// result.addValue("filled.pixels", plantImagePixelCnt);
+				// result.addValue("filled.percent", (100d * plantImagePixelCnt) / pixels.length);
 				
 				if (statsHueValuesOverall.getN() > 0) {
 					result.addValue("intensity.stddev", statsHueValuesOverall.getStandardDeviation());

@@ -75,6 +75,17 @@ public class ImageProcessorOptionsAndResults {
 		public static CameraPosition[] getSideAndTop() {
 			return new CameraPosition[] { CameraPosition.SIDE, CameraPosition.TOP };
 		}
+		
+		public String getNiceName() {
+			return toString();
+		}
+		
+		public static CameraPosition fromString(String string) {
+			for (CameraPosition cp : CameraPosition.values())
+				if (cp.toString().equals(string))
+					return cp;
+			return null;
+		}
 	}
 	
 	public void setCameraInfos(CameraPosition cameraTyp, String cameraConfig, String lateOrEarly, Double cameraAngle) {
