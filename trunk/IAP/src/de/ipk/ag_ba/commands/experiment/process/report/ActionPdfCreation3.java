@@ -6,6 +6,8 @@
  */
 package de.ipk.ag_ba.commands.experiment.process.report;
 
+import iap.blocks.extraction.Trait;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -638,16 +640,21 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				header = columnSheet.createRow(0);
 				{
 					Cell cc = header.createCell(0);
-					cc.setCellValue("Analysis Result Column");
+					cc.setCellValue("Internal Property Name");
 					cc.setCellStyle(style);
 				}
 				{
 					Cell cc = header.createCell(1);
-					cc.setCellValue("Description");
+					cc.setCellValue("Analysis Result Column Name");
 					cc.setCellStyle(style);
 				}
 				{
 					Cell cc = header.createCell(2);
+					cc.setCellValue("Description");
+					cc.setCellStyle(style);
+				}
+				{
+					Cell cc = header.createCell(3);
 					cc.setCellValue("Additional Info and/or Documentation Source");
 					cc.setCellStyle(style);
 				}
@@ -655,14 +662,31 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				for (String h : c.split(separator)) {
 					rr++;
 					Row rrrr = columnSheet.createRow(rr);
-					Cell cc = rrrr.createCell(0);
-					cc.setCellValue(h);
+					Cell cc0 = rrrr.createCell(0);
+					cc0.setCellValue(h);
+					cc0.setCellStyle(styleTL);
+					
+					String origH = h;
+					String unit = null;
+					if (h != null && h.endsWith(")") && h.contains("(")) {
+						unit = h.substring(h.indexOf("(") + "(".length());
+						unit = unit.substring(0, unit.length() - 1);
+						h = h.substring(0, h.indexOf("(")).trim();
+					}
+					
+					String niceName = new Trait(h).getNiceName();
+					if (niceName == null) {
+						niceName = origH;
+						niceName = StringManipulationTools.stringReplace(niceName, "(", "[");
+						niceName = StringManipulationTools.stringReplace(niceName, ")", "]");
+					} else
+						if (unit != null)
+							niceName = niceName + " [" + unit + "]";
+					Cell cc = rrrr.createCell(1);
+					cc.setCellValue(niceName);
 					cc.setCellStyle(styleTL);
 					
-					cc = rrrr.createCell(1);
-					String origH = h;
-					if (h != null && h.endsWith(")") && h.contains("("))
-						h = h.substring(0, h.indexOf("("));
+					cc = rrrr.createCell(2);
 					String desc = IAPpluginManager.getInstance().getDescriptionForCalculatedProperty(h);
 					if (desc == null || desc.isEmpty())
 						desc = IAPpluginManager.getInstance().getDescriptionForCalculatedProperty(origH);
@@ -680,7 +704,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 							: "- no description available -");
 					cc.setCellStyle(styleTL);
 					if (source != null) {
-						cc = rrrr.createCell(2);
+						cc = rrrr.createCell(3);
 						cc.setCellValue(StringManipulationTools.stringReplace(
 								StringManipulationTools.getWordWrapString(StringManipulationTools.removeHTMLtags(source), 50),
 								"<br>", "\n"));
@@ -691,6 +715,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				columnSheet.autoSizeColumn(0);
 				columnSheet.autoSizeColumn(1);
 				columnSheet.autoSizeColumn(2);
+				columnSheet.autoSizeColumn(3);
 			}
 			
 			Sheet sheet = xlsx ? wb.createSheet("Analysis Results") : null;
@@ -704,8 +729,26 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				c = StringManipulationTools.stringReplace(c, "\r\n", "");
 				c = StringManipulationTools.stringReplace(c, "\n", "");
 				for (String h : c.split(separator)) {
+					
+					String origH = h;
+					String unit = null;
+					if (h != null && h.endsWith(")") && h.contains("(")) {
+						unit = h.substring(h.indexOf("(") + "(".length());
+						unit = unit.substring(0, unit.length() - 1);
+						h = h.substring(0, h.indexOf("(")).trim();
+					}
+					
+					String niceName = new Trait(h).getNiceName();
+					if (niceName == null) {
+						niceName = origH;
+						niceName = StringManipulationTools.stringReplace(niceName, "(", "[");
+						niceName = StringManipulationTools.stringReplace(niceName, ")", "]");
+					} else
+						if (unit != null)
+							niceName = niceName + " [" + unit + "]";
+					
 					Cell cc = row.createCell(col++);
-					cc.setCellValue(h);
+					cc.setCellValue(niceName);
 					excelColumnHeaders.add(h);
 					if (style != null)
 						cc.setCellStyle(style);
