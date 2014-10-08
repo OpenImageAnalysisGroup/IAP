@@ -378,7 +378,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		
 		if (rt != null)
 			getResultSet().storeResults(
-					optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, "|skeleton", rt,
+					optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, null, rt,
 					getBlockPosition(), this);
 		
 		if (addPostProcessor) {

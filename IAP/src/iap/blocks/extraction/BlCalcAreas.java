@@ -5,6 +5,7 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,13 +94,13 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			CalculatesProperties propertyCalculator) {
 		
-		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
-				new String[] {
-						"RESULT_side.vis.area", "RESULT_top.vis.area", "RESULT_side.vis.area.norm", "RESULT_top.vis.area.norm",
-						"RESULT_side.fluo.area", "RESULT_top.fluo.area", "RESULT_side.fluo.area.norm", "RESULT_top.fluo.area.norm",
-						"RESULT_side.nir.area", "RESULT_top.nir.area", "RESULT_side.nir.area.norm", "RESULT_top.nir.area.norm",
-						"RESULT_side.ir.area", "RESULT_top.ir.area", "RESULT_side.fluo.ir.norm", "RESULT_top.ir.area.norm",
-				}, this);
+		for (CameraPosition cp : new CameraPosition[] { CameraPosition.SIDE, CameraPosition.TOP })
+			for (CameraType ct : CameraType.values())
+				calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
+						new String[] {
+								new Trait(cp, ct, TraitCategory.GEOMETRY, "area").toString(),
+								new Trait(cp, ct, TraitCategory.GEOMETRY, "area.norm").toString()
+						}, this);
 		
 	}
 	

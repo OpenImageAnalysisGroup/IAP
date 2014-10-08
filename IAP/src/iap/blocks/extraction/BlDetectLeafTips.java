@@ -238,7 +238,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	private void saveLeafCount(CameraType cameraType, CameraPosition cameraPosition, int count) {
 		// save leaf count
 		getResultSet().setNumericResult(getBlockPosition(),
-				new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count|SUSAN"), count, "leaftips", this);
+				new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count"), count, "leaftips", this);
 		
 		boolean isBestAngle = isBestAngle(cameraType);
 		// search for best side image
@@ -249,7 +249,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		// save leaf count for best angle
 		if (isBestAngle)
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count.best_angle|SUSAN"), count, "leaftips", this);
+					new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count.best_angle"), count, "leaftips", this);
 	}
 	
 	private void saveLeafTipList(LinkedList<Feature> peakList, CameraType cameraType, int maxValidY) {

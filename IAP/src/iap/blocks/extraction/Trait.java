@@ -71,9 +71,32 @@ public class Trait {
 					trait = StringManipulationTools.stringReplace(traitName, ".norm.", ".");
 				}
 			
-			trait = StringManipulationTools.stringReplace(trait, ".", " ");
+			boolean relativeR = false;
+			if (trait.endsWith(".relative.raw")) {
+				relativeR = true;
+				trait = trait.substring(0, trait.length() - ".relative.raw".length());
+			}
 			
-			return trait + " (" + (normalized ? "zoom-corrected " : "") + cat.getNiceString() + " trait based on " + ct.getNiceName() + " " + cpos.getNiceName()
+			boolean relativeP = false;
+			if (trait.endsWith(".relative.percent")) {
+				relativeP = true;
+				trait = trait.substring(0, trait.length() - ".relative.percent".length());
+			}
+			
+			boolean relativeL = false;
+			if (trait.endsWith(".relative.log")) {
+				relativeL = true;
+				trait = trait.substring(0, trait.length() - ".relative.log".length());
+			}
+			
+			trait = StringManipulationTools.stringReplace(trait, ".", " ");
+			trait = StringManipulationTools.stringReplace(trait, "_", " ");
+			
+			return (relativeR ? "relative daily change of " : "")
+					+ (relativeP ? "percentage of daily change of " : "")
+					+ (relativeL ? "daily log-change rate of " : "")
+					+ trait + " (" + (normalized ? "zoom-corrected " : "") + cat.getNiceString() + " trait based on "
+					+ ct.getNiceName() + " " + cpos.getNiceName()
 					+ " view)";
 		} else
 			return null;
