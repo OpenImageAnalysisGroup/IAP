@@ -129,11 +129,11 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 		final ArrayList<Color> colors = Colors.get(leafList.size() + 1, 1);
 		
 		getResultSet().setNumericResult(getBlockPosition(),
-				new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count|SUSAN"), leafList.size(), "tracked leaves", this);
+				new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count"), leafList.size(), "tracked leaves", this);
 		
 		if (isBestAngle(cameraType))
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count.best_angle|SUSAN"), leafList.size(), "tracked leaves", this);
+					new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count.best_angle"), leafList.size(), "tracked leaves", this);
 		
 		// calculate leaf parameter
 		for (Leaf l : plant.getLeafList()) {

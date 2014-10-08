@@ -206,8 +206,15 @@ public class BlCalcWidthAndHeight extends
 		super.postProcessResultsForAllTimesAndAngles(plandID2time2waterData,
 				time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus, this);
 		
-		calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
-				new String[] { "RESULT_side.width", "RESULT_side.width.norm", "RESULT_side.height.norm" }, this);
+		for (CameraPosition cp : new CameraPosition[] { CameraPosition.SIDE, CameraPosition.TOP })
+			for (CameraType ct : CameraType.values())
+				calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
+						new String[] {
+								new Trait(cp, ct, TraitCategory.GEOMETRY, "width").toString(),
+								new Trait(cp, ct, TraitCategory.GEOMETRY, "width.norm").toString(),
+								new Trait(cp, ct, TraitCategory.GEOMETRY, "height").toString(),
+								new Trait(cp, ct, TraitCategory.GEOMETRY, "height.norm").toString()
+						}, this);
 	}
 	
 	@Override
