@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.extraction.Trait;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.FlowLayout;
@@ -198,10 +199,17 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 									si = ((SampleInterface) mtdbe.getTargetEntity()).getParentCondition().getParentSubstance();
 								if (mtdbe.getTargetEntity() instanceof Measurement)
 									si = ((Measurement) mtdbe.getTargetEntity()).getParentSample().getParentCondition().getParentSubstance();
-								if (si != null)
-									desc = "<table cellspacing=0 cellpadding=2 border=0><tr><td bgcolor='FFDDDD'>Reference Information for <b>" + si.getName()
-											+ "</b></td></tr><tr><td bgcolor='#FFEEEE '>"
+								if (si != null) {
+									String abc = si.getName();
+									String niceName = new Trait(abc).getNiceName();
+									if (niceName != null)
+										abc = "<b>" + niceName + "</b> <small><font color='gray'>(" + abc + ")</font></small>";
+									else
+										abc = "<b>" + abc + "</b>";
+									desc = "<table cellspacing=0 cellpadding=2 border=0><tr><td bgcolor='FFDDDD'>Reference Information for " + abc
+											+ "</td></tr><tr><td bgcolor='#FFEEEE '>"
 											+ dd + "</td></tr></table>";
+								}
 							}
 							filePanel.removeAll();
 							filePanel.setLayout(new FlowLayout(filePanel.getWidth(), 10, 10));
