@@ -12,6 +12,8 @@ import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
 import org.OpenFileDialogService;
+import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -26,6 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataAnnotation;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableData;
 
 /**
  * @author klukas
@@ -50,8 +53,8 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		return new MainPanelComponent("This function will be implementented in an intermediate update.");
-		// return new MainPanelComponent("<b>Messages:</b><br><br>" + StringManipulationTools.getStringList(messages, "<br>"));
+		// return new MainPanelComponent("This function will be implementented in an intermediate update.");
+		return new MainPanelComponent("<b>Messages:</b><br><br>" + StringManipulationTools.getStringList(messages, "<br>"));
 	}
 	
 	@Override
@@ -127,7 +130,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	}
 	
 	private void prepareDataSetFromFileList(RunnableWithMappingData resultProcessor) throws Exception {
-		ArrayList<File> fileList = OpenFileDialogService.getFiles(new String[] { "jpg", "jpeg", "png" }, "JPEG or PNG Images");
+		ArrayList<File> fileList = OpenFileDialogService.getFiles(new String[] { "jpg", "jpeg", "png", "tif", "tiff" }, "JPEG, PNG or TIFF Images");
 		if (fileList == null)
 			return;
 		if (fileList.isEmpty())
@@ -140,6 +143,34 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		});
 		final File parentFolder = fileList.iterator().next().getParentFile();
 		
+		TableData tableData;
+		
+		boolean foundAnnoFile;
+		
+		File annotationFile = new File(parentFolder.getAbsoluteFile() + File.pathSeparator + "annotation.xlsx");
+		if (!annotationFile.exists()) {
+			tableData = new TableData();
+			foundAnnoFile = false;
+		} else {
+			tableData = TableData.getTableData(annotationFile, true);
+			foundAnnoFile = true;
+		}
+		
+		HashMap<Integer, String> colNum2headerText = new HashMap<>();
+		for (int row = 1; row < tableData.getMaximumRow(); row++) {
+			for (int col = 1; col < tableData.getMaximumCol(); col++) {
+				Object v = tableData.getCellData(col, row, null);
+				if (v == null)
+					continue;
+				if (row == 1) {
+					colNum2headerText.put(col, v + "");
+				} else
+					if (col == 1) {
+						
+					}
+			}
+		}
+		
 		HashMap<ExperimentDataAnnotation, GregorianCalendar> eda2day = new HashMap<ExperimentDataAnnotation, GregorianCalendar>();
 		GregorianCalendar first = null;
 		GregorianCalendar last = null;
@@ -147,13 +178,13 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		for (File f : fileList) {
 			ExperimentDataAnnotation eda = new ExperimentDataAnnotation();
 			
-			// anno.put(f, eda);
-			// eda.setExpname(hs(parentFolder.getName()));
-			// eda.setCondspecies(hs(c.getSpecies()));
-			// eda.setCondgenotype(hs(c.getGenotype()));
-			// eda.setCondtreatment(hs(c.getTreatment()));
-			// eda.setCondvariety(hs(c.getVariety()));
-			// eda.setReplicateIDs(hi(c.getConditionId()));
+			anno.put(f, eda);
+			eda.setExpname(hs(parentFolder.getName()));
+			eda.setCondspecies(hs(c.getSpecies()));
+			eda.setCondgenotype(hs(c.getGenotype()));
+			eda.setCondtreatment(hs(c.getTreatment()));
+			eda.setCondvariety(hs(c.getVariety()));
+			eda.setReplicateIDs(hi(c.getConditionId()));
 			String fn = f.getName();
 			if (fn.contains("."))
 				fn = fn.substring(0, fn.lastIndexOf("."));
@@ -184,50 +215,50 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		int lM = last.get(GregorianCalendar.MONTH);
 		int lY = last.get(GregorianCalendar.YEAR);
 		
-		// for (ExperimentDataAnnotation eda : anno.values()) {
-		// if (last == null || first == null || !eda2day.containsKey(eda))
-		// continue;
-		// LinkedHashSet<String> substances = new LinkedHashSet<String>();
-		// substances.add("vis.top");
-		// substances.add("vis.side");
-		// substances.add("fluo.top");
-		// substances.add("fluo.side");
-		// substances.add("nir.top");
-		// substances.add("nir.side");
-		// substances.add("ir.top");
-		// substances.add("ir.side");
-		//
-		// eda.setSubstances(substances);
-		// eda.setExpname(hs(parentFolder.getName()));
-		// eda.setExpcoord(hs(SystemAnalysis.getUserName()));
-		// try {
-		// eda.setExpsrc(hs(SystemAnalysis.getUserName() + "@" + SystemAnalysis.getLocalHost().getCanonicalHostName() +
-		// ":" + parentFolder.getName()));
-		// } catch (Exception e) {
-		// eda.setExpsrc(hs(SystemAnalysis.getUserName() + "@localhost:" + parentFolder.getName()));
-		//
-		// }
-		//
-		// eda.setExpstartdate(hs(nn(fD) + "/" + nn(fM) + "/" + nn(fY)));
-		// eda.setExpimportdate(hs(nn(lD) + "/" + nn(lM) + "/" + nn(lY)));
-		// GregorianCalendar g = eda2day.get(eda);
-		// long tS = first.getTime().getTime();
-		// long tM = g.getTime().getTime();
-		// long diff = 1 + (tM - tS) / MILLISECONDS_IN_DAY;
-		// eda.setSamptimepoint(hs(diff + ""));
-		// eda.setSamptimeunit(hs("day"));
-		// }
-		//
-		// String fn = "";
-		// TableData td = TableData.getTableData(new File(fn));
-		//
-		// for (ExperimentInterface mdl : il.process(fileList, null)) {
-		// if (mdl != null && resultProcessor != null) {
-		// resultProcessor.setExperimenData(mdl);
-		// resultProcessor.run();
-		// }
-		// }
-		//
+		for (ExperimentDataAnnotation eda : anno.values()) {
+			if (last == null || first == null || !eda2day.containsKey(eda))
+				continue;
+			LinkedHashSet<String> substances = new LinkedHashSet<String>();
+			substances.add("vis.top");
+			substances.add("vis.side");
+			substances.add("fluo.top");
+			substances.add("fluo.side");
+			substances.add("nir.top");
+			substances.add("nir.side");
+			substances.add("ir.top");
+			substances.add("ir.side");
+			
+			eda.setSubstances(substances);
+			eda.setExpname(hs(parentFolder.getName()));
+			eda.setExpcoord(hs(SystemAnalysis.getUserName()));
+			try {
+				eda.setExpsrc(hs(SystemAnalysis.getUserName() + "@" + SystemAnalysis.getLocalHost().getCanonicalHostName() +
+						":" + parentFolder.getName()));
+			} catch (Exception e) {
+				eda.setExpsrc(hs(SystemAnalysis.getUserName() + "@localhost:" + parentFolder.getName()));
+				
+			}
+			
+			eda.setExpstartdate(hs(nn(fD) + "/" + nn(fM) + "/" + nn(fY)));
+			eda.setExpimportdate(hs(nn(lD) + "/" + nn(lM) + "/" + nn(lY)));
+			GregorianCalendar g = eda2day.get(eda);
+			long tS = first.getTime().getTime();
+			long tM = g.getTime().getTime();
+			long diff = 1 + (tM - tS) / MILLISECONDS_IN_DAY;
+			eda.setSamptimepoint(hs(diff + ""));
+			eda.setSamptimeunit(hs("day"));
+		}
+		
+		String fn = "";
+		TableData td = TableData.getTableData(new File(fn));
+		
+		for (ExperimentInterface mdl : il.process(fileList, null)) {
+			if (mdl != null && resultProcessor != null) {
+				resultProcessor.setExperimenData(mdl);
+				resultProcessor.run();
+			}
+		}
+		
 	}
 	
 	private LinkedHashSet<String> hs(String string) {
