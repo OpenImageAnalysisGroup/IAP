@@ -114,10 +114,10 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 			if (cameraConfig == null || cameraConfig.trim().isEmpty())
 				cameraConfig = "unknown camera config";
 			getResultSet().setNumericResult(0,
-					new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "blue_marker_distance"), maxDist, "px",
+					new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "marker.horizontal_distance"), maxDist, "px",
 					this);
 			getResultSet().setNumericResult(0,
-					new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "blue_marker_distance.predefined"), 1,
+					new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "marker.horizontal_distance.predefined"), 1,
 					"0/1",
 					this);
 			optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);
@@ -167,7 +167,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 				maxDist = max(distances);
 				getResultSet()
 						.setNumericResult(0,
-								new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "blue_marker_distance"), maxDist,
+								new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "marker.horizontal_distance"), maxDist,
 								"px", this);
 				
 				if (maxDist > 0)
@@ -334,9 +334,9 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 						"If three blue marker points are located in the image at the left and right, "
 								+ "this value indicates the position of the bottom right blue marker (Y-coordinate)."),
 				
-				new CalculatedProperty("optics.blue_marker_distance", "User-provided horizontal distance "
+				new CalculatedProperty("marker.horizontal_distance", "User-provided horizontal distance "
 						+ "of blue markers of another real-world object in case the usage of a fixed marker distance has been enabled."),
-				new CalculatedProperty("optics.blue_marker_distance.predefined", "In case the option for the usage of a fixed "
+				new CalculatedProperty("marker.horizontal_distance.predefined", "In case the option for the usage of a fixed "
 						+ "marker distance has been enabled, the value of this property will 1, otherwise it will be 0."),
 				
 				new CalculatedProperty(PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_LEFT.getName(null),

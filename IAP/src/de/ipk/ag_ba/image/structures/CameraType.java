@@ -33,4 +33,32 @@ public enum CameraType {
 			r.add(c);
 		return r;
 	}
+	
+	public static CameraType fromString(String string) {
+		for (CameraType ct : CameraType.values())
+			if (ct.toString().equals(string))
+				return ct;
+		return null;
+	}
+	
+	public String getNiceName() {
+		String s = "unknown";
+		switch (this) {
+			case VIS:
+				s = "visible-light";
+				break;
+			case FLUO:
+				s = "fluorescence";
+				break;
+			case NIR:
+				s = "near-infrared";
+				break;
+			case IR:
+				s = "infrared";
+				break;
+			case MULTI:
+				s = "multi camera";
+		}
+		return s;
+	}
 }

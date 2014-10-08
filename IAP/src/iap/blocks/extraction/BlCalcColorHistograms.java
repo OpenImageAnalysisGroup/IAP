@@ -437,13 +437,6 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				new CalculatedProperty("intensity.phenol.plant_weight", ""),
 				new CalculatedProperty("intensity.phenol.plant_weight_drought_loss", ""),
 				
-				new CalculatedProperty("filled.pixels",
-						"Number of plant pixels."),
-				new CalculatedProperty("filled.percent",
-						"Number of plant pixels divided by number of overall pixels in the near-infrared image. If half of the "
-								+ "image is filled by the plant, the value would be 0.5. If 10% of the image is filled by the plant, the "
-								+ "value would be 0.1. Excel table display may be formatted to show percentage values (ranging from 0 to 100)."),
-				
 				new CalculatedProperty("intensity.stddev", ""),
 				new CalculatedProperty("intensity.skewness", ""),
 				new CalculatedProperty("intensity.kurtosis", ""),
