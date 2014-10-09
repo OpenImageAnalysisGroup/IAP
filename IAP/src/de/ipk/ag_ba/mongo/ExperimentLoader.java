@@ -238,7 +238,7 @@ public class ExperimentLoader implements RunnableOnDB {
 			}
 			((Experiment) experiment).sortSubstances();
 		}
-		if (SystemOptions.getInstance().getBoolean("GRID-STORAGE", "Sort Conditions upon Loading", true)) {
+		if (SystemOptions.getInstance().getBoolean("GRID-STORAGE", "Sort Conditions upon Loading", false)) {
 			if (optStatusProvider != null) {
 				optStatusProvider.setCurrentStatusText1("Sort Conditions");
 			}
