@@ -232,12 +232,29 @@ public class ExperimentLoader implements RunnableOnDB {
 		int numberOfImagesAndVolumes = Substance3D.countMeasurementValues(experiment, new MeasurementNodeType[] {
 				MeasurementNodeType.IMAGE, MeasurementNodeType.VOLUME });
 		experiment.getHeader().setNumberOfFiles(numberOfImagesAndVolumes);
-		boolean sortSubstances = false;
-		if (sortSubstances)
+		if (SystemOptions.getInstance().getBoolean("GRID-STORAGE", "Sort Substances upon Loading", true)) {
+			if (optStatusProvider != null) {
+				optStatusProvider.setCurrentStatusText1("Sort Substances");
+			}
 			((Experiment) experiment).sortSubstances();
+		}
+		if (SystemOptions.getInstance().getBoolean("GRID-STORAGE", "Sort Conditions upon Loading", true)) {
+			if (optStatusProvider != null) {
+				optStatusProvider.setCurrentStatusText1("Sort Conditions");
+			}
+			((Experiment) experiment).sortConditions();
+		}
+		
 		if (numberOfImagesAndVolumes > 0 && interactiveCalculateExperimentSize) {
+			if (optStatusProvider != null) {
+				optStatusProvider.setCurrentStatusText1("Check Storage Size");
+			}
 			mongoDB.updateExperimentSize(db, experiment, optStatusProvider);
 		}
+		if (optStatusProvider != null) {
+			optStatusProvider.setCurrentStatusText1("Dataset-processing finished");
+		}
+		
 		// }
 	}
 	

@@ -34,16 +34,16 @@ public class MySnapshotFilter implements SnapshotFilter {
 	
 	@Override
 	public boolean filterOut(SnapshotDataIAP s) {
-		if (toggles == null)
-			return false;
+		// if (toggles == null)
+		// return false;
 		
 		if (filterOut(s.getPlantId(), s.getDay()))
 			return true;
-		
-		for (ThreadSafeOptions t : toggles) {
-			if (match(t, s))
-				return true;
-		}
+		if (toggles != null)
+			for (ThreadSafeOptions t : toggles) {
+				if (match(t, s))
+					return true;
+			}
 		return false;
 	}
 	

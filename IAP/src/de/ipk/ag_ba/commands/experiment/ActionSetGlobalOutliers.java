@@ -73,6 +73,7 @@ public class ActionSetGlobalOutliers extends AbstractNavigationAction {
 		
 		if (resCnt > 0) {
 			experiment.getHeader().setGlobalOutlierInfo(StringManipulationTools.getStringList(outliers, "//"));
+			experiment.getExperiment().setHeader(experiment.getHeader());
 			res.add("Updated global outlier list with " + resCnt + " additional IDs (changed in memory, needs to be manually saved if desired)).");
 		} else
 			res.add("Found no image which has been marked as an outlier. Global outlier list remains unchanged.");
