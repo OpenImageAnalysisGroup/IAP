@@ -52,9 +52,13 @@ public class Trait {
 			
 			TraitCategory cat = TraitCategory.fromString(name[1]);
 			
+			if (cat == null)
+				return null;
+			
 			CameraType ct = CameraType.fromString(name[2]);
 			
 			String trait = name[3];
+			
 			h = trait;
 			if (h != null && h.endsWith(")") && h.contains("(")) {
 				h = h.substring(0, h.indexOf("(")).trim();
