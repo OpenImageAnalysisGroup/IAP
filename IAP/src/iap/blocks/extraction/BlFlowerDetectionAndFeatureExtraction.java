@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.Vector2i;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 import de.ipk.ag_ba.image.operation.ImageMoments;
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -41,7 +42,7 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		boolean markResults = getBoolean("Mark Results", true);
 		boolean saveResults = getBoolean("Save Results", true);
 		boolean trackResults = getBoolean("Track Results", true);
-		int minimumSizeOfRegion = getInt("Minimum Region Size", 15);
+		int minimumSizeOfRegion = getInt("Minimum Region Size", 30);
 		
 		Image img = input().masks().vis();
 		
@@ -75,12 +76,11 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		Vector2i[] clusterDimensions = rl.getClusterDimension();
 		TopBottomLeftRight[] boundingBox = rl.getBoundingBox();
 		
-		Image clusteredImage = rl.getClusterImage().show("rl image", true);
+		Image clusteredImage = rl.getClusterImage().show("rl image", debugValues);
 		CameraType ct = img.getCameraType();
 		
-		// get skeleton-image and workimage to connect lose leaves and for optimization
+		// get skeleton-image
 		Image skel = getResultSet().getImage("skeleton_" + ct.toString());
-		// Image skel_workimge = getResultSet().getImage("skeleton_workimage_" + ct.toString());
 		
 		if (skel != null) {
 			clusteredImage.copy().io().or(skel).getImage()
@@ -109,10 +109,10 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 				icclu.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 10, Color.BLUE.getRGB(), 0.0, 2);
 				
 				if (directionNextSekeltonPoint.x == -1)
-					directionNextSekeltonPoint = coGWeighted;
+					directionNextSekeltonPoint = new Point(coGWeighted.x + bounds.getLeftX(), coGWeighted.x + bounds.getTopY());
 				double ec = im.getEccentricity();
 				// direction
-				Vector2i direction = new Vector2i(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y);
+				Vector2D direction = new Vector2D(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y);
 				
 				if (true) {
 					ImageCanvas ic = new ImageCanvas(im.drawMoments().copy());
@@ -122,25 +122,22 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 					ic.drawCircle(coG.x, coG.y, 5, Color.YELLOW.getRGB(), 0, 1);
 					ic.drawCircle(coGWeighted.x, coGWeighted.y, 5, Color.RED.getRGB(), 0, 1);
 					ic.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 5, Color.BLACK.getRGB(), 0, 1);
-					ic.drawLine(new Point(centerX, centerY), new Point((direction.x),
-							(direction.y)), Color.ORANGE.getRGB(), 0.0, 1);
+					ic.drawLine(new Point(centerX, centerY), new Point((int) (direction.getX()),
+							(int) (direction.getY())), Color.ORANGE.getRGB(), 0.0, 1);
 					ic.getImage().show("marked flower", false);
 				}
-				
-				direction.x = direction.x;
-				direction.y = direction.y;
 				
 				Vector2i pos = centerPoints[idx];
 				Feature tempFeature = new Feature(new Integer(pos.x), new Integer(pos.y));
 				tempFeature.addFeature("size", areas[idx], FeatureObjectType.NUMERIC);
 				tempFeature.addFeature("eccentricity", ec, FeatureObjectType.NUMERIC);
 				tempFeature.addFeature("minDistToOtherRegion", minDistanceToOtherRegion, FeatureObjectType.NUMERIC);
-				tempFeature.addFeature("direction_1", direction, FeatureObjectType.NUMERIC);
+				tempFeature.addFeature("direction_1", direction, FeatureObjectType.VECTOR);
 				flist.add(tempFeature);
 			}
 			idx++;
 		}
-		icclu.getImage().show("petioles");
+		// icclu.getImage().show("petioles");
 		return flist;
 	}
 	
@@ -247,10 +244,10 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		if (markResults) {
 			ImageCanvas ic = new ImageCanvas(img);
 			for (Feature p : featureList) {
-				Vector2i direction = (Vector2i) p.getFeature("direction_1");
+				Vector2D direction = (Vector2D) p.getFeature("direction_1");
 				ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 3);
-				ic.drawLine(new Point((int) (p.getPosition().getX()), (int) (p.getPosition().getY())), new Point((direction.x),
-						(direction.y)),
+				ic.drawLine(new Point((int) (p.getPosition().getX()), (int) (p.getPosition().getY())), new Point((int) (direction.getX()),
+						(int) (direction.getY())),
 						Color.GREEN.getRGB(), 0.0, 2);
 			}
 			img = ic.getImage();
@@ -304,12 +301,12 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 	
 	@Override
 	public String getName() {
-		return "Detect Flowers (tested for tobacco)";
+		return "Detect Flowers";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Detects Flowers and extract Features. Before flowers should be segmented by a segmentation block.";
+		return "Detects Flowers and extract Features. Before flowers should be segmented by a segmentation block. Tested for tobacco flowers.";
 	}
 	
 	@Override
