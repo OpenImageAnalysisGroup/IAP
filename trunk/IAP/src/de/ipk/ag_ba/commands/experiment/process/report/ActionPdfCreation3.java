@@ -682,6 +682,10 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					} else
 						if (unit != null)
 							niceName = niceName + " [" + unit + "]";
+					
+					if (disableNiceNameMapping)
+						niceName = origH;
+					
 					Cell cc = rrrr.createCell(1);
 					cc.setCellValue(niceName);
 					cc.setCellStyle(styleTL);
@@ -746,6 +750,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					} else
 						if (unit != null)
 							niceName = niceName + " [" + unit + "]";
+					
+					if (disableNiceNameMapping)
+						niceName = origH;
 					
 					Cell cc = row.createCell(col++);
 					cc.setCellValue(niceName);
@@ -1449,6 +1456,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	private SnapshotVisitor snaphotVisitor;
 	
+	private boolean disableNiceNameMapping;
+	
 	@Override
 	public boolean prepareCommandLineExecution() throws Exception {
 		targetDirectoryOrTargetFile = null;
@@ -1595,5 +1604,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	public void setSnapshotVisitor(SnapshotVisitor sv) {
 		this.snaphotVisitor = sv;
+	}
+	
+	public void setDisableNiceNameMapping(boolean disableNiceNameMapping) {
+		this.disableNiceNameMapping = disableNiceNameMapping;
 	}
 }

@@ -1,6 +1,10 @@
 package de.ipk.ag_ba.commands.experiment.scripts.clustering;
 
+import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
+import de.ipk.ag_ba.image.structures.CameraType;
 
 /**
  * @author klukas
@@ -86,17 +90,21 @@ public class ScriptPVCLUST implements ActionScriptBasedDataProcessing {
 		return new String[] {
 				"weight_before:Weight before watering",
 				"water_weight:Water weight",
-				"side.vis.height.norm:Height (zoom corrected) // side.height:Height",
-				"side.vis.area.norm:Side Vis Area (normalized) // side.vis.area:Side Vis Area",
-				"side.fluo.intensity.mean:Fluo intensity (side)",
-				"side.nir.intensity.mean:NIR intensity (side)",
-				"top.fluo.intensity.mean:Fluo intensity (top)",
-				"top.nir.intensity.mean:NIR intensity (top)",
-				"side.vis.hsv.h.mean:Average hue (side)",
-				"top.vis.hsv.h.mean:Average hue (top)",
-				"side.vis.width.mean:Width (zoom corrected) // side.vis.width:Width",
-				"top.vis.area.norm:Top Vis Area (zoom corrected) // top.vis.area:Top Vis Area",
-				"volume.fluo.iap:Volume estimation (fluo)",
+				new Trait(CameraPosition.SIDE, CameraType.VIS, TraitCategory.GEOMETRY, "height.norm") + ":Height (zoom corrected) // " +
+						new Trait(CameraPosition.SIDE, CameraType.VIS, TraitCategory.GEOMETRY, "height") + ":Height",
+				new Trait(CameraPosition.SIDE, CameraType.VIS, TraitCategory.GEOMETRY, "area.norm") + ":Side Vis Area (normalized) // " +
+						new Trait(CameraPosition.SIDE, CameraType.VIS, TraitCategory.GEOMETRY, "area") + ":Side Vis Area",
+				new Trait(CameraPosition.SIDE, CameraType.FLUO, TraitCategory.INTENSITY, "intensity.classic.mean") + ":Fluorescence intensity (side)",
+				new Trait(CameraPosition.SIDE, CameraType.NIR, TraitCategory.INTENSITY, "intensity.mean") + ":Near-infrared intensity (side)",
+				new Trait(CameraPosition.TOP, CameraType.FLUO, TraitCategory.INTENSITY, "intensity.classic.mean") + ":Fluoresence intensity (top)",
+				new Trait(CameraPosition.TOP, CameraType.NIR, TraitCategory.INTENSITY, "intensity.mean") + ":Near-Infrared intensity (top)",
+				new Trait(CameraPosition.SIDE, CameraType.VIS, TraitCategory.INTENSITY, "hsv.h.mean") + ":Average hue (side)",
+				new Trait(CameraPosition.TOP, CameraType.VIS, TraitCategory.INTENSITY, "hsv.h.mean") + ":Average hue (top)",
+				new Trait(CameraPosition.SIDE, CameraType.VIS, TraitCategory.GEOMETRY, "width.norm") + ":Width (zoom corrected) // "
+						+ new Trait(CameraPosition.SIDE, CameraType.VIS, TraitCategory.GEOMETRY, "width") + ":Width",
+				new Trait(CameraPosition.TOP, CameraType.VIS, TraitCategory.GEOMETRY, "area.norm") + ":Top Vis Area (zoom corrected) // "
+						+ new Trait(CameraPosition.TOP, CameraType.VIS, TraitCategory.GEOMETRY, "area") + ":Top Vis Area",
+				new Trait(CameraPosition.COMBINED, CameraType.FLUO, TraitCategory.GEOMETRY, "volume.iap") + ":Volume estimation (fluo)",
 		};
 	}
 	

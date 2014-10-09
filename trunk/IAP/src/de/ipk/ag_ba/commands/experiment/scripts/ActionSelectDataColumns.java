@@ -49,6 +49,8 @@ public class ActionSelectDataColumns extends AbstractNavigationAction {
 					for (String dc : desiredDataColumns) {
 						colMatchLoop: for (String colDesired : dc.split("//")) {
 							colDesired = colDesired.trim();
+							if (colDesired.startsWith("RESULT_"))
+								colDesired = colDesired.substring("RESULT_".length());
 							String colName = colDesired.split(":", 2)[0];
 							String desc = colDesired.split(":", 2).length > 1 ? colDesired.split(":", 2)[1] : colName;
 							for (SubstanceInterface s : e) {
