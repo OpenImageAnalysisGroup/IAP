@@ -183,7 +183,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 						togglesMetaDataFiltering,
 						togglesDataColumns,
 						null, null, null, "complete, high mem requ.", ExportSetting.ALL, true);
-				
+				expCommand.setDisableNiceNameMapping(allowDataColumnSelection);
 				if (!createClusteringDataset) {
 					if (allowGroupColumnSelection) {
 						final ArrayList<ThreadSafeOptions> togglesDivideDataSetByF = togglesDivideDataSetBy;
