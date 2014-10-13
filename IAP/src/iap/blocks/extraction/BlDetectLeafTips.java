@@ -39,15 +39,6 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	@Override
 	protected void prepare() {
 		super.prepare();
-		
-		// calculation for side
-		if (!getBoolean("Process Side", true) && optionsAndResults.getCameraPosition() == CameraPosition.SIDE)
-			ignore = true;
-		
-		// calculation for top
-		if (!getBoolean("Process Top", false) && optionsAndResults.getCameraPosition() == CameraPosition.TOP)
-			ignore = true;
-		
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
 	}
 	
