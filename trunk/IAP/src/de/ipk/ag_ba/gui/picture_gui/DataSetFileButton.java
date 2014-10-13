@@ -1,7 +1,6 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import iap.pipelines.ImageProcessorOptionsAndResults;
-import ij.WindowManager;
 // import ij.io.FileInfoXYZ;
 import ij.io.Opener;
 // import ij.io.TiffDecoderExtended;
@@ -528,12 +527,12 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						Action action2 = new AbstractAction("Close All Image Windows") {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								WindowManager.closeAllWindows();
+								IAPservice.closeAllImageJimageWindows();
 							}
 							
 							@Override
 							public boolean isEnabled() {
-								return WindowManager.getImageCount() > 0;
+								return IAPservice.getIAPimageWindowCount() > 0;
 							}
 							
 						};
