@@ -22,8 +22,8 @@ public class MatchInfo {
 			return res;
 		if (res.startsWith("corr."))
 			res = res.substring("corr.".length());
-		if (res.endsWith(".avg"))
-			res = res.substring(0, res.length() - ".avg".length());
+		if (res.endsWith(".mean"))
+			res = res.substring(0, res.length() - ".mean".length());
 		else
 			if (res.endsWith(".angles"))
 				res = res.substring(0, res.length() - ".angles".length());
