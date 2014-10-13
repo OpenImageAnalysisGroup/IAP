@@ -58,7 +58,7 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		
 		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", true);
 		if (vanted) {
-			ActionDataProcessing action = new ActionShowDataWithinVANTED("Show in IAP-Data-Navigator", new PutIntoSidePanel(false));
+			ActionDataProcessing action = new ActionShowDataWithinVANTED("Show in VANTED", new PutIntoSidePanel(false));
 			actions.add(action);
 		}
 		

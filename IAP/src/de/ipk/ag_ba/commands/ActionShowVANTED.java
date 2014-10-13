@@ -21,7 +21,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 public class ActionShowVANTED extends AbstractNavigationAction {
 	
-	private boolean showInline = SystemOptions.getInstance().getBoolean("VANTED", "debug-show-inline-iap", false);
+	private final boolean showInline = SystemOptions.getInstance().getBoolean("VANTED", "debug-show-inline-iap", false);
 	private NavigationButton src;
 	
 	public ActionShowVANTED() {
@@ -66,6 +66,6 @@ public class ActionShowVANTED extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "IAP-Data-Navigator";
+		return "IAP-VANTED";
 	}
 }

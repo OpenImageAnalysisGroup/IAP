@@ -35,6 +35,7 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -116,31 +117,31 @@ public class BlockPipeline {
 				continue;
 			final int well = idx;
 			final int wellCnt = executionTrayCount;
-			// Runnable r = new Runnable() {
-			//
-			// @Override
-			// public void run() {
-			ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
-			try {
-				BlockResultSet res = executeInnerCall(well, wellCnt, options, new StringAndFlexibleMaskAndImageSet(null, input), ds, status);
-				if (options.forceDebugStack)
-					synchronized (options.forcedDebugStacks) {
-						options.forcedDebugStacks.add(ds);
+			Runnable r = new Runnable() {
+				
+				@Override
+				public void run() {
+					ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
+					try {
+						BlockResultSet res = executeInnerCall(well, wellCnt, options, new StringAndFlexibleMaskAndImageSet(null, input), ds, status);
+						if (options.forceDebugStack)
+							synchronized (options.forcedDebugStacks) {
+								options.forcedDebugStacks.add(ds);
+							}
+						res.clearStoredPostprocessors();
+						res.clearNotUsedResults();
+						synchronized (blockResults) {
+							blockResults.put(well, res);
+						}
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+						exception.setObject(e);
 					}
-				res.clearStoredPostprocessors();
-				res.clearNotUsedResults();
-				synchronized (blockResults) {
-					blockResults.put(well, res);
 				}
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
-				exception.setObject(e);
-			}
+			};
+			jobs.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + idx));
 		}
-		// };
-		// jobs.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + idx));
-		// }
-		// BackgroundThreadDispatcher.waitFor(jobs);
+		BackgroundThreadDispatcher.waitFor(jobs);
 		if (exception.getObject() != null)
 			throw ((Exception) exception.getObject());
 	}
