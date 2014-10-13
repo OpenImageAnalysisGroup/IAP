@@ -43,6 +43,7 @@ import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.OptionsGenerator;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -88,7 +89,7 @@ public class BlockPipeline {
 	
 	private static long lastOutput = 0;
 	
-	public void execute(final ImageProcessorOptionsAndResults options,
+	public void execute(final OptionsGenerator og,
 			final MaskAndImageSet input,
 			final HashMap<Integer, BlockResultSet> blockResults,
 			final BackgroundTaskStatusProviderSupportingExternalCall status)
@@ -102,12 +103,12 @@ public class BlockPipeline {
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (blockClass != null && (WellProcessor.class.isAssignableFrom(blockClass))) {
 				WellProcessor inst = (WellProcessor) blockClass.newInstance();
-				int n = inst.getDefinedWellCount(options);
+				int n = inst.getDefinedWellCount(og.getOptions());
 				if (n > 0)
 					executionTrayCount = n;
 			}
 		}
-		options.setWellCnt(executionTrayCount);
+		final int etc = executionTrayCount;
 		final ObjectRef exception = new ObjectRef();
 		if (status != null)
 			status.setCurrentStatusValue(0);
@@ -121,6 +122,9 @@ public class BlockPipeline {
 				
 				@Override
 				public void run() {
+					ImageProcessorOptionsAndResults options = og.getOptions();
+					
+					options.setWellCnt(etc);
 					ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
 					try {
 						BlockResultSet res = executeInnerCall(well, wellCnt, options, new StringAndFlexibleMaskAndImageSet(null, input), ds, status);

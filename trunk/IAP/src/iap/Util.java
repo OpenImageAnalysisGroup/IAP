@@ -23,6 +23,7 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk.ag_ba.postgresql.CommandLineBackgroundTaskStatusProvider;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.OptionsGenerator;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
@@ -72,7 +73,7 @@ public class Util {
 		SystemOptions settings = null;
 		TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint = null;
 		TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults = null;
-		ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(settings, previousResultsForThisTimePoint, plantResults);
+		final ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(settings, previousResultsForThisTimePoint, plantResults);
 		MaskAndImageSet input = new MaskAndImageSet(
 				new ImageSet((Image) null, (Image) null, (Image) null, (Image) null),
 				new ImageSet((Image) null, (Image) null, (Image) null, (Image) null));
@@ -115,7 +116,14 @@ public class Util {
 				input.images().set(img);
 		}
 		HashMap<Integer, BlockResultSet> blockResults = null;
-		p.execute(options, input, blockResults, new CommandLineBackgroundTaskStatusProvider(true));
+		OptionsGenerator og = new OptionsGenerator() {
+			
+			@Override
+			public ImageProcessorOptionsAndResults getOptions() {
+				return options;
+			}
+		};
+		p.execute(og, input, blockResults, new CommandLineBackgroundTaskStatusProvider(true));
 	}
 	
 	private static void convertStatisticsFilesToImages(String[] args) throws IOException {

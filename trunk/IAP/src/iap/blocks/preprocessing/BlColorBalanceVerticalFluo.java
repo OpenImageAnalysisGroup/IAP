@@ -21,14 +21,10 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug;
 	
-	BlockResult bpleft, bpright;
-	
 	@Override
 	protected void prepare() {
 		super.prepare();
 		debug = getBoolean("debug", false);
-		bpleft = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(optionsAndResults.getCameraPosition()));
-		bpright = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(optionsAndResults.getCameraPosition()));
 	}
 	
 	@Override
@@ -37,7 +33,7 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		Image res;
 		boolean invert = true;
 		if (input != null) {
-			res = balance(input, input, 255, invert);
+			res = balance(input.copy(), input.copy(), 255, invert);
 		} else
 			res = input;
 		return res;
@@ -49,7 +45,7 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		Image res;
 		boolean invert = true;
 		if (input != null) {
-			res = balance(input, input, 255, invert);
+			res = balance(input.copy(), input.copy(), 255, invert);
 		} else
 			res = input;
 		return res;
@@ -120,77 +116,82 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 	 *           - inverts the image (used for fluo)
 	 * @return
 	 */
-	public Image balance(Image input, Image inputUsedForColorAnalysis,
+	public synchronized Image balance(Image input, Image inputUsedForColorAnalysis,
 			int whitePoint, boolean invert) {
-		BlockResult markerPosLeftY = getResultSet()
-				.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(optionsAndResults.getCameraPosition()));
-		BlockResult markerPosRightY = getResultSet().searchNumericResult(0, 1,
-				PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(optionsAndResults.getCameraPosition()));
-		
-		BlockResult markerPosLeftX = getResultSet()
-				.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(optionsAndResults.getCameraPosition()));
-		BlockResult markerPosRightX = getResultSet().searchNumericResult(0, 1,
-				PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(optionsAndResults.getCameraPosition()));
-		if (inputUsedForColorAnalysis == input)
-			inputUsedForColorAnalysis = input.copy();
-		
-		Image res = input;
-		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-			if (input != null) {
-				Image nir = input;
-				// White Balancing
+		synchronized (BlColorBalanceVerticalFluo.class) {
+			BlockResult bpleft, bpright;
+			bpleft = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(optionsAndResults.getCameraPosition()));
+			bpright = getResultSet().searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(optionsAndResults.getCameraPosition()));
+			BlockResult markerPosLeftY = getResultSet()
+					.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_Y.getName(optionsAndResults.getCameraPosition()));
+			BlockResult markerPosRightY = getResultSet().searchNumericResult(0, 1,
+					PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_Y.getName(optionsAndResults.getCameraPosition()));
+			
+			BlockResult markerPosLeftX = getResultSet()
+					.searchNumericResult(0, 1, PropertyNames.RESULT_VIS_MARKER_POS_1_LEFT_X.getName(optionsAndResults.getCameraPosition()));
+			BlockResult markerPosRightX = getResultSet().searchNumericResult(0, 1,
+					PropertyNames.RESULT_VIS_MARKER_POS_1_RIGHT_X.getName(optionsAndResults.getCameraPosition()));
+			if (inputUsedForColorAnalysis == input)
+				inputUsedForColorAnalysis = input.copy();
+			
+			Image res = input;
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
+				if (input != null) {
+					Image nir = input;
+					// White Balancing
+					double[] pix;
+					if (invert) {
+						// FLUO
+						pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invertImageJ().getImage(),
+								getDouble("balance-size-width-top-invert", 0.08), bpleft, bpright);
+						Image bal = input.io().invertImageJ().imageBalancing(whitePoint, pix).invertImageJ().getImage();
+						return bal;
+					} else {
+						pix = getProbablyWhitePixels(inputUsedForColorAnalysis, getDouble("balance-size-width-top", 0.3), null, null);
+						res = new ImageOperation(nir).imageBalancing(whitePoint, pix).getImage();
+					}
+				}
+			} else {
+				ImageOperation io = new ImageOperation(input);
+				int width = input.getWidth();
+				int height = input.getHeight();
+				double markerPosY = -1;
+				double markerPosX = -1;
+				if (markerPosLeftY != null) {
+					markerPosY = markerPosLeftY.getValue() * height;
+				}
+				if (markerPosLeftY == null && markerPosRightY != null) {
+					markerPosY = markerPosRightY.getValue() * height;
+				}
+				if (markerPosLeftX != null) {
+					markerPosX = markerPosLeftX.getValue() * width;
+				}
+				if (markerPosLeftX == null && markerPosRightX != null) {
+					markerPosX = input.getWidth() - markerPosRightX.getValue() * width;
+				}
 				double[] pix;
-				if (invert) {
-					// FLUO
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().invertImageJ().getImage(),
-							getDouble("balance-size-width-top-invert", 0.08), bpleft, bpright);
-					Image bal = input.io().invertImageJ().imageBalancing(whitePoint, pix).invertImageJ().getImage();
-					return bal;
-				} else {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis, getDouble("balance-size-width-top", 0.3), null, null);
-					res = new ImageOperation(nir).imageBalancing(whitePoint, pix).getImage();
-				}
+				if (markerPosY != -1)
+					if (invert) {
+						pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invertImageJ().getImage(),
+								getDouble("balance-size-width-side-invert", 0.08), bpleft, bpright);
+						res = io.invertImageJ().imageBalancing(whitePoint, pix).invertImageJ().getImage();
+					} else { // nir - remove round shade
+						pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);
+						res = io.imageBalancing(whitePoint, pix).getImage();
+					}
+				else
+					if (invert) {
+						pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invertImageJ().getImage(),
+								getDouble("balance-size-width-side-invert", 0.08), bpleft, bpright);
+						res = io.invertImageJ().imageBalancing(whitePoint, pix).invertImageJ().getImage();
+					} else {
+						pix = getProbablyWhitePixels(inputUsedForColorAnalysis,
+								getDouble("balance-size-width-side", 0.08), bpleft, bpright);
+						res = io.imageBalancing(whitePoint, pix).getImage();
+					}
 			}
-		} else {
-			ImageOperation io = new ImageOperation(input);
-			int width = input.getWidth();
-			int height = input.getHeight();
-			double markerPosY = -1;
-			double markerPosX = -1;
-			if (markerPosLeftY != null) {
-				markerPosY = markerPosLeftY.getValue() * height;
-			}
-			if (markerPosLeftY == null && markerPosRightY != null) {
-				markerPosY = markerPosRightY.getValue() * height;
-			}
-			if (markerPosLeftX != null) {
-				markerPosX = markerPosLeftX.getValue() * width;
-			}
-			if (markerPosLeftX == null && markerPosRightX != null) {
-				markerPosX = input.getWidth() - markerPosRightX.getValue() * width;
-			}
-			double[] pix;
-			if (markerPosY != -1)
-				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invertImageJ().getImage(),
-							getDouble("balance-size-width-side-invert", 0.08), bpleft, bpright);
-					res = io.invertImageJ().imageBalancing(whitePoint, pix).invertImageJ().getImage();
-				} else { // nir - remove round shade
-					pix = getProbablyWhitePixelsforNir(inputUsedForColorAnalysis);
-					res = io.imageBalancing(whitePoint, pix).getImage();
-				}
-			else
-				if (invert) {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis.io().copy().crop().invertImageJ().getImage(),
-							getDouble("balance-size-width-side-invert", 0.08), bpleft, bpright);
-					res = io.invertImageJ().imageBalancing(whitePoint, pix).invertImageJ().getImage();
-				} else {
-					pix = getProbablyWhitePixels(inputUsedForColorAnalysis,
-							getDouble("balance-size-width-side", 0.08), bpleft, bpright);
-					res = io.imageBalancing(whitePoint, pix).getImage();
-				}
+			return res;
 		}
-		return res;
 	}
 	
 	private double[] getProbablyWhitePixelsforNir(Image inputUsedForColorAnalysis) {
