@@ -8,6 +8,8 @@
 package de.ipk.ag_ba.gui.util;
 
 import ij.ImageJ;
+import ij.WindowManager;
+import ij.gui.ImageWindow;
 import info.StopWatch;
 
 import java.awt.Color;
@@ -16,6 +18,7 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -1756,6 +1759,10 @@ public class IAPservice {
 	public static void showImageJ() {
 		if (SystemAnalysis.isHeadless())
 			return;
+		if (IAPservice.ij != null && !IAPservice.ij.isShowing())
+			closeAllImageJimageWindows();
+		if (IAPservice.ij != null && IAPservice.ij.isShowing())
+			IAPservice.ij.toFront();
 		if (IAPservice.ij == null || !IAPservice.ij.isShowing())
 			IAPservice.ij = new ImageJ();
 	}
@@ -1970,5 +1977,35 @@ public class IAPservice {
 			}
 		}
 		return false;
+	}
+	
+	public static boolean isImageJvisible() {
+		return IAPservice.ij != null && IAPservice.ij.isShowing();
+	}
+	
+	public static int getIAPimageWindowCount() {
+		if (isImageJvisible())
+			return WindowManager.getImageCount();
+		else {
+			int n = 0;
+			if (IAPservice.ij != null && !IAPservice.ij.isShowing())
+				if (IAPservice.ij.getWindows() != null)
+					for (Window w : IAPservice.ij.getWindows())
+						if (w instanceof ImageWindow)
+							if (!((ImageWindow) w).isClosed())
+								n++;
+			return n;
+		}
+	}
+	
+	public static void closeAllImageJimageWindows() {
+		if (IAPservice.isImageJvisible())
+			WindowManager.closeAllWindows();
+		else
+			if (IAPservice.ij != null && !IAPservice.ij.isShowing())
+				if (IAPservice.ij.getWindows() != null)
+					for (Window w : IAPservice.ij.getWindows())
+						if (w instanceof ImageWindow)
+							w.dispose();
 	}
 }

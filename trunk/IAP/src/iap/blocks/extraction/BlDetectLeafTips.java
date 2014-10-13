@@ -39,7 +39,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	@Override
 	protected void prepare() {
 		super.prepare();
-		
+	
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
 	}
 	
