@@ -2,7 +2,9 @@ package iap.blocks.image_analysis_tools.leafClustering;
 
 import iap.blocks.image_analysis_tools.leafClustering.FeatureObject.FeatureObjectType;
 
+import java.awt.Point;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.vecmath.Point3d;
 
@@ -13,6 +15,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
  */
 public class Feature {
 	HashMap<String, FeatureObject> featureMap = new HashMap<String, FeatureObject>();
+	Map<Point, String> mapp = new HashMap<Point, String>();
 	
 	public Feature(Integer X, Integer Y) {
 		featureMap.put("x", new FeatureObject(X.intValue(), FeatureObjectType.POSITION));
