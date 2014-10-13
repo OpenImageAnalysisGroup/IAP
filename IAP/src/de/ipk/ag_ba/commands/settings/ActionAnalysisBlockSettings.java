@@ -127,10 +127,8 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 				CalculatesProperties c = (CalculatesProperties) inst;
 				CalculatedPropertyDescription[] cp = c.getCalculatedProperties();
 				if (cp != null && cp.length > 0) {
-					calc = "Calculated Properties:<br><br>" +
-							"<li>Input/Output:<code><ul><li>In:&nbsp;&nbsp;" +
-							StringManipulationTools.getStringList("<li>", cp, "") +
-							"</ul>";
+					calc = "Calculates the following properties:<br>" +
+							StringManipulationTools.getStringList("<li>", cp, "");
 				}
 			}
 			return new MainPanelComponent("<html><b>" + inst.getName() + "</b><br><br>" +

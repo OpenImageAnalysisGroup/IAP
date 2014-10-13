@@ -80,7 +80,10 @@ public class CalculatedProperty implements CalculatedPropertyDescription {
 	
 	@Override
 	public String toString() {
-		return name + " (" + desc + ")";
+		String s = IAPpluginManager.getInstance().getDescriptionForCalculatedProperty(name);
+		if (s != null && s.contains("<br>"))
+			s = s.substring(0, s.indexOf("<br>"));
+		return name + " - " + s;
 	}
 	
 }
