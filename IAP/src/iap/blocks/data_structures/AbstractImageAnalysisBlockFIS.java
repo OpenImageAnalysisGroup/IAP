@@ -4,7 +4,6 @@ import iap.blocks.extraction.Trait;
 import iap.blocks.extraction.TraitCategory;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-import ij.WindowManager;
 import info.StopWatch;
 import info.clearthought.layout.TableLayout;
 
@@ -36,6 +35,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.ZoomedImage;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
@@ -482,20 +482,20 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		});
 		
 		Action action2 = new AbstractAction("<html>Close Additional<br>"
-				+ "Image Windows (" + WindowManager.getImageCount() + ")") {
+				+ "Image Windows (" + IAPservice.getIAPimageWindowCount() + ")") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				WindowManager.closeAllWindows();
+				IAPservice.closeAllImageJimageWindows();
 			}
 			
 			@Override
 			public boolean isEnabled() {
-				return WindowManager.getImageCount() > 0;
+				return IAPservice.getIAPimageWindowCount() > 0;
 			}
 			
 		};
 		final JButton closeWindows = new JButton(action2);
-		closeWindows.setEnabled(WindowManager.getImageCount() > 0);
+		closeWindows.setEnabled(IAPservice.getIAPimageWindowCount() > 0);
 		closeWindows.addMouseListener(new MouseListener() {
 			
 			@Override
@@ -509,15 +509,15 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				closeWindows.setText("<html>Close Additional<br>"
-						+ "Image Windows (" + WindowManager.getImageCount() + ")");
-				closeWindows.setEnabled(WindowManager.getImageCount() > 0);
+						+ "Image Windows (" + IAPservice.getIAPimageWindowCount() + ")");
+				closeWindows.setEnabled(IAPservice.getIAPimageWindowCount() > 0);
 			}
 			
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				closeWindows.setText("<html>Close Additional<br>"
-						+ "Image Windows (" + WindowManager.getImageCount() + ")");
-				closeWindows.setEnabled(WindowManager.getImageCount() > 0);
+						+ "Image Windows (" + IAPservice.getIAPimageWindowCount() + ")");
+				closeWindows.setEnabled(IAPservice.getIAPimageWindowCount() > 0);
 			}
 			
 			@Override

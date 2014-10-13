@@ -400,9 +400,9 @@ public class Image {
 	public Image show(String title) {
 		if (!SystemAnalysis.isHeadless()) {
 			image.setTitle(title);
+			IAPservice.showImageJ();
 			image.show(title);
 			debugOutputview = image;
-			IAPservice.showImageJ();
 		}
 		return this;
 	}
