@@ -39,7 +39,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	@Override
 	protected void prepare() {
 		super.prepare();
-	
+		
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
 	}
 	
@@ -352,7 +352,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				new CalculatedProperty("leaftip.*.x", "X-coordinate of a certain leaf-tip."),
 				new CalculatedProperty("leaftip.*.y", "Y-coordinate of a certain leaf-tip."),
 				new CalculatedProperty("leaftip.*.angle", "Leaf-tip angle of a certain leaf."),
-				new CalculatedProperty("leaftip.count|SUSAN", "Number of leaves."),
+				new CalculatedProperty("leaftip.count", "Number of leaves."),
 				new CalculatedProperty("leaftip.count.best_angle", "Number of leaves for the 'best' side view angle "
 						+ "(as determined from the main growth orientation observed from top-view.")
 		};
