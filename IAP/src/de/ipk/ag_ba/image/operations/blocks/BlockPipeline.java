@@ -101,8 +101,6 @@ public class BlockPipeline {
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (blockClass != null && (WellProcessor.class.isAssignableFrom(blockClass))) {
 				WellProcessor inst = (WellProcessor) blockClass.newInstance();
-				if (!inst.isEnabled(options))
-					continue;
 				int n = inst.getDefinedWellCount(options);
 				if (n > 0)
 					executionTrayCount = n;
