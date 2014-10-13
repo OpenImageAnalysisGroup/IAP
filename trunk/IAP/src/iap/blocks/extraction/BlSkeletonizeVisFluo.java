@@ -538,7 +538,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 							if (cp == CameraPosition.SIDE)
 								for (String keyC : allResultsForSnapshot.keySet()) {
 									HashMap<Integer, BlockResultSet> rt = allResultsForSnapshot.get(keyC);
-									
+									if (rt.get(tray) == null)
+										continue;
 									if (bestAngle != null && keyC.equals(bestAngle)) {
 										// System.out.println("Best side angle: " + bestAngle);
 										Double cnt = null;
