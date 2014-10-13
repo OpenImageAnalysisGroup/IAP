@@ -39,6 +39,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	@Override
 	protected void prepare() {
 		super.prepare();
+	
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
 	}
 	
@@ -82,6 +83,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			workimg = preprocessImage(workimg, searchRadius, blurSize, erodeSize, dilateSize);
 			Roi bb = workimg.io().getBoundingBox();
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - minHeightPercent / 100d * bb.getBounds().height);
+			workimg.setCameraType(CameraType.VIS);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.VIS, optionsAndResults.getCameraPosition(),
 					searchRadius, maxValidY);
 		}
@@ -108,6 +110,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 					getInt("Masksize Dilate (Fluo)", 5));
 			Roi bb = workimg.io().getBoundingBox();
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", -1) / 100d * bb.getBounds().height);
+			workimg.setCameraType(CameraType.FLUO);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, searchRadius, fillGradeInPercent), CameraType.FLUO, optionsAndResults.getCameraPosition(),
 					searchRadius, maxValidY);
 		}

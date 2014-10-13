@@ -39,7 +39,7 @@ public class BorderAnalysis {
 	public BorderAnalysis(Image img) {
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
 		borderIO = borderIO.skeletonize().replaceColor(Color.BLACK.getRGB(), Color.BLUE.getRGB());
-		Image boImg = borderIO.getImage().show("borderImg", debug);
+		Image boImg = borderIO.getImage().show("borderImg", debug);;
 		borderLength = boImg.io().countFilledPixels();
 		borderImage = borderIO.getAs2D();
 		borderLists = getBorderLists(borderImage, borderLength, debug);
@@ -104,7 +104,7 @@ public class BorderAnalysis {
 		
 		// plot SUSAN feature
 		for (Point3d p : normSUSANList) {
-			ic.drawCircle((int) p.x, (int) p.y, 3, Color.HSBtoRGB((float) (p.z / 255.0) * 0.3f, (float) 1.0, (float) 1.0), 0.0, 1);
+			ic.drawCircle((int) p.x, (int) p.y, 3, Color.HSBtoRGB((float) (p.z / 255.0) * 0.3f, (float) 1.0, (float) 1.0), 0.5, 1);
 		}
 		
 		// plot peak list and peak features
@@ -121,7 +121,7 @@ public class BorderAnalysis {
 						.text((int) pos.getX(), (int) pos.getY() - 10, "bp: " + borderpos, Color.DARK_GRAY);
 		}
 		
-		ic.getImage().show("susanImage");
+		ic.getImage().show("susanImage of " + image.getCameraType());
 		try {
 			Thread.sleep(waitTime);
 		} catch (InterruptedException e) {
