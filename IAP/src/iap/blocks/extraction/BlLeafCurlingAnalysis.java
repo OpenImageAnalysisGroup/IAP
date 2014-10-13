@@ -83,9 +83,9 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock impleme
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
 			rt.addValue("leaf.curling.n", statsFFTfrequency.getN());
-			rt.addValue("leaf.curling.frequency.avg", statsFFTfrequency.getMean());
+			rt.addValue("leaf.curling.frequency.mean", statsFFTfrequency.getMean());
 			rt.addValue("leaf.curling.frequency.stddev", statsFFTfrequency.getStandardDeviation());
-			rt.addValue("leaf.curling.amplitude.avg", statsFFTamplitude.getMean());
+			rt.addValue("leaf.curling.amplitude.mean", statsFFTamplitude.getMean());
 			rt.addValue("leaf.curling.amplitude.stddev", statsFFTamplitude.getStandardDeviation());
 			
 			getResultSet().storeResults(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.GEOMETRY, rt, getBlockPosition(), this);
@@ -149,11 +149,11 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock impleme
 		return new CalculatedPropertyDescription[] {
 				new CalculatedProperty("leaf.curling.n",
 						"Number of considered leaves (with length above the minimum-length threshold) for curling analysis."),
-				new CalculatedProperty("leaf.curling.frequency.avg",
+				new CalculatedProperty("leaf.curling.frequency.mean",
 						"Average curling frequency."),
 				new CalculatedProperty("leaf.curling.frequency.stddev",
 						"Standard deviation of the curling frequencies, based on the frequency of the considered leaves."),
-				new CalculatedProperty("leaf.curling.amplitude.avg",
+				new CalculatedProperty("leaf.curling.amplitude.mean",
 						"Average curling amplitude."),
 				new CalculatedProperty("leaf.curling.amplitude.stddev",
 						"Standard deviation of the curling amplitudes, based on the amplitudes of the considered leaves.")

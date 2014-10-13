@@ -727,7 +727,7 @@ public class IAPservice {
 			for (SubstanceInterface substance : experimentNF) {
 				if (optCustomSubsetDef != null && optCustomSubsetDef.ignoreSubstance(substance))
 					continue;
-				if (substance.getName() != null && substance.getName().equals("temp.air.avg")) {
+				if (substance.getName() != null && substance.getName().equals("temp.air.mean")) {
 					for (ConditionInterface ci : substance) {
 						for (SampleInterface sa : ci) {
 							Long time = sa.getSampleFineTimeOrRowId();

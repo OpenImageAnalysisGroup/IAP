@@ -63,7 +63,7 @@ public class BlCalcMainAxis
 						new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, TraitCategory.GEOMETRY, "main_axis.rotation"), angle,
 						"degree", this);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, TraitCategory.GEOMETRY, "main_axis.normalized.distance.avg"),
+						new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, TraitCategory.GEOMETRY, "main_axis.normalized.distance.mean"),
 						normalizedDistanceToMainAxis, this);
 			}
 		}
@@ -110,7 +110,7 @@ public class BlCalcMainAxis
 						"The orientation of the line (in degree), 0 indicates horizontal orientation "
 								+ "(when looking at the top-image), 90 means orientation from top to bottom "
 								+ "(when looking at the image)."),
-				new CalculatedProperty("main_axis.normalized.distance.avg",
+				new CalculatedProperty("main_axis.normalized.distance.mean",
 						"A centre line is calculated by detecting a line crossing the "
 								+ "centre of the image. This line is oriented so that the sum of "
 								+ "the distances of the plant pixels to this line is minimal. For "

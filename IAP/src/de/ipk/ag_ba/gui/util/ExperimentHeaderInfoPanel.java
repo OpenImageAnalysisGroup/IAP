@@ -641,7 +641,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 			
 			int width = 90, space = 5, border = 2;
 			// rows.add(new GuiRow(new JLabel("<html><br>Average visual property per plant versus manual measurement<hr>"), null));
-			Collection<MatchInfo> sortedMatch = match(optExperiment, new String[] { "corr.", ".avg" }, false);
+			Collection<MatchInfo> sortedMatch = match(optExperiment, new String[] { "corr.", ".mean" }, false);
 			Collections.sort((List<MatchInfo>) sortedMatch, new Comparator<MatchInfo>() {
 				@Override
 				public int compare(MatchInfo o1, MatchInfo o2) {
@@ -671,7 +671,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 			}
 			// rows.add(new GuiRow(new JLabel(""), null));
 			// rows.add(new GuiRow(new JLabel("<html><br>Visual property for each side view vs. manual measurement<hr>"), null));
-			sortedMatch = match(optExperiment, new String[] { "corr.", ".avg" }, true);
+			sortedMatch = match(optExperiment, new String[] { "corr.", ".mean" }, true);
 			Collections.sort((List<MatchInfo>) sortedMatch, new Comparator<MatchInfo>() {
 				@Override
 				public int compare(MatchInfo o1, MatchInfo o2) {
