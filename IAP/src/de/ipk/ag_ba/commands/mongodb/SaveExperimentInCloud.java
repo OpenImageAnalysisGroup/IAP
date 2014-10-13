@@ -178,13 +178,13 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		for (File f : fileList) {
 			ExperimentDataAnnotation eda = new ExperimentDataAnnotation();
 			
-			anno.put(f, eda);
-			eda.setExpname(hs(parentFolder.getName()));
-			eda.setCondspecies(hs(c.getSpecies()));
-			eda.setCondgenotype(hs(c.getGenotype()));
-			eda.setCondtreatment(hs(c.getTreatment()));
-			eda.setCondvariety(hs(c.getVariety()));
-			eda.setReplicateIDs(hi(c.getConditionId()));
+			// anno.put(f, eda);
+			// eda.setExpname(hs(parentFolder.getName()));
+			// eda.setCondspecies(hs(c.getSpecies()));
+			// eda.setCondgenotype(hs(c.getGenotype()));
+			// eda.setCondtreatment(hs(c.getTreatment()));
+			// eda.setCondvariety(hs(c.getVariety()));
+			// eda.setReplicateIDs(hi(c.getConditionId()));
 			String fn = f.getName();
 			if (fn.contains("."))
 				fn = fn.substring(0, fn.lastIndexOf("."));
@@ -215,6 +215,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		int lM = last.get(GregorianCalendar.MONTH);
 		int lY = last.get(GregorianCalendar.YEAR);
 		
+		HashMap<Integer, ExperimentDataAnnotation> anno = null;
 		for (ExperimentDataAnnotation eda : anno.values()) {
 			if (last == null || first == null || !eda2day.containsKey(eda))
 				continue;
@@ -251,14 +252,14 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		
 		String fn = "";
 		TableData td = TableData.getTableData(new File(fn));
-		
-		for (ExperimentInterface mdl : il.process(fileList, null)) {
-			if (mdl != null && resultProcessor != null) {
-				resultProcessor.setExperimenData(mdl);
-				resultProcessor.run();
-			}
-		}
-		
+		/*
+		 * for (ExperimentInterface mdl : il.process(fileList, null)) {
+		 * if (mdl != null && resultProcessor != null) {
+		 * resultProcessor.setExperimenData(mdl);
+		 * resultProcessor.run();
+		 * }
+		 * }
+		 */
 	}
 	
 	private LinkedHashSet<String> hs(String string) {
