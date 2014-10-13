@@ -260,6 +260,9 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	
 	@Override
 	public int getDefinedWellCount(ImageProcessorOptionsAndResults options) {
+		if (options.getBooleanSetting(this, "enabled", true) == false)
+			return 1;
+		
 		int hg = options.getIntSetting(this, "Well Grid Horizontal", 1);
 		int wg = options.getIntSetting(this, "Well Grid Vertical", 1);
 		int n = hg * wg;
@@ -267,8 +270,4 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 		return n;
 	}
 	
-	@Override
-	public boolean isEnabled(ImageProcessorOptionsAndResults options) {
-		return options.getBooleanSetting(this, "enabled", true);
-	}
 }
