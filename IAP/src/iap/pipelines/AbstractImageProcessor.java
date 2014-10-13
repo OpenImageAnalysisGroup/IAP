@@ -16,6 +16,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.OptionsGenerator;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -43,12 +44,12 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	 */
 	@Override
 	public void execute(
-			ImageProcessorOptionsAndResults options,
+			OptionsGenerator options,
 			ImageSet input,
 			ImageSet optInputMasks,
 			int maxThreadsPerImage)
 			throws Exception {
-		BlockPipeline pipeline = getPipeline(options);
+		BlockPipeline pipeline = getPipeline(options.getOptions());
 		pipeline.setValidTrays(debugValidTrays);
 		MaskAndImageSet workset = new MaskAndImageSet(input, optInputMasks != null ? optInputMasks : input);
 		

@@ -857,12 +857,12 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.unit_test_steps = unit_test_steps;
 	}
 	
-	private ResultsAndWaitThreads processAngleWithinSnapshot(ImageSet id,
+	private ResultsAndWaitThreads processAngleWithinSnapshot(final ImageSet id,
 			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadSnapshotAngles, int parentPriority,
-			TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults, String configAndAngle)
+			final TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint,
+			final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults, final String configAndAngle)
 			throws Exception {
 		// ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
 		ImageData inVis = id.getVisInfo() != null ? id.getVisInfo().copy() : null;
@@ -889,41 +889,49 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		input.setImageInfo(inVis, inFluo, inNir, inIr);
 		inputMasks.setImageInfo(inVis, inFluo, inNir, inIr);
 		
-		ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(pd.getOptions(), previousResultsForThisTimePoint, plantResults);
-		options.setConfigAndAngle(configAndAngle);
-		options.setUnitTestInfo(unit_test_idx, unit_test_steps);
-		
-		options.forceDebugStack = forceDebugStack;
-		options.forcedDebugStacks = forcedDebugStacks;
-		
-		options.databaseTarget = databaseTarget;
-		options.setCustomNullBlockPrefix("Separate Settings");
-		
-		{
-			boolean processEarlyTimes = options.getBooleanSetting(null, "Early//Custom settings for early timepoints", false);
-			boolean processLateTimes = options.getBooleanSetting(null, "Late//Custom settings for late timepoints", false);
-			int earlyTimeUntilDayX = options.getIntSetting(null, "Early//Early time until time point", -1);
-			int lateTimeUntilDayX = options.getIntSetting(null, "Late//Late time until time point", -1);
-			String timeInfo = null;
-			if (processEarlyTimes && id.getAnyInfo().getParentSample().getTime() <= earlyTimeUntilDayX)
-				timeInfo = "early";
-			else
-				if (processLateTimes && id.getAnyInfo().getParentSample().getTime() >= lateTimeUntilDayX)
-					timeInfo = "late";
-			
-			String info = id.getAnyInfo().getParentSample().getParentCondition().getParentSubstance().getInfo();
-			if (id.isSideImage())
-				options.setCameraInfos(CameraPosition.SIDE,
-						info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo, id.getAnyInfo().getPosition());
-			else
-				options.setCameraInfos(CameraPosition.TOP,
-						info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo, id.getAnyInfo().getPosition());
-			options.setCustomNullBlockPrefix(null);
-		}
-		
-		if (forceDebugStack) {
-			this.setDebugLastSystemOptionStorageGroup(options.getSystemOptionStorageGroup(null));
-		}
+		OptionsGenerator og = new OptionsGenerator() {
+			@Override
+			public ImageProcessorOptionsAndResults getOptions() {
+				ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(pd.getOptions(), previousResultsForThisTimePoint, plantResults);
+				options.setConfigAndAngle(configAndAngle);
+				options.setUnitTestInfo(unit_test_idx, unit_test_steps);
+				
+				options.forceDebugStack = forceDebugStack;
+				options.forcedDebugStacks = forcedDebugStacks;
+				
+				options.databaseTarget = databaseTarget;
+				options.setCustomNullBlockPrefix("Separate Settings");
+				
+				{
+					boolean processEarlyTimes = options.getBooleanSetting(null, "Early//Custom settings for early timepoints", false);
+					boolean processLateTimes = options.getBooleanSetting(null, "Late//Custom settings for late timepoints", false);
+					int earlyTimeUntilDayX = options.getIntSetting(null, "Early//Early time until time point", -1);
+					int lateTimeUntilDayX = options.getIntSetting(null, "Late//Late time until time point", -1);
+					String timeInfo = null;
+					if (processEarlyTimes && id.getAnyInfo().getParentSample().getTime() <= earlyTimeUntilDayX)
+						timeInfo = "early";
+					else
+						if (processLateTimes && id.getAnyInfo().getParentSample().getTime() >= lateTimeUntilDayX)
+							timeInfo = "late";
+					
+					String info = id.getAnyInfo().getParentSample().getParentCondition().getParentSubstance().getInfo();
+					if (id.isSideImage())
+						options.setCameraInfos(CameraPosition.SIDE,
+								info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo, id.getAnyInfo()
+										.getPosition());
+					else
+						options.setCameraInfos(CameraPosition.TOP,
+								info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo, id.getAnyInfo()
+										.getPosition());
+					options.setCustomNullBlockPrefix(null);
+				}
+				
+				if (forceDebugStack) {
+					AbstractPhenotypingTask.this.setDebugLastSystemOptionStorageGroup(options.getSystemOptionStorageGroup(null));
+				}
+				return options;
+			}
+		};
 		
 		HashMap<Integer, BlockResultSet> well2analysisResults = null;
 		
@@ -932,7 +940,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
 			imageProcessor.setValidTrays(debugValidTrays);
-			imageProcessor.execute(options, input, inputMasks, maximumThreadCountOnImageLevel);
+			imageProcessor.execute(og, input, inputMasks, maximumThreadCountOnImageLevel);
 			
 			well2analysisResults = imageProcessor.getNumericResults();
 		}

@@ -1144,7 +1144,9 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation invertImageJ() {
-		image.getProcessor().invert();
+		synchronized (ImageOperation.class) {
+			image.getProcessor().invert();
+		}
 		return new ImageOperation(getImage());
 	}
 	
@@ -3791,48 +3793,6 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(res);
 	}
 	
-	private ImageOperation multiplyHSV(double hf, double sf, double vf) {
-		int[] image = getAs1D();
-		int width = getImage().getWidth();
-		int height = getImage().getHeight();
-		float[] hsbvals = new float[3];
-		for (int idx = 0; idx < image.length; idx++) {
-			int c = image[idx];
-			int r = (c & 0xff0000) >> 16;
-			int g = (c & 0x00ff00) >> 8;
-			int b = (c & 0x0000ff);
-			Color.RGBtoHSB(r, g, b, hsbvals);
-			double blue = 0.8;
-			hsbvals[0] = (float) ((hsbvals[0] - blue) * hf + blue);
-			boolean left = (idx % width) < width / 2;
-			if (left)
-				hsbvals[1] *= sf * 1.5;
-			else
-				hsbvals[1] *= sf;
-			if (left)
-				hsbvals[0] = (hsbvals[1]);
-			else
-				hsbvals[0] = hsbvals[1];
-			if (left)
-				hsbvals[2] *= vf * 0.95;
-			else
-				hsbvals[2] *= vf;
-			
-			hsbvals[2] = (float) ((hsbvals[2] - 0.7) * 1.5 + 0.5);
-			
-			if (hsbvals[1] < 0)
-				hsbvals[1] = 0;
-			if (hsbvals[1] > 1)
-				hsbvals[1] = 1;
-			if (hsbvals[2] < 0)
-				hsbvals[2] = 0;
-			if (hsbvals[2] > 1)
-				hsbvals[2] = 1;
-			image[idx] = Color.HSBtoRGB(hsbvals[0], hsbvals[1], hsbvals[2]);
-		}
-		return new ImageOperation(image, width, height);
-	}
-	
 	public ImageOperation medianFilter32Bit(int repeat) {
 		for (int i = 0; i < repeat; i++)
 			image.getProcessor().medianFilter();
@@ -4505,12 +4465,16 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation flipVert() {
-		image.getProcessor().flipVertical();
+		synchronized (ImageOperation.class) {
+			image.getProcessor().flipVertical();
+		}
 		return this;
 	}
 	
 	public ImageOperation flipHor() {
-		image.getProcessor().flipHorizontal();
+		synchronized (ImageOperation.class) {
+			image.getProcessor().flipHorizontal();
+		}
 		return this;
 	}
 	
