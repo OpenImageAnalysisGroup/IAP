@@ -77,4 +77,10 @@ public class CalculatedProperty implements CalculatedPropertyDescription {
 		else
 			return null;
 	}
+	
+	@Override
+	public String toString() {
+		return name + " (" + desc + ")";
+	}
+	
 }
