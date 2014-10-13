@@ -6,7 +6,6 @@ import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.util.HashSet;
 
-import org.SystemOptions;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -66,8 +65,6 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 		
 		Vector2i[] centerpoints = new Vector2i[wellcount];
 		
-		SystemOptions.getInstance().getInteger("IAP", "Number of CPUs", 4);
-		
 		for (int i = 0; i < wellcount; i++) {
 			int cx = (int) (getInt("Position (VIS) " + (i + 1) + " (x)", 0) * SCALE_X);
 			int cy = (int) (getInt("Position (VIS) " + (i + 1) + " (y)", 0) * SCALE_Y);
@@ -77,7 +74,6 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 		
 		for (int x = 0; x < mask.getWidth(); x++) {
 			for (int y = 0; y < mask.getHeight(); y++) {
-				
 				double minWellDistance = Integer.MAX_VALUE;
 				double minWellIDX = -1;
 				
@@ -94,13 +90,10 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 						minWellDistance = tempDist;
 						minWellIDX = well_idx;
 					}
-					
 				}
 				
 				if (minWellIDX != getWellIdx()) {
-					
 					result[x][y] = ImageOperation.BACKGROUND_COLORint;
-					
 				}
 			}
 		}
@@ -110,13 +103,9 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 	
 	@Override
 	public int getDefinedWellCount(ImageProcessorOptionsAndResults options) {
+		if (options.getBooleanSetting(this, "enabled", true) == false)
+			return 1;
 		return options.getIntSetting(this, "Maximum Object Count", 1);
-		
-	}
-	
-	@Override
-	public boolean isEnabled(ImageProcessorOptionsAndResults options) {
-		return options.getBooleanSetting(this, "enabled", true);
 	}
 	
 }
