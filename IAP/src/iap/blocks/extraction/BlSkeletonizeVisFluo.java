@@ -509,13 +509,14 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 							Integer a = null;
 							searchLoop: for (String key : allResultsForSnapshot.keySet()) {
 								BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
-								for (BlockResultValue v : rt.searchResults("main.axis.rotation")) {
-									if (v.getValue() != null) {
-										a = v.getValue().intValue();
-										// System.out.println("main.axis.rotation: " + a);
-										break searchLoop;
+								if (rt != null)
+									for (BlockResultValue v : rt.searchResults("main.axis.rotation")) {
+										if (v.getValue() != null) {
+											a = v.getValue().intValue();
+											// System.out.println("main.axis.rotation: " + a);
+											break searchLoop;
+										}
 									}
-								}
 							}
 							
 							String bestAngle = null;
@@ -552,13 +553,14 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 										}
 									}
 									
-									for (BlockResultValue v : rt.get(tray).searchResults(new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.count"))) {
-										if (v.getValue() != null) {
-											if (v.getValue() > maxLeafcount)
-												maxLeafcount = v.getValue();
-											lc.add(v.getValue());
+									if (rt.get(tray) != null)
+										for (BlockResultValue v : rt.get(tray).searchResults(new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.count"))) {
+											if (v.getValue() != null) {
+												if (v.getValue() > maxLeafcount)
+													maxLeafcount = v.getValue();
+												lc.add(v.getValue());
+											}
 										}
-									}
 									for (BlockResultValue v : rt.get(tray).searchResults(new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum"))) {
 										if (v.getValue() != null) {
 											if (v.getValue() > maxLeaflength)

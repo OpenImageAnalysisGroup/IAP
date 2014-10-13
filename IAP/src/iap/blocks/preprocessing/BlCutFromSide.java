@@ -46,7 +46,7 @@ public class BlCutFromSide extends AbstractBlock {
 		
 		boolean doCutMarker = getBoolean("Crop (Marker-based)", true);
 		
-		boolean doCutFixed = getBoolean("Cut " + mask.getCameraType(), false);
+		boolean doCutFixed = getBoolean("Cut " + (mask.getCameraType() + "").toUpperCase(), false);
 		
 		if (!doCutMarker && !doCutFixed)
 			return mask;
@@ -87,10 +87,10 @@ public class BlCutFromSide extends AbstractBlock {
 			}
 		
 		if (doCutFixed) {
-			double cutoffLeft = getDouble("Cut-off " + mask.getCameraType() + " from left (percent)", 0) / 100d;
-			double cutoffRight = getDouble("Cut-off " + mask.getCameraType() + " from right (percent)", 0) / 100d;
-			double cutoffTop = getDouble("Cut-off " + mask.getCameraType() + " from top (percent)", 0) / 100d;
-			double cutoffBottom = getDouble("Cut-off " + mask.getCameraType() + " from bottom (percent)", 0) / 100d;
+			double cutoffLeft = getDouble("Cut-off " + (mask.getCameraType() + "").toUpperCase() + " from left (percent)", 0) / 100d;
+			double cutoffRight = getDouble("Cut-off " + (mask.getCameraType() + "").toUpperCase() + " from right (percent)", 0) / 100d;
+			double cutoffTop = getDouble("Cut-off " + (mask.getCameraType() + "").toUpperCase() + " from top (percent)", 0) / 100d;
+			double cutoffBottom = getDouble("Cut-off " + (mask.getCameraType() + "").toUpperCase() + " from bottom (percent)", 0) / 100d;
 			
 			result = result
 					.clearImage(ImageSide.Left, cutoffLeft, background)

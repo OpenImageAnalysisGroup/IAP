@@ -62,6 +62,7 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 		return filteredImage
 				.addBorder(borderSizeLeftRight, borderSizeTopBottom, (int) br.getMinX() - borderSizeLeftRight, (int) br.getMinY() - borderSizeTopBottom,
 						ImageOperation.BACKGROUND_COLORint)
+				.resize(image_io.getWidth(), image_io.getHeight())
 				.add(image_io.getImage())
 				.crop(bb)
 				.histogramEqualisation(nm.equalsIgnoreCase("Normalization"), getDouble("Saturated (for Normalization)", 0.35))
