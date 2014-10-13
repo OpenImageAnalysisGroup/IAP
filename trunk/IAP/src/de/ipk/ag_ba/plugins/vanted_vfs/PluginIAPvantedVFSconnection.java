@@ -11,7 +11,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 public class PluginIAPvantedVFSconnection extends AbstractIAPplugin {
 	
 	public PluginIAPvantedVFSconnection() {
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: IAP-Data-Navigation VFS features plugin is beeing loaded");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: IAP-VANTED VFS features plugin is beeing loaded");
 	}
 	
 	@Override

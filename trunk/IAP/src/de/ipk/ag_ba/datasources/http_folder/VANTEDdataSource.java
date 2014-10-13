@@ -26,7 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
  * @author klukas
  */
 public class VANTEDdataSource extends HTTPfolderSource {
-	private static final String VANTED = "IAP-Data-Navigator Resources";
+	private static final String VANTED = "IAP-VANTED Resources";
 	
 	public VANTEDdataSource(DataSourceGroup dsg) {
 		super(dsg, getLibrary(),
@@ -35,7 +35,7 @@ public class VANTEDdataSource extends HTTPfolderSource {
 				new String[] { ".gml", ".graphml" },
 				IAPmain.loadIcon("img/vanted1_0_doku.png"), // vanted1_0.png"),
 				IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
-		setDescription("<h2>Welcome to the IAP-Data-Navigator component</h2>"
+		setDescription("<h2>Welcome to the IAP-VANTED component</h2>"
 				+ "This system is derived from previous work on the VANTED system and makes it possible to load and edit graphs, which may represent biological pathways or functional hierarchies. "
 				+ "It is possible to map experimental datasets onto the graph elements and visualize time series data or data of different "
 				+ "genotypes or environmental conditions in the context of a the underlying biological processes. Built-in statistic "
