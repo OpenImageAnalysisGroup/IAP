@@ -449,10 +449,10 @@ public class MongoDB {
 											for (Object oo : cl)
 												if (oo != null)
 													rList.add(new ObjectId(oo.toString()));
-											// if (rList.size() > 2000) {
-											// collCond.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
-											// rList.clear();
-											// }
+											if (rList.size() > 2000) {
+												collCond.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
+												rList.clear();
+											}
 										}
 									}
 								}
