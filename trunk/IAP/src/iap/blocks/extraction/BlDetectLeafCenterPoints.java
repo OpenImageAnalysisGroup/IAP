@@ -55,17 +55,17 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			CameraPosition pos = optionsAndResults.getCameraPosition();
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf.count|CENTERPOINTS"), pointList.size(), "leaves", this);
+					new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf.count"), pointList.size(), "leaves", this);
 			
 			// save x and y position
 			int num = 0;
 			for (Feature p : pointList) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.x|CENTERPOINTS"), (int) p.getPosition().getX(),
+						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.x"), (int) p.getPosition().getX(),
 						"leaves", this);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.y|CENTERPOINTS"), (int) p.getPosition().getY(),
+						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.y"), (int) p.getPosition().getY(),
 						"leaves", this);
 				num++;
 			}
@@ -145,9 +145,9 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("leaf.count|CENTERPOINTS", "Number of detected leaves."),
-				new CalculatedProperty("leaf.*.position.x|CENTERPOINTS", "Center position (X-axis) of a leaf."),
-				new CalculatedProperty("leaf.*.position.y|CENTERPOINTS", "Center position (Y-axis) of a leaf."),
+				new CalculatedProperty("leaf.count", "Number of detected leaves."),
+				new CalculatedProperty("leaf.*.position.x", "Center position (X-axis) of a leaf."),
+				new CalculatedProperty("leaf.*.position.y", "Center position (Y-axis) of a leaf."),
 		};
 	}
 	
