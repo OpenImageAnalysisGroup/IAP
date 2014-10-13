@@ -184,7 +184,7 @@ public class MenuItemInfoDialog
 										+
 										"<b>Development</b>"
 										+ "<br><br>"
-										+ "IAP-Data-Navigator is one of the core components of the Integrated Analysis<br>" +
+										+ "IAP-VANTED is one of the core components of the Integrated Analysis<br>" +
 										"Platform (IAP). IAP is developed since May 2010 by the research group image<br>" +
 										"analysis, lead by C. Klukas.<br><br>"
 										+
