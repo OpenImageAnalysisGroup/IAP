@@ -181,7 +181,7 @@ public class Console {
 		String[] invalid = new String[] {
 				"Edit", // (graph)
 				"Add files",
-				"IAP-Data-Navigator",
+				"IAP-VANTED",
 				"CCTV (Maize)",
 				"CCTV (Barley)",
 				"Exp. Planning",
@@ -191,7 +191,7 @@ public class Console {
 				"Schedule Experiment",
 				"Performance Test",
 				"Watering Table",
-				"Show in IAP-Data-Navigator"
+				"Show in IAP-VANTED"
 		};
 		invalid = IAPoptions.getInstance().getStringAll("IAP-CONSOLE-MODE", "invalid_cmds", invalid);
 		for (String i : invalid)
