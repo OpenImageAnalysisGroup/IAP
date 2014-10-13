@@ -79,7 +79,7 @@ public class ActionPerformMassAnalysis extends AbstractNavigationAction {
 						IniIoProvider iniIO = er.getIniIoProvider();
 						SystemOptions so = SystemOptions.getInstance(null, iniIO);
 						String vv = so.getString("DESCRIPTION", "tuned_for_IAP_version", "(unknown legacy IAP version)");
-						boolean vok = vv != null && vv.length() >= 3 && ReleaseInfo.IAP_VERSION_STRING.substring(0, 3).equals(vv.substring(0, 3));
+						boolean vok = vv != null && vv.length() >= 3 && ReleaseInfo.IAP_VERSION_STRING.substring(0, 2).equals(vv.substring(0, 2));
 						if (vok)
 							withSettingList.add(eh);
 					} catch (Exception err) {
@@ -97,7 +97,7 @@ public class ActionPerformMassAnalysis extends AbstractNavigationAction {
 					IniIoProvider iniIO = er.getIniIoProvider();
 					SystemOptions so = SystemOptions.getInstance(null, iniIO);
 					String vv = so.getString("DESCRIPTION", "tuned_for_IAP_version", "(unknown legacy IAP version)");
-					boolean vok = ReleaseInfo.IAP_VERSION_STRING.substring(0, 3).equals(vv.substring(0, 3));
+					boolean vok = ReleaseInfo.IAP_VERSION_STRING.substring(0, 2).equals(vv.substring(0, 2));
 					
 					final JCheckBox analyzeExperiment = new JCheckBox(new AbstractAction("Submit analysis jobs, pipeline tuned for IAP " + vv
 							+ (vok ? "" : "(not tuned for IAP " + ReleaseInfo.IAP_VERSION_STRING + ")")
