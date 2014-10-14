@@ -39,7 +39,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	@Override
 	protected void prepare() {
 		super.prepare();
-	
+		
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
 	}
 	
@@ -154,6 +154,17 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		
 		if (saveLeafCount) {
 			saveLeafCount(cameraType, cameraPosition, peakList.size());
+		}
+		
+		boolean saveAddF = false;
+		if (saveAddF) {
+			int n = 0, nup = 0, ndown = 0;
+			double angleSum = 0;
+			for (Feature bf : peakList) {
+				Vector2D pos = bf.getPosition();
+				final Double angle = (Double) bf.getFeature("angle");
+				Vector2D direction = (Vector2D) bf.getFeature("direction");
+			}
 		}
 		
 		if (saveFeaturesInResultSet) {
