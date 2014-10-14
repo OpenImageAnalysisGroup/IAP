@@ -44,7 +44,11 @@ public class Feature {
 	}
 	
 	public Object getFeature(String key) {
-		return featureMap.get(key).feature;
+		FeatureObject v = featureMap.get(key);
+		if (v != null)
+			return v.feature;
+		else
+			return null;
 	}
 	
 	public Point3d getFeaturePoint(String key) {

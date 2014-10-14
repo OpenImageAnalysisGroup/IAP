@@ -175,38 +175,40 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 					
 					if (saveColorFeaturesInResultSet) {
 						ArrayList<PositionAndColor> pixels = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
-						int[] regionArray = BorderAnalysis.copyRegiontoArray(pixels);
-						Image leafTipImage = new Image(regionArray.length, 1, regionArray);
-						double r_mean = leafTipImage.io().channels().getR().getImageAsImagePlus().getStatistics().mean;
-						double g_mean = leafTipImage.io().channels().getG().getImageAsImagePlus().getStatistics().mean;
-						double b_mean = leafTipImage.io().channels().getB().getImageAsImagePlus().getStatistics().mean;
-						
-						double h_mean = leafTipImage.io().channels().getH().getImageAsImagePlus().getStatistics().mean;
-						double s_mean = leafTipImage.io().channels().getS().getImageAsImagePlus().getStatistics().mean;
-						double v_mean = leafTipImage.io().channels().getV().getImageAsImagePlus().getStatistics().mean;
-						
-						double labL_mean = leafTipImage.io().channels().getLabL().getImageAsImagePlus().getStatistics().mean;
-						double laba_mean = leafTipImage.io().channels().getLabA().getImageAsImagePlus().getStatistics().mean;
-						double labb_mean = leafTipImage.io().channels().getLabB().getImageAsImagePlus().getStatistics().mean;
-						
-						getResultSet().setNumericResult(getBlockPosition(),
-								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.red.mean"), r_mean, null, this);
-						getResultSet().setNumericResult(getBlockPosition(),
-								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.green.mean"), g_mean, null, this);
-						getResultSet().setNumericResult(getBlockPosition(),
-								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.blue.mean"), b_mean, null, this);
-						getResultSet().setNumericResult(getBlockPosition(),
-								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.h.mean"), h_mean, null, this);
-						getResultSet().setNumericResult(getBlockPosition(),
-								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.s.mean"), s_mean, null, this);
-						getResultSet().setNumericResult(getBlockPosition(),
-								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.v.mean"), v_mean, null, this);
-						getResultSet().setNumericResult(getBlockPosition(),
-								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.l.mean"), labL_mean, null, this);
-						getResultSet().setNumericResult(getBlockPosition(),
-								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.a.mean"), laba_mean, null, this);
-						getResultSet().setNumericResult(getBlockPosition(),
-								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.b.mean"), labb_mean, null, this);
+						if (pixels != null) {
+							int[] regionArray = BorderAnalysis.copyRegiontoArray(pixels);
+							Image leafTipImage = new Image(regionArray.length, 1, regionArray);
+							double r_mean = leafTipImage.io().channels().getR().getImageAsImagePlus().getStatistics().mean;
+							double g_mean = leafTipImage.io().channels().getG().getImageAsImagePlus().getStatistics().mean;
+							double b_mean = leafTipImage.io().channels().getB().getImageAsImagePlus().getStatistics().mean;
+							
+							double h_mean = leafTipImage.io().channels().getH().getImageAsImagePlus().getStatistics().mean;
+							double s_mean = leafTipImage.io().channels().getS().getImageAsImagePlus().getStatistics().mean;
+							double v_mean = leafTipImage.io().channels().getV().getImageAsImagePlus().getStatistics().mean;
+							
+							double labL_mean = leafTipImage.io().channels().getLabL().getImageAsImagePlus().getStatistics().mean;
+							double laba_mean = leafTipImage.io().channels().getLabA().getImageAsImagePlus().getStatistics().mean;
+							double labb_mean = leafTipImage.io().channels().getLabB().getImageAsImagePlus().getStatistics().mean;
+							
+							getResultSet().setNumericResult(getBlockPosition(),
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.red.mean"), r_mean, null, this);
+							getResultSet().setNumericResult(getBlockPosition(),
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.green.mean"), g_mean, null, this);
+							getResultSet().setNumericResult(getBlockPosition(),
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.blue.mean"), b_mean, null, this);
+							getResultSet().setNumericResult(getBlockPosition(),
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.h.mean"), h_mean, null, this);
+							getResultSet().setNumericResult(getBlockPosition(),
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.s.mean"), s_mean, null, this);
+							getResultSet().setNumericResult(getBlockPosition(),
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.v.mean"), v_mean, null, this);
+							getResultSet().setNumericResult(getBlockPosition(),
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.l.mean"), labL_mean, null, this);
+							getResultSet().setNumericResult(getBlockPosition(),
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.a.mean"), laba_mean, null, this);
+							getResultSet().setNumericResult(getBlockPosition(),
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.b.mean"), labb_mean, null, this);
+						}
 					}
 					
 					if (angle.doubleValue() > 90.0)
