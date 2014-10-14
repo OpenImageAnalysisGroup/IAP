@@ -19,7 +19,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
+import javax.management.RuntimeErrorException;
 
+import org.ReleaseInfo;
 import org.Vector2i;
 import org.apache.commons.io.IOUtils;
 
@@ -32,8 +34,8 @@ import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Detects Scale (like a map key) for example "2mm" in an image (only works for this style of naming). The scale should be orientated in a horizontal direction.
- * The legend should be added by digital image editing tool and is recommended to use a "straight" font like "Arial". The block requires a UNIX like system and
- * the package GOCR for text detection (Project webpage: http://jocr.sourceforge.net/).
+ * The legend should be added by digital image editing tool and is recommended to use a "straight" font like "Arial". The block is tested for linux system and
+ * also requires the package GOCR for text detection (available for linux and windows, project webpage: http://jocr.sourceforge.net/).
  * 
  * @author Pape
  */
@@ -123,7 +125,7 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 					CameraPosition pos = optionsAndResults.getCameraPosition();
 					
 					optionsAndResults.setCalculatedBlueMarkerDistance(clusterDimensions[minRatioPositionInClusterArray].x
-							/ optionsAndResults.getREAL_MARKER_DISTANCE() * valrs);
+							* optionsAndResults.getREAL_MARKER_DISTANCE() / valrs);
 					getResultSet()
 							.setNumericResult(getBlockPosition(), new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "ruler_length.detected"),
 									clusterDimensions[minRatioPositionInClusterArray].x, "px", this);
@@ -137,7 +139,7 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 	}
 	
 	private synchronized String DetectScaleUnit(Image filtered) {
-		String out = "~/";
+		String out = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch");
 		saveImage(out, "temp", "png", filtered);
 		String gocr = "gocr temp.png";
 		File dir = new File(out);
@@ -149,8 +151,7 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 		
 		String result = filterForLengthScale(resFromShell);
 		
-		String delete = "rm temp.png";
-		execute(dir, delete);
+		new File(out + "temp.png").delete();
 		
 		return result;
 	}
@@ -176,7 +177,7 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 			prozess = shell.exec(cmd, null, dir);
 			inp = prozess.getInputStream();
 		} catch (IOException ioe) {
-			System.out.println("Cmd command brocken: " + cmd);
+			throw new RuntimeErrorException(new Error(ioe), "Cmd command brocken: " + cmd);
 		}
 		
 		String readFromShell = "";
@@ -185,11 +186,10 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 			try {
 				readFromShell = IOUtils.toString(inp, "UTF-8");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RuntimeErrorException(new Error(e), e.getMessage());
 			}
 		} else
-			System.out.println("No stream!!");
+			throw new RuntimeErrorException(new Error("No input stream from external program."));
 		
 		return readFromShell;
 	}
