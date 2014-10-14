@@ -110,7 +110,7 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 					for (int i = 0; i < clusterDimensions.length; i++) {
 						// watch out cluster dimensions changed!!
 						double ratio = clusterDimensions[i].y / (double) clusterDimensions[i].x;
-						if (ratio < minRatio) {
+						if (ratio < minRatio && clusterDimensions[i].y > 0 && clusterDimensions[i].x > 0) {
 							minRatio = ratio;
 							minRatioPositionInClusterArray = i;
 						}

@@ -3,6 +3,7 @@ package de.ipk.ag_ba.image.operation.channels;
 import java.awt.Color;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Provides easy to use channel splitting operations.
@@ -16,11 +17,162 @@ public class ChannelProcessing {
 	private final int width;
 	@SuppressWarnings("unused")
 	private final int height;
+	private final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLORint;
 	
 	public ChannelProcessing(int[] imageAs1dArray, int width, int height) {
 		this.imageAs1dArray = imageAs1dArray;
 		this.width = width;
 		this.height = height;
+	}
+	
+	/**
+	 * @return A gray image composed from the R channel.
+	 */
+	public ImageOperation getR() {
+		int[] in = imageAs1dArray;
+		int[] out = new int[in.length];
+		int c, r, g, b;
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
+			if (c == BACKGROUND_COLORint) {
+				out[i] = BACKGROUND_COLORint;
+				continue;
+			}
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			g = r;
+			b = r;
+			
+			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new Image(width, height, out).io();
+	}
+	
+	/**
+	 * @return A gray image composed from the G channel.
+	 */
+	public ImageOperation getG() {
+		int[] in = imageAs1dArray;
+		int[] out = new int[in.length];
+		int c, r, g, b;
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
+			if (c == BACKGROUND_COLORint) {
+				out[i] = BACKGROUND_COLORint;
+				continue;
+			}
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			r = g;
+			b = g;
+			
+			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new Image(width, height, out).io();
+	}
+	
+	/**
+	 * @return A gray image composed from the B channel.
+	 */
+	public ImageOperation getB() {
+		int[] in = imageAs1dArray;
+		int[] out = new int[in.length];
+		int c, r, g, b;
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
+			if (c == BACKGROUND_COLORint) {
+				out[i] = BACKGROUND_COLORint;
+				continue;
+			}
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			r = b;
+			g = b;
+			
+			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new Image(width, height, out).io();
+	}
+	
+	public ImageOperation getLabL() {
+		int[] out = new int[imageAs1dArray.length];
+		float[][][] lab = ImageOperation.getLabCubeInstance();
+		for (int px = 0; px < imageAs1dArray.length; px++) {
+			int c = imageAs1dArray[px];
+			if (c == BACKGROUND_COLORint) {
+				out[px] = BACKGROUND_COLORint;
+				continue;
+			}
+			
+			int r = ((c & 0xff0000) >> 16); // R 0..1
+			int g = ((c & 0x00ff00) >> 8); // G 0..1
+			int b = (c & 0x0000ff); // B 0..1
+			
+			float Li = (int) lab[r][g][b];
+			
+			r = (int) Li;
+			g = r;
+			b = r;
+			
+			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new ImageOperation(out, width, height);
+	}
+	
+	public ImageOperation getLabA() {
+		int[] out = new int[imageAs1dArray.length];
+		float[][][] lab = ImageOperation.getLabCubeInstance();
+		for (int px = 0; px < imageAs1dArray.length; px++) {
+			int c = imageAs1dArray[px];
+			if (c == BACKGROUND_COLORint) {
+				out[px] = BACKGROUND_COLORint;
+				continue;
+			}
+			
+			int r = ((c & 0xff0000) >> 16); // R 0..1
+			int g = ((c & 0x00ff00) >> 8); // G 0..1
+			int b = (c & 0x0000ff); // B 0..1
+			
+			float ai = (int) lab[r][g][b + 256];
+			
+			r = (int) ai;
+			g = r;
+			b = r;
+			
+			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new ImageOperation(out, width, height);
+	}
+	
+	public ImageOperation getLabB() {
+		int[] out = new int[imageAs1dArray.length];
+		float[][][] lab = ImageOperation.getLabCubeInstance();
+		for (int px = 0; px < imageAs1dArray.length; px++) {
+			int c = imageAs1dArray[px];
+			if (c == BACKGROUND_COLORint) {
+				out[px] = BACKGROUND_COLORint;
+				continue;
+			}
+			
+			int r = ((c & 0xff0000) >> 16); // R 0..1
+			int g = ((c & 0x00ff00) >> 8); // G 0..1
+			int b = (c & 0x0000ff); // B 0..1
+			
+			float bi = (int) lab[r][g][b + 512];
+			
+			r = (int) bi;
+			g = r;
+			b = r;
+			
+			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new ImageOperation(out, width, height);
 	}
 	
 	public float[][] getLAB() {
@@ -42,6 +194,84 @@ public class ChannelProcessing {
 			res[2][px] = bi;
 		}
 		return res;
+	}
+	
+	public ImageOperation getH() {
+		int[] out = new int[imageAs1dArray.length];
+		float[] hsv = new float[3];
+		for (int px = 0; px < imageAs1dArray.length; px++) {
+			int c = imageAs1dArray[px];
+			if (c == BACKGROUND_COLORint) {
+				out[px] = BACKGROUND_COLORint;
+				continue;
+			}
+			
+			int r = ((c & 0xff0000) >> 16); // R 0..1
+			int g = ((c & 0x00ff00) >> 8); // G 0..1
+			int b = (c & 0x0000ff); // B 0..1
+			
+			Color.RGBtoHSB(r, g, b, hsv);
+			
+			float h = hsv[0];
+			r = (int) (h * 255);
+			g = r;
+			b = r;
+			
+			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new ImageOperation(out, width, height);
+	}
+	
+	public ImageOperation getS() {
+		int[] out = new int[imageAs1dArray.length];
+		float[] hsv = new float[3];
+		for (int px = 0; px < imageAs1dArray.length; px++) {
+			int c = imageAs1dArray[px];
+			if (c == BACKGROUND_COLORint) {
+				out[px] = BACKGROUND_COLORint;
+				continue;
+			}
+			
+			int r = ((c & 0xff0000) >> 16); // R 0..1
+			int g = ((c & 0x00ff00) >> 8); // G 0..1
+			int b = (c & 0x0000ff); // B 0..1
+			
+			Color.RGBtoHSB(r, g, b, hsv);
+			
+			float s = hsv[1];
+			r = (int) (s * 255);
+			g = r;
+			b = r;
+			
+			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new ImageOperation(out, width, height);
+	}
+	
+	public ImageOperation getV() {
+		int[] out = new int[imageAs1dArray.length];
+		float[] hsv = new float[3];
+		for (int px = 0; px < imageAs1dArray.length; px++) {
+			int c = imageAs1dArray[px];
+			if (c == BACKGROUND_COLORint) {
+				out[px] = BACKGROUND_COLORint;
+				continue;
+			}
+			
+			int r = ((c & 0xff0000) >> 16); // R 0..1
+			int g = ((c & 0x00ff00) >> 8); // G 0..1
+			int b = (c & 0x0000ff); // B 0..1
+			
+			Color.RGBtoHSB(r, g, b, hsv);
+			
+			float v = hsv[2];
+			r = (int) (v * 255);
+			g = r;
+			b = r;
+			
+			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+		}
+		return new ImageOperation(out, width, height);
 	}
 	
 	public float[][] getHSV() {
