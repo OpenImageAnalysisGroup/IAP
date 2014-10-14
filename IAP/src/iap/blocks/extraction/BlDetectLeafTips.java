@@ -26,6 +26,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import de.ipk.ag_ba.image.operation.ImageConvolution;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
+import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -170,43 +171,44 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			for (Feature bf : peakList) {
 				final Double angle = (Double) bf.getFeature("angle");
 				
-				if (saveColorFeaturesInResultSet) {
-					ArrayList<PositionAndColor> pixels = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
-					int[] regionArray = BorderAnalysis.copyRegiontoArray(pixels);
-					Image leafTipImage = new Image(regionArray.length, 1, regionArray);
-					double r_mean = leafTipImage.io().channels().getR().getImageAsImagePlus().getStatistics().mean;
-					double g_mean = leafTipImage.io().channels().getG().getImageAsImagePlus().getStatistics().mean;
-					double b_mean = leafTipImage.io().channels().getB().getImageAsImagePlus().getStatistics().mean;
-					
-					double h_mean = leafTipImage.io().channels().getH().getImageAsImagePlus().getStatistics().mean;
-					double s_mean = leafTipImage.io().channels().getS().getImageAsImagePlus().getStatistics().mean;
-					double v_mean = leafTipImage.io().channels().getV().getImageAsImagePlus().getStatistics().mean;
-					
-					double labL_mean = leafTipImage.io().channels().getLabL().getImageAsImagePlus().getStatistics().mean;
-					double laba_mean = leafTipImage.io().channels().getLabA().getImageAsImagePlus().getStatistics().mean;
-					double labb_mean = leafTipImage.io().channels().getLabB().getImageAsImagePlus().getStatistics().mean;
-					
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.color.rgb.r.mean"), r_mean, null, this);
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.color.rgb.g.mean"), g_mean, null, this);
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.color.rgb.b.mean"), b_mean, null, this);
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.color.hsv.h.mean"), h_mean, null, this);
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.color.hsv.h.mean"), s_mean, null, this);
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.color.hsv.h.mean"), v_mean, null, this);
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.color.lab.l.mean"), labL_mean, null, this);
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.color.lab.a.mean"), laba_mean, null, this);
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.color.lab.b.mean"), labb_mean, null, this);
-				}
-				
 				if (angle != null) {
+					
+					if (saveColorFeaturesInResultSet) {
+						ArrayList<PositionAndColor> pixels = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
+						int[] regionArray = BorderAnalysis.copyRegiontoArray(pixels);
+						Image leafTipImage = new Image(regionArray.length, 1, regionArray);
+						double r_mean = leafTipImage.io().channels().getR().getImageAsImagePlus().getStatistics().mean;
+						double g_mean = leafTipImage.io().channels().getG().getImageAsImagePlus().getStatistics().mean;
+						double b_mean = leafTipImage.io().channels().getB().getImageAsImagePlus().getStatistics().mean;
+						
+						double h_mean = leafTipImage.io().channels().getH().getImageAsImagePlus().getStatistics().mean;
+						double s_mean = leafTipImage.io().channels().getS().getImageAsImagePlus().getStatistics().mean;
+						double v_mean = leafTipImage.io().channels().getV().getImageAsImagePlus().getStatistics().mean;
+						
+						double labL_mean = leafTipImage.io().channels().getLabL().getImageAsImagePlus().getStatistics().mean;
+						double laba_mean = leafTipImage.io().channels().getLabA().getImageAsImagePlus().getStatistics().mean;
+						double labb_mean = leafTipImage.io().channels().getLabB().getImageAsImagePlus().getStatistics().mean;
+						
+						getResultSet().setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.red.mean"), r_mean, null, this);
+						getResultSet().setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.green.mean"), g_mean, null, this);
+						getResultSet().setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.blue.mean"), b_mean, null, this);
+						getResultSet().setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.h.mean"), h_mean, null, this);
+						getResultSet().setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.s.mean"), s_mean, null, this);
+						getResultSet().setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.v.mean"), v_mean, null, this);
+						getResultSet().setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.l.mean"), labL_mean, null, this);
+						getResultSet().setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.a.mean"), laba_mean, null, this);
+						getResultSet().setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.b.mean"), labb_mean, null, this);
+					}
+					
 					if (angle.doubleValue() > 90.0)
 						nup++;
 					else
@@ -216,20 +218,20 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 					statsLeafDirection.addValue(angle.doubleValue());
 				}
 			}
-			if (n > 0) {
+			if (n > 0 && cameraPosition == CameraPosition.SIDE) {
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.up.count"), nup, "leaftips", this);
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.down.count"), ndown, "leaftips", this);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.mean"), angleSum / n, "leaftips", this);
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.mean"), statsLeafDirection.getMean(), "degree", this);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.stdev"), statsLeafDirection.getStandardDeviation(), "leaftips",
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.stdev"), statsLeafDirection.getStandardDeviation(), null,
 						this);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.skewness"), statsLeafDirection.getSkewness(), "leaftips", this);
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.skewness"), statsLeafDirection.getSkewness(), null, this);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.kurtosis"), statsLeafDirection.getKurtosis(), "leaftips", this);
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.kurtosis"), statsLeafDirection.getKurtosis(), null, this);
 			}
 		}
 		
@@ -253,15 +255,15 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				getResultSet().setNumericResult(
 						0,
 						new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2)
-								+ ".position.x"),
+								+ ".x"),
 						pos_fin.getX(), "px", this);
 				getResultSet().setNumericResult(
 						0,
 						new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2)
-								+ ".position.y"),
+								+ ".y"),
 						pos_fin.getY(), "px", this);
 				
-				if (angle != null)
+				if (angle != null && cameraPosition == CameraPosition.SIDE)
 					getResultSet()
 							.setNumericResult(
 									0,
@@ -273,11 +275,13 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				
 				if (searchRadius > 0) {
 					final int searchRadius_fin = searchRadius;
+					final boolean isSide = cameraPosition == CameraPosition.SIDE;
+					
 					getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
 						
 						@Override
 						public Image postProcessMask(Image mask) {
-							return mask
+							ImageCanvas t = mask
 									.io()
 									.canvas()
 									.drawCircle((int) pos_fin.getX(), (int) pos_fin.getY(), searchRadius_fin, Color.RED.getRGB(), 0.5, 3)
@@ -286,9 +290,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 											1)
 									.text((int) direction_fin.getX() + 10, (int) direction_fin.getY(),
 											"x: " + ((int) pos_fin.getX() + borderSize) + " y: " + ((int) pos_fin.getY() + borderSize),
-											Color.BLACK)
-									.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, "angle: " + angle.intValue(), Color.BLACK)
-									.getImage();
+											Color.BLACK);
+							if (isSide)
+								return t.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, "angle: " + angle.intValue(), Color.BLACK)
+										.getImage();
+							else
+								return t.getImage();
 						}
 						
 						@Override
@@ -311,16 +318,18 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		getResultSet().setNumericResult(getBlockPosition(),
 				new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count"), count, "leaftips", this);
 		
-		boolean isBestAngle = isBestAngle(cameraType);
-		// search for best side image
-		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
-			if (!isBestAngle)
-				ignore = true;
+		if (cameraPosition == CameraPosition.SIDE) {
+			boolean isBestAngle = isBestAngle(cameraType);
+			// search for best side image
+			if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
+				if (!isBestAngle)
+					ignore = true;
+			}
+			// save leaf count for best angle
+			if (isBestAngle)
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count.best_angle"), count, "leaftips", this);
 		}
-		// save leaf count for best angle
-		if (isBestAngle)
-			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count.best_angle"), count, "leaftips", this);
 	}
 	
 	private void saveLeafTipList(LinkedList<Feature> peakList, CameraType cameraType, int maxValidY) {
@@ -431,7 +440,43 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				new CalculatedProperty("leaftip.*.angle", "Leaf-tip angle of a certain leaf."),
 				new CalculatedProperty("leaftip.count", "Number of leaves."),
 				new CalculatedProperty("leaftip.count.best_angle", "Number of leaves for the 'best' side view angle "
-						+ "(as determined from the main growth orientation observed from top-view.")
+						+ "(as determined from the main growth orientation observed from top-view."),
+				new CalculatedProperty("leaftip.rgb.red.mean",
+						"Average intensity of the red channel of the leaves tips pixels in the visible light or fluorescence image."),
+				new CalculatedProperty("leaftip.rgb.green.mean",
+						"Average intensity of the green channel of the leaves tips pixels in the visible light or fluorescence image."),
+				new CalculatedProperty("leaftip.rgb.blue.mean",
+						"Average intensity of the blue channel of the leaves tips pixels in the visible light or fluorescence image."),
+				new CalculatedProperty(
+						"leaftip.hsv.h.mean",
+						"The plant average hue of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
+				new CalculatedProperty(
+						"leaftip.hsv.s.mean",
+						"The plant average saturation of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
+				new CalculatedProperty(
+						"leaftip.hsv.v.mean",
+						"The plant average value (brightness) of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
+				new CalculatedProperty("leaftip.color.lab.l.mean",
+						"The leaves tips average brightness value in the L*a*b* colour space. Small values "
+								+ "indicate low and high values high brightness. This value ranges from 0 to 255."),
+				new CalculatedProperty("leaftip.lab.a.mean",
+						"The leaves tips average a-value in the L*a*b* colour space. Small values indicate green "
+								+ "while high values indicate magenta. This value ranges from 26 to 225, other software or references may "
+								+ "utilize different ranges, e.g. higher negative together with higher positive values."),
+				new CalculatedProperty("leaftip.lab.b.mean",
+						"The leaves tips average b-value in the L*a*b* colour space. Small values indicate blue and "
+								+ "high values indicate yellow. This value ranges from 8 to 223, other software or references may utilize "
+								+ "different ranges, e.g. higher negative values together with higher positive values."),
+				new CalculatedProperty("leaftip.up.count", "The number of leaf tips pointing upwards (greater 90 degree)."),
+				new CalculatedProperty("leaftip.down.count", "The number of leaf tips pointing downwards (less than 90 degree)."),
+				new CalculatedProperty("leaftip.angle.mean", "The average leaf tip angle."),
+				new CalculatedProperty("leaftip.angle.stdev", "The standard deviation of the leaf angles. "
+						+ "The lower this value, the more uniform are the leaf tip angles."),
+				new CalculatedProperty("leaftip.angle.skewness",
+						"The 'skewness' of the leaf tip angle values. 'Skewness' is a statistical term, "
+								+ "indicating the tendency of the value distribution to lean to one side of the value range."),
+				new CalculatedProperty("leaftip.angle.kurtosis",
+						"The 'kurtosis' of the leaf tip angle values. 'Kurtosis' is a statistical term, indicating the 'peakedness' of the value distribution."),
 		};
 	}
 }

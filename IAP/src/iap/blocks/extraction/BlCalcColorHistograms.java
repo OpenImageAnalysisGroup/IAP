@@ -415,24 +415,24 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 								+ "The lower this value, the more uniform is the plant colour"),
 				
 				new CalculatedProperty("lab.l.skewness",
-						"The 'skewness' of the brightness values L in the L*a*b* colour space of the plant pixels. 'skewness' "
+						"The 'skewness' of the brightness values L in the L*a*b* colour space of the plant pixels. 'Skewness' "
 								+ "is a statistical term, indicating the tendency of the value distribution to lean to one side of the value range."),
 				new CalculatedProperty("lab.a.skewness",
-						"The 'skewness' of the a-values in the L*a*b* colour space of the plant pixels. 'skewness' is a "
+						"The 'skewness' of the a-values in the L*a*b* colour space of the plant pixels. 'Skewness' is a "
 								+ "statistical term, indicating the tendency of the value distribution to lean to one side of the value range. "),
 				new CalculatedProperty("lab.b.skewness",
-						"The 'skewness' of the b values in the L*a*b* colour space of the plant pixels. 'skewness' is a statistical term, "
+						"The 'skewness' of the b values in the L*a*b* colour space of the plant pixels. 'Skewness' is a statistical term, "
 								+ "indicating the tendency of the value distribution to lean to one side of the value range."),
 				
 				new CalculatedProperty("lab.l.kurtosis",
-						"The 'kurtosis' of the brightness values L in the L*a*b* colour space of the plant pixels. 'kurtosis' is a "
+						"The 'kurtosis' of the brightness values L in the L*a*b* colour space of the plant pixels. 'Kurtosis' is a "
 								+ "statistical term, indicating the 'peakedness' of the value distribution. "),
 				new CalculatedProperty("lab.a.kurtosis",
-						"The 'kurtosis' of the a-values in the L*a*b* colour space of the plant pixels. 'kurtosis' is a statistical term, "
+						"The 'kurtosis' of the a-values in the L*a*b* colour space of the plant pixels. 'Kurtosis' is a statistical term, "
 								+ "indicating the 'peakedness' of the value distribution. The documentation will include a more complete "
 								+ "description of this trait in thefuture; see reference literature for full details."),
 				new CalculatedProperty("lab.b.kurtosis",
-						"The 'kurtosis' of the b-values in the L*a*b* colour space of the plant pixels. 'kurtosis' is a statistical term, "
+						"The 'kurtosis' of the b-values in the L*a*b* colour space of the plant pixels. 'Kurtosis' is a statistical term, "
 								+ "indicating the 'peakedness' of the value distribution. "),
 				new CalculatedProperty("intensity.phenol.plant_weight", ""),
 				new CalculatedProperty("intensity.phenol.plant_weight_drought_loss", ""),
