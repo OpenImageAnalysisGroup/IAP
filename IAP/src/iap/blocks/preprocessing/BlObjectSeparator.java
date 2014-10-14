@@ -61,7 +61,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			
 			final int[] sortCriteria;
 			if (sortBySize) {
-				sortCriteria = clusterSize;
+				sortCriteria = clusterSize != null ? clusterSize : new int[] {};
 			} else {
 				sortCriteria = new int[clusterPositions.length];
 				int idx = 0;
