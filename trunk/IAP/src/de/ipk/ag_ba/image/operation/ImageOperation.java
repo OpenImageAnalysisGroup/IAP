@@ -3608,76 +3608,25 @@ public class ImageOperation implements MemoryHogInterface {
 	/**
 	 * @return A gray image composed from the R channel.
 	 */
+	@Deprecated
 	public ImageOperation getR() {
-		int[] in = getAs1D();
-		int[] out = new int[in.length];
-		int c, r, g, b;
-		for (int i = 0; i < in.length; i++) {
-			c = in[i];
-			if (c == BACKGROUND_COLORint) {
-				out[i] = BACKGROUND_COLORint;
-				continue;
-			}
-			r = (c & 0xff0000) >> 16;
-			g = (c & 0x00ff00) >> 8;
-			b = c & 0x0000ff;
-			
-			g = r;
-			b = r;
-			
-			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
-		}
-		return new Image(getWidth(), getHeight(), out).io();
+		return channels().getR();
 	}
 	
 	/**
 	 * @return A gray image composed from the G channel.
 	 */
+	@Deprecated
 	public ImageOperation getG() {
-		int[] in = getAs1D();
-		int[] out = new int[in.length];
-		int c, r, g, b;
-		for (int i = 0; i < in.length; i++) {
-			c = in[i];
-			if (c == BACKGROUND_COLORint) {
-				out[i] = BACKGROUND_COLORint;
-				continue;
-			}
-			r = (c & 0xff0000) >> 16;
-			g = (c & 0x00ff00) >> 8;
-			b = c & 0x0000ff;
-			
-			r = g;
-			b = g;
-			
-			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
-		}
-		return new Image(getWidth(), getHeight(), out).io();
+		return channels().getG();
 	}
 	
 	/**
 	 * @return A gray image composed from the B channel.
 	 */
+	@Deprecated
 	public ImageOperation getB() {
-		int[] in = getAs1D();
-		int[] out = new int[in.length];
-		int c, r, g, b;
-		for (int i = 0; i < in.length; i++) {
-			c = in[i];
-			if (c == BACKGROUND_COLORint) {
-				out[i] = BACKGROUND_COLORint;
-				continue;
-			}
-			r = (c & 0xff0000) >> 16;
-			g = (c & 0x00ff00) >> 8;
-			b = c & 0x0000ff;
-			
-			r = b;
-			g = b;
-			
-			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
-		}
-		return new Image(getWidth(), getHeight(), out).io();
+		return channels().getB();
 	}
 	
 	public ImageOperation rmCircleShadeFixedGray(double whiteLevel_180d, int steps, boolean debug) {

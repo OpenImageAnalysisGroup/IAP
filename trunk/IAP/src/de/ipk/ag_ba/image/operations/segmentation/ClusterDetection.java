@@ -97,7 +97,7 @@ public class ClusterDetection implements Segmentation {
 				int wd = clusterMaxXY[i].x - clusterMinXY[i].x;
 				int hd = clusterMaxXY[i].y - clusterMinXY[i].y;
 				centerPoints[i] = new Vector2i(xd, yd);
-				widthAndHeight[i] = new Vector2i(wd, hd);
+				widthAndHeight[i] = new Vector2i(wd + 1, hd + 1);
 			}
 		} else {
 			this.centerPoints = new Vector2i[0];

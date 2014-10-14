@@ -90,6 +90,10 @@ public class FeatureList {
 		borderFeatureList.get(index).addFeature(key, val, type);
 	}
 	
+	public void addFeature(int index, Object val, String key, FeatureObjectType type) {
+		borderFeatureList.get(index).addFeature(key, val, type);
+	}
+	
 	public Feature get(int index) {
 		return borderFeatureList.get(index);
 	}
