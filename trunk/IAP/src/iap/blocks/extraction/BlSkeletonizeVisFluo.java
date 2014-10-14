@@ -600,7 +600,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 						time2allResultsForSnapshot,
 						time2summaryResult,
 						getBlockPosition(),
-						new String[] { new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum.max").toString(),
+						new String[] {
+								new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum.max").toString(),
 								new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum.norm.max").toString(),
 								new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum").toString(),
 								new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum.norm").toString() }, this);
