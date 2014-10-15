@@ -49,7 +49,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.KeggHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.EntryType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.datatypes.IdRef;
@@ -915,7 +915,7 @@ public class Pathway {
 		if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR)
 			return "";
 		StringBuilder sb = new StringBuilder();
-		String[] group = KoService.getPathwayGroupFromMapNumber(number.toString());
+		String[] group = KeggHelper.getGroupFromMapNumber(number.toString(), title);
 		if (group != null && group.length > 0) {
 			int idx = 0;
 			int max = group.length - 1;
