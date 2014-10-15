@@ -152,9 +152,6 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setInt(1);
 			
-			int pi = 1;// SystemAnalysis.getNumberOfCPUs();
-			int ti = 1;// SystemAnalysis.getNumberOfCPUs() / 2;
-			
 			ImageAnalysisTask task = getImageAnalysisTask();
 			if (filterAngle) {
 				task.setValidSideAngle(DEBUG_SINGLE_ANGLE1, DEBUG_SINGLE_ANGLE2, DEBUG_SINGLE_ANGLE3);
@@ -165,7 +162,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			task.setUnitTestInfo(unit_test_idx, unit_test_steps);
 			
-			task.performAnalysis(pi, ti, status);
+			task.performAnalysis(status);
 			
 			if (status != null)
 				status.setCurrentStatusText1("Analysis finished");

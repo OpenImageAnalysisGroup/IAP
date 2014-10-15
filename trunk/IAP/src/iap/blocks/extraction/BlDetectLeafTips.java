@@ -175,7 +175,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 					
 					if (saveColorFeaturesInResultSet) {
 						ArrayList<PositionAndColor> pixels = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
-						if (pixels != null) {
+						if (pixels != null && pixels.size() > 0) {
 							int[] regionArray = BorderAnalysis.copyRegiontoArray(pixels);
 							Image leafTipImage = new Image(regionArray.length, 1, regionArray);
 							double r_mean = leafTipImage.io().channels().getR().getImageAsImagePlus().getStatistics().mean;
@@ -451,13 +451,13 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 						"Average intensity of the blue channel of the leaves tips pixels in the visible light or fluorescence image."),
 				new CalculatedProperty(
 						"leaftip.hsv.h.mean",
-						"The plant average hue of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
+						"The average hue of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
 				new CalculatedProperty(
 						"leaftip.hsv.s.mean",
-						"The plant average saturation of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
+						"The saturation of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
 				new CalculatedProperty(
 						"leaftip.hsv.v.mean",
-						"The plant average value (brightness) of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
+						"The leaves tips average brightness in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
 				new CalculatedProperty("leaftip.color.lab.l.mean",
 						"The leaves tips average brightness value in the L*a*b* colour space. Small values "
 								+ "indicate low and high values high brightness. This value ranges from 0 to 255."),
