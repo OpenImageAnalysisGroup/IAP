@@ -271,6 +271,7 @@ public class SystemAnalysis {
 	private static final long MILLISECS_PER_MINUTE = 60 * 1000;
 	private static final long MILLISECS_PER_HOUR = 60 * MILLISECS_PER_MINUTE;
 	private static final long MILLISECS_PER_DAY = 24 * MILLISECS_PER_HOUR;
+	public static final String lineSeparator = System.getProperty("line.separator");
 	
 	public static long getUnixDay(long time, GregorianCalendar gc) {
 		long offset = gc.get(Calendar.ZONE_OFFSET) + gc.get(Calendar.DST_OFFSET);
@@ -486,12 +487,12 @@ public class SystemAnalysis {
 			return false;
 		}
 	}
-
+	
 	public static String getDesktopFolder() {
 		String home = System.getProperty("user.home");
 		return home + File.separator + "Desktop";
 	}
-
+	
 	public static String getFileSeparator() {
 		return System.getProperty("file.separator");
 	}
