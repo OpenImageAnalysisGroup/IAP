@@ -585,7 +585,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				
 				jp.add(fm);
 			}
-			jp.show(this, getX() + 5, getY() + 5);
+			jp.show((Component) e.getSource(), getX() + 5, getY() + 5);
 		}
 	}
 	
