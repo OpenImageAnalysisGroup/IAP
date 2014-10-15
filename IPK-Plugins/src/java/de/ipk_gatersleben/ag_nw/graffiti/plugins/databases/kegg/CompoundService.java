@@ -630,4 +630,8 @@ public class CompoundService extends MemoryHog
 		return null;
 	}
 	
+	public static boolean isDatabaseAvailable() {
+		return !getReleaseVersionForCompoundInformation().equals("unknown");
+	}
+	
 }

@@ -416,4 +416,9 @@ public class BriteService extends MemoryHog
 	public String getCurrentStatusMessage3() {
 		return null;
 	}
+	
+	public static boolean isDatabaseAvailable() {
+		initService(false);
+		return read_brite_DB_txt;
+	}
 }

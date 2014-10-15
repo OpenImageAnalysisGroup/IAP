@@ -30,6 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoEntry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.sib_enzymes.EnzymeEntry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.sib_enzymes.EnzymeService;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.KeggHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.IndexAndString;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.kgml.KeggGmlHelper;
@@ -158,7 +159,14 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 								ce = CompoundService.getInformation(id);
 								if (ce != null) {
 									names.add(processCompoundInfo(n, targetName, ce));
-								}
+								} else
+									if (!CompoundService.isDatabaseAvailable() && id.startsWith("cpd:")) {
+										String[] res = KeggHelper.get_compounds_by_ko(id.substring("cpd:".length()));
+										if (res != null) {
+											ce = new CompoundEntry(id, StringManipulationTools.getStringListFromArray(res));
+											names.add(processCompoundInfo(n, targetName, ce));
+										}
+									}
 							}
 							if (names.size() == 1)
 								setCompoundAnnotation(n, ce);
@@ -306,11 +314,19 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 				
 				if (targetName == null)
 					if (briteKO2geneName || briteKO2ecName) {
+						String title = new NodeHelper(n).getLabel();
+						if (title.startsWith("K"))
+							System.out.println();
 						ArrayList<IndexAndString> keggIDs = KeggGmlHelper.getKeggIds(n);
+						String kkid = KeggGmlHelper.getKeggId(n);
+						if (kkid != null)
+							keggIDs.add(new IndexAndString(-1, kkid));
 						for (IndexAndString ias : keggIDs) {
 							if (ias.getValue() != null) {
 								String[] keggID = ias.getValue().split(" ");
 								for (String kid : keggID) {
+									if (kid.startsWith("ko:"))
+										kid = kid.substring("ko:".length());
 									if (kid.startsWith("K")) {
 										ArrayList<String> altIDs = BriteService.getKoNamesFromKO(kid);
 										if (altIDs != null) {
@@ -397,6 +413,8 @@ public class DatabaseBasedLabelReplacementService implements Runnable,
 					break;
 				}
 			}
+		} catch (Exception e) {
+			ErrorMsg.addErrorMessage(e);
 		} finally {
 			if (graph != null)
 				graph.getListenerManager().transactionFinished(this);
