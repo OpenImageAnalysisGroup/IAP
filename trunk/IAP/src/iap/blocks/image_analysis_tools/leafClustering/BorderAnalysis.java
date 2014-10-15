@@ -224,10 +224,13 @@ public class BorderAnalysis {
 		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>();
 		int[] origArray = orig.getAs1A();
 		int w = orig.getWidth();
+		int h = orig.getHeight();
 		for (PositionAndColor pix : region) {
-			if (origArray[pix.x + xtemp + (pix.y + ytemp) * w] != ImageOperation.BACKGROUND_COLORint) {
-				res.add(pix);
-			}
+			int idx = pix.x + xtemp + (pix.y + ytemp) * w;
+			if (idx < origArray.length && pix.x + xtemp < w && pix.y + ytemp < h)
+				if (origArray[idx] != ImageOperation.BACKGROUND_COLORint) {
+					res.add(pix);
+				}
 		}
 		return res;
 	}
