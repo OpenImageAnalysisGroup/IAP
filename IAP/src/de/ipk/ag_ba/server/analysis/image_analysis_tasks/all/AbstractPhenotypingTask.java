@@ -186,9 +186,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void performAnalysis(final int maximumThreadCountParallelImages,
-			final int maximumThreadCountOnImageLevel,
-			final BackgroundTaskStatusProviderSupportingExternalCall status)
+	public void performAnalysis(final BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws InterruptedException {
 		
 		status.setCurrentStatusValue(-1);
@@ -255,7 +253,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 								processPlant(
 										plandID2time2waterData,
 										plantIDf, preThreadName,
-										maximumThreadCountOnImageLevel,
 										status, tso, workloadSnapshots,
 										workloadEqualAngleSnapshotSets,
 										imageSetWithSpecificAngle_f);
@@ -329,7 +326,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private void processPlant(
 			TreeMap<String, TreeMap<Long, Double>> plantID2time2waterData2,
 			String plantID, String preThreadName,
-			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final ThreadSafeOptions tso, final int workloadSnapshots,
 			final int workloadEqualAngleSnapshotSets,
@@ -351,7 +347,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
 							@Override
 							public void run() {
-								processAngle(maximumThreadCountOnImageLevel, status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
+								processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
 										inSamples, plantResults, analysisInput, time, configAndAngle);
 							}
 						}, "Analyze angle (top) " + configAndAngle));
@@ -366,7 +362,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
 							@Override
 							public void run() {
-								processAngle(maximumThreadCountOnImageLevel, status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
+								processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
 										inSamples, plantResults, analysisInput, time, configAndAngle);
 							}
 						}, "Analyze angle (side) " + configAndAngle));
@@ -400,7 +396,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		Thread.currentThread().setName("Snapshot Analysis (" + plantID + ")");
 	}
 	
-	private void processAngle(final int maximumThreadCountOnImageLevel, final BackgroundTaskStatusProviderSupportingExternalCall status,
+	private void processAngle(final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadEqualAngleSnapshotSets, final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle,
 			final TreeMap<Long, Sample3D> inSamples, final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults,
 			final TreeMap<Long, TreeMap<String, ImageData>> analysisInput, final Long time, final String configAndAngle) {
@@ -428,7 +424,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 			final ResultsAndWaitThreads resultsAndWaitThreads = processAngleWithinSnapshot(
 					imageSetWithSpecificAngle.get(time).get(configAndAngle),
-					maximumThreadCountOnImageLevel, status,
+					status,
 					workloadEqualAngleSnapshotSets,
 					getParentPriority(), previousResultsForThisTimePoint, plantResults, configAndAngle);
 			
@@ -858,17 +854,16 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	}
 	
 	private ResultsAndWaitThreads processAngleWithinSnapshot(final ImageSet id,
-			final int maximumThreadCountOnImageLevel,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadSnapshotAngles, int parentPriority,
 			final TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint,
 			final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults, final String configAndAngle)
 			throws Exception {
 		// ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
-		ImageData inVis = id.getVisInfo() != null ? id.getVisInfo().copy() : null;
-		ImageData inFluo = id.getFluoInfo() != null ? id.getFluoInfo().copy() : null;
-		ImageData inNir = id.getNirInfo() != null ? id.getNirInfo().copy() : null;
-		ImageData inIr = id.getIrInfo() != null ? id.getIrInfo().copy() : null;
+		final ImageData inVis = id.getVisInfo() != null ? id.getVisInfo().copy() : null;
+		final ImageData inFluo = id.getFluoInfo() != null ? id.getFluoInfo().copy() : null;
+		final ImageData inNir = id.getNirInfo() != null ? id.getNirInfo().copy() : null;
+		final ImageData inIr = id.getIrInfo() != null ? id.getIrInfo().copy() : null;
 		
 		if (inVis == null && inFluo == null && inNir == null && inIr == null) {
 			System.out.println(SystemAnalysis.getCurrentTime()
@@ -883,13 +878,23 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			return null;
 		}
 		
-		final ImageSet input = new ImageSet();
-		final ImageSet inputMasks = new ImageSet();
-		
-		input.setImageInfo(inVis, inFluo, inNir, inIr);
-		inputMasks.setImageInfo(inVis, inFluo, inNir, inIr);
-		
 		OptionsGenerator og = new OptionsGenerator() {
+			@Override
+			public ImageSet getImageSet() {
+				final ImageSet input = new ImageSet();
+				
+				input.setImageInfo(inVis, inFluo, inNir, inIr);
+				return input;
+			}
+			
+			@Override
+			public ImageSet getMaskSet() {
+				final ImageSet inputMasks = new ImageSet();
+				
+				inputMasks.setImageInfo(inVis, inFluo, inNir, inIr);
+				return inputMasks;
+			}
+			
 			@Override
 			public ImageProcessorOptionsAndResults getOptions() {
 				ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(pd.getOptions(), previousResultsForThisTimePoint, plantResults);
@@ -940,14 +945,21 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			BackgroundTaskStatusProviderSupportingExternalCall statusForThisTask = getStatusProcessor(status, workloadSnapshotAngles);
 			imageProcessor.setStatus(statusForThisTask);
 			imageProcessor.setValidTrays(debugValidTrays);
-			imageProcessor.execute(og, input, inputMasks, maximumThreadCountOnImageLevel);
+			imageProcessor.execute(og);
 			
 			well2analysisResults = imageProcessor.getNumericResults();
 		}
 		
-		if (well2analysisResults != null)
-			processResults(input.getAnyInfo(), well2analysisResults);
-		
+		if (well2analysisResults != null) {
+			ImageData anyInfo = inVis;
+			if (anyInfo == null)
+				anyInfo = inFluo;
+			if (anyInfo == null)
+				anyInfo = inNir;
+			if (anyInfo == null)
+				anyInfo = inIr;
+			processResults(anyInfo, well2analysisResults);
+		}
 		return new ResultsAndWaitThreads(well2analysisResults, new ArrayList<LocalComputeJob>());
 	}
 	

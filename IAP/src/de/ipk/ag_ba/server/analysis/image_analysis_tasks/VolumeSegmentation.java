@@ -69,7 +69,7 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	}
 	
 	@Override
-	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
+	public void performAnalysis(
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		if (output != null) {
 			input = null;

@@ -1144,9 +1144,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation invertImageJ() {
-		synchronized (ImageOperation.class) {
-			image.getProcessor().invert();
-		}
+		image.getProcessor().invert();
 		return new ImageOperation(getImage());
 	}
 	

@@ -39,6 +39,7 @@ import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -90,7 +91,6 @@ public class BlockPipeline {
 	private static long lastOutput = 0;
 	
 	public void execute(final OptionsGenerator og,
-			final MaskAndImageSet input,
 			final HashMap<Integer, BlockResultSet> blockResults,
 			final BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
@@ -127,7 +127,8 @@ public class BlockPipeline {
 					options.setWellCnt(etc);
 					ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
 					try {
-						BlockResultSet res = executeInnerCall(well, wellCnt, options, new StringAndFlexibleMaskAndImageSet(null, input), ds, status);
+						BlockResultSet res = executeInnerCall(well, wellCnt, options,
+								ds, status, og.getImageSet(), og.getMaskSet());
 						if (options.forceDebugStack)
 							synchronized (options.forcedDebugStacks) {
 								options.forcedDebugStacks.add(ds);
@@ -151,9 +152,9 @@ public class BlockPipeline {
 	}
 	
 	private BlockResultSet executeInnerCall(int well, int executionWellCount,
-			ImageProcessorOptionsAndResults options,
-			StringAndFlexibleMaskAndImageSet input, ImageStack debugStack,
-			BackgroundTaskStatusProviderSupportingExternalCall status)
+			ImageProcessorOptionsAndResults options, ImageStack debugStack,
+			BackgroundTaskStatusProviderSupportingExternalCall status,
+			ImageSet inputSet, ImageSet maskSet)
 			throws Exception {
 		BlockResultSet results = new BlockResults(options.getCameraAngle());
 		long a = System.currentTimeMillis();
@@ -166,19 +167,12 @@ public class BlockPipeline {
 		boolean debug = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "Debug-Pipeline-Execution", false);
 		int tPrintBlockTime = SystemOptions.getInstance().getInteger("Pipeline-Debugging", "Info-Print-Block-Execution-Time", 30);
 		
-		if (SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "Print-Block-Analysis-Results", false)) {
-			int n = 0;
-			
-			System.out.println("\n##Blocks##");
-			for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
-				System.out.println("Block " + n + "=" + blockClass.getSimpleName());
-				n++;
-			}
-			System.out.println("##Output##");
-		}
-		
 		double progressOfThisWell = 100d / executionWellCount;
 		int nBlocks = blocks.size();
+		
+		MaskAndImageSet workset = new MaskAndImageSet(inputSet, maskSet != null ? maskSet : inputSet.copy());
+		StringAndFlexibleMaskAndImageSet input = new StringAndFlexibleMaskAndImageSet(null, workset);
+		
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (status != null && status.wantsToStop()) {
 				System.out.println("Break requested");
@@ -244,9 +238,8 @@ public class BlockPipeline {
 				s5performance = ""
 						+ (now - lastOutput) + " ms, ";
 			}
-			System.out.println();
 			System.out
-					.print(SystemAnalysis.getCurrentTime()
+					.print(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 							+ ">INFO: "
 							+ s5performance
 							+ pipelineExecutionsWithinCurrentHour
@@ -351,8 +344,7 @@ public class BlockPipeline {
 			public void run() {
 				analysisTaskFinal.debugOverrideAndEnableDebugStackStorage(true);
 				try {
-					analysisTaskFinal.performAnalysis(SystemAnalysis.getNumberOfCPUs(), 1,
-							status);
+					analysisTaskFinal.performAnalysis(status);
 					ExperimentInterface out = analysisTaskFinal.getOutput();
 					if (out != null)
 						for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {

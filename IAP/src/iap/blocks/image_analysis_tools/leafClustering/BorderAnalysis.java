@@ -206,7 +206,8 @@ public class BorderAnalysis {
 							split = isSplit(predefinedRegion, region, radius, debug);
 						if (!split || !checkSplit) {
 							borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key, FeatureObjectType.NUMERIC);
-							borderFeatureList.addFeature(idx / 2, matchWithImage(region, orig), "pixels", FeatureObjectType.OBJECT);
+							borderFeatureList.addFeature(idx / 2, matchWithImage(region, orig, xtemp - radius / 2, ytemp - radius / 2), "pixels",
+									FeatureObjectType.OBJECT);
 						} else
 							borderFeatureList.addFeature(idx / 2, 0.0, key, FeatureObjectType.NUMERIC);
 					} else
@@ -219,12 +220,12 @@ public class BorderAnalysis {
 		}
 	}
 	
-	private ArrayList<PositionAndColor> matchWithImage(ArrayList<PositionAndColor> region, Image orig) {
+	private ArrayList<PositionAndColor> matchWithImage(ArrayList<PositionAndColor> region, Image orig, int xtemp, int ytemp) {
 		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>();
 		int[] origArray = orig.getAs1A();
 		int w = orig.getWidth();
 		for (PositionAndColor pix : region) {
-			if (origArray[pix.x + pix.y * w] != ImageOperation.BACKGROUND_COLORint) {
+			if (origArray[pix.x + xtemp + (pix.y + ytemp) * w] != ImageOperation.BACKGROUND_COLORint) {
 				res.add(pix);
 			}
 		}

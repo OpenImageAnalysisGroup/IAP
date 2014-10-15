@@ -74,7 +74,7 @@ public class Util {
 		TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint = null;
 		TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults = null;
 		final ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(settings, previousResultsForThisTimePoint, plantResults);
-		MaskAndImageSet input = new MaskAndImageSet(
+		final MaskAndImageSet input = new MaskAndImageSet(
 				new ImageSet((Image) null, (Image) null, (Image) null, (Image) null),
 				new ImageSet((Image) null, (Image) null, (Image) null, (Image) null));
 		while (!params.isEmpty()) {
@@ -122,8 +122,18 @@ public class Util {
 			public ImageProcessorOptionsAndResults getOptions() {
 				return options;
 			}
+			
+			@Override
+			public ImageSet getImageSet() {
+				return input.images();
+			}
+			
+			@Override
+			public ImageSet getMaskSet() {
+				return input.masks();
+			}
 		};
-		p.execute(og, input, blockResults, new CommandLineBackgroundTaskStatusProvider(true));
+		p.execute(og, blockResults, new CommandLineBackgroundTaskStatusProvider(true));
 	}
 	
 	private static void convertStatisticsFilesToImages(String[] args) throws IOException {

@@ -17,7 +17,7 @@ public interface ImageAnalysisTask {
 	
 	public String getTaskDescription();
 	
-	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
+	public void performAnalysis(
 			BackgroundTaskStatusProviderSupportingExternalCall status) throws InterruptedException;
 	
 	public String getName();

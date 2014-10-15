@@ -53,7 +53,7 @@ public class VolumeStatistics implements ImageAnalysisTask {
 	 * org.BackgroundTaskStatusProviderSupportingExternalCall)
 	 */
 	@Override
-	public void performAnalysis(int maximumThreadCountParallelImages, int maximumThreadCountOnImageLevel,
+	public void performAnalysis(
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		
 		output = new ArrayList<NumericMeasurementInterface>();
