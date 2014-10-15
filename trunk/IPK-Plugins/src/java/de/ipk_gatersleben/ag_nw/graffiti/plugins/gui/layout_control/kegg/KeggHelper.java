@@ -468,6 +468,20 @@ public class KeggHelper implements HelperClass {
 		return genes.toArray(new String[] {});
 	}
 	
+	public static String[] get_compounds_by_ko(String keggID) throws Exception {
+		// REST API: http://rest.kegg.jp/list/cpd:C01290
+		final Collection<String> compounds = new ArrayList<String>();
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/list/" + keggID),
+				new LineProcessor() {
+					@Override
+					public void process(String line) {
+						String[] fields = line.split("\t");
+						compounds.add(fields[1]);
+					}
+				});
+		return compounds.toArray(new String[] {});
+	}
+	
 	public static String[] get_enzymes_by_reaction(String reactionId) throws Exception {
 		// REST API: http://rest.kegg.jp/link/enzyme/rn:R01070
 		final Collection<String> enzymes = new ArrayList<String>();

@@ -29,6 +29,9 @@ import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.AbstractAlgorithm;
 import org.graffiti.plugin.algorithm.PreconditionException;
 
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg.CompoundService;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_brite.BriteService;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.sib_enzymes.EnzymeService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.DatabaseBasedLabelReplacementService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.kegg.KeggFTPinfo;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -43,6 +46,7 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#getName()
 	 */
+	@Override
 	public String getName() {
 		return "Interpret Database-Identifiers...";
 	}
@@ -62,6 +66,7 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 */
+	@Override
 	public void execute() {
 		exchangeLabel(getSelectedOrAllNodes());
 	}
@@ -96,19 +101,19 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 		double[][] size =
 		{ { border, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, border }, // Columns
 				{ border,
-												TableLayoutConstants.PREFERRED,
-												TableLayoutConstants.PREFERRED,
-												TableLayoutConstants.PREFERRED,
-												TableLayoutConstants.PREFERRED,
-												TableLayoutConstants.PREFERRED,
-												TableLayoutConstants.PREFERRED,
-												TableLayoutConstants.PREFERRED,
-												border }
+						TableLayoutConstants.PREFERRED,
+						TableLayoutConstants.PREFERRED,
+						TableLayoutConstants.PREFERRED,
+						TableLayoutConstants.PREFERRED,
+						TableLayoutConstants.PREFERRED,
+						TableLayoutConstants.PREFERRED,
+						TableLayoutConstants.PREFERRED,
+						border }
 		}; // Rows
 		
 		guiPanel.setLayout(new TableLayout(size));
 		
-		JButton changeButton1 = getChangeButton(KeggFTPinfo.keggFTPavailable, false);
+		JButton changeButton1 = null;
 		JButton changeButton2 = getChangeButton(false, false);
 		JButton changeButton3 = getChangeButton(false, true);
 		JButton changeButton4 = getChangeButton(KeggFTPinfo.keggFTPavailable, true);
@@ -116,15 +121,23 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 		JButton changeButton6 = getChangeButton(true, true);
 		JButton changeButton7 = getChangeButton(false, true);
 		
-		if (KeggFTPinfo.keggFTPavailable) {
-			guiPanel.add(new JLabel("Compound IDs  "), "1,1");
+		if (!CompoundService.getReleaseVersionForCompoundInformation().equals("unknown")) {
+			changeButton1 = getChangeButton(KeggFTPinfo.keggFTPavailable, false);
+			guiPanel.add(new JLabel("Compound IDs  "), "1,1 r");
 			guiPanel.add(new JLabel("  Compound Names (<-> Comp. File-DB)"), "3,1");
+			guiPanel.add(changeButton1, "2,1");
+		} else {
+			changeButton1 = getChangeButton(KeggFTPinfo.keggFTPavailable, true);
+			guiPanel.add(new JLabel("Compound IDs  "), "1,1 r");
+			guiPanel.add(new JLabel("  Compound Names (<-> KEGG API*)"), "3,1");
 			guiPanel.add(changeButton1, "2,1");
 		}
 		
-		guiPanel.add(new JLabel("EC Numbers  "), "1,2 r");
-		guiPanel.add(new JLabel("  Substance Names (<-> Enz. File-DB)"), "3,2");
-		guiPanel.add(changeButton2, "2,2");
+		if (EnzymeService.isDatabaseAvailable(false)) {
+			guiPanel.add(new JLabel("EC Numbers  "), "1,2 r");
+			guiPanel.add(new JLabel("  Substance Names (<-> Enz. File-DB)"), "3,2");
+			guiPanel.add(changeButton2, "2,2");
+		}
 		
 		guiPanel.add(new JLabel("Reaction No.~ "), "1,3 r");
 		guiPanel.add(new JLabel("  Enzyme IDs (-> SOAP*)"), "3,3");
@@ -139,31 +152,33 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 			guiPanel.add(new JLabel("  KO Name (-> KO File-DB)"), "3,5");
 			guiPanel.add(changeButton5, "2,5");
 		} else {
-			guiPanel.add(new JLabel("IDs of Orthologs (KO)  "), "1,4 r");
-			guiPanel.add(new JLabel("  Gene Name (-> KEGG BRITE DB)"), "3,4");
-			guiPanel.add(changeButton6, "2,4");
-			
-			guiPanel.add(new JLabel("IDs of Othologs (KO)  "), "1,5 r");
-			guiPanel.add(new JLabel("  Enzyme IDs (-> KEGG BRITE DB)"), "3,5");
-			guiPanel.add(changeButton7, "2,5");
+			if (BriteService.isDatabaseAvailable()) {
+				guiPanel.add(new JLabel("IDs of Orthologs (KO)  "), "1,4 r");
+				guiPanel.add(new JLabel("  Gene Name (-> KEGG BRITE DB)"), "3,4");
+				guiPanel.add(changeButton6, "2,4");
+				
+				guiPanel.add(new JLabel("IDs of Othologs (KO)  "), "1,5 r");
+				guiPanel.add(new JLabel("  Enzyme IDs (-> KEGG BRITE DB)"), "3,5");
+				guiPanel.add(changeButton7, "2,5");
+			}
 		}
 		
 		JCheckBox increaseSizeCheckBox = new JCheckBox("<html>" +
-							"Increase node size if label does not fit<br>" +
-							"(Nodes with Ellipse-Shape are not processed)");
+				"Increase node size if label does not fit<br>" +
+				"(Nodes with Ellipse-Shape are not processed)");
 		guiPanel.add(increaseSizeCheckBox, "1,6,3,6");
 		
 		JCheckBox useShortNameCheckBox = new JCheckBox("Use shortest synonym for labeling");
 		useShortNameCheckBox.setSelected(false);
 		guiPanel.add(
-							TableLayout.getSplitVertical(
-												useShortNameCheckBox,
-												new JLabel("<html><small>" +
-																	"<br>* SOAP based renaming-operation may take a longer time" +
-																	"<br>~ Requires KEGG Reaction node attribute" +
-																	(KeggFTPinfo.keggFTPavailable ?
-																			"<br># Requires KEGG ID attribute matching a KO/KO-Gene entry and KO-EC annotation" : "")),
-												TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED), "1,7,3,7");
+				TableLayout.getSplitVertical(
+						useShortNameCheckBox,
+						new JLabel("<html><small>" +
+								"<br>* SOAP based renaming-operation may take a longer time" +
+								"<br>~ Requires KEGG Reaction node attribute" +
+								(KeggFTPinfo.keggFTPavailable ?
+										"<br># Requires KEGG ID attribute matching a KO/KO-Gene entry and KO-EC annotation" : "")),
+						TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED), "1,7,3,7");
 		
 		String helpText;
 		if (ReleaseInfo.getIsAllowedFeature(FeatureSet.GravistoJavaHelp))
@@ -172,23 +187,23 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 			helpText = "";
 		
 		guiPanel.add(TableLayout.get3Split(
-							new JLabel(""),
-							new JLabel(helpText),
-							FolderPanel.getHelpButton(
-												JLabelJavaHelpLink.getHelpActionListener("nodesmenu_interpret"),
-												guiPanel.getBackground()),
-							TableLayoutConstants.FILL,
-							TableLayoutConstants.PREFERRED,
-							TableLayoutConstants.PREFERRED),
-							"1,8,3,8");
+				new JLabel(""),
+				new JLabel(helpText),
+				FolderPanel.getHelpButton(
+						JLabelJavaHelpLink.getHelpActionListener("nodesmenu_interpret"),
+						guiPanel.getBackground()),
+				TableLayoutConstants.FILL,
+				TableLayoutConstants.PREFERRED,
+				TableLayoutConstants.PREFERRED),
+				"1,8,3,8");
 		
 		guiPanel.revalidate();
 		
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(),
-							guiPanel,
-							"Interpret and replace Node-Labels",
-							JOptionPane.OK_CANCEL_OPTION,
-							JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
+				guiPanel,
+				"Interpret and replace Node-Labels",
+				JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
 			compoundIDtoName = changeButton1.getText().contains(">");
 			compoundNameToID = changeButton1.getText().contains("<");
 			ecNumberToName = changeButton2.getText().contains(">");
@@ -201,22 +216,22 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 			briteKO2ecName = changeButton7.getText().contains(">");
 			
 			DatabaseBasedLabelReplacementService mwt = new DatabaseBasedLabelReplacementService(
-								nodes,
-								compoundNameToID,
-								compoundIDtoName,
-								ecNumberToName,
-								ecNameOrSynonymeToECnumber,
-								reactionNumberToName,
-								reactionNameToNo,
-								processKeggId2EcAnnotaion,
-								koId2koName,
-								briteKO2geneName,
-								briteKO2ecName,
-								increaseSizeCheckBox.isSelected(),
-								useShortNameCheckBox.isSelected(),
-								false, false, null);
+					nodes,
+					compoundNameToID,
+					compoundIDtoName,
+					ecNumberToName,
+					ecNameOrSynonymeToECnumber,
+					reactionNumberToName,
+					reactionNameToNo,
+					processKeggId2EcAnnotaion,
+					koId2koName,
+					briteKO2geneName,
+					briteKO2ecName,
+					increaseSizeCheckBox.isSelected(),
+					useShortNameCheckBox.isSelected(),
+					false, false, null);
 			BackgroundTaskHelper bth = new BackgroundTaskHelper(mwt, mwt,
-								"Label Mapping", "Label Mapping", true, false);
+					"Label Mapping", "Label Mapping", true, false);
 			bth.startWork(this);
 		}
 	}
@@ -229,6 +244,7 @@ public class InterpreteLabelNamesAlgorithm extends AbstractAlgorithm {
 		if (!enabled)
 			res.setText(dir3);
 		res.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				JButton src = (JButton) e.getSource();
 				if (src.getText().equals(dir2)) {

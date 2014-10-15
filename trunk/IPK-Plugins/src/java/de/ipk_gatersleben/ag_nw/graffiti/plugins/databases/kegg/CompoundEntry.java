@@ -18,7 +18,7 @@ import org.ErrorMsg;
 public class CompoundEntry {
 	private String entryID = null;
 	private List<String> name = new ArrayList<String>();
-	private List<String> formula = new ArrayList<String>();
+	private final List<String> formula = new ArrayList<String>();
 	private String mass = null;
 	private static boolean readMass = true;
 	
@@ -28,6 +28,15 @@ public class CompoundEntry {
 	private static final String formulaTag = "FORMULA";
 	private static final String massTag = "MASS";
 	public static final String endTag_exists = "///";
+	
+	public CompoundEntry() {
+		//
+	}
+	
+	public CompoundEntry(String entryID, List<String> name) {
+		this.entryID = entryID;
+		this.name = name;
+	}
 	
 	public static boolean isValidCompoundStart(String line) {
 		boolean res = (line != null && line.startsWith(entryTag_exists));
