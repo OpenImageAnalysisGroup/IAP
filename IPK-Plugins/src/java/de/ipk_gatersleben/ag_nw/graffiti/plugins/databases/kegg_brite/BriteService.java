@@ -91,7 +91,7 @@ public class BriteService extends MemoryHog
 	public static String[] getPathwayGroupFromMapNumber(String mapNumber) {
 		noteRequest();
 		initService(false);
-		String s = mapNumber2groupInfo.get(mapNumber);
+		String s = mapNumber2groupInfo.get(StringManipulationTools.getNumbersFromString(mapNumber));
 		if (s != null && s.length() > 0) {
 			String[] res = s.split(";");
 			for (int i = 0; i < res.length; i++) {

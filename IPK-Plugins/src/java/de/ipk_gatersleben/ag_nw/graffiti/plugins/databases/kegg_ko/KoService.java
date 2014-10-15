@@ -189,7 +189,7 @@ public class KoService extends MemoryHog implements BackgroundTaskStatusProvider
 		BufferedReader input = getFileReader("ko");
 		int cnt = 1;
 		if (input == null) {
-			ErrorMsg.addErrorMessage("Info: 'ko'-file could not be loaded!");
+			;// ErrorMsg.addErrorMessage("Info: 'ko'-file could not be loaded!");
 		} else {
 			String line = null;
 			String lastStartTag = "";

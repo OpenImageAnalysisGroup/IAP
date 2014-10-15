@@ -119,7 +119,7 @@ public class CompoundService extends MemoryHog
 		status1 = "Read Version Info...";
 		BufferedReader input = getFileReader("ligand.txt");
 		if (input == null) {
-			ErrorMsg.addErrorMessage("Info: 'ligand.txt'-file could not be loaded!");
+			;// ErrorMsg.addErrorMessage("Info: 'ligand.txt'-file could not be loaded!");
 		} else {
 			String line = null;
 			try {
@@ -158,7 +158,7 @@ public class CompoundService extends MemoryHog
 		status1 = "Analyse compound information...";
 		BufferedReader input = getFileReader("compound");
 		if (input == null) {
-			ErrorMsg.addErrorMessage("Info: 'compound'-file could not be loaded!");
+			;// ErrorMsg.addErrorMessage("Info: 'compound'-file could not be loaded!");
 		} else {
 			String line = null;
 			String lastStartTag = "";

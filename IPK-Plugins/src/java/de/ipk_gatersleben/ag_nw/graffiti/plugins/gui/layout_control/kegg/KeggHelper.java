@@ -38,7 +38,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.databases.kegg_ko.KoService;
  * @author Christian Klukas
  * @version $Revision: 1.6 $
  */
-@SuppressWarnings({"rawtypes", "unchecked", "unused"})
+@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 public class KeggHelper implements HelperClass {
 	
 	private static String kgmlVersion = "0.6.1";
@@ -347,7 +347,7 @@ public class KeggHelper implements HelperClass {
 					public void process(String line) {
 						String[] fields = line.split("\t");
 						pathways.add(new KeggPathwayEntry(fields[1], stripOrganismName, fields[0],
-								new String[] { "Unknwon", "Pathway Group" }));
+								BriteService.getPathwayGroupFromMapNumber(fields[0])));
 					}
 				});
 		
@@ -471,7 +471,7 @@ public class KeggHelper implements HelperClass {
 	public static String[] get_enzymes_by_reaction(String reactionId) throws Exception {
 		// REST API: http://rest.kegg.jp/link/enzyme/rn:R01070
 		final Collection<String> enzymes = new ArrayList<String>();
-		GravistoService.processUrlTextContent(new IOurl(" http://rest.kegg.jp/link/enzyme/" + reactionId),
+		GravistoService.processUrlTextContent(new IOurl("http://rest.kegg.jp/link/enzyme/" + reactionId),
 				new LineProcessor() {
 					@Override
 					public void process(String line) {
