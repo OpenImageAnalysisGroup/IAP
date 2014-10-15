@@ -337,7 +337,6 @@ public class NavigationButton implements StyleAware {
 			// System.out.println(line2);
 			
 			if (dp < -1.01) {
-				System.out.println("Command " + title + " has lost its connection to the status provider.");
 				return "<html><center>" + dots + " " + "[REMOVE FROM UPDATE] " + title + progress + " " + dots2 + "" + s + line2;
 			} else
 				return "<html><center>" + dots + " " + title + progress + " " + dots2 + "" + s + line2;
