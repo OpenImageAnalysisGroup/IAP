@@ -41,6 +41,7 @@ import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.graph.Node;
 import org.graffiti.managers.pluginmgr.DefaultPluginEntry;
+import org.graffiti.managers.pluginmgr.DefaultPluginManager;
 import org.graffiti.managers.pluginmgr.PluginEntry;
 import org.graffiti.managers.pluginmgr.PluginManager;
 import org.graffiti.plugin.GenericPlugin;
@@ -99,8 +100,9 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 	 * org.graffiti.managers.IContextMenuManager#getContextMenu(java.lang.Object,
 	 * java.awt.event.MouseEvent)
 	 */
+	@Override
 	public JPopupMenu getContextMenu(MouseEvent e) {
-		PluginManager pm = GravistoService.getInstance().getMainFrame().getPluginManager();
+		PluginManager pm = DefaultPluginManager.lastInstance;
 		Collection<PluginEntry> plugins = pm.getPluginEntries();
 		Iterator<PluginEntry> iter = plugins.iterator();
 		
@@ -156,7 +158,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 		}
 		int added = 0;
 		for (JMenuItem mi : getDirectMouseClickContextCommands(org.graffiti.plugins.modes.defaults.MegaTools
-							.getLastMouseE(), org.graffiti.plugins.modes.defaults.MegaTools.getLastMouseSrc(), graph, plugins)) {
+				.getLastMouseE(), org.graffiti.plugins.modes.defaults.MegaTools.getLastMouseSrc(), graph, plugins)) {
 			result.add(mi);
 			added++;
 		}
@@ -190,6 +192,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 	private JMenuItem getDetachWindowCommand() {
 		JMenuItem menu = new JMenuItem("Detach/Attach");
 		menu.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				GraffitiFrame.detachOrAttachActiveFrame(false);
 			}
@@ -198,7 +201,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 	}
 	
 	private Collection<JMenuItem> getDirectMouseClickContextCommands(MouseEvent lastMouseE, Component lastMouseSrc,
-						Graph graph, Collection<PluginEntry> pluginEntries) {
+			Graph graph, Collection<PluginEntry> pluginEntries) {
 		Collection<JMenuItem> result = new ArrayList<JMenuItem>();
 		for (Object o : pluginEntries) {
 			PluginEntry pe = (PluginEntry) o;
@@ -206,7 +209,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 			if (p instanceof ProvidesDirectMouseClickContextMenu) {
 				ProvidesDirectMouseClickContextMenu mp = (ProvidesDirectMouseClickContextMenu) p;
 				for (JMenuItem mi : mp.getContextCommand(org.graffiti.plugins.modes.defaults.MegaTools.getLastMouseE(),
-									org.graffiti.plugins.modes.defaults.MegaTools.getLastMouseSrc(), graph)) {
+						org.graffiti.plugins.modes.defaults.MegaTools.getLastMouseSrc(), graph)) {
 					result.add(mi);
 				}
 			}
@@ -239,6 +242,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 				list = path.list(new FilenameFilter() {
 					private final Pattern pattern = Pattern.compile("(.*\\.bsh|.*\\.rb)");
 					
+					@Override
 					public boolean accept(File dir, String name) {
 						name = name.toLowerCase();
 						return pattern.matcher(new File(name).getName()).matches();
@@ -276,6 +280,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 				}
 			}
 			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
@@ -306,7 +311,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 			firstLine = getFirstOrSecondLine(FileSystemHandler.getURL(new File(fileName)), "#");
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage("First line of ruby script should contain the graph window context-menu label:<br>"
-								+ "Example:<br>" + "[Line 1] # Test Command 1");
+					+ "Example:<br>" + "[Line 1] # Test Command 1");
 			firstLine = "# Unnamed Ruby Script Command (" + list[i] + ")";
 		}
 		
@@ -333,6 +338,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 		ImageIcon icon = new ImageIcon(cl.getResource(path + "/scriptentry.png"));
 		cmdExec.setIcon(icon);
 		cmdExec.addActionListener(new ActionListener() {
+			@Override
 			@SuppressWarnings("unchecked")
 			public void actionPerformed(ActionEvent arg) {
 				if (arg.getSource() instanceof BSHscriptMenuEntry) {
@@ -418,7 +424,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 	 *           DOCUMENT ME!
 	 */
 	private void getPluginMenuItems(Iterator<PluginEntry> iter, JMenu pluginEntries, JMenu nodeEntries,
-						JMenu edgeEntries, Collection<Node> selectedNodes, Collection<Edge> selectedEdges) {
+			JMenu edgeEntries, Collection<Node> selectedNodes, Collection<Edge> selectedEdges) {
 		while (iter.hasNext()) {
 			DefaultPluginEntry element = (DefaultPluginEntry) iter.next();
 			if (element.getPlugin() == null)
@@ -474,34 +480,34 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 	// }
 	
 	private void processPlugins(JMenu pluginEntries, JMenu nodeEntries, JMenu edgeEntries,
-						Collection<Node> selectedNodes, Collection<Edge> selectedEdges, GenericPlugin plugin) {
+			Collection<Node> selectedNodes, Collection<Edge> selectedEdges, GenericPlugin plugin) {
 		if ((plugin instanceof ProvidesGeneralContextMenu) || (plugin instanceof ProvidesNodeContextMenu)
-							|| (plugin instanceof ProvidesEdgeContextMenu)) {
+				|| (plugin instanceof ProvidesEdgeContextMenu)) {
 			processContextMenuInterfaces(pluginEntries, nodeEntries, edgeEntries, selectedNodes, selectedEdges, plugin);
 		}
 	}
 	
 	private void processAlgorithms(JMenu pluginEntries, JMenu nodeEntries, JMenu edgeEntries,
-						Collection<Node> selectedNodes, Collection<Edge> selectedEdges, GenericPlugin plugin) {
+			Collection<Node> selectedNodes, Collection<Edge> selectedEdges, GenericPlugin plugin) {
 		if (plugin.getAlgorithms() != null) {
 			Algorithm[] algos = plugin.getAlgorithms();
 			if (algos.length > 0) {
 				for (int i = 0; i < algos.length; i++) {
 					processContextMenuInterfaces(pluginEntries, nodeEntries, edgeEntries, selectedNodes, selectedEdges,
-										algos[i]);
+							algos[i]);
 				}
 			}
 		}
 	}
 	
 	private void processExtensions(JMenu pluginEntries, JMenu nodeEntries, JMenu edgeEntries,
-						Collection<Node> selectedNodes, Collection<Edge> selectedEdges, GenericPlugin plugin) {
+			Collection<Node> selectedNodes, Collection<Edge> selectedEdges, GenericPlugin plugin) {
 		if (plugin.getExtensions() != null) {
 			Extension[] extensions = plugin.getExtensions();
 			if (extensions.length > 0) {
 				for (int i = 0; i < extensions.length; i++) {
 					processContextMenuInterfaces(pluginEntries, nodeEntries, edgeEntries, selectedNodes, selectedEdges,
-										extensions[i]);
+							extensions[i]);
 				}
 			}
 		}
@@ -517,7 +523,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 	 * @param i
 	 */
 	private void processContextMenuInterfaces(JMenu pluginEntries, JMenu nodeEntries, JMenu edgeEntries,
-						Collection<Node> selectedNodes, Collection<Edge> selectedEdges, Object object) {
+			Collection<Node> selectedNodes, Collection<Edge> selectedEdges, Object object) {
 		if (object instanceof Algorithm) {
 			GravistoService.getInstance().algorithmAttachData((Algorithm) object);
 		}
@@ -621,6 +627,7 @@ public class DefaultContextMenuManager extends ContextMenuManager {
 		}
 	}
 	
+	@Override
 	public void ensureActiveSession(MouseEvent e) {
 		View targetView = (View) e.getComponent();
 		if (targetView == null)

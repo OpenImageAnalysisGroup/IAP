@@ -16,11 +16,11 @@ import org.FolderPanel;
 import org.HelperClass;
 import org.ReleaseInfo;
 import org.UpdateInfoResult;
-import org.graffiti.editor.MainFrame;
 import org.graffiti.managers.pluginmgr.RSSfeedDefinition;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.addons.Addon;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.addons.AddonManagerPlugin;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
@@ -142,7 +142,7 @@ public class RSSFeedManager implements HelperClass {
 	
 	private String getPluginFeeds() {
 		String result = "";
-		Collection<RSSfeedDefinition> feeds = MainFrame.getInstance().getPluginManager().getPluginFeeds();
+		Collection<RSSfeedDefinition> feeds = GravistoMainHelper.getPluginManager().getPluginFeeds();
 		if (AddonManagerPlugin.getInstance() != null)
 			for (Addon addon : AddonManagerPlugin.getInstance().getAddons()) {
 				if (!addon.isActive() && addon.getDescription().hasRSSfeedDefined()) {
@@ -204,7 +204,7 @@ public class RSSFeedManager implements HelperClass {
 		try {
 			TextFile.writeE(getFeedtextfile(), text, System.getProperty("file.encoding"));
 		} catch (IOException e) {
-			System.out.println(SystemAnalysis.getCurrentTime()+">ERROR: Could not save RSS feed text file. Exception: "+e.getMessage());
+			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not save RSS feed text file. Exception: " + e.getMessage());
 		}
 	}
 	

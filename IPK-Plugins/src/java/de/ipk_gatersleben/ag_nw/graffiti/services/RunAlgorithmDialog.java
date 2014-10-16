@@ -16,20 +16,20 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Graph;
 import org.graffiti.plugin.algorithm.Algorithm;
 import org.graffiti.selection.Selection;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.plugin_settings.PreferencesDialog;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 
 /**
  * @author Christian Klukas
  *         (c) 2004 IPK-Gatersleben
  */
 public class RunAlgorithmDialog extends JDialog
-					implements HandlesAlgorithmData {
+		implements HandlesAlgorithmData {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -43,8 +43,8 @@ public class RunAlgorithmDialog extends JDialog
 	}
 	
 	public RunAlgorithmDialog(String title, Graph graph, Selection selection,
-						boolean returnAlgorithmInsteadOfRun,
-						boolean executeMoveToTopAfterwards) {
+			boolean returnAlgorithmInsteadOfRun,
+			boolean executeMoveToTopAfterwards) {
 		algorithm = null;
 		
 		if (title == null)
@@ -57,15 +57,15 @@ public class RunAlgorithmDialog extends JDialog
 		getContentPane().setLayout(new TableLayout(size));
 		
 		final PreferencesDialog pd = new PreferencesDialog();
-		GravistoService.getInstance().getMainFrame().getPluginManager()
-							.addPluginManagerListener(pd);
+		GravistoMainHelper.getPluginManager()
+				.addPluginManagerListener(pd);
 		JPanel newPanel = new JPanel();
 		if (returnAlgorithmInsteadOfRun)
 			pd.initializeGUIforGivenContainer(newPanel, this, false, false, true, false,
-								false, false, true, graph, selection, this, executeMoveToTopAfterwards);
+					false, false, true, graph, selection, this, executeMoveToTopAfterwards);
 		else
 			pd.initializeGUIforGivenContainer(newPanel, this, false, false, true, false,
-								true, false, true, graph, selection, null, executeMoveToTopAfterwards);
+					true, false, true, graph, selection, null, executeMoveToTopAfterwards);
 		
 		getContentPane().add(newPanel, "1,1");
 		getContentPane().validate();
@@ -76,9 +76,11 @@ public class RunAlgorithmDialog extends JDialog
 		
 		addWindowListener(new WindowListener() {
 			
+			@Override
 			public void windowOpened(WindowEvent e) {
 			}
 			
+			@Override
 			@SuppressWarnings("deprecation")
 			public void windowClosing(WindowEvent e) {
 				if (pd.optionsForPlugin != null) {
@@ -88,18 +90,23 @@ public class RunAlgorithmDialog extends JDialog
 				dispose();
 			}
 			
+			@Override
 			public void windowClosed(WindowEvent e) {
 			}
 			
+			@Override
 			public void windowIconified(WindowEvent e) {
 			}
 			
+			@Override
 			public void windowDeiconified(WindowEvent e) {
 			}
 			
+			@Override
 			public void windowActivated(WindowEvent e) {
 			}
 			
+			@Override
 			public void windowDeactivated(WindowEvent e) {
 			}
 		});
@@ -109,6 +116,7 @@ public class RunAlgorithmDialog extends JDialog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.HandlesAlgorithmData#setAlgorithm(org.graffiti.plugin.algorithm.Algorithm)
 	 */
+	@Override
 	public synchronized void setAlgorithm(Algorithm algorithm) {
 		this.algorithm = algorithm;
 	}
@@ -117,6 +125,7 @@ public class RunAlgorithmDialog extends JDialog
 	 * (non-Javadoc)
 	 * @see de.ipk_gatersleben.ag_nw.graffiti.services.HandlesAlgorithmData#getAlgorithm()
 	 */
+	@Override
 	public Algorithm getAlgorithm() {
 		return algorithm;
 	}

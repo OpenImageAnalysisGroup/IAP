@@ -75,6 +75,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.JLabelHTMLlink;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.addons.AddonManagerPlugin;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.plugin_info.PluginInfoHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.Main;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -514,7 +515,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 	
 	private Collection<JComponent> getOptionalSettingsPanels() {
 		Collection<JComponent> result = new ArrayList<JComponent>();
-		for (PluginEntry pe : MainFrame.getInstance().getPluginManager().getPluginEntries()) {
+		for (PluginEntry pe : GravistoMainHelper.getPluginManager().getPluginEntries()) {
 			if (pe.getDescription().isOptional()) {
 				result.add(TableLayout.getSplit(getEnableDisableOption(pe), new JLabel(""), TableLayout.PREFERRED,
 						TableLayout.FILL));
@@ -541,7 +542,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 	}
 	
 	public static void setSettings(boolean enable) {
-		for (PluginEntry pe : MainFrame.getInstance().getPluginManager().getPluginEntries())
+		for (PluginEntry pe : GravistoMainHelper.getPluginManager().getPluginEntries())
 			if (pe.getDescription().isOptional()) {
 				if (pe.getDescription().isOptionalDefaultTrue())
 					new SettingsHelperDefaultIsTrue().setEnabled(pe.getDescription().getName(), enable);

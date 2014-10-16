@@ -46,12 +46,16 @@ public class Main {
 	
 	// ~ Instance fields ========================================================
 	
-	/** The editor's main frame. */
+	/**
+	 * The editor's main frame.
+	 * 
+	 * @param addPluginFile
+	 */
 	
 	// ~ Constructors ===========================================================
 	
-	public Main(final boolean showMainFrame, String applicationName, String[] args, String addon) {
-		this(showMainFrame, applicationName, args, new String[] { addon });
+	public Main(final boolean showMainFrame, String applicationName, String[] args, String addon, String addPluginFile) {
+		this(showMainFrame, applicationName, args, new String[] { addon }, addPluginFile);
 	}
 	
 	private void setupLogger() {
@@ -66,7 +70,7 @@ public class Main {
 		}
 	}
 	
-	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon) {
+	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon, String addPluginFile) {
 		this(showMainFrame, applicationName, args, addon, new DBEsplashScreen(applicationName,
 				"", new RunnableWithSplashScreenReference() {
 					private SplashScreenInterface ss;
@@ -117,13 +121,15 @@ public class Main {
 					public void setSplashscreenInfo(SplashScreenInterface ss) {
 						this.ss = ss;
 					}
-				}) {});
+				}) {}, addPluginFile);
 	}
 	
 	/**
 	 * Constructs a new instance of the editor.
+	 * 
+	 * @param addPluginFile
 	 */
-	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon, SplashScreenInterface splashScreen) {
+	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon, SplashScreenInterface splashScreen, String addPluginFile) {
 		
 		setupLogger();
 		
@@ -183,7 +189,7 @@ public class Main {
 			splashScreen.setVisible(true);
 		}
 		
-		GravistoMainHelper.initApplicationExt(args, splashScreen, cl, null, addon);
+		GravistoMainHelper.initApplicationExt(args, splashScreen, cl, addPluginFile, addon);
 	}
 	
 	public static boolean doEnableKEGGaskUser() {
@@ -238,7 +244,7 @@ public class Main {
 		startVanted(args, null);
 	}
 	
-	public static void startVantedExt(String[] args, String[] developerAddon) {
+	public static void startVantedExt(String[] args, String[] developerAddon, String addPluginFile) {
 		System.out.println("Welcome! About to start the application...");
 		
 		if (SystemInfo.isMac()) {
@@ -297,11 +303,11 @@ public class Main {
 		AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
 		new Main(true,
-				DBEgravistoHelper.DBE_GRAVISTO_VERSION, args, developerAddon);
+				DBEgravistoHelper.DBE_GRAVISTO_VERSION, args, developerAddon, addPluginFile);
 	}
 	
 	public static void startVanted(String[] args, String adn) {
-		startVantedExt(args, new String[] { adn });
+		startVantedExt(args, new String[] { adn }, null);
 		
 	}
 }
