@@ -282,7 +282,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 							@Override
 							public void run() {
 								try {
-									MainFrame.getInstance().getPluginManager().loadPlugin(pd, xmlURL, false);
+									GravistoMainHelper.getPluginManager().loadPlugin(pd, xmlURL, false);
 								} catch (Exception e) {
 									or.setObject(e);
 								}
@@ -291,7 +291,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 						if (or.getObject() != null)
 							throw (Exception) or.getObject();
 					} else {
-						MainFrame.getInstance().getPluginManager().loadPlugin(pd, xmlURL, false);
+						GravistoMainHelper.getPluginManager().loadPlugin(pd, xmlURL, false);
 					}
 					icon = getIcon(pd);
 				} else {
@@ -430,7 +430,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 			
 			a.setIsActive(true);
 			PluginDescription desc = a.getDescription();
-			MainFrame.getInstance().getPluginManager().loadPlugin(desc, a.getXMLURL(), false);
+			GravistoMainHelper.getPluginManager().loadPlugin(desc, a.getXMLURL(), false);
 			a.setIcon(getIcon(desc));
 			
 			hideNewComponents();
@@ -475,7 +475,7 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 	
 	private ImageIcon getIcon(PluginDescription desc) {
 		try {
-			return MainFrame.getInstance().getPluginManager()
+			return GravistoMainHelper.getPluginManager()
 					.getPluginInstance(desc.getName()).getIcon();
 		} catch (Exception e) {
 			ClassLoader cl = GenericPluginAdapter.class.getClassLoader();

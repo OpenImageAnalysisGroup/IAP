@@ -11,7 +11,6 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.SystemAnalysis;
-import org.graffiti.editor.GravistoService;
 import org.graffiti.event.AttributeEvent;
 import org.graffiti.event.TransactionEvent;
 import org.graffiti.plugin.inspector.InspectorTab;
@@ -20,6 +19,7 @@ import org.graffiti.plugin.view.View;
 import org.graffiti.session.Session;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.plugin_settings.PreferencesDialog;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 
 /**
  * Represents the tab, which contains the functionality to edit the attributes
@@ -28,7 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.plugin_settings.Preferences
  * @version $Revision: 1.3 $
  */
 public class TabPluginControl
-					extends InspectorTab {
+		extends InspectorTab {
 	
 	private static final long serialVersionUID = 1L;
 	/**
@@ -51,13 +51,13 @@ public class TabPluginControl
 		double border = 2;
 		double[][] size =
 		{
-							{ border, TableLayoutConstants.FILL, border }, // Columns
+				{ border, TableLayoutConstants.FILL, border }, // Columns
 				{ border, TableLayoutConstants.FILL, border }
 		}; // Rows
 		this.setLayout(new TableLayout(size));
 		
 		PreferencesDialog pd = new PreferencesDialog();
-		GravistoService.getInstance().getMainFrame().getPluginManager().addPluginManagerListener(pd);
+		GravistoMainHelper.getPluginManager().addPluginManagerListener(pd);
 		JPanel newPanel = new JPanel();
 		pd.initializeGUIforGivenContainer(newPanel, null, true, false, true, false, true, false, true, null, null, null, false);
 		this.add(newPanel, "1,1");

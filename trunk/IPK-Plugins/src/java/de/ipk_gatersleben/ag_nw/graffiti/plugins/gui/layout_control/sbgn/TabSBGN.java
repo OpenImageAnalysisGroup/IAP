@@ -32,10 +32,11 @@ import org.graffiti.plugin.view.View2D;
 import org.graffiti.session.EditorSession;
 
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 
 public class TabSBGN
-					extends InspectorTab
-					implements ActionListener {
+		extends InspectorTab
+		implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -125,7 +126,7 @@ public class TabSBGN
 		fpConnectionsArcs.addGuiComponentRow(new JLabel("Consumption,Production"), reversibleSelection, false);
 		fpConnectionsArcs.addGuiComponentRow(new JLabel("Consumption/Production"), getEdgeButton(SBGNarc.ConsumptionProductionHorOrVert), false);
 		fpConnectionsArcs.addGuiComponentRow(new JLabel("Consumption/Production"), TableLayout.getSplit(getEdgeButton(SBGNarc.ConsumptionProductionHor),
-							getEdgeButton(SBGNarc.ConsumptionProductionVert), TableLayout.FILL, TableLayout.FILL), false);
+				getEdgeButton(SBGNarc.ConsumptionProductionVert), TableLayout.FILL, TableLayout.FILL), false);
 		fpConnectionsArcs.addGuiComponentRow(new JLabel("Modulation, Stimulation"), getEdgeButton(SBGNarc.Modulation), false);
 		fpConnectionsArcs.addGuiComponentRow(new JLabel("Modulation, Stimulation"), getEdgeButton(SBGNarc.Stimulation), false);
 		fpConnectionsArcs.addGuiComponentRow(new JLabel("Catalysis, Inhibition, Trigger"), getEdgeButton(SBGNarc.Catalysis), false);
@@ -134,8 +135,8 @@ public class TabSBGN
 		fpConnectionsArcs.addGuiComponentRow(new JLabel("Logic/Equivalence Arc"), getEdgeButton(SBGNarc.Logic), false);
 		fpConnectionsArcs.addGuiComponentRow(new JLabel("Logic/Equivalence Arc"), getEdgeButton(SBGNarc.Equivalence), false);
 		fpConnectionsArcs.addGuiComponentRow(new JLabel("<html>" +
-							"Redraw (click in case<br>" +
-							"view is not auto-updated)"), getRedrawButton(), false);
+				"Redraw (click in case<br>" +
+				"view is not auto-updated)"), getRedrawButton(), false);
 		fpConnectionsArcs.mergeRowsWithSameLeftLabel();
 		fpConnectionsArcs.layoutRows();
 		gui.add(fpConnectionsArcs);
@@ -153,12 +154,13 @@ public class TabSBGN
 		
 		res.setOpaque(false);
 		res.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				EditorSession es = MainFrame.getInstance().getActiveEditorSession();
 				if (es == null) {
 					MainFrame.showMessageDialog("<html>" +
-										"No active editor session!<br>" +
-										"Please open a graph file or create a new one.", "Error");
+							"No active editor session!<br>" +
+							"Please open a graph file or create a new one.", "Error");
 					return;
 				}
 				Graph g = es.getGraph();
@@ -175,22 +177,23 @@ public class TabSBGN
 		res.setOpaque(false);
 		final ActionListener aa = this;
 		res.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				aa.actionPerformed(e);
 				EditorSession es = MainFrame.getInstance().getActiveEditorSession();
 				if (es == null) {
 					MainFrame.showMessageDialog("<html>" +
-										"No active editor session!<br>" +
-										"Please open a graph file or create a new one." +
-										"", "Error");
+							"No active editor session!<br>" +
+							"Please open a graph file or create a new one." +
+							"", "Error");
 					return;
 				}
 				if (es.getSelectionModel().getActiveSelection() == null ||
-									es.getSelectionModel().getActiveSelection().getEdges().size() <= 0) {
+						es.getSelectionModel().getActiveSelection().getEdges().size() <= 0) {
 					MainFrame.showMessageDialog("<html>" +
-										"This command requires the selection of at least one<br>" +
-										"edge. The style of the edge-selection will be modifed<br>" +
-										"to reflect the requested edge type.", "Errorr");
+							"This command requires the selection of at least one<br>" +
+							"edge. The style of the edge-selection will be modifed<br>" +
+							"to reflect the requested edge type.", "Errorr");
 					return;
 				}
 				Graph g = es.getGraph();
@@ -255,21 +258,22 @@ public class TabSBGN
 		res.setOpaque(false);
 		final ActionListener aa = this;
 		res.addActionListener(new ActionListener() {
+			@Override
 			@SuppressWarnings("unchecked")
 			public void actionPerformed(ActionEvent e) {
 				aa.actionPerformed(e);
 				EditorSession es = MainFrame.getInstance().getActiveEditorSession();
 				if (es == null) {
 					MainFrame.showMessageDialog("<html>" +
-										"No active editor session!<br>" +
-										"Please open a graph file or create a new one.", "Error");
+							"No active editor session!<br>" +
+							"Please open a graph file or create a new one.", "Error");
 					return;
 				}
 				boolean setStyle = es.getSelectionModel().getActiveSelection().getElements().size() > 0;
 				Graph g = es.getGraph();
 				if (setStyle) {
 					if (es.getSelectionModel().getActiveSelection().getNodes().size() == 0 &&
-										es.getSelectionModel().getActiveSelection().getEdges().size() > 0) {
+							es.getSelectionModel().getActiveSelection().getEdges().size() > 0) {
 						g.numberGraphElements();
 						Collection<Edge> toBeDeleted = new ArrayList<Edge>();
 						final Collection<Node> newNodes = new ArrayList<Node>();
@@ -279,16 +283,17 @@ public class TabSBGN
 							Vector2d pos = new Vector2d((pa.x + pb.x) / 2, (pa.y + pb.y) / 2);
 							Node n = g.addNode(AttributeHelper.getDefaultGraphicsAttributeForNode(pos.x, pos.y));
 							SBGNgraphHelper.addItemOrSetStyle(n, item, entityPoolNodeLabel,
-												info1, info2, state1, state2, clone, cloneMarkerText, false);
+									info1, info2, state1, state2, clone, cloneMarkerText, false);
 							newNodes.add(n);
 							g.addEdgeCopy(edge, edge.getSource(), n);
 							g.addEdgeCopy(edge, n, edge.getTarget());
 							SBGNgraphHelper.addItemOrSetStyle(n, item, entityPoolNodeLabel,
-												info1, info2, state1, state2, clone, cloneMarkerText, setStyle);
+									info1, info2, state1, state2, clone, cloneMarkerText, setStyle);
 							toBeDeleted.add(edge);
 						}
 						g.deleteAll((Collection) toBeDeleted);
 						SwingUtilities.invokeLater(new Runnable() {
+							@Override
 							public void run() {
 								GraphHelper.selectNodes(newNodes);
 							}
@@ -296,7 +301,7 @@ public class TabSBGN
 					} else {
 						for (Node n : es.getSelectionModel().getActiveSelection().getNodes()) {
 							SBGNgraphHelper.addItemOrSetStyle(n, item, entityPoolNodeLabel,
-												info1, info2, state1, state2, clone, cloneMarkerText, setStyle);
+									info1, info2, state1, state2, clone, cloneMarkerText, setStyle);
 						}
 					}
 					GraphHelper.issueCompleteRedrawForGraph(es.getGraph());
@@ -306,7 +311,7 @@ public class TabSBGN
 						Vector2d pos = SBGNgraphHelper.getTargetPositionForNewElement(g);
 						Node n = g.addNode(AttributeHelper.getDefaultGraphicsAttributeForNode(pos.x, pos.y));
 						SBGNgraphHelper.addItemOrSetStyle(n, item, entityPoolNodeLabel,
-											info1, info2, state1, state2, clone, cloneMarkerText, setStyle);
+								info1, info2, state1, state2, clone, cloneMarkerText, setStyle);
 					} finally {
 						g.getListenerManager().transactionFinished(e);
 					}
@@ -436,6 +441,7 @@ public class TabSBGN
 		return "SBGN";
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		info1 = unitOfInformation1.getText();
 		info2 = unitOfInformation2.getText();
@@ -476,7 +482,7 @@ public class TabSBGN
 	}
 	
 	private boolean SGBNaddOnLoaded() {
-		return MainFrame.getInstance().getPluginManager().isInstalled("SBGN-ED");
+		return GravistoMainHelper.getPluginManager().isInstalled("SBGN-ED");
 	}
 	
 }

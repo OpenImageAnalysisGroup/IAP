@@ -59,6 +59,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.plugin_info.PluginInfoHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.workflow.WorkflowHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.GUIhelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.PatchedHTMLEditorKit;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -142,7 +143,7 @@ public class MenuItemInfoDialog
 					copyR = "(c) 2003-2014 IPK-Gatersleben";
 				
 				int num = 0;
-				num = MainFrame.getInstance().getPluginManager().getPluginEntries().size();
+				num = GravistoMainHelper.getPluginManager().getPluginEntries().size();
 				
 				int rrr = JOptionPane
 						.showOptionDialog(
@@ -184,7 +185,7 @@ public class MenuItemInfoDialog
 										+
 										"<b>Development</b>"
 										+ "<br><br>"
-										+ "IAP-VANTED is one of the core components of the Integrated Analysis<br>" +
+										+ "IAP-Data-Navigator is one of the core components of the Integrated Analysis<br>" +
 										"Platform (IAP). IAP is developed since May 2010 by the research group image<br>" +
 										"analysis, lead by C. Klukas.<br><br>"
 										+

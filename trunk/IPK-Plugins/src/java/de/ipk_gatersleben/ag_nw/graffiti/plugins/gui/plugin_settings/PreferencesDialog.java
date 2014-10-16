@@ -67,11 +67,12 @@ import scenario.ScenarioService;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.BSHscriptMenuEntry;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.DefaultContextMenuManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.RubyScriptMenuEntry;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.graph_to_origin_mover.CenterLayouterAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.services.HandlesAlgorithmData;
 
 public class PreferencesDialog extends JDialog
-					implements PluginManagerListener {
+		implements PluginManagerListener {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -122,18 +123,20 @@ public class PreferencesDialog extends JDialog
 		Container cp = this.getContentPane();
 		
 		initializeGUIforGivenContainer(cp, this, false, true, true, true, true, true, false,
-							null,
-							null,
-							null,
-							false);
+				null,
+				null,
+				null,
+				false);
 		
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		
 		addWindowListener(new WindowListener() {
 			
+			@Override
 			public void windowOpened(WindowEvent e) {
 			}
 			
+			@Override
 			@SuppressWarnings("deprecation")
 			public void windowClosing(WindowEvent e) {
 				if (optionsForPlugin != null) {
@@ -143,18 +146,23 @@ public class PreferencesDialog extends JDialog
 				dispose();
 			}
 			
+			@Override
 			public void windowClosed(WindowEvent e) {
 			}
 			
+			@Override
 			public void windowIconified(WindowEvent e) {
 			}
 			
+			@Override
 			public void windowDeiconified(WindowEvent e) {
 			}
 			
+			@Override
 			public void windowActivated(WindowEvent e) {
 			}
 			
+			@Override
 			public void windowDeactivated(WindowEvent e) {
 			}
 		});
@@ -167,15 +175,15 @@ public class PreferencesDialog extends JDialog
 	 * @param setAlgorithmDataObject
 	 */
 	public void initializeGUIforGivenContainer(Container cp, final JDialog thisDialog,
-						boolean vertical, boolean showCloseButton,
-						boolean showAlgorithms,
-						boolean showSettings,
-						boolean showInteractiveAlgorithms,
-						boolean showScripts,
-						boolean showOnlyLayoutAlgorithms,
-						final Graph graph, final Selection selection,
-						final HandlesAlgorithmData setAlgorithmDataObject,
-						final boolean executeMoveToTopAfterwards) {
+			boolean vertical, boolean showCloseButton,
+			boolean showAlgorithms,
+			boolean showSettings,
+			boolean showInteractiveAlgorithms,
+			boolean showScripts,
+			boolean showOnlyLayoutAlgorithms,
+			final Graph graph, final Selection selection,
+			final HandlesAlgorithmData setAlgorithmDataObject,
+			final boolean executeMoveToTopAfterwards) {
 		
 		if (showScripts && !ReleaseInfo.getIsAllowedFeature(FeatureSet.SCRIPT_ACCESS))
 			showScripts = false;
@@ -199,6 +207,7 @@ public class PreferencesDialog extends JDialog
 		this.showOnlyLayoutAlgorithms = showOnlyLayoutAlgorithms;
 		this.showThreadSafeLayoutAlgorithms = showInteractiveAlgorithms;
 		myTree.addTreeSelectionListener(new TreeSelectionListener() {
+			@Override
 			public void valueChanged(TreeSelectionEvent e) {
 				processTreeSelectionEvent(e);
 			}
@@ -228,6 +237,7 @@ public class PreferencesDialog extends JDialog
 						settingsPanel.add(new JLabel("Script file: " + sm.getCmdFile()));
 						JButton startButton = new JButton(sm.getText());
 						startButton.addActionListener(new ActionListener() {
+							@Override
 							public void actionPerformed(ActionEvent arg0) {
 								ActionListener al = sm.getActionListeners()[0];
 								al.actionPerformed(new ActionEvent(sm, 0, ""));
@@ -252,10 +262,10 @@ public class PreferencesDialog extends JDialog
 									ThreadSafeAlgorithm alg = (ThreadSafeAlgorithm) data;
 									JPanel pluginContent = new JPanel();
 									optionsForPlugin =
-														new ThreadSafeOptions();
+											new ThreadSafeOptions();
 									
 									if (alg.setControlInterface(optionsForPlugin,
-														pluginContent)) {
+											pluginContent)) {
 										JScrollPane sp = new JScrollPane(pluginContent);
 										sp.setBorder(null);
 										settingsPanel.add(sp);
@@ -281,16 +291,16 @@ public class PreferencesDialog extends JDialog
 			}
 			
 			private void initAlgorithmPreferencesPanel(final Algorithm alg,
-								final Graph graph, Selection sele,
-								final HandlesAlgorithmData setAlgorithmDataObject,
-								final boolean executeMoveToTopAfterwards) {
+					final Graph graph, Selection sele,
+					final HandlesAlgorithmData setAlgorithmDataObject,
+					final boolean executeMoveToTopAfterwards) {
 				// settingsPanel.add(new JLabel("Algorithm selection: "+alg.getName()));
 				
 				JPanel progressAndStatus = new JPanel();
 				double border = 5;
 				double[][] size =
 				{
-									{ border, TableLayoutConstants.FILL, border }, // Columns
+						{ border, TableLayoutConstants.FILL, border }, // Columns
 						{ border, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, TableLayoutConstants.PREFERRED, border }
 				}; // Rows
 				
@@ -330,7 +340,7 @@ public class PreferencesDialog extends JDialog
 				if (!canNotStart)
 					if (alg.getParameters() != null) {
 						paramPanel = new ParameterEditPanel(alg.getParameters(),
-											editComponentManager.getEditComponents(), sele, alg.getName(), true, alg.getName());
+								editComponentManager.getEditComponents(), sele, alg.getName(), true, alg.getName());
 						if (paramPanel != null) {
 							JScrollPane sp = new JScrollPane(paramPanel);
 							sp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -348,6 +358,7 @@ public class PreferencesDialog extends JDialog
 					runButton.setEnabled(false);
 				final Selection selectionF = sele;
 				runButton.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						Graph workgraph = graph;
 						if (workgraph == null) {
@@ -436,6 +447,7 @@ public class PreferencesDialog extends JDialog
 		
 		final JMenu scriptContextMenu = new JMenu();
 		Timer scanForScripts = new Timer(20000, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
 				// update settings
@@ -450,14 +462,14 @@ public class PreferencesDialog extends JDialog
 						if (comps[i] instanceof BSHscriptMenuEntry) {
 							BSHscriptMenuEntry sme = (BSHscriptMenuEntry) comps[i];
 							rootNodeScripts.add(
-												new MyPluginTreeNode(sme.getText(),
-																	comps[i], BSHscriptMenuEntry.class));
+									new MyPluginTreeNode(sme.getText(),
+											comps[i], BSHscriptMenuEntry.class));
 						}
 						if (comps[i] instanceof RubyScriptMenuEntry) {
 							RubyScriptMenuEntry sme = (RubyScriptMenuEntry) comps[i];
 							rootNodeScripts.add(
-												new MyPluginTreeNode(sme.getText(),
-																	comps[i], RubyScriptMenuEntry.class));
+									new MyPluginTreeNode(sme.getText(),
+											comps[i], RubyScriptMenuEntry.class));
 						}
 					}
 				}
@@ -476,6 +488,7 @@ public class PreferencesDialog extends JDialog
 		if (showCloseButton) {
 			JButton closeButton = new JButton("Close");
 			closeButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					thisDialog.setVisible(false);
 				}
@@ -484,7 +497,7 @@ public class PreferencesDialog extends JDialog
 		}
 		cp.validate();
 		
-		Collection<?> loadedPlugins = GravistoService.getInstance().getMainFrame().getPluginManager().getPluginEntries();
+		Collection<?> loadedPlugins = GravistoMainHelper.getPluginManager().getPluginEntries();
 		for (Iterator<?> it = loadedPlugins.iterator(); it.hasNext();) {
 			PluginEntry p = (PluginEntry) it.next();
 			if (p.getPlugin() != null) {
@@ -514,11 +527,12 @@ public class PreferencesDialog extends JDialog
 	 * @see org.graffiti.managers.pluginmgr.PluginManagerListener#pluginAdded(org.graffiti.plugin.GenericPlugin,
 	 * org.graffiti.managers.pluginmgr.PluginDescription)
 	 */
+	@Override
 	public void pluginAdded(GenericPlugin plugin, PluginDescription desc) {
 		
 		final String todoReplaceString = "DEPENDENCY NOT SOLVED:";
 		
-		Collection<?> pl = GravistoService.getInstance().getMainFrame().getPluginManager().getPluginEntries();
+		Collection<?> pl = GravistoMainHelper.getPluginManager().getPluginEntries();
 		
 		PluginEntry pluginEntry = null;
 		
@@ -564,7 +578,7 @@ public class PreferencesDialog extends JDialog
 	 */
 	private void addDependencies(final String todoReplaceString, PluginEntry pluginEntry, MyPluginTreeNode newNode) {
 		MyPluginTreeNode depsNode = new MyPluginTreeNode("Dependencies",
-							pluginEntry.getDescription().getDependencies(), Dependency.class);
+				pluginEntry.getDescription().getDependencies(), Dependency.class);
 		
 		List<?> deps = pluginEntry.getDescription().getDependencies();
 		if (!deps.isEmpty()) {
@@ -572,7 +586,7 @@ public class PreferencesDialog extends JDialog
 			for (Iterator<?> it = deps.iterator(); it.hasNext();) {
 				PluginDependency d = (PluginDependency) it.next();
 				String main = d.getMain();
-				MutableTreeNode knownPlugin = (MutableTreeNode) knownNodes.get(main);
+				MutableTreeNode knownPlugin = knownNodes.get(main);
 				if (knownPlugin != null)
 					depsNode.add(knownPlugin);
 				else {
@@ -594,8 +608,8 @@ public class PreferencesDialog extends JDialog
 			for (Iterator<?> it = options.iterator(); it.hasNext();) {
 				OptionPane op = (OptionPane) it.next();
 				rootNodeSettings.add(
-									new MyPluginTreeNode(
-														op.getCategory() + "/" + op.getOptionName(), op, OptionPane.class));
+						new MyPluginTreeNode(
+								op.getCategory() + "/" + op.getOptionName(), op, OptionPane.class));
 			}
 		}
 	}
