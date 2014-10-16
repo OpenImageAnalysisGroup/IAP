@@ -2,12 +2,11 @@ package de.ipk.ag_ba.commands.about;
 
 import java.util.ArrayList;
 
-import org.graffiti.editor.MainFrame;
-
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.plugin_info.PluginInfoHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
 
 /**
  * @author Christian Klukas
@@ -28,7 +27,7 @@ public class ActionAboutPlugins extends AbstractNavigationAction {
 		ArrayList<String> ll = new ArrayList<String>();
 		ll.add("<html><h2><font face=\"Sans,Tohama,Arial\">System Features - Loaded Plugins</font></h2>" +
 				"<font face=\"Sans,Tohama,Arial\">" +
-				PluginInfoHelper.pretifyPluginList(MainFrame.getInstance().getPluginManager().getPluginEntries())
+				PluginInfoHelper.pretifyPluginList(GravistoMainHelper.getPluginManager().getPluginEntries())
 				+ "</font>");
 		
 		MainPanelComponent mp = new MainPanelComponent(ll);// , new Color(0, 0, 20));
