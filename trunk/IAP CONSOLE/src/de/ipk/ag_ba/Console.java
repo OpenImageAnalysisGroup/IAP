@@ -292,7 +292,7 @@ public class Console {
 				
 				String[] args = new String[] { "IAP Console" };
 				SplashScreenInterface emptySplashScreen = new SplashScreenDontPrintProgress();
-				new Main(false, (args.length > 0 ? args[0] : DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT), args, new String[] {}, emptySplashScreen);
+				new Main(false, (args.length > 0 ? args[0] : DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT), args, new String[] {}, emptySplashScreen, "pluginsIAP.txt");
 			}
 			first = false;
 		}
