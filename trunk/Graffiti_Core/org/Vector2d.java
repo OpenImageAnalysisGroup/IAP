@@ -50,8 +50,8 @@ public class Vector2d {
 	}
 	
 	public Vector2d(Point2D p1, Point2D p2) {
-		x = p1.getX() - p2.getX();
-		y = p1.getY() - p2.getY();
+		x = p2.getX() - p1.getX();
+		y = p2.getY() - p1.getY();
 	}
 	
 	public Point2D getPoint2D() {
@@ -107,15 +107,15 @@ public class Vector2d {
 		this.x += leftX;
 		this.y += topY;
 	}
-
+	
 	public Vector2d add(Vector2d sub) {
-		return new Vector2d(x+sub.x, y+sub.y);
+		return new Vector2d(x + sub.x, y + sub.y);
 	}
 	
 	public Vector2d subtract(Vector2d sub) {
-		return new Vector2d(x-sub.x, y-sub.y);
+		return new Vector2d(x - sub.x, y - sub.y);
 	}
-
+	
 	public double getX() {
 		return x;
 	}
@@ -123,6 +123,5 @@ public class Vector2d {
 	public double getY() {
 		return y;
 	}
-
 	
 }
