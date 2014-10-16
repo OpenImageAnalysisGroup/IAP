@@ -68,6 +68,7 @@ import org.graffiti.editor.dialog.DefaultParameterDialog;
 import org.graffiti.editor.dialog.ParameterDialog;
 import org.graffiti.graph.Graph;
 import org.graffiti.managers.pluginmgr.DefaultPluginEntry;
+import org.graffiti.managers.pluginmgr.DefaultPluginManager;
 import org.graffiti.managers.pluginmgr.PluginEntry;
 import org.graffiti.options.OptionPane;
 import org.graffiti.plugin.algorithm.Algorithm;
@@ -355,7 +356,7 @@ public class GravistoService implements HelperClass {
 	 * @return The algorithm instance.
 	 */
 	public Algorithm getAlgorithmInstanceFromFriendlyName(String name) {
-		Collection<PluginEntry> plugins = getMainFrame().getPluginManager().getPluginEntries();
+		Collection<PluginEntry> plugins = DefaultPluginManager.lastInstance.getPluginEntries();
 		
 		for (Iterator<PluginEntry> pi = plugins.iterator(); pi.hasNext();) {
 			DefaultPluginEntry curPluginEntry = (DefaultPluginEntry) pi.next();
@@ -400,7 +401,7 @@ public class GravistoService implements HelperClass {
 	 * @return The plugin instance, if the plugin is loaded.
 	 */
 	public DefaultPluginEntry getPluginInstanceFromPluginDescription(String pluginDescription) {
-		Collection<PluginEntry> plugins = getMainFrame().getPluginManager().getPluginEntries();
+		Collection<PluginEntry> plugins = DefaultPluginManager.lastInstance.getPluginEntries();
 		
 		for (Iterator<PluginEntry> pi = plugins.iterator(); pi.hasNext();) {
 			DefaultPluginEntry curPluginEntry = (DefaultPluginEntry) pi.next();
