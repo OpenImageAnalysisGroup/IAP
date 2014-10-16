@@ -201,6 +201,7 @@ public class SystemAnalysis {
 	
 	private static SimpleDateFormat sdf = new SimpleDateFormat();
 	private static DateFormat sdfInclSec = DateFormat.getTimeInstance();
+	private static Scanner sc;
 	
 	public static String getCurrentTimeInclSec() {
 		return sdfInclSec.format(new Date());
@@ -259,9 +260,14 @@ public class SystemAnalysis {
 	public static String getCommandLineInput() {
 		String input = null;
 		if (System.console() == null) {
-			Scanner sc = new Scanner(System.in);
-			input = sc.next();
-			sc.close();
+			try {
+				if (SystemAnalysis.sc == null)
+					SystemAnalysis.sc = new Scanner(System.in);
+				input = sc.next();
+				// sc.close();
+			} catch (Exception e) {
+				return null;
+			}
 		} else {
 			input = System.console().readLine();
 		}
