@@ -28,20 +28,18 @@ public class Color_CIE_Lab {
 		this.b = b;
 	}
 	
-	public Color_CIE_Lab(int rgb, boolean exactAndSlow) {
+	public Color_CIE_Lab(int rgb, boolean dummy) {
 		int red = (rgb & 0xff0000) >> 16;
 		int green = (rgb & 0x00ff00) >> 8;
 		int blue = (rgb & 0x0000ff);
 		
-		Color_CIE_Lab c = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(red, green, blue, exactAndSlow));
+		Color_CIE_Lab c = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(red, green, blue));
 		l = c.l;
 		a = c.a;
 		b = c.b;
 	}
 	
 	/**
-	 * attention may not work correctly
-	 * 
 	 * @param rgb
 	 */
 	public Color_CIE_Lab(int rgb) {
@@ -49,9 +47,9 @@ public class Color_CIE_Lab {
 		int green = (rgb & 0x00ff00) >> 8;
 		int blue = (rgb & 0x0000ff);
 		float[][][] lab = ImageOperation.getLabCubeInstance();
-		l = lab[red][green][blue];
-		a = lab[red][green][blue + 256];
-		b = lab[red][green][blue + 512];
+		l = lab[red][green][blue] / 2.55f;
+		a = lab[red][green][blue + 256] - 128f;
+		b = lab[red][green][blue + 512] - 128f;
 	}
 	
 	public void setL(float l) {

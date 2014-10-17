@@ -141,44 +141,27 @@ public class ColorUtil {
 		return "#" + (r + g + b);
 	}
 	
-	public static ColorXYZ colorRGB2XYZ(float R, float G, float B, boolean exactAndSlow) {
+	public static ColorXYZ colorRGB2XYZ(float R, float G, float B) {
 		float var_R = (R / 255f); // R from 0 to 255
 		float var_G = (G / 255f); // G from 0 to 255
 		float var_B = (B / 255f); // B from 0 to 255
 		
-		if (exactAndSlow) {
-			if (var_R > 0.04045) {
-				double a = ((var_R + 0.055) / 1.055);
-				var_R = (float) Math.pow(a, 2.4);
-			} else
-				var_R = var_R / 12.92f;
-			if (var_G > 0.04045) {
-				double a = ((var_G + 0.055) / 1.055);
-				var_G = (float) Math.pow(a, 2.4);
-			} else
-				var_G = var_G / 12.92f;
-			if (var_B > 0.04045) {
-				double a = ((var_B + 0.055) / 1.055);
-				var_B = (float) Math.pow(a, 2.4);
-			} else
-				var_B = var_B / 12.92f;
-		} else {
-			if (var_R > 0.04045) {
-				float a = ((var_R + 0.055f) / 1.055f);
-				var_R = a * a * 1.2f; // ~ Math.pow(a, 2.4);
-			} else
-				var_R = var_R / 12.92f;
-			if (var_G > 0.04045) {
-				float a = ((var_G + 0.055f) / 1.055f);
-				var_G = a * a * 1.2f; // ~ Math.pow(b, 2.4);
-			} else
-				var_G = var_G / 12.92f;
-			if (var_B > 0.04045) {
-				float a = ((var_B + 0.055f) / 1.055f);
-				var_B = a * a * 1.2f; // ~ Math.pow(c, 2.4);
-			} else
-				var_B = var_B / 12.92f;
-		}
+		if (var_R > 0.04045) {
+			double a = ((var_R + 0.055) / 1.055);
+			var_R = (float) Math.pow(a, 2.4);
+		} else
+			var_R = var_R / 12.92f;
+		if (var_G > 0.04045) {
+			double a = ((var_G + 0.055) / 1.055);
+			var_G = (float) Math.pow(a, 2.4);
+		} else
+			var_G = var_G / 12.92f;
+		if (var_B > 0.04045) {
+			double a = ((var_B + 0.055) / 1.055);
+			var_B = (float) Math.pow(a, 2.4);
+		} else
+			var_B = var_B / 12.92f;
+		
 		var_R = var_R * 100;
 		var_G = var_G * 100;
 		var_B = var_B * 100;
@@ -343,9 +326,9 @@ public class ColorUtil {
 	 * methods.
 	 */
 	@Deprecated
-	public static double deltaE2000(int r1, int g1, int b1, int r2, int g2, int b2, boolean exactAndSlow) {
-		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1, exactAndSlow));
-		Color_CIE_Lab cCL2 = colorXYZ2CIELAB(colorRGB2XYZ(r2, g2, b2, exactAndSlow));
+	public static double deltaE2000(int r1, int g1, int b1, int r2, int g2, int b2) {
+		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1));
+		Color_CIE_Lab cCL2 = colorXYZ2CIELAB(colorRGB2XYZ(r2, g2, b2));
 		double CIE_L1 = cCL1.getL();
 		double CIE_a1 = cCL1.getA();
 		double CIE_b1 = cCL1.getB(); // Color #1 CIE-L*ab values
@@ -374,8 +357,8 @@ public class ColorUtil {
 	}
 	
 	@Deprecated
-	public static double deltaE2000(int r1, int g1, int b1, double CIE_L2, double CIE_a2, double CIE_b2, boolean exactAndSlow) {
-		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1, exactAndSlow));
+	public static double deltaE2000(int r1, int g1, int b1, double CIE_L2, double CIE_a2, double CIE_b2) {
+		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(r1, g1, b1));
 		double CIE_L1 = cCL1.getL();
 		double CIE_a1 = cCL1.getA();
 		double CIE_b1 = cCL1.getB(); // Color #1 CIE-L*ab values
