@@ -28,7 +28,7 @@ public class ColorXYZ {
 		r = c.getRed();
 		g = c.getGreen();
 		b = c.getBlue();
-		ColorXYZ xyz = ColorUtil.colorRGB2XYZ(r, g, b, true);
+		ColorXYZ xyz = ColorUtil.colorRGB2XYZ(r, g, b);
 		x = xyz.x;
 		y = xyz.y;
 		z = xyz.z;
@@ -92,6 +92,6 @@ public class ColorXYZ {
 		if (var_B < 0)
 			var_B = 0;
 		
-		return new Color((float) var_R, (float) var_G, (float) var_B);
+		return new Color(var_R, var_G, var_B);
 	}
 }
