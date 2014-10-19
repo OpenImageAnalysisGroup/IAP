@@ -124,10 +124,10 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().masks().setIr(fi);
 				} catch (Error e) {
-					System.out.println(SystemAnalysis.getCurrentTime()
+					System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 							+ ">ERROR: ERROR: IR-REFERENCE: " + e.getMessage() + " // " + url);
 				} catch (Exception e) {
-					System.out.println(SystemAnalysis.getCurrentTime()
+					System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 							+ ">ERROR: IR-REFERENCE: " + e.getMessage() + " // " + url);
 				}
 			}
@@ -141,10 +141,10 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 			if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 				input().images().setIr(fi);
 		} catch (Error e) {
-			System.out.println(SystemAnalysis.getCurrentTime()
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 					+ ">ERROR: ERROR: IR-MAIN: " + e.getMessage() + " // " + url);
 		} catch (Exception e) {
-			System.out.println(SystemAnalysis.getCurrentTime()
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 					+ ">ERROR: IR-MAIN: " + e.getMessage() + " // " + url);
 		}
 	}
@@ -159,10 +159,10 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().masks().setNir(fi);
 				} catch (Error e) {
-					System.out.println(SystemAnalysis.getCurrentTime()
+					System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 							+ ">ERROR: ERROR: NIR-REFERENCE: " + e.getMessage() + " // " + url);
 				} catch (Exception e) {
-					System.out.println(SystemAnalysis.getCurrentTime()
+					System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 							+ ">ERROR: NIR-REFERENCE: " + e.getMessage() + " // " + url);
 				}
 			}
@@ -176,10 +176,10 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 			if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 				input().images().setNir(fi);
 		} catch (Error e) {
-			System.out.println(SystemAnalysis.getCurrentTime()
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 					+ ">ERROR: ERROR: NIR-MAIN: " + e.getMessage() + " // " + url);
 		} catch (Exception e) {
-			System.out.println(SystemAnalysis.getCurrentTime()
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 					+ ">ERROR: NIR-MAIN: " + e.getMessage() + " // " + url);
 		}
 	}
@@ -211,10 +211,10 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 			if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 				input().images().setFluo(fi);
 		} catch (Error e) {
-			System.out.println(SystemAnalysis.getCurrentTime()
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 					+ ">ERROR: ERROR: FLUO-MAIN: " + e.getMessage() + " // " + url);
 		} catch (Exception e) {
-			System.out.println(SystemAnalysis.getCurrentTime()
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 					+ ">ERROR: EXCEPTION FLUO-MAIN: " + e.getMessage() + " // " + url);
 		}
 	}
@@ -229,10 +229,10 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 					if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 						input().masks().setVis(fi);
 				} catch (Error e) {
-					System.out.println(SystemAnalysis.getCurrentTime()
+					System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 							+ ">ERROR: ERROR: VIS-REFERENCE: " + e.getMessage() + " // " + url);
 				} catch (Exception e) {
-					System.out.println(SystemAnalysis.getCurrentTime()
+					System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 							+ ">ERROR: VIS-REFERENCE: " + e.getMessage() + " // " + url);
 				}
 			}
@@ -246,13 +246,15 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 			if (fi != null && fi.getWidth() > 1 && fi.getHeight() > 1)
 				input().images().setVis(fi);
 			if (fi.getWidth() < 200)
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS RES: " + fi + " / " + url);
+				System.out.println(SystemAnalysis.lineSeparator
+						+ SystemAnalysis.getCurrentTime() + ">WARNING: LOW VIS RES: " + fi + " / " + url);
 			
 		} catch (Error e) {
-			System.out.println(SystemAnalysis.getCurrentTime()
+			System.out.println(SystemAnalysis.lineSeparator +
+					SystemAnalysis.getCurrentTime()
 					+ ">ERROR: ERROR: VIS-MAIN: " + e.getMessage() + " // " + url);
 		} catch (Exception e) {
-			System.out.println(SystemAnalysis.getCurrentTime()
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 					+ ">ERROR: VIS-MAIN: " + e.getMessage() + " // " + url);
 		}
 	}
