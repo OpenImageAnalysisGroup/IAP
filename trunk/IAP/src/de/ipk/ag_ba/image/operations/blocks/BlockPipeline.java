@@ -45,6 +45,7 @@ import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.OptionsGenerator;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -205,7 +206,8 @@ public class BlockPipeline {
 			
 			if (blockProgressOutput)
 				if (seconds >= (debug ? 0 : tPrintBlockTime))
-					System.out.println("Pipeline " + id + ": finished block "
+					System.out.println(SystemAnalysis.lineSeparator
+							+ SystemAnalysis.getCurrentTime() + ">INFO Pipeline " + id + ": finished block "
 							+ index + "/" + blocks.size() + ", took " + seconds
 							+ " sec., " + mseconds + " ms, time: "
 							+ StopWatch.getNiceTime() + " ("
@@ -247,8 +249,10 @@ public class BlockPipeline {
 					+ pipelineExecutionsWithinCurrentHour
 					+ " p.e., "
 					+ blockExecutionWithinLastMinute
-					+ " bl/m, "
-					+ SystemAnalysis.getUsedMemoryInMB()
+					+ " bl/m"
+					+ ", CPU Load " + StringManipulationTools.formatNumber(
+							SystemAnalysisExt.getRealSystemCpuLoad(), "##.#")
+					+ ", MEM " + SystemAnalysis.getUsedMemoryInMB()
 					+ "/"
 					+ SystemAnalysis.getMemoryMB()
 					+ " MB";
