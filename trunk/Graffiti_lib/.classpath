@@ -47,10 +47,10 @@
 	<classpathentry kind="lib" path="log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="xbean.jar"/>
 	<classpathentry kind="lib" path="commons-collections-3.2.1.jar"/>
-	<classpathentry kind="lib" path="commons-math3-3.2.jar"/>
 	<classpathentry kind="lib" path="poi-3.10-FINAL-20140208.jar"/>
 	<classpathentry kind="lib" path="poi-ooxml-3.10-FINAL-20140208.jar"/>
 	<classpathentry kind="lib" path="poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
 	<classpathentry kind="lib" path="poi-scratchpad-3.10-FINAL-20140208.jar"/>
+	<classpathentry kind="lib" path="commons-math3-3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
