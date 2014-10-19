@@ -78,16 +78,26 @@ public class BlSaveResultImages extends AbstractBlock {
 		if (id != null && id.getParentSample() != null) {
 			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
 			// loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-			return saveImageAndUpdateURL(loadedImage, optionsAndResults.databaseTarget, false, tray, tray_cnt, image.getCameraType());
+			return saveImageAndUpdateURL(loadedImage, optionsAndResults.databaseTarget, false, tray, tray_cnt);
 		} else
 			return null;
 	}
 	
-	private String addTrayInfo(int tray, int tray_cnt, String fileName) {
+	private String addTrayInfo(int tray, int tray_cnt, String fileName, ImageData image) {
 		if (tray_cnt > 1) {
 			String extension = fileName.substring(fileName.lastIndexOf(".") + ".".length());
+			
+			String well = WellProcessing.getWellID(tray, tray_cnt, image);
+			String replace;
+			
+			if (well != null && well.length() > 0) {
+				replace = "." + well + ".";
+			} else {
+				replace = "." + tray + "." + tray_cnt + ".";
+			}
+			
 			fileName = StringManipulationTools.stringReplace(fileName,
-					"." + extension, "." + tray + "." + tray_cnt + "."
+					"." + extension, replace
 							+ extension);
 		}
 		return fileName;
@@ -95,7 +105,7 @@ public class BlSaveResultImages extends AbstractBlock {
 	
 	protected LoadedImage saveImageAndUpdateURL(LoadedImage result,
 			DatabaseTarget databaseTarget, boolean processLabelUrl,
-			int tray, int tray_cnt, CameraType cameraType) throws Exception {
+			int tray, int tray_cnt) throws Exception {
 		if (result.getURL() == null)
 			result.setURL(new IOurl(null, StringManipulationTools.removeFileExtension(result.getURL().getFileName())
 					+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png")));
@@ -105,13 +115,13 @@ public class BlSaveResultImages extends AbstractBlock {
 		// System.out.println("CT=" + cameraType + ", W=" + result.getLoadedImage().getWidth());
 		// }
 		
-		result.getURL().setFileName(addTrayInfo(tray, tray_cnt, cameraType + "_" + result.getURL().getFileName()));
+		result.getURL().setFileName(addTrayInfo(tray, tray_cnt, result.getURL().getFileName(), result));
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
 		
 		if (result.getLabelURL() != null && processLabelUrl) {
 			result.getLabelURL().setFileName(
 					addTrayInfo(tray, tray_cnt,
-							result.getLabelURL().getFileName()));
+							result.getLabelURL().getFileName(), result));
 			result.getLabelURL().setPrefix(LoadedDataHandler.PREFIX);
 		}
 		
