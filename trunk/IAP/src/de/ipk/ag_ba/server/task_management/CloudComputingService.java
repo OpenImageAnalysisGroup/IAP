@@ -247,11 +247,13 @@ public class CloudComputingService {
 																						if (receiveCount.getBval(0, false)) {
 																							discarded++;
 																							System.out
-																									.println(SystemAnalysis.getCurrentTimeInclSec()
+																									.println(SystemAnalysis.lineSeparator
+																											+ SystemAnalysis.getCurrentTimeInclSec()
 																											+ ">INFO: Received valid change message, but previous image has not been received yet! Message is discarded!");
 																							if (discarded >= 3) {
 																								System.out
-																										.println(SystemAnalysis.getCurrentTime()
+																										.println(SystemAnalysis.lineSeparator
+																												+ SystemAnalysis.getCurrentTime()
 																												+ ">WARNING: Did not receive image data 6 times in a row. Exiting to allow restart!");
 																								System.exit(1);
 																							}
