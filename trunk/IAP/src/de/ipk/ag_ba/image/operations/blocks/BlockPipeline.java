@@ -231,29 +231,44 @@ public class BlockPipeline {
 			String vfsSpeed = VirtualFileSystemVFS2.getVFSspeedInfo(div, "");
 			status.setCurrentStatusText2(s1 + ((b - a) / 1000) + "s" + vfsSpeed);
 		}
-		if (pipelineExecutionsWithinCurrentHour % 5 == 0) {
+		int ndiv = 20;
+		if (pipelineExecutionsWithinCurrentHour % ndiv == 0) {
 			String s5performance = "";
 			long now = System.currentTimeMillis();
 			if (lastOutput > 0) {
 				s5performance = ""
 						+ (now - lastOutput) + " ms, ";
 			}
+			double mu = 100d * SystemAnalysis.getUsedMemoryInMB() / SystemAnalysis
+					.getMemoryMB();
+			String ss = (pipelineExecutionsWithinCurrentHour > 0 ? "" : "") + SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
+					+ ">INFO: "
+					// + s5performance
+					+ pipelineExecutionsWithinCurrentHour
+					+ " p.e., "
+					+ blockExecutionWithinLastMinute
+					+ " bl/m, "
+					+ SystemAnalysis.getUsedMemoryInMB()
+					+ "/"
+					+ SystemAnalysis.getMemoryMB()
+					+ " MB";
+			int len = ss.length();
 			System.out
-					.print(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
-							+ ">INFO: "
-							+ s5performance
-							+ pipelineExecutionsWithinCurrentHour
-							+ " p.e., "
-							+ blockExecutionWithinLastMinute
-							+ " bl/m, "
-							+ SystemAnalysis.getUsedMemoryInMB()
-							+ "/"
-							+ SystemAnalysis.getMemoryMB()
-							+ " MB ("
-							+ (int) (100d * SystemAnalysis.getUsedMemoryInMB() / SystemAnalysis
-									.getMemoryMB()) + "%) || ");
+					.print(ss + StringManipulationTools.getString(5 - (len % 5) - 1, " ")
+							+ " "
+							+ StringManipulationTools.formatNumberAddZeroInFront((long) mu, 2) + "% "
+							+ StringManipulationTools.getString(mu / 10, (mu > 80 ? "!" : "#"))
+							+ StringManipulationTools.getString(10 - mu / 10 - 1, "-")
+							+ " || ");
 			lastOutput = now;
 		}
+		if (pipelineExecutionsWithinCurrentHour / ndiv % (100 / ndiv) == 0)
+			System.out.print("-");
+		else
+			System.out.print("#");
+		if ((pipelineExecutionsWithinCurrentHour + 1) % ndiv != 0
+				&& (pipelineExecutionsWithinCurrentHour + 1) % 5 == 0)
+			System.out.print(":");
 		lastPipelineExecutionTimeInSec = (int) ((b - a) / 1000);
 		updatePipelineStatistics();
 		return results;
