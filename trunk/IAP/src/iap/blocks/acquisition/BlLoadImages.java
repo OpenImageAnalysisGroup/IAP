@@ -263,29 +263,29 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 		if (processedImages.vis() != null
 				&& processedMasks.vis() != null
 				&& processedImages.vis().getWidth() != processedMasks.vis().getWidth()) {
-			System.out.println(SystemAnalysis.getCurrentTime()
-					+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (VIS)");
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
+					+ ">INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (VIS)");
 			processedMasks.setVis(null);
 		}
 		if (processedImages.fluo() != null
 				&& processedMasks.fluo() != null
 				&& processedImages.fluo().getWidth() != processedMasks.fluo().getWidth()) {
-			System.out.println(SystemAnalysis.getCurrentTime()
-					+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (FLUO)");
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
+					+ ">INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (FLUO)");
 			processedMasks.setFluo(null);
 		}
 		if (processedImages.nir() != null
 				&& processedMasks.nir() != null
 				&& processedImages.nir().getWidth() != processedMasks.nir().getWidth()) {
-			System.out.println(SystemAnalysis.getCurrentTime()
-					+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (NIR)");
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
+					+ ">INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (NIR)");
 			processedMasks.setNir(null);
 		}
 		if (processedImages.ir() != null
 				&& processedMasks.ir() != null
 				&& processedImages.ir().getWidth() != processedMasks.ir().getWidth()) {
-			System.out.println(SystemAnalysis.getCurrentTime()
-					+ "> INPUT ERROR: IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (IR)");
+			System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
+					+ ">ERROR: INPUT IMAGE AND REFERENCE IMAGE HAVE DIFFERENT SIZE (IR)");
 			processedMasks.setNir(null);
 		}
 		

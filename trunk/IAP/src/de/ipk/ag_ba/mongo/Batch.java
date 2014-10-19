@@ -155,8 +155,10 @@ public class Batch {
 				if (!includeArchived) {
 					Collection<BatchCmd> jl = getAll();
 					for (BatchCmd c : jl)
-						if (c.getRunStatus() != CloudAnalysisStatus.ARCHIVED)
+						if (c.getRunStatus() != CloudAnalysisStatus.ARCHIVED) {
 							delete(c);
+							res.addLong(1);
+						}
 					
 				} else {
 					res.setLong(db.getCollection(SCHEDULE_COLLECTRION_NAME).count());
