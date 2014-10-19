@@ -184,7 +184,7 @@ public class BlockPipeline {
 				block = blockClass.newInstance();
 			} catch (Exception e) {
 				System.out.println(SystemAnalysis.getCurrentTime()
-						+ "> ERROR: COULD NOT INSTANCIATE BLOCK OF CLASS "
+						+ ">ERROR: COULD NOT INSTANCIATE BLOCK OF CLASS "
 						+ blockClass.getCanonicalName() + "!");
 				throw e;
 			}

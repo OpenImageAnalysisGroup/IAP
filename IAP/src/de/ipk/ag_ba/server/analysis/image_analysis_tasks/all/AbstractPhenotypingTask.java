@@ -1049,7 +1049,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private void printError(final TreeMap<Long, TreeMap<String, ImageSet>> tmf, Exception err) {
 		System.err.println(SystemAnalysis
 				.getCurrentTime()
-				+ "> ERROR: "
+				+ ">ERROR: "
 				+ err.getMessage());
 		// System.err.println(SystemAnalysisExt
 		// .getCurrentTime()

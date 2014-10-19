@@ -212,15 +212,15 @@ public class SplitResult {
 						" // processing time: " +
 						SystemAnalysis.getWaitTime(tProcessing) + " // split results merged: " +
 						SystemAnalysis.getCurrentTime());
-		System.out.println("> T=" + IAPservice.getCurrentTimeAsNiceString());
-		System.out.println("> PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
-		System.out.println("*****************************");
-		System.out.println("Merged Experiment: " + mergedExperiment.getName());
-		System.out.println("Merged Measurements: " + mergedExperiment.getNumberOfMeasurementValues());
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: T=" + IAPservice.getCurrentTimeAsNiceString());
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: PIPELINE PROCESSING TIME =" + SystemAnalysis.getWaitTime(tProcessing));
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: *****************************");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Merged Experiment: " + mergedExperiment.getName());
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Merged Measurements: " + mergedExperiment.getNumberOfMeasurementValues());
 		
-		System.out.println("> SAVE COMBINED EXPERIMENT...");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: SAVE COMBINED EXPERIMENT...");
 		m.saveExperiment(mergedExperiment, optStatus == null ? new BackgroundTaskConsoleLogger("", "", true) : optStatus, true, true);
-		System.out.println("> COMBINED EXPERIMENT HAS BEEN SAVED");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COMBINED EXPERIMENT HAS BEEN SAVED");
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved combined experiment " + mergedExperiment.getName());
 		if (optStatus != null)
@@ -232,11 +232,11 @@ public class SplitResult {
 		// System.out.println("> DELETE TEMP DATA...");
 		boolean deleteAfterMerge = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_delete_temp_results", true);
 		if (!deleteAfterMerge) {
-			System.out.println("> MARK TEMP DATA AS TRASHED...");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: MARK TEMP DATA AS TRASHED...");
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Mark temp data as trashed");
 		} else {
-			System.out.println("> DELETE TEMP DATA...");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: DELETE TEMP DATA...");
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Delete temp data");
 		}
@@ -261,7 +261,8 @@ public class SplitResult {
 							" as trashed", err);
 				else
 					MongoDB.saveSystemErrorMessage("Could not delete experiment " + i.getExperimentName(), err);
-				System.out.println("Could not " + (deleteAfterMerge ? "delete" : "set delete-mark on") + " experiment " + i.getExperimentName() + " (" +
+				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not " + (deleteAfterMerge ? "delete" : "set delete-mark on") + " experiment "
+						+ i.getExperimentName() + " (" +
 						err.getMessage() + ")");
 			}
 		}
@@ -273,7 +274,7 @@ public class SplitResult {
 			optStatus.setCurrentStatusValueFine(100d);
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Completed in " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish) + "");
-		System.out.println(SystemAnalysis.getCurrentTime() + "> COMPLETED");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COMPLETED");
 	}
 	
 	public void merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {

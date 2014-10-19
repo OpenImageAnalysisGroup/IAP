@@ -37,11 +37,17 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 	protected int nTemps = -1;
 	private ArrayList<BatchCmd> commandList = null;
 	private final boolean global;
+	private boolean updateForCountNeeded = false;
 	
 	public ActionDeleteAnalysisJobs(final MongoDB m, boolean global) {
 		super("Deletes running and scheduled compute tasks");
 		this.m = m;
 		this.global = global;
+		updateN(m, global);
+		
+	}
+	
+	private void updateN(final MongoDB m, boolean global) {
 		if (global) {
 			BackgroundTaskHelper.issueSimpleTask("Count split results",
 					"Determine number of split result datasets",
@@ -64,7 +70,6 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 		} else {
 			//
 		}
-		
 	}
 	
 	public ActionDeleteAnalysisJobs(final MongoDB m, ArrayList<BatchCmd> commandList) {
@@ -81,6 +86,8 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
+		if (updateForCountNeeded)
+			updateN(m, global);
 		if (global)
 			return "<html><center>Delete " + (nJobs >= 0 ? nJobs + "" : "") + " analysis tasks and<br>" +
 					(nTemps >= 0 ? nTemps + "" : "") + " temporary result datasets</center>";
@@ -99,7 +106,7 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 				+ (global ? "<br><br>" +
 						"Removed " + deletedTempDatasets + " intermediate result experiment data sets." : ""));
 	}
-
+	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;
@@ -110,21 +117,43 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 		deleted = 0;
 		deletedTempDatasets = 0;
 		if (global) {
+			if (getStatusProvider() != null)
+				getStatusProvider().setCurrentStatusText1("Remove compute tasks...");
 			deleted = m.batch().deleteAll(false);
-			
-			for (ExperimentHeaderInterface ei : m.getExperimentList(null)) {
+			nJobs = 0;
+			if (getStatusProvider() != null)
+				getStatusProvider().setCurrentStatusText1("Removed compute tasks...");
+			ArrayList<ExperimentHeaderInterface> ell = m.getExperimentList(null);
+			int n = ell.size();
+			for (ExperimentHeaderInterface ei : ell) {
 				if (ei.getExperimentName() == null || ei.getExperimentName().length() == 0 || ei.getExperimentName().contains("§")) {
 					m.deleteExperiment(ei.getDatabaseId());
 					deletedTempDatasets += 1;
+					nTemps--;
 				}
+				n++;
+				getStatusProvider().setCurrentStatusText1("Removed temp dataset " + n + "/" + ell.size());
+				if (getStatusProvider() != null && getStatusProvider().wantsToStop())
+					break;
 			}
+			updateForCountNeeded = true;
 		} else {
+			if (getStatusProvider() != null)
+				getStatusProvider().setCurrentStatusText1("Remove compute tasks...");
 			for (BatchCmd c : commandList) {
 				ThreadSafeOptions ret = new ThreadSafeOptions();
 				m.batch().delete(c, ret);
+				nJobs--;
 				if (ret.getBval(0, false))
 					deleted++;
+				if (getStatusProvider() != null && getStatusProvider().wantsToStop())
+					break;
 			}
+			updateForCountNeeded = true;
+			if (getStatusProvider() != null)
+				getStatusProvider().setCurrentStatusText1("Removed compute tasks...");
 		}
+		if (getStatusProvider() != null)
+			getStatusProvider().setCurrentStatusText1("Processing completed");
 	}
 }
