@@ -237,8 +237,9 @@ public class Console {
 								if (o == null || o.trim().isEmpty())
 									continue;
 								if (!first)
-									System.out.println("> ----------------------");
-								System.out.println("> " + StringManipulationTools.removeHTMLtags(o.replace("<br>", "\r\n> ").replace("<li>", "\r\n> - ")));
+									System.out.println(SystemAnalysis.getCurrentTime() + ">----------------------");
+								System.out.println(SystemAnalysis.getCurrentTime() + ">"
+										+ StringManipulationTools.removeHTMLtags(o.replace("<br>", "\r\n> ").replace("<li>", "\r\n> - ")));
 								first = false;
 							}
 					}
