@@ -1033,4 +1033,13 @@ public class StringManipulationTools implements HelperClass {
 		}
 		return false;
 	}
+	
+	public static String getString(double n, String string) {
+		if (string.isEmpty())
+			return "";
+		String res = "";
+		while (res.length() < n)
+			res += string;
+		return res;
+	}
 }
