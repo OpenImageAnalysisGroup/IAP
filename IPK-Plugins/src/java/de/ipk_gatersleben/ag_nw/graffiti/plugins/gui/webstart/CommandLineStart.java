@@ -19,6 +19,7 @@ public class CommandLineStart {
 	@SuppressWarnings("nls")
 	public static void main(final String[] args) {
 		ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {
+			@Override
 			public void run() {
 				Graph graph;
 				try {
@@ -32,7 +33,7 @@ public class CommandLineStart {
 				System.exit(0); // all OK
 			}
 		});
-		new Main(false, (args.length > 0 ? args[0] : DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT), args, new String[] {});
+		new Main(false, (args.length > 0 ? args[0] : DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT), args, new String[] {}, null);
 	}
 	
 }
