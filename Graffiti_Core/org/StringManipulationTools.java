@@ -912,7 +912,7 @@ public class StringManipulationTools implements HelperClass {
 		return ErrorMsg.getDecimalFormat(pattern).format(d);
 	}
 	
-	private static Locale locale = Locale.getDefault();
+	private static Locale locale = Locale.ENGLISH;// Locale.getDefault();
 	
 	public static String formatNumber(long l) {
 		NumberFormat f = NumberFormat.getNumberInstance(locale);
