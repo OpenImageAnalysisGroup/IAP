@@ -29,10 +29,12 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	private MongoDB m;
 	private final ObjectRef postFix = new ObjectRef("", "");
 	private boolean requestRefresh = false;
+	private double loadSum = -1;
+	private int cpuSum = -1;
 	boolean onceExecuted = false;
 	
 	public ActionCloudClusterHostInformation(final MongoDB m) {
-		super("Compute Cluster");
+		super("Compute Grid");
 		this.m = m;
 		
 		this.hostStatus = new BackgroundTaskStatusProviderSupportingExternalCall() {
@@ -69,6 +71,8 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 					int speed = 0;
 					int procCnt = 0;
 					HashMap<String, ArrayList<CloudHost>> hl_filtered = new HashMap<String, ArrayList<CloudHost>>();
+					double loadSum = 0;
+					int cpuSum = 0;
 					for (CloudHost ch : hl) {
 						if (ch != null && ch.isClusterExecutionMode()) {
 							String ip = ch.getHostName();
@@ -76,12 +80,21 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 								continue;
 							if (ip.contains("_"))
 								ip = ip.substring(0, ip.indexOf("_"));
-							if (!hl_filtered.containsKey(ip))
+							if (!hl_filtered.containsKey(ip)) {
+								double l = ch.getLoad();
+								if (l > 0)
+									loadSum += l;
 								hl_filtered.put(ip, new ArrayList<CloudHost>());
+								
+								if (ch.getRealCPUcount() > 0)
+									cpuSum += ch.getRealCPUcount();
+							}
 							hl_filtered.get(ip).add(ch);
 							procCnt++;
 						}
 					}
+					ActionCloudClusterHostInformation.this.loadSum = loadSum;
+					ActionCloudClusterHostInformation.this.cpuSum = cpuSum;
 					if (initCnt < 0)
 						initCnt = procCnt;
 					if (procCnt < initCnt)
@@ -202,7 +215,10 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Compute Grid";
+		if (loadSum <= 0)
+			return "Compute Grid";
+		else
+			return "Compute Grid (load " + StringManipulationTools.formatNumber(loadSum, 0) + ", " + cpuSum + " CPUs)";
 	}
 	
 	@Override

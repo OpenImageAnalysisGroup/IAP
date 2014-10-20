@@ -556,6 +556,8 @@ public class Batch {
 										(wl > 0 ? ", active: " + wl : "") + diskHistory.toString());
 					}
 					res.setLastPipelineTime(BlockPipeline.getLastPipelineExecutionTimeInSec());
+					res.setLoad(SystemAnalysisExt.getRealSystemCpuLoad(true));
+					res.setRealCPUcount(SystemAnalysisExt.getNumberOfCpuLogicalCores());
 					if (add)
 						dbc.insert(res);
 					else

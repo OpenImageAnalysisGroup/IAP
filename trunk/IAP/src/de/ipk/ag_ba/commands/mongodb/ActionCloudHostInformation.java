@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -31,8 +32,11 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 	private final MongoDB m;
 	String niceHostName;
 	
+	double lastLoad = -1;
+	int cpuCnt;
+	
 	public ActionCloudHostInformation(final MongoDB m, final CloudHost ip) {
-		super("<html>Compute Node: " + ip.getHostName() + " <br>realized speed: " + ip.getPipelinesPerHour() + "  (pipelines/h)");
+		super("<html>Compute Node: " + ip.getHostName());
 		this.ip = ip;
 		this.m = m;
 		
@@ -92,6 +96,8 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 						lastStatus = ch.getTaskProgress();
 						hostInfo = ch.getHostInfo();
 						status3 = ch.getStatus3();
+						lastLoad = ch.getLoad();
+						cpuCnt = ch.getRealCPUcount();
 						if (System.currentTimeMillis() - ch.getLastUpdateTime() >= 60 * 1000) {
 							status3 += "<br>(finished, removing info in "
 									+ SystemAnalysis.getWaitTime(120 * 1000 - (System.currentTimeMillis() - ch.getLastUpdateTime())) + ")";
@@ -190,7 +196,12 @@ public class ActionCloudHostInformation extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return niceHostName;
+		String res = niceHostName;
+		if (lastLoad > 0) {
+			if (res.indexOf(")") > 0)
+				res = StringManipulationTools.stringReplace(res, ")", ", load " + StringManipulationTools.formatNumber(lastLoad, 1) + ", " + cpuCnt + " CPUs)");
+		}
+		return res;
 	}
 	
 	@Override
