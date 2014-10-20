@@ -262,6 +262,8 @@ public class SystemAnalysisExt {
 	private static long lastNanos = System.nanoTime();
 	private static long lastProcessCPUnanos = getProcessNanos();
 	
+	private static double lastLoad = -1;
+	
 	public static double getRealSystemCpuLoad() {
 		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
 		double res = operatingSystemMXBean.getSystemLoadAverage();
@@ -303,9 +305,12 @@ public class SystemAnalysisExt {
 					res = load;
 				}
 			}
+			lastLoad = res;
 			return res;
-		} else
+		} else {
+			lastLoad = res;
 			return res;
+		}
 	}
 	
 	private static long getProcessNanos() {
@@ -401,5 +406,12 @@ public class SystemAnalysisExt {
 		} catch (UnknownHostException e) {
 			return "(unknown host)";
 		}
+	}
+	
+	public static double getRealSystemCpuLoad(boolean cached) {
+		if (!cached)
+			return getRealSystemCpuLoad();
+		else
+			return lastLoad;
 	}
 }

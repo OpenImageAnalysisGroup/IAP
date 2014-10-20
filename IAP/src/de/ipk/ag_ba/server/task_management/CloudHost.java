@@ -101,6 +101,28 @@ public class CloudHost extends BasicDBObject {
 			return 0;
 	}
 	
+	public void setLoad(double lastLoad) {
+		put("load", lastLoad);
+	}
+	
+	public double getLoad() {
+		if (get("load") != null)
+			return (Double) get("load");
+		else
+			return -1;
+	}
+	
+	public void setRealCPUcount(int cpuCount) {
+		put("cpu-cnt", cpuCount);
+	}
+	
+	public int getRealCPUcount() {
+		if (get("cpu-cnt") != null)
+			return (Integer) get("cpu-cnt");
+		else
+			return -1;
+	}
+	
 	public void setOperatingSystem(String operatingSystem) {
 		put("operatingSystem", operatingSystem);
 	}
