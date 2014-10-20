@@ -32,6 +32,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	private double loadSum = -1;
 	private int cpuSum = -1;
 	boolean onceExecuted = false;
+	protected long lastUpdate;
 	
 	public ActionCloudClusterHostInformation(final MongoDB m) {
 		super("Compute Grid");
@@ -60,6 +61,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 			
 			@Override
 			public String getCurrentStatusMessage1() {
+				ActionCloudClusterHostInformation.this.lastUpdate = System.currentTimeMillis();
 				try {
 					ArrayList<CloudHost> hl = m.batch().getAvailableHosts(90 * 1000);// 5 * 60 * 1000);
 					int blocksExecutedWithinLastMinute = 0;
@@ -88,7 +90,12 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 								
 								if (ch.getRealCPUcount() > 0)
 									cpuSum += ch.getRealCPUcount();
-							}
+							} else
+								if (ch.getOperatingSystem() != null && ch.getOperatingSystem().toUpperCase().contains("WIN")) {
+									double l = ch.getLoad();
+									if (l > 0)
+										loadSum += l;
+								}
 							hl_filtered.get(ip).add(ch);
 							procCnt++;
 						}
