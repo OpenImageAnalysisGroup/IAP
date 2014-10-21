@@ -105,9 +105,9 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 		{
 			ResultsTableWithUnits rt = new ResultsTableWithUnits();
 			rt.incrementCounter();
-			rt.addValue("rgb.red", averageVisR);
-			rt.addValue("rgb.green", averageVisG);
-			rt.addValue("rgb.blue", averageVisB);
+			rt.addValue("rgb.red.mean", averageVisR);
+			rt.addValue("rgb.green.mean", averageVisG);
+			rt.addValue("rgb.blue.mean", averageVisB);
 			getResultSet().storeResults(cp, CameraType.VIS, TraitCategory.INTENSITY, resultPrefix, rt, getBlockPosition(), this);
 		}
 		
@@ -342,10 +342,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 								+ "may utilize different ranges, e.g. a maximum of 100."),
 				
 				new CalculatedProperty("hsv.dgci.mean",
-						"Numeric indication on how 'dark green' the plant appears, taking into account hue, saturation and brightness. Differs from "
-								+ "calculation in other sources in that the higher the saturation, the assumption is that the plant appears greener, and thus "
-								+ "the value is increasing in this case. The column 'side.vis.hsv.dgci_orig.mean' corresponds to the unintuitive "
-								+ "but documented calculation of this trait."),
+						"Numeric indication on how 'dark green' the plant appears, taking into account hue, saturation and brightness."),
 				
 				new CalculatedProperty("hsv.h.yellow2green",
 						"Proportion of yellow colour plant pixels (histogram bin 3) divided by the count of green colour pixels (bins 4 to 7). "
@@ -470,11 +467,11 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				
 				new CalculatedProperty("ndvi", "ndvi = (averageNir - averageVisR) / (averageNir + averageVisR))"),
 				
-				new CalculatedProperty("rgb.red.intensity.mean",
+				new CalculatedProperty("rgb.red.mean",
 						"Average intensity of the red channel of the plant pixels in the visible light image."),
-				new CalculatedProperty("rgb.green.intensity.mean",
+				new CalculatedProperty("rgb.green.mean",
 						"Average intensity of the green channel of the plant pixels in the visible light image."),
-				new CalculatedProperty("rgb.blue.intensity.mean",
+				new CalculatedProperty("rgb.blue.mean",
 						"Average intensity of the blue channel of the plant pixels in the visible light image.")
 		
 		};
