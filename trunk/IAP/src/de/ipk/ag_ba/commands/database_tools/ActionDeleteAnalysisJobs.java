@@ -124,19 +124,33 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 			if (getStatusProvider() != null)
 				getStatusProvider().setCurrentStatusText1("Removed compute tasks...");
 			ArrayList<ExperimentHeaderInterface> ell = m.getExperimentList(null);
-			int n = ell.size();
+			int nToDo = 0;
 			for (ExperimentHeaderInterface ei : ell) {
 				if (ei.getExperimentName() == null || ei.getExperimentName().length() == 0 || ei.getExperimentName().contains("§")) {
-					m.deleteExperiment(ei.getDatabaseId());
-					deletedTempDatasets += 1;
-					nTemps--;
+					nToDo++;
 				}
-				n++;
-				getStatusProvider().setCurrentStatusText1("Removed temp dataset " + n + "/" + ell.size());
-				if (getStatusProvider() != null && getStatusProvider().wantsToStop())
-					break;
 			}
+			if (getStatusProvider() != null)
+				getStatusProvider().setCurrentStatusValueFine(0);
+			int n = 0;
+			if (nToDo > 0)
+				for (ExperimentHeaderInterface ei : ell) {
+					if (ei.getExperimentName() == null || ei.getExperimentName().length() == 0 || ei.getExperimentName().contains("§")) {
+						m.deleteExperiment(ei.getDatabaseId());
+						deletedTempDatasets += 1;
+						nTemps--;
+						n++;
+					}
+					if (getStatusProvider() != null)
+						getStatusProvider().setCurrentStatusText1("Removed temp dataset " + n + "/" + nToDo);
+					if (getStatusProvider() != null && getStatusProvider().wantsToStop())
+						break;
+					if (getStatusProvider() != null)
+						getStatusProvider().setCurrentStatusValueFine(100d * n / nToDo);
+				}
 			updateForCountNeeded = true;
+			if (getStatusProvider() != null)
+				getStatusProvider().setCurrentStatusValueFine(100);
 		} else {
 			if (getStatusProvider() != null)
 				getStatusProvider().setCurrentStatusText1("Remove compute tasks...");
