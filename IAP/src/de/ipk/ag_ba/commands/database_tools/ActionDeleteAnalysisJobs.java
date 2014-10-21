@@ -48,6 +48,7 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 	}
 	
 	private void updateN(final MongoDB m, boolean global) {
+		updateForCountNeeded = false;
 		if (global) {
 			BackgroundTaskHelper.issueSimpleTask("Count split results",
 					"Determine number of split result datasets",
