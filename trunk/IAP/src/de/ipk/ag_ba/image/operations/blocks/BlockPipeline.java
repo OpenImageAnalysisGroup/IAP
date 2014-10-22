@@ -3,7 +3,6 @@ package de.ipk.ag_ba.image.operations.blocks;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.preprocessing.WellProcessor;
 import iap.pipelines.ImageProcessorOptionsAndResults;
-import iap.pipelines.StringAndFlexibleMaskAndImageSet;
 import info.StopWatch;
 
 import java.awt.Image;
@@ -35,8 +34,6 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.images.IAPimages;
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.ImageSet;
@@ -113,7 +110,7 @@ public class BlockPipeline {
 		final ObjectRef exception = new ObjectRef();
 		if (status != null)
 			status.setCurrentStatusValue(0);
-		ArrayList<LocalComputeJob> jobs = new ArrayList<LocalComputeJob>();
+		// ArrayList<LocalComputeJob> jobs = new ArrayList<LocalComputeJob>();
 		for (int idx = 0; idx < executionTrayCount; idx++) {
 			if (debugValidTrays != null && !debugValidTrays.contains(idx))
 				continue;
@@ -145,9 +142,10 @@ public class BlockPipeline {
 					}
 				}
 			};
-			jobs.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + idx));
+			r.run();
+			// jobs.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + idx));
 		}
-		BackgroundThreadDispatcher.waitFor(jobs);
+		// BackgroundThreadDispatcher.waitFor(jobs);
 		if (exception.getObject() != null)
 			throw ((Exception) exception.getObject());
 	}
@@ -172,7 +170,6 @@ public class BlockPipeline {
 		int nBlocks = blocks.size();
 		
 		MaskAndImageSet workset = new MaskAndImageSet(inputSet, maskSet != null ? maskSet : inputSet.copy());
-		StringAndFlexibleMaskAndImageSet input = new StringAndFlexibleMaskAndImageSet(null, workset);
 		
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (status != null && status.wantsToStop()) {
@@ -190,14 +187,11 @@ public class BlockPipeline {
 				throw e;
 			}
 			
-			block.setInputAndOptions(well, input.getMaskAndImageSet(), options, results, index++,
+			block.setInputAndOptions(well, workset, options, results, index++,
 					debugStack);
 			
 			long ta = System.currentTimeMillis();
-			
-			input.setMaskAndImageSet(block.process());
-			input.setOptions(block.getClass().getCanonicalName());
-			
+			workset = block.process();
 			long tb = System.currentTimeMillis();
 			
 			int seconds = (int) ((tb - ta) / 1000);

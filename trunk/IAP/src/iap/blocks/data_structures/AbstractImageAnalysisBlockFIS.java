@@ -151,7 +151,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	@Override
-	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptionsAndResults options, BlockResultSet properties,
+	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptionsAndResults options,
+			BlockResultSet properties,
 			int blockPositionInPipeline,
 			ImageStack debugStack) {
 		this.input = input;
