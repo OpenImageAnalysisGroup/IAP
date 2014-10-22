@@ -33,7 +33,7 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		Image res;
 		boolean invert = true;
 		if (input != null) {
-			res = balance(input, input, 255, invert);
+			res = balance(input, input.copy(), 255, invert);
 		} else
 			res = input;
 		return res;
@@ -45,7 +45,7 @@ public class BlColorBalanceVerticalFluo extends AbstractSnapshotAnalysisBlock {
 		Image res;
 		boolean invert = true;
 		if (input != null) {
-			res = balance(input, input, 255, invert);
+			res = balance(input, input.copy(), 255, invert);
 		} else
 			res = input;
 		return res;
