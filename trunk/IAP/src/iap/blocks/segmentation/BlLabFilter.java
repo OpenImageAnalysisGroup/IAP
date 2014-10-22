@@ -94,6 +94,11 @@ public class BlLabFilter extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	@Override
+	public String getDescriptionForParameters() {
+		return "<ul><li>L - Brightness Low to High<li>A - Green to Red<li>B - Blue to Yellow</ul>";
+	}
+	
+	@Override
 	public String getDescription() {
 		return "Uses a lab-based pixel filter(s) for the vis/fluo images.";
 	}

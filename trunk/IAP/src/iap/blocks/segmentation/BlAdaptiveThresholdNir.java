@@ -38,9 +38,12 @@ public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 						.show("Background replace with gray", debug);
 			}
 			regionSize = getInt("Adaptive_Threshold_Region_Size", 50);
+			Image nirOriginal = nirMask.copy();
 			nirMask = nirMask.io().show("ADAPT IN", debug).
 					adaptiveThresholdForGrayscaleImage(regionSize, average,
 							optionsAndResults.getBackground(), f).getImage().show("ADAPT OUT", debug);
+			if (f < 0)
+				nirMask = nirOriginal.io().applyMaskInversed_ResizeMaskIfNeeded(nirMask).getImage();
 			input().masks().setNir(nirMask);
 			if (origNirMask != null) {
 				nirMask = nirMask.io().and(origNirMask).getImage();
@@ -61,6 +64,11 @@ public class BlAdaptiveThresholdNir extends AbstractSnapshotAnalysisBlock {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.NIR);
 		return res;
+	}
+	
+	@Override
+	public String getDescriptionForParameters() {
+		return "A negative threshold inverses the operation.";
 	}
 	
 	@Override
