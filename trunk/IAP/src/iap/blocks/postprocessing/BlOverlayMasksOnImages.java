@@ -19,6 +19,8 @@ public class BlOverlayMasksOnImages extends AbstractImageAnalysisBlockFIS {
 	
 	@Override
 	protected MaskAndImageSet run() {
+		if (!getBoolean("enabled", true))
+			return input();
 		ImageSet i = input().images();
 		ImageSet m = input().masks();
 		
