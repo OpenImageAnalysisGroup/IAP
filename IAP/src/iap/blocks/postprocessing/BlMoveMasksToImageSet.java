@@ -18,7 +18,10 @@ public class BlMoveMasksToImageSet extends AbstractImageAnalysisBlockFIS {
 	
 	@Override
 	protected MaskAndImageSet run() {
-		return new MaskAndImageSet(input().masks(), new ImageSet());
+		if (getBoolean("enabled", true))
+			return new MaskAndImageSet(input().masks(), new ImageSet());
+		else
+			return input();
 	}
 	
 	@Override
