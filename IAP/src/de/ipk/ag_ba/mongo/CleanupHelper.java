@@ -93,7 +93,7 @@ public class CleanupHelper implements RunnableOnDB {
 		final double smallStep = 100d / el.size();
 		final HashSet<String> dbIdsOfSubstances = new HashSet<String>();
 		final HashSet<String> dbIdsOfConditions = new HashSet<String>();
-		status.setCurrentStatusText2("Read list of substances");
+		status.setCurrentStatusText2("Count Substance IDs");
 		double oldStatus = status.getCurrentStatusValueFine();
 		status.setCurrentStatusValue(-1);
 		{
@@ -101,7 +101,7 @@ public class CleanupHelper implements RunnableOnDB {
 			long nn = 0, max = substances.count();
 			status.setCurrentStatusText2("Read list of substance IDs (" + max + ")");
 			DBCursor subCur = substances.find(new BasicDBObject(), new BasicDBObject("_id", 1))
-					.hint(new BasicDBObject("_id", 1)).batchSize(5000);
+					.hint(new BasicDBObject("_id", 1)).batchSize(2000);
 			while (subCur.hasNext()) {
 				DBObject subO = subCur.next();
 				dbIdsOfSubstances.add(subO.get("_id") + "");
@@ -111,30 +111,32 @@ public class CleanupHelper implements RunnableOnDB {
 					status.setCurrentStatusValueFine(100d * nn / max);
 				}
 			}
+			subCur.close();
 			status.setCurrentStatusText2("Read list of substance IDs (" + nn + ")");
 		}
 		status.setCurrentStatusText1(status.getCurrentStatusMessage2());
-		status.setCurrentStatusText2("Read list of condition IDs");
+		// status.setCurrentStatusText2("Count condition IDs");
 		{
 			DBCollection conditions = db.getCollection("conditions");
 			if (MongoDB.getEnsureIndex())
-				conditions.ensureIndex(new BasicDBObject("_id", 1));
-			long nn = 0, max = conditions.count();
-			status.setCurrentStatusText2("Read list of condition IDs (" + max + ")");
+				conditions.ensureIndex("_id");
+			long nn = 0;// , max = conditions.count();
+			status.setCurrentStatusText2("Read list of condition IDs");// (" + max + ")");
 			DBCursor condCur = conditions
-					.find(new BasicDBObject(), new BasicDBObject("_id", 1)).hint(new BasicDBObject("_id", 1))
-					.batchSize(100000);
+					.find(new BasicDBObject(), new BasicDBObject("_id", 1));// .hint(new BasicDBObject("_id", 1))
+			// .batchSize(10000);
 			while (condCur.hasNext()) {
 				ObjectId condO = (ObjectId) condCur.next().get("_id");
 				dbIdsOfConditions.add(condO.toString());
 				nn++;
 				if (nn % 500 == 0) {
-					status.setCurrentStatusText2("Read list of condition IDs (" + nn + "/" + max + ")");
-					status.setCurrentStatusValueFine(100d * nn / max);
+					status.setCurrentStatusText2("Read list of condition IDs (" + nn /* + "/" + max */+ ")");
+					status.setCurrentStatusValueFine(-1);// 100d * nn / max);
 				}
 				
 			}
-			status.setCurrentStatusText2("Read list of condition IDs (" + nn + "/" + max + ")");
+			condCur.close();
+			status.setCurrentStatusText2("Read list of condition IDs (" + nn /* + "/" + max */+ ")");
 		}
 		status.setCurrentStatusText1("Create inventory");
 		status.setCurrentStatusValueFine(oldStatus);
@@ -286,12 +288,13 @@ public class CleanupHelper implements RunnableOnDB {
 		
 		{
 			DBCollection substances = db.getCollection("substances");
-			long cnt = substances.count();
+			status.setCurrentStatusText1("Count Substance IDs");
+			// long cnt = substances.count();
 			long max = dbIdsOfSubstances.size();
-			msg = SystemAnalysis.getCurrentTime() + ">Remove stale substances: " + max + "/" + cnt;
+			msg = SystemAnalysis.getCurrentTime() + ">Remove stale substances: " + max;// + "/" + cnt;
 			System.out.println(msg);
 			MongoDB.saveSystemMessage(msg);
-			status.setCurrentStatusText1("Remove stale substances: " + max + "/" + cnt);
+			status.setCurrentStatusText1("Remove Stale Substances: " + max);// + "/" + cnt);
 			int n = 0;
 			for (String subID : dbIdsOfSubstances) {
 				n++;
@@ -299,7 +302,7 @@ public class CleanupHelper implements RunnableOnDB {
 				status.setCurrentStatusValueFine(100d / max * n);
 				status.setCurrentStatusText2(n + "/" + max);
 			}
-			msg = SystemAnalysis.getCurrentTime() + ">Clean-up: Removed " + (cnt - substances.count()) + " substance documents";
+			msg = SystemAnalysis.getCurrentTime() + ">Clean-up: Removed " + dbIdsOfSubstances.size() + " substance documents";
 			System.out.println(msg);
 			MongoDB.saveSystemMessage(msg);
 		}
@@ -309,20 +312,21 @@ public class CleanupHelper implements RunnableOnDB {
 			final ThreadSafeOptions n = new ThreadSafeOptions();
 			final long max = dbIdsOfConditions.size();
 			final DBCollection conditions = db.getCollection("conditions");
-			final long cnt = conditions.count();
-			msg = SystemAnalysis.getCurrentTime() + ">Clean-up: Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt;
+			// status.setCurrentStatusText1("Count Condition IDs");
+			// final long cnt = conditions.count();
+			msg = SystemAnalysis.getCurrentTime() + ">Clean-up: Remove stale conditions: " + dbIdsOfConditions.size();// + "/" + cnt;
 			System.out.println(msg);
 			MongoDB.saveSystemMessage(msg);
-			status.setCurrentStatusText1("Remove stale conditions: " + dbIdsOfConditions.size() + "/" + cnt);
+			status.setCurrentStatusText1("Remove Stale Conditions: " + dbIdsOfConditions.size());// + "/" + cnt);
 			executor.submit(new Runnable() {
 				@Override
 				public void run() {
 					for (String condID : dbIdsOfConditions) {
 						ids.add(condID);
-						if (ids.size() >= 10) {
+						if (ids.size() >= 100) {
 							final ArrayList<String> toBeDeleted = new ArrayList<String>(ids);
 							ids.clear();
-							n.addLong(10);
+							n.addLong(100);
 							BasicDBList list = new BasicDBList();
 							synchronized (toBeDeleted) {
 								for (String coID : toBeDeleted)
@@ -358,7 +362,7 @@ public class CleanupHelper implements RunnableOnDB {
 					
 					status.setCurrentStatusValueFine(100d / max * n.getLong());
 					status.setCurrentStatusText2(n + "/" + max);
-					String msg = SystemAnalysis.getCurrentTime() + ">Clean-Up: Removed " + (cnt - conditions.count()) + " condition documents";
+					String msg = SystemAnalysis.getCurrentTime() + ">Clean-Up: Removed " + dbIdsOfConditions.size() + " condition documents";
 					System.out.println(msg);
 					MongoDB.saveSystemMessage(msg);
 				}
