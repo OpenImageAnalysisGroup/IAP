@@ -11,17 +11,17 @@ import org.jdom.Element;
 public class NumericMeasurement implements NumericMeasurementInterface {
 	private double value = Double.NaN;
 	private int replicateID;
-	private SampleInterface clonedSample;
+	private SampleInterface parent;
 	private String unit;
 	private String quality;
 	private String files;
 	
 	public NumericMeasurement(SampleInterface parent) {
-		this.clonedSample = parent;
+		this.parent = parent;
 	}
 	
 	public NumericMeasurement(SampleInterface parent, Map<?, ?> attributemap) {
-		this.clonedSample = parent;
+		this.parent = parent;
 		if (attributemap.containsKey("replicates"))
 			setReplicateID((Integer) attributemap.get("replicates"));
 		if (attributemap.containsKey("unit"))
@@ -54,18 +54,18 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		if (optNewExperimentName != null)
 			clonedCondition.setExperimentName(optNewExperimentName);
 		clonedCondition.setParent(clonedSubstance);
-		clonedSample = copyFrom.getParentSample().clone(clonedCondition);
-		clonedSample.setParent(clonedCondition);
+		parent = copyFrom.getParentSample().clone(clonedCondition);
+		parent.setParent(clonedCondition);
 		
 		setFiles(copyFrom.getFiles());
 		synchronized (clonedSubstance) {
 			clonedSubstance.add(clonedCondition);
 		}
 		synchronized (clonedCondition) {
-			clonedCondition.add(clonedSample);
+			clonedCondition.add(parent);
 		}
-		synchronized (clonedSample) {
-			clonedSample.add(this);
+		synchronized (parent) {
+			parent.add(this);
 		}
 	}
 	
@@ -101,7 +101,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	@Override
 	public SampleInterface getParentSample() {
-		return clonedSample;
+		return parent;
 	}
 	
 	@Override
@@ -209,7 +209,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	@Override
 	public void setParentSample(SampleInterface sample) {
-		clonedSample = sample;
+		parent = sample;
 	}
 	
 	@Override
