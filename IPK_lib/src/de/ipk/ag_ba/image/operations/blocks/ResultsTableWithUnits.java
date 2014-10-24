@@ -4,6 +4,9 @@ import ij.measure.ResultsTable;
 
 import java.util.HashMap;
 
+/**
+ * @author Christian Klukas
+ */
 public class ResultsTableWithUnits extends ResultsTable implements Cloneable {
 	HashMap<Integer, String> col2unit;
 	
