@@ -406,12 +406,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (status.wantsToStop())
 			return;
 		try {
-			if (imageSetWithSpecificAngle.get(time).get(configAndAngle) == null ||
-					imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() == null)
-				return;
-			
-			final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();
-			
 			TreeMap<String, HashMap<String, BlockResultSet>> previousResultsForThisTimePoint;
 			synchronized (plantResults) {
 				if (!plantResults.containsKey(time))
@@ -655,7 +649,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void outputAdd(NumericMeasurementInterface meas) {
 		// MappingData3DPath mp = new MappingData3DPath(meas, true);
-		Substance3D.addAndMergeC(output, meas, false, !(meas instanceof BinaryMeasurement));
+		synchronized (output) {
+			Substance3D.addAndMergeC(output, meas, false, !(meas instanceof BinaryMeasurement));
+		}
 		// Substance3D.addAndMerge(output, mp.getSubstance(), false);
 	}
 	
