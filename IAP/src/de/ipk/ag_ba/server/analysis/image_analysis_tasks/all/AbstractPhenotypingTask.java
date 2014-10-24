@@ -706,7 +706,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Invalid result with no reference information: " + bpv.getName());
 					} else {
 						NumericMeasurement3D m = new NumericMeasurement3D(bpv.getBinary(), bpv.getName(), null);
-						// m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
+						m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 						m.setAnnotation(null);
 						m.setValue(bpv.getValue());
 						m.setUnit(bpv.getUnit());

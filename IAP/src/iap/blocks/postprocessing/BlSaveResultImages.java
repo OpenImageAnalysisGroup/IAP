@@ -4,8 +4,10 @@ import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
+import java.awt.Color;
 import java.util.HashSet;
 
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -85,8 +87,13 @@ public class BlSaveResultImages extends AbstractBlock {
 	
 	private LoadedImage saveImage(CameraType ct, CameraPosition cp,
 			final String tray,
-			final ImageData id, final Image image) throws Exception {
+			final ImageData id, Image image) throws Exception {
 		if (id != null && id.getParentSample() != null) {
+			image = image.io().canvas().text(5, 15, ct + " " + cp, Color.BLUE)
+					.text(5, 30, id.getQualityAnnotation(), Color.RED)
+					.text(5, 45, id.getParentSample().getSampleTime(), Color.YELLOW)
+					.text(5, 60, "IAP V" + ReleaseInfo.IAP_VERSION_STRING, Color.ORANGE)
+					.getImage();
 			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
 			// loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 			return saveImageAndUpdateURL(ct, cp, loadedImage, optionsAndResults.databaseTarget, false, tray);
@@ -100,7 +107,7 @@ public class BlSaveResultImages extends AbstractBlock {
 			
 			String replace;
 			
-			replace = "." + ct + "." + cp + "." + tray + ".";
+			replace = "." + ct + "." + cp + "." + tray + "." + image.getParentSample().getSampleTime() + ".";
 			fileName = StringManipulationTools.stringReplace(fileName,
 					"." + extension, replace
 							+ extension);
@@ -109,7 +116,7 @@ public class BlSaveResultImages extends AbstractBlock {
 			
 			String replace;
 			
-			replace = "." + ct + "." + cp + ".";
+			replace = "." + ct + "." + cp + "." + image.getParentSample().getSampleTime() + ".";
 			fileName = StringManipulationTools.stringReplace(fileName,
 					"." + extension, replace
 							+ extension);
