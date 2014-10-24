@@ -29,6 +29,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.reconstruction3d.GenerationMode;
@@ -39,7 +40,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.ByteShortIntArray;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
@@ -61,7 +61,9 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 		Image fi = input().masks() != null ? input().masks().vis() : null;
 		if (!getBoolean("Process Fluo Instead of Vis", false)) {
 			if (fi != null) {
-				getResultSet().setImage(getBlockPosition(), "img.3D." + CameraType.VIS, fi, false);
+				getResultSet().setImage(getBlockPosition(), "img.3D." + CameraType.VIS,
+						new ImageAndImageData(fi, input().images().getVisInfo()),
+						false);
 			}
 		}
 		return fi;
@@ -72,7 +74,8 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 		Image fi = input().masks() != null ? input().masks().fluo() : null;
 		if (getBoolean("Process Fluo Instead of Vis", false)) {
 			if (fi != null) {
-				getResultSet().setImage(getBlockPosition(), "img.3D." + CameraType.FLUO, fi, false);
+				getResultSet().setImage(getBlockPosition(), "img.3D." + CameraType.FLUO,
+						new ImageAndImageData(fi, input().images().getFluoInfo()), false);
 			}
 		}
 		return fi;
@@ -81,32 +84,30 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
-			TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus, CalculatesProperties propertyCalculator) throws InterruptedException {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("3D-Generation in progress, waiting");
 		synchronized (this.getClass()) {
+			ImageData imageRef = null;
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Generate 3D-Model");
 			for (CameraType ct : new CameraType[] { CameraType.VIS, CameraType.FLUO })
-				for (Long time : time2inSamples.keySet()) {
-					Sample3D inSample = time2inSamples.get(time);
-					TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+				for (Long time : time2allResultsForSnapshot.keySet()) {
+					TreeMap<String, HashMap<String, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 					if (!time2summaryResult.containsKey(time)) {
-						time2summaryResult.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-						time2summaryResult.get(time).put("-720", new HashMap<Integer, BlockResultSet>());
+						time2summaryResult.put(time, new TreeMap<String, HashMap<String, BlockResultSet>>());
+						time2summaryResult.get(time).put("-720", new HashMap<String, BlockResultSet>());
 					}
-					TreeSet<Integer> allTrays = new TreeSet<Integer>();
+					TreeSet<String> allTrays = new TreeSet<String>();
 					for (String key : allResultsForSnapshot.keySet()) {
 						allTrays.addAll(allResultsForSnapshot.get(key).keySet());
 					}
 					if (time2summaryResult.get(time).get("-720").isEmpty())
-						for (Integer knownTray : allTrays)
+						for (String knownTray : allTrays)
 							time2summaryResult.get(time).get("-720").put(knownTray, new BlockResults(null));
-					for (Integer tray : time2summaryResult.get(time).get("-720").keySet()) {
+					for (String tray : time2summaryResult.get(time).get("-720").keySet()) {
 						for (String key : allResultsForSnapshot.keySet()) {
 							BlockResultSet rt = allResultsForSnapshot.get(key).get(tray);
 							if (rt == null || rt.isNumericStoreEmpty())
@@ -125,6 +126,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 							ArrayList<MyPicture> pictures = new ArrayList<MyPicture>();
 							Double distHorizontal = null;
 							Double realMarkerDistHorizontal = null;
+							Sample sample = null;
 							if (allResultsForSnapshot != null && allResultsForSnapshot.keySet() != null)
 								for (String angle : allResultsForSnapshot.keySet()) {
 									if (allResultsForSnapshot.get(angle) == null)
@@ -138,12 +140,16 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 									if (distHorizontal == null)
 										if (angle.startsWith("2nd_side")) {
 											BlockResult val = bp.searchNumericResult(0, 0, new Trait(cp(), ct, TraitCategory.OPTICS, "marker.horizontal_distance"));
-											if (val != null)
+											if (val != null) {
 												distHorizontal = val.getValue();
+											}
 										}
 									realMarkerDistHorizontal = optionsAndResults.getREAL_MARKER_DISTANCE();
-									Image vis = bp.getImage("img.3D." + ct);
-									bp.setImage(getBlockPosition(), "img.3D." + ct, (Image) null, true);
+									ImageAndImageData visID = bp.getImage("img.3D." + ct);
+									Image vis = visID.getImage();
+									imageRef = visID.getImageData();
+									sample = (Sample) visID.getImageData().getParentSample();
+									bp.setImage(getBlockPosition(), "img.3D." + ct, (ImageAndImageData) null, true);
 									if (angle.startsWith("2nd_side"))
 										if (vis != null) {
 											MyPicture p = new MyPicture();
@@ -186,19 +192,21 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 								}
 								double vv = 1;
 								double plantVolume = vv * solidVoxels;
-								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.volume"), plantVolume, "voxel", this);
-								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.cog.x"), cogX / solidVoxels, "voxel", this);
-								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.cog.y"), cogY / solidVoxels, "voxel", this);
-								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.cog.z"), cogZ / solidVoxels, "voxel", this);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.volume"), plantVolume, "voxel", this, imageRef);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.cog.x"), cogX / solidVoxels, "voxel", this,
+										imageRef);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.cog.y"), cogY / solidVoxels, "voxel", this,
+										imageRef);
+								summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.cog.z"), cogZ / solidVoxels, "voxel", this,
+										imageRef);
 								if (distHorizontal != null) {
 									double corr = realMarkerDistHorizontal / distHorizontal;
 									summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.volume.norm"), plantVolume * corr * corr
-											* corr, "mm^3", this);
+											* corr, "mm^3", this, imageRef);
 								}
 								
 								boolean saveVolumeDataset = getBoolean("Save Volume Dataset", false);
 								LoadedVolumeExtension volume = null;
-								Sample sample = inSample;
 								volume = new LoadedVolumeExtension(sample, mg.getRGBcubeResultCopy());
 								
 								HashSet<Integer> replicateIDsOfSampleMeasurements = new HashSet<Integer>();
@@ -256,7 +264,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 									if (optStatus != null)
 										optStatus.setCurrentStatusText1("Create 3-D skeleton");
 									createSimpleDefaultSkeleton(ct, summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, cube,
-											(LoadedVolume) volume.clone(volume.getParentSample()), save3Dskeleton);
+											(LoadedVolume) volume.clone(volume.getParentSample()), save3Dskeleton, imageRef);
 								}
 								boolean create3DadvancedProbabilitySkeleton = getBoolean("Calculate 3-D probability skeleton", true);
 								boolean save3DadvancedProbabilitySkeleton = getBoolean("Save 3-D probability skeleton", false);
@@ -266,7 +274,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 									int[][][] probabilityCube = mg.getByteCubeResult();
 									createAdvancedProbabilitySkeleton(ct,
 											summaryResult, voxelresolution, mg, distHorizontal, realMarkerDistHorizontal, probabilityCube,
-											(LoadedVolume) volume.clone(volume.getParentSample()), save3DadvancedProbabilitySkeleton);
+											(LoadedVolume) volume.clone(volume.getParentSample()), save3DadvancedProbabilitySkeleton, imageRef);
 								}
 							}
 						}
@@ -283,7 +291,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 	private void createSimpleDefaultSkeleton(CameraType ct, BlockResultSet summaryResult, int voxelresolution,
 			ThreeDmodelGenerator mg,
 			Double distHorizontal,
-			Double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume, boolean save3Dskeleton) {
+			Double realMarkerDistHorizontal, int[][][] cube, LoadedVolume volume, boolean save3Dskeleton, ImageData imageRef) {
 		int fire = ImageOperation.BACKGROUND_COLORint;
 		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">Create simple 3D skeleton", false);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
@@ -350,16 +358,19 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 			}
 		}
 		summaryResult.setNumericResult(0,
-				new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.length"), skeletonLength, "px", this);
+				new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.length"), skeletonLength, "px", this, imageRef);
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericResult(0,
 					new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.length.norm"),
-					skeletonLength * corr, "mm", this);
+					skeletonLength * corr, "mm", this, imageRef);
 		}
-		summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.cog.x"), skeletonX / skeletonLength, "voxel", this);
-		summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.cog.y"), skeletonY / skeletonLength, "voxel", this);
-		summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.cog.z"), skeletonZ / skeletonLength, "voxel", this);
+		summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.cog.x"), skeletonX / skeletonLength, "voxel", this,
+				imageRef);
+		summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.cog.y"), skeletonY / skeletonLength, "voxel", this,
+				imageRef);
+		summaryResult.setNumericResult(0, new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.skeleton.cog.z"), skeletonZ / skeletonLength, "voxel", this,
+				imageRef);
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);
 		lve.setVolume(new ByteShortIntArray(cube));
@@ -382,7 +393,7 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 			Double distHorizontal,
 			Double realMarkerDistHorizontal,
 			int[][][] probabilityCube, LoadedVolume volume,
-			boolean save3DadvancedProbabilitySkeleton) {
+			boolean save3DadvancedProbabilitySkeleton, ImageData imageRef) {
 		int empty = 0;
 		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">Create advanced probablity 3D skeleton", false);
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>> x2y2z2colorSkeleton = new HashMap<Integer, HashMap<Integer, HashMap<Integer, Integer>>>();
@@ -443,12 +454,12 @@ public class BlThreeDreconstruction extends AbstractBlock implements CalculatesP
 			}
 		}
 		summaryResult.setNumericResult(0,
-				new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.probability.skeleton.length"), skeletonLength, "px", this);
+				new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.probability.skeleton.length"), skeletonLength, "px", this, imageRef);
 		if (distHorizontal != null) {
 			double corr = realMarkerDistHorizontal / distHorizontal;
 			summaryResult.setNumericResult(0,
 					new Trait(cp(), ct, TraitCategory.GEOMETRY, "plant3d.probability.skeleton.length.norm"),
-					skeletonLength * corr, "mm", this);
+					skeletonLength * corr, "mm", this, imageRef);
 		}
 		
 		LoadedVolumeExtension lve = new LoadedVolumeExtension(volume);

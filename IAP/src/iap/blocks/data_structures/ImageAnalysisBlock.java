@@ -12,15 +12,13 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author Christian Klukas
  */
 public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	
-	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptionsAndResults options, BlockResultSet settings,
+	public void setInputAndOptions(String well, MaskAndImageSet input, ImageProcessorOptionsAndResults options, BlockResultSet settings,
 			int blockPositionInPipeline,
 			ImageStack debugStack);
 	
@@ -28,10 +26,8 @@ public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	
 	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandId2time2waterData,
-			TreeMap<Long, Sample3D> inSample,
-			TreeMap<Long, TreeMap<String, ImageData>> inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> allResultsForSnapshot,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			CalculatesProperties propertyCalculator)
 			throws InterruptedException;

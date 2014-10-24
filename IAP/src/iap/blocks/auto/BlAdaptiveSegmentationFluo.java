@@ -12,6 +12,7 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.fluoop.FluoAnalysis;
+import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -99,7 +100,8 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			r = r.io().show("BEFORE HUE", false).filterByHSV_hue(getDouble("Auto-Tune - Minimum Result Hue", 0.4), optionsAndResults.getBackground())
 					.show("AFTER HUE", false).getImage();
 		}
-		getResultSet().setImage(getBlockPosition(), RESULT_OF_FLUO_INTENSITY, r, true);
+		getResultSet().setImage(getBlockPosition(), RESULT_OF_FLUO_INTENSITY,
+				new ImageAndImageData(r, input().masks().getFluoInfo()), true);
 		return input().images().fluo().io().applyMask(r).getImage();
 	}
 	

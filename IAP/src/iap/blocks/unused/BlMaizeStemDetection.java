@@ -111,7 +111,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock implemen
 		}
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
-		getResultSet().storeResults(cp(), CameraType.VIS, TraitCategory.GEOMETRY, rt, getBlockPosition(), this);
+		getResultSet().storeResults(cp(), CameraType.VIS, TraitCategory.GEOMETRY, rt, getBlockPosition(), this, input().images().getVisInfo());
 		Image ress = ioClusteredSkeltonImage.bm().dilate(20).getImage();
 		return ress;
 	}

@@ -73,18 +73,21 @@ public class ThreadManager {
 						while (getRunningCount() < maxCnt) {
 							// start new executor threads
 							int idx = 0;
+							ArrayList<RunnerThread> toBeStarted = new ArrayList<>();
 							for (boolean s : started) {
 								if (!s) {
 									threadArray[idx] = new RunnerThread(jobs, jobModification);
 									started[idx] = true;
 									threadArray[idx].setDaemon(false);
 									threadArray[idx].setName("Background Thread " + (idx + 1));
-									threadArray[idx].start();
+									toBeStarted.add(threadArray[idx]);
 								}
 								idx++;
-								if (getRunningCount() >= maxCnt)
+								if (getRunningCount() + toBeStarted.size() >= maxCnt)
 									break;
 							}
+							for (RunnerThread tbs : toBeStarted)
+								tbs.start();
 						}
 					for (int idx = 0; idx < threadArray.length; idx++) {
 						if (started[idx] && threadArray[idx].stopRequested() && !threadArray[idx].isAlive()) {
@@ -145,7 +148,7 @@ public class ThreadManager {
 						res++;
 				return res;
 			}
-		}, 1000, 1000);
+		}, 100, 100);
 	}
 	
 	public static ThreadManager getInstance() {

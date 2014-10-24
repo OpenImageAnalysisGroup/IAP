@@ -11,12 +11,9 @@ import java.util.HashSet;
 
 import org.Vector2i;
 
-import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 
 /**
  * Separate objects according to their size, up to the maximum object count,
@@ -130,10 +127,11 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 					}
 				});
 			
-			int wellIdx = getWellIdx();
+			int wellIdx = optionsAndResults.getWellIdx();
 			int validClusterID = -1;
 			if (wellIdx < orderOfIds.size())
-				validClusterID = orderOfIds.get(getWellIdx());
+				validClusterID = orderOfIds.get(wellIdx);
+			
 			int[] pixels = mask.getAs1A();
 			int[] result = new int[pixels.length];
 			int back = optionsAndResults.getBackground();
@@ -190,16 +188,5 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 		if (options.getBooleanSetting(this, "enabled", true) == false)
 			return 1;
 		return options.getIntSetting(this, "Maximum Object Count", 10);
-	}
-	
-	public static Image getImage(Image inp, int idx, int maxN) throws InterruptedException {
-		BlObjectSeparator blSep = new BlObjectSeparator();
-		ImageSet masks = new ImageSet(inp, null, null, null);
-		MaskAndImageSet input = new MaskAndImageSet(null, masks);
-		ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(null, null, null);
-		options.setWellCnt(maxN);
-		blSep.setInputAndOptions(idx, input, options, new BlockResults(options.getCameraAngle()), 0, null);
-		MaskAndImageSet res = blSep.process();
-		return res.masks().vis();
 	}
 }

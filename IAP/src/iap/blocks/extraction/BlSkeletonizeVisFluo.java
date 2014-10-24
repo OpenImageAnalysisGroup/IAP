@@ -22,13 +22,15 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.binarymask.ImageJOperation;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
+import de.ipk.ag_ba.image.operations.blocks.DoubleAndImageData;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
@@ -36,7 +38,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * Requires the FLUO image for bloom detection.
  * 
  * @author pape, klukas
- *         ToDo: Traits should be named according to image source type. side.vis.xy instead of side.xy.
  */
 public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
@@ -72,7 +73,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 							getBoolean("Leaf Width Calculation Type A (VIS)", false),
 							getBoolean("Leaf Width Calculation Type B (VIS)", false),
 							getBoolean("draw_skeleton", true),
-							CameraType.VIS);
+							CameraType.VIS, input().images().getVisInfo());
 				}
 		}
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
@@ -88,7 +89,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 							getBoolean("Leaf Width Calculation Type A (VIS)", false),
 							getBoolean("Leaf Width Calculation Type B (VIS)", false),
 							getBoolean("draw_skeleton", true),
-							CameraType.VIS);
+							CameraType.VIS, input().images().getVisInfo());
 				}
 		}
 		return res;
@@ -117,7 +118,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 							getBoolean("Leaf Width Calculation Type A (FLUO)", false),
 							getBoolean("Leaf Width Calculation Type B (FLUO)", false),
 							getBoolean("draw_skeleton", true),
-							CameraType.FLUO);
+							CameraType.FLUO, input().images().getFluoInfo());
 				}
 		}
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
@@ -133,14 +134,15 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 							getBoolean("Leaf Width Calculation Type A (FLUO)", false),
 							getBoolean("Leaf Width Calculation Type B (FLUO)", false),
 							getBoolean("draw_skeleton", true),
-							CameraType.FLUO);
+							CameraType.FLUO, input().images().getFluoInfo());
 				}
 		}
 		return input().masks().fluo();
 	}
 	
 	public synchronized Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged,
-			boolean specialLeafWidthCalculations, boolean specialSkeletonBasedLeafWidthCalculation, boolean addPostProcessor, CameraType cameraType) {
+			boolean specialLeafWidthCalculations, boolean specialSkeletonBasedLeafWidthCalculation,
+			boolean addPostProcessor, CameraType cameraType, ImageData imageRef) {
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = inp.io().skeletonize().replaceColor(Color.BLACK.getRGB(), Color.MAGENTA.getRGB()).
 				show("out sk", false).skel2d();
@@ -329,16 +331,19 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 			// number of repeats is 1/4 of maximum leaf width, but the actual number of repeats (not 4x) is stored
 			if (leafWidthInPixels2 != null && leafWidthInPixels2 > 0 && !Double.isNaN(leafWidthInPixels2) && !Double.isInfinite(leafWidthInPixels2)) {
 				if (distHorizontal != null)
-					rt.addValue("leaf.width.whole.max.norm", leafWidthInPixels2 * normFactor);
-				rt.addValue("leaf.width.whole.max", leafWidthInPixels2);
+					rt.addValue("leaf.width.whole.max.norm", leafWidthInPixels2 * normFactor, "mm");
+				rt.addValue("leaf.width.whole.max", leafWidthInPixels2, "px");
 			}
 			// System.out.print("Leaf width: " + leafWidthInPixels + " // " + leafWidthInPixels2);
 		}
 		
 		if (skelres != null) {
 			skelres.show("Result Skeleton", false);
-			getResultSet().setImage(getBlockPosition(), "skeleton_" + cameraType, skelres, true);
-			getResultSet().setImage(getBlockPosition(), "skeleton_workimage_" + cameraType, inp, true);
+			getResultSet().setImage(getBlockPosition(), "skeleton_" + cameraType,
+					new ImageAndImageData(skelres, input().images().getImageInfo(cameraType)), true);
+			getResultSet().setImage(getBlockPosition(), "skeleton_workimage_" + cameraType,
+					new ImageAndImageData(inp, input().images().getImageInfo(cameraType)),
+					true);
 		}
 		
 		if (getBoolean("Detect Bloom", false)) {
@@ -346,13 +351,13 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		}
 		rt.addValue("leaf.count", leafcount);
 		if (distHorizontal != null)
-			rt.addValue("leaf.length.sum.norm", leaflength * normFactor);
-		rt.addValue("leaf.length.sum", leaflength);
+			rt.addValue("leaf.length.sum.norm", leaflength * normFactor, "mm");
+		rt.addValue("leaf.length.sum", leaflength, "px");
 		
 		if (leafWidthInPixels != null && leafWidthInPixels > 0 && !Double.isNaN(leafWidthInPixels) && !Double.isInfinite(leafWidthInPixels)) {
 			if (distHorizontal != null)
-				rt.addValue("leaf.width.outer.max.norm", leafWidthInPixels * normFactor);
-			rt.addValue("leaf.width.outer.max", leafWidthInPixels);
+				rt.addValue("leaf.width.outer.max.norm", leafWidthInPixels * normFactor, "mm");
+			rt.addValue("leaf.width.outer.max", leafWidthInPixels, "px");
 		}
 		
 		if (getBoolean("Detect Bloom", false)) {
@@ -364,22 +369,22 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		
 		if (leafcount > 0) {
 			if (distHorizontal != null)
-				rt.addValue("leaf.length.mean.norm", leaflength * normFactor / leafcount);
-			rt.addValue("leaf.length.mean", leaflength / leafcount);
+				rt.addValue("leaf.length.mean.norm", leaflength * normFactor / leafcount, "mm");
+			rt.addValue("leaf.length.mean", leaflength / leafcount, "px");
 		}
 		
 		if (leafcount > 0) {
 			double filled = inp.io().countFilledPixels();
 			if (distHorizontal != null)
-				rt.addValue("leaf.width.mean.norm", (filled / leaflength) * normFactor);
-			rt.addValue("leaf.width.mean", filled / leaflength);
+				rt.addValue("leaf.width.mean.norm", (filled / leaflength) * normFactor, "mm");
+			rt.addValue("leaf.width.mean", filled / leaflength, "px");
 			// System.out.println(" // " + (int) (filled / leaflength));
 		}
 		
 		if (rt != null)
 			getResultSet().storeResults(
 					optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, null, rt,
-					getBlockPosition(), this);
+					getBlockPosition(), this, imageRef);
 		
 		if (addPostProcessor) {
 			final Image skel2d_fin = skel2d.getAsImage();
@@ -485,26 +490,24 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 	@Override
 	public synchronized void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
-			TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			CalculatesProperties propertyCalculator) {
 		
 		for (CameraType ct : getCameraInputTypes())
 			for (CameraPosition cp : CameraPosition.getSideAndTop()) {
-				for (Long time : new ArrayList<Long>(time2inSamples.keySet())) {
-					TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+				for (Long time : new ArrayList<Long>(time2allResultsForSnapshot.keySet())) {
+					TreeMap<String, HashMap<String, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 					if (!time2summaryResult.containsKey(time))
-						time2summaryResult.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+						time2summaryResult.put(time, new TreeMap<String, HashMap<String, BlockResultSet>>());
 					for (String configName : time2summaryResult.get(time).keySet())
-						for (Integer tray : time2summaryResult.get(time).get(configName).keySet()) {
+						for (String tray : time2summaryResult.get(time).get(configName).keySet()) {
 							BlockResultSet summaryResult = time2summaryResult.get(time).get(configName).get(tray);
-							Double maxLeafcount = -1d;
-							Double maxLeaflength = -1d;
-							Double maxLeaflengthNorm = -1d;
-							ArrayList<Double> lc = new ArrayList<Double>();
+							DoubleAndImageData maxLeafcount = new DoubleAndImageData(-1d, null);
+							DoubleAndImageData maxLeaflength = new DoubleAndImageData(-1d, null);
+							DoubleAndImageData maxLeaflengthNorm = new DoubleAndImageData(-1d, null);
+							ArrayList<DoubleAndImageData> lc = new ArrayList<DoubleAndImageData>();
 							
 							Integer a = null;
 							searchLoop: for (String key : allResultsForSnapshot.keySet()) {
@@ -537,66 +540,69 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 							// System.out.println("ANGLES WITHIN SNAPSHOT: " + allResultsForSnapshot.size());
 							if (cp == CameraPosition.SIDE)
 								for (String keyC : allResultsForSnapshot.keySet()) {
-									HashMap<Integer, BlockResultSet> rt = allResultsForSnapshot.get(keyC);
+									HashMap<String, BlockResultSet> rt = allResultsForSnapshot.get(keyC);
 									if (rt.get(tray) == null)
 										continue;
 									if (bestAngle != null && keyC.equals(bestAngle)) {
 										// System.out.println("Best side angle: " + bestAngle);
-										Double cnt = null;
+										Double cntAtBestAngle = null;
+										NumericMeasurement3D refAtBestAngle = null;
 										for (BlockResultValue v : rt.get(tray).searchResults(new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.count"))) {
-											if (v.getValue() != null)
-												cnt = v.getValue();
+											if (v.getValue() != null) {
+												cntAtBestAngle = v.getValue();
+												refAtBestAngle = v.getBinary();
+											}
 										}
-										if (cnt != null && summaryResult != null) {
+										if (cntAtBestAngle != null && summaryResult != null) {
 											summaryResult.setNumericResult(getBlockPosition(),
-													new Trait(cp(), ct, TraitCategory.GEOMETRY, "leaf.count.best_angle"), cnt, this);
-											// System.out.println("Leaf count for best side image: " + cnt);
+													new Trait(cp(), ct, TraitCategory.GEOMETRY, "leaf.count.best_angle"), cntAtBestAngle, this, refAtBestAngle);
 										}
 									}
 									
 									if (rt.get(tray) != null)
 										for (BlockResultValue v : rt.get(tray).searchResults(new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.count"))) {
 											if (v.getValue() != null) {
-												if (v.getValue() > maxLeafcount)
-													maxLeafcount = v.getValue();
-												lc.add(v.getValue());
+												if (v.getValue() > maxLeafcount.getValue())
+													maxLeafcount = v.getDaV();
+												lc.add(v.getDaV());
 											}
 										}
 									for (BlockResultValue v : rt.get(tray).searchResults(new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum"))) {
 										if (v.getValue() != null) {
-											if (v.getValue() > maxLeaflength)
-												maxLeaflength = v.getValue();
+											if (v.getValue() > maxLeaflength.getValue())
+												maxLeaflength = v.getDaV();
 										}
 									}
 									for (BlockResultValue v : rt.get(tray).searchResults(new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum.norm"))) {
 										if (v.getValue() != null) {
-											if (v.getValue() > maxLeaflengthNorm)
-												maxLeaflengthNorm = v.getValue();
+											if (v.getValue() > maxLeaflengthNorm.getValue())
+												maxLeaflengthNorm = v.getDaV();
 										}
 									}
 								}
 							
-							if (summaryResult != null && maxLeafcount != null && maxLeafcount > 0) {
+							if (summaryResult != null && maxLeafcount != null && maxLeafcount.getValue() > 0) {
 								summaryResult.setNumericResult(getBlockPosition(),
-										new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.count.max"), maxLeafcount, this);
+										new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.count.max"), maxLeafcount.getValue(), this, maxLeafcount.getImageData());
 								// System.out.println("MAX leaf count: " + maxLeafcount);
-								Double[] lca = lc.toArray(new Double[] {});
+								DoubleAndImageData[] lca = lc.toArray(new DoubleAndImageData[] {});
 								Arrays.sort(lca);
-								Double median = lca[lca.length / 2];
+								DoubleAndImageData median = lca[lca.length / 2];
 								summaryResult.setNumericResult(getBlockPosition(),
-										new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.count.median"), median, this);
+										new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.count.median"), median.getValue(), this, median.getImageData());
 							}
-							if (maxLeaflength != null && maxLeaflength > 0)
+							if (maxLeaflength != null && maxLeaflength.getValue() > 0)
 								summaryResult.setNumericResult(getBlockPosition(),
-										new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum.max"), maxLeaflength, "px", this);
-							if (maxLeaflengthNorm != null && maxLeaflengthNorm > 0)
+										new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum.max"), maxLeaflength.getValue(), "px", this,
+										maxLeafcount.getImageData());
+							if (maxLeaflengthNorm != null && maxLeaflengthNorm.getValue() > 0)
 								summaryResult.setNumericResult(getBlockPosition(),
-										new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum.norm.max"), maxLeaflengthNorm, "mm", this);
+										new Trait(cp, ct, TraitCategory.GEOMETRY, "leaf.length.sum.norm.max"), maxLeaflengthNorm.getValue(), "mm", this,
+										maxLeaflengthNorm.getImageData());
 							
 						}
 				}
 				calculateRelativeValues(
-						time2inSamples,
 						time2allResultsForSnapshot,
 						time2summaryResult,
 						getBlockPosition(),

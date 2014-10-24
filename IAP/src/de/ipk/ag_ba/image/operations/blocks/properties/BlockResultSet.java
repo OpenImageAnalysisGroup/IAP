@@ -17,7 +17,8 @@ import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
@@ -43,7 +44,10 @@ public interface BlockResultSet {
 	 * @param position
 	 *           0 == current block property
 	 */
-	public void setNumericResult(int currentPositionInPipeline, Trait name, double value, CalculatesProperties descriptionProvider);
+	public void setNumericResult(int currentPositionInPipeline, Trait name, double value, CalculatesProperties descriptionProvider, NumericMeasurement3D imageRef);
+	
+	void setNumericResult(int currentPositionInPipeline, Trait name, double value, String unit, CalculatesProperties descriptionProvider,
+			NumericMeasurement3D imageRef);
 	
 	public int getBlockPosition();
 	
@@ -60,21 +64,19 @@ public interface BlockResultSet {
 	
 	public ArrayList<BlockResultValue> searchResults(boolean exact, String search, boolean removeReturnedValue);
 	
-	void setNumericResult(int currentPositionInPipeline, Trait name, double value, String unit, CalculatesProperties descriptionProvider);
-	
 	void storeResults(CameraPosition cp, CameraType ct, TraitCategory cat,
 			ResultsTableWithUnits numericResults,
-			int position, CalculatesProperties description);
+			int position, CalculatesProperties description, NumericMeasurement3D imageRef);
 	
 	void storeResults(CameraPosition cp, CameraType ct, TraitCategory cat, String id_postfix,
 			ResultsTableWithUnits numericResults,
-			int position, CalculatesProperties description);
+			int position, CalculatesProperties description, NumericMeasurement3D imageRef);
 	
 	public void printAnalysisResults();
 	
-	public void setImage(int currentPositionInPipeline, String id, ImageData image, boolean deleteAtPipelineCompletion);
+	public void setImage(int currentPositionInPipeline, String id, LoadedImage image, boolean deleteAtPipelineCompletion);
 	
-	public void setImage(int currentPositionInPipeline, String id, Image image, boolean deleteAtPipelineCompletion);
+	public void setImage(int currentPositionInPipeline, String id, ImageAndImageData image, boolean deleteAtPipelineCompletion);
 	
 	public Image getImage(int currentPositionInPipeline, String id);
 	
@@ -101,9 +103,9 @@ public interface BlockResultSet {
 	
 	public void clearStoredPostprocessors();
 	
-	public TreeMap<Integer, TreeMap<String, ImageData>> getImages();
+	public TreeMap<Integer, TreeMap<String, ImageAndImageData>> getImages();
 	
-	public void setImages(TreeMap<Integer, TreeMap<String, ImageData>> storedImages);
+	public void setImages(TreeMap<Integer, TreeMap<String, ImageAndImageData>> storedImages);
 	
 	public void addImagePostProcessor(ImageConfiguration imgConfig, RunnableOnImage roi, RunnableOnImage runnableOnMask);
 	
@@ -113,7 +115,7 @@ public interface BlockResultSet {
 	
 	public void removeResultObject(BlockResultObject result1);
 	
-	Image getImage(String id);
+	ImageAndImageData getImage(String id);
 	
 	public void clearNotUsedResults();
 	

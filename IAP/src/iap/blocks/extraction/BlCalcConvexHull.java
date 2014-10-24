@@ -14,6 +14,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * Calculates the convex hull for the visible light and fluorescence images and stores according data results as numeric
@@ -29,12 +30,12 @@ public class BlCalcConvexHull extends AbstractBlock implements CalculatesPropert
 		if (mask == null)
 			return mask;
 		if (getBoolean("process " + mask.getCameraType().name() + " mask", mask.getCameraType() == CameraType.VIS || mask.getCameraType() == CameraType.FLUO))
-			return processImage(optionsAndResults.getCameraPosition(), mask.getCameraType(), mask);
+			return processImage(optionsAndResults.getCameraPosition(), mask.getCameraType(), mask, input().images().getImageInfo(mask.getCameraType()));
 		else
 			return mask;
 	}
 	
-	private Image processImage(CameraPosition cp, CameraType ct, Image image) {
+	private Image processImage(CameraPosition cp, CameraType ct, Image image, ImageData imageRef) {
 		boolean debug = getBoolean("debug", false);
 		
 		ResultsTableWithUnits numericResults;
@@ -61,10 +62,10 @@ public class BlCalcConvexHull extends AbstractBlock implements CalculatesPropert
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && numericResults != null)
 			getResultSet().storeResults(
 					cp, ct, TraitCategory.GEOMETRY, numericResults,
-					getBlockPosition(), this);
+					getBlockPosition(), this, imageRef);
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && numericResults != null)
 			getResultSet().storeResults(
-					cp, ct, TraitCategory.GEOMETRY, numericResults, getBlockPosition(), this);
+					cp, ct, TraitCategory.GEOMETRY, numericResults, getBlockPosition(), this, imageRef);
 		
 		res.getImage().show("output image", debug);
 		

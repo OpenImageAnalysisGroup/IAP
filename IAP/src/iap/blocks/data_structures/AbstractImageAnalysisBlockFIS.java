@@ -41,13 +41,14 @@ import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
@@ -60,7 +61,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	private MaskAndImageSet input;
 	private BlockResultSet resultSet;
 	private int blockPositionInPipeline;
-	private int well;
+	private String well;
 	
 	private static LinkedHashMap<String, ThreadSafeOptions> id2time = new LinkedHashMap<String, ThreadSafeOptions>();
 	
@@ -96,7 +97,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		// empty
 	}
 	
-	protected int getWellIdx() {
+	protected String getWellIdx() {
 		return well;
 	}
 	
@@ -151,7 +152,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	@Override
-	public void setInputAndOptions(int well, MaskAndImageSet input, ImageProcessorOptionsAndResults options,
+	public void setInputAndOptions(String well, MaskAndImageSet input, ImageProcessorOptionsAndResults options,
 			BlockResultSet properties,
 			int blockPositionInPipeline,
 			ImageStack debugStack) {
@@ -234,25 +235,23 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
-			TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			CalculatesProperties propertyCalculator) throws InterruptedException {
 		
 		PostProcessor pp = getPostProcessor(time2allResultsForSnapshot);
 		if (pp != null)
-			for (Long time : new ArrayList<Long>(time2inSamples.keySet())) {
+			for (Long time : new ArrayList<Long>(time2allResultsForSnapshot.keySet())) {
 				if (!time2summaryResult.containsKey(time))
-					time2summaryResult.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-				TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+					time2summaryResult.put(time, new TreeMap<String, HashMap<String, BlockResultSet>>());
+				TreeMap<String, HashMap<String, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 				for (String configName : allResultsForSnapshot.keySet()) {
 					if (!time2summaryResult.get(time).containsKey(configName))
-						time2summaryResult.get(time).put(configName, new HashMap<Integer, BlockResultSet>());
-					TreeMap<String, HashMap<Integer, BlockResultSet>> nn = time2summaryResult.get(time);
-					HashMap<Integer, BlockResultSet> trayWithResult = nn.get(configName);
-					for (Integer tray : trayWithResult.keySet()) {
+						time2summaryResult.get(time).put(configName, new HashMap<String, BlockResultSet>());
+					TreeMap<String, HashMap<String, BlockResultSet>> nn = time2summaryResult.get(time);
+					HashMap<String, BlockResultSet> trayWithResult = nn.get(configName);
+					for (String tray : trayWithResult.keySet()) {
 						if (!time2summaryResult.get(time).containsKey(tray))
 							time2summaryResult.get(time).get(configName).put(tray, new BlockResults(null));
 						BlockResultSet summaryResult = time2summaryResult.get(time).get(configName).get(tray);
@@ -261,7 +260,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 							if (rl != null)
 								for (BlockResultValue bpv : rl) {
 									summaryResult.setNumericResult(getBlockPosition(),
-											new Trait(bpv.getName()), bpv.getValue(), bpv.getUnit(), propertyCalculator);
+											new Trait(bpv.getName()), bpv.getValue(), bpv.getUnit(), propertyCalculator, bpv.getBinary());
 								}
 						}
 					}
@@ -274,7 +273,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	 * 
 	 * @return PostProcessor, which processes previously calculated properties.
 	 */
-	protected PostProcessor getPostProcessor(TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot) {
+	protected PostProcessor getPostProcessor(TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2allResultsForSnapshot) {
 		return null;
 	}
 	
@@ -321,9 +320,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		}
 	}
 	
-	protected void calculateRelativeValues(TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2config2summaryResult, int blockPosition,
+	protected void calculateRelativeValues(
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2config2summaryResult, int blockPosition,
 			String[] desiredProperties, CalculatesProperties propertyCalculator) {
 		
 		boolean relRaw = getBoolean(null, "Calculate Relative Values (Raw)", true);
@@ -335,22 +334,22 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		
 		final double timeForOneDayD = 1000 * 60 * 60 * 24d;
 		
-		HashMap<String, TreeMap<String, TreeMap<Integer, Long>>> prop2config2tray2lastTime = new HashMap<String, TreeMap<String, TreeMap<Integer, Long>>>();
-		HashMap<String, TreeMap<String, TreeMap<Integer, Double>>> prop2config2tray2lastValue = new HashMap<String, TreeMap<String, TreeMap<Integer, Double>>>();
+		HashMap<String, TreeMap<String, TreeMap<String, Long>>> prop2config2tray2lastTime = new HashMap<String, TreeMap<String, TreeMap<String, Long>>>();
+		HashMap<String, TreeMap<String, TreeMap<String, Double>>> prop2config2tray2lastValue = new HashMap<String, TreeMap<String, TreeMap<String, Double>>>();
 		
-		for (Long time : time2inSamples.keySet()) {
-			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+		for (Long time : time2allResultsForSnapshot.keySet()) {
+			TreeMap<String, HashMap<String, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 			if (allResultsForSnapshot == null || allResultsForSnapshot.keySet() == null)
 				continue;
 			
 			boolean showWarning = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "DEBUG-WARN-MISSING-RESULTS", false);
 			for (String configName : allResultsForSnapshot.keySet()) {
 				if (!time2config2summaryResult.containsKey(time))
-					time2config2summaryResult.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+					time2config2summaryResult.put(time, new TreeMap<String, HashMap<String, BlockResultSet>>());
 				if (!time2config2summaryResult.get(time).containsKey(configName))
-					time2config2summaryResult.get(time).put(configName, new HashMap<Integer, BlockResultSet>());
-				HashMap<Integer, BlockResultSet> summaryResultArray = time2config2summaryResult.get(time).get(configName);
-				for (Integer tray : allResultsForSnapshot.get(configName).keySet()) {
+					time2config2summaryResult.get(time).put(configName, new HashMap<String, BlockResultSet>());
+				HashMap<String, BlockResultSet> summaryResultArray = time2config2summaryResult.get(time).get(configName);
+				for (String tray : allResultsForSnapshot.get(configName).keySet()) {
 					Double angle = getAngleFromConfig(configName);
 					if (!summaryResultArray.containsKey(tray))
 						summaryResultArray.put(tray, new BlockResults(angle));
@@ -362,10 +361,12 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result named '" + property + "' not found. Config=" + configName
 									+ ", Tray=" + tray + ", Time=" + time);
 						double valueSum = 0;
+						NumericMeasurement3D imageRef = null;
 						int valueN = 0;
 						for (BlockResultValue v : calculationResults) {
 							if (v.getValue() != null) {
 								double value = v.getValue().doubleValue();
+								imageRef = v.getBinary();
 								valueSum += value;
 								valueN++;
 							}
@@ -384,14 +385,15 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 									double ratioPerDay = Math.pow(ratio, 1d / days);
 									if (relRaw)
 										summaryResult.setNumericResult(blockPosition, new Trait(property + ".relative.raw"), ratioPerDay, "relative/day",
-												propertyCalculator);
+												propertyCalculator, imageRef);
 									double perc = (ratioPerDay - 1) * 100d;
 									if (relPer)
 										summaryResult.setNumericResult(blockPosition, new Trait(property + ".relative.percent"), perc, "percent change/day",
-												propertyCalculator);
+												propertyCalculator, imageRef);
 									double growth = (Math.log(currentPropertyValue) - Math.log(lastPropertyValue)) / days;
 									if (relLog)
-										summaryResult.setNumericResult(blockPosition, new Trait(property + ".relative.log"), growth, "relative/day", propertyCalculator);
+										summaryResult.setNumericResult(blockPosition, new Trait(property + ".relative.log"), growth, "relative/day", propertyCalculator,
+												imageRef);
 								}
 							}
 							
@@ -413,17 +415,17 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return isTop ? -angle : angle;
 	}
 	
-	private void initMaps(HashMap<String, TreeMap<String, TreeMap<Integer, Long>>> prop2config2tray2lastTime,
-			HashMap<String, TreeMap<String, TreeMap<Integer, Double>>> prop2config2tray2lastValue,
+	private void initMaps(HashMap<String, TreeMap<String, TreeMap<String, Long>>> prop2config2tray2lastTime,
+			HashMap<String, TreeMap<String, TreeMap<String, Double>>> prop2config2tray2lastValue,
 			String config, String property) {
 		if (!prop2config2tray2lastValue.containsKey(property))
-			prop2config2tray2lastValue.put(property, new TreeMap<String, TreeMap<Integer, Double>>());
+			prop2config2tray2lastValue.put(property, new TreeMap<String, TreeMap<String, Double>>());
 		if (!prop2config2tray2lastTime.containsKey(property))
-			prop2config2tray2lastTime.put(property, new TreeMap<String, TreeMap<Integer, Long>>());
+			prop2config2tray2lastTime.put(property, new TreeMap<String, TreeMap<String, Long>>());
 		if (!prop2config2tray2lastValue.get(property).containsKey(config))
-			prop2config2tray2lastValue.get(property).put(config, new TreeMap<Integer, Double>());
+			prop2config2tray2lastValue.get(property).put(config, new TreeMap<String, Double>());
 		if (!prop2config2tray2lastTime.get(property).containsKey(config))
-			prop2config2tray2lastTime.get(property).put(config, new TreeMap<Integer, Long>());
+			prop2config2tray2lastTime.get(property).put(config, new TreeMap<String, Long>());
 	}
 	
 	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
@@ -432,7 +434,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
 		
 		final MaskAndImageSet inputSet = in.copy();
-		final TreeMap<Integer, TreeMap<String, ImageData>> storedImages = copy(brs.getImages());
+		final TreeMap<Integer, TreeMap<String, ImageAndImageData>> storedImages = copy(brs.getImages());
 		
 		final ZoomedImage ic = new ZoomedImage(null);
 		final JScrollPane jsp = new JScrollPane(ic);
@@ -561,12 +563,15 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		timer.start();
 	}
 	
-	private TreeMap<Integer, TreeMap<String, ImageData>> copy(TreeMap<Integer, TreeMap<String, ImageData>> images) {
-		TreeMap<Integer, TreeMap<String, ImageData>> res = new TreeMap<Integer, TreeMap<String, ImageData>>();
+	private TreeMap<Integer, TreeMap<String, ImageAndImageData>> copy(TreeMap<Integer, TreeMap<String, ImageAndImageData>> images) {
+		TreeMap<Integer, TreeMap<String, ImageAndImageData>> res = new TreeMap<Integer, TreeMap<String, ImageAndImageData>>();
 		for (Integer key : images.keySet()) {
-			res.put(key, new TreeMap<String, ImageData>());
+			res.put(key, new TreeMap<String, ImageAndImageData>());
 			for (String id : images.get(key).keySet()) {
-				res.get(key).put(id, images.get(key).get(id));
+				res.get(key).put(id, new ImageAndImageData(
+						images.get(key).get(id).getImage(),
+						images.get(key).get(id).getImageData()
+						));
 			}
 		}
 		return res;

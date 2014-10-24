@@ -102,7 +102,8 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	private Image processCuttingOfImage(Image img, CameraType type, double horFillGrade, double vertFillGrade, int cols, int rows, double well_border) {
 		int offX = getInt("Offset X (" + type + ")", 0);
 		int offY = getInt("Offset Y (" + type + ")", 0);
-		Rectangle2D.Double r = getGridPos(getWellIdx(), cols, rows, (int) (img.getWidth() * horFillGrade), (int) (img.getHeight() * vertFillGrade),
+		Rectangle2D.Double r = getGridPos(optionsAndResults.getWellIdx(), cols, rows, (int) (img.getWidth() * horFillGrade),
+				(int) (img.getHeight() * vertFillGrade),
 				img.getWidth() / 2 + offX,
 				img.getHeight() / 2 + offY);
 		

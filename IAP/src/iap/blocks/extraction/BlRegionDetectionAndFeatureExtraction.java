@@ -20,6 +20,7 @@ import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author pape
@@ -48,7 +49,7 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		
 		// get features (size, angle, center of gravity)
 		LinkedList<Feature> featureList = getFeaturesFromClusters(cd, minimumSizeOfRegion);
-		Image marked = saveAndMarkResults(img, featureList, markResults, saveResults);
+		Image marked = saveAndMarkResults(img, featureList, markResults, saveResults, input().images().getVisInfo());
 		
 		return marked;
 	}
@@ -76,7 +77,7 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		return flist;
 	}
 	
-	private Image saveAndMarkResults(Image img, LinkedList<Feature> featureList, boolean markResults, boolean saveResults) {
+	private Image saveAndMarkResults(Image img, LinkedList<Feature> featureList, boolean markResults, boolean saveResults, ImageData imageRef) {
 		
 		boolean saveResultObject = true;
 		
@@ -92,18 +93,18 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			CameraPosition pos = optionsAndResults.getCameraPosition();
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower.count"), featureList.size(), "flower", this);
+					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower.count"), featureList.size(), "flower", this, imageRef);
 			
 			// save x and y position
 			int num = 1;
 			for (Feature p : featureList) {
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".position.x"),
-						(int) p.getPosition().getX(), "flower", this);
+						(int) p.getPosition().getX(), "flower", this, imageRef);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".position.y"),
-						(int) p.getPosition().getY(), "flower", this);
+						(int) p.getPosition().getY(), "flower", this, imageRef);
 				num++;
 			}
 		}

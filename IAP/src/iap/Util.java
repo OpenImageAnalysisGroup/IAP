@@ -71,8 +71,8 @@ public class Util {
 			}
 		}
 		SystemOptions settings = null;
-		TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint = null;
-		TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults = null;
+		TreeMap<String, HashMap<String, BlockResultSet>> previousResultsForThisTimePoint = null;
+		TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> plantResults = null;
 		final ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(settings, previousResultsForThisTimePoint, plantResults);
 		final MaskAndImageSet input = new MaskAndImageSet(
 				new ImageSet((Image) null, (Image) null, (Image) null, (Image) null),
@@ -115,7 +115,7 @@ public class Util {
 			else
 				input.images().set(img);
 		}
-		HashMap<Integer, BlockResultSet> blockResults = null;
+		HashMap<String, BlockResultSet> blockResults = null;
 		OptionsGenerator og = new OptionsGenerator() {
 			
 			@Override

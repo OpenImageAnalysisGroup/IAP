@@ -202,22 +202,22 @@ public class ConvexHullCalculator {
 						(hullLength * hullLength / filledArea));
 			}
 			if (distHorizontal != null) {
-				rt.addValue("hull.area.norm", polygon.area() * normFactorArea);
-				rt.addValue("border.length.norm", borderPixels * normFactor);
-				rt.addValue("hull.length.norm", hullLength * normFactor);
+				rt.addValue("hull.area.norm", polygon.area() * normFactorArea, "mm^2");
+				rt.addValue("border.length.norm", borderPixels * normFactor, "mm");
+				rt.addValue("hull.length.norm", hullLength * normFactor, "mm");
 			}
-			rt.addValue("hull.area", polygon.area());
-			rt.addValue("border.length", borderPixels);
+			rt.addValue("hull.area", polygon.area(), "px");
+			rt.addValue("border.length", borderPixels, "px");
 			
 			rt.addValue("hull.circularity", circularity());
 			
 			final Circle circumcircle = polygon.calculateminimalcircumcircle();
 			
 			if (circumcircle != null) {
-				rt.addValue("circumcircle.d", circumcircle.d);
+				rt.addValue("circumcircle.d", circumcircle.d, "px");
 				if (distHorizontal != null) {
 					rt.addValue("circumcircle.d.norm", circumcircle.d
-							* normFactor);
+							* normFactor, "mm");
 				}
 				if (drawCircle) {
 					RunnableOnImage runnableOnMask = new RunnableOnImage() {
@@ -269,19 +269,19 @@ public class ConvexHullCalculator {
 				}
 			}
 			
-			rt.addValue("hull.fillgrade", filledArea / polygon.area());
+			rt.addValue("hull.fillgrade", 100d * filledArea / polygon.area(), "%");
 			
 			centroid = polygon.centroid();
 			
 			final Line sp = polygon.getMaxSpan();
 			if (sp != null) {
 				double span = sp.getlength();
-				rt.addValue("hull.pc1", span);
+				rt.addValue("hull.pc1", span, "px");
 				final Span2result span2 = polygon.getMaxSpan2len(sp);
-				rt.addValue("hull.pc2", span2.getLengthPC2());
+				rt.addValue("hull.pc2", span2.getLengthPC2(), "px");
 				if (distHorizontal != null) {
-					rt.addValue("hull.pc1.norm", span * normFactor);
-					rt.addValue("hull.pc2.norm", span2.getLengthPC2() * normFactor);
+					rt.addValue("hull.pc1.norm", span * normFactor, "mm");
+					rt.addValue("hull.pc2.norm", span2.getLengthPC2() * normFactor, "mm");
 				}
 				
 				if (drawPCLine && (new Vector2i(res.getCropRectangle()).getArea() > 50 * 50)) {
@@ -302,8 +302,8 @@ public class ConvexHullCalculator {
 				}
 			}
 			
-			rt.addValue("hull.centroid.x", centroid.x);
-			rt.addValue("hull.centroid.y", centroid.y);
+			rt.addValue("hull.centroid.x", centroid.x, "px");
+			rt.addValue("hull.centroid.y", centroid.y, "px");
 		}
 		res.setResultsTable(rt);
 		

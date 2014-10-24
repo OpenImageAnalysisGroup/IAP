@@ -21,8 +21,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.BlockResults;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 
 /**
  * Calculates volume estimation values from the side and top areas.
@@ -35,46 +34,44 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
-			TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			CalculatesProperties propertyCalculator) {
 		if (getBoolean("process VIS", true))
-			calculatePlantVolumeMeasures(CameraType.VIS, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+			calculatePlantVolumeMeasures(CameraType.VIS, plandID2time2waterData, time2allResultsForSnapshot, time2summaryResult,
 					false);
 		if (getBoolean("process VIS normalized", true))
-			calculatePlantVolumeMeasures(CameraType.VIS, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+			calculatePlantVolumeMeasures(CameraType.VIS, plandID2time2waterData, time2allResultsForSnapshot, time2summaryResult,
 					true);
 		
 		if (getBoolean("process FLUO", false))
-			calculatePlantVolumeMeasures(CameraType.FLUO, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+			calculatePlantVolumeMeasures(CameraType.FLUO, plandID2time2waterData, time2allResultsForSnapshot, time2summaryResult,
 					false);
 		if (getBoolean("process FLUO normalized", false))
-			calculatePlantVolumeMeasures(CameraType.FLUO, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+			calculatePlantVolumeMeasures(CameraType.FLUO, plandID2time2waterData, time2allResultsForSnapshot, time2summaryResult,
 					true);
 		
 		if (getBoolean("process NIR", false))
-			calculatePlantVolumeMeasures(CameraType.NIR, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+			calculatePlantVolumeMeasures(CameraType.NIR, plandID2time2waterData, time2allResultsForSnapshot, time2summaryResult,
 					false);
 		if (getBoolean("process NIR normalized", false))
-			calculatePlantVolumeMeasures(CameraType.NIR, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+			calculatePlantVolumeMeasures(CameraType.NIR, plandID2time2waterData, time2allResultsForSnapshot, time2summaryResult,
 					true);
 		
 		if (getBoolean("process IR", false))
-			calculatePlantVolumeMeasures(CameraType.IR, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+			calculatePlantVolumeMeasures(CameraType.IR, plandID2time2waterData, time2allResultsForSnapshot, time2summaryResult,
 					false);
 		if (getBoolean("process IR normalized", false))
-			calculatePlantVolumeMeasures(CameraType.IR, plandID2time2waterData, time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult,
+			calculatePlantVolumeMeasures(CameraType.IR, plandID2time2waterData, time2allResultsForSnapshot, time2summaryResult,
 					true);
 	}
 	
 	private void calculatePlantVolumeMeasures(
 			CameraType cameraType,
-			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData, TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, ImageData>> time2inImages, TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult, boolean normalized) {
+			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2summaryResult, boolean normalized) {
 		
 		String plantID = null;
 		
@@ -86,27 +83,27 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 		
 		final double timeForOneDayD = 1000 * 60 * 60 * 24d;
 		
-		for (Long time : time2inSamples.keySet()) {
-			TreeMap<String, HashMap<Integer, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
+		for (Long time : time2allResultsForSnapshot.keySet()) {
+			TreeMap<String, HashMap<String, BlockResultSet>> allResultsForSnapshot = time2allResultsForSnapshot.get(time);
 			if (allResultsForSnapshot == null)
 				continue;
 			if (!time2summaryResult.containsKey(time)) {
-				time2summaryResult.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+				time2summaryResult.put(time, new TreeMap<String, HashMap<String, BlockResultSet>>());
 			}
 			TreeSet<String> ks;
 			synchronized (allResultsForSnapshot) {
 				ks = new TreeSet<String>(allResultsForSnapshot.keySet());
 			}
-			TreeSet<Integer> allTrays = new TreeSet<Integer>();
+			TreeSet<String> allTrays = new TreeSet<String>();
 			for (String key : ks) {
 				allTrays.addAll(allResultsForSnapshot.get(key).keySet());
 			}
 			if (!time2summaryResult.get(time).containsKey("-720"))
-				time2summaryResult.get(time).put("-720", new HashMap<Integer, BlockResultSet>());
+				time2summaryResult.get(time).put("-720", new HashMap<String, BlockResultSet>());
 			if (time2summaryResult.get(time).get("-720").isEmpty())
-				for (Integer knownTray : allTrays)
+				for (String knownTray : allTrays)
 					time2summaryResult.get(time).get("-720").put(knownTray, new BlockResults(null));
-			for (Integer tray : time2summaryResult.get(time).get("-720").keySet()) {
+			for (String tray : time2summaryResult.get(time).get("-720").keySet()) {
 				double areaSum = 0;
 				double areaCnt = 0;
 				double sideArea_for_angleNearestTo0 = Double.NaN;
@@ -116,6 +113,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 				double distanceTo45 = Double.MAX_VALUE;
 				double distanceTo90 = Double.MAX_VALUE;
 				DescriptiveStatistics areaStat = new DescriptiveStatistics();
+				NumericMeasurement3D imageRef = null;
 				
 				for (String key : ks) {
 					if (allResultsForSnapshot.get(key) == null)
@@ -129,35 +127,30 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 					for (BlockResultValue v : rt.searchResults(true, new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, "area"
 							+ (normalized ? ".norm" : "")).toString(), false)) {
 						if (v.getValue() != null) {
+							imageRef = v.getBinary();
 							double area = v.getValue().doubleValue();
 							areaStat.addValue(area);
 							areaSum += area;
 							areaCnt += 1;
 							
-							TreeMap<String, ImageData> tid = time2inImages.get(time);
-							if (tid != null) {
-								ImageData id = tid.get(key);
-								if (id != null) {
-									plantID = id.getReplicateID() + ";" + id.getQualityAnnotation();
-									Double pos = id.getPosition();
-									if (pos == null)
-										pos = 0d;
-									pos = pos % 180;
-									if (pos > 90)
-										pos = 180 - pos;
-									if (Math.abs(pos - 0) < distanceTo0) {
-										distanceTo0 = Math.abs(pos - 0);
-										sideArea_for_angleNearestTo0 = area;
-									}
-									if (Math.abs(pos - 45) < distanceTo45) {
-										distanceTo45 = Math.abs(pos - 45);
-										sideArea_for_angleNearestTo45 = area;
-									}
-									if (Math.abs(pos - 90) < distanceTo90) {
-										distanceTo0 = Math.abs(pos - 90);
-										sideArea_for_angleNearestTo90 = area;
-									}
-								}
+							plantID = v.getBinary().getReplicateID() + ";" + v.getBinary().getQualityAnnotation();
+							Double pos = v.getPosition();
+							if (pos == null)
+								pos = 0d;
+							pos = pos % 180;
+							if (pos > 90)
+								pos = 180 - pos;
+							if (Math.abs(pos - 0) < distanceTo0) {
+								distanceTo0 = Math.abs(pos - 0);
+								sideArea_for_angleNearestTo0 = area;
+							}
+							if (Math.abs(pos - 45) < distanceTo45) {
+								distanceTo45 = Math.abs(pos - 45);
+								sideArea_for_angleNearestTo45 = area;
+							}
+							if (Math.abs(pos - 90) < distanceTo90) {
+								distanceTo0 = Math.abs(pos - 90);
+								sideArea_for_angleNearestTo90 = area;
 							}
 						}
 					}
@@ -170,15 +163,15 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 						summaryResult.setNumericResult(getBlockPosition(),
 								new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, "area.min" + (normalized ? ".norm" : "")),
 								areaStat.getMin(),
-								normalized ? "mm^2" : "px", this);
+								normalized ? "mm^2" : "px", this, imageRef);
 						summaryResult.setNumericResult(getBlockPosition(),
 								new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, "area.max" + (normalized ? ".norm" : "")),
 								areaStat.getMax(),
-								normalized ? "mm^2" : "px", this);
+								normalized ? "mm^2" : "px", this, imageRef);
 						summaryResult.setNumericResult(getBlockPosition(),
 								new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, "area.median" + (normalized ? ".norm" : "")),
 								areaStat.getPercentile(50),
-								normalized ? "mm^2" : "px", this);
+								normalized ? "mm^2" : "px", this, imageRef);
 					}
 				}
 				
@@ -190,7 +183,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 					for (String key : ks2) {
 						BlockResultSet rt;
 						synchronized (allResultsForSnapshot) {
-							HashMap<Integer, BlockResultSet> kk = allResultsForSnapshot.get(key);
+							HashMap<String, BlockResultSet> kk = allResultsForSnapshot.get(key);
 							if (kk == null)
 								continue;
 							rt = allResultsForSnapshot.get(key).get(tray);
@@ -224,7 +217,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 									summaryResult.setNumericResult(getBlockPosition(),
 											new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.DERIVED, "area.avg.wue"
 													+ (normalized ? ".norm" : "")), wue, "px/ml/day",
-											this);
+											this, imageRef);
 									
 								}
 							}
@@ -234,7 +227,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 									summaryResult.setNumericResult(getBlockPosition(),
 											new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.DERIVED, "area.avg.wue.relative"
 													+ (normalized ? ".norm" : "")), wue,
-											"percent growth/ml/day", this);
+											"percent growth/ml/day", this, imageRef);
 									
 								}
 							}
@@ -252,10 +245,10 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 					double volume_iap_max = Math.sqrt(side * side * avgTopArea);
 					summaryResult.setNumericResult(getBlockPosition(),
 							new Trait(CameraPosition.COMBINED, cameraType, TraitCategory.GEOMETRY, "volume.iap" + (normalized ? ".norm" : "")), volume_iap, "voxel",
-							this);
+							this, imageRef);
 					summaryResult.setNumericResult(getBlockPosition(),
 							new Trait(CameraPosition.COMBINED, cameraType, TraitCategory.GEOMETRY, "volume.iap_max" + (normalized ? ".norm" : "")), volume_iap_max,
-							"voxel", this);
+							"voxel", this, imageRef);
 					
 					if (lastTimeVolumeIAP != null && lastVolumeIAP > 0 && plantID != null) {
 						double ratio = volume_iap / lastVolumeIAP;
@@ -263,7 +256,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 						summaryResult.setNumericResult(getBlockPosition(),
 								new Trait(CameraPosition.COMBINED, cameraType, TraitCategory.DERIVED, "volume.iap.relative_percent" + (normalized ? ".norm" : "")),
 								ratioPerDay,
-								"percent/day", this);
+								"percent/day", this, imageRef);
 						double days = (time - lastTimeVolumeIAP) / timeForOneDayD;
 						double absoluteGrowthPerDay = (volume_iap - lastVolumeIAP) / days;
 						
@@ -275,7 +268,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 							double wue = absoluteGrowthPerDay / waterUsePerDay;
 							summaryResult.setNumericResult(getBlockPosition(),
 									new Trait(CameraPosition.COMBINED, cameraType, TraitCategory.DERIVED, "volume.iap.wue" + (normalized ? ".norm" : "")), wue,
-									"px^3/ml/day", this);
+									"px^3/ml/day", this, imageRef);
 						}
 					}
 					
@@ -287,17 +280,17 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 						summaryResult.setNumericResult(getBlockPosition(),
 								new Trait(CameraPosition.COMBINED, cameraType, TraitCategory.GEOMETRY, "volume.lt" + (normalized ? ".norm" : "")), volume_lt,
 								normalized ? "mm^3" : "px^3",
-								this);
+								this, imageRef);
 						double area = sideArea_for_angleNearestTo0 + sideArea_for_angleNearestTo90 + avgTopArea;
 						summaryResult.setNumericResult(getBlockPosition(),
 								new Trait(CameraPosition.COMBINED, cameraType, TraitCategory.GEOMETRY, "volume.area090T" + (normalized ? ".norm" : "")), area,
 								normalized ? "mm^2" : "px^2",
-								this);
+								this, imageRef);
 						double areaLog = sideArea_for_angleNearestTo0 + sideArea_for_angleNearestTo90 + Math.log(avgTopArea) / 3;
 						summaryResult.setNumericResult(getBlockPosition(),
 								new Trait(CameraPosition.COMBINED, cameraType, TraitCategory.GEOMETRY, "volume.area090LogT" + (normalized ? ".norm" : "")), areaLog,
 								normalized ? "mm^2"
-										: "px^2", this);
+										: "px^2", this, imageRef);
 					}
 					
 					if (!Double.isNaN(sideArea_for_angleNearestTo0) && !Double.isNaN(sideArea_for_angleNearestTo45) && !Double.isNaN(sideArea_for_angleNearestTo90)) {
@@ -310,7 +303,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 						summaryResult.setNumericResult(getBlockPosition(),
 								new Trait(CameraPosition.COMBINED, cameraType, TraitCategory.GEOMETRY, "volume.prism" + (normalized ? ".norm" : "")), volume_prism,
 								normalized ? "mm^3"
-										: "px^3", this);
+										: "px^3", this, imageRef);
 					}
 				}
 			}

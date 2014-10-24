@@ -13,7 +13,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
  * @author Christian Klukas
  */
 public interface PostProcessor {
-	public ArrayList<BlockResultValue> postProcessCalculatedProperties(long time, int tray);
+	public ArrayList<BlockResultValue> postProcessCalculatedProperties(long time, String tray);
 	
 	public TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> getAllResults();
 }

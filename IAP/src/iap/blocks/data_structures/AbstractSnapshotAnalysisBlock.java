@@ -36,7 +36,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 		}
 		
 		String name = this.getClass().getSimpleName();
-		
+		boolean directRun = true;
 		final LocalComputeJob[] work = new LocalComputeJob[] {
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
@@ -53,7 +53,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process NIR image - exception");
 						}
 					}
-				}, name + " process NIR image", false),
+				}, name + " process NIR image", false, directRun),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -69,7 +69,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process IR image - exception");
 						}
 					}
-				}, name + " process IR image", false),
+				}, name + " process IR image", false, directRun),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -85,7 +85,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process NIR mask - exception");
 						}
 					}
-				}, name + " process NIR mask", false),
+				}, name + " process NIR mask", false, directRun),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -101,7 +101,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process IR mask - exception");
 						}
 					}
-				}, name + " process IR mask", false),
+				}, name + " process IR mask", false, directRun),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -117,7 +117,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process VIS image - exception");
 						}
 					}
-				}, name + " process VIS image", false),
+				}, name + " process VIS image", false, directRun),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -133,7 +133,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process VIS mask - exception");
 						}
 					}
-				}, name + " process VIS mask", false),
+				}, name + " process VIS mask", false, directRun),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -149,7 +149,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process FLUO image - exception");
 						}
 					}
-				}, name + " process FLU image", false),
+				}, name + " process FLU image", false, directRun),
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
@@ -165,7 +165,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 							reportError(e, "could not process FLUO mask - exception");
 						}
 					}
-				}, name + " process FLU mask", false) };
+				}, name + " process FLU mask", false, directRun) };
 		
 		BackgroundThreadDispatcher.waitFor(work);
 		

@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
 import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.blocks.postprocessing.WellProcessing;
 import iap.blocks.preprocessing.WellProcessor;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import info.StopWatch;
@@ -50,7 +51,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * A list of image analysis "blocks" ({@link ImageAnalysisBlock}) which may
@@ -89,7 +89,7 @@ public class BlockPipeline {
 	private static long lastOutput = 0;
 	
 	public void execute(final OptionsGenerator og,
-			final HashMap<Integer, BlockResultSet> blockResults,
+			final HashMap<String, BlockResultSet> blockResults,
 			final BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
 		// normally each image is analyzed once (i.e. one plant per image)
@@ -106,51 +106,38 @@ public class BlockPipeline {
 					executionTrayCount = n;
 			}
 		}
-		final int etc = executionTrayCount;
 		final ObjectRef exception = new ObjectRef();
 		if (status != null)
 			status.setCurrentStatusValue(0);
-		// ArrayList<LocalComputeJob> jobs = new ArrayList<LocalComputeJob>();
-		for (int idx = 0; idx < executionTrayCount; idx++) {
-			if (debugValidTrays != null && !debugValidTrays.contains(idx))
+		for (int currentWell = 0; currentWell < executionTrayCount; currentWell++) {
+			if (debugValidTrays != null && !debugValidTrays.contains(currentWell))
 				continue;
-			final int well = idx;
-			final int wellCnt = executionTrayCount;
-			Runnable r = new Runnable() {
-				
-				@Override
-				public void run() {
-					ImageProcessorOptionsAndResults options = og.getOptions();
-					
-					options.setWellCnt(etc);
-					ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
-					try {
-						BlockResultSet res = executeInnerCall(well, wellCnt, options,
-								ds, status, og.getImageSet(), og.getMaskSet());
-						if (options.forceDebugStack)
-							synchronized (options.forcedDebugStacks) {
-								options.forcedDebugStacks.add(ds);
-							}
-						res.clearStoredPostprocessors();
-						res.clearNotUsedResults();
-						synchronized (blockResults) {
-							blockResults.put(well, res);
-						}
-					} catch (Exception e) {
-						ErrorMsg.addErrorMessage(e);
-						exception.setObject(e);
+			ImageProcessorOptionsAndResults options = og.getOptions();
+			options.setWellCnt(currentWell, executionTrayCount);
+			ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
+			try {
+				String wellName = WellProcessing.getWellID(currentWell, executionTrayCount, options.getCameraPosition(), options.getCameraAngle());
+				BlockResultSet res = executeInnerCall(wellName, currentWell, executionTrayCount, options,
+						ds, status, og.getImageSet(), og.getMaskSet());
+				if (options.forceDebugStack)
+					synchronized (options.forcedDebugStacks) {
+						options.forcedDebugStacks.add(ds);
 					}
+				res.clearStoredPostprocessors();
+				res.clearNotUsedResults();
+				synchronized (blockResults) {
+					blockResults.put(wellName, res);
 				}
-			};
-			r.run();
-			// jobs.add(BackgroundThreadDispatcher.addTask(r, "Analyse well " + idx));
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+				exception.setObject(e);
+			}
 		}
-		// BackgroundThreadDispatcher.waitFor(jobs);
 		if (exception.getObject() != null)
 			throw ((Exception) exception.getObject());
 	}
 	
-	private BlockResultSet executeInnerCall(int well, int executionWellCount,
+	private BlockResultSet executeInnerCall(String wellName, int well, int executionWellCount,
 			ImageProcessorOptionsAndResults options, ImageStack debugStack,
 			BackgroundTaskStatusProviderSupportingExternalCall status,
 			ImageSet inputSet, ImageSet maskSet)
@@ -187,7 +174,7 @@ public class BlockPipeline {
 				throw e;
 			}
 			
-			block.setInputAndOptions(well, workset, options, results, index++,
+			block.setInputAndOptions(wellName, workset, options, results, index++,
 					debugStack);
 			
 			long ta = System.currentTimeMillis();
@@ -415,18 +402,21 @@ public class BlockPipeline {
 						}
 						ImageStack fis = fisArr;
 						final int idxF = idx - 1;
-						fis.show(analysisTaskFinal.getName() + " // Result tray " + idx + "/" + nn, new Runnable() {
-							@Override
-							public void run() {
-								analysisTaskFinal.debugSetValidTrays(new int[] { idxF });
-								analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, er.m, 0, 1);
-								BackgroundTaskHelper.issueSimpleTaskInWindow(
-										analysisTaskFinal.getName(), "Analyze...",
-										backgroundTask,
-										(Runnable) finishSwingTaskRef.getObject(), status, false,
-										true);
-							}
-						}, "Repeat Analysis", openSettingsButton, tsoCurrentImageDisplayPage);
+						NumericMeasurementInterface iii = input.iterator().next();
+						fis.show(iii.getQualityAnnotation() + " / " + iii.getParentSample().getSampleTime() + " / " + analysisTaskFinal.getName() + " / Well " + idx
+								+ "/" + nn,
+								new Runnable() {
+									@Override
+									public void run() {
+										analysisTaskFinal.debugSetValidTrays(new int[] { idxF });
+										analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, er.m, 0, 1);
+										BackgroundTaskHelper.issueSimpleTaskInWindow(
+												analysisTaskFinal.getName(), "Analyze...",
+												backgroundTask,
+												(Runnable) finishSwingTaskRef.getObject(), status, false,
+												true);
+									}
+								}, "Repeat Analysis", openSettingsButton, tsoCurrentImageDisplayPage);
 						idx++;
 					}
 					idx++;
@@ -439,23 +429,20 @@ public class BlockPipeline {
 				true);
 	}
 	
-	public TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> postProcessPipelineResultsForAllAngles(
+	public TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> postProcessPipelineResultsForAllAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
-			TreeMap<Long, Sample3D> inSample,
-			TreeMap<Long, TreeMap<String, ImageData>> inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ImageProcessorOptionsAndResults options)
 			throws InstantiationException, IllegalAccessException,
 			InterruptedException {
-		TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> summaryResult =
-				new TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>>();
+		TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> summaryResult =
+				new TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>>();
 		int index = 0;
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			ImageAnalysisBlock block = blockClass.newInstance();
-			block.setInputAndOptions(-1, null, options, null, index++, null);
+			block.setInputAndOptions(null, null, options, null, index++, null);
 			block.postProcessResultsForAllTimesAndAngles(
 					plandID2time2waterData,
-					inSample, inImages,
 					analysisResults, summaryResult, optStatus,
 					null);
 		}

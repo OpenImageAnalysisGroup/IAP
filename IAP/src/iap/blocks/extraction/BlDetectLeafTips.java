@@ -29,6 +29,7 @@ import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author pape, klukas
@@ -89,7 +90,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			workimg.setCameraType(CameraType.VIS);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, input().masks().vis(), searchRadius, fillGradeInPercent), CameraType.VIS,
 					optionsAndResults.getCameraPosition(),
-					searchRadius, maxValidY);
+					searchRadius, maxValidY, input().images().getVisInfo());
 		}
 		return input().masks().vis();
 	}
@@ -117,7 +118,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			workimg.setCameraType(CameraType.FLUO);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, input().masks().fluo(), searchRadius, fillGradeInPercent), CameraType.FLUO,
 					optionsAndResults.getCameraPosition(),
-					searchRadius, maxValidY);
+					searchRadius, maxValidY, input().images().getFluoInfo());
 		}
 		return input().masks().fluo();
 	}
@@ -144,12 +145,13 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", -1) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, input().masks().nir(), searchRadius, fillGradeInPercent), CameraType.NIR,
 					optionsAndResults.getCameraPosition(),
-					searchRadius, maxValidY);
+					searchRadius, maxValidY, input().images().getNirInfo());
 		}
 		return input().masks().nir();
 	}
 	
-	private void savePeaksAndFeatures(LinkedList<Feature> peakList, CameraType cameraType, CameraPosition cameraPosition, int searchRadius, int maxValidY) {
+	private void savePeaksAndFeatures(LinkedList<Feature> peakList, CameraType cameraType, CameraPosition cameraPosition,
+			int searchRadius, int maxValidY, ImageData imageRef) {
 		boolean saveListObject = true;
 		boolean saveLeafCount = true;
 		boolean saveFeaturesInResultSet = getBoolean("Save individual leaf features", true);
@@ -160,7 +162,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		}
 		
 		if (saveLeafCount) {
-			saveLeafCount(cameraType, cameraPosition, peakList.size());
+			saveLeafCount(cameraType, cameraPosition, peakList.size(), imageRef);
 		}
 		
 		boolean saveAddF = true;
@@ -191,23 +193,23 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 							double labb_mean = leafTipImage.io().channels().getLabB().getImageAsImagePlus().getStatistics().mean;
 							
 							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.red.mean"), r_mean, null, this);
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.red.mean"), r_mean, null, this, imageRef);
 							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.green.mean"), g_mean, null, this);
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.green.mean"), g_mean, null, this, imageRef);
 							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.blue.mean"), b_mean, null, this);
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.blue.mean"), b_mean, null, this, imageRef);
 							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.h.mean"), h_mean, null, this);
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.h.mean"), h_mean, null, this, imageRef);
 							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.s.mean"), s_mean, null, this);
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.s.mean"), s_mean, null, this, imageRef);
 							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.v.mean"), v_mean, null, this);
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.v.mean"), v_mean, null, this, imageRef);
 							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.l.mean"), labL_mean, null, this);
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.l.mean"), labL_mean, null, this, imageRef);
 							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.a.mean"), laba_mean, null, this);
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.a.mean"), laba_mean, null, this, imageRef);
 							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.b.mean"), labb_mean, null, this);
+									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.b.mean"), labb_mean, null, this, imageRef);
 						}
 					}
 					
@@ -222,18 +224,20 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			}
 			if (n > 0 && cameraPosition == CameraPosition.SIDE) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.up.count"), nup, "leaftips", this);
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.up.count"), nup, "leaftips", this, imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.down.count"), ndown, "leaftips", this);
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.down.count"), ndown, "leaftips", this, imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.mean"), statsLeafDirection.getMean(), "degree", this);
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.mean"), statsLeafDirection.getMean(), "degree", this, imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.stdev"), statsLeafDirection.getStandardDeviation(), null,
-						this);
+						this, imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.skewness"), statsLeafDirection.getSkewness(), null, this);
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.skewness"), statsLeafDirection.getSkewness(), null, this,
+						imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.kurtosis"), statsLeafDirection.getKurtosis(), null, this);
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.kurtosis"), statsLeafDirection.getKurtosis(), null, this,
+						imageRef);
 			}
 		}
 		
@@ -258,12 +262,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 						0,
 						new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2)
 								+ ".x"),
-						pos_fin.getX(), "px", this);
+						pos_fin.getX(), "px", this, imageRef);
 				getResultSet().setNumericResult(
 						0,
 						new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2)
 								+ ".y"),
-						pos_fin.getY(), "px", this);
+						pos_fin.getY(), "px", this, imageRef);
 				
 				if (angle != null && cameraPosition == CameraPosition.SIDE)
 					getResultSet()
@@ -272,7 +276,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 									new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip."
 											+ StringManipulationTools.formatNumberAddZeroInFront(index, 2)
 											+ ".angle"),
-									angle, "degree", this);
+									angle, "degree", this, imageRef);
 				index++;
 				
 				if (searchRadius > 0) {
@@ -315,10 +319,10 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		}
 	}
 	
-	private void saveLeafCount(CameraType cameraType, CameraPosition cameraPosition, int count) {
+	private void saveLeafCount(CameraType cameraType, CameraPosition cameraPosition, int count, ImageData imageRef) {
 		// save leaf count
 		getResultSet().setNumericResult(getBlockPosition(),
-				new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count"), count, "leaftips", this);
+				new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count"), count, "leaftips", this, imageRef);
 		
 		if (cameraPosition == CameraPosition.SIDE) {
 			boolean isBestAngle = isBestAngle(cameraType);
@@ -330,7 +334,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			// save leaf count for best angle
 			if (isBestAngle)
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count.best_angle"), count, "leaftips", this);
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count.best_angle"), count, "leaftips", this, imageRef);
 		}
 	}
 	
@@ -378,8 +382,8 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		CameraType ct = img.getCameraType();
 		
 		// get skeleton-image and workimage to connect lose leaves and for optimization
-		Image skel = getResultSet().getImage("skeleton_" + ct.toString());
-		Image skel_workimge = getResultSet().getImage("skeleton_workimage_" + ct.toString());
+		Image skel = getResultSet().getImage("skeleton_" + ct.toString()).getImage();
+		Image skel_workimge = getResultSet().getImage("skeleton_workimage_" + ct.toString()).getImage();
 		if (skel != null && skel_workimge != null) {
 			img = img.io().or(skel.copy().io().bm().dilate(15).getImage()).or(skel_workimge).getImage()
 					.show("skel images on mask" + ct.toString(), debugValues);

@@ -1,9 +1,7 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.all;
 
-import iap.blocks.postprocessing.WellProcessing;
 import iap.pipelines.ImageProcessor;
 import iap.pipelines.ImageProcessorOptionsAndResults;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import info.StopWatch;
 
 import java.util.ArrayList;
@@ -37,6 +35,7 @@ import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -49,7 +48,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
@@ -73,15 +71,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	protected DatabaseTarget databaseTarget;
 	private int workOnSubset;
 	private int numberOfSubsets;
-	private boolean forceDebugStack;
-	private ArrayList<ImageStack> forcedDebugStacks;
+	boolean forceDebugStack;
+	ArrayList<ImageStack> forcedDebugStacks;
 	private int prio;
 	private MongoDB m;
 	private TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData;
-	private int unit_test_idx;
-	private int unit_test_steps;
+	int unit_test_idx;
+	int unit_test_steps;
 	private int[] debugValidTrays;
-	private final PipelineDesc pd;
+	final PipelineDesc pd;
 	private String debugLastSystemOptionStorageGroup;
 	private int DEBUG_SINGLE_ANGLE1, DEBUG_SINGLE_ANGLE2, DEBUG_SINGLE_ANGLE3;
 	private boolean filterAngle;
@@ -240,7 +238,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 				if (status.wantsToStop())
 					continue;
-				final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
 				final String plantIDf = plantID;
 				try {
 					progress++;
@@ -249,6 +246,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					Runnable t = new Runnable() {
 						@Override
 						public void run() {
+							TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle_f = workload_imageSetsWithSpecificAngles.get(plantID);
 							try {
 								processPlant(
 										plandID2time2waterData,
@@ -277,7 +275,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			while (!workLoad.isEmpty() && !status.wantsToStop()) {
 				Runnable t = workLoad.poll();
 				String d = workLoad_desc.poll();
-				wait.add(BackgroundThreadDispatcher.addTask(t, d, false));
+				wait.add(BackgroundThreadDispatcher.addTask(t, d, true));
 				progr.addInt(1);
 				String plantName = d;
 				if (plantName.contains(";"))
@@ -332,48 +330,53 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle)
 			throws InterruptedException {
 		
-		final TreeMap<Long, Sample3D> inSamples = new TreeMap<Long, Sample3D>();
-		final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults = new TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>>();
-		final TreeMap<Long, TreeMap<String, ImageData>> analysisInput = new TreeMap<Long, TreeMap<String, ImageData>>();
+		final TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> plantResults = new TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>>();
+		
+		LinkedList<LocalComputeJob> wait = new LinkedList<LocalComputeJob>();
 		
 		if (imageSetWithSpecificAngle != null) {
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
 				if (status.wantsToStop())
 					continue;
 				
-				LinkedList<LocalComputeJob> wait = new LinkedList<LocalComputeJob>();
-				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
-					if (configAndAngle.startsWith("1st_top"))
-						wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
-							@Override
-							public void run() {
+				wait.add(BackgroundThreadDispatcher.addTask(new LocalComputeJob(new Runnable() {
+					@Override
+					public void run() {
+						// LinkedList<LocalComputeJob> wait = new LinkedList<LocalComputeJob>();
+						for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
+							if (configAndAngle.startsWith("1st_top"))
+								// wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+								// @Override
+								// public void run() {
 								processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
-										inSamples, plantResults, analysisInput, time, configAndAngle);
-							}
-						}, "Analyze angle (top) " + configAndAngle));
-				} // for top angle
-				BackgroundThreadDispatcher.waitFor(wait);
-				wait.clear();
-				for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
-					if (status.wantsToStop())
-						continue;
-					
-					if (!configAndAngle.startsWith("1st_top"))
-						wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
-							@Override
-							public void run() {
+										plantResults, time, configAndAngle);
+							// }
+							// }, "Analyze angle (top) " + configAndAngle));
+						} // for top angle
+							// BackgroundThreadDispatcher.waitFor(wait);
+							// wait.clear();
+						for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
+							if (status.wantsToStop())
+								continue;
+							
+							if (!configAndAngle.startsWith("1st_top"))
+								// wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+								// @Override
+								// public void run() {
 								processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
-										inSamples, plantResults, analysisInput, time, configAndAngle);
-							}
-						}, "Analyze angle (side) " + configAndAngle));
-				} // for side angle
-				BackgroundThreadDispatcher.waitFor(wait);
-				wait.clear();
-			} // for each time point
-		} // if image data available
-		
+										plantResults, time, configAndAngle);
+							// }
+							// }, "Analyze angle (side) " + configAndAngle));
+						} // for side angle
+							// BackgroundThreadDispatcher.waitFor(wait);
+							// wait.clear();
+					} // for each time point
+				}, "Analyze timepoint " + time), true));
+			} // if image data available
+		}
+		BackgroundThreadDispatcher.waitFor(wait);
 		if (!plantResults.isEmpty() && !status.wantsToStop()) {
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> postprocessingResults;
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> postprocessingResults;
 			try {
 				synchronized (AbstractPhenotypingTask.class) {
 					ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(pd.getOptions(), null, plantResults);
@@ -381,10 +384,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					postprocessingResults = getImageProcessor()
 							.postProcessPlantResults(
 									plantID2time2waterData2,
-									inSamples, analysisInput,
 									plantResults, status,
 									options);
-					addPostprocessingResults(inSamples, postprocessingResults);
+					addPostprocessingResults(postprocessingResults);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -398,28 +400,22 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	private void processAngle(final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadEqualAngleSnapshotSets, final TreeMap<Long, TreeMap<String, ImageSet>> imageSetWithSpecificAngle,
-			final TreeMap<Long, Sample3D> inSamples, final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults,
-			final TreeMap<Long, TreeMap<String, ImageData>> analysisInput, final Long time, final String configAndAngle) {
+			final TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> plantResults,
+			// final TreeMap<Long, TreeMap<String, ImageData>> analysisInput,
+			final Long time, final String configAndAngle) {
 		if (status.wantsToStop())
 			return;
 		try {
-			if (imageSetWithSpecificAngle.get(time).get(configAndAngle) != null &&
-					imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() != null) {
-				Sample3D inSample = (Sample3D) imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo()
-						.getParentSample();
-				if (inSample != null) {
-					synchronized (inSamples) {
-						inSamples.put(time, inSample);
-					}
-				}
-			} else
+			if (imageSetWithSpecificAngle.get(time).get(configAndAngle) == null ||
+					imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo() == null)
 				return;
+			
 			final ImageData inImage = imageSetWithSpecificAngle.get(time).get(configAndAngle).getAnyInfo();
 			
-			TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint;
+			TreeMap<String, HashMap<String, BlockResultSet>> previousResultsForThisTimePoint;
 			synchronized (plantResults) {
 				if (!plantResults.containsKey(time))
-					plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
+					plantResults.put(time, new TreeMap<String, HashMap<String, BlockResultSet>>());
 				previousResultsForThisTimePoint = plantResults.get(time);
 			}
 			final ResultsAndWaitThreads resultsAndWaitThreads = processAngleWithinSnapshot(
@@ -428,21 +424,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					workloadEqualAngleSnapshotSets,
 					getParentPriority(), previousResultsForThisTimePoint, plantResults, configAndAngle);
 			
-			HashMap<Integer, BlockResultSet> results = resultsAndWaitThreads.getResults();
-			synchronized (inSamples) {
-				processVolumeOutput(inSamples.get(time), results);
-			}
+			HashMap<String, BlockResultSet> results = resultsAndWaitThreads.getResults();
+			processVolumeOutput(results);
+			
 			if (results != null) {
-				synchronized (analysisInput) {
-					if (!analysisInput.containsKey(time))
-						analysisInput.put(time, new TreeMap<String, ImageData>());
-					synchronized (plantResults) {
-						synchronized (plantResults.get(time)) {
-							if (!plantResults.containsKey(time))
-								plantResults.put(time, new TreeMap<String, HashMap<Integer, BlockResultSet>>());
-							analysisInput.get(time).put(configAndAngle, inImage);
-							plantResults.get(time).put(configAndAngle, results);
-						}
+				synchronized (plantResults) {
+					synchronized (plantResults.get(time)) {
+						if (!plantResults.containsKey(time))
+							plantResults.put(time, new TreeMap<String, HashMap<String, BlockResultSet>>());
+						plantResults.get(time).put(configAndAngle, results);
 					}
 				}
 			}
@@ -453,9 +443,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		return;
 	}
 	
-	private void processVolumeOutput(Sample3D inSample, HashMap<Integer, BlockResultSet> analysisResultsArray) {
-		for (Integer key : analysisResultsArray.keySet()) {
-			BlockResultSet analysisResults = analysisResultsArray.get(key);
+	private void processVolumeOutput(HashMap<String, BlockResultSet> analysisResultsArray) {
+		for (String well : analysisResultsArray.keySet()) {
+			BlockResultSet analysisResults = analysisResultsArray.get(well);
 			for (String volumeID : analysisResults.getVolumeNames()) {
 				VolumeData v = analysisResults.getVolume(volumeID);
 				if (v != null) {
@@ -465,10 +455,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						StopWatch s = new StopWatch(
 								SystemAnalysis.getCurrentTime() + ">SAVE VOLUME");
 						if (databaseTarget != null) {
-							databaseTarget.saveVolume((LoadedVolume) v, inSample,
+							databaseTarget.saveVolume((LoadedVolume) v, (Sample3D) v.getParentSample(),
 									m, null, null);
-							VolumeData volumeInDatabase = new VolumeData(inSample,
-									v);
+							VolumeData volumeInDatabase = new VolumeData(v.getParentSample(), v);
 							volumeInDatabase.getURL().setPrefix(
 									databaseTarget.getPrefix());
 							volumeInDatabase.getURL().setDetail(
@@ -702,42 +691,40 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		return result;
 	}
 	
-	private void processResults(ImageData copyFrom, HashMap<Integer, BlockResultSet> tray2analysisResults) {
+	private void processResults(HashMap<String, BlockResultSet> tray2analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 1");
 		}
 		
 		boolean multiTray = tray2analysisResults.keySet().size() > 1;
-		for (Integer tray : tray2analysisResults.keySet()) {
+		for (String tray : tray2analysisResults.keySet()) {
 			for (BlockResultValue bpv : tray2analysisResults.get(tray).searchResults("RESULT_")) {
-				if (bpv.getName() == null)
+				if (bpv == null || bpv.getName() == null)
 					continue;
 				
-				if (bpv.getBinary() != null) {
-					ImageData id = ((ImageData) bpv.getBinary());
-					
-					// System.out.println("d/e/f=" + " // " + bpv.getName() + " // " + copyFrom.getSubstanceName() + " // "
-					// + id.getURL().getFileName() + " // " + id.getSubstanceName());
-					outputAdd(bpv.getBinary());
+				if (bpv.getObject() != null && bpv.getObject() instanceof ImageAndImageData) {
+					outputAdd(((ImageAndImageData) bpv.getObject()).getImageData());
 				} else {
-					NumericMeasurement3D m = new NumericMeasurement3D(copyFrom, bpv.getName(), null);
-					// m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-					m.setAnnotation(null);
-					m.setValue(bpv.getValue());
-					m.setUnit(bpv.getUnit());
-					if (multiTray)
-						m.setQualityAnnotation(m.getQualityAnnotation() + "_" + WellProcessing.getWellID(tray, tray2analysisResults.keySet().size(), m));
-					
-					outputAdd(m);
+					if (bpv.getBinary() == null) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Invalid result with no reference information: " + bpv.getName());
+					} else {
+						NumericMeasurement3D m = new NumericMeasurement3D(bpv.getBinary(), bpv.getName(), null);
+						// m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
+						m.setAnnotation(null);
+						m.setValue(bpv.getValue());
+						m.setUnit(bpv.getUnit());
+						if (multiTray)
+							m.setQualityAnnotation(m.getQualityAnnotation() + "_" + tray);
+						
+						outputAdd(m);
+					}
 				}
 			}
 		}
 	}
 	
-	private void addPostprocessingResults(
-			TreeMap<Long, Sample3D> inSamples,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults) {
+	private void addPostprocessingResults(TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> analysisResults) {
 		if (output == null) {
 			System.err.println("Internal Error: Output is NULL!!");
 			throw new RuntimeException("Internal Error: Output is NULL!! 2");
@@ -748,7 +735,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				int trays = analysisResults.get(time).get(configName).keySet().size();
 				boolean multiTray = trays > 1;
 				
-				for (Integer tray : analysisResults.get(time).get(configName).keySet()) {
+				for (String tray : analysisResults.get(time).get(configName).keySet()) {
 					boolean multipleTrays = analysisResults.get(time).get(configName).keySet().size() > 1;
 					for (String volumeID : analysisResults.get(time).get(configName).get(tray).getVolumeNames()) {
 						VolumeData v = analysisResults.get(time).get(configName).get(tray).getVolume(volumeID);
@@ -795,51 +782,32 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					}
 					synchronized (analysisResults.get(time)) {
 						for (BlockResultValue bpv : analysisResults.get(time).get(configName).get(tray).searchResults("RESULT_")) {
-							if (bpv.getName() == null)
+							if (bpv == null || bpv.getName() == null)
 								continue;
 							String name = bpv.getName();
 							if (name.contains("_cut.")) {
 								name = name.substring(0, name.indexOf("_cut."));
 							}
 							
-							NumericMeasurement3D m = new NumericMeasurement3D(
-									new NumericMeasurement(inSamples.get(time)), name, inSamples.get(time)
-											.getParentCondition().getExperimentName()
-											+ " ("
-											+ getName() + ")");
-							
-							if (bpv != null && m != null) {
+							try {
+								NumericMeasurement3D m = new NumericMeasurement3D(
+										bpv.getBinary(), name,
+										bpv.getBinary().getParentSample().getParentCondition().getExperimentName()
+												+ " ("
+												+ getName() + ")");
+								
 								m.setValue(bpv.getValue());
 								m.setUnit(bpv.getUnit());
-								if (inSamples.get(time).size() > 0) {
-									NumericMeasurement3D template = (NumericMeasurement3D) inSamples.get(time).iterator().next();
-									m.setReplicateID(template.getReplicateID());
-									m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-									
-									if (multiTray)
-										m.setQualityAnnotation(template.getQualityAnnotation() + "_" + WellProcessing.getWellID(tray, trays, m));
-									else
-										m.setQualityAnnotation(template.getQualityAnnotation());
-									
-									// rotation angle needs to be determined from the config-name
-									if (bpv.getPosition() != null)
-										m.setPosition(bpv.getPosition());
-									else {
-										String angle = configName;
-										if (angle != null && angle.contains(";"))
-											angle = angle.split(";")[1];
-										try {
-											double ra = Double.parseDouble(angle);
-											m.setPosition(ra);
-										} catch (Exception e) {
-											System.out
-													.println(SystemAnalysis.getCurrentTime() + ">WARNING: Can't determine rotation angle from config '" + configName + "'!");
-											m.setPosition(null);// template.getPosition());
-										}
-									}
-									m.setPositionUnit(template.getPositionUnit());
-								}
+								
+								m.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
+								
+								if (multiTray)
+									m.setQualityAnnotation(m.getQualityAnnotation() + "_" + tray);
+								
 								outputAdd(m);
+							} catch (Exception err) {
+								System.out.println("ERROR: " + name);
+								err.printStackTrace();
 							}
 						}
 					}
@@ -856,8 +824,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private ResultsAndWaitThreads processAngleWithinSnapshot(final ImageSet id,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			final int workloadSnapshotAngles, int parentPriority,
-			final TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint,
-			final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults, final String configAndAngle)
+			final TreeMap<String, HashMap<String, BlockResultSet>> previousResultsForThisTimePoint,
+			final TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> plantResults, final String configAndAngle)
 			throws Exception {
 		// ArrayList<LocalComputeJob> waitThreads = new ArrayList<LocalComputeJob>();
 		final ImageData inVis = id.getVisInfo() != null ? id.getVisInfo().copy() : null;
@@ -878,67 +846,9 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			return null;
 		}
 		
-		OptionsGenerator og = new OptionsGenerator() {
-			@Override
-			public ImageSet getImageSet() {
-				final ImageSet input = new ImageSet();
-				
-				input.setImageInfo(inVis, inFluo, inNir, inIr);
-				return input;
-			}
-			
-			@Override
-			public ImageSet getMaskSet() {
-				final ImageSet inputMasks = new ImageSet();
-				
-				inputMasks.setImageInfo(inVis, inFluo, inNir, inIr);
-				return inputMasks;
-			}
-			
-			@Override
-			public ImageProcessorOptionsAndResults getOptions() {
-				ImageProcessorOptionsAndResults options = new ImageProcessorOptionsAndResults(pd.getOptions(), previousResultsForThisTimePoint, plantResults);
-				options.setConfigAndAngle(configAndAngle);
-				options.setUnitTestInfo(unit_test_idx, unit_test_steps);
-				
-				options.forceDebugStack = forceDebugStack;
-				options.forcedDebugStacks = forcedDebugStacks;
-				
-				options.databaseTarget = databaseTarget;
-				options.setCustomNullBlockPrefix("Separate Settings");
-				
-				{
-					boolean processEarlyTimes = options.getBooleanSetting(null, "Early//Custom settings for early timepoints", false);
-					boolean processLateTimes = options.getBooleanSetting(null, "Late//Custom settings for late timepoints", false);
-					int earlyTimeUntilDayX = options.getIntSetting(null, "Early//Early time until time point", -1);
-					int lateTimeUntilDayX = options.getIntSetting(null, "Late//Late time until time point", -1);
-					String timeInfo = null;
-					if (processEarlyTimes && id.getAnyInfo().getParentSample().getTime() <= earlyTimeUntilDayX)
-						timeInfo = "early";
-					else
-						if (processLateTimes && id.getAnyInfo().getParentSample().getTime() >= lateTimeUntilDayX)
-							timeInfo = "late";
-					
-					String info = id.getAnyInfo().getParentSample().getParentCondition().getParentSubstance().getInfo();
-					if (id.isSideImage())
-						options.setCameraInfos(CameraPosition.SIDE,
-								info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo, id.getAnyInfo()
-										.getPosition());
-					else
-						options.setCameraInfos(CameraPosition.TOP,
-								info != null && options.getBooleanSetting(null, info + "//Custom settings", false) ? info : null, timeInfo, id.getAnyInfo()
-										.getPosition());
-					options.setCustomNullBlockPrefix(null);
-				}
-				
-				if (forceDebugStack) {
-					AbstractPhenotypingTask.this.setDebugLastSystemOptionStorageGroup(options.getSystemOptionStorageGroup(null));
-				}
-				return options;
-			}
-		};
+		OptionsGenerator og = new OptionsGenerator1(this, inIr, id, plantResults, inFluo, inNir, configAndAngle, inVis, previousResultsForThisTimePoint);
 		
-		HashMap<Integer, BlockResultSet> well2analysisResults = null;
+		HashMap<String, BlockResultSet> well2analysisResults = null;
 		
 		ImageProcessor imageProcessor = getImageProcessor();
 		{
@@ -951,14 +861,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		}
 		
 		if (well2analysisResults != null) {
-			ImageData anyInfo = inVis;
-			if (anyInfo == null)
-				anyInfo = inFluo;
-			if (anyInfo == null)
-				anyInfo = inNir;
-			if (anyInfo == null)
-				anyInfo = inIr;
-			processResults(anyInfo, well2analysisResults);
+			processResults(well2analysisResults);
 		}
 		return new ResultsAndWaitThreads(well2analysisResults, new ArrayList<LocalComputeJob>());
 	}

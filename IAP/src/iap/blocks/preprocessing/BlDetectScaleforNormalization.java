@@ -128,9 +128,9 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 							* optionsAndResults.getREAL_MARKER_DISTANCE() / valrs);
 					getResultSet()
 							.setNumericResult(getBlockPosition(), new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "ruler_length.detected"),
-									clusterDimensions[minRatioPositionInClusterArray].x, "px", this);
+									clusterDimensions[minRatioPositionInClusterArray].x, "px", this, input().images().getVisInfo());
 					getResultSet().setNumericResult(getBlockPosition(), new Trait(pos, CameraType.VIS, TraitCategory.OPTICS, "ruler_length.real"),
-							valrs, "mm", this);
+							valrs, "mm", this, input().images().getVisInfo());
 				}
 			}
 			

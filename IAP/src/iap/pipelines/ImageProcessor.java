@@ -8,8 +8,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.OptionsGenerator;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public interface ImageProcessor {
 	
@@ -19,7 +17,7 @@ public interface ImageProcessor {
 	/**
 	 * @return mapping from tray to analysis results
 	 */
-	public abstract HashMap<Integer, BlockResultSet> getNumericResults();
+	public abstract HashMap<String, BlockResultSet> getNumericResults();
 	
 	public abstract BlockPipeline getPipeline(ImageProcessorOptionsAndResults options);
 	
@@ -27,11 +25,9 @@ public interface ImageProcessor {
 	
 	public abstract BackgroundTaskStatusProviderSupportingExternalCall getStatus();
 	
-	public abstract TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> postProcessPlantResults(
+	public abstract TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> postProcessPlantResults(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
-			TreeMap<Long, Sample3D> inSample,
-			TreeMap<Long, TreeMap<String, ImageData>> inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			ImageProcessorOptionsAndResults options)
 			throws Exception;

@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -28,7 +29,9 @@ public class BlSkeletonizeNir extends AbstractSnapshotAnalysisBlock {
 				Image sk = nirMask.copy().io().skeletonize().getImage();
 				if (sk != null) {
 					sk = mapOriginalOnSkel(sk, nirMask, optionsAndResults.getBackground());
-					getResultSet().setImage(getBlockPosition(), "nir_skeleton", sk.show("SKELETON", debug), true);
+					getResultSet()
+							.setImage(getBlockPosition(), "nir_skeleton",
+									new ImageAndImageData(sk.show("SKELETON", debug), input().masks().getNirInfo()), true);
 					if (getBoolean("draw_skeleton", true)) {
 						addPostprocessor(nirMask, sk, CameraType.NIR);
 					}
