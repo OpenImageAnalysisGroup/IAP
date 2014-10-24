@@ -34,7 +34,7 @@ public class ImageProcessorOptionsAndResults {
 	private CameraPosition cameraPosition = CameraPosition.UNKNOWN;
 	private NeighbourhoodSetting neighbourhood = NeighbourhoodSetting.NB4;
 	private final int nirBackground = new Color(180, 180, 180).getRGB();
-	private int well_cnt;
+	private int well_cnt, well_idx;
 	private int unit_test_idx;
 	private int unit_test_steps;
 	private SystemOptions optSystemOptionStorage;
@@ -43,14 +43,14 @@ public class ImageProcessorOptionsAndResults {
 	
 	private String customNullBlockPrefix;
 	
-	private final TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint;
+	private final TreeMap<String, HashMap<String, BlockResultSet>> previousResultsForThisTimePoint;
 	
 	private Double cameraAngle;
 	
-	private final TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults;
+	private final TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> plantResults;
 	
-	public ImageProcessorOptionsAndResults(SystemOptions options, TreeMap<String, HashMap<Integer, BlockResultSet>> previousResultsForThisTimePoint,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> plantResults) {
+	public ImageProcessorOptionsAndResults(SystemOptions options, TreeMap<String, HashMap<String, BlockResultSet>> previousResultsForThisTimePoint,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> plantResults) {
 		this.optSystemOptionStorage = options;
 		this.previousResultsForThisTimePoint = previousResultsForThisTimePoint;
 		this.plantResults = plantResults;
@@ -129,12 +129,17 @@ public class ImageProcessorOptionsAndResults {
 		return nirBackground;
 	}
 	
-	public void setWellCnt(int tray_cnt) {
+	public void setWellCnt(int tray_idx, int tray_cnt) {
+		this.well_idx = tray_idx;
 		this.well_cnt = tray_cnt;
 	}
 	
 	public int getWellCnt() {
 		return well_cnt;
+	}
+	
+	public int getWellIdx() {
+		return well_idx;
 	}
 	
 	public void setUnitTestInfo(int unit_test_idx, int unit_test_steps) {
@@ -338,7 +343,7 @@ public class ImageProcessorOptionsAndResults {
 	}
 	
 	public TreeMap<Long, ArrayList<BlockResultValue>> searchPreviousResults(String string,
-			boolean exact, int well, String valid_config, boolean removeReturnedValue) {
+			boolean exact, String well, String valid_config, boolean removeReturnedValue) {
 		if (valid_config == null) {
 			throw new IllegalArgumentException("valid_config must not be null!");
 		}
@@ -363,9 +368,9 @@ public class ImageProcessorOptionsAndResults {
 	 * @return config -> result list
 	 */
 	public HashMap<String, ArrayList<BlockResultValue>> searchResultsOfCurrentSnapshot(String string,
-			boolean exact, int valid_well, String valid_config, boolean removeReturnedValue, TreeMap<String, HashMap<Integer, BlockResultSet>> optPreviousResult) {
+			boolean exact, String valid_well, String valid_config, boolean removeReturnedValue, TreeMap<String, HashMap<String, BlockResultSet>> optPreviousResult) {
 		HashMap<String, ArrayList<BlockResultValue>> res = new HashMap<String, ArrayList<BlockResultValue>>();
-		TreeMap<String, HashMap<Integer, BlockResultSet>> ds = optPreviousResult;
+		TreeMap<String, HashMap<String, BlockResultSet>> ds = optPreviousResult;
 		if (ds == null)
 			ds = previousResultsForThisTimePoint;
 		if (ds != null) {
@@ -373,10 +378,10 @@ public class ImageProcessorOptionsAndResults {
 				for (String config : ds.keySet()) {
 					if (valid_config != null && !valid_config.equals(config))
 						continue;
-					HashMap<Integer, BlockResultSet> rs = ds.get(config);
+					HashMap<String, BlockResultSet> rs = ds.get(config);
 					if (rs != null && !rs.isEmpty()) {
-						for (Integer well : rs.keySet()) {
-							if (well != valid_well)
+						for (String well : rs.keySet()) {
+							if (!valid_well.equals(well))
 								continue;
 							ArrayList<BlockResultValue> v = rs.get(well).searchResults(exact, string, removeReturnedValue);
 							if (v != null)

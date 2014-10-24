@@ -243,7 +243,7 @@ public class IntensityAnalysis {
 				result.addValue("hsv.s.mean", savg);
 				result.addValue("hsv.v.mean", vavg);
 				
-				if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
+				if (mode == Mode.MODE_HUE_VIS_ANALYSIS && isVisibleInputImage) {
 					result.addValue("hsv.dgci.mean", sumOfDGCIs2 / plantImagePixelCntVgreater0);
 				}
 			}

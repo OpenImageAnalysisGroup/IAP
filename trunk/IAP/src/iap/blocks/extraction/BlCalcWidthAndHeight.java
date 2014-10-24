@@ -21,8 +21,6 @@ import de.ipk.ag_ba.image.operation.TopBottomLeftRight;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * Calculates the plant width and height properties from the visible light image mask.
@@ -165,17 +163,17 @@ public class BlCalcWidthAndHeight extends
 							.setNumericResult(
 									getBlockPosition(),
 									new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, WIDTH_NORM),
-									values.x * (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this);
+									values.x * (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this, input().images().getVisInfo());
 					getResultSet()
 							.setNumericResult(
 									getBlockPosition(),
 									new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, HEIGHT_NORM),
-									values.y * (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this);
+									values.y * (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this, input().images().getVisInfo());
 				}
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, WIDTH), values.x, "px", this);
+						new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, WIDTH), values.x, "px", this, input().images().getVisInfo());
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, HEIGHT), values.y, "px", this);
+						new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, HEIGHT), values.y, "px", this, input().images().getVisInfo());
 				
 			}
 		}
@@ -197,18 +195,16 @@ public class BlCalcWidthAndHeight extends
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
-			TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			CalculatesProperties propertyCalculator) throws InterruptedException {
 		super.postProcessResultsForAllTimesAndAngles(plandID2time2waterData,
-				time2inSamples, time2inImages, time2allResultsForSnapshot, time2summaryResult, optStatus, this);
+				time2allResultsForSnapshot, time2summaryResult, optStatus, this);
 		
 		for (CameraPosition cp : new CameraPosition[] { CameraPosition.SIDE, CameraPosition.TOP })
 			for (CameraType ct : CameraType.values())
-				calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
+				calculateRelativeValues(time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
 						new String[] {
 								new Trait(cp, ct, TraitCategory.GEOMETRY, "width").toString(),
 								new Trait(cp, ct, TraitCategory.GEOMETRY, "width.norm").toString(),

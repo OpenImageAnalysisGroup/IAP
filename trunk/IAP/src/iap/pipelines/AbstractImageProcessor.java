@@ -15,23 +15,21 @@ import org.graffiti.util.InstanceLoader;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.OptionsGenerator;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author pape, klukas
  */
 public abstract class AbstractImageProcessor implements ImageProcessor {
 	
-	private final HashMap<Integer, BlockResultSet> blockResults;
+	private final HashMap<String, BlockResultSet> blockResults;
 	private int[] debugValidTrays;
 	protected BackgroundTaskStatusProviderSupportingExternalCall status;
 	
 	public AbstractImageProcessor() {
-		this(new HashMap<Integer, BlockResultSet>());
+		this(new HashMap<String, BlockResultSet>());
 	}
 	
-	public AbstractImageProcessor(HashMap<Integer, BlockResultSet> blockResults) {
+	public AbstractImageProcessor(HashMap<String, BlockResultSet> blockResults) {
 		this.blockResults = blockResults;
 	}
 	
@@ -51,7 +49,7 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	}
 	
 	@Override
-	public HashMap<Integer, BlockResultSet> getNumericResults() {
+	public HashMap<String, BlockResultSet> getNumericResults() {
 		return blockResults;
 	}
 	
@@ -59,19 +57,15 @@ public abstract class AbstractImageProcessor implements ImageProcessor {
 	public abstract BlockPipeline getPipeline(ImageProcessorOptionsAndResults options);
 	
 	@Override
-	public TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> postProcessPlantResults(
+	public TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> postProcessPlantResults(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData2,
-			TreeMap<Long, Sample3D> inSample,
-			TreeMap<Long, TreeMap<String, ImageData>> inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> analysisResults,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> analysisResults,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			ImageProcessorOptionsAndResults options) throws InstantiationException,
 			IllegalAccessException, InterruptedException {
 		BlockPipeline pipeline = getPipeline(options);
 		return pipeline.postProcessPipelineResultsForAllAngles(
 				plandID2time2waterData2,
-				inSample,
-				inImages,
 				analysisResults,
 				optStatus, options);
 	}

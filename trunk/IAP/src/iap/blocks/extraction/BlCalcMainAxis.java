@@ -61,10 +61,10 @@ public class BlCalcMainAxis
 				
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, TraitCategory.GEOMETRY, "main_axis.rotation"), angle,
-						"degree", this);
+						"degree", this, input().images().getFluoInfo());
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(optionsAndResults.getCameraPosition(), CameraType.FLUO, TraitCategory.GEOMETRY, "main_axis.normalized.distance.mean"),
-						normalizedDistanceToMainAxis, this);
+						normalizedDistanceToMainAxis, this, input().images().getFluoInfo());
 			}
 		}
 		return input().masks().fluo();

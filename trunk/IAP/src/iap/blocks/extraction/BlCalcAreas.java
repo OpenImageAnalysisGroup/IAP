@@ -16,7 +16,6 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
@@ -33,7 +32,7 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 	protected Image processVISmask() {
 		Image image = input().masks().vis();
 		if (getBoolean("process VIS mask", true))
-			processImage(CameraType.VIS, image);
+			processImage(CameraType.VIS, image, input().images().getVisInfo());
 		return image;
 	}
 	
@@ -41,7 +40,7 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 	protected Image processFLUOmask() {
 		Image image = input().masks().fluo();
 		if (getBoolean("process FLUO mask", true))
-			processImage(CameraType.FLUO, image);
+			processImage(CameraType.FLUO, image, input().images().getFluoInfo());
 		return image;
 	}
 	
@@ -49,7 +48,7 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 	protected Image processNIRmask() {
 		Image image = input().masks().nir();
 		if (getBoolean("process NIR mask", false))
-			processImage(CameraType.NIR, image);
+			processImage(CameraType.NIR, image, input().images().getNirInfo());
 		return image;
 	}
 	
@@ -57,11 +56,11 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 	protected Image processIRmask() {
 		Image image = input().masks().ir();
 		if (getBoolean("process IR mask", false))
-			processImage(CameraType.IR, image);
+			processImage(CameraType.IR, image, input().images().getIrInfo());
 		return image;
 	}
 	
-	private void processImage(CameraType ct, Image image) {
+	private void processImage(CameraType ct, Image image, ImageData imageRef) {
 		if (image == null)
 			return;
 		
@@ -78,25 +77,23 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 		if (distHorizontal != null) {
 			getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), ct, TraitCategory.GEOMETRY, AREA_NORM),
 					filledArea * normFactorArea,
-					"mm^2", this);
+					"mm^2", this, imageRef);
 		}
 		getResultSet().setNumericResult(getBlockPosition(), new Trait(optionsAndResults.getCameraPosition(), ct, TraitCategory.GEOMETRY, AREA), filledArea,
-				"px^2", this);
+				"px^2", this, imageRef);
 	}
 	
 	@Override
 	public void postProcessResultsForAllTimesAndAngles(
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
-			TreeMap<Long, Sample3D> time2inSamples,
-			TreeMap<Long, TreeMap<String, ImageData>> time2inImages,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2allResultsForSnapshot,
-			TreeMap<Long, TreeMap<String, HashMap<Integer, BlockResultSet>>> time2summaryResult,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2allResultsForSnapshot,
+			TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> time2summaryResult,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			CalculatesProperties propertyCalculator) {
 		
 		for (CameraPosition cp : new CameraPosition[] { CameraPosition.SIDE, CameraPosition.TOP })
 			for (CameraType ct : CameraType.values())
-				calculateRelativeValues(time2inSamples, time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
+				calculateRelativeValues(time2allResultsForSnapshot, time2summaryResult, getBlockPosition(),
 						new String[] {
 								new Trait(cp, ct, TraitCategory.GEOMETRY, "area").toString(),
 								new Trait(cp, ct, TraitCategory.GEOMETRY, "area.norm").toString()

@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class BlDetectLeafCenterPoints extends AbstractBlock implements CalculatesProperties {
 	
@@ -32,13 +33,13 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			// only top images
 			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 				LinkedList<Feature> pointList = detectCenterPoints(res);
-				res = saveAndMarkResults(res, pointList);
+				res = saveAndMarkResults(res, pointList, input().images().getImageInfo(mask.getCameraType()));
 			}
 		}
 		return res;
 	}
 	
-	private Image saveAndMarkResults(Image img, LinkedList<Feature> pointList) {
+	private Image saveAndMarkResults(Image img, LinkedList<Feature> pointList, ImageData imageRef) {
 		boolean markResults = getBoolean("Mark Center Points in Result Image", false);
 		boolean saveResults = true;
 		boolean saveResultObject = true;
@@ -55,18 +56,18 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			CameraPosition pos = optionsAndResults.getCameraPosition();
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf.count"), pointList.size(), "leaves", this);
+					new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf.count"), pointList.size(), "leaves", this, imageRef);
 			
 			// save x and y position
 			int num = 0;
 			for (Feature p : pointList) {
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.x"), (int) p.getPosition().getX(),
-						"leaves", this);
+						"leaves", this, imageRef);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.y"), (int) p.getPosition().getY(),
-						"leaves", this);
+						"leaves", this, imageRef);
 				num++;
 			}
 		}

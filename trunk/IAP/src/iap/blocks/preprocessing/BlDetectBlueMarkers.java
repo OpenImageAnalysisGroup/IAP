@@ -79,16 +79,16 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 				for (MarkerPair mp : numericResult) {
 					if (mp.getLeft() != null) {
 						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(optionsAndResults.getCameraPosition()),
-								mp.getLeft().x / w, this);
+								mp.getLeft().x / w, this, input().images().getVisInfo());
 						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(optionsAndResults.getCameraPosition()),
-								mp.getLeft().y / h, this);
+								mp.getLeft().y / h, this, input().images().getVisInfo());
 					}
 					i += 2;
 					if (mp.getRight() != null) {
 						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i).getName(optionsAndResults.getCameraPosition()),
-								mp.getRight().x / w, this);
+								mp.getRight().x / w, this, input().images().getVisInfo());
 						getResultSet().setNumericResult(0, PropertyNames.getMarkerPropertyNameFromIndex(i + 1).getName(optionsAndResults.getCameraPosition()),
-								mp.getRight().y / h, this);
+								mp.getRight().y / h, this, input().images().getVisInfo());
 					}
 					i += 2;
 					n++;
@@ -115,11 +115,11 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 				cameraConfig = "unknown camera config";
 			getResultSet().setNumericResult(0,
 					new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "marker.horizontal_distance"), maxDist, "px",
-					this);
+					this, input().images().getVisInfo());
 			getResultSet().setNumericResult(0,
 					new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "marker.horizontal_distance.predefined"), 1,
 					"0/1",
-					this);
+					this, input().images().getVisInfo());
 			optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);
 		} else
 			if (!numericResult.isEmpty()) {
@@ -134,7 +134,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 							* imageWidth;
 					
 					getResultSet().setNumericResult(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_LEFT.getName(optionsAndResults.getCameraPosition()),
-							Math.abs(markerPosTwoLeft - markerPosOneLeft), this);
+							Math.abs(markerPosTwoLeft - markerPosOneLeft), "px", this, input().images().getVisInfo());
 					if (debug)
 						System.out.println("dist_vertical: " + (markerPosTwoLeft - markerPosOneLeft));
 				}
@@ -149,7 +149,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 							* imageWidth;
 					
 					getResultSet().setNumericResult(0, PropertyNames.MARKER_DISTANCE_BOTTOM_TOP_RIGHT.getName(optionsAndResults.getCameraPosition()),
-							Math.abs(markerPosTwoRight - markerPosOneRight), this);
+							Math.abs(markerPosTwoRight - markerPosOneRight), "px", this, input().images().getVisInfo());
 					if (debug)
 						System.out.println("dist_vertical: " + (markerPosTwoRight - markerPosOneRight));
 				}
@@ -168,7 +168,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 				getResultSet()
 						.setNumericResult(0,
 								new Trait(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.OPTICS, "marker.horizontal_distance"), maxDist,
-								"px", this);
+								"px", this, input().images().getVisInfo());
 				
 				if (maxDist > 0)
 					optionsAndResults.setCalculatedBlueMarkerDistance(maxDist);

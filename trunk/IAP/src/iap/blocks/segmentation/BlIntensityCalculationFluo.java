@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.fluoop.FluoAnalysis;
+import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
@@ -26,7 +27,10 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		if (getBoolean("Store Unchanged Fluo for Color Analysis", true))
-			getResultSet().setImage(getBlockPosition(), "inp_fluo", input().masks().fluo(), true);
+			getResultSet().setImage(getBlockPosition(), "inp_fluo",
+					new ImageAndImageData(
+							input().masks().fluo(),
+							input().masks().getFluoInfo()), true);
 		
 		boolean debug = getBoolean("debug", false);
 		ImageOperation io = new ImageOperation(input().masks().fluo()).applyMask_ResizeSourceIfNeeded(input().images().fluo(),
@@ -51,7 +55,8 @@ public class BlIntensityCalculationFluo extends AbstractSnapshotAnalysisBlock {
 			fis.show("Fluorescence Segmentation Results");
 		}
 		
-		getResultSet().setImage(getBlockPosition(), BlAdaptiveSegmentationFluo.RESULT_OF_FLUO_INTENSITY, r, true);
+		getResultSet().setImage(getBlockPosition(), BlAdaptiveSegmentationFluo.RESULT_OF_FLUO_INTENSITY,
+				new ImageAndImageData(r, input().masks().getFluoInfo()), true);
 		
 		return input().masks().fluo().io().applyMask(r).getImage();
 	}

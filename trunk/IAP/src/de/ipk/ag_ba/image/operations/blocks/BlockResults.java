@@ -24,12 +24,13 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
 import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
-import de.ipk.ag_ba.image.structures.ImageInMemory;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 /**
@@ -37,9 +38,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  */
 public class BlockResults implements BlockResultSet {
 	
-	private final TreeMap<Integer, TreeMap<String, Double>> storedNumerics = new TreeMap<Integer, TreeMap<String, Double>>();
+	private final TreeMap<Integer, TreeMap<String, DoubleAndImageData>> storedNumerics = new TreeMap<Integer, TreeMap<String, DoubleAndImageData>>();
 	private final TreeMap<Integer, TreeMap<String, ThreadSafeOptions>> storedObjects = new TreeMap<Integer, TreeMap<String, ThreadSafeOptions>>();
-	private TreeMap<Integer, TreeMap<String, ImageData>> storedImages = new TreeMap<Integer, TreeMap<String, ImageData>>();
+	private TreeMap<Integer, TreeMap<String, ImageAndImageData>> storedImages = new TreeMap<Integer, TreeMap<String, ImageAndImageData>>();
 	private final HashMap<String, VolumeData> storedVolumes = new HashMap<String, VolumeData>();
 	private final ArrayList<RunnableOnImageSet> storedPostProcessors = new ArrayList<RunnableOnImageSet>();
 	private final Double cameraAngle;
@@ -77,8 +78,8 @@ public class BlockResults implements BlockResultSet {
 							if (storedNumerics.get(index).containsKey(name)) {
 								foundCount++;
 								if (foundCount == searchIndex) {
-									Double d = storedNumerics.get(index).get(name);
-									return new BlockResult(d, index);
+									DoubleAndImageData d = storedNumerics.get(index).get(name);
+									return new BlockResult(d.getValue(), index);
 								}
 							}
 						}
@@ -97,12 +98,12 @@ public class BlockResults implements BlockResultSet {
 				return null;
 			} else {
 				if (searchNumericValue_true_searchObject_false) {
-					Double d = storedNumerics.get(
+					DoubleAndImageData d = storedNumerics.get(
 							currentPositionInPipeline + searchIndex).get(name);
 					if (d == null)
 						return null;
 					else
-						return new BlockResult(d, currentPositionInPipeline + searchIndex);
+						return new BlockResult(d.getValue(), currentPositionInPipeline + searchIndex);
 				} else {
 					ThreadSafeOptions d = storedObjects.get(
 							currentPositionInPipeline + searchIndex).get(name);
@@ -117,24 +118,27 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized void setNumericResult(int position, Trait name,
-			double value, CalculatesProperties descriptionProvider) {
+			double value, CalculatesProperties descriptionProvider, NumericMeasurement3D imageRef) {
+		if (descriptionProvider == null)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No valid property-calculator object provided. Trait: " + name
+					+ " Indicating possibly incomplete trait description.");
 		if (!storedNumerics.containsKey(position))
-			storedNumerics.put(position, new TreeMap<String, Double>());
+			storedNumerics.put(position, new TreeMap<String, DoubleAndImageData>());
 		
-		storedNumerics.get(position).put(name.toString(), value);
+		storedNumerics.get(position).put(name.toString(), new DoubleAndImageData(value, imageRef));
 	}
 	
 	@Override
 	public synchronized void setNumericResult(int position, Trait trait,
-			double value, String unit, CalculatesProperties description) {
+			double value, String unit, CalculatesProperties descriptionProvider, NumericMeasurement3D imageRef) {
 		String name = trait.toString();
-		if (description == null)
-			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No valid property-calculator object provided. "
-					+ "Indicating possibly incomplete trait description.");
+		if (descriptionProvider == null)
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No valid property-calculator object provided. Trait: " + name
+					+ " Indicating possibly incomplete trait description.");
 		if (!storedNumerics.containsKey(position))
-			storedNumerics.put(position, new TreeMap<String, Double>());
+			storedNumerics.put(position, new TreeMap<String, DoubleAndImageData>());
 		
-		storedNumerics.get(position).put(name, value);
+		storedNumerics.get(position).put(name, new DoubleAndImageData(value, imageRef));
 		
 		if (unit != null) {
 			name2unit.put(name, unit);
@@ -209,9 +213,9 @@ public class BlockResults implements BlockResultSet {
 		ArrayList<BlockResultValue> result = new ArrayList<BlockResultValue>();
 		{
 			// analyse numeric store
-			Collection<TreeMap<String, Double>> sv = storedNumerics.values();
+			Collection<TreeMap<String, DoubleAndImageData>> sv = storedNumerics.values();
 			if (sv != null)
-				for (TreeMap<String, Double> tm : sv) {
+				for (TreeMap<String, DoubleAndImageData> tm : sv) {
 					String toRemove = null;
 					Set<String> ks = tm.keySet();
 					if (ks != null)
@@ -229,13 +233,16 @@ public class BlockResults implements BlockResultSet {
 										String name = key.substring(search.length());
 										BlockResultValue p = new BlockResultValue(
 												name, getUnitFromName(key),
-												tm.get(key), cameraAngle);
+												tm.get(key).getValue(), cameraAngle,
+												tm.get(key).getImageData());
 										result.add(p);
 										toRemove = key;
 									}
 								} else {
 									BlockResultValue p = new BlockResultValue(
-											pn.getName(null).toString(), pn.getUnit(), tm.get(key), cameraAngle);
+											pn.getName(null).toString(), pn.getUnit(),
+											tm.get(key).getValue(), cameraAngle,
+											tm.get(key).getImageData());
 									result.add(p);
 									toRemove = key;
 								}
@@ -247,9 +254,9 @@ public class BlockResults implements BlockResultSet {
 		}
 		{
 			// analyse image store
-			Collection<TreeMap<String, ImageData>> sv = storedImages.values();
+			Collection<TreeMap<String, ImageAndImageData>> sv = storedImages.values();
 			if (sv != null)
-				for (TreeMap<String, ImageData> tm : sv) {
+				for (TreeMap<String, ImageAndImageData> tm : sv) {
 					String toRemove = null;
 					Set<String> ks = tm.keySet();
 					if (ks != null)
@@ -345,13 +352,15 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public synchronized void storeResults(CameraPosition cp, CameraType ct, TraitCategory cat,
-			ResultsTableWithUnits numericResults, int position, CalculatesProperties description) {
-		storeResults(cp, ct, cat, null, numericResults, position, description);
+			ResultsTableWithUnits numericResults, int position, CalculatesProperties description, NumericMeasurement3D imageRef) {
+		storeResults(cp, ct, cat, null, numericResults, position, description, imageRef);
 	}
 	
 	@Override
-	public synchronized void storeResults(CameraPosition cp, CameraType ct, TraitCategory cat, String id_postfix,
-			ResultsTableWithUnits numericResults, int position, CalculatesProperties description) {
+	public synchronized void storeResults(CameraPosition cp, CameraType ct, TraitCategory cat,
+			String id_postfix,
+			ResultsTableWithUnits numericResults, int position,
+			CalculatesProperties description, NumericMeasurement3D imageRef) {
 		if (description == null)
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No valid property-calculator object provided. "
 					+ "Indicating possibly incomplete trait description.");
@@ -361,8 +370,10 @@ public class BlockResults implements BlockResultSet {
 				double val = numericResults.getValueAsDouble(col, row);
 				String unit = numericResults.getColumnHeadingUnit(col);
 				if (!Double.isNaN(val))
-					setNumericResult(position, new Trait(cp, ct, cat, id + (id_postfix != null && !id_postfix.isEmpty() ?
-							(id_postfix.startsWith("|") ? "" : ".") + id_postfix : "")), val, unit, description);
+					setNumericResult(position, new Trait(cp, ct, cat,
+							id + (id_postfix != null && !id_postfix.isEmpty() ?
+									(id_postfix.startsWith("|") ? "" : ".") + id_postfix : "")),
+							val, unit, description, imageRef);
 			}
 		}
 	}
@@ -381,31 +392,16 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public void setImage(int blockPosition, String id, ImageData image, boolean deleteAtPipelineCompletion) {
-		synchronized (storedImages) {
-			if (!storedImages.containsKey(blockPosition))
-				storedImages.put(blockPosition, new TreeMap<String, ImageData>());
-			else
-				if (storedImages.get(blockPosition).containsKey(id))
-					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Result set already contains image with ID '" + id
-							+ "', overwriting previous information!");
-			storedImages.get(blockPosition).put(id, image);
-		}
-		if (deleteAtPipelineCompletion)
-			synchronized (deleteAtPipelineFinishing) {
-				deleteAtPipelineFinishing.add(id);
-			}
-	}
-	
-	@Override
-	public void setImage(int position, String id, Image image, boolean deleteAtPipelineCompletion) {
+	public void setImage(int position, String id, ImageAndImageData image, boolean deleteAtPipelineCompletion) {
 		synchronized (storedImages) {
 			if (!storedImages.containsKey(position))
-				storedImages.put(position, new TreeMap<String, ImageData>());
+				storedImages.put(position, new TreeMap<String, ImageAndImageData>());
 			
-			storedImages.get(position).put(id, new ImageInMemory(null, image));
-			synchronized (deleteAtPipelineFinishing) {
-				deleteAtPipelineFinishing.add(id);
+			storedImages.get(position).put(id, image);
+			if (deleteAtPipelineCompletion) {
+				synchronized (deleteAtPipelineFinishing) {
+					deleteAtPipelineFinishing.add(id);
+				}
 			}
 		}
 	}
@@ -415,29 +411,29 @@ public class BlockResults implements BlockResultSet {
 		synchronized (storedImages) {
 			if (!storedImages.containsKey(blockPosition))
 				return null;
-			ImageData res = storedImages.get(blockPosition).get(id);
+			ImageAndImageData res = storedImages.get(blockPosition).get(id);
 			if (res == null)
 				return null;
 			else {
 				storedImages.get(blockPosition).remove(id);
-				return ((ImageInMemory) res).getImageData();
+				return res.getImage();
 			}
 		}
 	}
 	
 	@Override
-	public Image getImage(String id) {
+	public ImageAndImageData getImage(String id) {
 		synchronized (storedImages) {
 			for (Integer blockPosition : storedImages.keySet()) {
-				ImageData res = storedImages.get(blockPosition).get(id);
+				ImageAndImageData res = storedImages.get(blockPosition).get(id);
 				if (res == null)
 					continue;
 				else {
 					storedImages.get(blockPosition).remove(id);
-					return ((ImageInMemory) res).getImageData();
+					return res;
 				}
 			}
-			return null;
+			return new ImageAndImageData(null, null);
 		}
 	}
 	
@@ -517,7 +513,7 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public TreeMap<Integer, TreeMap<String, ImageData>> getImages() {
+	public TreeMap<Integer, TreeMap<String, ImageAndImageData>> getImages() {
 		return storedImages;
 	}
 	
@@ -543,7 +539,7 @@ public class BlockResults implements BlockResultSet {
 	}
 	
 	@Override
-	public void setImages(TreeMap<Integer, TreeMap<String, ImageData>> storedImages) {
+	public void setImages(TreeMap<Integer, TreeMap<String, ImageAndImageData>> storedImages) {
 		this.storedImages = storedImages;
 	}
 	
@@ -557,5 +553,11 @@ public class BlockResults implements BlockResultSet {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void setImage(int currentPositionInPipeline, String id, LoadedImage image, boolean deleteAtPipelineCompletion) {
+		setImage(currentPositionInPipeline, id, new ImageAndImageData(
+				new Image(image.getLoadedImage()), image.getImageDataReference()), deleteAtPipelineCompletion);
 	}
 }

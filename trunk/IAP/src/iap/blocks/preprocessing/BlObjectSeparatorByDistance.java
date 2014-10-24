@@ -2,6 +2,7 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.postprocessing.WellProcessing;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.util.HashSet;
@@ -75,7 +76,7 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 		for (int x = 0; x < mask.getWidth(); x++) {
 			for (int y = 0; y < mask.getHeight(); y++) {
 				double minWellDistance = Integer.MAX_VALUE;
-				double minWellIDX = -1;
+				String minWellIDX = null;
 				
 				for (int well_idx = 0; well_idx < wellcount; well_idx++) {
 					
@@ -88,7 +89,7 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 					if (tempDist < minWellDistance) {
 						
 						minWellDistance = tempDist;
-						minWellIDX = well_idx;
+						minWellIDX = WellProcessing.getWellID(well_idx, wellcount, input().images().getAnyInfo());
 					}
 				}
 				

@@ -30,6 +30,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResult;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author pape, klukas
@@ -85,13 +86,13 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 			if (previousResults != null) {
 				if (unassignedResults != null) {
 					// match new leaf tips
-					matchNewResults(previousResults, unassignedResults, cp, ct, time, n);
+					matchNewResults(previousResults, unassignedResults, cp, ct, time, n, input().images().getImageInfo(ct));
 					getResultSet().removeResultObject(result1);
 				}
 			} else {
 				if (unassignedResults != null) {
 					// first run, create new plant
-					createNewPlant(unassignedResults, cp, ct, time, n);
+					createNewPlant(unassignedResults, cp, ct, time, n, input().images().getImageInfo(ct));
 					getResultSet().removeResultObject(result1);
 				}
 			}
@@ -99,41 +100,43 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 	}
 	
 	private void createNewPlant(LinkedList<Feature> unassignedResults, CameraPosition cameraPosition,
-			CameraType cameraType, long timepoint, Normalisation norm) {
+			CameraType cameraType, long timepoint, Normalisation norm, ImageData imageRef) {
 		LeafMatcher ltm = new LeafMatcher(unassignedResults, timepoint, norm);
 		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);
 		ltm.matchLeafTips();
 		Plant plant = ltm.getMatchedPlant();
 		plant.setSettingFolder(optionsAndResults.getSystemOptionStorageGroup(this));
 		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, plant);
-		markAndSaveLeafFeatures(cameraPosition, cameraType, norm, plant, timepoint);
+		markAndSaveLeafFeatures(cameraPosition, cameraType, norm, plant, timepoint, imageRef);
 	}
 	
 	private void matchNewResults(Plant previousResults,
 			LinkedList<Feature> unassignedResults, final CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
-			final Normalisation norm) {
+			final Normalisation norm, ImageData imageRef) {
 		LeafMatcher ltm = new LeafMatcher(previousResults, unassignedResults, timepoint, norm);
 		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);
 		ltm.matchLeafTips();
 		final Plant plant = ltm.getMatchedPlant();
 		// TODO calc dist between leaftips , dist / (time_n +1 - time_n) * 24*60*60*1000; Leaflength += dist;
 		
-		markAndSaveLeafFeatures(cameraPosition, cameraType, norm, plant, timepoint);
+		markAndSaveLeafFeatures(cameraPosition, cameraType, norm, plant, timepoint, imageRef);
 		
 		getResultSet().setObjectResult(getBlockPosition(), "plant_" + cameraType, plant);
 	}
 	
-	private void markAndSaveLeafFeatures(CameraPosition cameraPosition, final CameraType cameraType, final Normalisation norm, final Plant plant, long timepoint) {
+	private void markAndSaveLeafFeatures(CameraPosition cameraPosition, final CameraType cameraType, final Normalisation norm,
+			final Plant plant, long timepoint, ImageData imageRef) {
 		// save to resultSet
 		LinkedList<Leaf> leafList = plant.getLeafList();
 		final ArrayList<Color> colors = Colors.get(leafList.size() + 1, 1);
 		
 		getResultSet().setNumericResult(getBlockPosition(),
-				new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count"), leafList.size(), "tracked leaves", this);
+				new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count"), leafList.size(), "tracked leaves", this, imageRef);
 		
 		if (isBestAngle(cameraType))
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count.best_angle"), leafList.size(), "tracked leaves", this);
+					new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count.best_angle"), leafList.size(), "tracked leaves", this,
+					imageRef);
 		
 		// calculate leaf parameter
 		for (Leaf l : plant.getLeafList()) {
@@ -161,19 +164,19 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 						0,
 						new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2)
 								+ ".span.orientation"),
-						angle, "degree", this);
+						angle, "degree", this, imageRef);
 				
 				getResultSet().setNumericResult(
 						0,
 						new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2)
 								+ ".span.norm"),
-						span_norm, "mm", this);
+						span_norm, "mm", this, imageRef);
 				
 				getResultSet().setNumericResult(
 						0,
 						new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2)
 								+ ".span"),
-						span, "px", this);
+						span, "px", this, imageRef);
 			}
 			
 			final int xPos_norm = ltLast.getRealWorldX();
@@ -186,12 +189,12 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 					0,
 					new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2)
 							+ ".position.x"),
-					xPos_norm, "px", this);
+					xPos_norm, "px", this, imageRef);
 			getResultSet().setNumericResult(
 					0,
 					new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(num, 2)
 							+ ".position.y"),
-					yPos_norm, "px", this);
+					yPos_norm, "px", this, imageRef);
 			
 			if (angle != null) {
 				getResultSet()
@@ -199,7 +202,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 								0,
 								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip."
 										+ StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".angle"),
-								angle, "degree", this);
+								angle, "degree", this, imageRef);
 			}
 			
 			boolean saveDistToCenter = true;
@@ -222,7 +225,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 							0,
 							new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip."
 									+ StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".dist_to_cog"),
-							distToCenter, "px", this);
+							distToCenter, "px", this, imageRef);
 				}
 			}
 		}

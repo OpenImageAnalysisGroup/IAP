@@ -43,6 +43,15 @@ public class BackgroundThreadDispatcher {
 		return addTask(new LocalComputeJob(r, name), forceMem);
 	}
 	
+	public static LocalComputeJob addTask(Runnable r, String name, boolean forceMem, boolean directRun) throws InterruptedException {
+		if (!directRun)
+			return addTask(r, name, forceMem);
+		else {
+			r.run();
+			return null;
+		}
+	}
+	
 	public static LocalComputeJob addTask(Runnable r, String name, boolean forceMem, int maxJobsWaiting) throws InterruptedException {
 		return addTask(new LocalComputeJob(r, name), forceMem, maxJobsWaiting);
 	}
@@ -131,7 +140,8 @@ public class BackgroundThreadDispatcher {
 	public static void waitFor(Collection<LocalComputeJob> threads) throws InterruptedException {
 		threads = new ArrayList<LocalComputeJob>(threads);
 		for (LocalComputeJob m : threads) {
-			m.getResult();
+			if (m != null)
+				m.getResult();
 		}
 	}
 	
@@ -139,7 +149,7 @@ public class BackgroundThreadDispatcher {
 		threads = new ArrayList<LocalComputeJob>(threads);
 		do {
 			LocalComputeJob m = threads.get(0);
-			if (m.isFinished())
+			if (m == null || m.isFinished())
 				threads.remove(0);
 			Thread.sleep(100);
 		} while (threads.size() > 0);

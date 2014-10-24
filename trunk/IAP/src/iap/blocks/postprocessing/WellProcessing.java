@@ -1,5 +1,7 @@
 package iap.blocks.postprocessing;
 
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
+
 import org.SystemOptions;
 
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
@@ -9,6 +11,22 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author Christian Klukas
  */
 public class WellProcessing {
+	
+	public static String getWellID(int wellIdx, int well_Cnt, CameraPosition cp, Double optRotationAngle) {
+		if (well_Cnt <= 1)
+			return "";
+		String sn;
+		if (cp == CameraPosition.TOP)
+			sn = "Top View ";
+		else
+			if (cp == CameraPosition.SIDE)
+				sn = "Side View ";
+			else
+				sn = "";
+		String ra = optRotationAngle != null ? " (" + sn + "Rotation Angle " + optRotationAngle.intValue() + ")" : "";
+		String id = SystemOptions.getInstance().getString("Multi-Tray Wells", "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, "X" + wellIdx);
+		return id;
+	}
 	
 	public static String getWellID(int wellIdx, int well_Cnt, ImageData img) {
 		String sn = img.getParentSample().getParentCondition().getParentSubstance().getName();

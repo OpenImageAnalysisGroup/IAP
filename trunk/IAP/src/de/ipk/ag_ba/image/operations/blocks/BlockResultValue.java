@@ -9,19 +9,16 @@ public class BlockResultValue {
 	private final Double value;
 	private Object object;
 	private Double position;
-	private NumericMeasurement3D binary;
+	private final NumericMeasurement3D binary;
 	
-	public BlockResultValue(String name, String unit, Double value) {
+	public BlockResultValue(String name, String unit, Double value, NumericMeasurement3D imageRef) {
 		this.name = name;
 		this.unit = unit;
 		this.value = value;
-	}
-	
-	public BlockResultValue(String name, NumericMeasurement3D binary) {
-		this.name = name;
-		this.binary = binary;
-		this.unit = null;
-		this.value = null;
+		this.binary = new NumericMeasurement3D(imageRef.getParentSample());
+		this.binary.setValue(value);
+		this.binary.setUnit(unit);
+		this.binary.setQualityAnnotation(imageRef.getQualityAnnotation());
 	}
 	
 	public BlockResultValue(String name, Object object) {
@@ -36,11 +33,11 @@ public class BlockResultValue {
 		this(
 				fromString.split("|", 3)[0],
 				fromString.split("|", 3)[1],
-				Double.parseDouble(fromString.split("|", 3)[2]));
+				Double.parseDouble(fromString.split("|", 3)[2]), null);
 	}
 	
-	public BlockResultValue(String name, String unit, Double value, Double position) {
-		this(name, unit, value);
+	public BlockResultValue(String name, String unit, Double value, Double position, NumericMeasurement3D ref) {
+		this(name, unit, value, ref);
 		setPosition(position);
 	}
 	
@@ -79,5 +76,9 @@ public class BlockResultValue {
 	
 	public Object getObject() {
 		return object;
+	}
+	
+	public DoubleAndImageData getDaV() {
+		return new DoubleAndImageData(value, binary);
 	}
 }
