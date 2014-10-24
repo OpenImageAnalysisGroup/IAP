@@ -235,7 +235,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			LinkedList<Runnable> workLoad = new LinkedList<Runnable>();
 			LinkedList<String> workLoad_desc = new LinkedList<String>();
 			
-			for (String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
+			for (final String plantID : workload_imageSetsWithSpecificAngles.keySet()) {
 				if (status.wantsToStop())
 					continue;
 				final String plantIDf = plantID;
