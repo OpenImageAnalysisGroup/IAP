@@ -115,20 +115,13 @@ public class BlCalcWidthAndHeight extends
 													.io()
 													.canvas()
 													.fillRect(
-															values.x
-																	/ 2
-																	+ temp.getLeftX(),
+															temp.getLeftX() + (temp.getRightX() - temp.getLeftX()) / 2,
 															temp.getTopY() - temp.getBottomY()
 																	+ temp.getTopY() + temp.getBottomY()
 																	- temp.getTopY(),
-															500,
+															(temp.getRightX() - temp.getLeftX()) / 2,
 															10,
-															Color.BLUE.getRGB(), 255)
-													.getImage()
-													.show("DEBUG", debug);
-											visRes = visRes
-													.io()
-													.canvas()
+															Color.BLUE.getRGB(), 0.8)
 													.fillRect(
 															values.x
 																	/ 2
@@ -139,7 +132,7 @@ public class BlCalcWidthAndHeight extends
 															10,
 															temp.getBottomY()
 																	- temp.getTopY(),
-															Color.RED.getRGB(), 255)
+															Color.BLUE.getRGB(), 0.8)
 													.getImage()
 													.show("DEBUG", debug);
 										}

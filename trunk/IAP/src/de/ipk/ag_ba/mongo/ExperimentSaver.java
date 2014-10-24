@@ -205,7 +205,8 @@ public class ExperimentSaver implements RunnableOnDB {
 					updatedSizeAvailable = true;
 				}
 			}
-		}
+		} else
+			experiment.getHeader().setSizekb(-1);
 		
 		final CollectionStorage cols = new CollectionStorage(db, MongoDB.getEnsureIndex());
 		
