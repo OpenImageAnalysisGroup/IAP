@@ -2,6 +2,7 @@ package iap.blocks.postprocessing;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.util.HashSet;
 
@@ -10,6 +11,7 @@ import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.image.operation.ImageHistogram;
 import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -33,11 +35,17 @@ public class BlSaveResultImages extends AbstractBlock {
 				outImageReference.setQualityAnnotation(outImageReference.getQualityAnnotation() + "_"
 						+ getWellIdx());
 			try {
-				LoadedImage res = processAndOrSaveResultImage(outImageReference, image);
+				LoadedImage res = processAndOrSaveResultImage(image.getCameraType(), getCameraPosition(), outImageReference, image);
 				if (res != null) {
 					if (!res.getParentSample().getParentCondition().getParentSubstance().getName().contains(image.getCameraType() + "")) {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Saved camera type " + image.getCameraType() + " to substance "
 								+ res.getParentSample().getParentCondition().getParentSubstance().getName());
+					}
+					if (image.getCameraType() != CameraType.NIR) {
+						ImageHistogram ih = image.io().histogram(false);
+						if (ih.getMostCommonValueR() == ih.getMostCommonValueG() && ih.getMostCommonValueG() == ih.getMostCommonValueB())
+							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Saved camera type " + image.getCameraType() + " to substance "
+									+ res.getParentSample().getParentCondition().getParentSubstance().getName() + ". R=G=B, so NIR image suspected!");
 					}
 					getResultSet().setImage(getBlockPosition(), "RESULT_" + res.getSubstanceName(),
 							new ImageAndImageData(
@@ -57,7 +65,7 @@ public class BlSaveResultImages extends AbstractBlock {
 		return mask;
 	}
 	
-	private LoadedImage processAndOrSaveResultImage(ImageData outImageReference, Image resImage) throws Exception {
+	private LoadedImage processAndOrSaveResultImage(CameraType ct, CameraPosition cp, ImageData outImageReference, Image resImage) throws Exception {
 		String tray = getWellIdx();
 		
 		if (optionsAndResults.forceDebugStack) {
@@ -71,28 +79,37 @@ public class BlSaveResultImages extends AbstractBlock {
 			
 			outImageReference.setURL(new IOurl(null, null, outImageReference.getURL().getFileName()));
 			
-			return saveImage(tray, outImageReference, resImage);
+			return saveImage(ct, cp, tray, outImageReference, resImage);
 		}
 	}
 	
-	private LoadedImage saveImage(
+	private LoadedImage saveImage(CameraType ct, CameraPosition cp,
 			final String tray,
 			final ImageData id, final Image image) throws Exception {
 		if (id != null && id.getParentSample() != null) {
 			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
 			// loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
-			return saveImageAndUpdateURL(loadedImage, optionsAndResults.databaseTarget, false, tray);
+			return saveImageAndUpdateURL(ct, cp, loadedImage, optionsAndResults.databaseTarget, false, tray);
 		} else
 			return null;
 	}
 	
-	private String addTrayInfo(String tray, String fileName, ImageData image) {
+	private String addTrayInfo(CameraType ct, CameraPosition cp, String tray, String fileName, ImageData image) {
 		if (tray != null && tray.length() > 0) {
 			String extension = fileName.substring(fileName.lastIndexOf(".") + ".".length());
 			
 			String replace;
 			
-			replace = "." + tray + ".";
+			replace = "." + ct + "." + cp + "." + tray + ".";
+			fileName = StringManipulationTools.stringReplace(fileName,
+					"." + extension, replace
+							+ extension);
+		} else {
+			String extension = fileName.substring(fileName.lastIndexOf(".") + ".".length());
+			
+			String replace;
+			
+			replace = "." + ct + "." + cp + ".";
 			fileName = StringManipulationTools.stringReplace(fileName,
 					"." + extension, replace
 							+ extension);
@@ -100,24 +117,19 @@ public class BlSaveResultImages extends AbstractBlock {
 		return fileName;
 	}
 	
-	protected LoadedImage saveImageAndUpdateURL(LoadedImage result,
+	protected LoadedImage saveImageAndUpdateURL(CameraType ct, CameraPosition cp, LoadedImage result,
 			DatabaseTarget databaseTarget, boolean processLabelUrl,
 			String tray) throws Exception {
 		if (result.getURL() == null)
 			result.setURL(new IOurl(null, StringManipulationTools.removeFileExtension(result.getURL().getFileName())
 					+ SystemOptions.getInstance().getString("IAP", "Result File Type", "png")));
-		// System.out.println("CT=" + cameraType + ", WxH=" + result.getLoadedImage().getWidth() + " x " + result.getLoadedImage().getHeight());
-		// if (cameraType == CameraType.NIR && result.getLoadedImage().getWidth() > 570) {
-		// new Image(result.getLoadedImage()).show(cameraType + " ?");
-		// System.out.println("CT=" + cameraType + ", W=" + result.getLoadedImage().getWidth());
-		// }
 		
-		result.getURL().setFileName(addTrayInfo(tray, result.getURL().getFileName(), result));
+		result.getURL().setFileName(addTrayInfo(ct, cp, tray, result.getURL().getFileName(), result));
 		result.getURL().setPrefix(LoadedDataHandler.PREFIX);
 		
 		if (result.getLabelURL() != null && processLabelUrl) {
 			result.getLabelURL().setFileName(
-					addTrayInfo(tray,
+					addTrayInfo(ct, cp, tray,
 							result.getLabelURL().getFileName(), result));
 			result.getLabelURL().setPrefix(LoadedDataHandler.PREFIX);
 		}
