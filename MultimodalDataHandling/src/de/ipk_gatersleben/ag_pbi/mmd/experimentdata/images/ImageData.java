@@ -244,7 +244,9 @@ public class ImageData extends NumericMeasurement3D implements
 	public boolean equalNumericMeasurement(NumericMeasurementInterface meas) {
 		ImageData id2 = ((ImageData) meas);
 		return super.equalNumericMeasurement(meas)
-				&& (getURL() + "").equals(id2.getURL())
+				&& (getURL() + "").equals(id2.getURL() + "")
+				&& (getLabelURL() + "").equals(id2.getLabelURL() + "")
+				&& (getAnnotation() + "").equals(id2.getAnnotation() + "")
 				&& (getRowID() + "").equals(id2.getRowID() + "")
 				&& (getPixelsizeX() + "").equals(id2.getPixelsizeX())
 				&& (getPixelsizeY() + "").equals(id2.getPixelsizeY())
