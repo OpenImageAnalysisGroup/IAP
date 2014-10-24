@@ -124,7 +124,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 		}
 		ioClusteredSkeltonImage.show("CLUSTERS", false);
 		
-		getResultSet().storeResults(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.GEOMETRY, rt, getBlockPosition(), this);
+		getResultSet().storeResults(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.GEOMETRY, rt, getBlockPosition(), this,
+				input().images().getVisInfo());
 		// Image skel = ioClusteredSkeltonImage.bm().dilate(getInt("Dilate for section detection", 5)).getImage();
 		for (RunnableOnImage roi : postProcessing) {
 			getResultSet().addImagePostProcessor(CameraType.VIS, null, roi);
@@ -162,7 +163,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 								limbs.addValue(val / 2);
 							}
 						} catch (Exception e2) {
-							// TODO: handle exception
+							// ignore missing limg length information in graph structure
 						}
 					}
 					if (resultPrefix.isEmpty())
