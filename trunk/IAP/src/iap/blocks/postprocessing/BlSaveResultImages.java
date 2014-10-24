@@ -35,6 +35,10 @@ public class BlSaveResultImages extends AbstractBlock {
 			try {
 				LoadedImage res = processAndOrSaveResultImage(outImageReference, image);
 				if (res != null) {
+					if (!res.getParentSample().getParentCondition().getParentSubstance().getName().contains(image.getCameraType() + "")) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Saved camera type " + image.getCameraType() + " to substance "
+								+ res.getParentSample().getParentCondition().getParentSubstance().getName());
+					}
 					getResultSet().setImage(getBlockPosition(), "RESULT_" + res.getSubstanceName(),
 							new ImageAndImageData(
 									null,// new Image(res.getLoadedImage()),
