@@ -147,7 +147,7 @@ public class ImageStack {
 			jb.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png").getScaledInstance(24, 24,
 					java.awt.Image.SCALE_SMOOTH)));
 			
-			java.awt.Image iconff = IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png");
+			final java.awt.Image iconff = IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png");
 			
 			jb.addActionListener(new ActionListener() {
 				@Override
@@ -155,7 +155,7 @@ public class ImageStack {
 					actionCmd.run();
 				}
 			});
-			String titlef = title + " (" + SystemAnalysis.getCurrentTime() + ")";
+			final String titlef = title + " (" + SystemAnalysis.getCurrentTime() + ")";
 			final JComponent ccc = FolderPanel.getBorderedComponent(
 					TableLayout.get3Split(jb, null,
 							optSideComponent, TableLayout.PREFERRED, 5, TableLayout.PREFERRED), 5, 5, 5, 5);
