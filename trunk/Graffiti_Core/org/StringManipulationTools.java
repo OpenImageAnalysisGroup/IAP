@@ -1050,6 +1050,9 @@ public class StringManipulationTools implements HelperClass {
 		t = t % 1000;
 		t = t / 250;
 		
-		return rotation[(int) t];
+		String res = "";
+		while (res.length() < n)
+			res += rotation[(int) t];
+		return res;
 	}
 }
