@@ -1042,4 +1042,14 @@ public class StringManipulationTools implements HelperClass {
 			res += string;
 		return res;
 	}
+	
+	private static String[] rotation = new String[] { "|", "/", "-", "\\" };
+	
+	public static String getRotationString(int n) {
+		long t = System.currentTimeMillis();
+		t = t % 1000;
+		t = t / 250;
+		
+		return rotation[(int) t];
+	}
 }
