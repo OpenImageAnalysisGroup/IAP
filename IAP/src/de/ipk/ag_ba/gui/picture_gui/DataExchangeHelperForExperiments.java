@@ -359,7 +359,7 @@ public class DataExchangeHelperForExperiments {
 				
 				String cl = DataSetFileButton.getName(imageResult, null);
 				if (cl != null)
-					if (!myFilterConnector.matches(cl, false))
+					if (!myFilterConnector.matches(cl, false, false))
 						continue;
 				lastBBB = binaryFileInfo;
 			}
@@ -371,7 +371,7 @@ public class DataExchangeHelperForExperiments {
 				
 				String cl = DataSetFileButton.getName(imageResult, null);
 				if (cl != null)
-					if (!myFilterConnector.matches(cl, binaryFileInfo == lastInList))
+					if (!myFilterConnector.matches(cl, binaryFileInfo == lastInList, true))
 						continue;
 				
 				boolean previewLoadAndConstructNeeded = false;
