@@ -165,6 +165,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	private boolean attachment;
 	private ActionListener additionalActionListener;
 	private AnnotationInfoPanel aip;
+	private String customLabel;
 	
 	public void updateLayout(String label, MyImageIcon icon,
 			ImageIcon previewImage, boolean isNoImageButton) {
@@ -201,6 +202,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			mmlbl = new JLabel("<html><center>" + label);
 			mmlbl.setHorizontalAlignment(JLabel.CENTER);
 		}
+		this.customLabel = label;
 		add(mmlbl, "1,5,c,c");
 		myImage = icon;
 		validate();
@@ -210,23 +212,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			ImageResult imageResult, ImageIcon previewImage, boolean readOnly, boolean isNoImageButton, String customNonImageTitle,
 			Collection<DataSetFileButton> buttonsInThisView) {
 		this(projectNode,
-				"<html><body><b>" +
-						(imageResult == null ? "<center>" + customNonImageTitle :
-								getMaxString(strip(
-										imageResult.getFileNameMain(),
-										((!(imageResult.getBinaryFileInfo().entity instanceof NumericMeasurement3D)) ?
-												"(Attachment)" :
-												((NumericMeasurement3D) imageResult
-														.getBinaryFileInfo().entity)
-														.getQualityAnnotation()
-														+ "<br>("
-														+ (((NumericMeasurement3D) imageResult
-																.getBinaryFileInfo().entity)
-																.getPosition() != null ? ((NumericMeasurement3D) imageResult
-																.getBinaryFileInfo().entity)
-																.getPosition().intValue()
-																+ ")" : "0)")))))
-						+ "</b></body></html>", null, previewImage, isNoImageButton, buttonsInThisView);
+				getName(imageResult, customNonImageTitle), null, previewImage, isNoImageButton, buttonsInThisView);
 		this.imageResult = imageResult;
 		this.readOnly = readOnly;
 		if (imageResult != null && getMaxString(imageResult.getFileNameMain()).endsWith("..."))
@@ -239,6 +225,26 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					if (projectNode.getTargetEntity() instanceof Condition3D)
 						setToolTipText(((Condition3D) projectNode.getTargetEntity()).getName());
 			}
+	}
+	
+	public static String getName(ImageResult imageResult, String customNonImageTitle) {
+		return "<html><body><b>" +
+				(imageResult == null ? "<center>" + customNonImageTitle :
+						getMaxString(strip(
+								imageResult.getFileNameMain(),
+								((!(imageResult.getBinaryFileInfo().entity instanceof NumericMeasurement3D)) ?
+										"(Attachment)" :
+										((NumericMeasurement3D) imageResult
+												.getBinaryFileInfo().entity)
+												.getQualityAnnotation()
+												+ "<br>("
+												+ (((NumericMeasurement3D) imageResult
+														.getBinaryFileInfo().entity)
+														.getPosition() != null ? ((NumericMeasurement3D) imageResult
+														.getBinaryFileInfo().entity)
+														.getPosition().intValue()
+														+ ")" : "0)")))))
+				+ "</b></body></html>";
 	}
 	
 	private static String strip(String fileName, String opt) {
@@ -1515,5 +1521,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	public void setAnnotationInfoPanel(AnnotationInfoPanel aip) {
 		this.aip = aip;
+	}
+	
+	public String getCustomLabel() {
+		return customLabel;
 	}
 }

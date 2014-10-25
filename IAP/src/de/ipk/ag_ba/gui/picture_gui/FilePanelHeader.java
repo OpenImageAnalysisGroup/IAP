@@ -12,20 +12,25 @@ package de.ipk.ag_ba.gui.picture_gui;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
+/**
+ * @author Christian Klukas
+ */
 public class FilePanelHeader extends JPanel {
 	private static final long serialVersionUID = 6358431643283288603L;
 	
 	JLabel header;
 	JButton button;
 	
-	public FilePanelHeader(JButton button, JButton[] actions, String desc) {
+	public FilePanelHeader(JButton button, JButton[] actions, String desc, FilterConnector myFilterConnector) {
 		setBackground(new Color(240, 245, 240));
 		setOpaque(true);
 		
@@ -48,6 +53,13 @@ public class FilePanelHeader extends JPanel {
 		
 		if (actions != null && actions.length > 0) {
 			ArrayList<JComponent> jl = new ArrayList<JComponent>();
+			JLabel il = new JLabel("");
+			jl.add(TableLayout.getSplitVertical(new JLabel("File Name >"), il, TableLayout.PREFERRED, TableLayout.PREFERRED));
+			JTextField tf = new JTextField("");
+			tf.setPreferredSize(new Dimension(100, (int) tf.getPreferredSize().getHeight()));
+			myFilterConnector.textFieldDefined(tf, il);
+			tf.setBackground(new Color(240, 240, 240));
+			jl.add(tf);
 			jl.add(new JLabel(desc));
 			for (JButton jb : actions)
 				jl.add(jb);

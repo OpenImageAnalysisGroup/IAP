@@ -138,20 +138,19 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		};
 		for (JButton jb : actions)
 			knownButtons.add(jb);
-		final FilePanelHeader filePanelHeader = new FilePanelHeader(addButton, actions, "Icon Size >");
+		
+		final FilterConnector myFilterConnector = new FilterConnector();
+		
+		final FilePanelHeader filePanelHeader = new FilePanelHeader(addButton, actions, "Icon Size >", myFilterConnector);
 		filePanel.init(filePanelHeader, knownButtons);
 		
 		currentFilePanel = filePanel;
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
-		ToolTipManager.sharedInstance().setDismissDelay(30000);
+		ToolTipManager.sharedInstance().setDismissDelay(20000);
 		
-		// todo if mongo knows this ID as an experiment ID
-		boolean readOnly = !(doc != null && doc.getHeader() != null
-				&& doc.getHeader().getDatabaseId() != null);
-		
-		readOnly = !IAPservice.getIsAnnotationSavePossible(doc);
+		boolean readOnly = !IAPservice.getIsAnnotationSavePossible(doc);
 		
 		expTree = new JTree(new ExperimentTreeModel(this, doc, readOnly));
 		
@@ -169,6 +168,8 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 			public void valueChanged(TreeSelectionEvent e) {
 				if (e.getNewLeadSelectionPath() == null || e.getNewLeadSelectionPath().getLastPathComponent() == null)
 					return;
+				
+				myFilterConnector.itemClicked(this, e);
 				
 				final Object mt = e.getNewLeadSelectionPath().getLastPathComponent();
 				if (mt instanceof MongoTreeNode && ((MongoTreeNode) mt).getTargetEntity() != null) {
@@ -231,7 +232,8 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							
 							removeTempFiles();
 							try {
-								DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree, IAPservice.getIsAnnotationSavePossible(doc));
+								DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree,
+										IAPservice.getIsAnnotationSavePossible(doc), myFilterConnector);
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -281,12 +283,14 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 				}
 			}
 		});
-		
 		JScrollPane fileScroller = new JScrollPane(filePanel);
 		fileScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		filePanel.setScrollpane(fileScroller);
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, new JScrollPane(expTree), TableLayout
-				.getSplitVertical(filePanelHeader, fileScroller, TableLayout.PREFERRED, TableLayout.FILL));
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true,
+				// TableLayout.getSplitVertical(
+				new JScrollPane(expTree), // new JLabel("[SEARCH GUI]"), TableLayout.FILL, TableLayout.PREFERRED),
+				TableLayout
+						.getSplitVertical(filePanelHeader, fileScroller, TableLayout.PREFERRED, TableLayout.FILL));
 		splitPane.setOneTouchExpandable(true);
 		splitPane.setLastDividerLocation(200);
 		splitPane.setDividerLocation(200);

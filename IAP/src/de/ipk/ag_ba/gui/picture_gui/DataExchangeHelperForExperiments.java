@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -172,19 +171,19 @@ public class DataExchangeHelperForExperiments {
 	}
 	
 	public static void fillFilePanel(final DataSetFilePanel filePanel,
-			final MongoTreeNode mtdbe, final JTree expTree, final boolean isAnnotationSavePossible)
+			final MongoTreeNode mtdbe, final JTree expTree, final boolean isAnnotationSavePossible, final FilterConnector myFilterConnector)
 			throws InterruptedException {
 		LocalComputeJob r = new LocalComputeJob(new Runnable() {
 			@Override
 			public void run() {
-				addFilesToPanel(filePanel, mtdbe, expTree, isAnnotationSavePossible);
+				addFilesToPanel(filePanel, mtdbe, expTree, isAnnotationSavePossible, myFilterConnector);
 			}
 		}, "add files to panel");
 		BackgroundThreadDispatcher.addTask(r);
 	}
 	
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel,
-			final MongoTreeNode mt, final JTree expTree, boolean isAnnotationSavePossible) {
+			final MongoTreeNode mt, final JTree expTree, boolean isAnnotationSavePossible, final FilterConnector myFilterConnector) {
 		if (!mt.mayContainData())
 			return;
 		final StopObject stop = new StopObject(false);
@@ -349,13 +348,32 @@ public class DataExchangeHelperForExperiments {
 			}
 			
 			BinaryFileInfo lastBBB = null;
-			if (bbb.size() > 0)
-				lastBBB = bbb.get(bbb.size() - 1);
 			Collection<DataSetFileButton> buttonsInThisView = new LinkedList<DataSetFileButton>();
+			
+			BinaryFileInfo lastInList = null;
+			for (final BinaryFileInfo binaryFileInfo : bbb) {
+				if (mt != expTree.getSelectionPath().getLastPathComponent())
+					break;
+				lastInList = binaryFileInfo;
+				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
+				
+				String cl = DataSetFileButton.getName(imageResult, null);
+				if (cl != null)
+					if (!myFilterConnector.matches(cl, false))
+						continue;
+				lastBBB = binaryFileInfo;
+			}
+			
 			for (final BinaryFileInfo binaryFileInfo : bbb) {
 				if (mt != expTree.getSelectionPath().getLastPathComponent())
 					break;
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
+				
+				String cl = DataSetFileButton.getName(imageResult, null);
+				if (cl != null)
+					if (!myFilterConnector.matches(cl, binaryFileInfo == lastInList))
+						continue;
+				
 				boolean previewLoadAndConstructNeeded = false;
 				
 				ImageIcon previewImage = null;
@@ -377,6 +395,7 @@ public class DataExchangeHelperForExperiments {
 				}
 				final DataSetFileButton imageButton = new DataSetFileButton(
 						mt, imageResult, previewImage, mt.isReadOnly(), false, null, buttonsInThisView);
+				
 				synchronized (buttonsInThisView) {
 					buttonsInThisView.add(imageButton);
 				}
@@ -713,28 +732,21 @@ public class DataExchangeHelperForExperiments {
 	
 	private static void clearPanel(final DataSetFilePanel filePanel,
 			final MongoTreeNode mt, final JTree expTree) {
-		try {
-			Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					if (mt == expTree.getSelectionPath().getLastPathComponent()) {
-						filePanel.removeAll();
-						filePanel.validate();
-						filePanel.repaint();
-						filePanel.getScrollpane().validate();
-					}
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				if (mt == expTree.getSelectionPath().getLastPathComponent()) {
+					filePanel.removeAll();
+					filePanel.validate();
+					filePanel.repaint();
+					filePanel.getScrollpane().validate();
 				}
-			};
-			if (SwingUtilities.isEventDispatchThread())
-				r.run();
-			else
-				SwingUtilities.invokeAndWait(r);
-		} catch (InterruptedException e2) {
-			SupplementaryFilePanelMongoDB.showError("InterruptedException", e2);
-		} catch (InvocationTargetException e2) {
-			SupplementaryFilePanelMongoDB.showError(
-					"InvocationTargetException", e2);
-		}
+			}
+		};
+		if (SwingUtilities.isEventDispatchThread())
+			r.run();
+		else
+			SwingUtilities.invokeLater(r);
 	}
 	
 	public static void attachFileToEntity(MappingDataEntity targetEntity, DatabaseStorageResultWithURL res, String name) {
