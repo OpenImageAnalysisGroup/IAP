@@ -51,7 +51,7 @@ public class FilterConnector {
 	
 	private String lastRotationString = null;
 	
-	public boolean matches(String label, final boolean isLastInList) {
+	public boolean matches(String label, final boolean isLastInList, boolean count) {
 		String rs = null;
 		if (!isLastInList)
 			rs = StringManipulationTools.getRotationString(1);
@@ -62,27 +62,35 @@ public class FilterConnector {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					if (isLastInList)
-						infolabel.setForeground(Color.GRAY);
-					else
+					if (isLastInList) {
+						if (matches == 0 && notmatches > 0)
+							infolabel.setForeground(Color.RED);
+						else
+							infolabel.setForeground(Color.GRAY);
+					} else
 						infolabel.setForeground(Color.LIGHT_GRAY);
-					if (diff)
-						infolabel.setText((isLastInList ? "" : lrs + " ") + matches + "/" + (matches + notmatches) + (isLastInList ? "" : " " + lrs));
+					if (!isLastInList && matches + notmatches == 0)
+						infolabel.setText((isLastInList ? "" : "- - -"));
 					else
-						infolabel.setText((isLastInList ? "" : lrs + " ") + matches + (isLastInList ? "" : " " + lrs));
+						if (diff)
+							infolabel.setText((isLastInList ? "" : lrs + " ") + matches + "/" + (matches + notmatches) + (isLastInList ? "" : " " + lrs));
+						else
+							infolabel.setText((isLastInList ? "" : lrs + " ") + matches + (isLastInList ? "" : " " + lrs));
 				}
 			});
 		}
 		
 		if (tf == null || label == null || tf.getText().isEmpty() || label.isEmpty()) {
-			matches++;
+			if (count)
+				matches++;
 			return true;
 		}
 		boolean match = label.contains(tf.getText());
-		if (match)
-			matches++;
-		else
-			notmatches++;
+		if (count)
+			if (match)
+				matches++;
+			else
+				notmatches++;
 		return match;
 	}
 	
