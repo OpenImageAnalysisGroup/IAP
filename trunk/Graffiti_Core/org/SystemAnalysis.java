@@ -219,8 +219,11 @@ public class SystemAnalysis {
 		return sdf.format(new Date(time));
 	}
 	
-	public static String getWaitTime(long fullTime) {
-		return getWaitTime(fullTime, 2);
+	public static String getWaitTime(Long fullTime) {
+		if (fullTime == null)
+			return "-";
+		else
+			return getWaitTime(fullTime, 2);
 	}
 	
 	public static String getWaitTime(long fullTime, int n) {
