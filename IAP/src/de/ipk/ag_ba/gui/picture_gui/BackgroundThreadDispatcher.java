@@ -2,11 +2,15 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.function.IntConsumer;
+import java.util.stream.IntStream;
 
 import javax.swing.Timer;
 
@@ -254,5 +258,35 @@ public class BackgroundThreadDispatcher {
 	
 	public static int getBackgroundThreadCount() {
 		return ThreadManager.getInstance().getNumberOfRunningBackgroundTasks();
+	}
+	
+	public static void process(IntStream range, final IntConsumer task, final UncaughtExceptionHandler handler) {
+		LinkedList<LocalComputeJob> work = new LinkedList<>();
+		int threads = SystemAnalysis.getNumberOfCPUs();
+		if (threads < 1)
+			threads = 1;
+		final LinkedList<Integer> values = new LinkedList<>();
+		range.forEach((v) -> values.add(v));
+		IntStream.range(0, threads).forEach((thread) -> {
+			try {
+				work.add(BackgroundThreadDispatcher.addTask(() -> {
+					Integer v = null;
+					do {
+						synchronized (values) {
+							v = values.poll();
+						}
+						if (v != null)
+							task.accept(v);
+					} while (v != null);
+				}, "Process Int Range Thread " + thread));
+			} catch (Exception e) {
+				handler.uncaughtException(Thread.currentThread(), e);
+			}
+		});
+		try {
+			waitFor(work);
+		} catch (InterruptedException e) {
+			handler.uncaughtException(Thread.currentThread(), e);
+		}
 	}
 }

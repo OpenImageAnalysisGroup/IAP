@@ -7,6 +7,9 @@ import org.ErrorMsg;
 
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 
+/**
+ * @author Christian Klukas
+ */
 public class RunnerThread extends Thread {
 	
 	private boolean pleaseStop;

@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import javax.vecmath.Point2d;
 
@@ -57,7 +58,6 @@ import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MemoryHogInterface;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operation.binarymask.ImageJOperation;
@@ -1980,103 +1980,28 @@ public class ImageOperation implements MemoryHogInterface {
 		if (IAPservice.getCurrentTimeAsNiceString() == null)
 			System.out.println();
 		StopWatch s = new StopWatch("lab_cube", false);
-		final float step = 1f / 255f;
 		final float[][][] result = new float[256][256][256 * 3];
 		
-		int cpus = SystemAnalysis.getNumberOfCPUs();
-		if (cpus > 6)
-			cpus = cpus / 2;
 		final ColorSpaceConverter convert = new ColorSpaceConverter();
-		final float cont = 16f / 116f;
-		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>(256);
-		for (int rr = 0; rr < 256; rr++) {
-			final int red = rr;
-			final float rd = (red / 255f);
-			
-			Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					float gd = -step;
-					float X, Y, Z, fX, fY, fZ;
-					float La, aa, bb;
-					float[] p;
-					for (int green = 0; green < 256; green++) {
-						gd += step;
-						float bd = -step;
-						// moved outside of most inner loop to increase performance:
-						float aXa = 1000 * (0.430587f * rd + 0.341545f * gd);
-						float aYa = 1000 * (0.222021f * rd + 0.706645f * gd);
-						float aZa = 1000 * (0.0201837f * rd + 0.129551f * gd);
-						p = result[red][green];
-						
-						for (int blue = 0; blue < 256; blue++) {
-							
-							// bd += step;
-							//
-							// boolean old = true;
-							//
-							// if (old) {
-							// // white reference D65 PAL/SECAM
-							// X = 0.430587f * rd + 0.341545f * gd + 0.178336f * bd;
-							// Y = 0.222021f * rd + 0.706645f * gd + 0.0713342f * bd;
-							// Z = 0.0201837f * rd + 0.129551f * gd + 0.939234f * bd;
-							//
-							// // XYZ to Lab
-							// if (X > 0.008856)
-							// fX = IAPservice.cubeRoots[(int) (1000 * X)];
-							// else
-							// fX = (7.78707f * X) + cont;// 7.7870689655172
-							//
-							// if (Y > 0.008856)
-							// fY = IAPservice.cubeRoots[(int) (1000 * Y)];
-							// else
-							// fY = (7.78707f * Y) + cont;
-							//
-							// if (Z > 0.008856)
-							// fZ = IAPservice.cubeRoots[(int) (1000 * Z)];
-							// else
-							// fZ = (7.78707f * Z) + cont;
-							//
-							// La = ((116 * fY) - 16) * 2.55f;
-							// aa = 1.0625f * (500f * (fX - fY)) + 128f;
-							// bb = 1.0625f * (200f * (fY - fZ)) + 128f;
-							// } else {
-							// // white reference D65 PAL/SECAM
-							// X = aXa + 178.336f * bd;
-							// Y = aYa + 71.3342f * bd;
-							// Z = aZa + 939.234f * bd;
-							//
-							// fX = IAPservice.cubeRoots[(int) X];
-							// fY = IAPservice.cubeRoots[(int) Y];
-							// fZ = IAPservice.cubeRoots[(int) Z];
-							//
-							// La = ((116 * fY) - 16) * 2.55f;
-							// aa = 1.0625f * (500f * (fX - fY)) + 128f;
-							// bb = 1.0625f * (200f * (fY - fZ)) + 128f;
-							// }
-							// p[blue] = La;
-							// p[blue + 256] = aa;
-							// p[blue + 512] = bb;
-							double[] lab = convert.RGBtoLAB(red, green, blue);
-							p[blue] = (float) lab[0] * 2.55f;
-							p[blue + 256] = (float) lab[1] + 128f;
-							p[blue + 512] = (float) lab[2] + 128f;
-						}
-					}
+		
+		BackgroundThreadDispatcher.process(IntStream.range(0, 256), (int red) -> {
+			float[] p;
+			for (int green = 0; green < 256; green++) {
+				p = result[red][green];
+				
+				for (int blue = 0; blue < 256; blue++) {
+					double[] lab = convert.RGBtoLAB(red, green, blue);
+					p[blue] = (float) lab[0] * 2.55f;
+					p[blue + 256] = (float) lab[1] + 128f;
+					p[blue + 512] = (float) lab[2] + 128f;
 				}
-			};
-			try {
-				wait.add(BackgroundThreadDispatcher.addTask(r, "LAB cube calculation"));
-			} catch (InterruptedException e) {
-				ErrorMsg.addErrorMessage(e);
 			}
-		}
+		}, (t, e) -> {
+			ErrorMsg.addErrorMessage(new RuntimeException(e));
+		});
+		
 		s.printTime();
-		try {
-			BackgroundThreadDispatcher.waitFor(wait);
-		} catch (InterruptedException e) {
-			ErrorMsg.addErrorMessage(e);
-		}
+		
 		analyzeCube(result);
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: setGlobalCalibration for IJ");
