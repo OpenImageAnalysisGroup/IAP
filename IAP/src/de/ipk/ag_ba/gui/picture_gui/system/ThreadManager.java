@@ -56,15 +56,19 @@ public class ThreadManager {
 					int idleTasks = 0;
 					boolean checkForIdle = SystemOptions.getInstance().getBoolean("SYSTEM", "Detect Idle Tasks", false);
 					if (checkForIdle) {
-						for (RunnerThread t : threadArray)
+						for (RunnerThread t : threadArray) {
 							if (t != null && (t.getState() == Thread.State.BLOCKED ||
 									t.getState() == Thread.State.WAITING ||
 									t.getState() == Thread.State.TIMED_WAITING)) {
 								idleTasks++;
 								// System.out.println("State=" + t.getState());
 							}
+							if (t != null && t.stopRequested())
+								idleTasks--;
+						}
 					}
-					desiredThreadCount += idleTasks;
+					if (idleTasks > 0)
+						desiredThreadCount += idleTasks;
 					desiredThreadCount = modifyConcurrencyDependingOnMemoryStatus(desiredThreadCount);
 					
 					int maxCnt = Math.min(Math.min(jobs.size(), desiredThreadCount), threadArray.length);

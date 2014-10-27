@@ -71,10 +71,10 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 							if (st == State.TERMINATED)
 								nTerm++;
 							t.append("<tr>"
-									+ "<td bgcolor='#FFFFFF'>" + job.getIndex() + "</td>"
+									+ "<td bgcolor='#FFFFFF'>" + (1 + job.getIndex()) + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + st + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + SystemAnalysis.getWaitTime(job.getUptime()) + "</td>"
-									+ "<td bgcolor='#FFFFFF'>" + job.stopRequested() + "</td>"
+									+ "<td bgcolor='#FFFFFF'>" + (job.stopRequested() ? "yes" : "-") + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + job.getCurrentTaskName() + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + SystemAnalysis.getWaitTime(job.getTaskUptime()) + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + (job.getTaskExceptionCount() > 0 ? job.getTaskExceptionCount() + "" : "-") + "</td>"
@@ -86,7 +86,8 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 					if (n == 0)
 						t.append("<tr><td colspan=7 bgcolor='#FFFFFF'><center><br>- No background tasks scheduled.-<br><br></center></td></tr>");
 					else
-						t.append("<tr><td colspan=7 bgcolor='#FFFFFF'><center><br>" + nRun + " running, " + nBlocked + " blocked, " + nWait + " waiting, " + nTerm
+						t.append("<tr><td colspan=7 bgcolor='#FFFFFF'><center><br>" + nRun + " running, " + nBlocked + " blocked, " + nWait + " waiting, " + nSleep
+								+ " sleeping, " + nTerm
 								+ " terminated.<br><br></center></td></tr>");
 					
 					t.append("</table>");
