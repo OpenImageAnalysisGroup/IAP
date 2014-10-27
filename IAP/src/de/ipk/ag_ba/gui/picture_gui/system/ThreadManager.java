@@ -106,11 +106,11 @@ public class ThreadManager {
 							for (RunnerThread tbs : toBeStarted)
 								tbs.start();
 						}
-					for (int idx = 0; idx < threadArray.length; idx++) {
-						if (started[idx] && threadArray[idx].stopRequested() && !threadArray[idx].isAlive()) {
-							threadArray[idx] = null;
-							started[idx] = false;
-						}
+				}
+				for (int idx = 0; idx < threadArray.length; idx++) {
+					if (started[idx] && threadArray[idx].stopRequested() && !threadArray[idx].isAlive()) {
+						threadArray[idx] = null;
+						started[idx] = false;
 					}
 				}
 			}

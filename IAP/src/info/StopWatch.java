@@ -85,8 +85,8 @@ public class StopWatch {
 	}
 	
 	public void stop() {
-		stopped = true;
 		stoppedTime = getTime();
+		stopped = true;
 	}
 	
 }
