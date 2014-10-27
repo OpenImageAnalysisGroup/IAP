@@ -18,7 +18,7 @@ public class ThreadManager {
 	
 	SystemOptions so = SystemOptions.getInstance();
 	
-	RunnerThread[] threadArray = new RunnerThread[SystemAnalysis.getRealNumberOfCPUs() * 2];
+	RunnerThread[] threadArray = new RunnerThread[SystemAnalysis.getRealNumberOfCPUs() * 4];
 	
 	private final LinkedList<LocalComputeJob> jobs = new LinkedList<LocalComputeJob>();
 	private final Semaphore jobModification = new Semaphore(1, true);
@@ -28,13 +28,13 @@ public class ThreadManager {
 	private ThreadManager() {
 		Timer res = new Timer("Background Thread Management", true);
 		res.scheduleAtFixedRate(new TimerTask() {
-			boolean[] started = new boolean[SystemAnalysis.getRealNumberOfCPUs() * 2];
+			boolean[] started = new boolean[SystemAnalysis.getRealNumberOfCPUs() * 4];
 			
 			@Override
 			public void run() {
 				runningTasks.setInt(getRunningCount());
-				if (started.length != SystemAnalysis.getRealNumberOfCPUs() * 2) {
-					boolean[] new_started = new boolean[SystemAnalysis.getRealNumberOfCPUs() * 2];
+				if (started.length != SystemAnalysis.getRealNumberOfCPUs() * 4) {
+					boolean[] new_started = new boolean[SystemAnalysis.getRealNumberOfCPUs() * 4];
 					for (int i = 0; i < started.length; i++) {
 						if (i < new_started.length)
 							new_started[i] = started[i];
@@ -51,7 +51,19 @@ public class ThreadManager {
 						jobs.remove(j);
 					jobModification.release();
 					
-					int desiredThreadCount = SystemAnalysis.getNumberOfCPUs() - 1;
+					int desiredThreadCount = SystemAnalysis.getNumberOfCPUs();
+					int idleTasks = 0;
+					boolean checkForIdle = SystemOptions.getInstance().getBoolean("SYSTEM", "Detect Idle Tasks", false);
+					if (checkForIdle) {
+						for (RunnerThread t : threadArray)
+							if (t != null && (t.getState() == Thread.State.BLOCKED ||
+									t.getState() == Thread.State.WAITING ||
+									t.getState() == Thread.State.TIMED_WAITING)) {
+								idleTasks++;
+								// System.out.println("State=" + t.getState());
+							}
+					}
+					desiredThreadCount += idleTasks;
 					desiredThreadCount = modifyConcurrencyDependingOnMemoryStatus(desiredThreadCount);
 					
 					int maxCnt = Math.min(Math.min(jobs.size(), desiredThreadCount), threadArray.length);
@@ -166,7 +178,6 @@ public class ThreadManager {
 	
 	public void memTask(LocalComputeJob t, boolean forceMem, int maxWait) {
 		boolean run = false;
-		boolean addForDelayedExecution = maxWait < 0;
 		if (maxWait < 0)
 			maxWait = -maxWait;
 		if (forceMem) {
@@ -199,6 +210,7 @@ public class ThreadManager {
 						.getMemoryMB() + " MB)");
 			}
 		}
+		
 		jobModification.acquireUninterruptibly();
 		if (jobs.size() > maxWait)
 			run = true;
@@ -239,6 +251,7 @@ public class ThreadManager {
 	}
 	
 	public int getNumberOfRunningBackgroundTasks() {
-		return runningTasks.getInt();
+		int v = runningTasks.getInt();
+		return v;
 	}
 }
