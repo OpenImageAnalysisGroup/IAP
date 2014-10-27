@@ -41,7 +41,7 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 			public void update() {
 				Collection<RunnerThread> jobs = ThreadManager.getInstance().getRunningTasks();
 				if (jobs.isEmpty()) {
-					setText("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>No Background-Task active.</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>");
+					setText("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>No Background-Task active</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>");
 				} else {
 					StringBuilder t = new StringBuilder();
 					t.append("<html><table>"
@@ -84,7 +84,7 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 						}
 					}
 					if (n == 0)
-						t.append("<tr><td colspan=7 bgcolor='#FFFFFF'><center><br>- No background tasks scheduled.-<br><br></center></td></tr>");
+						t.append("<tr><td colspan=7 bgcolor='#FFFFFF'><center><br>- No background tasks scheduled -<br><br></center></td></tr>");
 					else
 						t.append("<tr><td colspan=7 bgcolor='#FFFFFF'><center><br>" + nRun + " running, " + nBlocked + " blocked, " + nWait + " waiting, " + nSleep
 								+ " sleeping, " + nTerm
@@ -143,6 +143,6 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-Utilities-System-Monitor-64.png";
+		return "img/cores.png";// ext/gpl2/Gnome-Utilities-System-Monitor-64.png";
 	}
 }
