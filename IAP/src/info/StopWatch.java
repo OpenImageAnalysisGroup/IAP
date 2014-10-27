@@ -22,6 +22,8 @@ public class StopWatch {
 	
 	private long start = System.currentTimeMillis();
 	private String desc;
+	private long stoppedTime;
+	private boolean stopped;
 	
 	/**
 	 * @param desc
@@ -39,6 +41,7 @@ public class StopWatch {
 	
 	public void reset() {
 		start = System.currentTimeMillis();
+		stopped = false;
 	}
 	
 	/**
@@ -47,6 +50,8 @@ public class StopWatch {
 	 *         last {@link #reset()} operation.
 	 */
 	public long getTime() {
+		if (stopped)
+			return stoppedTime;
 		return System.currentTimeMillis() - start;
 	}
 	
@@ -77,6 +82,11 @@ public class StopWatch {
 	
 	public void setDescription(String desc) {
 		this.desc = desc;
+	}
+	
+	public void stop() {
+		stopped = true;
+		stoppedTime = getTime();
 	}
 	
 }

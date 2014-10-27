@@ -212,6 +212,9 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 		resultNavigationButtons.add(new NavigationButton(new ActionBlockStatistics("Show overview of block execution times"),
 				src.getGUIsetting()));
 		
+		resultNavigationButtons.add(new NavigationButton(new ActionTaskStatistics("Show overview of running background tasks"),
+				src.getGUIsetting()));
+		
 		// boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
 		// resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-03",
 		// simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src
