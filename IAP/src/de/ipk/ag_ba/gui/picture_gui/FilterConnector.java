@@ -73,9 +73,10 @@ public class FilterConnector {
 						infolabel.setText((isLastInList ? "" : "- - -"));
 					else
 						if (diff)
-							infolabel.setText((isLastInList ? "" : lrs + " ") + matches + "/" + (matches + notmatches) + (isLastInList ? "" : " " + lrs));
+							infolabel.setText("<html><code>" + (isLastInList ? "" : lrs + " ") + matches + "/" + (matches + notmatches)
+									+ (isLastInList ? "" : " " + lrs));
 						else
-							infolabel.setText((isLastInList ? "" : lrs + " ") + matches + (isLastInList ? "" : " " + lrs));
+							infolabel.setText("<html><code>" + (isLastInList ? "" : lrs + " ") + matches + (isLastInList ? "" : " " + lrs));
 				}
 			});
 		}
@@ -112,11 +113,16 @@ public class FilterConnector {
 			@Override
 			public void run() {
 				infolabel.setText("");
+				matches = 0;
+				notmatches = 0;
+				if (treeSelectionListener != null)
+					treeSelectionListener.valueChanged(e);
 			}
 		});
+	}
+	
+	public void resetCount() {
 		matches = 0;
 		notmatches = 0;
-		if (treeSelectionListener != null)
-			treeSelectionListener.valueChanged(e);
 	}
 }

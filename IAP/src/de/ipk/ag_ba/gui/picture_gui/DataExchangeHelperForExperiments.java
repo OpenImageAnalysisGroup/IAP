@@ -363,7 +363,7 @@ public class DataExchangeHelperForExperiments {
 						continue;
 				lastBBB = binaryFileInfo;
 			}
-			
+			myFilterConnector.resetCount();
 			for (final BinaryFileInfo binaryFileInfo : bbb) {
 				if (mt != expTree.getSelectionPath().getLastPathComponent())
 					break;
