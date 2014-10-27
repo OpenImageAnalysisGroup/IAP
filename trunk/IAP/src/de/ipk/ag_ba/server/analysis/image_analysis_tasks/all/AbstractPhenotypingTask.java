@@ -371,7 +371,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 							// BackgroundThreadDispatcher.waitFor(wait);
 							// wait.clear();
 					} // for each time point
-				}, "Analyze timepoint " + time), true));
+				}, "Analyze timepoint " + SystemAnalysis.getCurrentTime(time)), true));
 			} // if image data available
 		}
 		BackgroundThreadDispatcher.waitFor(wait);

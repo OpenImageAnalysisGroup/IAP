@@ -97,4 +97,8 @@ public class LocalComputeJob implements Runnable {
 	public String toString() {
 		return "Background Task " + name;
 	}
+	
+	public String getName() {
+		return name;
+	}
 }

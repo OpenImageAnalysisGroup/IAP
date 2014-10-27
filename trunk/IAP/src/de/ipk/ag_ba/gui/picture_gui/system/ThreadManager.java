@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.picture_gui.system;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -88,7 +89,7 @@ public class ThreadManager {
 							ArrayList<RunnerThread> toBeStarted = new ArrayList<>();
 							for (boolean s : started) {
 								if (!s) {
-									threadArray[idx] = new RunnerThread(jobs, jobModification);
+									threadArray[idx] = new RunnerThread(jobs, jobModification, idx);
 									started[idx] = true;
 									threadArray[idx].setDaemon(false);
 									threadArray[idx].setName("Background Thread " + (idx + 1));
@@ -253,5 +254,12 @@ public class ThreadManager {
 	public int getNumberOfRunningBackgroundTasks() {
 		int v = runningTasks.getInt();
 		return v;
+	}
+	
+	public Collection<RunnerThread> getRunningTasks() {
+		Collection<RunnerThread> res = new LinkedList<>();
+		for (RunnerThread t : threadArray)
+			res.add(t);
+		return res;
 	}
 }
