@@ -10,6 +10,8 @@ import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
+import javax.xml.bind.DatatypeConverter;
+
 /**
  * @author klukas
  */
@@ -47,5 +49,10 @@ public class MyByteArrayInputStream extends ByteArrayInputStream {
 	
 	public MyByteArrayInputStream getNewStream() {
 		return new MyByteArrayInputStream(buf, count);
+	}
+	
+	@Override
+	public String toString() {
+		return DatatypeConverter.printBase64Binary(getBuffTrimmed());
 	}
 }
