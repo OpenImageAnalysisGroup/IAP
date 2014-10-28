@@ -105,7 +105,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 					time2summaryResult.get(time).get("-720").put(knownTray, new BlockResults(null));
 			for (String tray : time2summaryResult.get(time).get("-720").keySet()) {
 				double areaSum = 0;
-				double areaCnt = 0;
+				int areaCnt = 0;
 				double sideArea_for_angleNearestTo0 = Double.NaN;
 				double sideArea_for_angleNearestTo45 = Double.NaN;
 				double sideArea_for_angleNearestTo90 = Double.NaN;
@@ -124,7 +124,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 					}
 					if (rt == null || rt.isNumericStoreEmpty())
 						continue;
-					for (BlockResultValue v : rt.searchResults(true, new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, "area"
+					for (BlockResultValue v : rt.searchResults(true, new Trait(CameraPosition.SIDE, cameraType, TraitCategory.GEOMETRY, "area"
 							+ (normalized ? ".norm" : "")).toString(), false)) {
 						if (v.getValue() != null) {
 							imageRef = v.getBinary();
@@ -161,22 +161,22 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 				if (areaStat.getN() > 0) {
 					if (getBoolean("Store additional area statistics values", false)) {
 						summaryResult.setNumericResult(getBlockPosition(),
-								new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, "area.min" + (normalized ? ".norm" : "")),
+								new Trait(CameraPosition.SIDE, cameraType, TraitCategory.GEOMETRY, "area.min" + (normalized ? ".norm" : "")),
 								areaStat.getMin(),
 								normalized ? "mm^2" : "px", this, imageRef);
 						summaryResult.setNumericResult(getBlockPosition(),
-								new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, "area.max" + (normalized ? ".norm" : "")),
+								new Trait(CameraPosition.SIDE, cameraType, TraitCategory.GEOMETRY, "area.max" + (normalized ? ".norm" : "")),
 								areaStat.getMax(),
 								normalized ? "mm^2" : "px", this, imageRef);
 						summaryResult.setNumericResult(getBlockPosition(),
-								new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.GEOMETRY, "area.median" + (normalized ? ".norm" : "")),
+								new Trait(CameraPosition.SIDE, cameraType, TraitCategory.GEOMETRY, "area.median" + (normalized ? ".norm" : "")),
 								areaStat.getPercentile(50),
 								normalized ? "mm^2" : "px", this, imageRef);
 					}
 				}
 				
 				double topAreaSum = 0;
-				double topAreaCnt = 0;
+				int topAreaCnt = 0;
 				
 				synchronized (allResultsForSnapshot) {
 					TreeSet<String> ks2 = new TreeSet<String>(allResultsForSnapshot.keySet());
@@ -189,7 +189,8 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 							rt = allResultsForSnapshot.get(key).get(tray);
 						}
 						if (rt != null)
-							for (BlockResultValue v : rt.searchResults(true, "RESULT_top." + cameraType + ".area" + (normalized ? ".norm" : ""), false)) {
+							for (BlockResultValue v : rt.searchResults(true, new Trait(CameraPosition.TOP, cameraType, TraitCategory.GEOMETRY, "area"
+									+ (normalized ? ".norm" : "")).toString(), false)) {
 								if (v.getValue() != null) {
 									topAreaSum += v.getValue().doubleValue();
 									topAreaCnt += 1;
@@ -215,7 +216,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 								double wue = absoluteGrowthPerDay / waterUsePerDay;
 								if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
 									summaryResult.setNumericResult(getBlockPosition(),
-											new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.DERIVED, "area.avg.wue"
+											new Trait(CameraPosition.SIDE, cameraType, TraitCategory.DERIVED, "area.avg.wue"
 													+ (normalized ? ".norm" : "")), wue, "px/ml/day",
 											this, imageRef);
 									
@@ -225,10 +226,9 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 								double wue = (relativeGrowthPerDay - 1) * 100 / waterUsePerDay;
 								if (!Double.isNaN(wue) && !Double.isInfinite(wue)) {
 									summaryResult.setNumericResult(getBlockPosition(),
-											new Trait(optionsAndResults.getCameraPosition(), cameraType, TraitCategory.DERIVED, "area.avg.wue.relative"
+											new Trait(CameraPosition.SIDE, cameraType, TraitCategory.DERIVED, "area.avg.wue.relative"
 													+ (normalized ? ".norm" : "")), wue,
 											"percent growth/ml/day", this, imageRef);
-									
 								}
 							}
 						}
