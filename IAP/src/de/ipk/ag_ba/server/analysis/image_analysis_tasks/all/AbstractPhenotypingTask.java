@@ -241,7 +241,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				final String plantIDf = plantID;
 				try {
 					progress++;
-					final String preThreadName = "Snapshot Analysis (" + progress + "/" + numberOfPlants + ", plant " + plantID + ")";
+					final String preThreadName = "Analysis Task " + progress + "/" + numberOfPlants + " (" + plantID + ")";
 					status.setCurrentStatusText1(preThreadName);
 					Runnable t = new Runnable() {
 						@Override
@@ -263,12 +263,11 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					};
 					workLoad.add(t);
 					workLoad_desc.add(preThreadName);
-					Thread.sleep(50);
 				} catch (Exception eeee) {
 					throw new RuntimeException(eeee);
 				}
 			}
-			status.setCurrentStatusText1("Enqueue Analysis Tasks");
+			status.setCurrentStatusText1(" Process Tasks");
 			ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 			final int todo = workLoad.size();
 			final ThreadSafeOptions progr = new ThreadSafeOptions();
@@ -282,10 +281,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					plantName = plantName.split(";", 2)[1];
 				do {
 					Thread.sleep(100);
-					status.setCurrentStatusText1("Enqueued " + progr.getInt() + "/" + todo + " plants ("
+					status.setCurrentStatusText1("Enqueue Task " + progr.getInt() + "/" + todo + " ("
 							+ BackgroundThreadDispatcher.getWorkLoad() + " tasks, "
 							+ (BackgroundThreadDispatcher.getBackgroundThreadCount()) + " threads)");
-				} while (BackgroundThreadDispatcher.getWorkLoad() > SystemAnalysis.getNumberOfCPUs());
+				} while (BackgroundThreadDispatcher.getWorkLoad() - 2 > SystemAnalysis.getNumberOfCPUs());
 			}
 			BackgroundThreadDispatcher.waitFor(wait, new Runnable() {
 				@Override
@@ -338,40 +337,38 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			for (final Long time : imageSetWithSpecificAngle.keySet()) {
 				if (status.wantsToStop())
 					continue;
-				
-				wait.add(BackgroundThreadDispatcher.addTask(new LocalComputeJob(new Runnable() {
-					@Override
-					public void run() {
-						// LinkedList<LocalComputeJob> wait = new LinkedList<LocalComputeJob>();
-						for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
-							if (configAndAngle.startsWith("1st_top"))
-								// wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
-								// @Override
-								// public void run() {
-								processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
-										plantResults, time, configAndAngle);
-							// }
-							// }, "Analyze angle (top) " + configAndAngle));
-						} // for top angle
-							// BackgroundThreadDispatcher.waitFor(wait);
-							// wait.clear();
-						for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
-							if (status.wantsToStop())
-								continue;
-							
-							if (!configAndAngle.startsWith("1st_top"))
-								// wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
-								// @Override
-								// public void run() {
-								processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
-										plantResults, time, configAndAngle);
-							// }
-							// }, "Analyze angle (side) " + configAndAngle));
-						} // for side angle
-							// BackgroundThreadDispatcher.waitFor(wait);
-							// wait.clear();
-					} // for each time point
-				}, "Analyze timepoint " + SystemAnalysis.getCurrentTime(time)), true));
+				wait.add(BackgroundThreadDispatcher.addTask(
+						new LocalComputeJob(
+								() -> {
+									// LinkedList<LocalComputeJob> wait = new LinkedList<LocalComputeJob>();
+								for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
+									if (configAndAngle.startsWith("1st_top"))
+										// wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+										// @Override
+										// public void run() {
+										processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
+												plantResults, time, configAndAngle);
+									// }
+									// }, "Analyze angle (top) " + configAndAngle));
+								} // for top angle
+									// BackgroundThreadDispatcher.waitFor(wait);
+									// wait.clear();
+								for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
+									if (status.wantsToStop())
+										continue;
+									
+									if (!configAndAngle.startsWith("1st_top"))
+										// wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+										// @Override
+										// public void run() {
+										processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
+												plantResults, time, configAndAngle);
+									// }
+									// }, "Analyze angle (side) " + configAndAngle));
+								} // for side angle
+									// BackgroundThreadDispatcher.waitFor(wait);
+									// wait.clear();
+							}, "Analyze data from " + SystemAnalysis.getCurrentTime(time) + " (" + plantID + ")"), true));
 			} // if image data available
 		}
 		BackgroundThreadDispatcher.waitFor(wait);
@@ -389,7 +386,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					addPostprocessingResults(postprocessingResults);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
 				ErrorMsg.addErrorMessage(e);
 			}
 		}

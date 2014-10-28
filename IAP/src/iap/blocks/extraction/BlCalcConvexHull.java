@@ -83,7 +83,7 @@ public class BlCalcConvexHull extends AbstractBlock implements CalculatesPropert
 	}
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return false;
 	}
 	

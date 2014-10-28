@@ -104,7 +104,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 	}
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return true;
 	}
 	

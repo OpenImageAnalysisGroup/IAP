@@ -159,7 +159,7 @@ public class BlSaveResultImages extends AbstractBlock {
 	}
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return false;
 	}
 	

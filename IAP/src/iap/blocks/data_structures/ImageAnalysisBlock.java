@@ -64,4 +64,6 @@ public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	 */
 	public String getDescriptionForParameters();
 	
+	boolean isChangingImages();
+	
 }

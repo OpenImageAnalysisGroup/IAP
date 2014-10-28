@@ -25,8 +25,6 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 	
 	private final LinkedList<JComponent> htmlTextPanels = new LinkedList<JComponent>();
 	
-	private int shown_groups = -1;
-	
 	public ActionTaskStatistics(String tooltip) {
 		super(tooltip);
 	}
@@ -98,8 +96,6 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 		};
 		r.setBorder(BorderFactory.createBevelBorder(1));
 		htmlTextPanels.add(r);
-		
-		shown_groups = htmlTextPanels.size();
 	}
 	
 	@Override

@@ -29,7 +29,7 @@ public class BlCalcMainAxis
 		implements CalculatesProperties {
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return false;
 	}
 	

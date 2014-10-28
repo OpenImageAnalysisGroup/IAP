@@ -200,7 +200,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			return null;
 	}
 	
-	protected boolean isChangingImages() {
+	@Override
+	public boolean isChangingImages() {
 		return true;
 	}
 	

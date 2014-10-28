@@ -127,7 +127,7 @@ public class BlCalcAreas extends AbstractSnapshotAnalysisBlock implements Calcul
 	}
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return false;
 	}
 	

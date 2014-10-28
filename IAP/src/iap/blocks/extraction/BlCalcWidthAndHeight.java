@@ -43,7 +43,7 @@ public class BlCalcWidthAndHeight extends
 	}
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return false;
 	}
 	

@@ -366,7 +366,7 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 	}
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return false;
 	}
 	
