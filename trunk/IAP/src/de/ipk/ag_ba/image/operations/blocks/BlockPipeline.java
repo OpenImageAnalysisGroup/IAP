@@ -31,6 +31,8 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.ActionSettings;
+import de.ipk.ag_ba.commands.BlockMonitoringResult;
+import de.ipk.ag_ba.commands.PipelineMonitoringResult;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
@@ -60,6 +62,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
  */
 public class BlockPipeline {
 	
+	private static final HashMap<BlockPipeline, PipelineMonitoringResult> monitoringResultHashMap = new HashMap<BlockPipeline, PipelineMonitoringResult>();
 	private final ArrayList<Class<? extends ImageAnalysisBlock>> blocks = new ArrayList<Class<? extends ImageAnalysisBlock>>();
 	private static int lastPipelineExecutionTimeInSec = -1;
 	
@@ -157,10 +160,10 @@ public class BlockPipeline {
 		int nBlocks = blocks.size();
 		
 		MaskAndImageSet workset = new MaskAndImageSet(inputSet, maskSet != null ? maskSet : inputSet.copy());
-		
+		int blockCount = blocks.size();
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (status != null && status.wantsToStop()) {
-				System.out.println("Break requested");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Break requested. Stopping pipeline execution flow.");
 				break;
 			}
 			
@@ -180,6 +183,25 @@ public class BlockPipeline {
 			long ta = System.currentTimeMillis();
 			workset = block.process();
 			long tb = System.currentTimeMillis();
+			
+			if (System.currentTimeMillis() < pipelineMonitoringMaxValidTimePoint) {
+				// save block results
+				PipelineMonitoringResult currentPipelineMonitoringResult = null;
+				synchronized (BlockPipeline.monitoringResultHashMap) {
+					if (!BlockPipeline.monitoringResultHashMap.containsKey(this)) {
+						String plantID = workset.images().getAnyInfo().getQualityAnnotation();
+						Long snapshotTime = workset.images().getAnyInfo().getParentSample().getSampleFineTimeOrRowId();
+						BlockPipeline.monitoringResultHashMap.put(this, new PipelineMonitoringResult(plantID, snapshotTime));
+					}
+					currentPipelineMonitoringResult = BlockPipeline.monitoringResultHashMap.get(this);
+				}
+				if (block.isChangingImages() && currentPipelineMonitoringResult.isEmpty() || index == blockCount)
+					currentPipelineMonitoringResult.addBlockResult(new BlockMonitoringResult(workset, pipelineMonitoringResultImageSize, block.getName(), tb - ta));
+				if (index == blockCount) {
+					// last block in list
+					lastPipelineMonitoringResult = currentPipelineMonitoringResult;
+				}
+			}
 			
 			int seconds = (int) ((tb - ta) / 1000);
 			
@@ -302,6 +324,9 @@ public class BlockPipeline {
 	}
 	
 	private static int pipelineExecutionsWithinCurrentHour = 0;
+	private static PipelineMonitoringResult lastPipelineMonitoringResult;
+	private static int pipelineMonitoringResultImageSize;
+	private static long pipelineMonitoringMaxValidTimePoint;
 	private HashSet<Integer> debugValidTrays;
 	
 	/**
@@ -465,5 +490,21 @@ public class BlockPipeline {
 	
 	public static void ping() {
 		overallBlockExecutions++;
+	}
+	
+	public static void activateBlockResultMonitoring(int imageSize, int validTime) {
+		pipelineMonitoringResultImageSize = imageSize;
+		pipelineMonitoringMaxValidTimePoint = System.currentTimeMillis() + validTime;
+	}
+	
+	public static PipelineMonitoringResult getLastPipelineMonitoringResults() {
+		if (System.currentTimeMillis() >= pipelineMonitoringMaxValidTimePoint || lastPipelineMonitoringResult == null) {
+			lastPipelineMonitoringResult = null;
+			synchronized (monitoringResultHashMap) {
+				monitoringResultHashMap.clear();
+			}
+			return null;
+		}
+		return lastPipelineMonitoringResult;
 	}
 }

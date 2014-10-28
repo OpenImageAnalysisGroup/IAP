@@ -662,4 +662,14 @@ public class Image {
 		
 		return bimage;
 	}
+	
+	public String getHTMLimageTag() throws IOException {
+		// call Handler.installl(), before showing HTML. Otherwise data URLs can't be displayed properly.
+		return "<img width=" + getWidth() + " height=" + getHeight() + " src=\"data:" + getPNGstreamData() + "\"/>";
+	}
+	
+	private String getPNGstreamData() throws IOException {
+		String streamData = getAsPNGstream().toString();
+		return "image/png;charset=utf-8;base64," + streamData;
+	}
 }

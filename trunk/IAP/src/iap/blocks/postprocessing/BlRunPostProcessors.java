@@ -126,7 +126,7 @@ public class BlRunPostProcessors extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return true;
 	}
 	

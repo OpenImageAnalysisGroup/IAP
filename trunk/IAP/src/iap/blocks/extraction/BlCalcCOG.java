@@ -97,7 +97,7 @@ public class BlCalcCOG extends AbstractBlock implements CalculatesProperties {
 	}
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return false;
 	}
 	

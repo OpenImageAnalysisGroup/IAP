@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.ImageSet;
 public class BlFilterImagesByAngle extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return true;
 	}
 	

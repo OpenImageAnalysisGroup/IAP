@@ -17,7 +17,7 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlockClearSmallBorderAroundImagesAndMasks extends AbstractBlock {
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return true;
 	}
 	

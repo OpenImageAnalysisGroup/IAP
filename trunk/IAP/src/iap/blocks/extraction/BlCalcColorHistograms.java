@@ -37,7 +37,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 	private boolean addHistogramValuesForSections = false;
 	
 	@Override
-	protected boolean isChangingImages() {
+	public boolean isChangingImages() {
 		return false;
 	}
 	
