@@ -48,14 +48,14 @@ public class ActionPipelineStatus extends AbstractNavigationAction {
 					lastRes = pr;
 					StringBuilder t = new StringBuilder();
 					t.append("<html><table>"
-							+ "<tr><th colspan=6 bgcolor='#EE9977'>Block Results (" + pr.getPlantID() + " " + pr.getSnapshotTime() + ")</th></tr>"
+							+ "<tr><th colspan=5 bgcolor='#EE9977'>Block Results (" + pr.getPlantID() + " " + pr.getSnapshotTime() + ")</th></tr>"
 							+ "<tr>"
 							+ "<th bgcolor='#DDDDDD'>Block</th>"
 							+ "<th bgcolor='#DDDDDD'>Visible-Light</th>"
 							+ "<th bgcolor='#DDDDDD'>Fluorescence</th>"
 							+ "<th bgcolor='#DDDDDD'>Near-Infrared</th>"
 							+ "<th bgcolor='#DDDDDD'>Infrared</th>"
-							+ "<th bgcolor='#DDDDDD'>Processing time</th>"
+							// + "<th bgcolor='#DDDDDD'>Processing time</th>"
 							+ "</tr>");
 					int n = 0;
 					for (BlockMonitoringResult bmr : pr.getBlockResults()) {
@@ -65,12 +65,12 @@ public class ActionPipelineStatus extends AbstractNavigationAction {
 								+ "<td bgcolor='#FFFFFF'>" + bmr.getImageHTML(CameraType.FLUO) + "&nbsp;" + bmr.getMaskHTML(CameraType.FLUO) + "</td>"
 								+ "<td bgcolor='#FFFFFF'>" + bmr.getImageHTML(CameraType.NIR) + "&nbsp;" + bmr.getMaskHTML(CameraType.NIR) + "</td>"
 								+ "<td bgcolor='#FFFFFF'>" + bmr.getImageHTML(CameraType.IR) + "&nbsp;" + bmr.getMaskHTML(CameraType.IR) + "</td>"
-								+ "<td bgcolor='#FFFFFF'>" + bmr.getProcessTime() + "</td>"
+								// + "<td bgcolor='#FFFFFF'>" + bmr.getProcessTime() + "</td>"
 								+ "</tr>");
 						n++;
 					}
 					if (n == 0)
-						t.append("<tr><td colspan=6 bgcolor='#FFFFFF'><center><br>Pipeline-Monitoring Activated. Waiting for Block-Results.<br><br></center></td></tr>");
+						t.append("<tr><td colspan=5 bgcolor='#FFFFFF'><center><br>Pipeline-Monitoring Activated. Waiting for Block-Results.<br><br></center></td></tr>");
 					
 					t.append("</table>");
 					String txt = t.toString();
