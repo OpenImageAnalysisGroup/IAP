@@ -29,8 +29,8 @@ public class WellProcessing {
 		String id = SystemOptions.getInstance().getString("Multi-Tray Wells", "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, "X" + wellIdx);
 		SystemOptions o = options != null ? options.getOptSystemOptions() : null;
 		if (o != null)
-			id = o.getString("Multi-Tray Wells",
-					"Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, id);
+			id = o.getString("Well Names",
+					sn + "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, id);
 		return id;
 	}
 	
@@ -48,8 +48,8 @@ public class WellProcessing {
 		String id = SystemOptions.getInstance().getString("Multi-Tray Wells", "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, "X" + wellIdx);
 		SystemOptions o = options != null ? options.getOptSystemOptions() : null;
 		if (o != null)
-			id = o.getString("Multi-Tray Wells",
-					"Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, id);
+			id = o.getString("Well Names",
+					sn + "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, id);
 		return id;
 	}
 	
@@ -67,8 +67,8 @@ public class WellProcessing {
 		String id = SystemOptions.getInstance().getString("Multi-Tray Wells", "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, "X" + wellIdx);
 		SystemOptions o = options != null ? options.getOptSystemOptions() : null;
 		if (o != null)
-			id = o.getString("Multi-Tray Wells",
-					"Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, id);
+			id = o.getString("Well Names",
+					sn + "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, id);
 		return id;
 	}
 }
