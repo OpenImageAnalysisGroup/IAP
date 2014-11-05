@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import javax.swing.ImageIcon;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.plugin.GenericPluginAdapter;
@@ -45,12 +46,20 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin
 			for (AnalysisPipelineTemplate t : getAnalysisTemplates()) {
 				SystemOptions options = null;
 				ImageProcessorOptionsAndResults ipo = new ImageProcessorOptionsAndResults(options, null, null);
-				ImageAnalysisBlock[] bl = t.getBlockList(ipo);
-				if (bl != null)
-					for (ImageAnalysisBlock b : bl) {
-						if (b != null)
-							res.add(b);
-					}
+				try {
+					ImageAnalysisBlock[] bl = t.getBlockList(ipo);
+					if (bl != null)
+						for (ImageAnalysisBlock b : bl) {
+							if (b != null)
+								res.add(b);
+						}
+				} catch (Error e) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage() + " // template: " + t.getTitle());
+					ErrorMsg.addErrorMessage(e.getMessage() + " // template: " + t.getTitle());
+				} catch (Exception e) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage() + " // template: " + t.getTitle());
+					ErrorMsg.addErrorMessage(e);
+				}
 			}
 			return res.toArray(new ImageAnalysisBlock[] {});
 		}
