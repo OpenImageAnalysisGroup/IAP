@@ -54,7 +54,9 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		rl.detectClusters();
 		
 		LinkedList<Feature> featureList = getFeaturesFromClusters(img, rl, minimumSizeOfRegion);
-		Image marked = saveAndMarkResults(img, featureList, markResults, saveResults, trackResults, input().images().getVisInfo());
+		Image marked = null;
+		if (featureList != null)
+			marked = saveAndMarkResults(img, featureList, markResults, saveResults, trackResults, input().images().getVisInfo());
 		
 		return marked;
 	}
@@ -87,58 +89,61 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			clusteredImage.copy().io().or(skel).getImage()
 					.show("skel images on mask" + ct.toString(), debugValues);
 			// removes flowers from skleton
-			skel = skel.io().removePixel(clusteredImage, background).getImage();
-		}
-		
-		int[] skelArray = skel.getAs1A();
-		ImageCanvas icclu = new ImageCanvas(clusteredImage);
-		
-		int idx = 0;
-		for (ArrayList<PositionAndColor> cluster : regions) {
-			if (!deleted[idx]) {
-				Vector2i dim = clusterDimensions[idx];
-				TopBottomLeftRight bounds = boundingBox[idx];
-				Vector2i centerPoint = centerPoints[idx];
-				double minDistanceToOtherRegion = getMinDist(centerPoint, centerPoints);
-				Image flowerImage = getClusterImage(cluster, dim, bounds);
-				// flowerImage.show("flower");
-				ImageMoments im = new ImageMoments(flowerImage);
-				Point coG = im.getCenterOfGravity();
-				Point coGWeighted = im.getCenterOfGravityWeigthed(ColorMode.BLUE);
-				Point directionNextSekeltonPoint = getConnectedDirectionFromSkeleton(skelArray, clusteredImage, cluster, img.getWidth());
-				
-				icclu.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 10, Color.BLUE.getRGB(), 0.0, 2);
-				
-				if (directionNextSekeltonPoint.x == -1)
-					directionNextSekeltonPoint = new Point(coGWeighted.x + bounds.getLeftX(), coGWeighted.x + bounds.getTopY());
-				double ec = im.getEccentricity();
-				// direction
-				Vector2D direction = new Vector2D(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y);
-				
-				if (true) {
-					ImageCanvas ic = new ImageCanvas(im.drawMoments().copy());
-					int centerX = centerPoint.x - bounds.getLeftX();
-					int centerY = centerPoint.y - bounds.getTopY();
-					ic.drawCircle(centerX, centerY, 5, Color.BLUE.getRGB(), 0, 1);
-					ic.drawCircle(coG.x, coG.y, 5, Color.YELLOW.getRGB(), 0, 1);
-					ic.drawCircle(coGWeighted.x, coGWeighted.y, 5, Color.RED.getRGB(), 0, 1);
-					ic.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 5, Color.BLACK.getRGB(), 0, 1);
-					ic.drawLine(new Point(centerX, centerY), new Point((int) (direction.getX()),
-							(int) (direction.getY())), Color.ORANGE.getRGB(), 0.0, 1);
-					ic.getImage().show("marked flower", false);
+			skel = skel.io().removeOutliers().removePixel(clusteredImage, background).getImage().show("removed flowers from skel + outlier removal", debugValues);
+			
+			int[] skelArray = skel.getAs1A();
+			ImageCanvas icSkelPoints = new ImageCanvas(clusteredImage);
+			
+			int idx = 0;
+			for (ArrayList<PositionAndColor> cluster : regions) {
+				if (!deleted[idx]) {
+					Vector2i dim = clusterDimensions[idx];
+					TopBottomLeftRight bounds = boundingBox[idx];
+					Vector2i centerPoint = centerPoints[idx];
+					double minDistanceToOtherRegion = getMinDist(centerPoint, centerPoints);
+					Image flowerImage = getClusterImage(cluster, dim, bounds);
+					// flowerImage.show("flower");
+					ImageMoments im = new ImageMoments(flowerImage);
+					Point coG = im.getCenterOfGravity();
+					Point coGWeighted = im.getCenterOfGravityWeigthed(ColorMode.BLUE);
+					Point directionNextSekeltonPoint = getConnectedDirectionFromSkeleton(skelArray, cluster, img.getWidth());
+					
+					icSkelPoints.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 3, Color.BLUE.getRGB(), 0.0, 2);
+					
+					if (directionNextSekeltonPoint.x == -1)
+						directionNextSekeltonPoint = new Point(coGWeighted.x + bounds.getLeftX(), coGWeighted.x + bounds.getTopY());
+					double ec = im.getEccentricity();
+					// direction
+					Vector2D direction = new Vector2D(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y);
+					
+					if (true) {
+						ImageCanvas ic = new ImageCanvas(im.drawMoments().copy());
+						int centerX = centerPoint.x - bounds.getLeftX();
+						int centerY = centerPoint.y - bounds.getTopY();
+						ic.drawCircle(centerX, centerY, 5, Color.BLUE.getRGB(), 0, 1);
+						ic.drawCircle(coG.x, coG.y, 5, Color.YELLOW.getRGB(), 0, 1);
+						ic.drawCircle(coGWeighted.x, coGWeighted.y, 5, Color.RED.getRGB(), 0, 1);
+						ic.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 5, Color.BLACK.getRGB(), 0, 1);
+						ic.drawLine(new Point(centerX, centerY), new Point((int) (direction.getX()),
+								(int) (direction.getY())), Color.ORANGE.getRGB(), 0.0, 1);
+						ic.getImage().show("marked flower", debugValues);
+					}
+					
+					Vector2i pos = centerPoints[idx];
+					Feature tempFeature = new Feature(new Integer(pos.x), new Integer(pos.y));
+					tempFeature.addFeature("size", areas[idx], FeatureObjectType.NUMERIC);
+					tempFeature.addFeature("eccentricity", ec, FeatureObjectType.NUMERIC);
+					tempFeature.addFeature("minDistToOtherRegion", minDistanceToOtherRegion, FeatureObjectType.NUMERIC);
+					tempFeature.addFeature("direction_1", direction, FeatureObjectType.VECTOR);
+					flist.add(tempFeature);
 				}
-				
-				Vector2i pos = centerPoints[idx];
-				Feature tempFeature = new Feature(new Integer(pos.x), new Integer(pos.y));
-				tempFeature.addFeature("size", areas[idx], FeatureObjectType.NUMERIC);
-				tempFeature.addFeature("eccentricity", ec, FeatureObjectType.NUMERIC);
-				tempFeature.addFeature("minDistToOtherRegion", minDistanceToOtherRegion, FeatureObjectType.NUMERIC);
-				tempFeature.addFeature("direction_1", direction, FeatureObjectType.VECTOR);
-				flist.add(tempFeature);
+				idx++;
 			}
-			idx++;
-		}
-		// icclu.getImage().show("petioles");
+			icSkelPoints.getImage().show("icclu", debugValues);
+		} else
+			if (debugValues)
+				System.out.println("No skeleton available for flower detection!");
+		
 		return flist;
 	}
 	
@@ -151,7 +156,7 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 	 * @param cluster
 	 * @return
 	 */
-	private Point getConnectedDirectionFromSkeleton(int[] skelimg, Image clusteredImage, ArrayList<PositionAndColor> cluster, int w) {
+	private Point getConnectedDirectionFromSkeleton(int[] skelimg, ArrayList<PositionAndColor> cluster, int w) {
 		ArrayList<PositionAndColor> connectedSkelPoints = new ArrayList<PositionAndColor>();
 		
 		int idx = 0;
@@ -162,6 +167,7 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			if (skelimg[idx] != background)
 				continue;
 			
+			// search neighbors
 			int f = idx - 1; // left
 			if (idx % w > 0 && skelimg[f] != background) {
 				connectedSkelPoints.add(new PositionAndColor(idx % w, idx / w, skelimg[f]));
@@ -210,7 +216,7 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		} else {
 			center.x = -1;
 			center.y = -1;
-			System.out.println("No skeleton point found.");
+			System.out.println(this.getName() + ": No skeleton point found.");
 		}
 		
 		return center;
@@ -247,10 +253,12 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			ImageCanvas ic = new ImageCanvas(img);
 			for (Feature p : featureList) {
 				Vector2D direction = (Vector2D) p.getFeature("direction_1");
-				ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 3);
-				ic.drawLine(new Point((int) (p.getPosition().getX()), (int) (p.getPosition().getY())), new Point((int) (direction.getX()),
-						(int) (direction.getY())),
-						Color.GREEN.getRGB(), 0.0, 2);
+				if (direction != null && direction.getX() != 0 && direction.getY() != 0) {
+					ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 3);
+					ic.drawLine(new Point((int) (p.getPosition().getX()), (int) (p.getPosition().getY())), new Point((int) (direction.getX()),
+							(int) (direction.getY())),
+							Color.GREEN.getRGB(), 0.0, 2);
+				}
 			}
 			img = ic.getImage();
 		}
