@@ -83,9 +83,9 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 				inDilatedForSectionDetection.getHeight(),
 				cd.getImageClusterIdMask()).io();
 		
-		ArrayList<Color> cols = Colors.get(clusters + 1);
+		ArrayList<Color> cols = Colors.get(clusters);
 		for (int i = 1; i < cols.size(); i++) {
-			ioClusteredSkeltonImage = ioClusteredSkeltonImage.replaceColor(i, cols.get(i).getRGB());
+			ioClusteredSkeltonImage = ioClusteredSkeltonImage.replaceColor(i, cols.get(i - 1).getRGB());
 		}
 		
 		int[] clusterIDsPixels = ioClusteredSkeltonImage.getAs1D();
@@ -97,13 +97,15 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 					clusterIDsPixels[i] = background;
 			
 			HashMap<Integer, Integer> color2clusterId = new HashMap<Integer, Integer>();
-			ClusterSizeAndClusterId[] clusterSize = new ClusterSizeAndClusterId[clusters + 1];
+			ClusterSizeAndClusterId[] clusterSize = new ClusterSizeAndClusterId[clusters + 1 + 1];
 			for (int i = 0; i < clusterSize.length; i++)
 				clusterSize[i] = new ClusterSizeAndClusterId();
 			int idx = 0;
 			for (int p : clusterIDsPixels) {
 				if (!color2clusterId.containsKey(p))
 					color2clusterId.put(p, idx++);
+				if (color2clusterId.get(p) >= clusterSize.length)
+					System.err.println("THERE WILL BE A PROBLEM....");
 				clusterSize[color2clusterId.get(p)].size += 1;
 				clusterSize[color2clusterId.get(p)].id = color2clusterId.get(p);
 			}
@@ -180,11 +182,11 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 								!getBoolean("Diameter Calculation Limit to Thick to Thin Disable Edge Traversal Veto", true)) :
 						sg.calculateDiameter(
 								getBoolean("Debug - Save Graphs to Files", false),
-								getBoolean("Don't check all endpoints but find and use most left and right ones", false),
+								getBoolean("Don not check all endpoints but find and use most left and right ones", true),
 								postProcessing, isThinnedImage);
 				HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
 				int idx = 1;
-				ArrayList<Double> sizeList = new ArrayList<Double>(id2size.size() - 1);
+				ArrayList<Double> sizeList = new ArrayList<Double>(id2size.size() > 1 ? id2size.size() - 1 : 0);
 				for (Integer id : id2size.keySet()) {
 					if (id > 0)
 						sizeList.add(id2size.get(id));
@@ -321,7 +323,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 							rt.addValue("roots.volume.skeleton_dist_based", Math.PI * (1 + skelStat.getMean()) * (1 + skelStat.getMean())
 									* (endTipps * skelStat.getMean() + skelStat.getN() / 2d));
 							rt.addValue("roots.width.skeleton_based.mean", (1 + skelStat.getMean()));
-							if (getBoolean("Calculate Graph Diameters", false)) {
+							if (getBoolean("Calculate Graph Diameters", true)) {
 								graphAnalysis(getClusterIDarray(image.copy().bm().dilate(5).io()),
 										new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
 												skeletonImage.getAs1D())
