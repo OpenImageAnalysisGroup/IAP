@@ -1982,7 +1982,8 @@ public class ImageOperation implements MemoryHogInterface {
 		StopWatch s = new StopWatch("lab_cube", false);
 		final float[][][] result = new float[256][256][256 * 3];
 		
-		final ColorSpaceConverter convert = new ColorSpaceConverter();
+		final ColorSpaceConverter convert = new ColorSpaceConverter(SystemOptions.getInstance().getStringRadioSelection("IAP//Color Management", "White Point",
+				ColorSpaceConverter.getWhitePointList(), ColorSpaceConverter.getDefaultWhitePoint(), true));
 		
 		BackgroundThreadDispatcher.process(IntStream.range(0, 256), (int red) -> {
 			float[] p;
@@ -5266,5 +5267,70 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public enum HSVChannel {
 		H, S, V
+	}
+	
+	/**
+	 * Removes one pixel noise, based on inspection of the 3x3 neighborhood.
+	 * 
+	 * @return
+	 */
+	public ImageOperation removeOutliers() {
+		int[] pixels = getAs1D();
+		int w = getWidth();
+		int l = pixels.length;
+		int background = BACKGROUND_COLORint;
+		int[] res = new int[l];
+		int pixel_int;
+		
+		for (int idx = 0; idx < l; idx++) {
+			pixel_int = pixels[idx];
+			int found = 0;
+			if (pixel_int == BACKGROUND_COLORint) {
+				res[idx] = background;
+				continue;
+			}
+			// check neighbors
+			else {
+				int f = idx - 1; // left
+				if (idx % w > 0 && pixels[f] != background) {
+					found++;
+				}
+				f = idx - w; // above
+				if (idx > w && pixels[f] != background) {
+					found++;
+				}
+				f = idx + 1; // right
+				if ((idx) % w < w - 1 && pixels[f] != background) {
+					found++;
+				}
+				f = idx + w; // below
+				if (idx < pixels.length - w && pixels[f] != background) {
+					found++;
+				}
+				
+				f = idx - 1 - w; // left/above
+				if (idx % w > 0 && pixels[f] != background) {
+					found++;
+				}
+				f = idx - w + 1; // right/above
+				if (idx > w && pixels[f] != background) {
+					found++;
+				}
+				f = idx - 1 + w; // left/below
+				if ((idx) % w < w - 1 && pixels[f] != background) {
+					found++;
+				}
+				f = idx + w + 1; // right/below
+				if (idx < pixels.length - w && pixels[f] != background) {
+					found++;
+				}
+			}
+			if (found > 1)
+				res[idx] = pixels[idx];
+			else
+				res[idx] = background;
+		}
+		
+		return new ImageOperation(res, w, getHeight());
 	}
 }
