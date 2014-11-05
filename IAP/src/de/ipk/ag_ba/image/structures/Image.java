@@ -133,6 +133,8 @@ public class Image {
 		
 		int[] pixels = new int[inpimg.getWidth() * inpimg.getHeight()];
 		boolean noAlpha = pixels.length != bp.length / 4;
+		if (noAlpha)
+			return new ImagePlus(optName, inpimg);
 		int idx = 0;
 		int out_idx = 0;
 		int b1 = 0, b2 = 0, b3 = 0, b4;
