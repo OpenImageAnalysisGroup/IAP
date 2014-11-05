@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.image.operation;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 // --------------------------------------------------------
 // convert an image to a different color space
@@ -460,6 +461,20 @@ public class ColorSpaceConverter {
 	 */
 	public double[] XYZtoxyY(double[] XYZ) {
 		return XYZtoxyY(XYZ[0], XYZ[1], XYZ[2]);
+	}
+	
+	public static ArrayList<String> getWhitePointList() {
+		ArrayList<String> res = new ArrayList<String>();
+		res.add("D50");
+		res.add("D55");
+		res.add("D65");
+		res.add("D75");
+		
+		return res;
+	}
+	
+	public static String getDefaultWhitePoint() {
+		return "D65";
 	}
 	
 }
