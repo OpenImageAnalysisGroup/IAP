@@ -27,9 +27,9 @@ public class WellProcessing {
 				sn = "";
 		String ra = optRotationAngle != null ? " (" + sn + "Rotation Angle " + optRotationAngle.intValue() + ")" : "";
 		String id = SystemOptions.getInstance().getString("Multi-Tray Wells", "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, "X" + wellIdx);
-		SystemOptions o = options.getOptSystemOptions();
+		SystemOptions o = options != null ? options.getOptSystemOptions() : null;
 		if (o != null)
-			id = SystemOptions.getInstance().getString("Multi-Tray Wells",
+			id = o.getString("Multi-Tray Wells",
 					"Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, id);
 		return id;
 	}
@@ -46,9 +46,9 @@ public class WellProcessing {
 				sn = "";
 		String ra = img.getPosition() != null ? " (" + sn + "Rotation Angle " + img.getPosition().intValue() + ")" : "";
 		String id = SystemOptions.getInstance().getString("Multi-Tray Wells", "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, "X" + wellIdx);
-		SystemOptions o = options.getOptSystemOptions();
+		SystemOptions o = options != null ? options.getOptSystemOptions() : null;
 		if (o != null)
-			id = SystemOptions.getInstance().getString("Multi-Tray Wells",
+			id = o.getString("Multi-Tray Wells",
 					"Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, id);
 		return id;
 	}
@@ -65,9 +65,9 @@ public class WellProcessing {
 				sn = "";
 		String ra = m.getPosition() != null ? " (" + sn + "Rotation Angle " + m.getPosition().intValue() + ")" : "";
 		String id = SystemOptions.getInstance().getString("Multi-Tray Wells", "Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, "X" + wellIdx);
-		SystemOptions o = options.getOptSystemOptions();
+		SystemOptions o = options != null ? options.getOptSystemOptions() : null;
 		if (o != null)
-			id = SystemOptions.getInstance().getString("Multi-Tray Wells",
+			id = o.getString("Multi-Tray Wells",
 					"Tray with " + well_Cnt + " wells//Well " + (wellIdx + 1) + ra, id);
 		return id;
 	}
