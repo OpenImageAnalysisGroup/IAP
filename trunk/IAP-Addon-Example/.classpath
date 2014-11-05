@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="src" path="/IAP"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Graffiti_Core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Graffiti_Plugins"/>
@@ -10,5 +9,6 @@
 	<classpathentry kind="src" path="/IPK-Plugins"/>
 	<classpathentry kind="lib" path="/IAP/lib/ij-1.48r.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-math3-3.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
