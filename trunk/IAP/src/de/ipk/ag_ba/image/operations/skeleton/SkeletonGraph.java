@@ -545,7 +545,8 @@ public class SkeletonGraph {
 		HashMap<Integer, Double> id2size = new HashMap<Integer, Double>();
 		Collection<Graph> gl = GraphHelper.getConnectedComponents(graph);
 		if (gl.size() != 1)
-			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Skeleton graph with more than one component created. Number of components: " + gl.size());
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Skeleton graph with more than one component created. Number of components: "
+					+ gl.size());
 		Graph lcgg = null;
 		double largestDiameter = 0;
 		String optGMLoutputFileName = !saveGraphFiles ? null : ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"

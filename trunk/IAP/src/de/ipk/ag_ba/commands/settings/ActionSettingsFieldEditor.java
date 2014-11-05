@@ -410,7 +410,7 @@ public class ActionSettingsFieldEditor extends AbstractNavigationAction {
 			if (isBoolean) {
 				boolean enabled = SystemOptions.getInstance(this.actionSettingsEditor.iniFileName,
 						this.actionSettingsEditor.iniIO)
-						.getBoolean(this.actionSettingsEditor.section, setting, false);
+						.getBoolean(this.actionSettingsEditor.section, setting, false, false);
 				if (enabled)
 					return "img/ext/gpl2/Dialog-Apply-64.png";// gtcf.png";
 				else
