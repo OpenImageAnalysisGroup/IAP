@@ -119,7 +119,8 @@ public class BlockPipeline {
 			options.setWellCnt(currentWell, executionTrayCount);
 			ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
 			try {
-				String wellName = WellProcessing.getWellID(currentWell, executionTrayCount, options.getCameraPosition(), options.getCameraAngle());
+				String wellName = WellProcessing.getWellID(currentWell, executionTrayCount,
+						options.getCameraPosition(), options.getCameraAngle(), options);
 				BlockResultSet res = executeInnerCall(wellName, currentWell, executionTrayCount, options,
 						ds, status, og.getImageSet(), og.getMaskSet());
 				if (options.forceDebugStack)

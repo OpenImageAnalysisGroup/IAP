@@ -89,7 +89,7 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 					if (tempDist < minWellDistance) {
 						
 						minWellDistance = tempDist;
-						minWellIDX = WellProcessing.getWellID(well_idx, wellcount, input().images().getAnyInfo());
+						minWellIDX = WellProcessing.getWellID(well_idx, wellcount, input().images().getAnyInfo(), optionsAndResults);
 					}
 				}
 				
