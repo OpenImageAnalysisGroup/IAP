@@ -255,6 +255,10 @@ public class SystemOptions {
 	}
 	
 	public boolean getBoolean(String group, String setting, boolean defaultValue) {
+		return getBoolean(group, setting, defaultValue, true);
+	}
+	
+	public boolean getBoolean(String group, String setting, boolean defaultValue, boolean addDefaultIfNeeded) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
@@ -268,8 +272,10 @@ public class SystemOptions {
 				checkInvalidStatus();
 				Boolean r = ini.get(group, setting, Boolean.class);
 				if (r == null) {
-					ini.put(group, setting, defaultValue);
-					store(group, setting);
+					if (addDefaultIfNeeded) {
+						ini.put(group, setting, defaultValue);
+						store(group, setting);
+					}
 					return defaultValue;
 				} else
 					return r;
