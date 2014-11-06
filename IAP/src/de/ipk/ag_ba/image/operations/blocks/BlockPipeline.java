@@ -68,7 +68,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
  */
 public class BlockPipeline {
 	
-	private static final HashMap<BlockPipeline, PipelineMonitoringResult> monitoringResultHashMap = new HashMap<BlockPipeline, PipelineMonitoringResult>();
+	private static final HashMap<String, PipelineMonitoringResult> monitoringResultHashMap = new HashMap<String, PipelineMonitoringResult>();
 	private final ArrayList<Class<? extends ImageAnalysisBlock>> blocks = new ArrayList<Class<? extends ImageAnalysisBlock>>();
 	private static int lastPipelineExecutionTimeInSec = -1;
 	
@@ -231,27 +231,26 @@ public class BlockPipeline {
 			
 			if (System.currentTimeMillis() < pipelineMonitoringMaxValidTimePoint) {
 				// save block results
-				boolean firstSave = true;
 				PipelineMonitoringResult currentPipelineMonitoringResult = null;
 				synchronized (BlockPipeline.monitoringResultHashMap) {
-					if (!BlockPipeline.monitoringResultHashMap.containsKey(this)) {
+					if (!BlockPipeline.monitoringResultHashMap.containsKey(this + "_" + well)) {
 						String plantID = workset.images().getAnyInfo().getQualityAnnotation();
 						Long snapshotTime = workset.images().getAnyInfo().getParentSample().getSampleFineTimeOrRowId();
-						BlockPipeline.monitoringResultHashMap.put(this, new PipelineMonitoringResult(plantID, snapshotTime));
+						BlockPipeline.monitoringResultHashMap.put(this + "_" + well, new PipelineMonitoringResult(plantID, snapshotTime));
 					}
-					currentPipelineMonitoringResult = BlockPipeline.monitoringResultHashMap.get(this);
+					currentPipelineMonitoringResult = BlockPipeline.monitoringResultHashMap.get(this + "_" + well);
 				}
-				synchronized (currentPipelineMonitoringResult) {
-					if (block.isChangingImages() && currentPipelineMonitoringResult.isEmpty() || (index == blockCount && firstSave)) {
-						if (index == blockCount && firstSave)
-							firstSave = false;
-						currentPipelineMonitoringResult
-								.addBlockResult(new BlockMonitoringResult(workset, pipelineMonitoringResultImageSize, block.getName(), tb - ta));
+				if (currentPipelineMonitoringResult != null) {
+					synchronized (currentPipelineMonitoringResult) {
+						if (index == 1 || index == blockCount) {
+							currentPipelineMonitoringResult
+									.addBlockResult(new BlockMonitoringResult(workset, pipelineMonitoringResultImageSize, block.getName(), tb - ta));
+						}
 					}
-				}
-				if (index == blockCount) {
-					// last block in list
-					lastPipelineMonitoringResult = currentPipelineMonitoringResult;
+					if (index == blockCount) {
+						// last block in list
+						lastPipelineMonitoringResult = currentPipelineMonitoringResult;
+					}
 				}
 			}
 			
