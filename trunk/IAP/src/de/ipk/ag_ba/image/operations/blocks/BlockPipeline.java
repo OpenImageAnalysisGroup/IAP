@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.TreeMap;
+import java.util.stream.IntStream;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,6 +38,7 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.ImageSet;
@@ -109,19 +111,20 @@ public class BlockPipeline {
 					executionTrayCount = n;
 			}
 		}
+		final int executionTrayCountFF = executionTrayCount;
 		final ObjectRef exception = new ObjectRef();
 		if (status != null)
 			status.setCurrentStatusValue(0);
-		for (int currentWell = 0; currentWell < executionTrayCount; currentWell++) {
+		BackgroundThreadDispatcher.process(IntStream.range(0, executionTrayCount), (currentWell) -> {
 			if (debugValidTrays != null && !debugValidTrays.contains(currentWell))
-				continue;
+				return;
 			ImageProcessorOptionsAndResults options = og.getOptions();
-			options.setWellCnt(currentWell, executionTrayCount);
+			options.setWellCnt(currentWell, executionTrayCountFF);
 			ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
 			try {
-				String wellName = WellProcessing.getWellID(currentWell, executionTrayCount,
+				String wellName = WellProcessing.getWellID(currentWell, executionTrayCountFF,
 						options.getCameraPosition(), options.getCameraAngle(), options);
-				BlockResultSet res = executeInnerCall(wellName, currentWell, executionTrayCount, options,
+				BlockResultSet res = executeInnerCall(wellName, currentWell, executionTrayCountFF, options,
 						ds, status, og.getImageSet(), og.getMaskSet());
 				if (options.forceDebugStack)
 					synchronized (options.forcedDebugStacks) {
@@ -136,7 +139,11 @@ public class BlockPipeline {
 				ErrorMsg.addErrorMessage(e);
 				exception.setObject(e);
 			}
-		}
+		}, (Thread t, Throwable e) -> {
+			ErrorMsg.addErrorMessage(new Exception(e));
+			exception.setObject(e);
+		});
+		
 		if (exception.getObject() != null)
 			throw ((Exception) exception.getObject());
 	}
