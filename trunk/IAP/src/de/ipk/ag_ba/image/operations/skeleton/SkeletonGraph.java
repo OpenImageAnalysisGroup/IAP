@@ -220,8 +220,7 @@ public class SkeletonGraph {
 					graph.deleteNode(n);
 				
 				deleteSelfLoops();
-				if (!preventIntermediateNodeRemoval)
-					removeParallelEdges();
+				removeParallelEdges();
 				graph.numberGraphElements();
 				
 				if (delN.size() > 0)
@@ -726,6 +725,8 @@ public class SkeletonGraph {
 		Node mr = null;
 		for (GraphElement g : graphElements) {
 			if (g instanceof Node) {
+				if (((Node) g).getNeighbors().size() != 1)
+					continue;
 				Vector2i pos = new NodeHelper((Node) g).getPosition2i();
 				if (pos.x < mostLeft) {
 					mostLeft = pos.x;
@@ -737,6 +738,7 @@ public class SkeletonGraph {
 				}
 			}
 		}
+		
 		if (ml != null)
 			res.add(ml);
 		if (mr != null)
