@@ -415,7 +415,7 @@ public class BlockPipeline {
 												+ ")", "Modify settings");
 								ac.setInitialNavigationPath(analysisTaskFinal.getDebugLastSystemOptionStorageGroup());
 								ac.setInitialNavigationSubPath((String) tsoCurrentImageDisplayPage.getParam(0, null)); // current image analysis step
-								mnp.getNewWindowListener(ac).actionPerformed(arg0);
+								mnp.getNewWindowListener(ac, true).actionPerformed(arg0);
 							}
 						});
 					}

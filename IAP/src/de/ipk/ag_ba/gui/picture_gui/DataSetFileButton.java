@@ -505,7 +505,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							public void actionPerformed(ActionEvent e) {
 								IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
 								NavigationAction ac = new ActionSettings(null, iop, "Change analysis settings", "Modify settings");
-								mnp.getNewWindowListener(ac).actionPerformed(null);
+								mnp.getNewWindowListener(ac, true).actionPerformed(null);
 							}
 						};
 						jp.add(new JSeparator());

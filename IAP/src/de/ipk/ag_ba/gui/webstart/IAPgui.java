@@ -17,7 +17,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 
@@ -43,14 +42,14 @@ public class IAPgui {
 			final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
 			boolean secondWindow,
 			NavigationAction optCustomHomeAction) {
-		return getMainGUIcontent(myStatus, secondWindow, optCustomHomeAction, null);
+		return getMainGUIcontent(myStatus, secondWindow, optCustomHomeAction, null, true);
 	}
 	
 	public static JComponent getMainGUIcontent(
 			final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
 			boolean secondWindow,
 			NavigationAction optCustomHomeAction,
-			NavigationButtonFilter optNavigationButtonFilter) {
+			NavigationButtonFilter optNavigationButtonFilter, boolean executeAction) {
 		
 		final JPanel graphPanel = new JPanel();
 		
@@ -79,58 +78,38 @@ public class IAPgui {
 		
 		final NavigationButton overView = new NavigationButton(home, guiSetting);
 		
-		// overView.setTitle("Initialize");
-		// overView.setProcessing(true);
-		
-		ErrorMsg.addOnAppLoadingFinishedAction(new Runnable() {
-			// ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {
-			@Override
-			public void run() {
-				// overView.setTitle("Overview");
-				// overView.setProcessing(false);
-				try {
-					// JSObject win = JSObject.getWindow(ReleaseInfo.getApplet());
-					// Object o = win.eval("s = window.location.hash;");
-					// String h = o + "";
-					// h = URLDecoder.decode(h, "UTF-8");
-					// System.out.println("HASH: " + h);
-					// navigateTo(h, navigationPanel, actionPanel, graphPanel);
-				} catch (Exception e) {
-					// System.out.println("JavaScript and Browser window not accessible.");
-					// navigateTo("Overview.MetaCrop.Carbohydrate Metabolism.Ascorbate biosynthesis",
-					// navigationPanel, actionPanel, graphPanel, knownEntities);
-					// navigateTo("Overview.DBE Database.User Login.AG PBI.klukas.AAT-Juniproben2004 (test)",
-					// navigationPanel, actionPanel, graphPanel, knownEntities);
-				}
-			}
-		});
-		
-		// JScrollPane navScroller = new MyScrollPane(navigationPanel, false);
-		// navScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		// navigationPanel.setScrollpane(navScroller);
-		
-		// JScrollPane actionScroller = new MyScrollPane(actionPanel, false);
-		// actionScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		// actionPanel.setScrollpane(actionScroller);
-		
 		final ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
+		ArrayList<NavigationButton> set = home.getResultNewNavigationSet(homeNavigation);
+		if (set != null)
+			while (!set.isEmpty() && set.get(0) == null)
+				set.remove(0);
+		if (optCustomHomeAction != null && (set == null || set.isEmpty())) {
+			set = new ArrayList<>();
+			set.add(new NavigationButton(optCustomHomeAction, guiSetting));
+		}
+		navigationPanel.setEntitySet(set);
 		try {
-			home.performActionCalculateResults(overView);
+			if (executeAction) {
+				home.performActionCalculateResults(overView);
+				actionPanel.setEntitySet(home.getResultNewActionSet());
+			} else
+				actionPanel.setEntitySet(new ArrayList<>());
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		navigationPanel.setEntitySet(home.getResultNewNavigationSet(homeNavigation));
-		actionPanel.setEntitySet(home.getResultNewActionSet());
 		
 		JLabel lbl;
-		if (!secondWindow && IAPmain.myClassKnown) {
-			lbl = new JLabel("<html><h2><font color='red'>IAP Reloading Not Supported!</font></h2>"
-					+ "<b>It is recommended to close any browser window and re-open this website,<br>"
-					+ "otherwise this information system may not work reliable.</b><br><br>"
-					+ "Technical background: reloading this applet is not yet supported");
-		} else {
-			lbl = new JLabel(getIntroTxt());
-		}
+		if (!executeAction)
+			lbl = new JLabel(optCustomIntroText);
+		else
+			if (!secondWindow && IAPmain.myClassKnown) {
+				lbl = new JLabel("<html><h2><font color='red'>IAP Reloading Not Supported!</font></h2>"
+						+ "<b>It is recommended to close any browser window and re-open this website,<br>"
+						+ "otherwise this information system may not work reliable.</b><br><br>"
+						+ "Technical background: reloading this applet is not yet supported");
+			} else {
+				lbl = new JLabel(getIntroTxt());
+			}
 		lbl.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		graphPanel.add(new MainPanelComponent(lbl.getText()).getGUI(), "0,0");
 		graphPanel.revalidate();
@@ -139,7 +118,6 @@ public class IAPgui {
 				actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
 				TableLayout.PREFERRED, TableLayout.FILL);
 		
-		// navigateTo("IAP", navigationPanel, actionPanel, graphPanel);
 		res.revalidate();
 		return res;
 	}

@@ -37,9 +37,15 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 	private NavigationButton src;
 	private final HashMap<String, ArrayList<String>> infoset = new HashMap<String, ArrayList<String>>();
 	ArrayList<NavigationButton> resultNavigationButtons = new ArrayList<NavigationButton>();
+	private String title;
 	
 	ActionSystemStatus(String tooltip) {
 		super(tooltip);
+	}
+	
+	public ActionSystemStatus(String tooltip, String title) {
+		this(tooltip);
+		this.title = title;
 	}
 	
 	@Override
@@ -244,6 +250,16 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return resultNavigationButtons;
+	}
+	
+	@Override
+	public String getDefaultImage() {
+		return IAPimages.getCheckstatus();
+	}
+	
+	@Override
+	public String getDefaultTitle() {
+		return title;
 	}
 	
 	@Override

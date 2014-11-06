@@ -894,32 +894,21 @@ public class NavigationButton implements StyleAware {
 						JPopupMenu p = new JPopupMenu();
 						boolean added = false;
 						
+						boolean showCommandToShowCommandInNewWindow = true;
+						if (showCommandToShowCommandInNewWindow && ac != null) {
+							JMenuItem menuItem = new JMenuItem("Show Command Button in New Window");
+							menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, "img/new_frame.png"));
+							menuItem.addActionListener(navPanel.getNewWindowListener(ac, false));
+							p.add(menuItem);
+							added = true;
+							
+						}
+						
 						if (n.isProcessing() && n.getAction() != null) {
 							AbstractAction a = new AbstractAction("Show Progress Dialog") {
 								@Override
 								public void actionPerformed(ActionEvent e) {
-									final BackgroundTaskWindow taskWindow = new BackgroundTaskWindow(false);
-									taskWindow.setStatusProvider(ac.getStatusProvider(), ac.getDefaultTitle(), ac.getDefaultTitle());
-									final ThreadSafeOptions tso = new ThreadSafeOptions();
-									Timer checkStatus = new Timer(100, new ActionListener() {
-										boolean finishedCalled = false;
-										
-										@Override
-										public void actionPerformed(ActionEvent arg0) {
-											taskWindow.updateSize();
-											if (!n.isProcessing()) {
-												if (!finishedCalled) {
-													finishedCalled = true;
-													taskWindow.dispose();
-													Timer checkStatusTimer = (Timer) tso.getParam(0, null);
-													if (checkStatusTimer != null)
-														checkStatusTimer.stop();
-												}
-											}
-										}
-									});
-									tso.setParam(0, checkStatus);
-									checkStatus.start();
+									createProgressDialogForRunningAction(n, ac);
 								}
 							};
 							JMenuItem menuItem = new JMenuItem(a);
@@ -1144,6 +1133,32 @@ public class NavigationButton implements StyleAware {
 			}
 		};
 		return iconUpdateCheck;
+	}
+	
+	public static void createProgressDialogForRunningAction(final NavigationButton n, final NavigationAction ac) {
+		final BackgroundTaskWindow taskWindow = new BackgroundTaskWindow(false);
+		taskWindow.setStatusProvider(ac.getStatusProvider(),
+				ac.getDefaultTitle(), ac.getDefaultTitle());
+		final ThreadSafeOptions tso = new ThreadSafeOptions();
+		Timer checkStatus = new Timer(100, new ActionListener() {
+			boolean finishedCalled = false;
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				taskWindow.updateSize();
+				if (!n.isProcessing()) {
+					if (!finishedCalled) {
+						finishedCalled = true;
+						taskWindow.dispose();
+						Timer checkStatusTimer = (Timer) tso.getParam(0, null);
+						if (checkStatusTimer != null)
+							checkStatusTimer.stop();
+					}
+				}
+			}
+		});
+		tso.setParam(0, checkStatus);
+		checkStatus.start();
 	}
 	
 	@Override

@@ -1,87 +1,92 @@
 ############################################
-# Author: S. Friedel, adapted by C. Klukas
-# 2012/2013
+# Authors: S. Friedel, adapted by C. Klukas,
+# D. Chen
+# 2012/2013/2014
 ############################################
 
 cat(c("Plot diagrams:\n"))
 fileName="report.csv"
 
-col.time="Day (Int)"
-col.plantID="Plant ID"
+col.time <- "Day (Int)"
+col.variety <- "Variety"
+col.condition <- "Condition"
+col.plant <- "Plant ID"
 
 stop.watering=-1
 # as.numeric(commandArgs(TRUE)[1])
 rewatering=-1
 # as.numeric(commandArgs(TRUE)[2])
+## the first *** columns are non-traits
+non.traits <- 28
 
 cat("Read input file", fileName, "...\n")
-data<-read.csv(fileName, header=TRUE, sep=";", fileEncoding="UTF-8", check.names=FALSE)
+data <- read.csv(fileName, header=TRUE, sep=";", fileEncoding="UTF-8", check.names=FALSE)
+data[data[, col.variety]=="", col.variety] <- "Other"
 
-TraitsOfInterest <- colnames(data)
+plot.trait <- function(conditions, trait) {
+	## get the range for the x and y axis
+	# sub.data <- data[data[, col.plant] %in% varieties, c(trait, col.time, col.plant)]
+	## sub.data[!is.na(sub.data[,1]),]
+	sub.data <- na.omit(data[, c(col.condition, col.variety, col.plant, col.time, trait)]) 
+	if (nrow(sub.data) < 1){
+		cat('******** no data for ', trait, "\n")
+		return(NULL)
+	}
+	
+	## cat('-----------------------\n')
+	## plant varieties
+	varieties <- unique(as.character(sub.data[, col.variety]))
+	## number of varieties
+	n.varieties <- length(varieties)
+	## plant ID with variety
+	plant2variety <- unique(sub.data[, c(col.plant, col.variety)])
+	rownames(plant2variety) <- plant2variety[, col.plant]
+	
+	# set up the plot
+	op <- par(mfrow=c(1, length(conditions)), pty="m")
+	for(condition in conditions){
+		plot.data <- sub.data[sub.data[, col.condition]==condition, ]
+		xrange <- range(plot.data[, col.time])
+		yrange <- range(plot.data[, trait], na.rm=T) 
+		plot(xrange, yrange, type="n", xlab="Days", ylab=trait, main=condition)
+		pchs <- seq(from=10, length.out=n.varieties)
+		cols <- rainbow(n.varieties)
+		ltys <- c(1:n.varieties)
+		names(cols) <- names(ltys) <- names(pchs) <- varieties
+		
+		## highlight stress period
+		if (stop.watering>0 & rewatering>0) {
+			abline(v=c(stop.watering, rewatering), col="red", lty=3)
+		}
 
-plot.trait<-function(Condition, Trait) {
-  # define Plant ID
-  PlantIDsOfInterest<-unique(
-                        data[
-                          which(data$Condition==Condition),
-                          col.plantID])
-                          
-  # number of lines
-  nPlantIDs <- length(PlantIDsOfInterest)
-  # get the range for the x and y axis
-  dataOfPlant <- data[data$'Plant ID' %in% PlantIDsOfInterest,c(Trait, col.time, 'Plant ID')]
-  dataOfPlant <- dataOfPlant[!is.na(dataOfPlant[,1]),]
-  xrange <- range(dataOfPlant[,col.time])
-  yrange <- range(dataOfPlant[,Trait], na.rm=T) 
-  # set up the plot
-  colors <- rainbow(nPlantIDs)
-  if (length(colors)==0)
-    return;
-  plot(xrange, yrange, type="n", xlab="Days", ylab=Trait)
-  linetype <- c(1:nPlantIDs)
-  plotchar <- seq(10,10+nPlantIDs,1)
-  # add lines
-  if (stop.watering>0) {
-    if (rewatering>0) {
-      abline(v=c(stop.watering,rewatering), col="red", lty=3)
-  	}
-  }
-  # add a legend
-  legend(xrange[1], yrange[2], PlantIDsOfInterest[1:nPlantIDs], cex=0.8, col=colors, pch=plotchar,
-         lty=linetype, title=Condition)
-  for (i in 1:nPlantIDs) {
-    lines(dataOfPlant[which(dataOfPlant$'Plant ID' == PlantIDsOfInterest[i]),col.time],
-          dataOfPlant[which(dataOfPlant$'Plant ID' == PlantIDsOfInterest[i]),Trait], type="b", 
-          lwd=1.5, lty=linetype[i], col=colors[i], pch=plotchar[i])
-  }
-  # add a title and subtitle
-  title(Condition)
+		## add a legend
+		legend('topleft', varieties, cex=0.8, col=cols, pch=pchs, lty=ltys, title="Varieties")
+
+		## plot lines
+		for (plant in rownames(plant2variety)) {
+			plant.data <- plot.data[which(plot.data[, col.plant] == plant), c(col.time, trait)]
+			if(nrow(plant.data) < 1) next
+			variety <- as.character(plant2variety[plant, col.variety])
+			lines(plant.data[, 1], plant.data[, 2], lwd=1.5, type="b", lty=ltys[variety], 
+					col=cols[variety], pch=pchs[variety])
+		}
+	}
+	par(op)
 }
 
-conditions <- unique(data$Condition)
+conditions <- unique(data[, col.condition])
+##########################
+trait.columns <- colnames(data)[-c(1:non.traits)]
 
 pdf("plots.pdf", height=10, width=10*length(conditions))
-
-par(mfrow = c(1,length(conditions)))
-
-for (Trait in TraitsOfInterest) {
-  if (Trait=="Plant ID" || Trait==col.time || Trait=="Day" || Trait=="vor" 
-      || Trait=="Time"
-      || Trait=="Day (Int)"
-      || Trait=="Plant ID"|| Trait=="Condition"
-      || Trait=="Species"
-      || Trait=="Genotype"
-      || Trait=="Variety"
-      || Trait=="GrowthCondition"
-      || Trait=="Treatment"
-      || Trait=="Sequence")
-    next
-  cat(Trait, "\n")
-  for (con in conditions) {
-    tryCatch(plot.trait(con, Trait), error=function(w) {cat(c("\n", "Can't plot condition ", con, ", trait ", Trait,"\n"));return(NA)})
-  }
+#par(mfrow = c(1,length(conditions)))
+for (trait in trait.columns) {
+	cat(trait, "\n")
+	## plot.trait(conditions, trait)
+	tryCatch(plot.trait(conditions, trait), error=function(w) {
+		cat(c("\n", "Can't plot condition ", condition, ", trait ", trait,"\n")); return(NA)}
+	)
 }
-
 dev.off()
 
 cat("Processing finished.\n")

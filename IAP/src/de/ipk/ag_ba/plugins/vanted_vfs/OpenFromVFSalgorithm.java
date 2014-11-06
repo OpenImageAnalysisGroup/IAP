@@ -49,7 +49,7 @@ public class OpenFromVFSalgorithm extends AbstractEditorAlgorithm {
 				} else
 					return false;
 			}
-		});
+		}, true);
 	}
 	
 	@Override
