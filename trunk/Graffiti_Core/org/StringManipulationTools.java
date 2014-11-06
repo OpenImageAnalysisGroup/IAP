@@ -1055,4 +1055,11 @@ public class StringManipulationTools implements HelperClass {
 			res += rotation[(int) t];
 		return res;
 	}
+	
+	public static String getStringList(int[] values, String div) {
+		ArrayList<String> v = new ArrayList<String>();
+		for (int i : values)
+			v.add(i + "");
+		return getStringList(v, div);
+	}
 }
