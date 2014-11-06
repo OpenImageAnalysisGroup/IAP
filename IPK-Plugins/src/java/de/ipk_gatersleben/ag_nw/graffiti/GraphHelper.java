@@ -262,10 +262,18 @@ public class GraphHelper implements HelperClass {
 	 * @return a collection with all connected components as separate graphs
 	 */
 	public static Collection<Graph> getConnectedComponents(Graph graph) {
-		if (graph.getNumberOfNodes() <= 0)
-			return new ArrayList<Graph>();
+		HashMap<Node, Node> map = getConnectedComponentMap(graph);
 		
-		ArrayList<Graph> graphList = new ArrayList<Graph>();
+		HashSet<Graph> components = new HashSet<Graph>();
+		for (Node n : map.values())
+			components.add(n.getGraph());
+		
+		return components;
+	}
+	
+	public static HashMap<Node, Node> getConnectedComponentMap(Graph graph) {
+		if (graph.getNumberOfNodes() <= 0)
+			return new HashMap<>();
 		
 		List<Node> nodesToProcess = new ArrayList<Node>(graph.getNodes());
 		HashMap<Node, Node> sourceGraphNode2connectedGraphNode = new LinkedHashMap<Node, Node>();
@@ -275,19 +283,22 @@ public class GraphHelper implements HelperClass {
 			Graph connectedComponentGraph = new AdjListGraph();
 			for (Node n : connectedNodes) {
 				Node newNode = connectedComponentGraph.addNodeCopy(n);
+				int nn = sourceGraphNode2connectedGraphNode.size();
 				sourceGraphNode2connectedGraphNode.put(n, newNode);
+				if (sourceGraphNode2connectedGraphNode.size() - 1 != nn)
+					System.out.println("FUUUUU");
 			}
 			for (Node n : connectedNodes) {
 				for (Edge e : n.getEdges()) {
 					if (connectedNodes.contains(e.getSource()) || connectedNodes.contains(e.getTarget()))
-						connectedComponentGraph.addEdgeCopy(e, sourceGraphNode2connectedGraphNode.get(e.getSource()),
+						connectedComponentGraph.addEdgeCopy(e,
+								sourceGraphNode2connectedGraphNode.get(e.getSource()),
 								sourceGraphNode2connectedGraphNode.get(e.getTarget()));
 				}
 			}
-			graphList.add(connectedComponentGraph);
-			nodesToProcess.removeAll(getConnectedNodes(startNode));
+			nodesToProcess.removeAll(connectedNodes);
 		}
-		return graphList;
+		return sourceGraphNode2connectedGraphNode;
 	}
 	
 	/**
