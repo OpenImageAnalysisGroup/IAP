@@ -266,8 +266,7 @@ public class BackgroundThreadDispatcher {
 		if (threads < 1)
 			threads = 1;
 		final LinkedList<Integer> values = new LinkedList<>();
-		range
-				.forEach((v) -> values.add(v));
+		range.forEach((v) -> values.add(v));
 		IntStream.range(0, threads).forEach((thread) -> {
 			try {
 				work.add(BackgroundThreadDispatcher.addTask(() -> {
