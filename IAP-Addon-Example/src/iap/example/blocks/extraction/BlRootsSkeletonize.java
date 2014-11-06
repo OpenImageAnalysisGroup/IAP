@@ -149,7 +149,9 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 			in = skel.getImageOperation();
 			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
 			// sg.setPreventIntermediateNodeRemoval(true);
-			sg.createGraph(optClusterIDsPixels, optDistanceMap, 0, postProcessing, getInt("Remove root segments shorter than", 20));
+			sg.createGraph(optClusterIDsPixels, optDistanceMap, 0, postProcessing,
+					getInt("Remove root segments shorter than", 20),
+					getBoolean("Show Result Graph (Debug)", false));
 			
 			if (getBoolean("Create Single Connected Graph Component", true))
 				sg.connectGraphComponents();
