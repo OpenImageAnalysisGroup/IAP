@@ -281,11 +281,11 @@ public class Image {
 	/**
 	 * Handles separate 2d-arrays for each rgb component.
 	 * 
-	 * @param R
+	 * @param RGB_R
 	 *           image
-	 * @param B
+	 * @param RGB_B
 	 *           image
-	 * @param G
+	 * @param RGB_G
 	 *           image
 	 */
 	public Image(int[][] r, int[][] g, int[][] b) {
@@ -531,13 +531,13 @@ public class Image {
 			int c = img[idx];
 			float f = 0f;
 			switch (r) {
-				case R:
+				case RGB_R:
 					f = ((c & 0xff0000) >> 16) / 255f;
 					break;
-				case G:
+				case RGB_G:
 					f = ((c & 0x00ff00) >> 8) / 255f;
 					break;
-				case B:
+				case RGB_B:
 					f = (c & 0x0000ff) / 255f;
 					break;
 			}

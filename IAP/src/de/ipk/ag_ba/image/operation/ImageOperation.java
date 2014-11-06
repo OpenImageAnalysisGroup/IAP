@@ -3683,9 +3683,9 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation unsharpenMask() {
 		UnsharpMask um = new UnsharpMask();
 		
-		float[] channelR = getImage().getFloatChannel(Channel.R);
-		float[] channelG = getImage().getFloatChannel(Channel.G);
-		float[] channelB = getImage().getFloatChannel(Channel.B);
+		float[] channelR = getImage().getFloatChannel(Channel.RGB_R);
+		float[] channelG = getImage().getFloatChannel(Channel.RGB_G);
+		float[] channelB = getImage().getFloatChannel(Channel.RGB_B);
 		
 		float[][] channels = new float[][] { channelR, channelG, channelB };
 		int w = getImage().getWidth();

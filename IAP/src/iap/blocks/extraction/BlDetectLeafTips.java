@@ -23,10 +23,14 @@ import org.StringManipulationTools;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import de.ipk.ag_ba.image.operation.FirstOrderTextureFeatures;
+import de.ipk.ag_ba.image.operation.GLCMTextureFeatures;
 import de.ipk.ag_ba.image.operation.ImageConvolution;
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.ImageTexture;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
+import de.ipk.ag_ba.image.operation.channels.Channel;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -156,6 +160,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		boolean saveLeafCount = true;
 		boolean saveFeaturesInResultSet = getBoolean("Save individual leaf features", true);
 		boolean saveColorFeaturesInResultSet = getBoolean("Save individual leaf color features", true);
+		boolean saveTextureFeaturesInResultSet = getBoolean("Save individual leaf texture features", true);
 		
 		if (saveListObject) {
 			saveLeafTipList(peakList, cameraType, maxValidY);
@@ -168,48 +173,57 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		boolean saveAddF = true;
 		if (saveAddF) {
 			int n = 0, nup = 0, ndown = 0;
-			double angleSum = 0;
 			DescriptiveStatistics statsLeafDirection = new DescriptiveStatistics();
 			for (Feature bf : peakList) {
 				final Double angle = (Double) bf.getFeature("angle");
+				Vector2D direction = (Vector2D) bf.getFeature("direction");
 				
 				if (angle != null) {
 					
 					if (saveColorFeaturesInResultSet) {
 						ArrayList<PositionAndColor> pixels = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
 						if (pixels != null && pixels.size() > 0) {
+							Image leafTipImage, leafTipImage2d = null;
+							if (saveTextureFeaturesInResultSet) {
+								int[][] regionArray2d = BorderAnalysis.copyRegiontoArray(BorderAnalysis.findDimensions(pixels), pixels);
+								leafTipImage2d = new Image(regionArray2d).show("sdsdsdsdsd");
+							}
+							
 							int[] regionArray = BorderAnalysis.copyRegiontoArray(pixels);
-							Image leafTipImage = new Image(regionArray.length, 1, regionArray);
-							double r_mean = leafTipImage.io().channels().getR().getImageAsImagePlus().getStatistics().mean;
-							double g_mean = leafTipImage.io().channels().getG().getImageAsImagePlus().getStatistics().mean;
-							double b_mean = leafTipImage.io().channels().getB().getImageAsImagePlus().getStatistics().mean;
+							leafTipImage = new Image(regionArray.length, 1, regionArray);
 							
-							double h_mean = leafTipImage.io().channels().getH().getImageAsImagePlus().getStatistics().mean;
-							double s_mean = leafTipImage.io().channels().getS().getImageAsImagePlus().getStatistics().mean;
-							double v_mean = leafTipImage.io().channels().getV().getImageAsImagePlus().getStatistics().mean;
-							
-							double labL_mean = leafTipImage.io().channels().getLabL().getImageAsImagePlus().getStatistics().mean;
-							double laba_mean = leafTipImage.io().channels().getLabA().getImageAsImagePlus().getStatistics().mean;
-							double labb_mean = leafTipImage.io().channels().getLabB().getImageAsImagePlus().getStatistics().mean;
-							
-							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.red.mean"), r_mean, null, this, imageRef);
-							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.green.mean"), g_mean, null, this, imageRef);
-							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.rgb.blue.mean"), b_mean, null, this, imageRef);
-							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.h.mean"), h_mean, null, this, imageRef);
-							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.s.mean"), s_mean, null, this, imageRef);
-							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.hsv.v.mean"), v_mean, null, this, imageRef);
-							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.l.mean"), labL_mean, null, this, imageRef);
-							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.a.mean"), laba_mean, null, this, imageRef);
-							getResultSet().setNumericResult(getBlockPosition(),
-									new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip.lab.b.mean"), labb_mean, null, this, imageRef);
+							for (Channel c : Channel.values()) {
+								ImageOperation img = leafTipImage.io().channels().get(c);
+								double stats = img.getImageAsImagePlus().getStatistics().mean;
+								
+								getResultSet().setNumericResult(getBlockPosition(),
+										new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip." + c + ".mean"), stats, null, this, imageRef);
+								
+								if (saveTextureFeaturesInResultSet) {
+									ImageOperation img2d = leafTipImage2d.io().channels().get(c);
+									boolean right = direction.getX() > 0;
+									if (right)
+										img2d = img2d.rotate(-angle);
+									else
+										img2d = img2d.rotate(angle);
+									
+									ImageTexture it = new ImageTexture(img2d.getImage());
+									it.calcTextureFeatures();
+									it.calcGLCMTextureFeatures();
+									
+									for (FirstOrderTextureFeatures tf : FirstOrderTextureFeatures.values()) {
+										getResultSet().setNumericResult(getBlockPosition(),
+												new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip." + c + ".texture." + tf),
+												it.firstOrderFeatures.get(tf), null, this, imageRef);
+									}
+									
+									for (GLCMTextureFeatures tf : GLCMTextureFeatures.values()) {
+										getResultSet().setNumericResult(getBlockPosition(),
+												new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip." + c + ".texture." + tf),
+												it.glcmFeatures.get(tf), null, this, imageRef);
+									}
+								}
+							}
 						}
 					}
 					
@@ -218,7 +232,6 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 					else
 						ndown++;
 					n++;
-					angleSum += angle.doubleValue();
 					statsLeafDirection.addValue(angle.doubleValue());
 				}
 			}

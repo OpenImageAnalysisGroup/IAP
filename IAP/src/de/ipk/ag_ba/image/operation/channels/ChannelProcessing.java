@@ -25,6 +25,32 @@ public class ChannelProcessing {
 		this.height = height;
 	}
 	
+	public ImageOperation get(Channel c) {
+		switch (c) {
+			case HSV_H:
+				return getH();
+			case HSV_S:
+				return getS();
+			case HSV_V:
+				return getV();
+			case LAB_B:
+				return getLabB();
+			case LAB_A:
+				return getLabA();
+			case LAB_L:
+				return getLabL();
+			case RGB_B:
+				return getB();
+			case RGB_G:
+				return getG();
+			case RGB_R:
+				return getR();
+			default:
+				break;
+		}
+		throw new UnsupportedOperationException("Channel not implemented.");
+	}
+	
 	/**
 	 * @return A gray image composed from the R channel.
 	 */
@@ -39,9 +65,6 @@ public class ChannelProcessing {
 				continue;
 			}
 			r = (c & 0xff0000) >> 16;
-			g = (c & 0x00ff00) >> 8;
-			b = c & 0x0000ff;
-			
 			g = r;
 			b = r;
 			
@@ -63,9 +86,7 @@ public class ChannelProcessing {
 				out[i] = BACKGROUND_COLORint;
 				continue;
 			}
-			r = (c & 0xff0000) >> 16;
 			g = (c & 0x00ff00) >> 8;
-			b = c & 0x0000ff;
 			
 			r = g;
 			b = g;
@@ -88,8 +109,6 @@ public class ChannelProcessing {
 				out[i] = BACKGROUND_COLORint;
 				continue;
 			}
-			r = (c & 0xff0000) >> 16;
-			g = (c & 0x00ff00) >> 8;
 			b = c & 0x0000ff;
 			
 			r = b;
