@@ -115,34 +115,65 @@ public class BlockPipeline {
 		final ObjectRef exception = new ObjectRef();
 		if (status != null)
 			status.setCurrentStatusValue(0);
-		BackgroundThreadDispatcher.process(IntStream.range(0, executionTrayCount), (currentWell) -> {
-			if (debugValidTrays != null && !debugValidTrays.contains(currentWell))
-				return;
-			ImageProcessorOptionsAndResults options = og.getOptions();
-			options.setWellCnt(currentWell, executionTrayCountFF);
-			ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
-			try {
-				String wellName = WellProcessing.getWellID(currentWell, executionTrayCountFF,
-						options.getCameraPosition(), options.getCameraAngle(), options);
-				BlockResultSet res = executeInnerCall(wellName, currentWell, executionTrayCountFF, options,
-						ds, status, og.getImageSet(), og.getMaskSet());
-				if (options.forceDebugStack)
-					synchronized (options.forcedDebugStacks) {
-						options.forcedDebugStacks.add(ds);
+		boolean quick = false;
+		if (quick) {
+			BackgroundThreadDispatcher.process(IntStream.range(0, executionTrayCount), (currentWell) -> {
+				if (debugValidTrays != null && !debugValidTrays.contains(currentWell))
+					return;
+				ImageProcessorOptionsAndResults options = og.getOptions();
+				options.setWellCnt(currentWell, executionTrayCountFF);
+				ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
+				try {
+					String wellName = WellProcessing.getWellID(currentWell, executionTrayCountFF,
+							options.getCameraPosition(), options.getCameraAngle(), options);
+					BlockResultSet res = executeInnerCall(wellName, currentWell, executionTrayCountFF, options,
+							ds, status, og.getImageSet(), og.getMaskSet());
+					if (options.forceDebugStack)
+						synchronized (options.forcedDebugStacks) {
+							options.forcedDebugStacks.add(ds);
+						}
+					res.clearStoredPostprocessors();
+					res.clearNotUsedResults();
+					synchronized (blockResults) {
+						blockResults.put(wellName, res);
 					}
-				res.clearStoredPostprocessors();
-				res.clearNotUsedResults();
-				synchronized (blockResults) {
-					blockResults.put(wellName, res);
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+					exception.setObject(e);
 				}
-			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
+			}, (Thread t, Throwable e) -> {
+				ErrorMsg.addErrorMessage(new Exception(e));
 				exception.setObject(e);
+			});
+		} else {
+			if (status != null)
+				status.setCurrentStatusValue(0);
+			for (int currentWell = 0; currentWell < executionTrayCount; currentWell++) {
+				if (debugValidTrays != null && !debugValidTrays.contains(currentWell))
+					continue;
+				ImageProcessorOptionsAndResults options = og.getOptions();
+				options.setWellCnt(currentWell, executionTrayCount);
+				ImageStack ds = options.forceDebugStack ? new ImageStack() : null;
+				try {
+					String wellName = WellProcessing.getWellID(currentWell, executionTrayCount,
+							options.getCameraPosition(), options.getCameraAngle(), options);
+					BlockResultSet res = executeInnerCall(wellName, currentWell, executionTrayCount, options,
+							ds, status, og.getImageSet(), og.getMaskSet());
+					if (options.forceDebugStack)
+						synchronized (options.forcedDebugStacks) {
+							options.forcedDebugStacks.add(ds);
+						}
+					res.clearStoredPostprocessors();
+					res.clearNotUsedResults();
+					synchronized (blockResults) {
+						blockResults.put(wellName, res);
+					}
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+					exception.setObject(e);
+				}
 			}
-		}, (Thread t, Throwable e) -> {
-			ErrorMsg.addErrorMessage(new Exception(e));
-			exception.setObject(e);
-		});
+		}
 		
 		if (exception.getObject() != null)
 			throw ((Exception) exception.getObject());
