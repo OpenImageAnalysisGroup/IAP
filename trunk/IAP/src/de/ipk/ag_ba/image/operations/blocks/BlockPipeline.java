@@ -509,9 +509,17 @@ public class BlockPipeline {
 						final String wif = wellInfo;
 						final JButton osf = openSettingsButton;
 						ObjectRef or = new ObjectRef();
+						ObjectRef stack = new ObjectRef();
+						Runnable prepare = new Runnable() {
+							@Override
+							public void run() {
+								stack.setObject(fis.getStack());
+							}
+						};
 						Runnable reopen = new Runnable() {
 							@Override
 							public void run() {
+								fis.setStack((ij.ImageStack) stack.getObject());
 								fis.show(iii.getQualityAnnotation() + " / " + iii.getParentSample().getSampleTime() + " / " + analysisTaskFinal.getName() + " / Well "
 										+ wif,
 										new Runnable() {
@@ -526,7 +534,7 @@ public class BlockPipeline {
 														true);
 											}
 										}, "Repeat Analysis",
-										TableLayout.get3Split(osf, null, new JButton(getCloseAction((Runnable) (or.getObject()))), TableLayout.PREFERRED, 5,
+										TableLayout.get3Split(osf, null, new JButton(getCloseAction(prepare, (Runnable) (or.getObject()))), TableLayout.PREFERRED, 5,
 												TableLayout.PREFERRED),
 										tsoCurrentImageDisplayPage);
 							}
@@ -547,13 +555,14 @@ public class BlockPipeline {
 				true);
 	}
 	
-	protected static Action getCloseAction(Runnable runnable) {
+	protected static Action getCloseAction(Runnable runnablePrepare, Runnable runnablePost) {
 		
 		Action action2 = new AbstractAction("Close Additional Image Windows", new ImageIcon(IAPimages.getImage("img/close_frame.png"))) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				runnablePrepare.run();
 				IAPservice.closeAllImageJimageWindows();
-				runnable.run();
+				runnablePost.run();
 			}
 			
 			@Override

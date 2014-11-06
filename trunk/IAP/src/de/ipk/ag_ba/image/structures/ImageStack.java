@@ -224,4 +224,12 @@ public class ImageStack {
 		well = wellIdx;
 		this.wellCnt = wellCnt;
 	}
+	
+	public ij.ImageStack getStack() {
+		return stack;
+	}
+	
+	public void setStack(ij.ImageStack stack) {
+		this.stack = stack;
+	}
 }
