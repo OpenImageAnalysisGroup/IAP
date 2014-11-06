@@ -13,6 +13,7 @@ import javax.swing.JDialog;
 
 import org.BackgroundTaskStatusProvider;
 import org.FolderPanel;
+import org.StringManipulationTools;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 
@@ -53,7 +54,12 @@ public class BackgroundTaskWindow extends JDialog implements BackgroundTaskGUIpr
 	
 	@Override
 	public String getTitle() {
-		return panel.taskMessage;
+		String s = panel.taskMessage;
+		if (s != null && s.indexOf("<br>") > 0)
+			s = s.substring(0, s.indexOf("<br>")).trim();
+		if (s != null && s.indexOf("<small>") > 0)
+			s = s.substring(0, s.indexOf("<small>")).trim();
+		return StringManipulationTools.removeHTMLtags(s);
 	}
 	
 	@Override
