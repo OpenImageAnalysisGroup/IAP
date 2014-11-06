@@ -1167,7 +1167,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			}
 		}
 		
-		while (!snapshotsToBeProcessed.isEmpty()) {
+		while (!snapshotsToBeProcessed.isEmpty() && !(status != null && status.wantsToStop())) {
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
 			sidx++;
 			progressOutput(snapshotsToBeProcessed, status, r, scnt, sidx);

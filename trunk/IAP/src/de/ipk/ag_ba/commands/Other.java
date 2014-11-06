@@ -16,7 +16,6 @@ import javax.swing.Timer;
 import org.ObjectRef;
 
 import de.ipk.ag_ba.gui.calendar.NavigationButtonCalendar2;
-import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -36,9 +35,8 @@ public class Other {
 	
 	public static NavigationButton getServerStatusEntity(String title,
 			GUIsetting guIsetting) {
-		NavigationAction serverStatusAction = new ActionSystemStatus("Check service availability");
-		NavigationButton serverStatusEntity = new NavigationButton(serverStatusAction, title,
-				IAPimages.getCheckstatus(),
+		NavigationAction serverStatusAction = new ActionSystemStatus("Check service availability", title);
+		NavigationButton serverStatusEntity = new NavigationButton(serverStatusAction,
 				guIsetting);
 		return serverStatusEntity;
 	}
