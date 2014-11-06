@@ -198,7 +198,10 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 							String tt = SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
 									"IAP Cloud Storage, Analysis and Visualization System");
 							if (optCustomStartAction != null)
-								jff.setTitle(optCustomStartAction.getDefaultTitle());
+								jff.setTitle(StringManipulationTools.removeHTMLtags(
+										StringManipulationTools.stringReplace(
+												optCustomStartAction.getDefaultTitle(), "%gt;", " > "))
+										);
 							else
 								jff.setTitle(tt);
 						}
@@ -721,7 +724,9 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			NavigationButtonFilter optNavigationButtonFilter, boolean executeActionDelayed) {
 		final JFrame jff = new JFrame(windowTitle);
 		if (optCustomStartAction != null)
-			jff.setTitle(optCustomStartAction.getDefaultTooltip());
+			jff.setTitle(StringManipulationTools.removeHTMLtags(
+					StringManipulationTools.stringReplace(
+							optCustomStartAction.getDefaultTitle(), "%gt;", " - ")));
 		jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				"", "");

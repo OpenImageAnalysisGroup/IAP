@@ -43,6 +43,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
+import de.ipk.ag_ba.commands.bookmarks.ImageProvider;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -99,9 +100,11 @@ public class NavigationButton implements StyleAware {
 	public NavigationButton(String overrideTitle, NavigationAction navigationAction, GUIsetting guiSetting) {
 		this(navigationAction, guiSetting);
 		this.overrideTitle = overrideTitle;
+		assert guiSetting != null;
 	}
 	
 	public NavigationButton(NavigationAction navigationAction, GUIsetting guiSetting) {
+		assert guiSetting != null;
 		if (navigationAction != null) {
 			boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
 			if (enableRemoteTaskExecution && navigationAction instanceof RemoteCapableAnalysisAction
@@ -133,6 +136,7 @@ public class NavigationButton implements StyleAware {
 		this.setTitle(title);
 		this.navigationImage = image;
 		this.actionImage = image;
+		assert guiSetting != null;
 	}
 	
 	public NavigationButton(NavigationAction navigationAction, String title, String navigationImage, String actionImage,
@@ -141,17 +145,20 @@ public class NavigationButton implements StyleAware {
 		this.setTitle(title);
 		this.navigationImage = navigationImage;
 		this.actionImage = actionImage;
+		assert guiSetting != null;
 	}
 	
 	public NavigationButton(JComponent gui, GUIsetting guiSetting) {
 		this.gui = gui;
 		this.guiSetting = guiSetting;
+		assert guiSetting != null;
 	}
 	
 	public NavigationButton(BookmarkAction ba, BufferedImage image, GUIsetting guiSetting, String optStaticIconId) {
 		this(ba, guiSetting);
 		this.optStaticIconId = optStaticIconId;
 		this.icon = image != null ? new ImageIcon(image) : null;
+		assert guiSetting != null;
 	}
 	
 	public JComponent getGUI() {
@@ -712,10 +719,13 @@ public class NavigationButton implements StyleAware {
 								ArrayList<NavigationButton> res = na.getResultNewNavigationSet(prior);
 								if (res != null && res.size() > 0 && res.get(res.size() - 1) == null) {
 									String path = IAPnavigationPanel.getTargetPath(res);
-									IAPgui.navigateTo(path, NavigationButton.this);
+									IAPgui.navigateTo(path, NavigationButton.this, null);
 								} else {
-									if (res == null || res.isEmpty())
+									if (res == null || res.isEmpty()) {
+										if (res == null)
+											res = new ArrayList<NavigationButton>();
 										res.add(NavigationButton.this);
+									}
 									navPanel.setEntitySet(res);
 								}
 							} else {
@@ -727,7 +737,7 @@ public class NavigationButton implements StyleAware {
 								if (set != null)
 									if (set != null && set.size() > 0 && set.get(set.size() - 1) == null) {
 										String path = IAPnavigationPanel.getTargetPath(set);
-										IAPgui.navigateTo(path, NavigationButton.this);
+										IAPgui.navigateTo(path, NavigationButton.this, null);
 										reload = true;
 									} else {
 										for (final NavigationButton src : set) {
@@ -780,6 +790,12 @@ public class NavigationButton implements StyleAware {
 		int imgS = getImageSize(style, target);
 		
 		ImageIcon icon = null;
+		if (n != null && n.getAction() != null && (n.getAction() instanceof ImageProvider)) {
+			ImageProvider ip = (ImageProvider) n.getAction();
+			if (ip.getImage() != null)
+				icon = new ImageIcon(ip.getImage());
+		}
+		
 		if (target == PanelTarget.NAVIGATION && n.getIconActive() != null && n.getIconActive().getImage() != null) {
 			icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgS, imgS));
 		} else

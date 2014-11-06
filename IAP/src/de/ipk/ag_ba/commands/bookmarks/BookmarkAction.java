@@ -14,6 +14,7 @@ import org.StringManipulationTools;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.Unicode;
+import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
@@ -21,13 +22,15 @@ import de.ipk.ag_ba.gui.webstart.IAPgui;
 /**
  * @author klukas
  */
-public class BookmarkAction extends AbstractNavigationAction {
+public class BookmarkAction extends AbstractNavigationAction implements ImageProvider {
 	
 	private final Bookmark bookmark;
+	private final NavigationAction actionHome;
 	
-	public BookmarkAction(Bookmark bookmark) {
+	public BookmarkAction(Bookmark bookmark, NavigationAction actionHome) {
 		super(pretify(Unicode.STAR + " Bookmark " + Unicode.STAR + "<br>" + bookmark.getTarget()));
 		this.bookmark = bookmark;
+		this.actionHome = actionHome;
 	}
 	
 	private static String pretify(String target) {
@@ -44,7 +47,7 @@ public class BookmarkAction extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		IAPgui.navigateTo(bookmark.getTarget(), src);
+		IAPgui.navigateTo(bookmark.getTarget(), src, actionHome);
 	}
 	
 	@Override
