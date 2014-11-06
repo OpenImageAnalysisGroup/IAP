@@ -127,7 +127,7 @@ public class BlMaizeStemDetection extends AbstractSnapshotAnalysisBlock implemen
 			String prefix = "prefix1";
 			rt.addValue(prefix + resultPrefix + ".skeleton.endlimbs", nEndLimbs);
 			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
-			sg.createGraph(optClusterIDsPixels, null, 10, null, 0);
+			sg.createGraph(optClusterIDsPixels, null, 10, null, 0, getBoolean("Show Result Graph (Debug)", false));
 			sg.deleteSelfLoops();
 			sg.removeParallelEdges();
 			sg.getGraph().numberGraphElements();
