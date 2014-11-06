@@ -33,6 +33,7 @@ import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.MapAB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.EdgeFollowingVetoEvaluation;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.algorithms.shortest_paths.WeightedShortestPathSelectionAlgorithm;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.MergeNodes;
@@ -992,9 +993,8 @@ public class SkeletonGraph {
 	public void connectGraphComponents() {
 		int connectedComponents;
 		HashSet<Graph> components = new HashSet<Graph>();
-		HashMap<Node, Node> map = GraphHelper.getConnectedComponentMap(graph);
-		HashMap<Node, Node> mapInverse = NodeHelper.inverseMap(map);
-		for (Node n : map.values()) {
+		MapAB mapAB = GraphHelper.getConnectedComponentMap(graph);
+		for (Node n : mapAB.getA().values()) {
 			components.add(n.getGraph());
 		}
 		connectedComponents = components.size();
@@ -1010,12 +1010,12 @@ public class SkeletonGraph {
 						if (gA == gB)
 							continue;
 						for (Node a : gA.getNodes()) {
-							if (mapInverse.get(a) == null) {
+							if (mapAB.getA().get(a) == null) {
 								System.out.println("ERR_A");
 								continue;
 							}
 							for (Node b : gB.getNodes()) {
-								if (mapInverse.get(b) == null) {
+								if (mapAB.getB().get(b) == null) {
 									System.out.println("ERR_B");
 									continue;
 								}
@@ -1033,8 +1033,8 @@ public class SkeletonGraph {
 						}
 					}
 				if (nearestA != null) {
-					Node sourceA = mapInverse.get(nearestA);
-					Node sourceB = mapInverse.get(nearestB);
+					Node sourceA = mapAB.getB().get(nearestA);
+					Node sourceB = mapAB.getB().get(nearestB);
 					if (sourceA == null || sourceB == null)
 						System.out.println("ERRR");
 					else
@@ -1042,8 +1042,8 @@ public class SkeletonGraph {
 				}
 				components.clear();
 				graph.numberGraphElements();
-				map = GraphHelper.getConnectedComponentMap(graph);
-				for (Node n : map.values()) {
+				mapAB = GraphHelper.getConnectedComponentMap(graph);
+				for (Node n : mapAB.getA().values()) {
 					components.add(n.getGraph());
 				}
 				connectedComponents = components.size();

@@ -1992,6 +1992,7 @@ public class IAPservice {
 				if (IAPservice.ij.getWindows() != null)
 					for (Window w : IAPservice.ij.getWindows())
 						if (w instanceof ImageWindow)
+							// if (!((((ImageWindow) w).getState() & Frame.ICONIFIED) == Frame.ICONIFIED))
 							if (!((ImageWindow) w).isClosed())
 								n++;
 			return n;
@@ -1999,13 +2000,21 @@ public class IAPservice {
 	}
 	
 	public static void closeAllImageJimageWindows() {
-		if (IAPservice.isImageJvisible())
+		if (IAPservice.isImageJvisible()) {
 			WindowManager.closeAllWindows();
-		else
+		} else
 			if (IAPservice.ij != null && !IAPservice.ij.isShowing())
 				if (IAPservice.ij.getWindows() != null)
 					for (Window w : IAPservice.ij.getWindows())
 						if (w instanceof ImageWindow)
+							// if (!((((ImageWindow) w).getState() & Frame.ICONIFIED) == Frame.ICONIFIED))
 							w.dispose();
+	}
+	
+	public static int[] add(int[] arr, int add) {
+		int[] res = new int[arr.length];
+		for (int i = 0; i < res.length; i++)
+			res[i] = arr[i] + add;
+		return res;
 	}
 }

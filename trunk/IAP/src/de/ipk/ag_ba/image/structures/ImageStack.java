@@ -4,6 +4,7 @@ import ij.ImagePlus;
 import ij.gui.StackWindow;
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.FolderPanel;
@@ -41,6 +43,18 @@ public class ImageStack {
 	private final ArrayList<String> settingsPaths = new ArrayList<String>();
 	
 	private ImageSetConfig debugConfig;
+	
+	private int well;
+	
+	private int wellCnt;
+	
+	public ImageStack() {
+		this.well = -1;
+	}
+	
+	public ImageStack(int well) {
+		this.well = well;
+	}
 	
 	public void addImage(String label, Image image) {
 		addImage(label, image, null);
@@ -123,14 +137,6 @@ public class ImageStack {
 						String tt = getStack().getSliceLabel(z);
 						if (tt != null && tt.startsWith("Result of ")) {
 							tt = tt.substring("Result of ".length());
-							// try {
-							// ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(tt).newInstance();
-							// String desc = inst.getDescription();
-							// tsoCurrentImageDisplayPage.setParam(1, desc);
-							// } catch (Exception ee) {
-							// // empty
-							// tsoCurrentImageDisplayPage.setParam(1, null);
-							// }
 						} else
 							tsoCurrentImageDisplayPage.setParam(1, null);
 						tsoCurrentImageDisplayPage.setParam(0, tt);
@@ -171,7 +177,14 @@ public class ImageStack {
 				public void paint(Graphics arg0) {
 					super.paint(arg0);
 					jb.repaint();
-					optSideComponent.repaint();
+					if (optSideComponent != null) {
+						if (optSideComponent instanceof JPanel) {
+							JPanel jp = (JPanel) optSideComponent;
+							for (Component j : jp.getComponents())
+								j.repaint();
+						} else
+							optSideComponent.repaint();
+					}
 				}
 				
 				@Override
@@ -197,5 +210,18 @@ public class ImageStack {
 		if (this.debugConfig == null)
 			debugConfig = new ImageSetConfig();
 		return debugConfig;
+	}
+	
+	public int getWell() {
+		return well;
+	}
+	
+	public int getWellCnt() {
+		return wellCnt;
+	}
+	
+	public void setWell(int wellIdx, int wellCnt) {
+		well = wellIdx;
+		this.wellCnt = wellCnt;
 	}
 }
