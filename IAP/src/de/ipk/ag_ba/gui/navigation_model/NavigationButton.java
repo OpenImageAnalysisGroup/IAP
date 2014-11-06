@@ -713,8 +713,11 @@ public class NavigationButton implements StyleAware {
 								if (res != null && res.size() > 0 && res.get(res.size() - 1) == null) {
 									String path = IAPnavigationPanel.getTargetPath(res);
 									IAPgui.navigateTo(path, NavigationButton.this);
-								} else
+								} else {
+									if (res == null || res.isEmpty())
+										res.add(NavigationButton.this);
 									navPanel.setEntitySet(res);
+								}
 							} else {
 								boolean includeBookmarks = false;
 								ArrayList<NavigationButton> var = navPanel.getEntitySet(includeBookmarks);
