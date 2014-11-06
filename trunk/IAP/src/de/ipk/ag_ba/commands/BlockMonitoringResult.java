@@ -16,8 +16,8 @@ public class BlockMonitoringResult {
 	private final long processingTime;
 	private final String blockName;
 	
-	private final HashMap<CameraType, Image> resultImages = new HashMap<>();
-	private final HashMap<CameraType, Image> resultMasks = new HashMap<>();
+	private HashMap<CameraType, Image> resultImages = new HashMap<>();
+	private HashMap<CameraType, Image> resultMasks = new HashMap<>();
 	
 	public BlockMonitoringResult(MaskAndImageSet workset, int pipelineMonitoringResultImageSize, String blockName, long processingTime) {
 		this.blockName = blockName;
@@ -66,6 +66,22 @@ public class BlockMonitoringResult {
 	
 	public String getProcessTime() {
 		return SystemAnalysis.getWaitTime(processingTime);
+	}
+	
+	public HashMap<CameraType, Image> getImages() {
+		return resultImages;
+	}
+	
+	public HashMap<CameraType, Image> getMasks() {
+		return resultMasks;
+	}
+	
+	public void setImages(HashMap<CameraType, Image> images) {
+		this.resultImages = images;
+	}
+	
+	public void setMasks(HashMap<CameraType, Image> masks) {
+		this.resultMasks = masks;
 	}
 	
 }

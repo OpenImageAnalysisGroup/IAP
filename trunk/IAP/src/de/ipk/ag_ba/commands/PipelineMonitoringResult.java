@@ -9,14 +9,15 @@ import org.SystemAnalysis;
  * @author Christian Klukas
  */
 public class PipelineMonitoringResult {
-	
 	private final Collection<BlockMonitoringResult> results = new ArrayList<BlockMonitoringResult>();
 	private final String plantID;
 	private final Long snapshotTime;
+	private final long creationTime;
 	
 	public PipelineMonitoringResult(String plantID, Long snapshotTime) {
 		this.plantID = plantID;
 		this.snapshotTime = snapshotTime;
+		this.creationTime = System.currentTimeMillis();
 	}
 	
 	public boolean isEmpty() {
@@ -33,7 +34,17 @@ public class PipelineMonitoringResult {
 	
 	public void addBlockResult(BlockMonitoringResult pipelineMonitoringResult) {
 		synchronized (results) {
-			results.add(pipelineMonitoringResult);
+			String n = pipelineMonitoringResult.getBlockName();
+			boolean updated = false;
+			for (BlockMonitoringResult bmr : results) {
+				if (bmr.getBlockName().equals(n)) {
+					updated = true;
+					bmr.setImages(bmr.getImages());
+					bmr.setMasks(bmr.getMasks());
+				}
+			}
+			if (!updated)
+				results.add(pipelineMonitoringResult);
 		}
 	}
 	

@@ -24,6 +24,7 @@ import org.SystemAnalysis;
 import org.Vector2i;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.graffiti.attributes.Attribute;
+import org.graffiti.attributes.AttributeNotFoundException;
 import org.graffiti.attributes.ObjectAttribute;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.AdjListGraph;
@@ -202,7 +203,12 @@ public class SkeletonGraph {
 					int n = 0;
 					double lenS = 0;
 					for (Edge e : leaf.getEdges()) {
-						ArrayList<Vector2i> edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
+						ArrayList<Vector2i> edgePoints;
+						try {
+							edgePoints = ((LimbInfo) ((ObjectAttribute) e.getAttribute("info")).getValue()).getEdgePoints();
+						} catch (AttributeNotFoundException anfe) {
+							edgePoints = new ArrayList<Vector2i>();
+						}
 						lenS += edgePoints.size();
 						n++;
 					}

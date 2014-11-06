@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import org.SystemOptions;
 
@@ -41,7 +42,7 @@ public class ActionPipelineStatus extends AbstractNavigationAction {
 						.getInteger("Pipeline-Debugging", "Block Result-Monitoring//Image-Size", 256), 2000);
 				PipelineMonitoringResult pr = BlockPipeline.getLastPipelineMonitoringResults();
 				if (pr == null || pr.isEmpty()) {
-					setText("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Pipeline-Monitoring activated. Waiting for block-rResults.</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>");
+					setText("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Pipeline-Monitoring activated. Waiting for Block-Results.</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>");
 				} else {
 					if (lastRes == pr)
 						return;
@@ -80,6 +81,10 @@ public class ActionPipelineStatus extends AbstractNavigationAction {
 		};
 		r.setBorder(BorderFactory.createBevelBorder(1));
 		htmlTextPanels.add(r);
+		htmlTextPanels
+				.add(new JLabel(
+						"<html><font color='gray'><small>Display is updated according to debug-view process timing,<br>therefore "
+								+ "some intermediate pipeline results may not be shown."));
 	}
 	
 	@Override
@@ -108,8 +113,10 @@ public class ActionPipelineStatus extends AbstractNavigationAction {
 	public String getDefaultTitle() {
 		if (System.currentTimeMillis() - lastRequest > 1000) {
 			for (JComponent jc : htmlTextPanels) {
-				JLabelUpdateReady ur = (JLabelUpdateReady) jc;
-				ur.update();
+				if (jc instanceof JLabelUpdateReady) {
+					JLabelUpdateReady ur = (JLabelUpdateReady) jc;
+					ur.update();
+				}
 			}
 			
 			lastRequest = System.currentTimeMillis();
