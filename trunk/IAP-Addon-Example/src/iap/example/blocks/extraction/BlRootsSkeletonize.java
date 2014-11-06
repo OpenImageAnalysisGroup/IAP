@@ -324,7 +324,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 								graphAnalysis(getClusterIDarray(image.copy().bm().dilate(5).io()),
 										new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
 												skeletonImage.getAs1D())
-												.show("input for graph analysis", true).io(), rt, prefix, width > 1, distanceMap, postProcessing);
+												.show("input for graph analysis", debug).io(), rt, prefix, width > 1, distanceMap, postProcessing);
 							}
 							
 						}
