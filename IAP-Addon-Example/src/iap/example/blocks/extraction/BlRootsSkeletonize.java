@@ -363,7 +363,10 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 			}
 			int realLen = currentLengthWider - nextLengthThinner;
 			if (realLen < 0) {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Negative skeleton length calculated for width " + w + " (set to 0): " + realLen);
+				if (debug)
+					System.out.println(SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime() + ">WARNING: Negative skeleton length calculated for width "
+							+ w
+							+ " (set to 0): " + realLen);
 				realLen = 0;
 			}
 			int www = w;// width - w + 1;
