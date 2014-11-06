@@ -514,7 +514,7 @@ public class BlockPipeline {
 							@Override
 							public void run() {
 								if (fis.getStack() != null)
-									stack.setObject(fis.getStack());
+									stack.setObject(fis.getStack().duplicate());
 							}
 						};
 						Runnable reopen = new Runnable() {
@@ -562,14 +562,18 @@ public class BlockPipeline {
 		Action action2 = new AbstractAction("Close Additional Image Windows", new ImageIcon(IAPimages.getImage("img/close_frame.png"))) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				runnablePrepare.run();
-				IAPservice.closeAllImageJimageWindows();
-				runnablePost.run();
+				if (IAPservice.getIAPimageWindowCount() > 1) {
+					runnablePrepare.run();
+					IAPservice.closeAllImageJimageWindows();
+					runnablePost.run();
+				} else {
+					MainFrame.showMessageDialog("No additional windows are open!", "Information");
+				}
 			}
 			
 			@Override
 			public boolean isEnabled() {
-				return IAPservice.getIAPimageWindowCount() > 0;
+				return true;
 			}
 			
 		};
