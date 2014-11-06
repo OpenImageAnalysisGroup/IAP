@@ -23,7 +23,7 @@ public class BlCrop extends AbstractBlock {
 	
 	@Override
 	protected Image processMask(Image mask) {
-		if (!getBoolean("Process Masks", false))
+		if (!getBoolean("Process Masks", true))
 			return mask;
 		else
 			return mask.io().crop().getImage();
