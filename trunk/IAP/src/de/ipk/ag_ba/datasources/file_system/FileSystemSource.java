@@ -37,7 +37,7 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	protected Collection<PathwayWebLinkItem> mainList;
 	protected final NavigationImage mainDataSourceIconInactive;
 	protected final NavigationImage mainDataSourceIconActive;
-	private final String dataSourceName;
+	protected final String dataSourceName;
 	protected final NavigationImage folderIcon;
 	protected boolean read;
 	protected DataSourceLevel thisLevel;
