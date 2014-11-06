@@ -83,7 +83,7 @@ public class ActionPipelineStatus extends AbstractNavigationAction {
 		htmlTextPanels.add(r);
 		htmlTextPanels
 				.add(new JLabel(
-						"<html><font color='gray'><small>Display is updated according to debug-view process timing,<br>therefore "
+						"<html><font color='gray'><small>Display is updated according to intepended debug-view process timing,<br>therefore "
 								+ "some intermediate pipeline results may not be shown."));
 	}
 	
