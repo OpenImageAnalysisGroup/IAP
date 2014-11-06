@@ -262,7 +262,7 @@ public class GraphHelper implements HelperClass {
 	 * @return a collection with all connected components as separate graphs
 	 */
 	public static Collection<Graph> getConnectedComponents(Graph graph) {
-		HashMap<Node, Node> map = getConnectedComponentMap(graph);
+		HashMap<Node, Node> map = getConnectedComponentMap(graph).getA();
 		
 		HashSet<Graph> components = new HashSet<Graph>();
 		for (Node n : map.values())
@@ -271,12 +271,13 @@ public class GraphHelper implements HelperClass {
 		return components;
 	}
 	
-	public static HashMap<Node, Node> getConnectedComponentMap(Graph graph) {
+	public static MapAB getConnectedComponentMap(Graph graph) {
 		if (graph.getNumberOfNodes() <= 0)
-			return new HashMap<>();
+			return new MapAB(new HashMap<>(), new HashMap<>());
 		
 		List<Node> nodesToProcess = new ArrayList<Node>(graph.getNodes());
 		HashMap<Node, Node> sourceGraphNode2connectedGraphNode = new LinkedHashMap<Node, Node>();
+		HashMap mapB = new HashMap();
 		while (!nodesToProcess.isEmpty()) {
 			Node startNode = nodesToProcess.get(0);
 			Set<Node> connectedNodes = getConnectedNodes(startNode);
@@ -285,6 +286,7 @@ public class GraphHelper implements HelperClass {
 				Node newNode = connectedComponentGraph.addNodeCopy(n);
 				int nn = sourceGraphNode2connectedGraphNode.size();
 				sourceGraphNode2connectedGraphNode.put(n, newNode);
+				mapB.put(newNode, n);
 				if (sourceGraphNode2connectedGraphNode.size() - 1 != nn)
 					System.out.println("FUUUUU");
 			}
@@ -298,7 +300,7 @@ public class GraphHelper implements HelperClass {
 			}
 			nodesToProcess.removeAll(connectedNodes);
 		}
-		return sourceGraphNode2connectedGraphNode;
+		return new MapAB(sourceGraphNode2connectedGraphNode, mapB);
 	}
 	
 	/**

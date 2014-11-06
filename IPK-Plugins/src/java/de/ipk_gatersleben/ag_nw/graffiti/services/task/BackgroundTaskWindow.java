@@ -86,6 +86,7 @@ public class BackgroundTaskWindow extends JDialog implements BackgroundTaskGUIpr
 		pack();
 		setLocationRelativeTo(MainFrame.getInstance());
 		setVisible(true);
+		updateSize();
 	}
 	
 	@Override
