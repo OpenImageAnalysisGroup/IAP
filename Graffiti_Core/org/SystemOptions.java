@@ -720,6 +720,7 @@ public class SystemOptions {
 	
 	public String getStringRadioSelection(String group, String setting,
 			ArrayList<String> possibleValues, String defaultSelection, boolean addDefaultIfNeeded) {
+		checkGroup(group);
 		synchronized (ini) {
 			String settingTemplateEmpty = possibleValues != null ? StringManipulationTools.getStringList(possibleValues, "//") : null;
 			String settingTemplateDefaultSelected = settingTemplateEmpty != null ? StringManipulationTools.stringReplace(
@@ -740,6 +741,12 @@ public class SystemOptions {
 				setString(group, setting + "-radio-selection", settingTemplateDefaultSelected);
 			return defaultSelection;
 		}
+	}
+	
+	private void checkGroup(String group) {
+		if (group != null && group.contains("//"))
+			throw new UnsupportedOperationException(
+					"Settings group can't contain '//' characters. Use these separator string within the settings field name, to create a subgroup.");
 	}
 	
 	public String getIniValue() throws IOException {
