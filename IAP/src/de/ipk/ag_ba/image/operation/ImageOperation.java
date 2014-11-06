@@ -1982,7 +1982,7 @@ public class ImageOperation implements MemoryHogInterface {
 		StopWatch s = new StopWatch("lab_cube", false);
 		final float[][][] result = new float[256][256][256 * 3];
 		
-		final ColorSpaceConverter convert = new ColorSpaceConverter(SystemOptions.getInstance().getStringRadioSelection("IAP//Color Management", "White Point",
+		final ColorSpaceConverter convert = new ColorSpaceConverter(SystemOptions.getInstance().getStringRadioSelection("IAP", "Color Management//White Point",
 				ColorSpaceConverter.getWhitePointList(), ColorSpaceConverter.getDefaultWhitePoint(), true));
 		
 		BackgroundThreadDispatcher.process(IntStream.range(0, 256), (int red) -> {
