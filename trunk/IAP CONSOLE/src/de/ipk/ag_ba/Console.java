@@ -311,7 +311,7 @@ public class Console {
 	public ArrayList<NavigationButton> getNavigationBarActions() {
 		if (navigationBarContent.isEmpty()) {
 			// add IAP home navigation button
-			ActionHome ha = new ActionHome(new BackgroundTaskStatusProviderSupportingExternalCallImpl("", ""));
+			ActionHome ha = new ActionHome(new BackgroundTaskStatusProviderSupportingExternalCallImpl("", ""), guiSetting);
 			guiSetting = new GUIsetting(null, null, null);
 			ha.setSource(ha, guiSetting);
 			addNavigationBarAction(new NavigationButton(ha, null));
