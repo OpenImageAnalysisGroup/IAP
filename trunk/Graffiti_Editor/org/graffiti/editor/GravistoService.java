@@ -62,6 +62,7 @@ import org.ReleaseInfo;
 import org.Scalr;
 import org.Scalr.Method;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.editor.actions.RunAlgorithm;
 import org.graffiti.editor.dialog.DefaultParameterDialog;
@@ -980,8 +981,10 @@ public class GravistoService implements HelperClass {
 		if (img != null)
 			cachedIcons.put(id, img);
 		else
-			if (warnIfNotFound)
-				System.out.println("Could not load icon " + name);
+			if (warnIfNotFound) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not load icon '" + name + "' !");
+				return loadIcon(GravistoService.class, "images/Stop24.gif", w, h, false);
+			}
 		return result;
 	}
 	
