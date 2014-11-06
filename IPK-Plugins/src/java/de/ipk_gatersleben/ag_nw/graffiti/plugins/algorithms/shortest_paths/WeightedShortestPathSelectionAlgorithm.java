@@ -22,7 +22,6 @@ import javax.swing.KeyStroke;
 import org.AttributeHelper;
 import org.Release;
 import org.ReleaseInfo;
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Edge;
 import org.graffiti.graph.GraphElement;
@@ -131,7 +130,7 @@ public class WeightedShortestPathSelectionAlgorithm
 						weightattribute, null, false));
 		}
 		
-		ListOrderedSet targetGraphElementsToBeProcessed = new ListOrderedSet();
+		Set targetGraphElementsToBeProcessed = new HashSet();
 		for (GraphElement ge : currentSelElements) {
 			targetGraphElementsToBeProcessed.add(ge);
 		}
@@ -200,7 +199,7 @@ public class WeightedShortestPathSelectionAlgorithm
 		List<GraphElement> res = findLongestShortestPathStartAndEndPoints(possibleSourceAndEndElements, wa, optLengthReturn, allowAllTargets);
 		sel.addAll(res);
 		wsp.setSelection(sel);
-		ListOrderedSet targetGraphElementsToBeProcessed = new ListOrderedSet();
+		Set targetGraphElementsToBeProcessed = new HashSet();
 		for (GraphElement ge : sel.getElements()) {
 			targetGraphElementsToBeProcessed.add(ge);
 		}
@@ -267,7 +266,7 @@ public class WeightedShortestPathSelectionAlgorithm
 					}
 				}
 				
-				ListOrderedSet targetGraphElementsToBeProcessed = new ListOrderedSet();
+				Set targetGraphElementsToBeProcessed = new HashSet();
 				targetGraphElementsToBeProcessed.add(target);
 				
 				ThreadSafeOptions retDist = new ThreadSafeOptions();
@@ -327,7 +326,7 @@ public class WeightedShortestPathSelectionAlgorithm
 	public static Collection<GraphElement> getShortestPathElements(
 			Collection<GraphElement> validGraphElements,
 			GraphElement startGraphElement,
-			ListOrderedSet targetGraphElements,
+			Set targetGraphElements,
 			boolean directed,
 			boolean considerNodeWeight,
 			boolean considerEdgeWeight,
