@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import javax.swing.KeyStroke;
 
@@ -345,7 +346,7 @@ public class WeightedShortestPathSelectionAlgorithm
 	public static Collection<GraphElement> getShortestPathElements(
 			Collection<GraphElement> validGraphElements,
 			GraphElement startGraphElement,
-			ListOrderedSet targetGraphElements,
+			Set targetGraphElements,
 			boolean directed,
 			boolean considerNodeWeight,
 			boolean considerEdgeWeight,
