@@ -20,15 +20,21 @@ public class PipelineMonitoringResult {
 	}
 	
 	public boolean isEmpty() {
-		return results.isEmpty();
+		synchronized (results) {
+			return results.isEmpty();
+		}
 	}
 	
 	public Collection<BlockMonitoringResult> getBlockResults() {
-		return results;
+		synchronized (results) {
+			return new ArrayList<BlockMonitoringResult>(results);
+		}
 	}
 	
 	public void addBlockResult(BlockMonitoringResult pipelineMonitoringResult) {
-		results.add(pipelineMonitoringResult);
+		synchronized (results) {
+			results.add(pipelineMonitoringResult);
+		}
 	}
 	
 	public String getPlantID() {
