@@ -735,8 +735,10 @@ public class SkeletonGraph {
 			res.add(ml);
 		if (mr != null)
 			res.add(mr);
-		System.out.println("left: " + new NodeHelper(ml).getLabel());
-		System.out.println("right: " + new NodeHelper(mr).getLabel());
+		if (DEBUG) {
+			System.out.println("left: " + new NodeHelper(ml).getLabel());
+			System.out.println("right: " + new NodeHelper(mr).getLabel());
+		}
 		return res;
 	}
 	
