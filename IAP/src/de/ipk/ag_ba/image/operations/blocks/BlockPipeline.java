@@ -5,6 +5,7 @@ import iap.blocks.postprocessing.WellProcessing;
 import iap.blocks.preprocessing.WellProcessor;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 import info.StopWatch;
+import info.clearthought.layout.TableLayout;
 
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -19,6 +20,8 @@ import java.util.LinkedHashSet;
 import java.util.TreeMap;
 import java.util.stream.IntStream;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
@@ -40,6 +43,7 @@ import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.ImageStack;
@@ -115,7 +119,7 @@ public class BlockPipeline {
 		final ObjectRef exception = new ObjectRef();
 		if (status != null)
 			status.setCurrentStatusValue(0);
-		boolean quick = false;
+		boolean quick = true;
 		if (quick) {
 			BackgroundThreadDispatcher.process(IntStream.range(0, executionTrayCount), (currentWell) -> {
 				if (debugValidTrays != null && !debugValidTrays.contains(currentWell))
@@ -130,6 +134,7 @@ public class BlockPipeline {
 							ds, status, og.getImageSet(), og.getMaskSet());
 					if (options.forceDebugStack)
 						synchronized (options.forcedDebugStacks) {
+							ds.setWell(options.getWellIdx(), options.getWellCnt());
 							options.forcedDebugStacks.add(ds);
 						}
 					res.clearStoredPostprocessors();
@@ -161,6 +166,7 @@ public class BlockPipeline {
 							ds, status, og.getImageSet(), og.getMaskSet());
 					if (options.forceDebugStack)
 						synchronized (options.forcedDebugStacks) {
+							ds.setWell(options.getWellIdx(), options.getWellCnt());
 							options.forcedDebugStacks.add(ds);
 						}
 					res.clearStoredPostprocessors();
@@ -397,13 +403,9 @@ public class BlockPipeline {
 					nmi.clone(old2newSample.get(nmi.getParentSample())));
 		}
 		
-		analysisTaskFinal.setInput(
-				AbstractPhenotypingTask.getWateringInfo(e),
-				samples, input, er.m, 0, 1);
-		
-		final BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+		BackgroundTaskStatusProviderSupportingExternalCall status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				analysisTaskFinal.getName(), analysisTaskFinal.getTaskDescription());
-		final Runnable backgroundTask = new Runnable() {
+		Runnable backgroundTask = new Runnable() {
 			@Override
 			public void run() {
 				analysisTaskFinal.debugOverrideAndEnableDebugStackStorage(true);
@@ -429,6 +431,7 @@ public class BlockPipeline {
 		};
 		
 		final ObjectRef finishSwingTaskRef = new ObjectRef();
+		
 		Runnable finishSwingTask = new Runnable() {
 			@Override
 			public void run() {
@@ -436,61 +439,131 @@ public class BlockPipeline {
 						|| analysisTaskFinal.getForcedDebugStackStorageResult().isEmpty()) {
 					MainFrame.showMessageDialog(
 							"No pipeline results available! (" + input.size()
-									+ " images input)", "Error");
+									+ " images used as input)", "Error");
 				} else {
-					final ThreadSafeOptions tsoCurrentImageDisplayPage = new ThreadSafeOptions();
-					JButton openSettingsButton = null;
-					if (er.getIniIoProvider() != null) {
-						openSettingsButton = new JButton("Change Analysis Settings");
-						openSettingsButton.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(24, 24,
-								Image.SCALE_SMOOTH)));
-						openSettingsButton.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent arg0) {
-								IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
-								ActionSettings ac = new ActionSettings(null, er.getIniIoProvider(),
-										"Change analysis settings (experiment " + er.getExperimentName()
-												+ ")", "Modify settings");
-								ac.setInitialNavigationPath(analysisTaskFinal.getDebugLastSystemOptionStorageGroup());
-								ac.setInitialNavigationSubPath((String) tsoCurrentImageDisplayPage.getParam(0, null)); // current image analysis step
-								mnp.getNewWindowListener(ac, true).actionPerformed(arg0);
-							}
-						});
-					}
-					int idx = 1;
-					int nn = analysisTaskFinal.getForcedDebugStackStorageResult().size();
 					for (ImageStack fisArr : analysisTaskFinal.getForcedDebugStackStorageResult()) {
 						if (fisArr == null) {
-							idx++;
 							continue;
 						}
 						ImageStack fis = fisArr;
-						final int idxF = idx - 1;
+						final int idxF = fisArr.getWell();
+						final int idxCntF = fisArr.getWellCnt();
 						NumericMeasurementInterface iii = input.iterator().next();
-						fis.show(iii.getQualityAnnotation() + " / " + iii.getParentSample().getSampleTime() + " / " + analysisTaskFinal.getName() + " / Well " + idx
-								+ "/" + nn,
-								new Runnable() {
-									@Override
-									public void run() {
-										analysisTaskFinal.debugSetValidTrays(new int[] { idxF });
-										analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, er.m, 0, 1);
-										BackgroundTaskHelper.issueSimpleTaskInWindow(
-												analysisTaskFinal.getName(), "Analyze...",
-												backgroundTask,
-												(Runnable) finishSwingTaskRef.getObject(), status, false,
-												true);
-									}
-								}, "Repeat Analysis", openSettingsButton, tsoCurrentImageDisplayPage);
-						idx++;
+						
+						final ThreadSafeOptions tsoCurrentImageDisplayPage = new ThreadSafeOptions();
+						JButton openSettingsButton = null;
+						if (er.getIniIoProvider() != null) {
+							openSettingsButton = new JButton("Change Analysis Settings");
+							openSettingsButton.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(24, 24,
+									Image.SCALE_SMOOTH)));
+							openSettingsButton.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent arg0) {
+									IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
+									ActionSettings ac = new ActionSettings(null, er.getIniIoProvider(),
+											"Change analysis settings (experiment " + er.getExperimentName()
+													+ ")", "Modify settings");
+									ac.setInitialNavigationPath(analysisTaskFinal.getDebugLastSystemOptionStorageGroup());
+									ac.setInitialNavigationSubPath((String) tsoCurrentImageDisplayPage.getParam(0, null)); // current image analysis step
+									mnp.getNewWindowListener(ac, true).actionPerformed(arg0);
+								}
+							});
+						} else
+							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No INI-I/O-Provider given for window.");
+						
+						analysisTaskFinal.setInput(
+								AbstractPhenotypingTask.getWateringInfo(e),
+								samples, input, er.m, idxF, idxCntF);
+						
+						BackgroundTaskStatusProviderSupportingExternalCall statusInnerCall = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+								analysisTaskFinal.getName(), analysisTaskFinal.getTaskDescription());
+						Runnable backgroundTaskInnerCall = new Runnable() {
+							@Override
+							public void run() {
+								analysisTaskFinal.debugOverrideAndEnableDebugStackStorage(true);
+								try {
+									analysisTaskFinal.performAnalysis(statusInnerCall);
+									ExperimentInterface out = analysisTaskFinal.getOutput();
+									if (out != null)
+										for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {
+											if (nmi instanceof NumericMeasurement) {
+												NumericMeasurement nm = (NumericMeasurement) nmi;
+												String sub = nm.getParentSample().getParentCondition().getParentSubstance().getName();
+												if (!sub.contains("histogram"))
+													System.out.println("> "
+															+ nm.getQualityAnnotation() + " // day: " + nm.getParentSample().getTime() + " // condition: "
+															+ nm.getParentSample().getParentCondition().getConditionName() + " // "
+															+ sub + ": " + nm.getValue() + " [" + nm.getUnit() + "]");
+											}
+										}
+								} catch (InterruptedException e) {
+									MongoDB.saveSystemErrorMessage("BlockPipeline backgroundTask InterruptedException.", e);
+								}
+							}
+						};
+						
+						String wellInfo = (idxF + 1) + "/" + idxCntF;
+						if (analysisTaskFinal.debugGetValidTrays() != null)
+							wellInfo = StringManipulationTools.getStringList(IAPservice.add(analysisTaskFinal.debugGetValidTrays(), 1), ",");
+						
+						final String wif = wellInfo;
+						final JButton osf = openSettingsButton;
+						ObjectRef or = new ObjectRef();
+						Runnable reopen = new Runnable() {
+							@Override
+							public void run() {
+								fis.show(iii.getQualityAnnotation() + " / " + iii.getParentSample().getSampleTime() + " / " + analysisTaskFinal.getName() + " / Well "
+										+ wif,
+										new Runnable() {
+											@Override
+											public void run() {
+												analysisTaskFinal.debugSetValidTrays(new int[] { idxF });
+												analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, er.m, 0, 1);
+												BackgroundTaskHelper.issueSimpleTaskInWindow(
+														analysisTaskFinal.getName(), "Repeat Snapshot Analysis...",
+														backgroundTaskInnerCall,
+														(Runnable) finishSwingTaskRef.getObject(), statusInnerCall, false,
+														true);
+											}
+										}, "Repeat Analysis",
+										TableLayout.get3Split(osf, null, new JButton(getCloseAction((Runnable) (or.getObject()))), TableLayout.PREFERRED, 5,
+												TableLayout.PREFERRED),
+										tsoCurrentImageDisplayPage);
+							}
+						};
+						or.setObject(reopen);
+						
+						reopen.run();
 					}
-					idx++;
 				}
 			}
 		};
 		finishSwingTaskRef.setObject(finishSwingTask);
+		analysisTaskFinal.setInput(
+				AbstractPhenotypingTask.getWateringInfo(e),
+				samples, input, er.m, 0, 1);
 		BackgroundTaskHelper.issueSimpleTaskInWindow(analysisTaskFinal.getName(),
 				"Analyze...", backgroundTask, finishSwingTask, status, false,
 				true);
+	}
+	
+	protected static Action getCloseAction(Runnable runnable) {
+		
+		Action action2 = new AbstractAction("Close Additional Image Windows", new ImageIcon(IAPimages.getImage("img/close_frame.png"))) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				IAPservice.closeAllImageJimageWindows();
+				runnable.run();
+			}
+			
+			@Override
+			public boolean isEnabled() {
+				return IAPservice.getIAPimageWindowCount() > 0;
+			}
+			
+		};
+		
+		return action2;
 	}
 	
 	public TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> postProcessPipelineResultsForAllAngles(

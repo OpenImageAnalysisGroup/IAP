@@ -530,7 +530,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							jp.add(debugPipelineTest00a);
 						}
 						jp.add(new JSeparator());
-						Action action2 = new AbstractAction("Close All Image Windows") {
+						Action action2 = new AbstractAction("Close All Image Windows (" + IAPservice.getIAPimageWindowCount() + ")") {
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								IAPservice.closeAllImageJimageWindows();

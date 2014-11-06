@@ -61,6 +61,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
+/**
+ * @author Christian Klukas
+ */
 public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	public static final String _1ST_TOP = "1st_top";
@@ -100,6 +103,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	@Override
 	public String getName() {
 		return pd.getName();
+	}
+	
+	public int getNumberOfSubsets() {
+		return numberOfSubsets;
 	}
 	
 	@Override
@@ -994,6 +1001,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.debugValidTrays = debugValidTrays;
 	}
 	
+	public int[] debugGetValidTrays() {
+		return debugValidTrays;
+	}
+	
 	public String getDebugLastSystemOptionStorageGroup() {
 		return debugLastSystemOptionStorageGroup;
 	}
@@ -1009,4 +1020,5 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.DEBUG_SINGLE_ANGLE3 = DEBUG_SINGLE_ANGLE3;
 		this.filterAngle = true;
 	}
+	
 }
