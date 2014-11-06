@@ -989,4 +989,65 @@ public class SkeletonGraph {
 		this.preventIntermediateNodeRemoval = b;
 	}
 	
+	public void connectGraphComponents() {
+		int connectedComponents;
+		HashSet<Graph> components = new HashSet<Graph>();
+		HashMap<Node, Node> map = GraphHelper.getConnectedComponentMap(graph);
+		HashMap<Node, Node> mapInverse = NodeHelper.inverseMap(map);
+		for (Node n : map.values()) {
+			components.add(n.getGraph());
+		}
+		connectedComponents = components.size();
+		Node nearestA = null, nearestB = null;
+		do {
+			
+			if (connectedComponents > 1) {
+				nearestA = null;
+				nearestB = null;
+				double minDist = Double.MAX_VALUE;
+				for (Graph gA : components)
+					for (Graph gB : components) {
+						if (gA == gB)
+							continue;
+						for (Node a : gA.getNodes()) {
+							if (mapInverse.get(a) == null) {
+								System.out.println("ERR_A");
+								continue;
+							}
+							for (Node b : gB.getNodes()) {
+								if (mapInverse.get(b) == null) {
+									System.out.println("ERR_B");
+									continue;
+								}
+								
+								if (a == b)
+									continue;
+								
+								double d = AttributeHelper.getPositionVec2d(a).distance(AttributeHelper.getPositionVec2d(b));
+								if (d < minDist) {
+									nearestA = a;
+									nearestB = b;
+									minDist = d;
+								}
+							}
+						}
+					}
+				if (nearestA != null) {
+					Node sourceA = mapInverse.get(nearestA);
+					Node sourceB = mapInverse.get(nearestB);
+					if (sourceA == null || sourceB == null)
+						System.out.println("ERRR");
+					else
+						graph.addEdge(sourceA, sourceB, false);
+				}
+				components.clear();
+				graph.numberGraphElements();
+				map = GraphHelper.getConnectedComponentMap(graph);
+				for (Node n : map.values()) {
+					components.add(n.getGraph());
+				}
+				connectedComponents = components.size();
+			}
+		} while (connectedComponents > 1 && nearestA != null && nearestB != null);
+	}
 }
