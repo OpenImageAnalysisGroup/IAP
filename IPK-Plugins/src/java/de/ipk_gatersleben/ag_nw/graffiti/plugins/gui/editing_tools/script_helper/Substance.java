@@ -769,7 +769,7 @@ public class Substance implements SubstanceInterface {
 	@Override
 	public void setName(String name) {
 		assert name != null;
-		assert name.length() > 0;
+		// assert name.length() > 0;
 		this.name = name;
 	}
 	
