@@ -147,7 +147,10 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 			skel.markEndpointsAndBranches();
 			in = skel.getImageOperation();
 			SkeletonGraph sg = new SkeletonGraph(in.getWidth(), in.getHeight(), skel.skelImg);
+			sg.setPreventIntermediateNodeRemoval(true);
 			sg.createGraph(optClusterIDsPixels, optDistanceMap, 0, postProcessing, getInt("Remove root segments shorter than", 20));
+			if (getBoolean("Create Single Connected Graph Component", true))
+				sg.connectGraphComponents();
 			new ImageOperation(optClusterIDsPixels, in.getWidth(), in.getHeight())
 					// .debugPrintValueSetToConsole()
 					.debugIntToGrayScale().bm().dilate(5).io();
@@ -308,14 +311,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 					if (getBoolean("Calculate Width-Histogram", true) || getBoolean("Calculate Graph Diameters", false)) {
 						
 						ImageOperation tobeSkeletonized = image.copy().bm().dilate().io();
-						ImageOperation skeletonImage = tobeSkeletonized.skeletonize();// .resize(0.5d);
 						if (width < 2) {
-							// first image, not thinned
-							
-							// skeletonImage.or(tobeSkeletonized.distanceMap(DistanceCalculationMode.DISTANCE_VISUALISATION_GRAY).getImage()).show("DISTANCE MAP",
-							// false);
-							
-							// calculate fraction based volume
+							ImageOperation skeletonImage = tobeSkeletonized.skeletonize();// .resize(0.5d);
 							DescriptiveStatistics skelStat = new DescriptiveStatistics();
 							for (Vector2i i : skeletonImage.getForegroundPixels())
 								skelStat.addValue(distanceMap[i.x][i.y] / 10d / 2d);
@@ -327,7 +324,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 								graphAnalysis(getClusterIDarray(image.copy().bm().dilate(5).io()),
 										new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
 												skeletonImage.getAs1D())
-												.show("input for graph analysis", debug).io(), rt, prefix, width > 1, distanceMap, postProcessing);
+												.show("input for graph analysis", true).io(), rt, prefix, width > 1, distanceMap, postProcessing);
 							}
 							
 						}
