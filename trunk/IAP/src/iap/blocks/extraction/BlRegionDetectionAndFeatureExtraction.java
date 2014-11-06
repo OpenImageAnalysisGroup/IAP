@@ -25,6 +25,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author pape
  */
+@Deprecated
 public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
 	@Override
