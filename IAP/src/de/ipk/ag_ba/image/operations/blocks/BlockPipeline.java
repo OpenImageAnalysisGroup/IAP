@@ -513,13 +513,15 @@ public class BlockPipeline {
 						Runnable prepare = new Runnable() {
 							@Override
 							public void run() {
-								stack.setObject(fis.getStack());
+								if (fis.getStack() != null)
+									stack.setObject(fis.getStack());
 							}
 						};
 						Runnable reopen = new Runnable() {
 							@Override
 							public void run() {
-								fis.setStack((ij.ImageStack) stack.getObject());
+								if (stack.getObject() != null)
+									fis.setStack((ij.ImageStack) stack.getObject());
 								fis.show(iii.getQualityAnnotation() + " / " + iii.getParentSample().getSampleTime() + " / " + analysisTaskFinal.getName() + " / Well "
 										+ wif,
 										new Runnable() {
