@@ -899,7 +899,7 @@ public class NavigationButton implements StyleAware {
 						
 						boolean showCommandToShowCommandInNewWindow = true;
 						if (showCommandToShowCommandInNewWindow && ac != null) {
-							JMenuItem menuItem = new JMenuItem("Show Command Button in New Window");
+							JMenuItem menuItem = new JMenuItem("Execute Command, Show Results in New Window");
 							menuItem.setIcon(GravistoService.loadIcon(IAPmain.class, "img/new_frame.png"));
 							menuItem.addActionListener(navPanel.getNewWindowListener(ac, false));
 							p.add(menuItem);
