@@ -142,10 +142,13 @@ public class HsmFileSystemSource extends FileSystemSource {
 	
 	@Override
 	public String getName() {
-		if (thisLevel == null)
-			return super.getName();
-		else
-			return thisLevel.getName();
+		return dataSourceName;
+		/*
+		 * if (thisLevel == null)
+		 * return super.getName();
+		 * else
+		 * return thisLevel.getName();
+		 */
 	}
 	
 	@Override
