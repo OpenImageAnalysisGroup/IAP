@@ -231,6 +231,7 @@ public class BlockPipeline {
 			
 			if (System.currentTimeMillis() < pipelineMonitoringMaxValidTimePoint) {
 				// save block results
+				boolean firstSave = true;
 				PipelineMonitoringResult currentPipelineMonitoringResult = null;
 				synchronized (BlockPipeline.monitoringResultHashMap) {
 					if (!BlockPipeline.monitoringResultHashMap.containsKey(this)) {
@@ -240,8 +241,14 @@ public class BlockPipeline {
 					}
 					currentPipelineMonitoringResult = BlockPipeline.monitoringResultHashMap.get(this);
 				}
-				if (block.isChangingImages() && currentPipelineMonitoringResult.isEmpty() || index == blockCount)
-					currentPipelineMonitoringResult.addBlockResult(new BlockMonitoringResult(workset, pipelineMonitoringResultImageSize, block.getName(), tb - ta));
+				synchronized (currentPipelineMonitoringResult) {
+					if (block.isChangingImages() && currentPipelineMonitoringResult.isEmpty() || (index == blockCount && firstSave)) {
+						if (index == blockCount && firstSave)
+							firstSave = false;
+						currentPipelineMonitoringResult
+								.addBlockResult(new BlockMonitoringResult(workset, pipelineMonitoringResultImageSize, block.getName(), tb - ta));
+					}
+				}
 				if (index == blockCount) {
 					// last block in list
 					lastPipelineMonitoringResult = currentPipelineMonitoringResult;
