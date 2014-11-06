@@ -24,6 +24,7 @@ import org.FolderPanel;
 import org.ProgressStatusService;
 import org.StringManipulationTools;
 import org.SystemInfo;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.gui.ToolButton;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_classes.MyGraphicsTools;
@@ -276,10 +277,11 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 			}
 		}
 		final ProgressStatusService statusService = new ProgressStatusService();
+		final ThreadSafeOptions tsoLinesS1 = new ThreadSafeOptions();
+		final ThreadSafeOptions tsoLinesS2 = new ThreadSafeOptions();
 		final Timer updateCheck = new Timer(100, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
 				if (SystemInfo.isMac()) {
 					progressBar.putClientProperty("JProgressBar.style", "circular");
 				}
@@ -345,6 +347,17 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 					stopButton.setText(autoCloseText);
 				
 				validate();
+				
+				if (inWindow) {
+					if (tsoLinesS1.getInt() != StringManipulationTools.count(status1.getText(), "<br>")) {
+						tsoLinesS1.setInt(StringManipulationTools.count(status1.getText(), "<br>"));
+						FolderPanel.performDialogResize(status1);
+					}
+					if (tsoLinesS2.getInt() != StringManipulationTools.count(status2.getText(), "<br>")) {
+						tsoLinesS2.setInt(StringManipulationTools.count(status2.getText(), "<br>"));
+						FolderPanel.performDialogResize(status2);
+					}
+				}
 			}
 		});
 		updateCheck.start();
