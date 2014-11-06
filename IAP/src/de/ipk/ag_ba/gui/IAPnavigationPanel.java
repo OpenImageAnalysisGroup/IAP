@@ -180,7 +180,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		return getNewWindowListener(null, true);
 	}
 	
-	public ActionListener getNewWindowListener(final NavigationAction optCustomStartAction, final boolean executeAction) {
+	public ActionListener getNewWindowListener(final NavigationAction optCustomStartAction, final boolean executeActionDelayed) {
 		
 		ActionListener res = new ActionListener() {
 			
@@ -188,7 +188,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				String tt = SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
 						"IAP Cloud Storage, Analysis and Visualization System");
-				final JFrame jff = getIAPwindow(optCustomStartAction, tt, 800, 600, null, executeAction);
+				final JFrame jff = getIAPwindow(optCustomStartAction, tt, 800, 600, null, executeActionDelayed);
 				final Runnable rr = new Runnable() {
 					@Override
 					public void run() {
@@ -718,14 +718,14 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	public static JFrame getIAPwindow(final NavigationAction optCustomStartAction, String windowTitle, int width, int height,
-			NavigationButtonFilter optNavigationButtonFilter, boolean executeAction) {
+			NavigationButtonFilter optNavigationButtonFilter, boolean executeActionDelayed) {
 		final JFrame jff = new JFrame(windowTitle);
 		if (optCustomStartAction != null)
 			jff.setTitle(optCustomStartAction.getDefaultTooltip());
 		jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				"", "");
-		jff.add(IAPgui.getMainGUIcontent(myStatus, true, optCustomStartAction, optNavigationButtonFilter, executeAction), "0,0");
+		jff.add(IAPgui.getMainGUIcontent(myStatus, true, optCustomStartAction, optNavigationButtonFilter, executeActionDelayed), "0,0");
 		jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		jff.setLocationByPlatform(true);
 		jff.setSize(width, height);

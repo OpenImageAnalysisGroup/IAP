@@ -17,6 +17,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 
@@ -29,6 +30,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -119,6 +121,16 @@ public class IAPgui {
 				TableLayout.PREFERRED, TableLayout.FILL);
 		
 		res.revalidate();
+		if (!executeAction) {
+			NavigationButton ab = set.iterator().next();
+			BackgroundTaskHelper.executeLaterOnSwingTask(1, () -> {
+				try {
+					ab.performAction();
+				} catch (Exception e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+			});
+		}
 		return res;
 	}
 	
