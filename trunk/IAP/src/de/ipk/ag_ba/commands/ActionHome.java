@@ -29,23 +29,24 @@ public final class ActionHome extends AbstractNavigationAction {
 	private ArrayList<NavigationButton> homePrimaryActions = new ArrayList<NavigationButton>();
 	private final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus;
 	
-	public ActionHome(BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus) {
+	public ActionHome(BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus, GUIsetting guiSetting) {
 		super("IAP Home");
 		this.myStatus = myStatus;
-		
+		this.guiSetting = guiSetting;
+		assert guiSetting != null;
 	}
 	
 	private void initializeHomeActions(GUIsetting guiSetting) {
-		
+		assert guiSetting != null;
 		homePrimaryActions = new ArrayList<NavigationButton>();
 		
 		for (NavigationAction na : IAPpluginManager.getInstance().getHomeActions()) {
-			homePrimaryActions.add(new NavigationButton(na, src != null ? src.getGUIsetting() : null));
+			homePrimaryActions.add(new NavigationButton(na, guiSetting));
 		}
 		
 		addDataSourceAndDataSourceGroups(guiSetting);
 		
-		NavigationButton serverStatusEntity = Other.getServerStatusEntity(src != null ? src.getGUIsetting() : null);
+		NavigationButton serverStatusEntity = Other.getServerStatusEntity(guiSetting);
 		homePrimaryActions.add(serverStatusEntity);
 		
 		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", true);
@@ -115,7 +116,7 @@ public final class ActionHome extends AbstractNavigationAction {
 		if (src != null) {
 			try {
 				for (Bookmark b : Bookmark.getBookmarks()) {
-					BookmarkAction ba = new BookmarkAction(b);
+					BookmarkAction ba = new BookmarkAction(b, this);
 					NavigationButton nge = new NavigationButton(ba, ba.getImage(), src.getGUIsetting(), ba.getStaticIconId());
 					bookmarks.add(nge);
 				}
@@ -140,7 +141,7 @@ public final class ActionHome extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
-		homeNavigation.add(new NavigationButton(this, src != null ? src.getGUIsetting() : null));
+		homeNavigation.add(new NavigationButton(this, src != null ? src.getGUIsetting() : guiSetting));
 		
 		if (bookmarks != null)
 			for (NavigationButton n : bookmarks)

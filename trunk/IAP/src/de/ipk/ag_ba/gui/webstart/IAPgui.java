@@ -11,6 +11,7 @@ import info.clearthought.layout.TableLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -20,6 +21,7 @@ import javax.swing.JPanel;
 import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.ActionHome;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
@@ -72,8 +74,8 @@ public class IAPgui {
 		navigationPanel.setTheOther(actionPanel);
 		actionPanel.setTheOther(navigationPanel);
 		
-		final NavigationAction home = optCustomHomeAction != null ? optCustomHomeAction : new ActionHome(myStatus);
 		GUIsetting guiSetting = new GUIsetting(navigationPanel, actionPanel, graphPanel);
+		final NavigationAction home = optCustomHomeAction != null ? optCustomHomeAction : new ActionHome(myStatus, guiSetting);
 		
 		navigationPanel.setGuiSetting(guiSetting);
 		actionPanel.setGuiSetting(guiSetting);
@@ -81,15 +83,6 @@ public class IAPgui {
 		final NavigationButton overView = new NavigationButton(home, guiSetting);
 		
 		final ArrayList<NavigationButton> homeNavigation = new ArrayList<NavigationButton>();
-		ArrayList<NavigationButton> set = home.getResultNewNavigationSet(homeNavigation);
-		if (set != null)
-			while (!set.isEmpty() && set.get(0) == null)
-				set.remove(0);
-		if (optCustomHomeAction != null && (set == null || set.isEmpty())) {
-			set = new ArrayList<>();
-			set.add(new NavigationButton(optCustomHomeAction, guiSetting));
-		}
-		navigationPanel.setEntitySet(set);
 		try {
 			if (executeAction) {
 				home.performActionCalculateResults(overView);
@@ -99,6 +92,15 @@ public class IAPgui {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
+		ArrayList<NavigationButton> set = home.getResultNewNavigationSet(homeNavigation);
+		if (set != null)
+			while (!set.isEmpty() && set.get(0) == null)
+				set.remove(0);
+		if (optCustomHomeAction != null && (set == null || set.isEmpty())) {
+			set = new ArrayList<>();
+			set.add(new NavigationButton(optCustomHomeAction, guiSetting));
+		}
+		navigationPanel.setEntitySet(set);
 		
 		JLabel lbl;
 		if (!executeAction)
@@ -157,16 +159,18 @@ public class IAPgui {
 		}
 	}
 	
-	public static void navigateTo(final String target, NavigationButton src) {
-		System.out.println("NAVIGATE: " + target);
-		if (src == null)
-			System.out.println("ERRR");
-		if (src.getGUIsetting() == null)
-			System.out.println("ERRRRRR");
-		if (src.getGUIsetting().getNavigationPanel() == null)
-			System.out.println("ERRRRRRRRRRR");
-		NavigationButton button = src.getGUIsetting().getNavigationPanel().getEntitySet(false).iterator().next();
+	public static void navigateTo(final String target, NavigationButton src, NavigationAction optHomeAction) {
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: NAVIGATE TO: " + target);
+		assert src != null;
+		assert src.getGUIsetting() != null;
+		assert src.getGUIsetting().getNavigationPanel() != null;
 		
+		NavigationButton button = null;
+		try {
+			button = src.getGUIsetting().getNavigationPanel().getEntitySet(false).iterator().next();
+		} catch (NoSuchElementException nse) {
+			button = new NavigationButton(optHomeAction, src.getGUIsetting());
+		}
 		final IAPnavigationPanel navigationPanel = src.getGUIsetting().getNavigationPanel();
 		final IAPnavigationPanel actionPanel = src.getGUIsetting().getActionPanel();
 		final JComponent graphPanel = src.getGUIsetting().getGraphPanel();

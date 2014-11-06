@@ -223,6 +223,7 @@ public abstract class VirtualFileSystem {
 	public abstract VfsFileObject getFileObjectFor(String fileName) throws Exception;
 	
 	public NavigationButton getNavigationButton(GUIsetting guiSetting) {
+		assert guiSetting != null;
 		VirtualFileSystem vfsEntry = this;
 		Library lib = new Library();
 		String ico = IAPimages.getFolderRemoteClosed();
