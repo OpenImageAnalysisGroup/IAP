@@ -190,7 +190,7 @@ public class ResourceIOManager {
 	
 	public synchronized static ResourceIOHandler getHandlerFromPrefix(String prefix) {
 		for (ResourceIOHandler mh : getInstance().handlers)
-			if (mh.getPrefix().startsWith(prefix))
+			if (mh.getPrefix().equals(prefix.split(":", 2)[0]))
 				return mh;
 		// for (ResourceIOHandler mh : getInstance().handlers)
 		// System.out.println("Known Handler: " + mh.getPrefix());

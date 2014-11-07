@@ -140,4 +140,16 @@ public class FileSystemHandler extends AbstractResourceIOHandler {
 			return f.length();
 	}
 	
+	@Override
+	public void deleteResource(IOurl url) {
+		if (url.isEqualPrefix(getPrefix())) {
+			File file = new File(
+					(folder != null ? folder + IOurl.SEPERATOR : "") +
+							url.getDetail()
+							+ IOurl.SEPERATOR + filter(url.getFileName()));
+			file.delete();
+		} else
+			throw new UnsupportedOperationException("Invalid prefix '" + url.getPrefix() + "' instead of expected '" + getPrefix() + "'!");
+	}
+	
 }

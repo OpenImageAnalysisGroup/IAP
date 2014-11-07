@@ -28,4 +28,6 @@ public interface ResourceIOHandler {
 	 * @return The size of the resource, or Null if size can't be determined.
 	 */
 	public Long getStreamLength(IOurl url) throws Exception;
+	
+	public void deleteResource(IOurl iOurl);
 }

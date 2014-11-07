@@ -58,4 +58,9 @@ public class HTTPhandler extends AbstractResourceIOHandler {
 		else
 			return (long) size;
 	}
+	
+	@Override
+	public void deleteResource(IOurl iOurl) {
+		throw new UnsupportedOperationException("File delete command for HTTP protocoll not supported");
+	}
 }

@@ -9,6 +9,7 @@ public class FTPhandler extends AbstractResourceIOHandler {
 	
 	public static final String PREFIX = "ftp";
 	
+	@Override
 	public String getPrefix() {
 		return PREFIX;
 	}
@@ -25,7 +26,7 @@ public class FTPhandler extends AbstractResourceIOHandler {
 	
 	@Override
 	public IOurl copyDataAndReplaceURLPrefix(InputStream is, String targetFilename, ResourceIOConfigObject config)
-						throws Exception {
+			throws Exception {
 		throw new UnsupportedOperationException("FTP save not supported");
 	}
 	
@@ -36,5 +37,10 @@ public class FTPhandler extends AbstractResourceIOHandler {
 	@Override
 	public Long getStreamLength(IOurl url) throws Exception {
 		return null;
+	}
+	
+	@Override
+	public void deleteResource(IOurl iOurl) {
+		throw new UnsupportedOperationException("FTP delete file command not yet supported");
 	}
 }
