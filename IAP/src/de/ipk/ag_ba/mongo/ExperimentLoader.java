@@ -76,11 +76,7 @@ public class ExperimentLoader implements RunnableOnDB {
 		// synchronized (db) {
 		
 		final DBCollection collCond = db.getCollection("conditions");
-		if (MongoDB.getEnsureIndex())
-			collCond.ensureIndex("_id");
 		final DBCollection collSubst = db.getCollection("substances");
-		if (MongoDB.getEnsureIndex())
-			collSubst.ensureIndex("_id");
 		
 		DBRef dbr = new DBRef(db, MongoExperimentCollections.EXPERIMENTS.toString(), new ObjectId(header.getDatabaseId()));
 		
@@ -112,8 +108,6 @@ public class ExperimentLoader implements RunnableOnDB {
 		}
 		experiment.setHeader(header);
 		
-		ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();;
-		
 		if (!quickLoaded) {
 			DBObject expref = dbr.fetch();
 			if (expref != null) {
@@ -122,7 +116,6 @@ public class ExperimentLoader implements RunnableOnDB {
 				final BasicDBList l = (BasicDBList) expref.get("substance_ids");
 				if (l != null) {
 					final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
-					final int n = l.size();
 					
 					if (optStatusProvider != null)
 						optStatusProvider.setCurrentStatusText1("Load substance objects");
@@ -140,7 +133,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					subList.close();
 					
 					if (optStatusProvider != null)
-						optStatusProvider.setCurrentStatusText1("Enumerate conditions");
+						optStatusProvider.setCurrentStatusText1("Enumerate Conditions");
 					// load all conditions
 					HashMap<String, Substance3D> condId2substanceId = new HashMap<String, Substance3D>();
 					ll = new BasicDBList();
@@ -163,7 +156,7 @@ public class ExperimentLoader implements RunnableOnDB {
 									condId2substanceId.put(id, sub);
 								}
 								if (optStatusProvider != null)
-									optStatusProvider.setCurrentStatusText1("Enumerate conditions (" + condId2substanceId.size() + ")");
+									optStatusProvider.setCurrentStatusText1("Enumerate Conditions (" + condId2substanceId.size() + ")");
 							}
 							idx++;
 							if (optStatusProvider != null)
@@ -172,7 +165,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					}
 					
 					if (optStatusProvider != null)
-						optStatusProvider.setCurrentStatusText1("Load conditions (" + condId2substanceId.size() + ")");
+						optStatusProvider.setCurrentStatusText1("Load Conditions (" + condId2substanceId.size() + ")");
 					
 					BasicDBObject fields = new BasicDBObject("settings", 0);
 					fields.put("remark", 0);
@@ -184,8 +177,8 @@ public class ExperimentLoader implements RunnableOnDB {
 					fields.put("storagedate", 0);
 					
 					DBCursor condL = collCond.find(
-							new BasicDBObject("_id", new BasicDBObject("$in", ll)), fields)
-							.hint(new BasicDBObject("_id", 1));// .batchSize(Math.min(ll.size(), 500));
+							new BasicDBObject("_id", new BasicDBObject("$in", ll)), fields);
+					// .hint(new BasicDBObject("_id", 1));// .batchSize(Math.min(ll.size(), 500));
 					idx = 0;
 					max = condId2substanceId.size();
 					ArrayList<LocalComputeJob> threads = new ArrayList<>();
