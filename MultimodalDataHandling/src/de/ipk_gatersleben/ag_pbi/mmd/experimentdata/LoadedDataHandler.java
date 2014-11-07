@@ -142,4 +142,9 @@ public class LoadedDataHandler extends AbstractResourceIOHandler {
 		return null;
 	}
 	
+	@Override
+	public void deleteResource(IOurl iOurl) {
+		throw new UnsupportedOperationException("delete command for in-memory ressources not supported");
+	}
+	
 }
