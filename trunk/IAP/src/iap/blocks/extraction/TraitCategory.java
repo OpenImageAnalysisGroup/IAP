@@ -1,7 +1,10 @@
 package iap.blocks.extraction;
 
+/**
+ * @author klukas
+ */
 public enum TraitCategory {
-	GEOMETRY, INTENSITY, OPTICS, DERIVED, ORGAN_GEOMETRY, ORGAN_INTENSITY;
+	GEOMETRY, INTENSITY, OPTICS, DERIVED, ORGAN_GEOMETRY, ORGAN_INTENSITY, TEXTURE, ORGAN_TEXTURE;
 	
 	@Override
 	public String toString() {
@@ -18,6 +21,10 @@ public enum TraitCategory {
 				return "derived";
 			case OPTICS:
 				return "optics";
+			case TEXTURE:
+				return "texture";
+			case ORGAN_TEXTURE:
+				return "texture";
 			default:
 				return "";
 		}
@@ -45,6 +52,10 @@ public enum TraitCategory {
 				return "derived";
 			case OPTICS:
 				return "optics";
+			case TEXTURE:
+				return "texture";
+			case ORGAN_TEXTURE:
+				return "texture";
 			default:
 				return "";
 		}
