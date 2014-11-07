@@ -54,35 +54,7 @@ public class MainPanelComponent {
 		
 		ArrayList<JComponent> infos = new ArrayList<JComponent>();
 		for (String txt : htmlTextPanels) {
-			final JEditorPane jep;
-			jep = new JEditorPane();
-			jep.setEditorKitForContentType("text/html", new PatchedHTMLEditorKit());
-			jep.setContentType("text/html");
-			jep.setText(txt);
-			jep.setEditable(false);
-			jep.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-			if (!(optCustomBackgroundColor != null && optCustomBackgroundColor.getRed() == 1
-					&& optCustomBackgroundColor.getGreen() == 1 && optCustomBackgroundColor.getBlue() == 1)) {
-				jep.setOpaque(true);
-				if (optCustomBackgroundColor != null)
-					jep.setBackground(optCustomBackgroundColor);
-				else
-					jep.setBackground(Colors.brighten(IAPnavigationPanel.getTabColor(), 0.8, 1.2));
-			} else
-				jep.setOpaque(false);
-			jep.addHyperlinkListener(new HyperlinkListener() {
-				@Override
-				public void hyperlinkUpdate(HyperlinkEvent e) {
-					if (e.getEventType() == HyperlinkEvent.EventType.ENTERED)
-						jep.setCursor(new Cursor(Cursor.HAND_CURSOR));
-					if (e.getEventType() == HyperlinkEvent.EventType.EXITED)
-						jep.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-					if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-						String url = e.getURL().toString();
-						AttributeHelper.showInBrowser(url);
-					}
-				}
-			});
+			final JEditorPane jep = getTextComponent(optCustomBackgroundColor, txt);
 			
 			infos.add(jep);
 		}
@@ -110,6 +82,39 @@ public class MainPanelComponent {
 				
 			}
 		component.putClientProperty("isHTML", true);
+	}
+	
+	public static JEditorPane getTextComponent(Color optCustomBackgroundColor, String txt) {
+		final JEditorPane jep;
+		jep = new JEditorPane();
+		jep.setEditorKitForContentType("text/html", new PatchedHTMLEditorKit());
+		jep.setContentType("text/html");
+		jep.setText(txt);
+		jep.setEditable(false);
+		jep.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+		if (!(optCustomBackgroundColor != null && optCustomBackgroundColor.getRed() == 1
+				&& optCustomBackgroundColor.getGreen() == 1 && optCustomBackgroundColor.getBlue() == 1)) {
+			jep.setOpaque(true);
+			if (optCustomBackgroundColor != null)
+				jep.setBackground(optCustomBackgroundColor);
+			else
+				jep.setBackground(Colors.brighten(IAPnavigationPanel.getTabColor(), 0.8, 1.2));
+		} else
+			jep.setOpaque(false);
+		jep.addHyperlinkListener(new HyperlinkListener() {
+			@Override
+			public void hyperlinkUpdate(HyperlinkEvent e) {
+				if (e.getEventType() == HyperlinkEvent.EventType.ENTERED)
+					jep.setCursor(new Cursor(Cursor.HAND_CURSOR));
+				if (e.getEventType() == HyperlinkEvent.EventType.EXITED)
+					jep.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+					String url = e.getURL().toString();
+					AttributeHelper.showInBrowser(url);
+				}
+			}
+		});
+		return jep;
 	}
 	
 	public MainPanelComponent(String htmlTextPanel) {

@@ -258,6 +258,7 @@ public class IAPmain extends JApplet {
 				// myAppletLoad(mainFrame2, myStatus);
 			}
 		};
+		t.setName("Application Loader");
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();
 		
