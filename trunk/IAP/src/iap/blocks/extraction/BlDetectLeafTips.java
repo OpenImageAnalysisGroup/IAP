@@ -94,7 +94,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			workimg.setCameraType(CameraType.VIS);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, input().masks().vis(), searchRadius, fillGradeInPercent), CameraType.VIS,
 					optionsAndResults.getCameraPosition(),
-					searchRadius, maxValidY, input().images().getVisInfo());
+					searchRadius, maxValidY, input().images().getVisInfo(), input().masks().vis());
 		}
 		return input().masks().vis();
 	}
@@ -122,7 +122,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			workimg.setCameraType(CameraType.FLUO);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, input().masks().fluo(), searchRadius, fillGradeInPercent), CameraType.FLUO,
 					optionsAndResults.getCameraPosition(),
-					searchRadius, maxValidY, input().images().getFluoInfo());
+					searchRadius, maxValidY, input().images().getFluoInfo(), input().masks().fluo());
 		}
 		return input().masks().fluo();
 	}
@@ -149,13 +149,13 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", -1) / 100d * bb.getBounds().height);
 			savePeaksAndFeatures(getPeaksFromBorder(workimg, input().masks().nir(), searchRadius, fillGradeInPercent), CameraType.NIR,
 					optionsAndResults.getCameraPosition(),
-					searchRadius, maxValidY, input().images().getNirInfo());
+					searchRadius, maxValidY, input().images().getNirInfo(), input().masks().nir());
 		}
 		return input().masks().nir();
 	}
 	
 	private void savePeaksAndFeatures(LinkedList<Feature> peakList, CameraType cameraType, CameraPosition cameraPosition,
-			int searchRadius, int maxValidY, ImageData imageRef) {
+			int searchRadius, int maxValidY, ImageData imageRef, Image orig_image) {
 		boolean saveListObject = true;
 		boolean saveLeafCount = true;
 		boolean saveFeaturesInResultSet = getBoolean("Save individual leaf features", true);
@@ -174,7 +174,9 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		if (saveAddF) {
 			int n = 0, nup = 0, ndown = 0;
 			DescriptiveStatistics statsLeafDirection = new DescriptiveStatistics();
+			
 			for (Feature bf : peakList) {
+				
 				final Double angle = (Double) bf.getFeature("angle");
 				Vector2D direction = (Vector2D) bf.getFeature("direction");
 				
@@ -182,11 +184,12 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 					
 					if (saveColorFeaturesInResultSet) {
 						ArrayList<PositionAndColor> pixels = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
+						
 						if (pixels != null && pixels.size() > 0) {
 							Image leafTipImage, leafTipImage2d = null;
 							if (saveTextureFeaturesInResultSet) {
 								int[][] regionArray2d = BorderAnalysis.copyRegiontoArray(BorderAnalysis.findDimensions(pixels), pixels);
-								leafTipImage2d = new Image(regionArray2d).show("sdsdsdsdsd");
+								leafTipImage2d = new Image(regionArray2d).show("region array from orig image", false);
 							}
 							
 							int[] regionArray = BorderAnalysis.copyRegiontoArray(pixels);
@@ -235,6 +238,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 					statsLeafDirection.addValue(angle.doubleValue());
 				}
 			}
+			
 			if (n > 0 && cameraPosition == CameraPosition.SIDE) {
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.up.count"), nup, "leaftips", this, imageRef);
@@ -268,7 +272,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				
 				// correct positions
 				Vector2D sub = new Vector2D(-borderSize, -borderSize);
-				final Vector2D pos_fin = pos.add(sub);
+				final Vector2D pos_fin = pos;// .add(sub);
 				final Vector2D direction_fin = direction.add(sub);
 				
 				getResultSet().setNumericResult(
@@ -305,8 +309,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 									.canvas()
 									.drawCircle((int) pos_fin.getX(), (int) pos_fin.getY(), searchRadius_fin, Color.RED.getRGB(), 0.5, 3)
 									.drawLine((int) pos_fin.getX(), (int) pos_fin.getY(), (int) direction_fin.getX(), (int) direction_fin.getY(), Color.BLUE.getRGB(),
-											0.8,
-											1)
+											0.8, 1)
 									.text((int) direction_fin.getX() + 10, (int) direction_fin.getY(),
 											"x: " + ((int) pos_fin.getX() + borderSize) + " y: " + ((int) pos_fin.getY() + borderSize),
 											Color.BLACK);
