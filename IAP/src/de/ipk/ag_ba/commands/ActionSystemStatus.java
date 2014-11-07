@@ -224,6 +224,9 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 		resultNavigationButtons.add(new NavigationButton(new ActionPipelineStatus("Show overview of pipeline input and output of images"),
 				src.getGUIsetting()));
 		
+		resultNavigationButtons.add(new NavigationButton(new ActionChat("Network Broadcast Chat"),
+				src.getGUIsetting()));
+		
 		// boolean rBA03 = IAPservice.isReachable("ba-03.ipk-gatersleben.de");
 		// resultNavigationButtons.add(new NavigationButton(new ActionPortScan("BA-03",
 		// simpleIcons ? (rBA03 ? pc : pcOff) : "img/ext/delT7500.png"), src

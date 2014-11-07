@@ -114,31 +114,34 @@ public class ExperimentLoader implements RunnableOnDB {
 				if (MongoDB.getEnsureIndex())
 					db.getCollection("substances").ensureIndex("_id");
 				final BasicDBList l = (BasicDBList) expref.get("substance_ids");
+				
+				DBCursor subList;
 				if (l != null) {
 					final ThreadSafeOptions tsoIdxS = new ThreadSafeOptions();
-					
-					if (optStatusProvider != null)
-						optStatusProvider.setCurrentStatusText1("Load substance objects");
-					BasicDBList ll = new BasicDBList();
-					for (Object o : l) {
-						if (o != null)
-							ll.add(new ObjectId(o + ""));
+					{
+						if (optStatusProvider != null)
+							optStatusProvider.setCurrentStatusText1("Load substance objects");
+						BasicDBList llSubst = new BasicDBList();
+						for (Object o : l) {
+							if (o != null)
+								llSubst.add(new ObjectId(o + ""));
+						}
+						subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", llSubst)))
+								.hint(new BasicDBObject("_id", 1));// .batchSize(Math.min(100, ll.size()));
+						LinkedList<DBObject> sl = new LinkedList<DBObject>();
+						for (DBObject substance : subList) {
+							sl.add(substance);
+						}
+						subList.close();
 					}
-					DBCursor subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", ll)))
-							.hint(new BasicDBObject("_id", 1)).batchSize(Math.min(100, ll.size()));
-					LinkedList<DBObject> sl = new LinkedList<DBObject>();
-					for (DBObject substance : subList) {
-						sl.add(substance);
-					}
-					subList.close();
 					
 					if (optStatusProvider != null)
 						optStatusProvider.setCurrentStatusText1("Enumerate Conditions");
 					// load all conditions
 					HashMap<String, Substance3D> condId2substanceId = new HashMap<String, Substance3D>();
-					ll = new BasicDBList();
+					BasicDBList llCond = new BasicDBList();
 					int idx = 0;
-					int max = subList.size();
+					int max = llCond.size();
 					for (DBObject s : subList) {
 						DBObject substance = s;
 						if (substance != null) {
@@ -152,7 +155,7 @@ public class ExperimentLoader implements RunnableOnDB {
 							for (Object o : condIdList) {
 								if (o != null) {
 									String id = o + "";
-									ll.add(new ObjectId(id));
+									llCond.add(new ObjectId(id));
 									condId2substanceId.put(id, sub);
 								}
 								if (optStatusProvider != null)
@@ -177,7 +180,7 @@ public class ExperimentLoader implements RunnableOnDB {
 					fields.put("storagedate", 0);
 					
 					DBCursor condL = collCond.find(
-							new BasicDBObject("_id", new BasicDBObject("$in", ll)), fields);
+							new BasicDBObject("_id", new BasicDBObject("$in", llCond)), fields);
 					// .hint(new BasicDBObject("_id", 1));// .batchSize(Math.min(ll.size(), 500));
 					idx = 0;
 					max = condId2substanceId.size();
