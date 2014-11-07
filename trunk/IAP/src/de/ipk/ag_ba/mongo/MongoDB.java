@@ -220,6 +220,33 @@ public class MongoDB {
 				}
 			}
 		}
+		
+		if (getEnsureIndex())
+			try {
+				ensureBasicIndecies();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+	}
+	
+	private void ensureBasicIndecies() throws Exception {
+		processDB(new RunnableOnDB() {
+			private DB db;
+			
+			@Override
+			public void run() {
+				DBCollection collCond = db.getCollection("conditions");
+				collCond.ensureIndex("_id");
+				
+				DBCollection collSubst = db.getCollection("substances");
+				collSubst.ensureIndex("_id");
+			}
+			
+			@Override
+			public void setDB(DB db) {
+				this.db = db;
+			}
+		});
 	}
 	
 	public ExperimentInterface saveExperiment(final ExperimentInterface experiment, final BackgroundTaskStatusProviderSupportingExternalCall status)
@@ -416,11 +443,7 @@ public class MongoDB {
 			public void run() {
 				DBObject obj = new BasicDBObject("_id", new ObjectId(experimentID));
 				DBCollection collCond = db.getCollection("conditions");
-				if (getEnsureIndex())
-					collCond.ensureIndex("_id");
 				DBCollection collSubst = db.getCollection("substances");
-				if (getEnsureIndex())
-					collSubst.ensureIndex("_id");
 				
 				DBCollection collExps = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 				if (db.collectionExists(MongoExperimentCollections.EXPERIMENTS.toString())) {
@@ -637,11 +660,11 @@ public class MongoDB {
 								mapableNames.put(s.split("/")[0], s.split("/", 2)[1]);
 						}
 					if (optStatus != null)
-						optStatus.setCurrentStatusText1("Count");
-					
-					long max = col.count();
-					if (optStatus != null)
-						optStatus.setCurrentStatusText1("Found " + max);
+						optStatus.setCurrentStatusText1("Locate Experiments");// "Count");
+						
+					// long max = col.count();
+					// if (optStatus != null)
+					// optStatus.setCurrentStatusText1("Found " + max);
 					long idx = 0;
 					for (DBObject header : col.find()) {
 						if (opt_last_ping != null)
@@ -663,8 +686,8 @@ public class MongoDB {
 							res.add(h);
 						idx++;
 						if (optStatus != null) {
-							optStatus.setCurrentStatusText1("Process Experiment " + idx + "/" + max + "");
-							optStatus.setCurrentStatusValueFine(100d / max * idx);
+							optStatus.setCurrentStatusText1("Process Experiment " + idx);// + "/" + max + "");
+							optStatus.setCurrentStatusValueFine(-1);// 100d / max * idx);
 						}
 					}
 					if (optStatus != null) {
@@ -738,8 +761,6 @@ public class MongoDB {
 				if (expref != null) {
 					{
 						BasicDBList subList = (BasicDBList) expref.get("substances");
-						if (getEnsureIndex())
-							collCond.ensureIndex("_id");
 						
 						if (subList != null) {
 							LinkedList<DBObject> list = new LinkedList<DBObject>();
