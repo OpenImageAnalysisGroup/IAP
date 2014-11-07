@@ -223,9 +223,15 @@ public class MongoDB {
 		
 		if (getEnsureIndex())
 			try {
-				ensureBasicIndecies();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
+				BackgroundThreadDispatcher.addTask(() -> {
+					try {
+						ensureBasicIndecies();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}, "Ensure Indecies in Grid DB");
+			} catch (InterruptedException e) {
+				ErrorMsg.addErrorMessage(e);
 			}
 	}
 	
