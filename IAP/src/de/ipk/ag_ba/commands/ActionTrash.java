@@ -7,13 +7,15 @@ import java.util.Set;
 
 import org.ErrorMsg;
 import org.StringManipulationTools;
+import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
+import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.server.ExperimentInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 
 /**
@@ -101,17 +103,16 @@ public class ActionTrash extends AbstractNavigationAction {
 	}
 	
 	private void processExperiment(ExperimentHeaderInterface hhh) throws Exception {
-		ExperimentInfo ei = null;
-		if (hhh == null)
-			return;
-		else
-			ei = new ExperimentInfo(hhh);
 		experimentName = hhh.getExperimentName();
 		message += "<li>Process Experiment " + experimentName + ": ";
 		if (cmd == DeletionCommand.DELETE || cmd == DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST) {
 			if (m != null && getHeader() != null) {
 				m.deleteExperiment(hhh.getDatabaseId());
 				message += "<html><b>" + "Experiment " + experimentName + " has been deleted.";
+			} else {
+				ResourceIOHandler h = ResourceIOManager.getInstance().getHandlerFromPrefix(new IOurl(hhh.getDatabaseId()).getPrefix());
+				if (h != null)
+					h.deleteResource(new IOurl(hhh.getDatabaseId()));
 			}
 		}
 		if (cmd == DeletionCommand.TRASH || cmd == DeletionCommand.TRASH_GROUP_OF_EXPERIMENTS) {

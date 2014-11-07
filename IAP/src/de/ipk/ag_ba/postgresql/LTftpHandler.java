@@ -202,4 +202,9 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 	public Long getStreamLength(IOurl url) throws Exception {
 		return null;
 	}
+	
+	@Override
+	public void deleteResource(IOurl iOurl) {
+		throw new UnsupportedOperationException("FTP delete file command save not supported");
+	}
 }
