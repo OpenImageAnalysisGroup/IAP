@@ -222,6 +222,7 @@ public class BorderAnalysis {
 	
 	private ArrayList<PositionAndColor> matchWithImage(ArrayList<PositionAndColor> region, Image orig, int xtemp, int ytemp) {
 		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>();
+		
 		int[] origArray = orig.getAs1A();
 		int w = orig.getWidth();
 		int h = orig.getHeight();
@@ -229,9 +230,10 @@ public class BorderAnalysis {
 			int idx = pix.x + xtemp + (pix.y + ytemp) * w;
 			if (idx < origArray.length && pix.x + xtemp < w && pix.y + ytemp < h)
 				if (origArray[idx] != ImageOperation.BACKGROUND_COLORint) {
-					res.add(pix);
+					res.add(new PositionAndColor(pix.x + xtemp, pix.y + ytemp, origArray[idx]));
 				}
 		}
+		// new Image(copyRegionto2dArray(res)).show("debug border");
 		return res;
 	}
 	
@@ -324,6 +326,40 @@ public class BorderAnalysis {
 		return res;
 	}
 	
+	/**
+	 * Extract region into 2d array. Uses color from original image.
+	 * 
+	 * @param dim
+	 * @param region
+	 * @return
+	 */
+	public static int[][] copyRegiontoArray(int[] dim, ArrayList<PositionAndColor> region, int[][] orig) {
+		int[][] res = new int[(dim[1] - dim[0]) + 1][(dim[3] - dim[2]) + 1];
+		ImageOperation.fillArray(res, ImageOperation.BACKGROUND_COLORint);
+		for (Iterator<PositionAndColor> i = region.iterator(); i.hasNext();) {
+			PositionAndColor temp = i.next();
+			res[temp.x - dim[0]][temp.y - dim[2]] = orig[temp.x][temp.y];
+		}
+		return res;
+	}
+	
+	/**
+	 * Extract region into 2d array.
+	 * 
+	 * @param region
+	 * @return
+	 */
+	public static int[][] copyRegionto2dArray(ArrayList<PositionAndColor> region) {
+		final int[] dim = findDimensions(region);
+		int[][] res = new int[(dim[1] - dim[0]) + 1][(dim[3] - dim[2]) + 1];
+		ImageOperation.fillArray(res, ImageOperation.BACKGROUND_COLORint);
+		for (Iterator<PositionAndColor> i = region.iterator(); i.hasNext();) {
+			PositionAndColor temp = i.next();
+			res[temp.x - dim[0]][temp.y - dim[2]] = temp.intensityInt;
+		}
+		return res;
+	}
+	
 	public static int[] copyRegiontoArray(ArrayList<PositionAndColor> region) {
 		int pix = 0;
 		for (Iterator<PositionAndColor> i = region.iterator(); i.hasNext();) {
@@ -338,6 +374,24 @@ public class BorderAnalysis {
 			PositionAndColor temp = i.next();
 			if (temp.intensityInt != ImageOperation.BACKGROUND_COLORint)
 				res[pix++] = temp.intensityInt;
+		}
+		return res;
+	}
+	
+	public static int[] copyRegiontoArray(ArrayList<PositionAndColor> region, int[] orig, int w) {
+		int pix = 0;
+		for (Iterator<PositionAndColor> i = region.iterator(); i.hasNext();) {
+			PositionAndColor temp = i.next();
+			if (temp.intensityInt != ImageOperation.BACKGROUND_COLORint)
+				pix++;
+		}
+		
+		int[] res = new int[pix];
+		pix = 0;
+		for (Iterator<PositionAndColor> i = region.iterator(); i.hasNext();) {
+			PositionAndColor temp = i.next();
+			if (temp.intensityInt != ImageOperation.BACKGROUND_COLORint)
+				res[pix++] = orig[temp.x + w * temp.y];
 		}
 		return res;
 	}
