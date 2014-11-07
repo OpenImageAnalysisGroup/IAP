@@ -90,4 +90,9 @@ public class HsmResourceIoHandler extends AbstractResourceIOHandler {
 		return new File(fn).length();
 	}
 	
+	@Override
+	public void deleteResource(IOurl iOurl) {
+		throw new UnsupportedOperationException("File delete command for HSM ressource not supported");
+	}
+	
 }

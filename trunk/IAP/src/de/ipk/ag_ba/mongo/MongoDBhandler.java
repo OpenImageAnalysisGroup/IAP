@@ -305,4 +305,9 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 		}
 		return (Boolean) found.getObject();
 	}
+	
+	@Override
+	public void deleteResource(IOurl iOurl) {
+		throw new UnsupportedOperationException("URL delete command not supported");
+	}
 }

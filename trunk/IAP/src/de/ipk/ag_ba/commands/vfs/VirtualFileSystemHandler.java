@@ -54,4 +54,14 @@ public class VirtualFileSystemHandler extends AbstractResourceIOHandler {
 	public VirtualFileSystem getVFS() {
 		return vfs;
 	}
+	
+	@Override
+	public void deleteResource(IOurl url) {
+		try {
+			VfsFileObject fo = vfs.getFileObjectFor(url.getFileName());
+			fo.delete();
+		} catch (Exception e) {
+			throw new UnsupportedOperationException(e);
+		}
+	}
 }
