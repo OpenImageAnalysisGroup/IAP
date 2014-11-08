@@ -126,8 +126,8 @@ public class ExperimentLoader implements RunnableOnDB {
 							if (o != null)
 								llSubst.add(new ObjectId(o + ""));
 						}
-						subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", llSubst)))
-								.hint(new BasicDBObject("_id", 1));// .batchSize(Math.min(100, ll.size()));
+						subList = collSubst.find(new BasicDBObject("_id", new BasicDBObject("$in", llSubst)));
+						// .hint(new BasicDBObject("_id", 1));// .batchSize(Math.min(100, ll.size()));
 						LinkedList<DBObject> sl = new LinkedList<DBObject>();
 						for (DBObject substance : subList) {
 							sl.add(substance);

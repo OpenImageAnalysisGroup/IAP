@@ -241,11 +241,11 @@ public class MongoDB {
 			
 			@Override
 			public void run() {
-				DBCollection collCond = db.getCollection("conditions");
-				collCond.ensureIndex("_id");
-				
-				DBCollection collSubst = db.getCollection("substances");
-				collSubst.ensureIndex("_id");
+				// DBCollection collCond = db.getCollection("conditions");
+				// collCond.ensureIndex("_id");
+				//
+				// DBCollection collSubst = db.getCollection("substances");
+				// collSubst.ensureIndex("_id");
 			}
 			
 			@Override
