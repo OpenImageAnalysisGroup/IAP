@@ -2,6 +2,8 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 import iap.blocks.data_structures.RunnableOnImageSet;
 import iap.blocks.extraction.postprocessors.MomentResultPostProcessor;
 
@@ -14,7 +16,7 @@ import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
-public class BlCalcMoments extends AbstractBlock {
+public class BlCalcMoments extends AbstractBlock implements CalculatesProperties {
 	
 	@Override
 	protected Image processVISmask() {
@@ -67,8 +69,8 @@ public class BlCalcMoments extends AbstractBlock {
 			secondMoment_2_norm = temp2;
 		}
 		
-		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_major", my20);
-		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_minor", my02);
+		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_major", my20); // TRAIT NAME IS MANUALLY CREATED
+		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_minor", my02); // DATA IS NOT STORED??
 		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_major.norm", secondMoment_1_norm);
 		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "2nd_moment_minor.norm", secondMoment_2_norm);
 		rt.addValue("Result." + optionsAndResults.getCameraPosition() + imageModality + "eccentricity", eccentricity);
@@ -126,5 +128,11 @@ public class BlCalcMoments extends AbstractBlock {
 	@Override
 	protected Image processMask(Image mask) {
 		return mask;
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		// TODO Auto-generated method stub
+		return null; // TODO !
 	}
 }
