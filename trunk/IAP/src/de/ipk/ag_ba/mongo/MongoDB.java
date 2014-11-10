@@ -172,7 +172,7 @@ public class MongoDB {
 			if (mc != null)
 				return mc;
 			else
-				System.out.println("Cache miss (" + id2m.size() + " entries known): " + id);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Cache miss (" + id2m.size() + " entries known), create new grid instance: " + id);
 		}
 		MongoDB mm = new MongoDB(displayName, databaseName, hostName, port,
 				login, password, HashType.MD5);
