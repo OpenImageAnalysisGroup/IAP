@@ -3,6 +3,7 @@ package de.ipk.ag_ba.commands.mongodb;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -251,8 +252,8 @@ public class ActionJobStatus extends AbstractNavigationAction {
 		
 		try {
 			HashMap<String, ExperimentHeaderInterface> dbId2header = new HashMap<String, ExperimentHeaderInterface>();
-			final HashMap<String, ArrayList<NavigationButton>> set = new HashMap<String, ArrayList<NavigationButton>>();
-			final HashMap<String, ArrayList<BatchCmd>> setBatchCmds = new HashMap<String, ArrayList<BatchCmd>>();
+			final LinkedHashMap<String, ArrayList<NavigationButton>> set = new LinkedHashMap<String, ArrayList<NavigationButton>>();
+			final LinkedHashMap<String, ArrayList<BatchCmd>> setBatchCmds = new LinkedHashMap<String, ArrayList<BatchCmd>>();
 			final HashMap<String, Integer> setMaxSize = new HashMap<String, Integer>();
 			for (BatchCmd b : m.batch().getAll()) {
 				if (!dbId2header.containsKey(b.getExperimentDatabaseId()))

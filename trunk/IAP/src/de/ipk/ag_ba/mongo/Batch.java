@@ -211,7 +211,12 @@ public class Batch {
 					// System.out.println("---");
 					DBCollection collection = db.getCollection(SCHEDULE_COLLECTION_NAME);
 					collection.setObjectClass(BatchCmd.class);
-					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
+					for (DBObject dbo : collection.find()
+							.sort(new BasicDBObject("submission", 1))
+							.sort(new BasicDBObject("part_idx", 1))
+							.sort(new BasicDBObject("experiment", 1))
+							.sort(new BasicDBObject("part_cnt", 1))
+					) {
 						BatchCmd batch = (BatchCmd) dbo;
 						res.add(batch);
 					}
