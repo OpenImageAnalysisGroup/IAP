@@ -821,7 +821,6 @@ class MoveMouseListener implements MouseListener, MouseMotionListener {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			this.start_drag = this.getScreenLocation(e);
 			this.start_loc = this.getFrame(this.target).getLocation();
-			System.out.println("Update cursor");
 			cursor = target.getCursor();
 			if (SystemAnalysis.isMacRunning())
 				target.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
