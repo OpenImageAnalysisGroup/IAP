@@ -109,9 +109,10 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 					// get skeleton-image and applay distance map
 					Image skel = getResultSet().getImage("skeleton_" + ct.toString()).getImage();
 					if (skel != null) {
-						ImageOperation dist = ch_img.bm().edmFloatClipped().show("distance clipped");
-						Image mapped = dist.applyMask(skel).getImage().show("mapped");
-						calcTextureForSkeleton(new ImageOperation(getGrayImageAs2dArray(mapped)), ch_img, c, ct, cp, imageRef);
+						ImageOperation dist = ch_img.bm().edmFloatClipped().show("distance clipped", debugValues);
+						Image mapped = dist.applyMask(skel).getImage().show("mapped", debugValues);
+						calcTextureForSkeleton(new ImageOperation(getGrayImageAs2dArray(mapped)), new ImageOperation(getGrayImageAs2dArray(ch_img.getImage())), c,
+								ct, cp, imageRef);
 					}
 				}
 				if (calculationMode == TextureCalculationMode.VISUALIZE) {
@@ -195,7 +196,8 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 				// rotate due to main axis
 				ImageMoments im = new ImageMoments(skelMask, masksize, masksize);
 				double angle = im.calcOmega(ImageOperation.BACKGROUND_COLORint);
-				ImageTexture it = new ImageTexture(new Image(masksize, masksize, mask).io().rotate(angle).getAs1D(), f_masksize, f_masksize, true);
+				ImageOperation rot = new Image(masksize, masksize, mask).io().rotate(angle);
+				ImageTexture it = new ImageTexture(rot.getAs1D(), f_masksize, f_masksize, true);
 				
 				it.calcTextureFeatures();
 				
@@ -421,7 +423,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 										(tf.getReferenceLink() != null ? " Further information: <a href='" + tf.getReferenceLink() + "'>Link</a>." : "")));
 			}
 		}
-		return (CalculatedPropertyDescription[]) desList.toArray();
+		return desList.toArray(new CalculatedPropertyDescription[desList.size()]);
 	}
 	
 	private enum TextureCalculationMode {

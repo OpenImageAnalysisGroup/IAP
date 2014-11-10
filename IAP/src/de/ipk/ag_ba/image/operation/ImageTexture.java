@@ -333,7 +333,7 @@ public class ImageTexture {
 		int[] hist = new int[256];
 		
 		for (int i : img) {
-			if (i == ImageOperation.BACKGROUND_COLORint)
+			if (i == ImageOperation.BACKGROUND_COLORint || i < 0)
 				continue;
 			hist[i]++;
 		}
