@@ -264,6 +264,7 @@ public class ImageOperation implements MemoryHogInterface {
 		ImageOperation res = new ImageOperation(getImage());
 		if (replaceColor) {
 			res = res.replaceColor(Color.BLACK.getRGB(),
+					ImageOperation.BACKGROUND_COLORint).replaceColor(Color.WHITE.getRGB(),
 					ImageOperation.BACKGROUND_COLORint);
 		}
 		return res;
