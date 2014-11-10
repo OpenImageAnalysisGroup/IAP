@@ -2,6 +2,8 @@ package de.ipk.ag_ba.commands;
 
 import java.util.ArrayList;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabAglet;
@@ -49,10 +51,10 @@ public class ActionChat extends AbstractNavigationAction {
 	}
 	
 	private String getChatStatus() {
-		// if (ta == null)
-		return "not initialized";
-		// else
-		// return StringManipulationTools.removeHTMLtags(ta.status);
+		if (ta == null)
+			return "not initialized";
+		else
+			return StringManipulationTools.removeHTMLtags(ta.status);
 	}
 	
 	@Override
