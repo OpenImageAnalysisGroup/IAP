@@ -2,7 +2,6 @@ package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import org.FeatureSet;
 import org.HelperClass;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
+import org.SystemOptions;
 import org.graffiti.attributes.AttributeTypesManager;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
@@ -195,12 +195,10 @@ public class GravistoMainHelper implements HelperClass {
 		String os = (String) p.get("os.name");
 		
 		try {
-			if (new File(ReleaseInfo.getAppFolderWithFinalSep() + "setting_java_look_and_feel").exists()) {
-				TextFile tf = new TextFile(new FileReader(new File(ReleaseInfo.getAppFolderWithFinalSep()
-						+ "setting_java_look_and_feel")));
-				String look = tf.get(0);
+			if (SystemOptions.getInstance().getString("VANTED", "LnF", null, false) != null) {
+				String look = SystemOptions.getInstance().getString("VANTED", "LnF", null, false);
 				
-				System.out.print("Look and feel " + look);
+				System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Activate look and feel " + look);
 				
 				UIManager.setLookAndFeel(look);
 				System.out.println(": OK");
