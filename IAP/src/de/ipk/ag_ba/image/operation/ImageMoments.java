@@ -19,7 +19,7 @@ public class ImageMoments {
 	static Image img;
 	
 	static Point centerOfGravity;
-	static int background;
+	static int background = ImageOperation.BACKGROUND_COLORint;
 	
 	private double my20;
 	
@@ -49,6 +49,12 @@ public class ImageMoments {
 	public ImageMoments(Image img, int background) {
 		this.img = img;
 		this.background = background;
+		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
+		clacMys();
+	}
+	
+	public ImageMoments(int[] temp, int w, int h) {
+		this.img = new Image(w, h, temp);
 		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
 		clacMys();
 	}

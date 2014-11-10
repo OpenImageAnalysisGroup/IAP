@@ -18,6 +18,7 @@ import iap.blocks.extraction.BlCalcConvexHull;
 // import iap.blocks.extraction.BlCalcIntensityFeature3DHistogram;
 import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcMoments;
+import iap.blocks.extraction.BlCalcTextureFeatures;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
 import iap.blocks.extraction.BlDetectLeafCenterPoints;
@@ -154,6 +155,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlDetectScaleforNormalization(),
 				new BlObjectSeparatorByDistance(),
 				new BlFlowerDetectionAndFeatureExtraction(),
+				new BlCalcTextureFeatures(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
@@ -165,5 +167,4 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 		
 		return res;
 	}
-	
 }

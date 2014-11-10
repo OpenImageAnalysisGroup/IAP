@@ -8,6 +8,9 @@ import ij.process.Blitter;
 import ij.process.ByteProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
+
+import java.awt.Color;
+
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -213,6 +216,19 @@ public class ImageJOperation {
 	public FloatProcessor edmFloat() {
 		EDM edm = new EDM();
 		return edm.makeFloatEDM(image.getProcessor(), -1, false);
+	}
+	
+	public ImageOperation edmFloatClipped() {
+		float[][] distanceMapFloat = edmFloat().getFloatArray();
+		int[][] clipped = new int[distanceMapFloat.length][distanceMapFloat[0].length];
+		
+		for (int x = 0; x < distanceMapFloat.length; x++) {
+			for (int y = 0; y < distanceMapFloat[0].length; y++) {
+				int val = (int) Math.min(distanceMapFloat[x][y], 255.0);
+				clipped[x][y] = new Color(val, val, val).getRGB();
+			}
+		}
+		return new ImageOperation(clipped);
 	}
 	
 	public ImageJOperation show(String title, boolean doit) {
