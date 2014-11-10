@@ -72,7 +72,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 	@Override
 	protected Image processFLUOmask() {
 		if (input().masks().fluo() != null) {
-			
+			Image fluoSkel = getResultSet().getImage("fluo_skeleton").getImage();
 			return input().masks().fluo();
 		} else
 			return null;
@@ -82,12 +82,6 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 	protected Image processNIRmask() {
 		Image nirSkel = getResultSet().getImage("nir_skeleton").getImage();
 		if (nirSkel != null) {
-			int nirSkeletonFilledPixels = nirSkel.io().countFilledPixels();
-			double nirSkeletonIntensitySum = nirSkel.io().intensitySumOfChannel(false, true, false, false);
-			double avgNirSkel = 1 - nirSkeletonIntensitySum / nirSkeletonFilledPixels;
-			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(optionsAndResults.getCameraPosition(), CameraType.NIR, TraitCategory.INTENSITY, "skeleton.mean"), avgNirSkel,
-					this, input().images().getNirInfo());
 		}
 		
 		if (input().masks().nir() != null) {
@@ -199,9 +193,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 				}
 				
 				// rotate due to main axis
-				// new Image(masksize, masksize, skelMask).show("maskSkeleton" + x + " | y " + y);
 				ImageMoments im = new ImageMoments(skelMask, masksize, masksize);
-				// im.drawMoments().show(im.calcOmega(ImageOperation.BACKGROUND_COLORint) + "x - " + x + " | y - " + y);
 				double angle = im.calcOmega(ImageOperation.BACKGROUND_COLORint);
 				ImageTexture it = new ImageTexture(new Image(masksize, masksize, mask).io().rotate(angle).getAs1D(), f_masksize, f_masksize, true);
 				
@@ -429,7 +421,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 										(tf.getReferenceLink() != null ? " Further information: <a href='" + tf.getReferenceLink() + "'>Link</a>." : "")));
 			}
 		}
-		return null;
+		return (CalculatedPropertyDescription[]) desList.toArray();
 	}
 	
 	private enum TextureCalculationMode {
