@@ -290,15 +290,18 @@ public class CloudTaskManager {
 										}
 									}
 								};
-								Thread msg = new Thread(r);
-								msg.start();
 								System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 15 MIN");
 								System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
-								try {
-									Thread.sleep(9000);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
+								Thread msg = new Thread(r);
+								msg.start();
+								long startMS = System.currentTimeMillis();
+								long l = 0;
+								do {
+									l++;
+									if (l == Integer.MAX_VALUE) {
+										l = 0;
+									}
+								} while (System.currentTimeMillis() - startMS < 9000);
 								System.exit(0);
 							}
 						Thread.sleep(60 * 1000); // every minute
