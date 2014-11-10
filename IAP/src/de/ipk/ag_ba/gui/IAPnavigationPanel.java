@@ -815,6 +815,7 @@ class MoveMouseListener implements MouseListener, MouseMotionListener {
 	}
 	
 	Cursor cursor = null;
+	boolean dragOK = false;
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -822,11 +823,13 @@ class MoveMouseListener implements MouseListener, MouseMotionListener {
 			this.start_drag = this.getScreenLocation(e);
 			this.start_loc = this.getFrame(this.target).getLocation();
 			cursor = target.getCursor();
+			dragOK = true;
 			if (SystemAnalysis.isMacRunning())
 				target.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			else
 				target.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-		}
+		} else
+			dragOK = false;
 	}
 	
 	@Override
@@ -835,11 +838,12 @@ class MoveMouseListener implements MouseListener, MouseMotionListener {
 			if (cursor != null)
 				target.setCursor(cursor);
 		}
+		dragOK = false;
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1) {
+		if (dragOK) {
 			Point current = this.getScreenLocation(e);
 			Point offset = new Point((int) current.getX() - (int) start_drag.getX(),
 					(int) current.getY() - (int) start_drag.getY());
