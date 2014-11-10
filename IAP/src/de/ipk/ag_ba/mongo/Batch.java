@@ -35,7 +35,7 @@ import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 public class Batch {
 	
 	public static final String COMPUTE_HOSTS_COLLECTION = "compute_hosts_" + ReleaseInfo.IAP_VERSION_STRING;
-	public static final String SCHEDULE_COLLECTRION_NAME = "schedule_" + ReleaseInfo.IAP_VERSION_STRING;
+	public static final String SCHEDULE_COLLECTION_NAME = "schedule_" + ReleaseInfo.IAP_VERSION_STRING;
 	private final MongoDB mongoDB;
 	
 	public Batch(MongoDB mongoDB) {
@@ -53,7 +53,7 @@ public class Batch {
 				@Override
 				public void run() {
 					try {
-						DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
+						DBCollection collection = db.getCollection(SCHEDULE_COLLECTION_NAME);
 						collection.setObjectClass(BatchCmd.class);
 						DBObject dbo = new BasicDBObject();
 						dbo.put("_id", batch.get("_id"));
@@ -117,7 +117,7 @@ public class Batch {
 				
 				@Override
 				public void run() {
-					DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
+					DBCollection collection = db.getCollection(SCHEDULE_COLLECTION_NAME);
 					collection.setObjectClass(BatchCmd.class);
 					DBObject dbo = new BasicDBObject();
 					dbo.put("_id", batch.get("_id"));
@@ -161,8 +161,8 @@ public class Batch {
 						}
 					
 				} else {
-					res.setLong(db.getCollection(SCHEDULE_COLLECTRION_NAME).count());
-					db.getCollection(SCHEDULE_COLLECTRION_NAME).drop();
+					res.setLong(db.getCollection(SCHEDULE_COLLECTION_NAME).count());
+					db.getCollection(SCHEDULE_COLLECTION_NAME).drop();
 				}
 			}
 			
@@ -188,7 +188,7 @@ public class Batch {
 			
 			@Override
 			public void run() {
-				DBCollection dbc = db.getCollection(SCHEDULE_COLLECTRION_NAME);
+				DBCollection dbc = db.getCollection(SCHEDULE_COLLECTION_NAME);
 				dbc.setObjectClass(BatchCmd.class);
 				dbc.insert(cmd);
 			}
@@ -209,7 +209,7 @@ public class Batch {
 				@Override
 				public void run() {
 					// System.out.println("---");
-					DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
+					DBCollection collection = db.getCollection(SCHEDULE_COLLECTION_NAME);
 					collection.setObjectClass(BatchCmd.class);
 					for (DBObject dbo : collection.find().sort(new BasicDBObject("submission", 1))) {
 						BatchCmd batch = (BatchCmd) dbo;
@@ -283,7 +283,7 @@ public class Batch {
 				
 				@Override
 				public void run() {
-					DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
+					DBCollection collection = db.getCollection(SCHEDULE_COLLECTION_NAME);
 					collection.setObjectClass(BatchCmd.class);
 					DBObject dbo = new BasicDBObject();
 					if (batch != null && batch.get("_id") != null && collection != null) {
@@ -314,7 +314,7 @@ public class Batch {
 				public void run() {
 					String hostName;
 					try {
-						DBCollection collection = db.getCollection(SCHEDULE_COLLECTRION_NAME);
+						DBCollection collection = db.getCollection(SCHEDULE_COLLECTION_NAME);
 						collection.setObjectClass(BatchCmd.class);
 						for (BasicDBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.IN_PROGRESS)) {
 							rm.append("lastupdate", new BasicDBObject("$lt", System.currentTimeMillis() - 30 * 60000));
@@ -337,9 +337,10 @@ public class Batch {
 							if (addCnt < maxTasks)
 								for (DBObject dbo : collection.find(rm)
 										.sort(new BasicDBObject("submission", 1))
-										.sort(new BasicDBObject("part_idx", 1)
-										// .sort(new BasicDBObject("part_cnt", 1)
-										).limit(maxTasks)) {
+										.sort(new BasicDBObject("part_idx", 1))
+										.sort(new BasicDBObject("experiment", 1))
+										.sort(new BasicDBObject("part_cnt", 1))
+										.limit(maxTasks)) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
 										continue;
@@ -361,7 +362,8 @@ public class Batch {
 							loop: for (DBObject dbo : collection.find()
 									.sort(new BasicDBObject("submission", 1))
 									.sort(new BasicDBObject("part_idx", 1))
-							// .sort(new BasicDBObject("part_cnt", 1))
+									.sort(new BasicDBObject("experiment", 1))
+									.sort(new BasicDBObject("part_cnt", 1))
 							) {
 								BatchCmd batch = (BatchCmd) dbo;
 								if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
@@ -389,7 +391,8 @@ public class Batch {
 								for (DBObject dbo : collection.find(sm)
 										.sort(new BasicDBObject("submission", 1))
 										.sort(new BasicDBObject("part_idx", 1))
-								// .sort(new BasicDBObject("part_cnt", 1))
+										.sort(new BasicDBObject("experiment", 1))
+										.sort(new BasicDBObject("part_cnt", 1))
 								) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (batch.getExperimentHeader() == null)
@@ -411,7 +414,8 @@ public class Batch {
 								for (DBObject dbo : collection.find(sm)
 										.sort(new BasicDBObject("submission", 1))
 										.sort(new BasicDBObject("part_idx", 1))
-								// .sort(new BasicDBObject("part_cnt", 1))
+										.sort(new BasicDBObject("experiment", 1))
+										.sort(new BasicDBObject("part_cnt", 1))
 								) {
 									BatchCmd batch = (BatchCmd) dbo;
 									if (!batch.desiredOperatingSystemMatchesCurrentOperatingSystem())
