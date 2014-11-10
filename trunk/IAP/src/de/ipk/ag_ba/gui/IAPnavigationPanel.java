@@ -11,6 +11,7 @@ import info.clearthought.layout.TableLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
@@ -66,6 +67,7 @@ import de.ipk.ag_ba.gui.webstart.Bookmark;
 import de.ipk.ag_ba.gui.webstart.IAPgui;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
@@ -812,26 +814,42 @@ class MoveMouseListener implements MouseListener, MouseMotionListener {
 	public void mouseExited(MouseEvent e) {
 	}
 	
+	Cursor cursor = null;
+	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		this.start_drag = this.getScreenLocation(e);
-		this.start_loc = this.getFrame(this.target).getLocation();
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			this.start_drag = this.getScreenLocation(e);
+			this.start_loc = this.getFrame(this.target).getLocation();
+			System.out.println("Update cursor");
+			cursor = target.getCursor();
+			if (SystemAnalysis.isMacRunning())
+				target.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			else
+				target.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		}
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			if (cursor != null)
+				target.setCursor(cursor);
+		}
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		Point current = this.getScreenLocation(e);
-		Point offset = new Point((int) current.getX() - (int) start_drag.getX(),
-				(int) current.getY() - (int) start_drag.getY());
-		JFrame frame = this.getFrame(target);
-		Point new_location = new Point(
-				(int) (this.start_loc.getX() + offset.getX()), (int) (this.start_loc
-						.getY() + offset.getY()));
-		frame.setLocation(new_location);
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			Point current = this.getScreenLocation(e);
+			Point offset = new Point((int) current.getX() - (int) start_drag.getX(),
+					(int) current.getY() - (int) start_drag.getY());
+			JFrame frame = this.getFrame(target);
+			Point new_location = new Point(
+					(int) (this.start_loc.getX() + offset.getX()), (int) (this.start_loc
+							.getY() + offset.getY()));
+			frame.setLocation(new_location);
+		}
 	}
 	
 	@Override
