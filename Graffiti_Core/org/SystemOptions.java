@@ -245,12 +245,12 @@ public class SystemOptions {
 			} catch (IOException e) {
 				e.printStackTrace();
 				ErrorMsg.addErrorMessage(e);
-				return null;
+				return ini;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
-			return null;
+			return ini;
 		}
 	}
 	
@@ -475,19 +475,25 @@ public class SystemOptions {
 					if (saveTime != null) {
 						iniIO.setStoredLastUpdateTime(saveTime);
 					} else {
-						System.err.println(SystemAnalysis.getCurrentTime() + ">" +
-								"INFO: Changes could not be saved by the INI-Provider. " +
+						System.out.println(SystemAnalysis.getCurrentTime() + ">" +
+								"ERROR: Changes could not be saved by the INI-Provider. " +
 								"Tried to update: " + srcSection + "//" + srcSetting);
 					}
 					return;
 				}
-				ini.store();
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes in INI-File " + iniFileName
-						+ " have been saved. Updated setting: " + srcSection + "//" + srcSetting);
-				if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).exists())
-					new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).createNewFile();
-				if (!lastModification.containsKey(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName))
-					lastModification.put(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName, new ObjectRef());
+				ini.store(new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName + ".new"));
+				if (!(new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName + ".new").renameTo(
+						new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName)))) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Changes in INI-File " + iniFileName
+							+ " could NOT be saved. Tried to update: " + srcSection + "//" + srcSetting);
+				} else {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes in INI-File " + iniFileName
+							+ " have been saved. Updated setting: " + srcSection + "//" + srcSetting);
+					if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).exists())
+						new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).createNewFile();
+					if (!lastModification.containsKey(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName))
+						lastModification.put(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName, new ObjectRef());
+				}
 				lastModification.get(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).setObject(
 						new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified());
 				LinkedHashSet<Runnable> rr = changeListeners.get(getKey(srcSection, srcSetting));
