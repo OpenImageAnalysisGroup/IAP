@@ -54,7 +54,7 @@ public class ThreadManager {
 					
 					int desiredThreadCount = SystemAnalysis.getNumberOfCPUs();
 					int idleTasks = 0;
-					boolean checkForIdle = SystemOptions.getInstance().getBoolean("SYSTEM", "Detect Idle Tasks", false);
+					boolean checkForIdle = SystemOptions.getInstance().getBoolean("SYSTEM", "Detect Idle Tasks", true);
 					if (checkForIdle) {
 						for (RunnerThread t : threadArray) {
 							if (t != null && (t.getState() == Thread.State.BLOCKED ||
