@@ -259,7 +259,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 			double irSkeletonIntensitySum = irSkel.io().intensitySumOfChannel(false, true, false, false);
 			double avgIrSkel = 1 - irSkeletonIntensitySum / irSkeletonFilledPixels;
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(optionsAndResults.getCameraPosition(), CameraType.IR, TraitCategory.INTENSITY, "skeleton.mean"), avgIrSkel, null,
+					new Trait(optionsAndResults.getCameraPosition(), CameraType.IR, TraitCategory.INTENSITY, "skeleton.mean"), avgIrSkel, this,
 					input().images().getIrInfo());
 		}
 		
@@ -270,7 +270,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				double irIntensitySum = input().masks().ir().io().intensitySumOfChannel(false, true, false, false);
 				double avgIr = 1 - irIntensitySum / irFilledPixels;
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(optionsAndResults.getCameraPosition(), CameraType.IR, TraitCategory.INTENSITY, "mean"), avgIr, null, input().images().getIrInfo());
+						new Trait(optionsAndResults.getCameraPosition(), CameraType.IR, TraitCategory.INTENSITY, "mean"), avgIr, this, input().images().getIrInfo());
 				ResultsTableWithUnits rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
 						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_IR_ANALYSIS, addHistogramValues,
 						getBoolean("Calculate Kurtosis Values", false), false); // markerDistanceHorizontally
@@ -476,7 +476,13 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				new CalculatedProperty("rgb.green.mean",
 						"Average intensity of the green channel of the plant pixels in the visible light image."),
 				new CalculatedProperty("rgb.blue.mean",
-						"Average intensity of the blue channel of the plant pixels in the visible light image.")
+						"Average intensity of the blue channel of the plant pixels in the visible light image."),
+				
+				new CalculatedProperty("ir.mean",
+						"Estimated relative temperature (relative to the reference area, which is by default the pot area without the plant) of the leaf pixels."),
+				new CalculatedProperty(
+						"ir.skelton.mean",
+						"Estimated relative temperature (relative to the reference area, which is by default the pot area without the plant) of the skeleton leaf pixels.")
 		
 		};
 	}

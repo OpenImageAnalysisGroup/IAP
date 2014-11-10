@@ -105,9 +105,9 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static void main(String[] args, String[] addons) {
-		System.out.println("****************************************************************");
-		System.out.println("* WELCOME TO IAP --- INITIALIZING APPLICATION ---              *");
-		System.out.println("****************************************************************");
+		for (String info : IAPmain.getMainInfoLines())
+			System.out.println(info);
+		
 		setRunMode(IAPrunMode.SWING_MAIN);
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Initialize IAP start... (run-mode: " + getRunMode() + ")");
@@ -620,16 +620,20 @@ public class IAPmain extends JApplet {
 	
 	public static ArrayList<String> getMainInfoLines() {
 		ArrayList<String> res = new ArrayList<String>();
-		int l = "***************************************************".length();
-		res.add("***************************************************");
+		String line = "****************************************************";
+		int l = line.length();
+		res.add(line);
 		res.add(fillLen("**", l));
 		res.add(fillLen("*IAP - Integrated Analysis Platform*", l));
 		res.add(fillLen("*(V" + ReleaseInfo.IAP_VERSION_STRING + ")*", l));
+		res.add(fillLen("**", l));
+		res.add(fillLen("* - OPEN SOURCE - *", l));
+		res.add(fillLen("**", l));
 		res.add(fillLen("*--  Systems Biology Cloud Computing --*", l));
 		res.add(fillLen("**", l));
-		res.add(fillLen("*(c) 2010-2014 IPK, Group Image Analysis*", l));
+		res.add(fillLen("*(c) 2010-2014 Research Group Image Analysis, IPK *", l));
 		res.add(fillLen("**", l));
-		res.add("***************************************************");
+		res.add(line);
 		res.add(fillLen("**", l));
 		res.add(fillLenLA("*  Design and main development:  *", " ", l, 2));
 		res.add(fillLenLA("*     Christian Klukas  *", " ", l, 2));
@@ -640,7 +644,7 @@ public class IAPmain extends JApplet {
 		res.add(fillLenLA("*  External post-processing:  *", " ", l, 2));
 		res.add(fillLenLA("*     Dijun Chen, Swetlana Friedel (DI) *", " ", l, 2));
 		res.add(fillLen("**", l));
-		res.add("***************************************************");
+		res.add(line);
 		return res;
 	}
 	

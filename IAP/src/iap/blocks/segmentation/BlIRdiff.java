@@ -2,9 +2,6 @@ package iap.blocks.segmentation;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.CalculatedProperty;
-import iap.blocks.data_structures.CalculatedPropertyDescription;
-import iap.blocks.data_structures.CalculatesProperties;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
@@ -23,7 +20,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlIRdiff extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
+public class BlIRdiff extends AbstractSnapshotAnalysisBlock {
 	
 	boolean debug = false;
 	
@@ -122,17 +119,6 @@ public class BlIRdiff extends AbstractSnapshotAnalysisBlock implements Calculate
 		return "Calculates the relative temperature (as a gray image) from the IR image " +
 				"(difference of plant temperature and background temperature). " +
 				"The location and properties for the background identification can be parameterized.";
-	}
-	
-	@Override
-	public CalculatedPropertyDescription[] getCalculatedProperties() {
-		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("ir.mean",
-						"Estimated relative temperature (relative to the reference area, which is by default the pot area without the plant) of the leaf pixels."),
-				new CalculatedProperty(
-						"ir.skelton.mean",
-						"Estimated relative temperature (relative to the reference area, which is by default the pot area without the plant) of the skeleton leaf pixels.")
-		};
 	}
 	
 }
