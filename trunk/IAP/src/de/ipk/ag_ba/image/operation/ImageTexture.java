@@ -76,14 +76,14 @@ public class ImageTexture {
 		DescriptiveStatistics ds = new DescriptiveStatistics();
 		
 		for (int idx = 0; idx < w * h; idx++) {
-			if (img[idx] != ImageOperation.BACKGROUND_COLORint || img[idx] == -1)
+			if (img[idx] != ImageOperation.BACKGROUND_COLORint)
 				ds.addValue(img[idx]);
 		}
 		
 		firstOrderFeatures.put(STD, ds.getStandardDeviation());
 		firstOrderFeatures.put(MEAN, ds.getMean());
 		firstOrderFeatures.put(VARIANCE, ds.getVariance());
-		firstOrderFeatures.put(ENTROPY, entropy() + 255);
+		firstOrderFeatures.put(ENTROPY, 255 - entropy());
 		firstOrderFeatures.put(CONTRAST, ((ds.getMax() - ds.getMin()) / (ds.getMax() + ds.getMin())) * 255.0); // Michelson contrast
 		firstOrderFeatures.put(ASM, secondAngularMoment());
 		firstOrderFeatures.put(CORRELATION, correlation(ds.getStandardDeviation(), ds.getMean()));
@@ -296,7 +296,7 @@ public class ImageTexture {
 				}
 			}
 			
-			if (x == ImageOperation.BACKGROUND_COLORint || y == ImageOperation.BACKGROUND_COLORint || x == -1 || y == -1)
+			if (x == ImageOperation.BACKGROUND_COLORint || y == ImageOperation.BACKGROUND_COLORint)
 				continue;
 			
 			if (x != -1 && y != -1)
@@ -318,7 +318,7 @@ public class ImageTexture {
 	private double secondAngularMoment() {
 		double sum = 0.0;
 		for (int i = 0; i < img.length; i++) {
-			if (img[i] == ImageOperation.BACKGROUND_COLORint || i == -1)
+			if (img[i] == ImageOperation.BACKGROUND_COLORint)
 				continue;
 			sum += img[i] * img[i];
 		}
@@ -333,7 +333,7 @@ public class ImageTexture {
 		int[] hist = new int[256];
 		
 		for (int i : img) {
-			if (i == ImageOperation.BACKGROUND_COLORint || i == -1)
+			if (i == ImageOperation.BACKGROUND_COLORint)
 				continue;
 			hist[i]++;
 		}
