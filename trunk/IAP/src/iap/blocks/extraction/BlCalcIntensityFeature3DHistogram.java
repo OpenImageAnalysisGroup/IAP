@@ -2,6 +2,8 @@ package iap.blocks.extraction;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
 
 import java.awt.Color;
 import java.io.File;
@@ -26,7 +28,7 @@ import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Sample;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeColorDepth;
 
-public class BlCalcIntensityFeature3DHistogram extends AbstractBlock {
+public class BlCalcIntensityFeature3DHistogram extends AbstractBlock implements CalculatesProperties {
 	
 	int cubedimension = 256;
 	int background = ImageOperation.BACKGROUND_COLORint;
@@ -191,5 +193,10 @@ public class BlCalcIntensityFeature3DHistogram extends AbstractBlock {
 			}
 			return is;
 		}
+	}
+	
+	@Override
+	public CalculatedPropertyDescription[] getCalculatedProperties() {
+		return null; // TODO !
 	};
 }
