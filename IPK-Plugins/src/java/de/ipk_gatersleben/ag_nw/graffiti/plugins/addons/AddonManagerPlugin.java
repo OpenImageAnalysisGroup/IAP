@@ -168,15 +168,15 @@ public class AddonManagerPlugin extends IPK_EditorPluginAdapter implements DragA
 			if (fff != null && fff.length == 0)
 				updateAddonDir.delete();
 			
-			System.out.println("Trying to load Add-ons... ");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Trying to load Add-ons... ");
 			
 			for (File toBeActivatedAddon : getJarFileList(addonDirFile))
 				addAddon(toBeActivatedAddon, true);
 			
 			if (getJarFileList(addonDirFile).length > 0)
-				System.out.println("Add-ons loaded in " + (System.currentTimeMillis() - time) + "ms");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Add-ons loaded in " + (System.currentTimeMillis() - time) + "ms");
 			else
-				System.out.println("No Add-on found.");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: No Add-on found.");
 			
 			hideNewComponents();
 			
