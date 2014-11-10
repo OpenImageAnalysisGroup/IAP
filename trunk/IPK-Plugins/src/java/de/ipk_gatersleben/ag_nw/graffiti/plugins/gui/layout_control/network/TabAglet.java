@@ -49,19 +49,20 @@ public class TabAglet
 	public static final String ENABLE_BROADCAST_SETTING = "udp_broadcast";
 	
 	private Timer networkBroadCast;
-	private BroadCastService broadCastService = new BroadCastService(9900, 9910, 512);
+	private final BroadCastService broadCastService = new BroadCastService(9900, 9910, 512);
 	private BroadCastTask broadCastTask;
 	
-	private JComponent runService =
+	private final JComponent runService =
 			new SettingsHelperDefaultIsFalse().getBooleanSettingsEditor(
 					"Allow Network Broadcast (udp-port " +
 							broadCastService.getStartPort() + "-" + broadCastService.getEndPort() + ")",
 					ENABLE_BROADCAST_SETTING, null, null);
 	
-	private JLabel myStatusLabel = new JLabel();
-	private JTextArea myDataIn = new JTextArea();
-	private JTextField inputField = new JTextField();
-	private JButton sendButton = new JButton("Send");
+	private final JLabel myStatusLabel = new JLabel();
+	public String status = "not initialized";
+	private final JTextArea myDataIn = new JTextArea();
+	private final JTextField inputField = new JTextField();
+	private final JButton sendButton = new JButton("Send");
 	
 	private javax.swing.Timer updateNetStatus;
 	
@@ -85,6 +86,7 @@ public class TabAglet
 		sendButton.setMnemonic('S');
 		sendButton.setEnabled(false);
 		sendButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				String msg = inputField.getText();
 				inputField.setText("");
@@ -97,6 +99,7 @@ public class TabAglet
 		myDataIn.setBackground(new Color(230, 230, 255));
 		
 		updateNetStatus = new javax.swing.Timer(3000, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				updateNetworkStatus();
 			}
@@ -104,6 +107,9 @@ public class TabAglet
 		updateNetStatus.start();
 		
 		this.revalidate();
+		inputField.addActionListener((e) -> {
+			sendButton.doClick();
+		});
 	}
 	
 	/**
@@ -176,6 +182,7 @@ public class TabAglet
 	 * (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		if (broadCastTask == null)
 			return;
@@ -204,6 +211,7 @@ public class TabAglet
 		
 		if (broadCastTask == null) {
 			myStatusLabel.setText("<html><small>Network functions are disabled");
+			status = "disabled";
 		} else {
 			List<InetAddress> hosts = broadCastTask.getActiveHosts();
 			String hostList = "";
@@ -222,7 +230,7 @@ public class TabAglet
 				netW = "Broadcast enabled";
 			else
 				netW = "Broadcast disabled";
-			
+			status = hostList;
 			myStatusLabel.setText("<html><small>" + netW + " (in/out/other in, listener-port): "
 					+ broadCastService.getInCount() + "/"
 					+ broadCastService.getOutCount() + "/"
