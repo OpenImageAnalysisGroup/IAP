@@ -105,7 +105,11 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static void main(String[] args, String[] addons) {
+		System.out.println("****************************************************************");
+		System.out.println("* WELCOME TO IAP --- INITIALIZING APPLICATION ---              *");
+		System.out.println("****************************************************************");
 		setRunMode(IAPrunMode.SWING_MAIN);
+		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		String title = IAPoptions.getInstance().getString("IAP", "window_title",
 				"IAP - The Integrated Analysis Platform") + "";
