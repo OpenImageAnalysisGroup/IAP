@@ -154,6 +154,12 @@ public class SystemOptions {
 						String ffnn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
 						if (!new File(ffnn).exists()) {
 							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-File " + iniFileName
+									+ " is not available any more. Trying to recreate file from memory.");
+							ini.store(new File(ffnn));
+							
+						}
+						if (!new File(ffnn).exists()) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: INI-File " + iniFileName
 									+ " is not available any more. Update-check stops for this file.");
 							updateCheckTasks.remove(this);
 							lastModification.remove(ffnn);
@@ -481,29 +487,51 @@ public class SystemOptions {
 					}
 					return;
 				}
-				ini.store(new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName + ".new"));
-				if (!(new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName + ".new").renameTo(
-						new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName)))) {
-					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Changes in INI-File " + iniFileName
-							+ " could NOT be saved. Tried to update: " + srcSection + "//" + srcSetting);
-				} else {
-					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes in INI-File " + iniFileName
-							+ " have been saved. Updated setting: " + srcSection + "//" + srcSetting);
-					if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).exists())
-						new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).createNewFile();
-					if (!lastModification.containsKey(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName))
-						lastModification.put(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName, new ObjectRef());
+				boolean saveToSave = true;
+				if (new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName + ".new").exists())
+					if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName + ".new").delete()) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Existing new INI-File " + iniFileName
+								+ ".new could NOT be removed!");
+						saveToSave = false;
+					}
+				if (saveToSave) {
+					ini.store(new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName + ".new"));
+					if (new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).exists())
+						if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).delete()) {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Existing INI-File " + iniFileName
+									+ " could NOT be removed for replacement with updated new INI-File!");
+							saveToSave = false;
+						}
+					if (saveToSave) {
+						if (!(new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName + ".new").renameTo(
+								new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName)))) {
+							Thread.sleep((long) (50 + Math.random() * 100));
+							if (!(new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName + ".new").renameTo(
+									new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName)))) {
+								System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Changes in INI-File " + iniFileName
+										+ " could NOT be saved (first and second attempt to rename new file failed). Tried to update: " + srcSection + "//" + srcSetting);
+							} else
+								System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes in INI-File " + iniFileName
+										+ " have been saved (rename new file success after second attempt). Updated setting: " + srcSection + "//" + srcSetting);
+						} else {
+							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Changes in INI-File " + iniFileName
+									+ " have been saved. Updated setting: " + srcSection + "//" + srcSetting);
+						}
+						if (!new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).exists())
+							new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).createNewFile();
+						if (!lastModification.containsKey(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName))
+							lastModification.put(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName, new ObjectRef());
+						lastModification.get(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).setObject(
+								new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified());
+					}
 				}
-				lastModification.get(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).setObject(
-						new File(ReleaseInfo.getAppFolderWithFinalSep() + iniFileName).lastModified());
 				LinkedHashSet<Runnable> rr = changeListeners.get(getKey(srcSection, srcSetting));
 				if (rr != null)
 					for (Runnable r : new ArrayList<Runnable>(rr)) {
 						r.run();
 					}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException | InterruptedException e) {
 			ErrorMsg.addErrorMessage(e);
 		}
 	}
