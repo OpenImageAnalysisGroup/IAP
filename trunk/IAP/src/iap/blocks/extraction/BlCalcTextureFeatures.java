@@ -112,7 +112,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			for (Channel c : Channel.values()) {
 				ImageOperation ch_img = img.io().channels().get(c);
 				if (calculationMode == TextureCalculationMode.WHOLE_IMAGE) {
-					calcTextureForImage(ch_img, c, ct, cp, imageRef);
+					calcTextureForImage(new ImageOperation(getGrayImageAs2dArray(ch_img.getImage())), c, ct, cp, imageRef);
 				}
 				if (calculationMode == TextureCalculationMode.SKELETON) {
 					if (skel != null) {
@@ -123,7 +123,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 					}
 				}
 				if (calculationMode == TextureCalculationMode.VISUALIZE) {
-					calcTextureForVizualization(ch_img, masksize, c, ct);
+					calcTextureForVizualization(new ImageOperation(getGrayImageAs2dArray(ch_img.crop().resize(0.1).getImage())), masksize, c, ct);
 				}
 			}
 		}
@@ -131,6 +131,8 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 	
 	private void calcTextureForImage(ImageOperation img, Channel c, CameraType cameraType, CameraPosition cp, NumericMeasurement3D imageRef) {
 		ImageTexture it = new ImageTexture(img.getImage());
+		it.calcTextureFeatures();
+		it.calcGLCMTextureFeatures();
 		
 		for (FirstOrderTextureFeatures tf : FirstOrderTextureFeatures.values()) {
 			getResultSet().setNumericResult(getBlockPosition(),
@@ -260,6 +262,9 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		
 		BackgroundThreadDispatcher.process(IntStream.range(0, w), (int x) -> {
 			for (int y = 0; y < h; y++) {
+				
+				if (img2d[x][y] == ImageOperation.BACKGROUND_COLORint)
+					continue;
 				
 				for (int i = 0; i < temp.length; i++)
 					temp[i] = ImageOperation.BACKGROUND_COLORint;
