@@ -456,49 +456,72 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
-		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("leaftip.*.x", "X-coordinate of a certain leaf-tip."),
-				new CalculatedProperty("leaftip.*.y", "Y-coordinate of a certain leaf-tip."),
-				new CalculatedProperty("leaftip.*.angle", "Leaf-tip angle of a certain leaf."),
-				new CalculatedProperty("leaftip.count", "Number of leaves."),
-				new CalculatedProperty("leaftip.count.best_angle", "Number of leaves for the 'best' side view angle "
-						+ "(as determined from the main growth orientation observed from top-view."),
-				new CalculatedProperty("leaftip.rgb.red.mean",
-						"Average intensity of the red channel of the leaves tips pixels in the visible light or fluorescence image."),
-				new CalculatedProperty("leaftip.rgb.green.mean",
-						"Average intensity of the green channel of the leaves tips pixels in the visible light or fluorescence image."),
-				new CalculatedProperty("leaftip.rgb.blue.mean",
-						"Average intensity of the blue channel of the leaves tips pixels in the visible light or fluorescence image."),
-				new CalculatedProperty(
+		ArrayList<CalculatedPropertyDescription> desList = new ArrayList<CalculatedPropertyDescription>();
+		
+		desList.add(new CalculatedProperty("leaftip.*.x", "X-coordinate of a certain leaf-tip."));
+		desList.add(new CalculatedProperty("leaftip.*.y", "Y-coordinate of a certain leaf-tip."));
+		desList.add(new CalculatedProperty("leaftip.*.angle", "Leaf-tip angle of a certain leaf."));
+		desList.add(new CalculatedProperty("leaftip.count", "Number of leaves."));
+		desList.add(new CalculatedProperty("leaftip.count.best_angle", "Number of leaves for the 'best' side view angle "
+				+ "(as determined from the main growth orientation observed from top-view."));
+		desList.add(new CalculatedProperty("leaftip.rgb.red.mean",
+				"Average intensity of the red channel of the leaves tips pixels in the visible light or fluorescence image."));
+		desList.add(new CalculatedProperty("leaftip.rgb.green.mean",
+				"Average intensity of the green channel of the leaves tips pixels in the visible light or fluorescence image."));
+		desList.add(new CalculatedProperty("leaftip.rgb.blue.mean",
+				"Average intensity of the blue channel of the leaves tips pixels in the visible light or fluorescence image."));
+		desList
+				.add(new CalculatedProperty(
 						"leaftip.hsv.h.mean",
-						"The average hue of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
-				new CalculatedProperty(
+						"The average hue of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."));
+		desList
+				.add(new CalculatedProperty(
 						"leaftip.hsv.s.mean",
-						"The saturation of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
-				new CalculatedProperty(
+						"The saturation of the leaves tips pixels in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."));
+		desList
+				.add(new CalculatedProperty(
 						"leaftip.hsv.v.mean",
-						"The leaves tips average brightness in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."),
-				new CalculatedProperty("leaftip.color.lab.l.mean",
-						"The leaves tips average brightness value in the L*a*b* colour space. Small values "
-								+ "indicate low and high values high brightness. This value ranges from 0 to 255."),
-				new CalculatedProperty("leaftip.lab.a.mean",
-						"The leaves tips average a-value in the L*a*b* colour space. Small values indicate green "
-								+ "while high values indicate magenta. This value ranges from 26 to 225, other software or references may "
-								+ "utilize different ranges, e.g. higher negative together with higher positive values."),
-				new CalculatedProperty("leaftip.lab.b.mean",
-						"The leaves tips average b-value in the L*a*b* colour space. Small values indicate blue and "
-								+ "high values indicate yellow. This value ranges from 8 to 223, other software or references may utilize "
-								+ "different ranges, e.g. higher negative values together with higher positive values."),
-				new CalculatedProperty("leaftip.up.count", "The number of leaf tips pointing upwards (greater 90 degree)."),
-				new CalculatedProperty("leaftip.down.count", "The number of leaf tips pointing downwards (less than 90 degree)."),
-				new CalculatedProperty("leaftip.angle.mean", "The average leaf tip angle."),
-				new CalculatedProperty("leaftip.angle.stdev", "The standard deviation of the leaf angles. "
-						+ "The lower this value, the more uniform are the leaf tip angles."),
-				new CalculatedProperty("leaftip.angle.skewness",
-						"The 'skewness' of the leaf tip angle values. 'Skewness' is a statistical term, "
-								+ "indicating the tendency of the value distribution to lean to one side of the value range."),
-				new CalculatedProperty("leaftip.angle.kurtosis",
-						"The 'kurtosis' of the leaf tip angle values. 'Kurtosis' is a statistical term, indicating the 'peakedness' of the value distribution."),
-		};
+						"The leaves tips average brightness in the HSV/HSB colour space. For this property the value range is normalized to a minimum of 0 and a maximum of 255."));
+		desList.add(new CalculatedProperty("leaftip.color.lab.l.mean",
+				"The leaves tips average brightness value in the L*a*b* colour space. Small values "
+						+ "indicate low and high values high brightness. This value ranges from 0 to 255."));
+		desList.add(new CalculatedProperty("leaftip.lab.a.mean",
+				"The leaves tips average a-value in the L*a*b* colour space. Small values indicate green "
+						+ "while high values indicate magenta. This value ranges from 26 to 225, other software or references may "
+						+ "utilize different ranges, e.g. higher negative together with higher positive values."));
+		desList.add(new CalculatedProperty("leaftip.lab.b.mean",
+				"The leaves tips average b-value in the L*a*b* colour space. Small values indicate blue and "
+						+ "high values indicate yellow. This value ranges from 8 to 223, other software or references may utilize "
+						+ "different ranges, e.g. higher negative values together with higher positive values."));
+		desList.add(new CalculatedProperty("leaftip.up.count", "The number of leaf tips pointing upwards (greater 90 degree)."));
+		desList.add(new CalculatedProperty("leaftip.down.count", "The number of leaf tips pointing downwards (less than 90 degree)."));
+		desList.add(new CalculatedProperty("leaftip.angle.mean", "The average leaf tip angle."));
+		desList.add(new CalculatedProperty("leaftip.angle.stdev", "The standard deviation of the leaf angles. "
+				+ "The lower this value, the more uniform are the leaf tip angles."));
+		desList.add(new CalculatedProperty("leaftip.angle.skewness",
+				"The 'skewness' of the leaf tip angle values. 'Skewness' is a statistical term, "
+						+ "indicating the tendency of the value distribution to lean to one side of the value range."));
+		desList.add(new CalculatedProperty("leaftip.angle.kurtosis",
+				"The 'kurtosis' of the leaf tip angle values. 'Kurtosis' is a statistical term, indicating the 'peakedness' of the value distribution."));
+		
+		for (Channel c : Channel.values()) {
+			for (FirstOrderTextureFeatures tf : FirstOrderTextureFeatures.values()) {
+				desList.add(new CalculatedProperty(c + ".leaftip." + tf, tf.getNiceName()
+						+ " - first order texture property (independent of pixel neighbors). Calculated on grayscale image derived from channel " + c
+						+ " within leftip area." +
+						(tf.getReferenceLink() != null ? " Further information: <a href='" + tf.getReferenceLink() + "'>Link</a>." : "")));
+			}
+			
+			for (GLCMTextureFeatures tf : GLCMTextureFeatures.values()) {
+				desList
+						.add(new CalculatedProperty(
+								c + ".leaftip." + tf,
+								tf.getNiceName()
+										+ " - Grey Level Co-occurrence Matrix (GLCM) texture property (independent of pixel neighbors). Calculated on grayscale image derived from channel "
+										+ c + " within leftip area." +
+										(tf.getReferenceLink() != null ? " Further information: <a href='" + tf.getReferenceLink() + "'>Link</a>." : "")));
+			}
+		}
+		return desList.toArray(new CalculatedPropertyDescription[desList.size()]);
 	}
 }

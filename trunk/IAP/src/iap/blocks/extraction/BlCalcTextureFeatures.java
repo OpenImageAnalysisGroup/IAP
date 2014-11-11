@@ -44,7 +44,8 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 	
 	private TextureCalculationMode calculationMode;
 	
-	private final int minDistance = 10;
+	private int minDistance = 3;
+	private int masksize = 5;
 	
 	@Override
 	protected void prepare() {
@@ -54,16 +55,18 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		
 		// calculate for whole plant or skel points
 		ArrayList<String> possibleValues = new ArrayList<String>(Arrays.asList(TextureCalculationMode.getMethods()));
-		String calculationMode = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", TextureCalculationMode.SKELETON.name(), possibleValues);
+		String calculationMode = optionsAndResults.getStringSettingRadio(this, "Calculation Mode", TextureCalculationMode.SKELETON.name(), possibleValues);
 		this.calculationMode = TextureCalculationMode.valueOf(calculationMode);
+		
+		masksize = getInt("Masksize For Vizualization", 5);
+		minDistance = getInt("Minimal EDM Value", 3);
 	}
 	
 	@Override
 	protected Image processVISmask() {
 		if (input().masks().vis() != null) {
-			int masksize = getInt("Masksize", 3);
 			Image input = input().masks().vis();
-			calcTextureFeaturesVis(input, CameraType.VIS, masksize, optionsAndResults.getCameraPosition(), input().images().getVisInfo());
+			calcTextureFeatures(input, CameraType.VIS, masksize, optionsAndResults.getCameraPosition(), input().images().getVisInfo());
 			return input().masks().vis();
 		} else
 			return null;
@@ -98,16 +101,20 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			return null;
 	}
 	
-	private void calcTextureFeaturesVis(Image img, CameraType ct, int masksize, CameraPosition cp, NumericMeasurement3D imageRef) {
+	private void calcTextureFeatures(Image img, CameraType ct, int masksize, CameraPosition cp, NumericMeasurement3D imageRef) {
 		if (ct == CameraType.VIS) {
+			Image skel = null;
+			if (calculationMode == TextureCalculationMode.SKELETON) {
+				// get skeleton-image and applay distance map
+				skel = getResultSet().getImage("skeleton_" + ct.toString()).getImage();
+			}
+			
 			for (Channel c : Channel.values()) {
 				ImageOperation ch_img = img.io().channels().get(c);
 				if (calculationMode == TextureCalculationMode.WHOLE_IMAGE) {
 					calcTextureForImage(ch_img, c, ct, cp, imageRef);
 				}
 				if (calculationMode == TextureCalculationMode.SKELETON) {
-					// get skeleton-image and applay distance map
-					Image skel = getResultSet().getImage("skeleton_" + ct.toString()).getImage();
 					if (skel != null) {
 						ImageOperation dist = ch_img.bm().edmFloatClipped().show("distance clipped", debugValues);
 						Image mapped = dist.applyMask(skel).getImage().show("mapped", debugValues);
@@ -169,9 +176,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 				if (masksize < minDistance)
 					continue;
 				
-				// only odd masksize
-				if (masksize % 2 != 1)
-					masksize += 1;
+				masksize = (masksize * 2) + 1; // double masksize
 				int halfmask = masksize / 2;
 				int[] mask = new int[masksize * masksize];
 				int[] skelMask = new int[masksize * masksize];
@@ -196,7 +201,9 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 				// rotate due to main axis
 				ImageMoments im = new ImageMoments(skelMask, masksize, masksize);
 				double angle = im.calcOmega(ImageOperation.BACKGROUND_COLORint);
-				ImageOperation rot = new Image(masksize, masksize, mask).io().rotate(angle);
+				double newMasksize = masksize * Math.sqrt(2) / 2.0;
+				int halfdiff = (int) (masksize - newMasksize);
+				ImageOperation rot = new Image(masksize, masksize, mask).io().rotate(angle).cropAbs(halfdiff, halfdiff, halfdiff, halfdiff);
 				ImageTexture it = new ImageTexture(rot.getAs1D(), f_masksize, f_masksize, true);
 				
 				it.calcTextureFeatures();
@@ -232,9 +239,8 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		int w = img.getWidth();
 		int h = img.getHeight();
 		
-		// only odd masksize
-		if (masksize % 2 != 1)
-			masksize += 1;
+		// double masksize
+		masksize = masksize * 2 + 1;
 		int halfmask = masksize / 2;
 		int[][] img2d = img.getAs2D();
 		int[] temp = new int[masksize * masksize];
@@ -377,9 +383,9 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
-		res.add(CameraType.FLUO);
-		res.add(CameraType.NIR);
-		res.add(CameraType.IR);
+		// res.add(CameraType.FLUO);
+		// res.add(CameraType.NIR);
+		// res.add(CameraType.IR);
 		return res;
 	}
 	
@@ -404,12 +410,20 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 	}
 	
 	@Override
+	public String getDescriptionForParameters() {
+		return "<ul><li>Calculation Mode - Feature calculation for skeletoon pixels, whole image or vizualization of all features."
+				+ "<li>Masksize For Vizualization - Used masksize during visualization mode."
+				+ "<li>Minimal EDM Value - Used masksize during skeleton calculation mode.</ul>";
+	}
+	
+	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		ArrayList<CalculatedPropertyDescription> desList = new ArrayList<CalculatedPropertyDescription>();
 		for (Channel c : Channel.values()) {
 			for (FirstOrderTextureFeatures tf : FirstOrderTextureFeatures.values()) {
 				desList.add(new CalculatedProperty(c + "." + tf, tf.getNiceName()
-						+ " - first order texture property (independent of pixel neighbors). Calculated on grayscale image derived from channel " + c + "." +
+						+ " - first order texture property (independent of pixel neighbors). Calculated on grayscale image derived from channel " + c.getNiceName()
+						+ "." +
 						(tf.getReferenceLink() != null ? " Further information: <a href='" + tf.getReferenceLink() + "'>Link</a>." : "")));
 			}
 			
@@ -419,7 +433,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 								c + "." + tf,
 								tf.getNiceName()
 										+ " - Grey Level Co-occurrence Matrix (GLCM) texture property (independent of pixel neighbors). Calculated on grayscale image derived from channel "
-										+ c + "." +
+										+ c.getNiceName() + "." +
 										(tf.getReferenceLink() != null ? " Further information: <a href='" + tf.getReferenceLink() + "'>Link</a>." : "")));
 			}
 		}

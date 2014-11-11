@@ -34,7 +34,7 @@ public enum GLCMTextureFeatures {
 			case GLCM_ASM_V:
 				return "Angular Second Moment (" + this.getOrientation() + ")";
 			default:
-				return WordUtils.capitalize(this.name().split("_")[1]) + " (" + this.getOrientation() + ")";
+				return WordUtils.capitalize(this.name().toLowerCase().split("_")[1]) + " (" + this.getOrientation() + ")";
 		}
 	}
 	

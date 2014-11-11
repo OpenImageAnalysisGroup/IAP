@@ -10,4 +10,28 @@ public enum Channel {
 		r = r.replace('_', '.');
 		return r;
 	}
+	
+	public String getNiceName() {
+		switch (this) {
+			case HSV_H:
+				return "Hue (HSV)";
+			case HSV_S:
+				return "Saturation (HSV)";
+			case HSV_V:
+				return "Brightness (HSV)";
+			case LAB_A:
+				return "Green-Red-Parameter a* (L*a*b*)";
+			case LAB_B:
+				return "Blue-Yellow-Parameter b* (L*a*b*)";
+			case LAB_L:
+				return "Ligthness-Parameter L* (L*a*b*)";
+			case RGB_B:
+				return "Blue (RGB)";
+			case RGB_G:
+				return "Green (RGB)";
+			case RGB_R:
+				return "Red (RGB)";
+		}
+		return null;
+	}
 }
