@@ -17,7 +17,7 @@ public enum FirstOrderTextureFeatures {
 			case STD:
 				return "Standard Deviation";
 			default:
-				return WordUtils.capitalize(this.name());
+				return WordUtils.capitalize(this.name().toLowerCase());
 		}
 	}
 	

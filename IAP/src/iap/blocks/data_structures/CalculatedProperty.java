@@ -83,7 +83,7 @@ public class CalculatedProperty implements CalculatedPropertyDescription {
 		String s = IAPpluginManager.getInstance().getDescriptionForCalculatedProperty(name);
 		if (s != null && s.contains("<br>"))
 			s = s.substring(0, s.indexOf("<br>"));
-		return name+" - "+s;
+		return "<b>" + name + ":</b><br>" + s;
 	}
 	
 }

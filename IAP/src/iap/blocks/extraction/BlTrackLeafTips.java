@@ -131,11 +131,12 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 		final ArrayList<Color> colors = Colors.get(leafList.size() + 1, 1);
 		
 		getResultSet().setNumericResult(getBlockPosition(),
-				new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count"), leafList.size(), "tracked leaves", this, imageRef);
+				new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.tracked.count"), leafList.size(), "tracked leaves", this, imageRef);
 		
 		if (isBestAngle(cameraType))
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.count.best_angle"), leafList.size(), "tracked leaves", this,
+					new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip.tracked.count.best_angle"), leafList.size(), "tracked leaves",
+					this,
 					imageRef);
 		
 		// calculate leaf parameter
@@ -327,8 +328,8 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("leaftip.count", "Number of detected leafs."),
-				new CalculatedProperty("leaftip.count.best_angle", "Number of detected leafs for best side view."),
+				new CalculatedProperty("leaftip.tracked.count", "Number of detected leafs, considered during leaf tracking."),
+				new CalculatedProperty("leaftip.tracked.count.best_angle", "Number of detected leafs for best side view, considered during leaf tracking."),
 				new CalculatedProperty("leaftip.*.span.orientation",
 						"Orientation of the movement vector from first appearance of a leaf to current leaf tip position."),
 				new CalculatedProperty("leaftip.*.span.norm",
