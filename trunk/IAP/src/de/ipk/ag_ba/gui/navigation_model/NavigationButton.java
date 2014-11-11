@@ -672,9 +672,10 @@ public class NavigationButton implements StyleAware {
 										errors.add(e);
 									}
 									ErrorMsg.clearErrorMessages();
-									gui = TableLayout.getSplitVertical(TableLayout.getMultiSplitVertical(errors, 2),
-											gui.getClientProperty("isHTML") != null ? new JScrollPane(new OnlyVerticalScrollPanel(gui)) : gui,
-											TableLayout.PREFERRED, TableLayout.FILL);
+									if (gui != null)
+										gui = TableLayout.getSplitVertical(TableLayout.getMultiSplitVertical(errors, 2),
+												gui.getClientProperty("isHTML") != null ? new JScrollPane(new OnlyVerticalScrollPanel(gui)) : gui,
+												TableLayout.PREFERRED, TableLayout.FILL);
 								} else
 									if (gui != null)
 										gui = gui.getClientProperty("isHTML") != null ? new JScrollPane(new OnlyVerticalScrollPanel(gui)) : gui;
