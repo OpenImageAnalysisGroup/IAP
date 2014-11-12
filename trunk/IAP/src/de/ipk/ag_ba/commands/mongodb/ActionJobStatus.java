@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -11,6 +12,7 @@ import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.database_tools.ActionArchiveAnalysisJobs;
@@ -28,6 +30,12 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	private final MongoDB m;
 	private NavigationButton src;
 	private BackgroundTaskStatusProviderSupportingExternalCall jobStatus;
+	private Collection<BatchCmd> allJobs;
+	private LinkedHashMap<String, ArrayList<NavigationButton>> set;
+	private HashMap<String, Integer> setMaxSize;
+	private HashMap<String, CloudAnalysisStatus> setKey2status;
+	private ArrayList<NavigationButton> res;
+	ThreadSafeOptions tsoActivated = new ThreadSafeOptions();
 	
 	public ActionJobStatus(MongoDB m) {
 		super("Analyze or Modify Workload");
@@ -65,6 +73,8 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			@Override
 			public double getCurrentStatusValueFine() {
+				if (tsoActivated.getBval(0, false))
+					return tsoActivated.getDouble();
 				double finishedJobs = 0.00001;
 				HashSet<String> activeJobsIds = new HashSet<String>();
 				TreeMap<String, Integer> submission2partCnt = new TreeMap<String, Integer>();
@@ -170,6 +180,8 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			@Override
 			public String getCurrentStatusMessage1() {
+				if (tsoActivated.getBval(0, false))
+					return "Analyze Task Structure";
 				String detail = "";
 				try {
 					for (CloudAnalysisStatus cas : sss.keySet()) {
@@ -190,6 +202,8 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			@Override
 			public String getCurrentStatusMessage2() {
+				if (tsoActivated.getBval(0, false))
+					return null;
 				return remain;
 			}
 			
@@ -233,29 +247,18 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		this.src = src;
-	}
-	
-	@Override
-	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
-		res.add(src);
-		return res;
-	}
-	
-	@Override
-	public ArrayList<NavigationButton> getResultNewActionSet() {
-		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		
-		NavigationButton archiveJobs = new NavigationButton(
-				new ActionArchiveAnalysisJobs(m), guiSetting);
-		res.add(archiveJobs);
-		
+		this.res = new ArrayList<NavigationButton>();
 		try {
+			tsoActivated.setBval(0, true);
+			allJobs = m.batch().getAll();
 			HashMap<String, ExperimentHeaderInterface> dbId2header = new HashMap<String, ExperimentHeaderInterface>();
-			final LinkedHashMap<String, ArrayList<NavigationButton>> set = new LinkedHashMap<String, ArrayList<NavigationButton>>();
+			this.set = new LinkedHashMap<String, ArrayList<NavigationButton>>();
+			this.setKey2status = new HashMap<String, CloudAnalysisStatus>();
 			final LinkedHashMap<String, ArrayList<BatchCmd>> setBatchCmds = new LinkedHashMap<String, ArrayList<BatchCmd>>();
-			final HashMap<String, Integer> setMaxSize = new HashMap<String, Integer>();
-			for (BatchCmd b : m.batch().getAll()) {
+			this.setMaxSize = new HashMap<String, Integer>();
+			int idx = 0;
+			int idxCnt = allJobs.size();
+			for (BatchCmd b : allJobs) {
 				if (!dbId2header.containsKey(b.getExperimentDatabaseId()))
 					dbId2header.put(b.getExperimentDatabaseId(), b.getExperimentHeader());
 				ExperimentHeaderInterface ehi = dbId2header.get(b.getExperimentDatabaseId());
@@ -263,38 +266,29 @@ public class ActionJobStatus extends AbstractNavigationAction {
 				n.setProcessing(true);
 				
 				String desc = "<html>" + ehi.getExperimentName() + "<br>"
-						+ " Job submission " + SystemAnalysis.getCurrentTime(b.getSubmissionTime()) + "<br>"
+						+ "<small><font color='gray'>&nbsp;Submitted " + SystemAnalysis.getCurrentTime(b.getSubmissionTime()) + "<br>"
 						+ "(" + b.getRunStatus().toNiceString() + "";
 				
 				if (!set.containsKey(desc)) {
 					set.put(desc, new ArrayList<NavigationButton>());
 					setBatchCmds.put(desc, new ArrayList<BatchCmd>());
+					setKey2status.put(desc, b.getRunStatus());
 				}
 				set.get(desc).add(n);
 				setMaxSize.put(desc, b.getPartCnt());
+				tsoActivated.setDouble(100d * (idx++) / idxCnt);
 			}
 			
+			NavigationButton archiveJobs = new NavigationButton(
+					new ActionArchiveAnalysisJobs(m), guiSetting);
+			res.add(archiveJobs);
 			for (String desc : set.keySet()) {
 				final String fd = desc;
-				NavigationAction setCmd = new AbstractNavigationAction(desc + ")") {
+				NavigationAction setCmd = new AbstractNavigationAction(StringManipulationTools.stringReplace(desc, "&nbsp;", "") + ")") {
+					ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+					
 					@Override
 					public void performActionCalculateResults(NavigationButton src) throws Exception {
-					}
-					
-					@Override
-					public String getDefaultTitle() {
-						return "<html><center>" + fd + ": " + set.get(fd).size()
-								+ "/" + setMaxSize.get(fd) + ")";
-					}
-					
-					@Override
-					public String getDefaultImage() {
-						return "img/ext/gpl2/Gtk-Dnd-Multiple-64.png";
-					}
-					
-					@Override
-					public ArrayList<NavigationButton> getResultNewActionSet() {
-						ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 						res.addAll(set.get(fd));
 						if (res.size() > 0 &&
 								(
@@ -320,6 +314,36 @@ public class ActionJobStatus extends AbstractNavigationAction {
 							res.add(0, removeJobs);
 							res.add(0, archiveJobs);
 						}
+					}
+					
+					@Override
+					public String getDefaultTitle() {
+						String s = fd;
+						CloudAnalysisStatus status = setKey2status.get(fd);
+						if (status == CloudAnalysisStatus.IN_PROGRESS)
+							s = StringManipulationTools.stringReplace(s, "'gray'", "#225522");
+						if (status == CloudAnalysisStatus.SCHEDULED)
+							s = StringManipulationTools.stringReplace(s, "'gray'", "#559955");
+						return "<html><center>" + s + ": " + set.get(fd).size()
+								+ "/" + setMaxSize.get(fd) + ")";
+					}
+					
+					@Override
+					public String getDefaultImage() {
+						CloudAnalysisStatus status = setKey2status.get(fd);
+						if (status != null && status == CloudAnalysisStatus.IN_PROGRESS)
+							return "img/ext/gpl2/Gnome-Text-X-Script-64.png";
+						else
+							if (status != null && status == CloudAnalysisStatus.ARCHIVED)
+								return "img/ext/gpl2/Gnome-Text-X-Generic-Template-64.png";// Gtk-Dnd-Multiple-64.png";
+							else
+								return "img/ext/gpl2/Gnome-Image-Loading-64.png";
+						
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewActionSet() {
+						
 						return res;
 					}
 				};
@@ -327,7 +351,22 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
+		} finally {
+			tsoActivated.setBval(0, false);
 		}
+		
+	}
+	
+	@Override
+	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>(currentSet);
+		res.add(src);
+		return res;
+	}
+	
+	@Override
+	public ArrayList<NavigationButton> getResultNewActionSet() {
+		
 		return res;
 	}
 	
