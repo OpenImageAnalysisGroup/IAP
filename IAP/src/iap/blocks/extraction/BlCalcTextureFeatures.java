@@ -151,7 +151,6 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			NumericMeasurement3D imageRef) {
 		int w = mappedSkel.getWidth();
 		int h = mappedSkel.getHeight();
-		
 		int[][] img2d = ch_img.getAs2D();
 		int[][] mappedSkel2d = mappedSkel.getAs2D();
 		
@@ -182,7 +181,6 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 				int halfmask = masksize / 2;
 				int[] mask = new int[masksize * masksize];
 				int[] skelMask = new int[masksize * masksize];
-				final int f_masksize = masksize;
 				
 				for (int i = 0; i < mask.length; i++) {
 					mask[i] = ImageOperation.BACKGROUND_COLORint;
@@ -201,12 +199,22 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 				}
 				
 				// rotate due to main axis
+				// if (x > 808 && x < 812 && y > 78 && y < 82) {
+				// new Image(masksize, masksize, mask).show("before rot", false);
+				// }
 				ImageMoments im = new ImageMoments(skelMask, masksize, masksize);
 				double angle = im.calcOmega(ImageOperation.BACKGROUND_COLORint);
 				double newMasksize = masksize * Math.sqrt(2) / 2.0;
-				int halfdiff = (int) (masksize - newMasksize);
-				ImageOperation rot = new Image(masksize, masksize, mask).io().rotate(angle).cropAbs(halfdiff, halfdiff, halfdiff, halfdiff);
-				ImageTexture it = new ImageTexture(rot.getAs1D(), f_masksize, f_masksize, true);
+				ImageOperation rot = new Image(masksize, masksize, mask).io().rotate(-angle * 180 / Math.PI);
+				int halfdiff_disired = (int) (rot.getWidth() - newMasksize) / 2;
+				ImageOperation crop = rot.cropAbs(halfdiff_disired, rot.getWidth() - halfdiff_disired, halfdiff_disired, rot.getWidth() - halfdiff_disired);
+				// if (x % 10 == 0 && y % 10 == 0) {
+				// if (x > 806 && x < 814 && y > 76 && y < 84) {
+				// crop.show("rotate " + x + " : " + y);
+				// new Image(masksize, masksize, skelMask).show("skalmask");
+				// }
+				final int f_masksize = crop.getWidth();
+				ImageTexture it = new ImageTexture(crop.getAs1D(), f_masksize, f_masksize, true);
 				
 				it.calcTextureFeatures();
 				
@@ -321,7 +329,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		is.show("debug texture stack " + c.name());
 	}
 	
-	public static int[][] normalizeToInt(double[][] img) {
+	private static int[][] normalizeToInt(double[][] img) {
 		int width = img.length;
 		int height = img[0].length;
 		double[] temp1d = new double[width * height];
@@ -343,7 +351,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		return res;
 	}
 	
-	public static double[] normalize(double[] img) {
+	private static double[] normalize(double[] img) {
 		double[] res = new double[img.length];
 		double max = Double.MIN_VALUE;
 		double min = Double.MAX_VALUE;
@@ -364,7 +372,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		return res;
 	}
 	
-	public static int[][] getGrayImageAs2dArray(Image grayImage) {
+	private static int[][] getGrayImageAs2dArray(Image grayImage) {
 		int[] img1d = grayImage.getAs1A();
 		int c, r, y = 0;
 		int w = grayImage.getWidth();
