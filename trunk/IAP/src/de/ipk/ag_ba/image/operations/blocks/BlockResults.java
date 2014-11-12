@@ -423,13 +423,18 @@ public class BlockResults implements BlockResultSet {
 	
 	@Override
 	public ImageAndImageData getImage(String id) {
+		return getImage(id, true);
+	}
+	
+	public ImageAndImageData getImage(String id, boolean remove) {
 		synchronized (storedImages) {
 			for (Integer blockPosition : storedImages.keySet()) {
 				ImageAndImageData res = storedImages.get(blockPosition).get(id);
 				if (res == null)
 					continue;
 				else {
-					storedImages.get(blockPosition).remove(id);
+					if (remove)
+						storedImages.get(blockPosition).remove(id);
 					return res;
 				}
 			}
