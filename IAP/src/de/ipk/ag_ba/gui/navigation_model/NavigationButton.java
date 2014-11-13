@@ -793,8 +793,9 @@ public class NavigationButton implements StyleAware {
 		ImageIcon icon = null;
 		if (n != null && n.getAction() != null && (n.getAction() instanceof ImageProvider)) {
 			ImageProvider ip = (ImageProvider) n.getAction();
-			if (ip.getImage() != null)
-				icon = new ImageIcon(ip.getImage());
+			if (ip.getImage() != null) {
+				icon = new ImageIcon(GravistoService.getScaledImage(ip.getImage(), -imgS, imgS));
+			}
 		}
 		
 		if (icon == null)
