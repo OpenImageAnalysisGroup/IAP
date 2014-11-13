@@ -23,7 +23,9 @@ import javafx.scene.shape.Shape3D;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.border.BevelBorder;
 
 import org.SystemOptions;
 
@@ -60,7 +62,7 @@ public class ActionJavaFX extends AbstractNavigationAction {
 		Platform.runLater(() -> {
 			initFX(jp);
 		});
-		
+		jp.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
 		return jp;
 	}
 	
@@ -85,9 +87,9 @@ public class ActionJavaFX extends AbstractNavigationAction {
 					// Specular Color
 					material.setDiffuseColor(new Color((x + 0.5) / (n + 1), (z + 0.5) / (n + 1), (y + 0.5) / (n + 1), 1.0));
 					c.setMaterial(material);
-					c.setLayoutX(xc + (x - n / 2d) * radius / 2);
-					c.setLayoutY(yc + (y - n / 2d) * radius / 2);
-					c.setTranslateZ((z - n / 2d) * radius / 2);
+					c.setLayoutX(xc + (x - n / 2d) * radius / 4);
+					c.setLayoutY(yc + (y - n / 2d) * radius / 4);
+					c.setTranslateZ((z - n / 2d) * radius / 4);
 					// c.getTransforms().add(new Rotate(20, Rotate.X_AXIS));
 					// c.getTransforms().add(new Rotate(10, Rotate.Z_AXIS));
 					// c.getTransforms().add(new Rotate(30, Rotate.Y_AXIS));
@@ -104,7 +106,7 @@ public class ActionJavaFX extends AbstractNavigationAction {
 		root.setTranslateZ(jp.getWidth() / 2);
 		root.setRotationAxis(Rotate.Y_AXIS);
 		// Creating 3DShape
-		ArrayList<Shape3D> shl = make3DObjects(200, 350, 100);
+		ArrayList<Shape3D> shl = make3DObjects(800, 350, 100);
 		// Creating Ambient Light
 		AmbientLight ambient = new AmbientLight();
 		ambient.setColor(Color.rgb(110, 255, 110, 0.6));
@@ -125,7 +127,7 @@ public class ActionJavaFX extends AbstractNavigationAction {
 				root.getChildren().addAll(sh);
 		}
 		// Adding to scene
-		Scene scene = new Scene(root, 2600, 2600);
+		Scene scene = new Scene(root, 2600, 2600, true);
 		// Creating Perspective View Camera
 		PerspectiveCamera cam = new PerspectiveCamera(false);
 		scene.setCamera(cam);
