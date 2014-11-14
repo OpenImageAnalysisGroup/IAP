@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operation.channels;
 
 import java.awt.Color;
 
+import de.ipk.ag_ba.image.operation.ColorSpaceConverter;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -13,11 +14,9 @@ import de.ipk.ag_ba.image.structures.Image;
 public class ChannelProcessing {
 	
 	private final int[] imageAs1dArray;
-	@SuppressWarnings("unused")
-	private final int width;
-	@SuppressWarnings("unused")
-	private final int height;
 	private final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLORint;
+	int width;
+	int height;
 	
 	public ChannelProcessing(int[] imageAs1dArray, int width, int height) {
 		this.imageAs1dArray = imageAs1dArray;
@@ -45,10 +44,85 @@ public class ChannelProcessing {
 				return getG();
 			case RGB_R:
 				return getR();
+			case XYZ_X:
+				return getX();
+			case XYZ_Y:
+				return getY();
+			case XYZ_Z:
+				return getZ();
 			default:
 				break;
 		}
 		throw new UnsupportedOperationException("Channel not implemented.");
+	}
+	
+	private ImageOperation getZ() {
+		int[] in = imageAs1dArray;
+		int[] out = new int[in.length];
+		int c, r, g, b;
+		ColorSpaceConverter cspc = new ColorSpaceConverter();
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
+			if (c == BACKGROUND_COLORint) {
+				out[i] = BACKGROUND_COLORint;
+				continue;
+			}
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			double[] xyz = cspc.RGBtoXYZ(r, g, b);
+			r = (int) (xyz[2] * 2.55);
+			
+			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
+		}
+		return new Image(width, height, out).io();
+	}
+	
+	private ImageOperation getY() {
+		int[] in = imageAs1dArray;
+		int[] out = new int[in.length];
+		int c, r, g, b;
+		ColorSpaceConverter cspc = new ColorSpaceConverter();
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
+			if (c == BACKGROUND_COLORint) {
+				out[i] = BACKGROUND_COLORint;
+				continue;
+			}
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			double[] xyz = cspc.RGBtoXYZ(r, g, b);
+			r = (int) (xyz[1] * 2.55);
+			
+			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
+		}
+		return new Image(width, height, out).io();
+	}
+	
+	private ImageOperation getX() {
+		int[] in = imageAs1dArray;
+		int[] out = new int[in.length];
+		int c, r, g, b;
+		ColorSpaceConverter cspc = new ColorSpaceConverter();
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
+			if (c == BACKGROUND_COLORint) {
+				out[i] = BACKGROUND_COLORint;
+				continue;
+			}
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			double[] xyz = cspc.RGBtoXYZ(r, g, b);
+			r = (int) (xyz[0] * 2.55);
+			
+			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
+		}
+		return new Image(width, height, out).io();
 	}
 	
 	/**

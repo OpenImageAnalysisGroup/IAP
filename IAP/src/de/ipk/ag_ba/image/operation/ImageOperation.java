@@ -76,7 +76,7 @@ import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.operations.segmentation.Segmentation;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
-import de.ipk.ag_ba.image.structures.ChannelMode;
+import de.ipk.ag_ba.image.structures.ColorSpace;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.labcube.ImageOperationLabCube;
@@ -3697,7 +3697,7 @@ public class ImageOperation implements MemoryHogInterface {
 			um.run(fp);
 		}
 		
-		return new ImageOperation(new Image(w, h, channelR, channelG, channelB, ChannelMode.RGB));
+		return new ImageOperation(new Image(w, h, channelR, channelG, channelB, ColorSpace.RGB));
 	}
 	
 	public ImageOperation subtractGrayImages(Image image2) {

@@ -51,7 +51,7 @@ public class BlFluoMaskIsRequired extends AbstractBlock {
 	
 	@Override
 	public BlockType getBlockType() {
-		return BlockType.FILTER;
+		return BlockType.DEBUG;
 	}
 	
 	@Override

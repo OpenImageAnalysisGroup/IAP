@@ -61,7 +61,7 @@ public class BlFilterImagesByTopOrSide extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public BlockType getBlockType() {
-		return BlockType.FILTER;
+		return BlockType.DEBUG;
 	}
 	
 	@Override
