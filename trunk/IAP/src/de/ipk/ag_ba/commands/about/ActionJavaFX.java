@@ -87,8 +87,8 @@ public class ActionJavaFX extends AbstractNavigationAction {
 					// Specular Color
 					material.setDiffuseColor(new Color((x + 0.5) / (n + 1), (z + 0.5) / (n + 1), (y + 0.5) / (n + 1), 1.0));
 					c.setMaterial(material);
-					c.setLayoutX(xc + (x - n / 2d) * radius / 4);
-					c.setLayoutY(yc + (y - n / 2d) * radius / 4);
+					c.setTranslateX(xc + (x - n / 2d) * radius / 4);
+					c.setTranslateY(yc + (y - n / 2d) * radius / 4);
 					c.setTranslateZ((z - n / 2d) * radius / 4);
 					// c.getTransforms().add(new Rotate(20, Rotate.X_AXIS));
 					// c.getTransforms().add(new Rotate(10, Rotate.Z_AXIS));
