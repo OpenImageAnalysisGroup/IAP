@@ -191,7 +191,7 @@ public class Image {
 		this(new ImagePlus("Image", image));
 	}
 	
-	public Image(int w, int h, float[] channelR, float[] channelG, float[] channelB, ChannelMode mode) {
+	public Image(int w, int h, float[] channelR, float[] channelG, float[] channelB, ColorSpace mode) {
 		this.w = w;
 		this.h = h;
 		int a = 255;
@@ -201,12 +201,12 @@ public class Image {
 		ColorSpaceConverter csc = new ColorSpaceConverter();
 		for (int idx = 0; idx < img.length; idx++) {
 			int r, g, b;
-			if (mode == ChannelMode.RGB) {
+			if (mode == ColorSpace.RGB) {
 				r = (int) (channelR[idx] * 255d + 0.5d);
 				g = (int) (channelG[idx] * 255d + 0.5d);
 				b = (int) (channelB[idx] * 255d + 0.5d);
 			} else
-				if (mode == ChannelMode.LAB) {
+				if (mode == ColorSpace.LAB) {
 					float labl = channelR[idx];
 					float laba = channelG[idx];
 					float labb = channelB[idx];

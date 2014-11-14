@@ -72,34 +72,34 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			return null;
 	}
 	
-	@Override
-	protected Image processFLUOmask() {
-		if (input().masks().fluo() != null) {
-			Image fluoSkel = getResultSet().getImage("fluo_skeleton").getImage();
-			return input().masks().fluo();
-		} else
-			return null;
-	}
-	
-	@Override
-	protected Image processNIRmask() {
-		Image nirSkel = getResultSet().getImage("nir_skeleton").getImage();
-		if (nirSkel != null) {
-		}
-		
-		if (input().masks().nir() != null) {
-			return input().masks().nir();
-		} else
-			return null;
-	}
-	
-	@Override
-	protected Image processIRmask() {
-		if (input().masks().ir() != null) {
-			return input().masks().ir();
-		} else
-			return null;
-	}
+	// @Override
+	// protected Image processFLUOmask() {
+	// if (input().masks().fluo() != null) {
+	// Image fluoSkel = getResultSet().getImage("fluo_skeleton").getImage();
+	// return input().masks().fluo();
+	// } else
+	// return null;
+	// }
+	//
+	// @Override
+	// protected Image processNIRmask() {
+	// Image nirSkel = getResultSet().getImage("nir_skeleton").getImage();
+	// if (nirSkel != null) {
+	// }
+	//
+	// if (input().masks().nir() != null) {
+	// return input().masks().nir();
+	// } else
+	// return null;
+	// }
+	//
+	// @Override
+	// protected Image processIRmask() {
+	// if (input().masks().ir() != null) {
+	// return input().masks().ir();
+	// } else
+	// return null;
+	// }
 	
 	private void calcTextureFeatures(Image img, CameraType ct, int masksize, CameraPosition cp, NumericMeasurement3D imageRef) {
 		if (ct == CameraType.VIS) {
