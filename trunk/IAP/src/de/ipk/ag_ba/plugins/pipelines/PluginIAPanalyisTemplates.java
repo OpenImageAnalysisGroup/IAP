@@ -11,6 +11,7 @@ import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
 import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
 import iap.blocks.auto.BlWarpImages;
 import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.blocks.debug.BlShowThreeDColorHistogram;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
@@ -156,6 +157,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlObjectSeparatorByDistance(),
 				new BlFlowerDetectionAndFeatureExtraction(),
 				new BlCalcTextureFeatures(),
+				new BlShowThreeDColorHistogram(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
