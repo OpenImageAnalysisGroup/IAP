@@ -314,9 +314,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 			
-			JMenuItem debugPipelineTestShowReferenceImage = new JMenuItem(
+			JMenuItem debugShowReferenceImage = new JMenuItem(
 					"Show Reference");
-			debugPipelineTestShowReferenceImage
+			debugShowReferenceImage
 					.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -333,9 +333,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						}
 					});
 			
-			JMenuItem debugPipelineTestShowImage = new JMenuItem(
+			JMenuItem debugShowAnnotationImage = new JMenuItem(
 					"Show Annotation");
-			debugPipelineTestShowImage
+			debugShowAnnotationImage
 					.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -458,8 +458,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			
 			jp.add(debugPipelineTestShowMainImage);
 			if (imageResult.getBinaryFileInfo().getFileNameLabel() != null)
-				jp.add(debugPipelineTestShowReferenceImage);
-			jp.add(debugPipelineTestShowImage);
+				jp.add(debugShowReferenceImage);
+			
+			jp.add(debugShowAnnotationImage);
 			
 			JMenuItem stl = new JMenuItem("Show Image Timeline");
 			stl.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Appointment-Soon-64.png").getScaledInstance(16, 16,

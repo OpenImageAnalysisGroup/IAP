@@ -195,8 +195,8 @@ public class DataExchangeHelperForExperiments {
 		try {
 			ArrayList<BinaryFileInfo> bbb = new ArrayList<BinaryFileInfo>();
 			BinaryFileInfo primary = null;
+			MappingDataEntity mde = mt.getTargetEntity();
 			try {
-				MappingDataEntity mde = mt.getTargetEntity();
 				
 				String files = mde.getFiles();
 				if (files != null && !files.isEmpty()) {
@@ -316,6 +316,9 @@ public class DataExchangeHelperForExperiments {
 			Map<String, Object> properties = new HashMap<String, Object>();
 			mt.getTargetEntity().fillAttributeMap(properties);
 			
+			if (primary != null)
+				bbb.add(new BinaryFileInfo(primary.getFileNameLabel(), primary.getFileNameLabel(), false, mt.getTargetEntity()));
+			
 			search: for (Entry<String, Object> e : properties.entrySet()) {
 				if (e.getKey().startsWith("anno")) {
 					Object v = e.getValue();
@@ -330,8 +333,6 @@ public class DataExchangeHelperForExperiments {
 								continue;
 							if (vs.contains("#"))
 								fileName = vs.split("#", 2)[1];
-							if (primary != null)
-								bbb.add(new BinaryFileInfo(primary.getFileNameLabel(), new IOurl(fileName), false, mt.getTargetEntity()));
 							bbb.add(new BinaryFileInfo(new IOurl(fileName), null, false, mt.getTargetEntity()));
 							break search;
 						}
