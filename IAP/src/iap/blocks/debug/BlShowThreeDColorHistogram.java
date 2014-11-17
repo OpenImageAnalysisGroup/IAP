@@ -16,6 +16,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.geometry.Point3D;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
@@ -248,9 +249,12 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 			root.getChildren().add(point);
 		}
 		
-		// cubeGroup.setTranslateX(0.0);
-		// cubeGroup.setTranslateY(0.0);
-		// cubeGroup.setTranslateZ(0.0);
+		// translate t origin
+		Point3D p = cubeGroup.localToScene(Point3D.ZERO);
+		cubeGroup.setTranslateX(-p.getX());
+		cubeGroup.setTranslateY(-p.getY());
+		cubeGroup.setTranslateZ(-p.getZ());
+		
 		root.getChildren().add(cubeGroup);
 		sp.setCurrentStatusText2("Create Scene...");
 		
