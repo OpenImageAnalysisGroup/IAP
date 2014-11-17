@@ -281,6 +281,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	 */
 	@Override
 	public void actionPerformed(final ActionEvent e) {
+		if (e.getSource() instanceof JMenuItem) {
+			processMouseClick(e);
+			return;
+		}
 		if (primary) {
 			JPopupMenu jp = new JPopupMenu("Debug");
 			
