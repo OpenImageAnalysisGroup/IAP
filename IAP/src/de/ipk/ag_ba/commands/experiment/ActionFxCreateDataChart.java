@@ -21,14 +21,14 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author klukas
  */
-public class ActionSetGlobalOutliers extends AbstractNavigationAction {
+public class ActionFxCreateDataChart extends AbstractNavigationAction {
 	
 	private final ExperimentReference experiment;
 	
 	private final ArrayList<String> res = new ArrayList<String>();
 	
-	public ActionSetGlobalOutliers(ExperimentReference experiment) {
-		super("Enumerates a global outlier list from marked outliers.");
+	public ActionFxCreateDataChart(ExperimentReference experiment) {
+		super("Create a Data Chart");
 		this.experiment = experiment;
 	}
 	
@@ -94,12 +94,12 @@ public class ActionSetGlobalOutliers extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Add Marked Outliers to Global Outlier List";
+		return "Create Data Chart";
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-User-Desktop-64.png";
+		return "img/ext/gpl2/Gnome-X-Office-Presentation-64.png";
 	}
 	
 }
