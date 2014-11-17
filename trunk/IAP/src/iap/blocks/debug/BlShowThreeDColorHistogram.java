@@ -10,13 +10,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.geometry.Point3D;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
@@ -36,7 +31,6 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
-import javafx.util.Duration;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -249,13 +243,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 			root.getChildren().add(point);
 		}
 		
-		// translate t origin
-		Point3D p = cubeGroup.localToScene(Point3D.ZERO);
-		cubeGroup.setTranslateX(-p.getX());
-		cubeGroup.setTranslateY(-p.getY());
-		cubeGroup.setTranslateZ(-p.getZ());
-		
-		root.getChildren().add(cubeGroup);
+		root.getChildren().addAll(cubeGroup);
 		sp.setCurrentStatusText2("Create Scene...");
 		
 		// Adding to scene
@@ -273,21 +261,14 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		cam.getTransforms().add(rz);
 		cam.getTransforms().add(tz);
 		scene.setCamera(cam);
-		sp.setCurrentStatusText2("Setup Interaction...");
-		new FxInteraction(cubeGroup, scene, cam, camZdist, numberOfBins);
+		
 		sp.setCurrentStatusText2("Setup Animation...");
+		FxCameraAnnimation camAni = new FxCameraAnnimation(cam);
+		camAni.startAnimation();
 		
-		Timeline animation = new Timeline();
+		sp.setCurrentStatusText2("Setup Interaction...");
+		new FxCameraInteraction(scene, cam, camAni, camZdist, numberOfBins);
 		
-		animation.getKeyFrames().addAll(
-				new KeyFrame(Duration.ZERO,
-						new KeyValue(root.rotationAxisProperty(), Rotate.Z_AXIS),
-						new KeyValue(root.rotateProperty(), 0d)),
-				new KeyFrame(Duration.seconds(30),
-						new KeyValue(root.rotationAxisProperty(), Rotate.Z_AXIS),
-						new KeyValue(root.rotateProperty(), 360d)));
-		animation.setCycleCount(Animation.INDEFINITE);
-		animation.play();
 		sp.setCurrentStatusText2("Return Completed Scene...");
 		return scene;
 	}
