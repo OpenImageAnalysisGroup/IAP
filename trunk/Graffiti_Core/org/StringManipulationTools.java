@@ -733,6 +733,14 @@ public class StringManipulationTools implements HelperClass {
 		return al;
 	}
 	
+	public static ArrayList<String> getStringListFromArray(NiceStringSupport[] elements) {
+		ArrayList<String> al = new ArrayList<String>();
+		if (elements != null)
+			for (NiceStringSupport o : elements)
+				al.add(o.getNiceString());
+		return al;
+	}
+	
 	/**
 	 * @return An empty string, if no value is added to the result.
 	 */
