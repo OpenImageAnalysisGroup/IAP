@@ -1,8 +1,10 @@
 package de.ipk.ag_ba.image.structures;
 
+import org.NiceStringSupport;
+
 import de.ipk.ag_ba.image.operation.channels.Channel;
 
-public enum ColorSpace {
+public enum ColorSpace implements NiceStringSupport {
 	RGB, LAB, HSV, XYZ, CMYK, GRAYSCALE_RGB_BLUE;
 	
 	public Channel[] getChannels() {
@@ -21,5 +23,20 @@ public enum ColorSpace {
 				return new Channel[] { Channel.XYZ_X, Channel.XYZ_Y, Channel.XYZ_Z };
 		}
 		return null;
+	}
+	
+	@Override
+	public String getNiceString() {
+		if (this == GRAYSCALE_RGB_BLUE)
+			return "GRAYSCALE";
+		else
+			return this.name();
+	}
+	
+	public static ColorSpace valueOfNiceString(String calculationMode) {
+		if ("GRAYSCALE".equals(calculationMode))
+			return GRAYSCALE_RGB_BLUE;
+		else
+			return valueOf(calculationMode);
 	}
 }

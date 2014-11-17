@@ -5,7 +5,6 @@ import iap.blocks.data_structures.BlockType;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 
 import javafx.animation.Animation;
@@ -14,17 +13,12 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.event.EventHandler;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.PointLight;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -45,11 +39,16 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.border.BevelBorder;
 
+import org.StringManipulationTools;
+
 import de.ipk.ag_ba.image.operation.ColorSpaceConverter;
 import de.ipk.ag_ba.image.operation.channels.Channel;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.ColorSpace;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * Calculates the 3-D histogram cube for the given input images. Different color-spaces for calculations are usable. Please disable before experiment analysis,
@@ -63,16 +62,6 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 	private boolean processFluo;
 	private boolean processNir;
 	private boolean processIr;
-	private ColorSpace colorspace;
-	private int numberOfBins;
-	private Channel ch_a;
-	private Channel ch_b;
-	private Channel ch_c;
-	private double[][][] cube;
-	private double maxValue;
-	private int sceneWidth;
-	private int sceneHeight;
-	private int camZdist = -700;
 	
 	@Override
 	protected void prepare() {
@@ -80,62 +69,64 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		processFluo = getBoolean("Process Fluo", false);
 		processNir = getBoolean("Process Nir", false);
 		processIr = getBoolean("Process Ir", false);
-		numberOfBins = getInt("Number of Histogram Bins", 10);
-		
-		ArrayList<String> possibleValues = new ArrayList<String>(Arrays.asList(ColorSpace.values().toString()));
-		String calculationMode = optionsAndResults.getStringSettingRadio(this, "Calculation Mode", ColorSpace.RGB.name(), possibleValues);
-		this.colorspace = ColorSpace.valueOf(calculationMode);
 	}
 	
 	@Override
 	protected Image processMask(Image mask) {
 		CameraType ct = mask.getCameraType();
-		if (ct == CameraType.VIS && processVis ||
-				ct == CameraType.FLUO && processFluo ||
-				ct == CameraType.NIR && processNir ||
-				ct == CameraType.IR && processIr)
-			calc3DHistogram(mask);
+		ArrayList<String> possibleValues = StringManipulationTools.getStringListFromArray(ColorSpace.values());
+		String calculationMode = optionsAndResults.getStringSettingRadio(this, "Calculation Mode", ColorSpace.RGB.getNiceString(), possibleValues);
+		ColorSpace colorspace = ColorSpace.valueOfNiceString(calculationMode);
+		
+		if ((ct == CameraType.VIS && processVis) ||
+				(ct == CameraType.FLUO && processFluo) ||
+				(ct == CameraType.NIR && processNir) ||
+				(ct == CameraType.IR && processIr))
+			calc3DHistogram(mask, input().masks().getAnyInfo(), colorspace, getInt("Number of Histogram Bins", 20), getDouble("Gamma", 4d));
 		
 		return mask;
 	}
 	
-	private void calc3DHistogram(Image img) {
+	public static void calc3DHistogram(Image img, NumericMeasurement3D nm, ColorSpace colorspace, int numberOfBins, double gamma) {
 		// get cube
-		colorspace = ColorSpace.RGB;
 		Channel[] channels = colorspace.getChannels();
-		ch_a = channels[0];
-		ch_b = channels[1];
-		ch_c = channels[2];
+		Channel ch_a = channels[0];
+		Channel ch_b = channels[1];
+		Channel ch_c = channels[2];
 		ColorCubeEstimation cce = new ColorCubeEstimation(img, ch_a, ch_b, ch_c, numberOfBins);
-		cube = cce.getHistogramCube();
-		maxValue = cce.getMaxValue();
+		double[][][] cube = cce.getHistogramCube();
+		double maxValue = cce.getMaxValue();
 		
-		// Fx stuff
-		JFrame frame = new JFrame("3-D Histogram " + img.getCameraType().getNiceName());
+		int sceneWidth = 800;
+		int sceneHeight = 600;
+		
+		JFrame frame = new JFrame("3-D Histogram of " + img.getCameraType().getNiceName() + " image (" + nm.getQualityAnnotation() + " at "
+				+ nm.getParentSample().getSampleTime() + ")");
 		final JFXPanel jpfx = new JFXPanel();
 		frame.add(jpfx);
 		frame.setSize(sceneWidth, sceneHeight);
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setLocationByPlatform(true);
 		jpfx.setPreferredSize(new Dimension(sceneWidth, sceneHeight));
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				initFX(jpfx);
+				initFX(jpfx, cube, ch_a, ch_b, ch_c, numberOfBins, gamma, maxValue, colorspace);
 				jpfx.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
-				
+				frame.setVisible(true);
 			}
 		});
 	}
 	
-	private void initFX(JFXPanel jp) {
-		Scene s = createScene(jp);
+	private static void initFX(JFXPanel jp, double[][][] cube, Channel ch_a, Channel ch_b, Channel ch_c, int numberOfBins, double gamma, double maxVal,
+			ColorSpace colorspace) {
+		int camZdistInit = -6000;
+		Scene s = createScene(jp, cube, camZdistInit, ch_a, ch_b, ch_c, numberOfBins, colorspace, maxVal, gamma);
 		jp.setScene(s);
 	}
 	
-	double anchorX, anchorY, anchorAngle;
-	
-	private Scene createScene(JComponent jp) {
+	private static Scene createScene(JComponent jp, double[][][] cube, int camZdist, Channel ch_a, Channel ch_b, Channel ch_c, int numberOfBins,
+			ColorSpace colorspace, double maxVal, double gamma) {
 		// Container
 		Group root = new Group();
 		final Group cubeGroup = new Group();
@@ -143,7 +134,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		
 		// Creating 3DShape
 		int radius = 100;
-		ArrayList<Shape3D> shl = make3DHistogram(0, 0, radius);
+		ArrayList<Shape3D> shl = make3DHistogram(0, 0, radius, cube, numberOfBins, maxVal, gamma, colorspace);
 		
 		// Adding nodes inside Container
 		for (Shape3D sh : shl)
@@ -151,14 +142,14 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		
 		// add Legend for all corners
 		int n = numberOfBins;
-		addLegend(cubeGroup, 7, radius, n + 1, -2, -2, ch_a.name().split("_")[1]);
-		addLegend(cubeGroup, 7, radius, -2, n + 1, -2, ch_b.name().split("_")[1]);
-		addLegend(cubeGroup, 7, radius, -2, -2, n + 1, ch_c.name().split("_")[1]);
-		addLegend(cubeGroup, 7, radius, n + 1, n + 1, -2, ch_a.name().split("_")[1] + " " + ch_b.name().split("_")[1]);
-		addLegend(cubeGroup, 7, radius, n + 1, -2, n + 1, ch_a.name().split("_")[1] + " " + ch_c.name().split("_")[1]);
-		addLegend(cubeGroup, 7, radius, -2, n + 1, n + 1, ch_b.name().split("_")[1] + " " + ch_c.name().split("_")[1]);
-		addLegend(cubeGroup, 7, radius, -2, -2, -2, "0");
-		addLegend(cubeGroup, 7, radius, n + 1, n + 1, n + 1, "1");
+		addLegend(cubeGroup, 7, radius, n + 1, -2, -2, ch_a.name().split("_")[1], numberOfBins);
+		addLegend(cubeGroup, 7, radius, -2, n + 1, -2, ch_b.name().split("_")[1], numberOfBins);
+		addLegend(cubeGroup, 7, radius, -2, -2, n + 1, ch_c.name().split("_")[1], numberOfBins);
+		addLegend(cubeGroup, 7, radius, n + 1, n + 1, -2, ch_a.name().split("_")[1] + " " + ch_b.name().split("_")[1], numberOfBins);
+		addLegend(cubeGroup, 7, radius, n + 1, -2, n + 1, ch_a.name().split("_")[1] + " " + ch_c.name().split("_")[1], numberOfBins);
+		addLegend(cubeGroup, 7, radius, -2, n + 1, n + 1, ch_b.name().split("_")[1] + " " + ch_c.name().split("_")[1], numberOfBins);
+		addLegend(cubeGroup, 7, radius, -2, -2, -2, "0", numberOfBins);
+		addLegend(cubeGroup, 7, radius, n + 1, n + 1, n + 1, "1", numberOfBins);
 		
 		// Creating Ambient Light
 		AmbientLight ambient = new AmbientLight();
@@ -167,12 +158,15 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		{
 			// Creating Point Light
 			PointLight point = new PointLight();
-			point.setColor(Color.ANTIQUEWHITE);
-			point.setTranslateZ(-600);
+			point.setColor(Color.WHITE);
+			point.setTranslateZ(-2500);
 			point.getScope().add(cubeGroup);
 			root.getChildren().add(point);
 		}
 		
+		// cubeGroup.setTranslateX(0.0);
+		// cubeGroup.setTranslateY(0.0);
+		// cubeGroup.setTranslateZ(0.0);
 		root.getChildren().add(cubeGroup);
 		
 		// Adding to scene
@@ -191,7 +185,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		cam.getTransforms().add(tz);
 		scene.setCamera(cam);
 		
-		addInteraction(cubeGroup, scene, cam);
+		new FxInteraction(cubeGroup, scene, cam, camZdist, numberOfBins);
 		
 		Timeline animation = new Timeline();
 		
@@ -208,82 +202,24 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		return scene;
 	}
 	
-	private void addInteraction(final Group cubeGroup, Scene scene, final PerspectiveCamera cam) {
-		scene.setOnMousePressed(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				anchorX = event.getSceneX();
-				anchorY = event.getSceneY();
-				anchorAngle = cubeGroup.getRotate();
-			}
-		});
-		
-		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				cubeGroup.setRotate(anchorAngle + anchorX - event.getSceneX());
-			}
-		});
-		
-		scene.setOnScroll(new EventHandler<ScrollEvent>() {
-			@Override
-			public void handle(ScrollEvent event) {
-				System.out.println("x: " + event.getDeltaX() + " y: " + event.getDeltaY());
-				camZdist += event.getDeltaY() * 0.5 * numberOfBins;
-				Translate tz = new Translate(0.0, 0.0, cam.getTranslateZ() + event.getDeltaY() * 0.5 * numberOfBins);
-				cam.getTransforms().add(tz);
-			}
-		});
-		
-		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-			@Override
-			public void handle(KeyEvent ke) {
-				if (ke.getCode() == KeyCode.UP) {
-					System.out.println("Key Pressed: " + ke.getCode() + camZdist);
-					cam.getTransforms().add(new Translate(0, 0, -camZdist));
-					cam.getTransforms().add(new Rotate(5, Rotate.X_AXIS));
-					cam.getTransforms().add(new Translate(0, 0, camZdist));
-				}
-				
-				if (ke.getCode() == KeyCode.DOWN) {
-					System.out.println("Key Pressed: " + ke.getCode());
-					cam.getTransforms().add(new Translate(0, 0, -camZdist));
-					cam.getTransforms().add(new Rotate(-5, Rotate.X_AXIS));
-					cam.getTransforms().add(new Translate(0, 0, camZdist));
-				}
-				
-				if (ke.getCode() == KeyCode.LEFT) {
-					System.out.println("Key Pressed: " + ke.getCode());
-					Translate tx = new Translate(-40 * numberOfBins, 0);
-					cam.getTransforms().add(tx);
-				}
-				
-				if (ke.getCode() == KeyCode.RIGHT) {
-					System.out.println("Key Pressed: " + ke.getCode());
-					Translate tx = new Translate(40 * numberOfBins, 0);
-					cam.getTransforms().add(tx);
-				}
-			}
-		});
-	}
-	
-	private void addLegend(Group cubeGroup, int size, int radius, int x, int y, int z, String t) {
+	private static void addLegend(Group cubeGroup, int size, int radius, int x, int y, int z, String t, int numberOfBins) {
 		Text text = new Text(0, 0, t);
 		text.setScaleX(size);
 		text.setScaleY(size);
 		text.setScaleZ(size);
 		text.setFill(Color.rgb(0, 0, 0, .99));
-		getCoordinate(text, x, y, z, radius);
+		getCoordinate(text, x, y, z, radius, numberOfBins);
 		cubeGroup.getChildren().add(text);
 	}
 	
-	public void getCoordinate(Shape s, int binX, int binY, int binZ, int radius) {
+	public static void getCoordinate(Shape s, int binX, int binY, int binZ, int radius, int numberOfBins) {
 		s.setTranslateX((binX - (numberOfBins + 1) / 2d) * radius);
 		s.setTranslateY((binY - (numberOfBins + 1) / 2d) * radius);
 		s.setTranslateZ((binZ - (numberOfBins + 1) / 2d) * radius);
 	}
 	
-	public ArrayList<Shape3D> make3DHistogram(double xc, double yc, double radius) {
+	public static ArrayList<Shape3D> make3DHistogram(double xc, double yc, double radius, double[][][] cube, int numberOfBins, double maxValue, double gamma,
+			ColorSpace colorspace) {
 		ArrayList<Shape3D> res = new ArrayList<>();
 		
 		int n = numberOfBins;
@@ -295,7 +231,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 								(y == -1 || y == n) && (z == -1 || z == n) ||
 								(z == -1 || z == n) && (x == -1 || x == n)) {
 							Box c = new Box(radius / 10, radius / 10, radius / 10);
-							Material material = getMaterial(x, y, z, n);
+							Material material = getMaterial(x, y, z, n, colorspace);
 							c.setMaterial(material);
 							c.setTranslateX(xc + (x - n / 2d) * radius);
 							c.setTranslateY(yc + (y - n / 2d) * radius);
@@ -305,8 +241,8 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 						}
 					} else {
 						if (cube[x][y][z] > 0) {
-							Sphere c = new Sphere(radius * Math.pow(cube[x][y][z] / maxValue, 0.5), 1 + 256 / numberOfBins);
-							Material material = getMaterial(x, y, z, n);
+							Sphere c = new Sphere(0.5 * radius * Math.pow(cube[x][y][z] / maxValue, 1 / gamma), 1 + 256 / numberOfBins);
+							Material material = getMaterial(x, y, z, n, colorspace);
 							c.setMaterial(material);
 							c.setTranslateX(xc + (x - n / 2d) * radius);
 							c.setTranslateY(yc + (y - n / 2d) * radius);
@@ -318,7 +254,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		return res;
 	}
 	
-	private Material getMaterial(int x, int y, int z, int n) {
+	private static Material getMaterial(int x, int y, int z, int n, ColorSpace colorspace) {
 		PhongMaterial material = new PhongMaterial();
 		Color col;
 		ColorSpaceConverter spc;
@@ -377,43 +313,6 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		return material;
 	}
 	
-	public class ColorCubeEstimation {
-		
-		private final double[][][] histCube;
-		private final int numberOfBins;
-		private double maxVal = 0.0;
-		
-		public ColorCubeEstimation(Image img, Channel a, Channel b, Channel c, int numberOfBins) {
-			histCube = new double[numberOfBins][numberOfBins][numberOfBins];
-			this.numberOfBins = numberOfBins;
-			int[] ch_a = img.io().channels().get(a).getAs1D();
-			int[] ch_b = img.io().channels().get(b).getAs1D();
-			int[] ch_c = img.io().channels().get(c).getAs1D();
-			
-			calcCube(ch_a, ch_b, ch_c);
-		}
-		
-		private void calcCube(int[] ch_a, int[] ch_b, int[] ch_c) {
-			double sizeOfBins = 256 / (double) numberOfBins;
-			for (int idx = 0; idx < ch_a.length; idx++) {
-				int a = (int) ((ch_a[idx] & 0x0000ff) / sizeOfBins);
-				int b = (int) ((ch_b[idx] & 0x0000ff) / sizeOfBins);
-				int c = (int) ((ch_c[idx] & 0x0000ff) / sizeOfBins);
-				histCube[a][b][c]++;
-				if (histCube[a][b][c] > maxVal)
-					maxVal = histCube[a][b][c];
-			}
-		}
-		
-		public double[][][] getHistogramCube() {
-			return histCube;
-		}
-		
-		public double getMaxValue() {
-			return maxVal;
-		}
-	};
-	
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
@@ -457,5 +356,23 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 				+ "<li>Process Nir - Processes only Near-infrared image."
 				+ "<li>Process Ir - Processes only infrared image."
 				+ "<li>Number of Bins - Defines the number of used histogram bins.</ul>";
+	}
+	
+	public static void showHistogram(Image fi, ImageData id) {
+		ArrayList<String> possibleValues = StringManipulationTools.getStringListFromArray(ColorSpace.values());
+		
+		Object[] p = MyInputHelper.getInput("Please select the disired color-space and bin-count:", "Create 3-D Histogram Cube", new Object[] {
+				"Color-space", possibleValues,
+				"Bin-count", 20,
+				"Gamma", 4d
+		});
+		
+		if (p != null) {
+			String calculationMode = (String) p[0];
+			int bincount = (int) p[1];
+			double gamma = (double) p[2];
+			ColorSpace colorspace = ColorSpace.valueOfNiceString(calculationMode);
+			calc3DHistogram(fi, id, colorspace, bincount, gamma);
+		}
 	}
 }
