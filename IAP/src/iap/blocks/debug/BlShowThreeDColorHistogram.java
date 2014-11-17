@@ -4,8 +4,11 @@ import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.Semaphore;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -37,8 +40,11 @@ import javafx.util.Duration;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ErrorMsg;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.image.operation.ColorSpaceConverter;
@@ -47,6 +53,8 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.ColorSpace;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
@@ -88,45 +96,118 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 	}
 	
 	public static void calc3DHistogram(Image img, NumericMeasurement3D nm, ColorSpace colorspace, int numberOfBins, double gamma) {
-		// get cube
-		Channel[] channels = colorspace.getChannels();
-		Channel ch_a = channels[0];
-		Channel ch_b = channels[1];
-		Channel ch_c = channels[2];
-		ColorCubeEstimation cce = new ColorCubeEstimation(img, ch_a, ch_b, ch_c, numberOfBins);
-		double[][][] cube = cce.getHistogramCube();
-		double maxValue = cce.getMaxValue();
-		
-		int sceneWidth = 800;
-		int sceneHeight = 600;
-		
-		JFrame frame = new JFrame("3-D Histogram of " + img.getCameraType().getNiceName() + " image (" + nm.getQualityAnnotation() + " at "
-				+ nm.getParentSample().getSampleTime() + ")");
-		final JFXPanel jpfx = new JFXPanel();
-		frame.add(jpfx);
-		frame.setSize(sceneWidth, sceneHeight);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setLocationByPlatform(true);
-		jpfx.setPreferredSize(new Dimension(sceneWidth, sceneHeight));
-		Platform.runLater(new Runnable() {
+		BackgroundTaskStatusProviderSupportingExternalCall sp = new BackgroundTaskStatusProviderSupportingExternalCallImpl("Initialize...", null);
+		BackgroundTaskHelper.issueSimpleTaskInWindow("Show 3-D Histogram Cube", "Initialize...", new Runnable() {
+			
 			@Override
 			public void run() {
-				initFX(jpfx, cube, ch_a, ch_b, ch_c, numberOfBins, gamma, maxValue, colorspace);
-				jpfx.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
-				frame.setVisible(true);
+				// get cube
+				Channel[] channels = colorspace.getChannels();
+				Channel ch_a = channels[0];
+				Channel ch_b = channels[1];
+				Channel ch_c = channels[2];
+				sp.setCurrentStatusText1("Calculate channel data...");
+				ColorCubeEstimation cce = new ColorCubeEstimation(img, ch_a, ch_b, ch_c, numberOfBins);
+				sp.setCurrentStatusText1("Calculate histogram..");
+				double[][][] cube = cce.getHistogramCube();
+				double maxValue = cce.getMaxValue();
+				
+				int sceneWidth = 800;
+				int sceneHeight = 600;
+				sp.setCurrentStatusText1("Calculation Finished");
+				sp.setCurrentStatusText2("Create 3-D View");
+				
+				Semaphore s = BackgroundTaskHelper.lockGetSemaphore(sp, 1);
+				try {
+					s.acquire();
+					
+					JFrame frame = new JFrame("3-D Histogram of " + img.getCameraType().getNiceName() + " image (" + nm.getQualityAnnotation() + " at "
+							+ nm.getParentSample().getSampleTime() + ")");
+					final JFXPanel jpfx = new JFXPanel();
+					frame.add(jpfx);
+					frame.setSize(sceneWidth, sceneHeight);
+					frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+					frame.addWindowListener(new WindowListener() {
+						
+						@Override
+						public void windowOpened(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void windowIconified(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void windowDeiconified(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void windowDeactivated(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void windowClosing(WindowEvent e) {
+							Platform.runLater(() -> {
+								jpfx.getScene().getWindow().hide();
+								SwingUtilities.invokeLater(() -> {
+									frame.setVisible(false);
+								});
+							});
+						}
+						
+						@Override
+						public void windowClosed(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void windowActivated(WindowEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+					});
+					frame.setLocationByPlatform(true);
+					jpfx.setPreferredSize(new Dimension(sceneWidth, sceneHeight));
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								initFX(jpfx, cube, ch_a, ch_b, ch_c, numberOfBins, gamma, maxValue, colorspace, sp);
+								jpfx.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
+								frame.setVisible(true);
+							} finally {
+								s.release();
+							}
+						}
+					});
+					s.acquire();
+					sp.setCurrentStatusText1("3-D View Created");
+					sp.setCurrentStatusText2("");
+				} catch (InterruptedException e) {
+					ErrorMsg.addErrorMessage(e);
+				}
 			}
-		});
+		}, null, sp);
 	}
 	
 	private static void initFX(JFXPanel jp, double[][][] cube, Channel ch_a, Channel ch_b, Channel ch_c, int numberOfBins, double gamma, double maxVal,
-			ColorSpace colorspace) {
+			ColorSpace colorspace, BackgroundTaskStatusProviderSupportingExternalCall sp) {
 		int camZdistInit = -6000;
-		Scene s = createScene(jp, cube, camZdistInit, ch_a, ch_b, ch_c, numberOfBins, colorspace, maxVal, gamma);
+		Scene s = createScene(jp, cube, camZdistInit, ch_a, ch_b, ch_c, numberOfBins, colorspace, maxVal, gamma, sp);
 		jp.setScene(s);
 	}
 	
 	private static Scene createScene(JComponent jp, double[][][] cube, int camZdist, Channel ch_a, Channel ch_b, Channel ch_c, int numberOfBins,
-			ColorSpace colorspace, double maxVal, double gamma) {
+			ColorSpace colorspace, double maxVal, double gamma, BackgroundTaskStatusProviderSupportingExternalCall sp) {
 		// Container
 		Group root = new Group();
 		final Group cubeGroup = new Group();
@@ -134,7 +215,9 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		
 		// Creating 3DShape
 		int radius = 100;
+		sp.setCurrentStatusText2("Create Histogram Elements...");
 		ArrayList<Shape3D> shl = make3DHistogram(0, 0, radius, cube, numberOfBins, maxVal, gamma, colorspace);
+		sp.setCurrentStatusText2("Create Legend...");
 		
 		// Adding nodes inside Container
 		for (Shape3D sh : shl)
@@ -150,6 +233,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		addLegend(cubeGroup, 7, radius, -2, n + 1, n + 1, ch_b.name().split("_")[1] + " " + ch_c.name().split("_")[1], numberOfBins);
 		addLegend(cubeGroup, 7, radius, -2, -2, -2, "0", numberOfBins);
 		addLegend(cubeGroup, 7, radius, n + 1, n + 1, n + 1, "1", numberOfBins);
+		sp.setCurrentStatusText2("Create Lights...");
 		
 		// Creating Ambient Light
 		AmbientLight ambient = new AmbientLight();
@@ -168,6 +252,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		// cubeGroup.setTranslateY(0.0);
 		// cubeGroup.setTranslateZ(0.0);
 		root.getChildren().add(cubeGroup);
+		sp.setCurrentStatusText2("Create Scene...");
 		
 		// Adding to scene
 		Scene scene = new Scene(root, 2600, 2600, true, SceneAntialiasing.DISABLED);
@@ -184,8 +269,9 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 		cam.getTransforms().add(rz);
 		cam.getTransforms().add(tz);
 		scene.setCamera(cam);
-		
+		sp.setCurrentStatusText2("Setup Interaction...");
 		new FxInteraction(cubeGroup, scene, cam, camZdist, numberOfBins);
+		sp.setCurrentStatusText2("Setup Animation...");
 		
 		Timeline animation = new Timeline();
 		
@@ -198,7 +284,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 						new KeyValue(root.rotateProperty(), 360d)));
 		animation.setCycleCount(Animation.INDEFINITE);
 		animation.play();
-		
+		sp.setCurrentStatusText2("Return Completed Scene...");
 		return scene;
 	}
 	
