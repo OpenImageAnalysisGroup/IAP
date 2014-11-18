@@ -81,7 +81,8 @@ public class MainPanelComponent {
 				this.component = jp;
 				
 			}
-		component.putClientProperty("isHTML", true);
+		if (component != null)
+			component.putClientProperty("isHTML", true);
 	}
 	
 	public static JEditorPane getTextComponent(Color optCustomBackgroundColor, String txt) {

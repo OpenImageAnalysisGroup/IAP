@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -130,7 +131,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	}
 	
 	private void prepareDataSetFromFileList(RunnableWithMappingData resultProcessor) throws Exception {
-		ArrayList<File> fileList = OpenFileDialogService.getFiles(new String[] { "jpg", "jpeg", "png", "tif", "tiff" }, "JPEG, PNG or TIFF Images");
+		List<File> fileList = OpenFileDialogService.getFiles(new String[] { "jpg", "jpeg", "png", "tif", "tiff" }, "JPEG, PNG or TIFF Images");
 		if (fileList == null)
 			return;
 		if (fileList.isEmpty())

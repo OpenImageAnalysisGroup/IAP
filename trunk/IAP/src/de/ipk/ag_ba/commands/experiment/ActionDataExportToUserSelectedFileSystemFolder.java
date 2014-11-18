@@ -56,8 +56,9 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		ArrayList<String> rl = new ArrayList<String>();
-		for (MainPanelComponent m : results)
-			rl.addAll(m.getHTML());
+		if (results != null)
+			for (MainPanelComponent m : results)
+				rl.addAll(m.getHTML());
 		return new MainPanelComponent(rl);
 	}
 	
