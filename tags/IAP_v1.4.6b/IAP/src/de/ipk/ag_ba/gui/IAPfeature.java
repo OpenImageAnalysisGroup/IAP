@@ -1,0 +1,6 @@
+package de.ipk.ag_ba.gui;
+
+public enum IAPfeature {
+	REMOTE_EXECUTION, DELETE_CLOUD_JOBS_AND_TEMP_DATA_UPON_CLOUD_START, TOMCAT_AUTOMATIC_HSM_BACKUP
+	
+}
