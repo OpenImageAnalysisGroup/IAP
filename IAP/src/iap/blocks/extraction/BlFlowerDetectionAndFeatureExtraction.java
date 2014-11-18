@@ -279,8 +279,20 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".position.y"),
 						(int) p.getPosition().getY(), "flower", this, imageRef);
+				
+				// save direction_1
+				Vector2D dir = (Vector2D) p.getFeature("direction_1");
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".length"),
+						(int) dir.getNorm(), "flower", this, imageRef);
+				
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".angle"),
+						dir.angle(dir, new Vector2D(0.0, 1.0)), "flower", this, imageRef);
+				
 				num++;
 			}
+			
 		}
 		
 		if (saveResultObject) {
