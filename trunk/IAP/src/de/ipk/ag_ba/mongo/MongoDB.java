@@ -95,7 +95,7 @@ public class MongoDB {
 	private MongoClient m;
 	private static HashSet<String> dbsAnalyzedForCollectionSettings = new HashSet<String>();
 	
-	private boolean enabled;
+	private final boolean enabled;
 	final ArrayList<VirtualFileSystem> vfs_file_storage = new ArrayList<VirtualFileSystem>();
 	
 	private final String displayName;
@@ -176,8 +176,7 @@ public class MongoDB {
 						+ displayName);
 		}
 		MongoDB mm = new MongoDB(displayName, databaseName, hostName, port,
-				login, password, HashType.MD5);
-		mm.enabled = enabled;
+				login, password, HashType.MD5, enabled);
 		synchronized (id2m) {
 			id2m.put(id, mm);
 		}
@@ -199,6 +198,10 @@ public class MongoDB {
 	// conditions
 	
 	private MongoDB(String displayName, String databaseName, String hostName, int port, String login, String password, HashType hashType) {
+		this(displayName, databaseName, hostName, port, login, password, hashType, true);
+	}
+	
+	private MongoDB(String displayName, String databaseName, String hostName, int port, String login, String password, HashType hashType, boolean enabled) {
 		if (databaseName == null || databaseName.contains("/")) // databaseName.contains("_") ||
 			throw new UnsupportedOperationException("Database name may not be NULL and may not contain special characters!");
 		this.displayName = displayName;
@@ -208,32 +211,36 @@ public class MongoDB {
 		this.databaseLogin = login;
 		this.databasePass = password;
 		this.hashType = hashType;
+		this.enabled = enabled;
 		
-		mh = new MongoDBhandler(databaseHost, port, this);
-		
-		for (VirtualFileSystem vfs : VirtualFileSystem.getKnown(false)) {
-			if (vfs instanceof VirtualFileSystemVFS2) {
-				VirtualFileSystemVFS2 vf = (VirtualFileSystemVFS2) vfs;
-				if (vf.isUseForMongoFileStorage()) {
-					String n = vf.getUseForMongoFileStorageCloudName();
-					if (databaseName.equals(n + ""))
-						vfs_file_storage.add(vfs);
+		if (enabled) {
+			mh = new MongoDBhandler(databaseHost, port, this);
+			
+			for (VirtualFileSystem vfs : VirtualFileSystem.getKnown(false)) {
+				if (vfs instanceof VirtualFileSystemVFS2) {
+					VirtualFileSystemVFS2 vf = (VirtualFileSystemVFS2) vfs;
+					if (vf.isUseForMongoFileStorage()) {
+						String n = vf.getUseForMongoFileStorageCloudName();
+						if (databaseName.equals(n + ""))
+							vfs_file_storage.add(vfs);
+					}
 				}
 			}
-		}
-		
-		if (getEnsureIndex())
-			try {
-				BackgroundThreadDispatcher.addTask(() -> {
-					try {
-						ensureBasicIndecies();
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}, "Ensure Indecies in Grid DB");
-			} catch (InterruptedException e) {
-				ErrorMsg.addErrorMessage(e);
-			}
+			
+			if (getEnsureIndex())
+				try {
+					BackgroundThreadDispatcher.addTask(() -> {
+						try {
+							ensureBasicIndecies();
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					}, "Ensure Indecies in Grid DB");
+				} catch (InterruptedException e) {
+					ErrorMsg.addErrorMessage(e);
+				}
+		} else
+			mh = null;
 	}
 	
 	private void ensureBasicIndecies() throws Exception {
