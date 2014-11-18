@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
+ *******************************************************************************/
+/*
+ * Created on 13.05.2004
+ * To change the template for this generated file go to
+ * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ */
 package de.ipk_gatersleben.ag_nw.graffiti;
 
 import java.io.File;
@@ -13,7 +21,7 @@ import org.graffiti.editor.GravistoService;
 /**
  * @author klukas
  */
-public class FileHelper implements HelperClass {
+public class FileHelperSwing implements HelperClass {
 	public static String getFileName(final String defaultExt,
 			final String description, String defaultFileName) {
 		JFileChooser fc = new JFileChooser();
