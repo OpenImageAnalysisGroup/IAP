@@ -322,7 +322,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 	
 	@Override
 	public String getDescription() {
-		return "Tracks Leaf Tips (prior processing of block 'Detect Leaf-Tips' is nessessary)";
+		return "Tracks Leaf Tips (prior processing of block 'Detect Leaf-Tips' is necessary)";
 	}
 	
 	@Override
