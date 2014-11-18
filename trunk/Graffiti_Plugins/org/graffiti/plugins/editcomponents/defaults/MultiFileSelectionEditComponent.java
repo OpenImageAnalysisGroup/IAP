@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -67,7 +68,7 @@ public class MultiFileSelectionEditComponent extends AbstractValueEditComponent 
 					String extensionDescription = ((MultiFileSelectionParameter) getDisplayable()).getExtensionDescription();
 					ArrayList<File> files = new ArrayList<File>();
 					if (((MultiFileSelectionParameter) getDisplayable()).selectMultipleFile()) {
-						ArrayList<File> selected = OpenFileDialogService.getFiles(extensions, extensionDescription);
+						List<File> selected = OpenFileDialogService.getFiles(extensions, extensionDescription);
 						if (selected != null)
 							files.addAll(selected);
 					} else {
