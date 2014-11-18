@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.AmbientLight;
@@ -31,6 +35,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
+import javafx.util.Duration;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -85,12 +90,12 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 				(ct == CameraType.FLUO && processFluo) ||
 				(ct == CameraType.NIR && processNir) ||
 				(ct == CameraType.IR && processIr))
-			calc3DHistogram(mask, input().masks().getAnyInfo(), colorspace, getInt("Number of Histogram Bins", 20), getDouble("Gamma", 4d));
+			calc3DHistogram(mask, null, input().masks().getAnyInfo(), colorspace, getInt("Number of Histogram Bins", 20), getDouble("Gamma", 4d));
 		
 		return mask;
 	}
 	
-	public static void calc3DHistogram(Image img, NumericMeasurement3D nm, ColorSpace colorspace, int numberOfBins, double gamma) {
+	public static void calc3DHistogram(Image img, Image optImg2, NumericMeasurement3D nm, ColorSpace colorspace, int numberOfBins, double gamma) {
 		BackgroundTaskStatusProviderSupportingExternalCall sp = new BackgroundTaskStatusProviderSupportingExternalCallImpl("Initialize...", null);
 		BackgroundTaskHelper.issueSimpleTaskInWindow("Show 3-D Histogram Cube", "Initialize...", new Runnable() {
 			
@@ -102,7 +107,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 				Channel ch_b = channels[1];
 				Channel ch_c = channels[2];
 				sp.setCurrentStatusText1("Calculate channel data...");
-				ColorCubeEstimation cce = new ColorCubeEstimation(img, ch_a, ch_b, ch_c, numberOfBins);
+				ColorCubeEstimation cce = new ColorCubeEstimation(img, optImg2, ch_a, ch_b, ch_c, numberOfBins);
 				sp.setCurrentStatusText1("Calculate histogram..");
 				double[][][] cube = cce.getHistogramCube();
 				double maxValue = cce.getMaxValue();
@@ -311,8 +316,13 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 							res.add(c);
 						}
 					} else {
-						if (cube[x][y][z] > 0) {
-							Sphere c = new Sphere(0.5 * radius * Math.pow(cube[x][y][z] / maxValue, 1 / gamma), 1 + 256 / numberOfBins);
+						if (cube[x][y][z] != 0) {
+							double ss = 0.5 * radius * Math.pow(cube[x][y][z] / maxValue, 1 / gamma);
+							Shape3D c;
+							if (cube[x][y][z] < 0)
+								c = new Box(ss, ss, ss);
+							else
+								c = new Sphere(ss, 1 + 256 / numberOfBins);
 							Material material = getMaterial(x, y, z, n, colorspace);
 							c.setMaterial(material);
 							c.setTranslateX(xc + (x - n / 2d) * radius);
@@ -429,13 +439,13 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 				+ "<li>Number of Bins - Defines the number of used histogram bins.</ul>";
 	}
 	
-	public static void showHistogram(Image fi, ImageData id) {
+	public static void showHistogram(Image fi, Image optfi2, ImageData id) {
 		ArrayList<String> possibleValues = StringManipulationTools.getStringListFromArray(ColorSpace.values());
 		
 		Object[] p = MyInputHelper.getInput("Please select the disired color-space and bin-count:", "Create 3-D Histogram Cube", new Object[] {
 				"Color-space", possibleValues,
 				"Bin-count", 20,
-				"Gamma", 4d
+				"Gamma", 10d
 		});
 		
 		if (p != null) {
@@ -443,7 +453,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 			int bincount = (int) p[1];
 			double gamma = (double) p[2];
 			ColorSpace colorspace = ColorSpace.valueOfNiceString(calculationMode);
-			calc3DHistogram(fi, id, colorspace, bincount, gamma);
+			calc3DHistogram(fi, optfi2, id, colorspace, bincount, gamma);
 		}
 	}
 }
