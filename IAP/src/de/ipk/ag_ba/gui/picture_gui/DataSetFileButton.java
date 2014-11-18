@@ -497,23 +497,58 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			sn.add(debugShowSnapshot);
 			jp.add(sn);
 			
-			JMenuItem shcube = new JMenuItem("Show 3-D Histogram Cube");
-			shcube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
+			JMenu fxCube = new JMenu("FX");
+			fxCube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
 					java.awt.Image.SCALE_SMOOTH)));
-			shcube.addActionListener((ActionEvent ev) -> {
-				IOurl s = imageResult
-						.getBinaryFileInfo()
-						.getFileNameMain();
-				try {
-					Image fi = new Image(s);
-					ImageConfiguration imageConfiguration = ImageConfiguration.get(((ImageData) imageResult.getBinaryFileInfo().getEntity()).getSubstanceName());
-					fi.setCameraType(imageConfiguration.getCameraType());
-					BlShowThreeDColorHistogram.showHistogram(fi, (ImageData) imageResult.getBinaryFileInfo().entity);
-				} catch (Exception e1) {
-					ErrorMsg.addErrorMessage(e1);
-				}
-			});
-			jp.add(shcube);
+			{
+				JMenuItem shcube = new JMenuItem("Show 3-D Histogram Cube");
+				shcube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
+						java.awt.Image.SCALE_SMOOTH)));
+				shcube.addActionListener((ActionEvent ev) -> {
+					IOurl s = imageResult
+							.getBinaryFileInfo()
+							.getFileNameMain();
+					try {
+						Image fi = new Image(s);
+						ImageConfiguration imageConfiguration = ImageConfiguration.get(((ImageData) imageResult.getBinaryFileInfo().getEntity()).getSubstanceName());
+						fi.setCameraType(imageConfiguration.getCameraType());
+						BlShowThreeDColorHistogram.showHistogram(fi, null, (ImageData) imageResult.getBinaryFileInfo().entity);
+					} catch (Exception e1) {
+						ErrorMsg.addErrorMessage(e1);
+					}
+				});
+				fxCube.add(shcube);
+			}
+			
+			if (primary && ((ImageData) imageResult.getBinaryFileInfo().getEntity()).getLabelURL() != null)
+			{
+				
+				JMenuItem shcube = new JMenuItem("Show 3-D Reference-Difference Histogram Cube");
+				shcube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
+						java.awt.Image.SCALE_SMOOTH)));
+				shcube.addActionListener((ActionEvent ev) -> {
+					IOurl s = imageResult
+							.getBinaryFileInfo()
+							.getFileNameMain();
+					
+					IOurl s2 = ((ImageData) imageResult.getBinaryFileInfo().getEntity()).getLabelURL();
+					try {
+						Image fi = new Image(s);
+						ImageConfiguration imageConfiguration = ImageConfiguration.get(((ImageData) imageResult.getBinaryFileInfo().getEntity()).getSubstanceName());
+						fi.setCameraType(imageConfiguration.getCameraType());
+						
+						Image fi2 = new Image(s2);
+						fi2.setCameraType(imageConfiguration.getCameraType());
+						
+						BlShowThreeDColorHistogram.showHistogram(fi, fi2, (ImageData) imageResult.getBinaryFileInfo().entity);
+					} catch (Exception e1) {
+						ErrorMsg.addErrorMessage(e1);
+					}
+				});
+				fxCube.add(shcube);
+			}
+			
+			jp.add(fxCube);
 			
 			if (targetTreeNode.getExperiment().getIniIoProvider() != null) {
 				try {
@@ -1092,6 +1127,24 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			// myPopup.add(removeOneFromDatabaseCmd);
 			// myPopup.add(removeAllFromDatabaseCmd);
 		}
+		myPopup.add(new JSeparator());
+		JMenuItem shcube = new JMenuItem("Show 3-D Histogram Cube");
+		shcube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
+				java.awt.Image.SCALE_SMOOTH)));
+		shcube.addActionListener((ActionEvent ev) -> {
+			IOurl s = imageResult
+					.getBinaryFileInfo()
+					.getFileNameMain();
+			try {
+				Image fi = new Image(s);
+				ImageConfiguration imageConfiguration = ImageConfiguration.get(((ImageData) imageResult.getBinaryFileInfo().getEntity()).getSubstanceName());
+				fi.setCameraType(imageConfiguration.getCameraType());
+				BlShowThreeDColorHistogram.showHistogram(fi, null, (ImageData) imageResult.getBinaryFileInfo().entity);
+			} catch (Exception e1) {
+				ErrorMsg.addErrorMessage(e1);
+			}
+		});
+		myPopup.add(shcube);
 		
 		// myPopup.add(debugPipelineTest);
 		
@@ -1296,7 +1349,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 											Image fi = new Image(
 													id.getURL());
 											if (viewMode == ImageViewMode.HISTOGRAM)
-												BlShowThreeDColorHistogram.showHistogram(fi, id);
+												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
 											else
 												fi.show(id.getSubstanceName() + " // " + pre);
 										}
@@ -1320,7 +1373,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 													+ id.getParentSample().getTime(), fi);
 										else {
 											if (viewMode == ImageViewMode.HISTOGRAM)
-												BlShowThreeDColorHistogram.showHistogram(fi, id);
+												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
 											else
 												fi.show("Reference " + id.getSubstanceName() + " // " + pre);
 										}
@@ -1347,7 +1400,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 													+ id.getParentSample().getTime(), fi);
 										else {
 											if (viewMode == ImageViewMode.HISTOGRAM)
-												BlShowThreeDColorHistogram.showHistogram(fi, id);
+												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
 											else
 												fi.show("Annotation " + id.getSubstanceName() + " // " + pre);
 										}
