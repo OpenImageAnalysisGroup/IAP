@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.commands.experiment;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -48,36 +46,46 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		ThreadSafeOptions exportIndividualAngles = new ThreadSafeOptions();
-		exportIndividualAngles.setBval(0, true);
+		exportIndividualAngles.setBval(0, false);
 		
 		ThreadSafeOptions exportIndividualReplicates = new ThreadSafeOptions();
 		exportIndividualReplicates.setBval(0, true);
+		
+		ThreadSafeOptions exportImages = new ThreadSafeOptions();
+		exportImages.setBval(0, false);
 		
 		res.add(new NavigationButton(new ActionDataExportZIP(experiment), guiSetting));
 		res.add(new NavigationButton(new ActionDataExportTar(experiment), guiSetting));
 		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
 		
-		if (src!=null && src.getEventSource()!=null && (src.getEventSource().getModifiers() & ActionEvent.SHIFT_MASK)!=0) {
+		// if (src!=null && src.getEventSource()!=null && (src.getEventSource().getModifiers() & ActionEvent.SHIFT_MASK)!=0) {
 		res.add(new NavigationButton(
-				new ActionToggle("Enable/disable export of data for individual (side) angles",
+				new ActionToggle("Enable/disable export of data for individual camera view angles",
 						"<html>"
 								+ "<center>Export data for<br>"
 								+ "all camera angles &#8594;", exportIndividualAngles),
 				guiSetting));
-		
+		/*
+		 * res.add(new NavigationButton(
+		 * new ActionToggle("Enable/disable export of data for replicates (export sample average, otherwise)",
+		 * "<html>"
+		 * + "<center>Export individual<br>"
+		 * + "replicate data &#8594;", exportIndividualReplicates),
+		 * guiSetting));
+		 */
 		res.add(new NavigationButton(
-				new ActionToggle("Enable/disable export of data for replicates (export sample average, otherwise)",
+				new ActionToggle("Enable/disable export of images",
 						"<html>"
-								+ "<center>Export individual<br>"
-								+ "replicate data &#8594;", exportIndividualReplicates),
+								+ "<center>Export of<br>JPG images &#8594;", exportImages),
 				guiSetting));
-		}
+		// }
 		res.add(new NavigationButton(
 				new ActionPdfCreation3(
 						experiment,
 						toggles,
 						exportIndividualAngles,
 						exportIndividualReplicates,
+						exportImages,
 						true,
 						null, null, null, null, null, null, ExportSetting.ALL, true),
 				guiSetting));
@@ -88,6 +96,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 						toggles,
 						exportIndividualAngles,
 						exportIndividualReplicates,
+						exportImages,
 						false,
 						null, null, null, null, null, true),
 				guiSetting));
