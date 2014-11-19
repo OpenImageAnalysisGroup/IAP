@@ -343,7 +343,10 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 									if (group.startsWith(IAPexperimentTypes.Raps + ""))
 										return IAPimages.getRapeseedImage();
 									else
-										return "img/ext/network-workgroup.png";
+										if (group.startsWith(IAPexperimentTypes.TobaccoImages + ""))
+											return IAPimages.getTobaccoImage();
+										else
+											return "img/ext/network-workgroup.png";
 			}
 			
 			@Override
@@ -371,7 +374,10 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 									if (group.startsWith(IAPexperimentTypes.Raps + ""))
 										return IAPimages.getRapeseedImage();
 									else
-										return "img/ext/network-workgroup-power.png";
+										if (group.startsWith(IAPexperimentTypes.TobaccoImages + ""))
+											return IAPimages.getTobaccoImage();
+										else
+											return "img/ext/network-workgroup-power.png";
 			}
 			
 			@Override
