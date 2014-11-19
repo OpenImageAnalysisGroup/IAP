@@ -39,8 +39,9 @@ public class FxCameraInteraction {
 			public void handle(MouseEvent event) {
 				// System.out.println("ang " + anchorAngle + "   |X " + anchorX + " | evX" + event.getSceneX() + " | ");
 				double rot = 4;
+				double delay = 0.0;
 				
-				if (2 < Math.abs(anchorX - event.getSceneX()))
+				if (delay < Math.abs(anchorX - event.getSceneX()))
 					if (anchorX < event.getSceneX()) {
 						cam.getTransforms().add(new Translate(0, 0, -camZdist));
 						cam.getTransforms().add(new Rotate(rot, Rotate.Y_AXIS));
@@ -52,7 +53,7 @@ public class FxCameraInteraction {
 					}
 				anchorX = event.getSceneX();
 				
-				if (2 < Math.abs(anchorY - event.getSceneY()))
+				if (delay < Math.abs(anchorY - event.getSceneY()))
 					if (anchorY < event.getSceneY()) {
 						cam.getTransforms().add(new Translate(0, 0, -camZdist));
 						cam.getTransforms().add(new Rotate(-rot, Rotate.X_AXIS));
@@ -70,7 +71,8 @@ public class FxCameraInteraction {
 			@Override
 			public void handle(ScrollEvent event) {
 				// System.out.println("x: " + event.getDeltaX() + " y: " + event.getDeltaY());
-				camZdist += event.getDeltaY() * 0.5 * numberOfBins;
+				// System.out.println(camZdist - Math.log((event.getDeltaY() * 0.5 * numberOfBins)));
+				camZdist += (event.getDeltaY() * 0.5 * numberOfBins);
 				Translate tz = new Translate(0.0, 0.0, cam.getTranslateZ() + event.getDeltaY() * 0.5 * numberOfBins);
 				cam.getTransforms().add(tz);
 			}

@@ -258,4 +258,8 @@ public class IAPimages {
 			return "img/ext/gpl2/Gnome-Text-X-Generic-64.png";
 		return null;
 	}
+	
+	public static String getTobaccoImage() {
+		return "img/tobacco.png";
+	}
 }
