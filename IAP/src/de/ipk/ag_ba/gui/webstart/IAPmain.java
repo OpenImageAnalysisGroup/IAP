@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.WeakHashMap;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JComponent;
@@ -608,10 +609,17 @@ public class IAPmain extends JApplet {
 	
 	private static IAPrunMode currentGuiMode = IAPrunMode.UNKNOWN;
 	
+	public static boolean imageIOdiskCacheEnabled = disableDiskCache();
+	
 	private static boolean startMaximized;
 	
 	public static IAPrunMode getRunMode() {
 		return currentGuiMode;
+	}
+	
+	private static boolean disableDiskCache() {
+		ImageIO.setUseCache(false);
+		return false;
 	}
 	
 	public static void setRunMode(IAPrunMode currentGuiMode) {
