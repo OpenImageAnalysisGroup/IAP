@@ -124,6 +124,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 						experimentReference, divideDatasetBy,
 						new ThreadSafeOptions() /* false */,
 						new ThreadSafeOptions() /* false */,
+						new ThreadSafeOptions(),
 						false, toggles,
 						togglesForInterestingProperties, tsoBootstrapN,
 						tsoSplitFirst, tsoSplitSecond, false),

@@ -179,6 +179,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 						togglesDivideDataSetBy,
 						new ThreadSafeOptions() /* false */, // all side angles?
 						new ThreadSafeOptions() /* false */, // all replicates or sample averge?
+						new ThreadSafeOptions(), // images?
 						false, // xlsx?
 						togglesMetaDataFiltering,
 						togglesDataColumns,
