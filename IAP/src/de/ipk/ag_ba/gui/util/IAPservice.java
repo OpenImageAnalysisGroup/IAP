@@ -841,6 +841,10 @@ public class IAPservice {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Snapshot Set Created");
 		
+		if (optStatus != null)
+			if (optStatus.wantsToStop())
+				return null;
+		
 		return result;
 	}
 	
@@ -851,6 +855,9 @@ public class IAPservice {
 			HashSet<NumericMeasurement> lowerSingle, HashSet<NumericMeasurement> upperSingle,
 			HashSet<SampleInterface> lowerCombined, HashSet<SampleInterface> upperCombined) {
 		for (ConditionInterface c : sort(substance.toArray(new ConditionInterface[] {}))) {
+			if (optStatus != null)
+				if (optStatus.wantsToStop())
+					return;
 			for (SampleInterface sample : c) {
 				TreeSet<String> qualities = new TreeSet<String>();
 				if (storeAllReplicates) {

@@ -470,7 +470,7 @@ public class SnapshotDataIAP {
 		}
 	}
 	
-	public String getCSVvalue(boolean numberFormat_deTrue_enFalse, String separator, UrlCacheManager urlManager) {
+	public String getCSVvalue(boolean numberFormat_deTrue_enFalse, String separator, UrlCacheManager urlManager, boolean ommit_RowType_Angle_ImageConfigs) {
 		SnapshotDataIAP s = this;
 		
 		String weightBeforeWatering = enDe(numberFormat_deTrue_enFalse, s.getWeightBefore() != null ? s.getWeightBefore() + "" : "");
@@ -495,7 +495,7 @@ public class SnapshotDataIAP {
 		
 		if (position2store == null) {
 			// Species;Genotype;Variety;GrowthCondition;Treatment;Sequence;
-			return "no imaging" + separator + "" + separator
+			return (ommit_RowType_Angle_ImageConfigs ? "" : "no imaging" + separator + "" + separator)
 					+ replaceNull(s.getPlantId()) + separator
 					+ replaceNull(s.getCondition()) + separator
 					+ replaceNull(s.getSpecies()) + separator
@@ -510,17 +510,19 @@ public class SnapshotDataIAP {
 					+ enDe(numberFormat_deTrue_enFalse, fineTime.toString()) + separator
 					+ weightBeforeWatering + separator
 					+ sumBA + separator
-					+ waterWeight + separator + waterAmount + separator
-					+ replaceNull(s.getUrlList(urlManager, CameraType.VIS, NO_ANGLE)) + separator
-					+ replaceNull(s.getUrlList(urlManager, CameraType.FLUO, NO_ANGLE)) + separator
-					+ replaceNull(s.getUrlList(urlManager, CameraType.NIR, NO_ANGLE)) + separator
-					+ replaceNull(s.getUrlList(urlManager, CameraType.IR, NO_ANGLE)) + separator
-					+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, NO_ANGLE)) + separator
-					+ replaceNull(s.getConfigList(urlManager, CameraType.VIS, NO_ANGLE)) + separator
-					+ replaceNull(s.getConfigList(urlManager, CameraType.FLUO, NO_ANGLE)) + separator
-					+ replaceNull(s.getConfigList(urlManager, CameraType.NIR, NO_ANGLE)) + separator
-					+ replaceNull(s.getConfigList(urlManager, CameraType.IR, NO_ANGLE)) + separator
-					+ replaceNull(s.getConfigList(urlManager, CameraType.UNKNOWN, NO_ANGLE))
+					+ waterWeight + separator + waterAmount
+					+ (ommit_RowType_Angle_ImageConfigs ? "" :
+							separator +
+									replaceNull(s.getUrlList(urlManager, CameraType.VIS, NO_ANGLE)) + separator
+									+ replaceNull(s.getUrlList(urlManager, CameraType.FLUO, NO_ANGLE)) + separator
+									+ replaceNull(s.getUrlList(urlManager, CameraType.NIR, NO_ANGLE)) + separator
+									+ replaceNull(s.getUrlList(urlManager, CameraType.IR, NO_ANGLE)) + separator
+									+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, NO_ANGLE)) + separator
+									+ replaceNull(s.getConfigList(urlManager, CameraType.VIS, NO_ANGLE)) + separator
+									+ replaceNull(s.getConfigList(urlManager, CameraType.FLUO, NO_ANGLE)) + separator
+									+ replaceNull(s.getConfigList(urlManager, CameraType.NIR, NO_ANGLE)) + separator
+									+ replaceNull(s.getConfigList(urlManager, CameraType.IR, NO_ANGLE)) + separator
+									+ replaceNull(s.getConfigList(urlManager, CameraType.UNKNOWN, NO_ANGLE)))
 					+ "\r\n";
 		} else {
 			StringBuilder result = new StringBuilder();
@@ -562,8 +564,7 @@ public class SnapshotDataIAP {
 							rowType = "top" + separator + enDe(numberFormat_deTrue_enFalse, (-angle) + "");
 						}
 				String res =
-						rowType
-								+ separator
+						(ommit_RowType_Angle_ImageConfigs ? "" : rowType + separator)
 								+ replaceNull(s.getPlantId()) + separator
 								+ replaceNull(s.getCondition()) + separator
 								+ replaceNull(s.getSpecies()) + separator
@@ -579,17 +580,19 @@ public class SnapshotDataIAP {
 								+ (addWater ? weightBeforeWatering : "") + separator
 								+ (addWater ? sumBA : "") + separator
 								+ (addWater ? waterWeight : "") + separator
-								+ (addWater ? waterAmount : "") + separator
-								+ replaceNull(s.getUrlList(urlManager, CameraType.VIS, angle)) + separator
-								+ replaceNull(s.getUrlList(urlManager, CameraType.FLUO, angle)) + separator
-								+ replaceNull(s.getUrlList(urlManager, CameraType.NIR, angle)) + separator
-								+ replaceNull(s.getUrlList(urlManager, CameraType.IR, angle)) + separator
-								+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, angle)) + separator
-								+ replaceNull(s.getConfigList(urlManager, CameraType.VIS, angle)) + separator
-								+ replaceNull(s.getConfigList(urlManager, CameraType.FLUO, angle)) + separator
-								+ replaceNull(s.getConfigList(urlManager, CameraType.NIR, angle)) + separator
-								+ replaceNull(s.getConfigList(urlManager, CameraType.IR, angle)) + separator
-								+ replaceNull(s.getConfigList(urlManager, CameraType.UNKNOWN, angle))
+								+ (addWater ? waterAmount : "")
+								+ (ommit_RowType_Angle_ImageConfigs ? "" :
+										separator
+												+ replaceNull(s.getUrlList(urlManager, CameraType.VIS, angle)) + separator
+												+ replaceNull(s.getUrlList(urlManager, CameraType.FLUO, angle)) + separator
+												+ replaceNull(s.getUrlList(urlManager, CameraType.NIR, angle)) + separator
+												+ replaceNull(s.getUrlList(urlManager, CameraType.IR, angle)) + separator
+												+ replaceNull(s.getUrlList(urlManager, CameraType.UNKNOWN, angle)) + separator
+												+ replaceNull(s.getConfigList(urlManager, CameraType.VIS, angle)) + separator
+												+ replaceNull(s.getConfigList(urlManager, CameraType.FLUO, angle)) + separator
+												+ replaceNull(s.getConfigList(urlManager, CameraType.NIR, angle)) + separator
+												+ replaceNull(s.getConfigList(urlManager, CameraType.IR, angle)) + separator
+												+ replaceNull(s.getConfigList(urlManager, CameraType.UNKNOWN, angle)))
 								+ columnData + "\r\n";
 				result.append(res);
 			}

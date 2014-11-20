@@ -103,7 +103,7 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 			indexHeader.append(ActionPdfCreation3.separator + val);
 		
 		StringBuilder csv = new StringBuilder();
-		String csvHeader = ActionPdfCreation3.getCSVheader(false);
+		String csvHeader = ActionPdfCreation3.getCSVheader(false, false);
 		csv.append(csvHeader + indexHeader.toString() + "\r\n");
 		
 		System.out.println(SystemAnalysis.getCurrentTime() +
