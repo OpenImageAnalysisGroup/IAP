@@ -52,16 +52,17 @@ public class PluginHelper implements HelperClass {
 	 *               plugin description.
 	 */
 	public static PluginDescription readPluginDescription(URL pluginLocation)
-						throws PluginManagerException {
+			throws PluginManagerException {
 		if (pluginLocation == null) {
 			throw new PluginManagerException("exception.MalformedURL", "null");
 		}
 		
 		String fileName = pluginLocation.toString();
-		InputStream input;
+		PluginDescription description = null;
 		
 		if (fileName.toLowerCase().endsWith(".xml")) {
 			try {
+				InputStream input;
 				if (fileName.startsWith("jar:")) {
 					JarURLConnection juc = (JarURLConnection) pluginLocation.openConnection();
 					input = juc.getInputStream();
@@ -78,6 +79,7 @@ public class PluginHelper implements HelperClass {
 						input = uc.getInputStream();
 					}
 				}
+				description = readInput(input);
 			} catch (IOException ioe) {
 				throw new PluginManagerException("exception.IO");
 			}
@@ -85,18 +87,22 @@ public class PluginHelper implements HelperClass {
 			// directly read from the jar or zip file
 		} else
 			if (fileName.toLowerCase().endsWith(".jar") ||
-								fileName.toLowerCase().endsWith(".zip")) {
+					fileName.toLowerCase().endsWith(".zip")) {
 				try {
 					JarFile file = new JarFile(new File(
-										new URI(pluginLocation.toString())));
+							new URI(pluginLocation.toString())));
 					StringBundle sBundle = StringBundle.getInstance();
 					ZipEntry entry = file.getEntry(sBundle.getString(
-										"plugin.xml.filename"));
+							"plugin.xml.filename"));
 					
 					if (entry != null) {
 						// create an input stream from this entry.
+						InputStream input;
 						input = file.getInputStream(entry);
+						description = readInput(input);
+						file.close();
 					} else {
+						file.close();
 						throw new PluginManagerException("exception.IO");
 					}
 				} catch (MalformedURLException mue) {
@@ -108,11 +114,14 @@ public class PluginHelper implements HelperClass {
 				}
 			} else {
 				throw new PluginManagerException("exception.unknownFileType",
-									fileName);
+						fileName);
 			}
 		
+		return description;
+	}
+	
+	private static PluginDescription readInput(InputStream input) throws PluginManagerException {
 		PluginDescription description = null;
-		
 		try {
 			PluginXMLParser parser = new PluginXMLParser();
 			description = parser.parse(input);
@@ -125,7 +134,6 @@ public class PluginHelper implements HelperClass {
 				ioe.printStackTrace();
 			}
 		}
-		
 		return description;
 	}
 	
