@@ -70,8 +70,10 @@ public class ActionCopyToMongo extends AbstractExperimentDataNavigationAction {
 			active = true;
 			
 			ExperimentInterface exp = experiment.getData();
-			
-			exp.getHeader().setOriginDbId(exp.getHeader().getDatabaseId() + "");
+			if (saveAnnotation) {
+				exp.setHeader(experiment.getHeader());
+			} else
+				exp.getHeader().setOriginDbId(exp.getHeader().getDatabaseId() + "");
 			
 			ExperimentInterface ue = m.saveExperiment(exp, status);
 		} finally {
