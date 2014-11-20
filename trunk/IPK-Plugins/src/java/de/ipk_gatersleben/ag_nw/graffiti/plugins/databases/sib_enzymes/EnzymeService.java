@@ -328,7 +328,9 @@ public class EnzymeService extends MemoryHog
 				return isr.ready();
 			} else {
 				FileReader fr = new FileReader(ReleaseInfo.getAppFolderWithFinalSep() + fileName);
-				return fr.ready();
+				boolean res = fr.ready();
+				fr.close();
+				return res;
 			}
 		} catch (Exception e) {
 			return false;
