@@ -26,8 +26,10 @@ public class BlMedianFilter extends AbstractBlock {
 		
 		Image medianMask = new ImageOperation(mask).copy().bm().medianFilter().io().border(2)
 				.getImage();
-		
-		return input().images().getImage(mask.getCameraType()).io().applyMask_ResizeSourceIfNeeded(medianMask, optionsAndResults.getBackground()).getImage();
+		Image ref = input().images().getImage(mask.getCameraType());
+		if (ref == null)
+			return null;
+		return ref.io().applyMask_ResizeSourceIfNeeded(medianMask, optionsAndResults.getBackground()).getImage();
 	}
 	
 	@Override
