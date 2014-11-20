@@ -119,11 +119,11 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 		deletedTempDatasets = 0;
 		if (global) {
 			if (getStatusProvider() != null)
-				getStatusProvider().setCurrentStatusText1("Remove compute tasks...");
+				getStatusProvider().setCurrentStatusText1("Remove all non-archived compute tasks...");
 			deleted = m.batch().deleteAll(false);
 			nJobs = 0;
 			if (getStatusProvider() != null)
-				getStatusProvider().setCurrentStatusText1("Removed compute tasks...");
+				getStatusProvider().setCurrentStatusText1("Removed non-archived compute tasks...");
 			ArrayList<ExperimentHeaderInterface> ell = m.getExperimentList(null);
 			int nToDo = 0;
 			for (ExperimentHeaderInterface ei : ell) {
@@ -163,6 +163,8 @@ public class ActionDeleteAnalysisJobs extends AbstractNavigationAction {
 					deleted++;
 				if (getStatusProvider() != null && getStatusProvider().wantsToStop())
 					break;
+				if (getStatusProvider() != null)
+					getStatusProvider().setCurrentStatusText1("Removed " + deleted + " compute tasks...");
 			}
 			updateForCountNeeded = true;
 			if (getStatusProvider() != null)
