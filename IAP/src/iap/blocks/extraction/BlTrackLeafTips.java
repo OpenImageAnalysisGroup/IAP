@@ -38,11 +38,14 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
 	double maxDistBetweenLeafTips;
+	boolean debug = false;
 	
 	@Override
 	public void prepare() {
 		// get parms
 		maxDistBetweenLeafTips = getDouble("Maximal distance between leaf-tips", 100.0);
+		boolean useNormalization = getBoolean("Do Normalization using BM", true);
+		debug = getBoolean("Debug", false);
 		
 		CameraPosition cp = optionsAndResults.getCameraPosition();
 		for (CameraType ct : CameraType.values()) {
@@ -75,8 +78,11 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 					input().masks(), ct, optionsAndResults.getLeftShiftX(ct), optionsAndResults.getTopShiftY(ct), optionsAndResults.getCenterX(ct),
 					optionsAndResults.getCenterY(ct));
 			
-			if (!n.isRealWorldCoordinateValid())
+			if (!n.isRealWorldCoordinateValid() && useNormalization)
 				continue;
+			
+			if (!n.isRealWorldCoordinateValid())
+				n = null;
 			
 			// check if new config equals current config, if not reset plant object
 			if (previousResults != null)
@@ -96,6 +102,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 					getResultSet().removeResultObject(result1);
 				}
 			}
+			
 		}
 	}
 	
@@ -239,15 +246,23 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 				if (lt == null || cameraPosition == null || cameraType == null)
 					continue;
 				
-				final boolean db = debugValues;
+				final boolean db = debug;
 				final boolean isLast = last == lt && last.getTime() == timepoint;
 				final int num = l.leafID;
-				final int xPos = lt.getImageX();
-				final int yPos = lt.getImageY();
+				final int xPos;
+				final int yPos;
 				final int xPos_norm = lt.getRealWorldX();
 				final int yPos_norm = lt.getRealWorldY();
 				final Double angle = (Double) lt.getFeature("angle");
 				final Vector2D direction = (Vector2D) lt.getFeature("direction");
+				
+				if (norm == null) {
+					xPos = xPos_norm;
+					yPos = yPos_norm;
+				} else {
+					xPos = lt.getImageX();
+					yPos = lt.getImageY();
+				}
 				
 				getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
 					
@@ -257,8 +272,12 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 						if (!isLast) {
 							c = c.drawRectanglePoints(xPos - 4, yPos - 4, 8, 8, colors.get(num), 1);
 							if (db)
-								c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
-										" a: " + angle.intValue(), Color.BLACK);
+								if (angle != null)
+									c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
+											" a: " + angle.intValue(), Color.BLACK);
+								else
+									c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
+											" ", Color.BLACK);
 						} else {
 							if (direction != null) {
 								Vector2D vv = direction.subtract(new Vector2D(xPos, yPos));
@@ -270,8 +289,12 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 							}
 							c = c.drawRectangle(xPos - 18, yPos - 18, 36, 36, colors.get(num), 2);
 							if (db)
-								c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
-										" a: " + angle.intValue(), Color.BLACK);
+								if (angle != null)
+									c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
+											" a: " + angle.intValue(), Color.BLACK);
+								else
+									c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
+											" ", Color.BLACK);
 						}
 						return c.getImage();
 					}

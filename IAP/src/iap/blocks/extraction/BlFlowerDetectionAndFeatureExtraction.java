@@ -103,39 +103,42 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 					double minDistanceToOtherRegion = getMinDist(centerPoint, centerPoints);
 					Image flowerImage = getClusterImage(cluster, dim, bounds);
 					// flowerImage.show("flower");
-					ImageMoments im = new ImageMoments(flowerImage);
-					Point coG = im.getCenterOfGravity();
-					Point coGWeighted = im.getCenterOfGravityWeigthed(ColorMode.BLUE);
-					Point directionNextSekeltonPoint = getConnectedDirectionFromSkeleton(skelArray, cluster, img.getWidth());
 					
-					icSkelPoints.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 3, Color.BLUE.getRGB(), 0.0, 2);
-					
-					if (directionNextSekeltonPoint.x == -1)
-						directionNextSekeltonPoint = new Point(coGWeighted.x + bounds.getLeftX(), coGWeighted.x + bounds.getTopY());
-					double ec = im.getEccentricity();
-					// direction
-					Vector2D direction = new Vector2D(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y);
-					
-					if (true) {
-						ImageCanvas ic = new ImageCanvas(im.drawMoments().copy());
-						int centerX = centerPoint.x - bounds.getLeftX();
-						int centerY = centerPoint.y - bounds.getTopY();
-						ic.drawCircle(centerX, centerY, 5, Color.BLUE.getRGB(), 0, 1);
-						ic.drawCircle(coG.x, coG.y, 5, Color.YELLOW.getRGB(), 0, 1);
-						ic.drawCircle(coGWeighted.x, coGWeighted.y, 5, Color.RED.getRGB(), 0, 1);
-						ic.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 5, Color.BLACK.getRGB(), 0, 1);
-						ic.drawLine(new Point(centerX, centerY), new Point((int) (direction.getX()),
-								(int) (direction.getY())), Color.ORANGE.getRGB(), 0.0, 1);
-						ic.getImage().show("marked flower", debugValues);
+					if (flowerImage.getWidth() > 1 && flowerImage.getHeight() > 1) {
+						ImageMoments im = new ImageMoments(flowerImage);
+						Point coG = im.getCenterOfGravity();
+						Point coGWeighted = im.getCenterOfGravityWeigthed(ColorMode.BLUE);
+						Point directionNextSekeltonPoint = getConnectedDirectionFromSkeleton(skelArray, cluster, img.getWidth());
+						
+						icSkelPoints.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 3, Color.BLUE.getRGB(), 0.0, 2);
+						
+						if (directionNextSekeltonPoint.x == -1)
+							directionNextSekeltonPoint = new Point(coGWeighted.x + bounds.getLeftX(), coGWeighted.x + bounds.getTopY());
+						double ec = im.getEccentricity();
+						// direction
+						Vector2D direction = new Vector2D(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y);
+						
+						if (true) {
+							ImageCanvas ic = new ImageCanvas(im.drawMoments().copy());
+							int centerX = centerPoint.x - bounds.getLeftX();
+							int centerY = centerPoint.y - bounds.getTopY();
+							ic.drawCircle(centerX, centerY, 5, Color.BLUE.getRGB(), 0, 1);
+							ic.drawCircle(coG.x, coG.y, 5, Color.YELLOW.getRGB(), 0, 1);
+							ic.drawCircle(coGWeighted.x, coGWeighted.y, 5, Color.RED.getRGB(), 0, 1);
+							ic.drawCircle(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y, 5, Color.BLACK.getRGB(), 0, 1);
+							ic.drawLine(new Point(centerX, centerY), new Point((int) (direction.getX()),
+									(int) (direction.getY())), Color.ORANGE.getRGB(), 0.0, 1);
+							ic.getImage().show("marked flower", debugValues);
+						}
+						
+						Vector2i pos = centerPoints[idx];
+						Feature tempFeature = new Feature(new Integer(pos.x), new Integer(pos.y));
+						tempFeature.addFeature("size", areas[idx], FeatureObjectType.NUMERIC);
+						tempFeature.addFeature("eccentricity", ec, FeatureObjectType.NUMERIC);
+						tempFeature.addFeature("minDistToOtherRegion", minDistanceToOtherRegion, FeatureObjectType.NUMERIC);
+						tempFeature.addFeature("direction_1", direction, FeatureObjectType.VECTOR);
+						flist.add(tempFeature);
 					}
-					
-					Vector2i pos = centerPoints[idx];
-					Feature tempFeature = new Feature(new Integer(pos.x), new Integer(pos.y));
-					tempFeature.addFeature("size", areas[idx], FeatureObjectType.NUMERIC);
-					tempFeature.addFeature("eccentricity", ec, FeatureObjectType.NUMERIC);
-					tempFeature.addFeature("minDistToOtherRegion", minDistanceToOtherRegion, FeatureObjectType.NUMERIC);
-					tempFeature.addFeature("direction_1", direction, FeatureObjectType.VECTOR);
-					flist.add(tempFeature);
 				}
 				idx++;
 			}

@@ -195,7 +195,7 @@ public class ImageStack {
 			win.add(ccc);
 			win.pack();
 			
-			IAPservice.showImageJ();
+			IAPservice.showImageJ(true);
 			
 			image.show(title + " (" + stack.getSize() + ")");
 			
