@@ -163,26 +163,26 @@ public class ClassPathAttributeCollector {
 				
 				try {
 					jarFile = new JarFile(root);
+					
+					Enumeration<JarEntry> entries = jarFile.entries();
+					
+					String name = new String();
+					
+					while (entries.hasMoreElements()) {
+						JarEntry jarEntry = entries.nextElement();
+						
+						// name = classRoot.getAbsolutePath()+"/"+jarEntry.getName();
+						name = isAttribute(jarEntry.getName());
+						
+						if (!"".equals(name)) {
+							System.out.println("is attr: " + name);
+							acc.add(name);
+						}
+					}
+					jarFile.close();
 				} catch (IOException e) {
 					System.out.println(e);
-					
 					return;
-				}
-				
-				Enumeration<JarEntry> entries = jarFile.entries();
-				
-				String name = new String();
-				
-				while (entries.hasMoreElements()) {
-					JarEntry jarEntry = entries.nextElement();
-					
-					// name = classRoot.getAbsolutePath()+"/"+jarEntry.getName();
-					name = isAttribute(jarEntry.getName());
-					
-					if (!"".equals(name)) {
-						System.out.println("is attr: " + name);
-						acc.add(name);
-					}
 				}
 				
 				// the file is an attribute. Add it to the list of
