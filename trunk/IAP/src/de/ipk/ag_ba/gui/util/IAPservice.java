@@ -1763,6 +1763,13 @@ public class IAPservice {
 		return true;
 	}
 	
+	public static void showImageJ(boolean alwaysOnTop) {
+		showImageJ();
+		if (!SystemAnalysis.isHeadless() && (IAPservice.ij == null || !IAPservice.ij.isShowing())) {
+			IAPservice.ij.setAlwaysOnTop(alwaysOnTop);
+		}
+	}
+	
 	public static void showImageJ() {
 		if (SystemAnalysis.isHeadless())
 			return;
