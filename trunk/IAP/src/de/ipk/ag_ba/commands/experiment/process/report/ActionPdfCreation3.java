@@ -511,7 +511,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					cola.put(indexInfo.get(val), val);
 				for (String val : cola.values())
 					indexHeader.append(separator + val);
-				csvHeader = getCSVheader(false);
+				boolean addRowType = (exportIndividualAngles.getBval(0, false)) || (exportIndividualReplicates.getBval(0, false));
+				csvHeader = getCSVheader(false,
+						addRowType);
 				csv.appendLine(csvHeader + indexHeader.toString() + "\r\n", written);
 				if (row2col2value != null)
 					row2col2value.put(0, getColumnValues((csvHeader + indexHeader.toString()).split(separator)));
@@ -798,7 +800,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				boolean germanLanguage = false;
 				int row = 1; // header is added before at row 0
 				for (SnapshotDataIAP s : snapshots) {
-					String rowContent = s.getCSVvalue(germanLanguage, separator, urlManager);
+					String rowContent = s.getCSVvalue(germanLanguage, separator, urlManager,
+							(!exportIndividualAngles.getBval(0, false)) && (!exportIndividualReplicates.getBval(0, false)));
 					csv.appendLine(rowContent, written);
 					if (row2col2value != null) {
 						row2col2value.put(row++, getColumnValues(rowContent.split(separator)));
@@ -1447,17 +1450,22 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		return experimentReference;
 	}
 	
-	public static String getCSVheader(boolean addLineFeed) {
-		return "Row Type" + separator + "Angle" + separator + "Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype"
+	public static String getCSVheader(boolean addLineFeed, boolean addRowAndImageTypes) {
+		return (addRowAndImageTypes ?
+				"Row Type" + separator + "Angle" + separator : "") +
+				"Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype"
 				+ separator + "Variety" + separator
 				+ "GrowthCondition"
 				+ separator + "Treatment" + separator + "Sequence" + separator + "Day" + separator + "Time" + separator + "Day (Int)"
 				+ separator + "Day (Float)"
-				+ separator + "Weight A (g)" + separator + "Weight B (g)" + separator +
-				"Water (weight-diff)" +
-				separator + "Water (sum of day)" + separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "IR" + separator + "OTHER" +
-				separator + "RGB Config" + separator + "FLUO Config" + separator + "NIR Config" + separator + "IR Config" + separator + "OTHER Config" +
-				(addLineFeed ? "\r\n" : "");
+				+ separator + "Weight A (g)" + separator + "Weight B (g)"
+				+ separator + "Water (sum of day)"
+				+ separator + "Water (weight-diff)"
+				+ (addRowAndImageTypes ?
+						separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "IR" + separator + "OTHER" +
+								separator + "RGB Config" + separator + "FLUO Config" + separator + "NIR Config" + separator + "IR Config" + separator + "OTHER Config"
+						: "")
+				+ (addLineFeed ? "\r\n" : "");
 	}
 	
 	long startTime;

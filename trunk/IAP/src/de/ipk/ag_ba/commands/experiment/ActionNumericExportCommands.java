@@ -49,7 +49,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 		exportIndividualAngles.setBval(0, false);
 		
 		ThreadSafeOptions exportIndividualReplicates = new ThreadSafeOptions();
-		exportIndividualReplicates.setBval(0, true);
+		exportIndividualReplicates.setBval(0, false);
 		
 		ThreadSafeOptions exportImages = new ThreadSafeOptions();
 		exportImages.setBval(0, false);
@@ -58,27 +58,25 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 		res.add(new NavigationButton(new ActionDataExportTar(experiment), guiSetting));
 		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
 		
-		// if (src!=null && src.getEventSource()!=null && (src.getEventSource().getModifiers() & ActionEvent.SHIFT_MASK)!=0) {
 		res.add(new NavigationButton(
 				new ActionToggle("Enable/disable export of data for individual camera view angles",
 						"<html>"
 								+ "<center>Export data for<br>"
 								+ "all camera angles &#8594;", exportIndividualAngles),
 				guiSetting));
-		/*
-		 * res.add(new NavigationButton(
-		 * new ActionToggle("Enable/disable export of data for replicates (export sample average, otherwise)",
-		 * "<html>"
-		 * + "<center>Export individual<br>"
-		 * + "replicate data &#8594;", exportIndividualReplicates),
-		 * guiSetting));
-		 */
+		res.add(new NavigationButton(
+				new ActionToggle("Enable/disable export of data for replicates",
+						"<html>"
+								+ "<center>Export individual<br>"
+								+ "replicate data &#8594;", exportIndividualReplicates),
+				guiSetting));
+		
 		res.add(new NavigationButton(
 				new ActionToggle("Enable/disable export of images",
 						"<html>"
 								+ "<center>Export of<br>JPG images &#8594;", exportImages),
 				guiSetting));
-		// }
+		
 		res.add(new NavigationButton(
 				new ActionPdfCreation3(
 						experiment,
