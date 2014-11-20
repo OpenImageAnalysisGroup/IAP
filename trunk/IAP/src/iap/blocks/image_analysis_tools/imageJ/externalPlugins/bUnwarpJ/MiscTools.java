@@ -1574,6 +1574,7 @@ public class MiscTools
 			if (!(line = br.readLine()).equals("Index\txSource\tySource\txTarget\tyTarget")) {
 				fr.close();
 				IJ.write("Line " + k + ": 'Index\txSource\tySource\txTarget\tyTarget'");
+				br.close();
 				return;
 			}
 			++k;
@@ -1584,6 +1585,7 @@ public class MiscTools
 					fr.close();
 					IJ.write("Line " + k
 							+ ": #Index# <tab> #xSource# <tab> #ySource# <tab> #xTarget# <tab> #yTarget#");
+					br.close();
 					return;
 				}
 				index = line.substring(0, separatorIndex);
@@ -1595,6 +1597,7 @@ public class MiscTools
 					fr.close();
 					IJ.write("Line " + k
 							+ ": #Index# <tab> #xSource# <tab> #ySource# <tab> #xTarget# <tab> #yTarget#");
+					br.close();
 					return;
 				}
 				xSource = line.substring(0, separatorIndex);
@@ -1606,6 +1609,7 @@ public class MiscTools
 					fr.close();
 					IJ.write("Line " + k
 							+ ": #Index# <tab> #xSource# <tab> #ySource# <tab> #xTarget# <tab> #yTarget#");
+					br.close();
 					return;
 				}
 				ySource = line.substring(0, separatorIndex);
@@ -1617,6 +1621,7 @@ public class MiscTools
 					fr.close();
 					IJ.write("Line " + k
 							+ ": #Index# <tab> #xSource# <tab> #ySource# <tab> #xTarget# <tab> #yTarget#");
+					br.close();
 					return;
 				}
 				xTarget = line.substring(0, separatorIndex);
@@ -1752,6 +1757,7 @@ public class MiscTools
 				{
 					fr.close();
 					IJ.write("Line " + lineN + ": Cannot read enough coefficients");
+					br.close();
 					return;
 				}
 				for (int j = 0; j < intervals + 3; j++)
@@ -1773,6 +1779,7 @@ public class MiscTools
 				{
 					fr.close();
 					IJ.write("Line " + lineN + ": Cannot read enough coefficients");
+					br.close();
 					return;
 				}
 				for (int j = 0; j < intervals + 3; j++)
@@ -1852,6 +1859,7 @@ public class MiscTools
 				{
 					fr.close();
 					IJ.write("Line " + lineN + ": Cannot read enough coordinates");
+					br.close();
 					return;
 				}
 				for (int j = 0; j < width; j++)
@@ -1873,6 +1881,7 @@ public class MiscTools
 				{
 					fr.close();
 					IJ.write("Line " + lineN + ": Cannot read enough coordinates");
+					br.close();
 					return;
 				}
 				for (int j = 0; j < width; j++)
@@ -1955,6 +1964,7 @@ public class MiscTools
 				{
 					fr.close();
 					IJ.write("Line " + lineN + ": Cannot read enough coordinates");
+					br.close();
 					return;
 				}
 				for (int j = 0; j < width; j++)
@@ -1976,6 +1986,7 @@ public class MiscTools
 				{
 					fr.close();
 					IJ.write("Line " + lineN + ": Cannot read enough coordinates");
+					br.close();
 					return;
 				}
 				for (int j = 0; j < width; j++)
