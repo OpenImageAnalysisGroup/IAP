@@ -324,8 +324,11 @@ public class ActionJobStatus extends AbstractNavigationAction {
 							s = StringManipulationTools.stringReplace(s, "'gray'", "#225522");
 						if (status == CloudAnalysisStatus.SCHEDULED)
 							s = StringManipulationTools.stringReplace(s, "'gray'", "#559955");
-						return "<html><center>" + s + ": " + set.get(fd).size()
-								+ "/" + setMaxSize.get(fd) + ")";
+						if (set.get(fd) != null)
+							return "<html><center>" + s + ": " + set.get(fd).size()
+									+ "/" + setMaxSize.get(fd) + ")";
+						else
+							return "<html><center>" + s + ": (n/a)";
 					}
 					
 					@Override
