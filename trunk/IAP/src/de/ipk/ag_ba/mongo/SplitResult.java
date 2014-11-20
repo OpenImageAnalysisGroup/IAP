@@ -163,9 +163,11 @@ public class SplitResult {
 				mergedExperiment.getHeader().setDatabaseId(null);
 			}
 			mergedExperiment.addAndMerge(ei);
-			System.out.println(" // merged in " + s.getTime() + " ms");
+			System.out.println(" // merged in " + s.getTime() + " ms // " + mergedExperiment.getNumberOfMeasurementValues() + " values in dataset");
 			if (optStatus != null)
-				optStatus.setCurrentStatusText2("Processed " + (nnii - 1) + "/" + tempDataSetDescription.getPartCntI() + "<br>" +
+				optStatus.setCurrentStatusText2("Processed " + (nnii - 1) + "/" + tempDataSetDescription.getPartCntI() + ", "
+						+ mergedExperiment.getNumberOfMeasurementValues() + " values in dataset"
+						+ "<br>" +
 						"<small><font color='gray'>(" + msg + ", merging: " + s.getTime() + " ms)</font></small>");
 			
 			if (s.getTime() > 30000)
