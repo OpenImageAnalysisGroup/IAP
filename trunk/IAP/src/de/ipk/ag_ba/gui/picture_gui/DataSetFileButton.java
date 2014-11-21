@@ -250,6 +250,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	}
 	
 	private static String strip(String fileName, String opt) {
+		if (fileName == null)
+			return null;
 		if (fileName.equals("null"))
 			fileName = opt;
 		if (fileName.contains(File.separator))
@@ -260,6 +262,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	}
 	
 	public static String getMaxString(String fileName) {
+		if (fileName == null)
+			return null;
 		int maxlen = 20;
 		if (fileName.length() < maxlen)
 			return fileName;

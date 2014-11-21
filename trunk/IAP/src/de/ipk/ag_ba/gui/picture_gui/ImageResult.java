@@ -27,6 +27,8 @@ public class ImageResult {
 	public File downloadedFileMain, downloadedFileLabel;
 	
 	public String getFileNameMain() {
+		if (bfi == null || bfi.getFileNameMain() == null)
+			return null;
 		String fn = bfi.getFileNameMain().getFileName();
 		if (fn != null && fn.indexOf("#") > 0)
 			return fn.substring(fn.indexOf("#") + 1);
