@@ -75,7 +75,7 @@ public class CloudComputingService {
 	}
 	
 	public static void main(String[] args) {
-		if (args.length == 0 || (args[0] + "").toLowerCase().startsWith("gui")) {
+		if (args.length == 0 || !(args[0] + "").toLowerCase().startsWith("gui")) {
 			for (String info : IAPmain.getMainInfoLines())
 				System.out.println(info);
 			SystemAnalysis.simulateHeadless = true;
