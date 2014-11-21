@@ -17,7 +17,7 @@ import javax.swing.filechooser.FileFilter;
  */
 public class OpenFileDialogService implements HelperClass {
 	
-	private static final boolean USE_FX_BY_DEFAULT = false;
+	private static final boolean USE_FX_BY_DEFAULT = true;
 	private static JFileChooser openDialog = null;
 	
 	public static File getFile(final String[] valid_extensions, final String description) {
@@ -66,7 +66,7 @@ public class OpenFileDialogService implements HelperClass {
 	}
 	
 	public static File getFile(final String[] valid_extensions, final String description, String selectButtonText) {
-		if (!SystemOptions.getInstance().getBoolean("IAP", "FX/Use FX File Choosers", USE_FX_BY_DEFAULT))
+		if (!SystemOptions.getInstance().getBoolean("IAP", "FX//Use FX File Choosers", USE_FX_BY_DEFAULT))
 			return OpenFileDialogServiceSwing.getFile(valid_extensions, description, selectButtonText);
 		
 		if (openDialog == null) {
@@ -111,7 +111,7 @@ public class OpenFileDialogService implements HelperClass {
 	}
 	
 	public static List<File> getFiles(final String[] valid_extensions, final String description) {
-		if (!SystemOptions.getInstance().getBoolean("IAP", "FX/Use FX File Choosers", USE_FX_BY_DEFAULT))
+		if (!SystemOptions.getInstance().getBoolean("IAP", "FX//Use FX File Choosers", USE_FX_BY_DEFAULT))
 			return OpenFileDialogServiceSwing.getFiles(valid_extensions, description);
 		
 		if (openDialog == null) {
@@ -217,7 +217,7 @@ public class OpenFileDialogService implements HelperClass {
 	}
 	
 	public static File getDirectoryFromUser(String okButtonText, String startDir) {
-		if (!SystemOptions.getInstance().getBoolean("IAP", "FX/Use FX File Choosers", true))
+		if (!SystemOptions.getInstance().getBoolean("IAP", "FX//Use FX File Choosers", USE_FX_BY_DEFAULT))
 			return OpenFileDialogServiceSwing.getDirectoryFromUser(okButtonText, startDir);
 		if (openDialog == null) {
 			openDialog = new JFileChooser();
