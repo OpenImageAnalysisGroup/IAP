@@ -243,7 +243,7 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 	
 	@Override
 	public String getName() {
-		return "Cut Well Parts";
+		return "Cut Well Parts (Rectangular Grid)";
 	}
 	
 	@Override
