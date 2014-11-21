@@ -10,10 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.AmbientLight;
@@ -35,7 +31,6 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
-import javafx.util.Duration;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -183,7 +178,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 							try {
 								initFX(jpfx, cube, ch_a, ch_b, ch_c, numberOfBins, gamma, maxValue, colorspace, sp);
 								jpfx.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
-								frame.setVisible(true);
+								SwingUtilities.invokeLater(() -> frame.setVisible(true));
 							} finally {
 								s.release();
 							}
