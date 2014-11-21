@@ -791,7 +791,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 						new File(path).mkdirs();
 				} else
 					xlsxJPGdisabled = true;
-				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status, urlManager, path);
+				boolean addRowType = (exportIndividualAngles.getBval(0, false)) || (exportIndividualReplicates.getBval(0, false));
+				
+				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status, urlManager, path, addRowType);
 				snapshots = null;
 			} else {
 				if (status != null)
@@ -1086,7 +1088,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			Sheet sheet,
 			ArrayList<String> excelColumnHeaders,
 			BackgroundTaskStatusProviderSupportingExternalCall status,
-			UrlCacheManager urlManager, String outpath) {
+			UrlCacheManager urlManager, String outpath, boolean addRowTypeAndImages) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
 		int rowNum = 1;
 		Runtime r = Runtime.getRuntime();
@@ -1146,7 +1148,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		
 		HashMap<String, org.apache.poi.ss.usermodel.Hyperlink> links = new HashMap<String, org.apache.poi.ss.usermodel.Hyperlink>();
 		for (SnapshotDataIAP s : snapshotsToBeProcessed) {
-			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager)) {
+			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, addRowTypeAndImages)) {
 				for (DateDoubleString o : valueRow) {
 					if (o != null && o.getString() != null && !o.getString().isEmpty()) {
 						if (outpath != null)
@@ -1186,7 +1188,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
 			sidx++;
 			progressOutput(snapshotsToBeProcessed, status, r, scnt, sidx);
-			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager)) {
+			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, addRowTypeAndImages)) {
 				Row row = sheet.createRow(rowNum++);
 				int colNum = 0;
 				
@@ -1209,7 +1211,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 									for (BinaryMeasurement bm : bin) {
 										String of = null;
 										if (bm.getURL() != null) {
-											if (o.getString().endsWith("jpg")) {
+											if (o.getString().toLowerCase().endsWith("jpg")) {
 												// direct copy
 												// StringManipulationTools.removeFileExtension(o.getString()) + ".jpg"
 												of = outpath + "/" + o.getString();
@@ -1227,7 +1229,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 													}
 												}
 											} else
-												if (o.getString().endsWith("png") || o.getString().endsWith("tiff") || o.getString().endsWith("tif")) {
+												if (o.getString().toLowerCase().endsWith("png") || o.getString().toLowerCase().endsWith("tiff")
+														|| o.getString().endsWith("tif")) {
 													// convert
 													of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
 													final String off = of;

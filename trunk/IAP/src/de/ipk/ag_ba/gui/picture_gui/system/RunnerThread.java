@@ -33,12 +33,17 @@ public class RunnerThread extends Thread {
 	
 	@Override
 	public void run() {
+		int emptyCount = 0;
 		do {
 			LocalComputeJob nextTask = null;
 			jobModification.acquireUninterruptibly();
-			if (jobs.isEmpty())
-				pleaseStop = true;
-			else {
+			if (jobs.isEmpty()) {
+				emptyCount++;
+				if (emptyCount > 200)
+					pleaseStop = true;
+			} else {
+				emptyCount = 0;
+				pleaseStopAsked = 0;
 				nextTask = jobs.removeLast();
 			}
 			jobModification.release();
@@ -60,8 +65,12 @@ public class RunnerThread extends Thread {
 		sw.stop();
 	}
 	
+	int pleaseStopAsked = 0;
+	
 	public void pleaseStop() {
-		this.pleaseStop = true;
+		pleaseStopAsked++;
+		if (pleaseStopAsked > 500)
+			this.pleaseStop = true;
 	}
 	
 	public boolean stopRequested() {
