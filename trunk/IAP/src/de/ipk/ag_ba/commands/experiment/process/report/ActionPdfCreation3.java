@@ -1148,7 +1148,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		
 		HashMap<String, org.apache.poi.ss.usermodel.Hyperlink> links = new HashMap<String, org.apache.poi.ss.usermodel.Hyperlink>();
 		for (SnapshotDataIAP s : snapshotsToBeProcessed) {
-			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, addRowTypeAndImages)) {
+			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, !addRowTypeAndImages)) {
 				for (DateDoubleString o : valueRow) {
 					if (o != null && o.getString() != null && !o.getString().isEmpty()) {
 						if (outpath != null)
@@ -1188,7 +1188,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
 			sidx++;
 			progressOutput(snapshotsToBeProcessed, status, r, scnt, sidx);
-			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, addRowTypeAndImages)) {
+			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, !addRowTypeAndImages)) {
 				Row row = sheet.createRow(rowNum++);
 				int colNum = 0;
 				
