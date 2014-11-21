@@ -75,10 +75,12 @@ public class CloudComputingService {
 	}
 	
 	public static void main(String[] args) {
-		for (String info : IAPmain.getMainInfoLines())
-			System.out.println(info);
-		SystemAnalysis.simulateHeadless = true;
-		IAPmain.setRunMode(IAPrunMode.CLOUD_HOST);
+		if (args.length == 0 || (args[0] + "").toLowerCase().startsWith("gui")) {
+			for (String info : IAPmain.getMainInfoLines())
+				System.out.println(info);
+			SystemAnalysis.simulateHeadless = true;
+			IAPmain.setRunMode(IAPrunMode.CLOUD_HOST);
+		}
 		if (args.length > 0 && args[0].toLowerCase().startsWith("info")) {
 			SystemInfoExt info = new SystemInfoExt();
 			System.out.println("Sockets        : " + info.getCpuSockets());
