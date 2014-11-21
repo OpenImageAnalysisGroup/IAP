@@ -32,11 +32,9 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -177,7 +175,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 						public void run() {
 							try {
 								initFX(jpfx, cube, ch_a, ch_b, ch_c, numberOfBins, gamma, maxValue, colorspace, sp);
-								jpfx.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
+								// jpfx.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
 								SwingUtilities.invokeLater(() -> frame.setVisible(true));
 							} finally {
 								s.release();
