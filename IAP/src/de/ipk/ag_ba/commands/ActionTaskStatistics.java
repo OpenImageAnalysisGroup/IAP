@@ -73,7 +73,7 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 									+ "<td bgcolor='#FFFFFF'>" + st + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + SystemAnalysis.getWaitTime(job.getUptime()) + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + (job.stopRequested() ? "yes" : "-") + "</td>"
-									+ "<td bgcolor='#FFFFFF'>" + job.getCurrentTaskName() + "</td>"
+									+ "<td bgcolor='#FFFFFF'>" + (job.getCurrentTaskName() != null ? job.getCurrentTaskName() : "-") + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + SystemAnalysis.getWaitTime(job.getTaskUptime()) + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + (job.getTaskExceptionCount() > 0 ? job.getTaskExceptionCount() + "" : "-") + "</td>"
 									
