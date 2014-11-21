@@ -501,7 +501,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			sn.add(debugShowSnapshot);
 			jp.add(sn);
 			
-			JMenu fxCube = new JMenu("FX");
+			JMenu fxCube = new JMenu("Color Analysis (FX Cubes)");
 			fxCube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
 					java.awt.Image.SCALE_SMOOTH)));
 			{
