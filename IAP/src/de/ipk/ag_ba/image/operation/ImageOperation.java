@@ -2444,7 +2444,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation drawLine(Vector2d centroid, double resultAngle,
 			int subX, int addX, Color color, float width) {
-		BufferedImage bi = getImage().getAsBufferedImage();
+		BufferedImage bi = getImage().getAsBufferedImage(false);
 		Graphics2D g2 = (Graphics2D) bi.getGraphics();
 		
 		g2.translate(centroid.x, centroid.y);
@@ -2458,7 +2458,7 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	public ImageOperation drawLine(int x1, int y1, int x2, int y2, Color color, float width) {
-		BufferedImage bi = getImage().getAsBufferedImage();
+		BufferedImage bi = getImage().getAsBufferedImage(false);
 		Graphics2D g2 = (Graphics2D) bi.getGraphics();
 		
 		g2.setStroke(new BasicStroke(width));

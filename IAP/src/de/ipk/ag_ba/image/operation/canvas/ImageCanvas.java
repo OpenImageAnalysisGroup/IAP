@@ -249,7 +249,7 @@ public class ImageCanvas {
 	
 	public Graphics getGraphics() {
 		if (buf == null)
-			buf = image.getAsBufferedImage();
+			buf = image.getAsBufferedImage(true);
 		return buf.getGraphics();
 	}
 	

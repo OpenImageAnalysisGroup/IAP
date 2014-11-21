@@ -757,7 +757,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						String targetFileExtension = IAPservice.getTargetFileExtension(isIconStorage, sourceFileExtension);
 						if (url != null && sourceFileExtension != null && targetFileExtension != null && !sourceFileExtension.equals(targetFileExtension)) {
 							// convert from PNG to JPG, if needed
-							BufferedImage img = new Image(url).getAsBufferedImage();
+							BufferedImage img = new Image(url).getAsBufferedImage(false);
 							MyByteArrayOutputStream outNewFormat = new MyByteArrayOutputStream();
 							ImageIO.write(img, targetFileExtension.toUpperCase(), outNewFormat);
 							in = new MyByteArrayInputStream(outNewFormat.getBuffTrimmed());

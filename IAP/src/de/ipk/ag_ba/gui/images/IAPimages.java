@@ -15,7 +15,7 @@ public class IAPimages {
 	public static java.awt.Image getImage(String image, int maxSize) {
 		java.awt.Image img = IAPservice.getImage(IAPmain.class, image);
 		Image f = new Image(img);
-		return f.resize(maxSize, maxSize, true).getAsBufferedImage();
+		return f.resize(maxSize, maxSize, true).getAsBufferedImage(true);
 	}
 	
 	public static Image getImageIAP(String image, int maxSize) {

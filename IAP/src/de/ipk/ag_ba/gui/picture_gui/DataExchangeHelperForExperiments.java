@@ -391,7 +391,7 @@ public class DataExchangeHelperForExperiments {
 						previewLoadAndConstructNeeded = true;
 					}
 				} else {
-					previewImage = new ImageIcon(MyImageIcon.loadingIcon.getAsBufferedImage());
+					previewImage = new ImageIcon(MyImageIcon.loadingIcon.getAsBufferedImage(true));
 					previewLoadAndConstructNeeded = true;
 				}
 				final DataSetFileButton imageButton = new DataSetFileButton(
