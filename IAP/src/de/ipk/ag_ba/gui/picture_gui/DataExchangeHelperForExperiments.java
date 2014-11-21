@@ -316,7 +316,7 @@ public class DataExchangeHelperForExperiments {
 			Map<String, Object> properties = new HashMap<String, Object>();
 			mt.getTargetEntity().fillAttributeMap(properties);
 			
-			if (primary != null)
+			if (primary != null && primary.getFileNameLabel() != null)
 				bbb.add(new BinaryFileInfo(primary.getFileNameLabel(), primary.getFileNameLabel(), false, mt.getTargetEntity()));
 			
 			search: for (Entry<String, Object> e : properties.entrySet()) {
