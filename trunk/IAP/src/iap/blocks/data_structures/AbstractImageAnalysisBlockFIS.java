@@ -471,7 +471,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 						brs.clearStoredPostprocessors();
 					}
 					
-					ic.setImage(processingResultImage.getAsBufferedImage());
+					ic.setImage(processingResultImage.getAsBufferedImage(true));
 					jsp.setViewportView(ic);
 					jsp.revalidate();
 					jsp.getVerticalScrollBar().setValue(vs);

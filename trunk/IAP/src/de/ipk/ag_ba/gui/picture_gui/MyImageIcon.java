@@ -78,7 +78,7 @@ public class MyImageIcon extends ImageIcon {
 						.resize(DataSetFileButton.ICON_HEIGHT, DataSetFileButton.ICON_HEIGHT, true)
 						.io().replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint)
 						.getImage()
-						.getAsBufferedImage();
+						.getAsBufferedImage(true);
 			}
 			if (i == null || width != 128) {
 				BackgroundThreadDispatcher.addTask(new Runnable() {
@@ -88,7 +88,7 @@ public class MyImageIcon extends ImageIcon {
 						BufferedImage i;
 						try {
 							i = new de.ipk.ag_ba.image.structures.Image(fileURLmain).resize(DataSetFileButton.ICON_HEIGHT, DataSetFileButton.ICON_HEIGHT, true)
-									.getAsBufferedImage();
+									.getAsBufferedImage(true);
 							setImage(i);
 							observer.repaint();
 						} catch (Exception e) {

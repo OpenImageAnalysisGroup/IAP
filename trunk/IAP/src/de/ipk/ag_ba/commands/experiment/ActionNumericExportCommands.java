@@ -6,7 +6,6 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
-import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportTar;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.settings.ActionToggle;
@@ -49,14 +48,19 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 		exportIndividualAngles.setBval(0, false);
 		
 		ThreadSafeOptions exportIndividualReplicates = new ThreadSafeOptions();
-		exportIndividualReplicates.setBval(0, false);
+		exportIndividualReplicates.setBval(0, true);
 		
 		ThreadSafeOptions exportImages = new ThreadSafeOptions();
 		exportImages.setBval(0, false);
 		
-		res.add(new NavigationButton(new ActionDataExportZIP(experiment), guiSetting));
-		res.add(new NavigationButton(new ActionDataExportTar(experiment), guiSetting));
+		res.add(new NavigationButton(new ActionDataExportZIP(experiment, exportImages), guiSetting));
 		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
+		
+		res.add(new NavigationButton(
+				new ActionToggle("Enable/disable export of images",
+						"<html>"
+								+ "<center>Export of<br>&#8592; JPG images &#8594;", exportImages),
+				guiSetting));
 		
 		res.add(new NavigationButton(
 				new ActionToggle("Enable/disable export of data for individual camera view angles",
@@ -68,13 +72,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 				new ActionToggle("Enable/disable export of data for replicates",
 						"<html>"
 								+ "<center>Export individual<br>"
-								+ "replicate data &#8594;", exportIndividualReplicates),
-				guiSetting));
-		
-		res.add(new NavigationButton(
-				new ActionToggle("Enable/disable export of images",
-						"<html>"
-								+ "<center>Export of<br>JPG images &#8594;", exportImages),
+								+ "replicate/well data &#8594;", exportIndividualReplicates),
 				guiSetting));
 		
 		res.add(new NavigationButton(

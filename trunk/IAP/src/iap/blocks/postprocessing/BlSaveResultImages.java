@@ -95,7 +95,7 @@ public class BlSaveResultImages extends AbstractBlock {
 					.text(5, 45, id.getParentSample().getSampleTime(), Color.YELLOW)
 					.text(5, 60, "IAP V" + ReleaseInfo.IAP_VERSION_STRING, Color.ORANGE)
 					.getImage();
-			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage());
+			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage(true));
 			// loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 			return saveImageAndUpdateURL(ct, cp, loadedImage, optionsAndResults.databaseTarget, false, tray);
 		} else

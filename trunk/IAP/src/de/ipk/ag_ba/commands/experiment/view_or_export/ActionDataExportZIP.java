@@ -34,6 +34,7 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -59,14 +60,16 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 	private int files;
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
+	private ThreadSafeOptions jpg;
 	
 	public ActionDataExportZIP(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionDataExportZIP(ExperimentReference experimentReference) {
+	public ActionDataExportZIP(ExperimentReference experimentReference, ThreadSafeOptions jpg) {
 		this("Create ZIP file");
 		this.er = experimentReference;
+		this.jpg = jpg;
 	}
 	
 	@Override
@@ -85,7 +88,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 	public String getDefaultTitle() {
 		return "<html><cener>"
 				+ "Create ZIP file<br>"
-				+ "<small><font color='gray'>(image export)</font></small>";
+				+ "<small><font color='gray'>(" + (jpg.getBval(0, false) ? "JPG " : "") + "image export)</font></small>";
 	}
 	
 	@Override
@@ -247,29 +250,40 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 								
 								status.setCurrentStatusValueFine(100d * (idx++) / files);
 								
-								final String zefn;
+								final String zefnSRC;
 								final ImageData id = (ImageData) bm;
 								try {
 									if (bm instanceof ImageData) {
-										zefn = getImageFileExportNameForZIPexport(gc, id);
+										zefnSRC = getImageFileExportNameForZIPexport(gc, id);
 										
 									} else {
-										zefn = bm.getURL().getFileName();
+										zefnSRC = bm.getURL().getFileName();
 									}
 									// bm.getURL().getFileName();
 									
-									final MyByteArrayInputStream in = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
+									MyByteArrayInputStream inSRC = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
 									
-									if (in != null) {
+									if (inSRC != null) {
 										while (written.getInt() > 0)
 											Thread.sleep(5);
 										written.addInt(1);
 										es.submit(new Runnable() {
 											@Override
 											public void run() {
+												MyByteArrayInputStream in = inSRC;
+												String zefn = zefnSRC;
+												boolean closed = false;
 												synchronized (out) {
 													try {
 														if (in.getCount() > 0) {
+															if (jpg.getBval(0, false)) {
+																String ext = bm.getURL().getFileNameExtension().toLowerCase();
+																if (!ext.endsWith("jpg") && !ext.endsWith("jpeg")) {
+																	in = new Image(in).getAsJPGstream();
+																	closed = true;
+																	zefn = StringManipulationTools.removeFileExtension(zefn) + ".jpg";
+																}
+															}
 															ZipArchiveEntry entry = new ZipArchiveEntry(zefn);
 															entry.setSize(in.getCount());
 															entry.setCrc(in.getCRC32());
@@ -290,19 +304,17 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 														System.out.println("ERROR: " + e.getMessage());
 													} finally {
 														written.addInt(-1);
+														if (!closed)
+															try {
+																in.close();
+															} catch (IOException e) {
+																System.out.println("ERROR: " + e.getMessage());
+															}
 													}
 												}
 											}
 										});
 										
-										// int len;
-										// while ((len = in.read(buf)) > 0) {
-										// out.write(buf, 0, len);
-										// written += len;
-										// }
-										// Complete the entry
-										// out.closeEntry();
-										in.close();
 									}
 								} catch (Exception e) {
 									System.out.println("ERROR: " + e.getMessage());

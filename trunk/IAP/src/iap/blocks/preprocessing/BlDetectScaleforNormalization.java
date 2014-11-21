@@ -291,7 +291,7 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 	}
 	
 	private static synchronized void saveImage(String outputPath, String name, String format, Image img) {
-		saveImage(outputPath, name, format, img.getAsBufferedImage());
+		saveImage(outputPath, name, format, img.getAsBufferedImage(name != null && name.toUpperCase().contains("PNG")));
 	}
 	
 	private static synchronized void saveImage(String outputPath, String name, String format, BufferedImage img) {

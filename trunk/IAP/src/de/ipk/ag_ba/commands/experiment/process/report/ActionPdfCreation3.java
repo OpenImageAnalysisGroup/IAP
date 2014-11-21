@@ -1250,7 +1250,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 																		i.saveToFile(off);
 																	} catch (IOException e) {
 																		System.out.println(SystemAnalysis.getCurrentTime()
-																				+ ">WARNING: Could not create image file in output directory: "
+																				+ ">WARNING: Could not create image file: "
 																				+ e.getMessage());
 																	}
 																}

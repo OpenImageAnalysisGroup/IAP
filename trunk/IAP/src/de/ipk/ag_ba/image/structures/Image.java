@@ -359,8 +359,11 @@ public class Image {
 		return Toolkit.getDefaultToolkit().createImage(ip);
 	}
 	
-	public BufferedImage getAsBufferedImage() {
-		return toBufferedImage(makeColorTransparent(image.getBufferedImage()));
+	public BufferedImage getAsBufferedImage(boolean forPNGwithTransparency) {
+		if (forPNGwithTransparency)
+			return toBufferedImage(makeColorTransparent(image.getBufferedImage()));
+		else
+			return io().copy().replaceColor(ImageOperation.BACKGROUND_COLORint, java.awt.Color.WHITE.getRGB()).getAsBufferedImage();
 	}
 	
 	public static BufferedImage toBufferedImage(java.awt.Image img)
@@ -575,13 +578,13 @@ public class Image {
 	
 	public MyByteArrayInputStream getAsPNGstream() throws IOException {
 		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
-		ImageIO.write(getAsBufferedImage(), "PNG", output);
+		ImageIO.write(getAsBufferedImage(true), "PNG", output);
 		return new MyByteArrayInputStream(output.getBuffTrimmed());
 	}
 	
 	public MyByteArrayInputStream getAsJPGstream() throws IOException {
 		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
-		ImageIO.write(getAsBufferedImage(), "JPG", output);
+		ImageIO.write(getAsBufferedImage(false), "JPG", output);
 		return new MyByteArrayInputStream(output.getBuffTrimmed());
 	}
 	
