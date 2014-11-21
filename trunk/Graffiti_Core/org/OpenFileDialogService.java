@@ -21,7 +21,7 @@ public class OpenFileDialogService implements HelperClass {
 	private static JFileChooser openDialog = null;
 	
 	public static File getFile(final String[] valid_extensions, final String description) {
-		if (!SystemOptions.getInstance().getBoolean("IAP", "FX/Use FX File Choosers", USE_FX_BY_DEFAULT))
+		if (!SystemOptions.getInstance().getBoolean("IAP", "FX//Use FX File Choosers", USE_FX_BY_DEFAULT))
 			return OpenFileDialogServiceSwing.getFile(valid_extensions, description);
 		
 		if (openDialog == null) {
