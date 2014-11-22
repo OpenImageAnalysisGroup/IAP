@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import org.SystemAnalysis;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -220,6 +221,8 @@ public class ImageProcessorOptionsAndResults {
 	}
 	
 	private String getSettingName(ImageAnalysisBlock block, String title) {
+		if (title != null && title.contains(","))
+			System.err.println(SystemAnalysis.getCurrentTime() + ">WARNING: INVALID SETTINGS NAME (CONTAINS ',')!");
 		return block != null ?
 				block.getClass().getCanonicalName() + "//" + title :
 				title;

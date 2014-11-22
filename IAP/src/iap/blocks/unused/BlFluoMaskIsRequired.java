@@ -20,7 +20,7 @@ public class BlFluoMaskIsRequired extends AbstractBlock {
 	@Override
 	protected void prepare() {
 		super.prepare();
-		this.enabled = getBoolean("Set VIS, NIR, IR to NULL if no FLUO is found", true);
+		this.enabled = getBoolean("Set other images to NULL if no FLUO is found", true);
 		this.fluoAvailable = input().masks().fluo() != null;
 	}
 	
