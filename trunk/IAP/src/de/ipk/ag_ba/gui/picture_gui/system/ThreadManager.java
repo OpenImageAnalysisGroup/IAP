@@ -82,7 +82,7 @@ public class ThreadManager {
 						tsoStopRequestCount.setInt(tooMany);
 					} else
 						tsoStopRequestCount.setInt(0);
-					while (getRunningCount() < maxCnt) {
+					while (tsoStopRequestCount.getInt() <= 0 && getRunningCount() < maxCnt) {
 						// start new executor threads
 						int idx = 0;
 						ArrayList<RunnerThread> toBeStarted = new ArrayList<>();

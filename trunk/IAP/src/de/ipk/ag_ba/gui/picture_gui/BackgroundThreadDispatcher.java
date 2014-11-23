@@ -260,7 +260,12 @@ public class BackgroundThreadDispatcher {
 		return ThreadManager.getInstance().getNumberOfRunningBackgroundTasks();
 	}
 	
+	@Deprecated
 	public static void process(IntStream range, final IntConsumer task, final UncaughtExceptionHandler handler) {
+		process("Process int range thread", range, task, handler);
+	}
+	
+	public static void process(String desc, IntStream range, final IntConsumer task, final UncaughtExceptionHandler handler) {
 		LinkedList<LocalComputeJob> work = new LinkedList<>();
 		int threads = SystemAnalysis.getNumberOfCPUs();
 		if (threads < 1)
@@ -278,7 +283,7 @@ public class BackgroundThreadDispatcher {
 						if (v != null)
 							task.accept(v);
 					} while (v != null);
-				}, "Process Int Range Thread " + thread));
+				}, desc + " " + thread));
 			} catch (Exception e) {
 				handler.uncaughtException(Thread.currentThread(), e);
 			}

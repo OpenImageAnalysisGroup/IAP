@@ -1180,6 +1180,9 @@ public class ImageOperation implements MemoryHogInterface {
 		if (radius < 0.001)
 			return this;
 		
+		if (true)
+			return ImageOperationAlt.gaussianBlur(this, radius);
+		
 		Prefs.setThreads(1);
 		GaussianBlur gb = new GaussianBlur();
 		gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
@@ -1986,7 +1989,7 @@ public class ImageOperation implements MemoryHogInterface {
 		final ColorSpaceConverter convert = new ColorSpaceConverter(SystemOptions.getInstance().getStringRadioSelection("IAP", "Color Management//White Point",
 				ColorSpaceConverter.getWhitePointList(), ColorSpaceConverter.getDefaultWhitePoint(), true));
 		
-		BackgroundThreadDispatcher.process(IntStream.range(0, 256), (int red) -> {
+		BackgroundThreadDispatcher.process("Construct Lab cube", IntStream.range(0, 256), (int red) -> {
 			float[] p;
 			for (int green = 0; green < 256; green++) {
 				p = result[red][green];
