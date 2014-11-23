@@ -95,8 +95,6 @@ public class BlockPipeline {
 	
 	private static ThreadSafeOptions pipelineID = new ThreadSafeOptions();
 	
-	private static long lastOutput = 0;
-	
 	public void execute(final OptionsGenerator og,
 			final HashMap<String, BlockResultSet> blockResults,
 			final BackgroundTaskStatusProviderSupportingExternalCall status)
@@ -290,17 +288,10 @@ public class BlockPipeline {
 		}
 		int ndiv = 20;
 		if (pipelineExecutionsWithinCurrentHour % ndiv == 0) {
-			String s5performance = "";
-			long now = System.currentTimeMillis();
-			if (lastOutput > 0) {
-				s5performance = ""
-						+ (now - lastOutput) + " ms, ";
-			}
 			double mu = 100d * SystemAnalysis.getUsedMemoryInMB() / SystemAnalysis
 					.getMemoryMB();
 			String ss = (pipelineExecutionsWithinCurrentHour > 0 ? "" : "") + SystemAnalysis.lineSeparator + SystemAnalysis.getCurrentTime()
 					+ ">INFO: "
-					// + s5performance
 					+ pipelineExecutionsWithinCurrentHour
 					+ " p.e., "
 					+ blockExecutionWithinLastMinute
@@ -319,7 +310,6 @@ public class BlockPipeline {
 							+ StringManipulationTools.getString(mu / 10, (mu > 80 ? "!" : "#"))
 							+ StringManipulationTools.getString(10 - mu / 10 - 1, "-")
 							+ " || ");
-			lastOutput = now;
 		}
 		if (pipelineExecutionsWithinCurrentHour / ndiv % (100 / ndiv) == 0)
 			System.out.print("-");
