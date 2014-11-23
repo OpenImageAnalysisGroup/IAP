@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
 import org.ErrorMsg;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 
@@ -20,30 +21,28 @@ public class RunnerThread extends Thread {
 	private final int index;
 	private final StopWatch sw;
 	private String currentTaskName = null;
-	private int runtimeErrorCount = 0;
+	private long runtimeErrorCount = 0;
 	private final StopWatch swCurrentTask;
+	private long runtimeExecCount = 0;
+	private final ThreadSafeOptions tsoStopRequestCount;
 	
-	public RunnerThread(LinkedList<LocalComputeJob> jobs, Semaphore jobModification, int index) {
+	public RunnerThread(LinkedList<LocalComputeJob> jobs, Semaphore jobModification, int index, ThreadSafeOptions tsoStopRequestCount) {
 		this.jobs = jobs;
 		this.jobModification = jobModification;
 		this.index = index;
+		this.tsoStopRequestCount = tsoStopRequestCount;
 		this.sw = new StopWatch("Runner Thread " + index, false);
 		this.swCurrentTask = new StopWatch(null, false);
 	}
 	
 	@Override
 	public void run() {
-		int emptyCount = 0;
 		do {
 			LocalComputeJob nextTask = null;
 			jobModification.acquireUninterruptibly();
 			if (jobs.isEmpty()) {
-				emptyCount++;
-				if (emptyCount > 200)
-					pleaseStop = true;
+				pleaseStop = true;
 			} else {
-				emptyCount = 0;
-				pleaseStopAsked = 0;
 				nextTask = jobs.removeLast();
 			}
 			jobModification.release();
@@ -55,26 +54,17 @@ public class RunnerThread extends Thread {
 					swCurrentTask.reset();
 					currentTaskName = nextTask.getName();
 					nextTask.run();
+					runtimeExecCount++;
 					swCurrentTask.stop();
 				}
 			} catch (Exception e) {
 				runtimeErrorCount++;
 				ErrorMsg.addErrorMessage(e);
 			}
-		} while (!stopRequested());
+		} while (!pleaseStop && tsoStopRequestCount.getInt() <= 0);
+		if (tsoStopRequestCount.getInt() > 0)
+			tsoStopRequestCount.addInt(-1);
 		sw.stop();
-	}
-	
-	int pleaseStopAsked = 0;
-	
-	public void pleaseStop() {
-		pleaseStopAsked++;
-		if (pleaseStopAsked > 500)
-			this.pleaseStop = true;
-	}
-	
-	public boolean stopRequested() {
-		return pleaseStop;
 	}
 	
 	public int getIndex() {
@@ -89,7 +79,7 @@ public class RunnerThread extends Thread {
 		return currentTaskName;
 	}
 	
-	public int getTaskExceptionCount() {
+	public long getTaskExceptionCount() {
 		return runtimeErrorCount;
 	}
 	
@@ -100,4 +90,7 @@ public class RunnerThread extends Thread {
 			return null;
 	}
 	
+	public long getTaskRuntimeCount() {
+		return runtimeExecCount;
+	}
 }
