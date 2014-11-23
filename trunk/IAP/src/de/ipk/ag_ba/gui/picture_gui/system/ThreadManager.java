@@ -24,6 +24,8 @@ public class ThreadManager {
 	private final LinkedList<LocalComputeJob> jobs = new LinkedList<LocalComputeJob>();
 	private final Semaphore jobModification = new Semaphore(1, true);
 	
+	private final ThreadSafeOptions tsoStopRequestCount = new ThreadSafeOptions();
+	
 	private final ThreadSafeOptions runningTasks = new ThreadSafeOptions();
 	
 	private ThreadManager() {
@@ -57,14 +59,16 @@ public class ThreadManager {
 					boolean checkForIdle = SystemOptions.getInstance().getBoolean("SYSTEM", "Detect Idle Tasks", true);
 					if (checkForIdle) {
 						for (RunnerThread t : threadArray) {
-							if (t != null && (t.getState() == Thread.State.BLOCKED ||
+							if (t == null)
+								continue;
+							Long tu = t.getTaskUptime();
+							if (tu != null && tu < 5000)
+								continue;
+							if ((t.getState() == Thread.State.BLOCKED ||
 									t.getState() == Thread.State.WAITING ||
-									t.getState() == Thread.State.TIMED_WAITING)) {
+							t.getState() == Thread.State.TIMED_WAITING)) {
 								idleTasks++;
-								// System.out.println("State=" + t.getState());
 							}
-							if (t != null && t.stopRequested())
-								idleTasks--;
 						}
 					}
 					if (idleTasks > 0)
@@ -75,40 +79,31 @@ public class ThreadManager {
 					if (getRunningCount() > maxCnt) {
 						// ask threads to stop execution
 						int tooMany = getRunningCount() - maxCnt;
-						int askedToStop = 0;
-						if (tooMany > 0) {
-							for (int idx = threadArray.length - 1; idx >= 0; idx--) {
-								if (started[idx]) {
-									threadArray[idx].pleaseStop();
-									askedToStop++;
-								}
-								if (askedToStop >= tooMany)
-									break;
-							}
-						}
+						tsoStopRequestCount.setInt(tooMany);
 					} else
-						while (getRunningCount() < maxCnt) {
-							// start new executor threads
-							int idx = 0;
-							ArrayList<RunnerThread> toBeStarted = new ArrayList<>();
-							for (boolean s : started) {
-								if (!s) {
-									threadArray[idx] = new RunnerThread(jobs, jobModification, idx);
-									started[idx] = true;
-									threadArray[idx].setDaemon(false);
-									threadArray[idx].setName("Background Thread " + (idx + 1));
-									toBeStarted.add(threadArray[idx]);
-								}
-								idx++;
-								if (getRunningCount() + toBeStarted.size() >= maxCnt)
-									break;
+						tsoStopRequestCount.setInt(0);
+					while (getRunningCount() < maxCnt) {
+						// start new executor threads
+						int idx = 0;
+						ArrayList<RunnerThread> toBeStarted = new ArrayList<>();
+						for (boolean s : started) {
+							if (!s) {
+								threadArray[idx] = new RunnerThread(jobs, jobModification, idx, tsoStopRequestCount);
+								started[idx] = true;
+								threadArray[idx].setDaemon(false);
+								threadArray[idx].setName("Background Thread " + (idx + 1));
+								toBeStarted.add(threadArray[idx]);
 							}
-							for (RunnerThread tbs : toBeStarted)
-								tbs.start();
+							idx++;
+							if (getRunningCount() + toBeStarted.size() >= maxCnt)
+								break;
 						}
+						for (RunnerThread tbs : toBeStarted)
+							tbs.start();
+					}
 				}
 				for (int idx = 0; idx < threadArray.length; idx++) {
-					if (started[idx] && threadArray[idx].stopRequested() && !threadArray[idx].isAlive()) {
+					if (started[idx] && !threadArray[idx].isAlive()) {
 						threadArray[idx] = null;
 						started[idx] = false;
 					}
@@ -151,10 +146,6 @@ public class ThreadManager {
 				}
 				if (nn < 0)
 					nn = 0;
-				// System.out
-				// .println(SystemAnalysis.getCurrentTime()
-				// + ">SERIAL SNAPSHOT ANALYSIS... (max concurrent thread count: "
-				// + nn + ")");
 				return nn;
 			}
 			
@@ -265,5 +256,9 @@ public class ThreadManager {
 		for (RunnerThread t : threadArray)
 			res.add(t);
 		return res;
+	}
+	
+	public int getTooMany() {
+		return tsoStopRequestCount.getInt();
 	}
 }

@@ -38,6 +38,7 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 			@Override
 			public void update() {
 				Collection<RunnerThread> jobs = ThreadManager.getInstance().getRunningTasks();
+				int nTooMany = ThreadManager.getInstance().getTooMany();
 				if (jobs.isEmpty()) {
 					setText("<html><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>No Background-Task active</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>");
 				} else {
@@ -48,10 +49,10 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 							+ "<th bgcolor='#DDDDDD'>No.</th>"
 							+ "<th bgcolor='#DDDDDD'>Thread State</th>"
 							+ "<th bgcolor='#DDDDDD'>Thread Uptime</th>"
-							+ "<th bgcolor='#DDDDDD'>Stop Requested?</th>"
 							+ "<th bgcolor='#DDDDDD'>Current Task</th>"
 							+ "<th bgcolor='#DDDDDD'>Task Runtime</th>"
-							+ "<th bgcolor='#DDDDDD'>Task Exceptions</th>"
+							+ "<th bgcolor='#DDDDDD'>Count</th>"
+							+ "<th bgcolor='#DDDDDD'>Errors</th>"
 							+ "</tr>");
 					int n = 0;
 					int nWait = 0, nBlocked = 0, nSleep = 0, nRun = 0, nTerm = 0;
@@ -72,11 +73,10 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 									+ "<td bgcolor='#FFFFFF'>" + (1 + job.getIndex()) + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + st + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + SystemAnalysis.getWaitTime(job.getUptime()) + "</td>"
-									+ "<td bgcolor='#FFFFFF'>" + (job.stopRequested() ? "yes" : "-") + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + (job.getCurrentTaskName() != null ? job.getCurrentTaskName() : "-") + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + SystemAnalysis.getWaitTime(job.getTaskUptime()) + "</td>"
+									+ "<td bgcolor='#FFFFFF'>" + (job.getTaskRuntimeCount() > 0 ? job.getTaskRuntimeCount() + "" : "-") + "</td>"
 									+ "<td bgcolor='#FFFFFF'>" + (job.getTaskExceptionCount() > 0 ? job.getTaskExceptionCount() + "" : "-") + "</td>"
-									
 									+ "</tr>");
 							n++;
 						}
@@ -84,9 +84,10 @@ public class ActionTaskStatistics extends AbstractNavigationAction {
 					if (n == 0)
 						t.append("<tr><td colspan=7 bgcolor='#FFFFFF'><center><br>- No background tasks scheduled -<br><br></center></td></tr>");
 					else
-						t.append("<tr><td colspan=7 bgcolor='#FFFFFF'><center><br>" + nRun + " running, " + nBlocked + " blocked, " + nWait + " waiting, " + nSleep
+						t.append("<tr><td colspan=7 bgcolor='#FFFFFF'><center><br>" + nRun + " threads running, " + nBlocked + " blocked, " + nWait + " waiting, "
+								+ nSleep
 								+ " sleeping, " + nTerm
-								+ " terminated.<br><br></center></td></tr>");
+								+ " terminated, " + nTooMany + " will stop.<br><br></center></td></tr>");
 					
 					t.append("</table>");
 					String txt = t.toString();
