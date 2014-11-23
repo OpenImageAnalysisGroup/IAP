@@ -121,7 +121,8 @@ public class BlockPipeline {
 			status.setCurrentStatusValue(0);
 		boolean quick = true;
 		if (quick) {
-			BackgroundThreadDispatcher.process(IntStream.range(0, executionTrayCount), (currentWell) -> {
+			BackgroundThreadDispatcher.process(executionTrayCount > 1 ? "Analyze well" : "Pipeline execution", IntStream.range(0, executionTrayCount), (
+					currentWell) -> {
 				if (debugValidTrays != null && !debugValidTrays.contains(currentWell))
 					return;
 				ImageProcessorOptionsAndResults options = og.getOptions();

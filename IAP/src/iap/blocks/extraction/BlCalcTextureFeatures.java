@@ -166,7 +166,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			glcmArrays.put(f, new SummaryStatistics());
 		}
 		
-		BackgroundThreadDispatcher.process(IntStream.range(0, w), (int x) -> {
+		BackgroundThreadDispatcher.process("Texture analysis", IntStream.range(0, w), (int x) -> {
 			for (int y = 0; y < h; y++) {
 				
 				if (mappedSkel2d[x][y] == ImageOperation.BACKGROUND_COLORint)
@@ -268,7 +268,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			glcmArrays.put(f, new double[w][h]);
 		}
 		
-		BackgroundThreadDispatcher.process(IntStream.range(0, w), (int x) -> {
+		BackgroundThreadDispatcher.process("Texture analysis for visualization", IntStream.range(0, w), (int x) -> {
 			for (int y = 0; y < h; y++) {
 				
 				if (img2d[x][y] == ImageOperation.BACKGROUND_COLORint)
