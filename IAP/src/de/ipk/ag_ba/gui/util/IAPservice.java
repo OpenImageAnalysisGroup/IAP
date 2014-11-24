@@ -1967,7 +1967,7 @@ public class IAPservice {
 							t = new SimpleDateFormat("HH:mm").format(date);
 						}
 						Color c = SystemOptions.getInstance().getColor("IAP", "Image View//Snapshot Time Text Color", Color.YELLOW, true);
-						if (main && SystemOptions.getInstance().getBoolean("IAP", "Image View//Add Snapshot Time to Timeline", true))
+						if (SystemOptions.getInstance().getBoolean("IAP", "Image View//Add Snapshot Time to Timeline", true))
 							fi = fi.io().canvas().text(10, fi.getHeight() - 10, id.getParentSample().getTimeUnit() + " "
 									+ id.getParentSample().getTime() + " " + t, c, 25).getImage();
 						is.addImage(id.getQualityAnnotation() + "|" + id.getSubstanceName() + "|" + id.getParentSample().getTimeUnit() + " "
