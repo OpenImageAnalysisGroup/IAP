@@ -166,18 +166,19 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			glcmArrays.put(f, new SummaryStatistics());
 		}
 		
-		BackgroundThreadDispatcher.process("Texture analysis", IntStream.range(0, w), (int x) -> {
-			for (int y = 0; y < h; y++) {
-				
-				if (mappedSkel2d[x][y] == ImageOperation.BACKGROUND_COLORint)
-					continue;
-				
-				int masksize = mappedSkel2d[x][y];
-				
-				if (masksize < minDistance)
-					continue;
-				
-				masksize = (masksize * 2) + 1; // double masksize
+		BackgroundThreadDispatcher.stream("Texture analysis").processInts(
+				IntStream.range(0, w), (int x) -> {
+					for (int y = 0; y < h; y++) {
+						
+						if (mappedSkel2d[x][y] == ImageOperation.BACKGROUND_COLORint)
+							continue;
+						
+						int masksize = mappedSkel2d[x][y];
+						
+						if (masksize < minDistance)
+							continue;
+						
+						masksize = (masksize * 2) + 1; // double masksize
 				int halfmask = masksize / 2;
 				int[] mask = new int[masksize * masksize];
 				int[] skelMask = new int[masksize * masksize];
@@ -268,7 +269,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			glcmArrays.put(f, new double[w][h]);
 		}
 		
-		BackgroundThreadDispatcher.process("Texture analysis for visualization", IntStream.range(0, w), (int x) -> {
+		BackgroundThreadDispatcher.stream("Texture analysis for visualization").processInts(IntStream.range(0, w), (int x) -> {
 			for (int y = 0; y < h; y++) {
 				
 				if (img2d[x][y] == ImageOperation.BACKGROUND_COLORint)

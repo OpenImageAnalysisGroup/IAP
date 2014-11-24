@@ -1949,6 +1949,8 @@ public class IAPservice {
 					if (status.wantsToStop())
 						break;
 					status.setCurrentStatusText1("Load image " + (i + 1) + "/" + toBeLoaded.size());
+					status.setCurrentStatusText2("<html><font color='gray'>" + SystemAnalysis.getUsedMemoryInMB() + "/" + SystemAnalysis.getMemoryMB()
+							+ " MB RAM used");
 					ImageData id = toBeLoaded.get(i);
 					Image fi = null;
 					try {

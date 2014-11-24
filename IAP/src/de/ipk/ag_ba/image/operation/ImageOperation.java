@@ -1989,21 +1989,22 @@ public class ImageOperation implements MemoryHogInterface {
 		final ColorSpaceConverter convert = new ColorSpaceConverter(SystemOptions.getInstance().getStringRadioSelection("IAP", "Color Management//White Point",
 				ColorSpaceConverter.getWhitePointList(), ColorSpaceConverter.getDefaultWhitePoint(), true));
 		
-		BackgroundThreadDispatcher.process("Construct Lab cube", IntStream.range(0, 256), (int red) -> {
-			float[] p;
-			for (int green = 0; green < 256; green++) {
-				p = result[red][green];
-				
-				for (int blue = 0; blue < 256; blue++) {
-					double[] lab = convert.RGBtoLAB(red, green, blue);
-					p[blue] = (float) lab[0] * 2.55f;
-					p[blue + 256] = (float) lab[1] + 128f;
-					p[blue + 512] = (float) lab[2] + 128f;
-				}
-			}
-		}, (t, e) -> {
-			ErrorMsg.addErrorMessage(new RuntimeException(e));
-		});
+		BackgroundThreadDispatcher.stream("Construct Lab cube")
+				.processInts(IntStream.range(0, 256), (int red) -> {
+					float[] p;
+					for (int green = 0; green < 256; green++) {
+						p = result[red][green];
+						
+						for (int blue = 0; blue < 256; blue++) {
+							double[] lab = convert.RGBtoLAB(red, green, blue);
+							p[blue] = (float) lab[0] * 2.55f;
+							p[blue + 256] = (float) lab[1] + 128f;
+							p[blue + 512] = (float) lab[2] + 128f;
+						}
+					}
+				}, (t, e) -> {
+					ErrorMsg.addErrorMessage(new RuntimeException(e));
+				});
 		
 		s.printTime();
 		
