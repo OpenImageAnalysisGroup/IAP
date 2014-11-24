@@ -1933,7 +1933,7 @@ public class IAPservice {
 		return removed;
 	}
 	
-	public static void showImages(final ArrayList<ImageData> toBeLoaded) {
+	public static void showImages(final ArrayList<ImageData> toBeLoaded, boolean main, boolean ref, String title) {
 		if (toBeLoaded == null || toBeLoaded.size() == 0)
 			return;
 		final ImageStack is = new ImageStack();
@@ -1944,14 +1944,34 @@ public class IAPservice {
 			@Override
 			public void run() {
 				int err = 0;
+				String lasturl = "";
 				for (int i = 0; i < toBeLoaded.size(); i++) {
+					if (status.wantsToStop())
+						break;
 					status.setCurrentStatusText1("Load image " + (i + 1) + "/" + toBeLoaded.size());
 					ImageData id = toBeLoaded.get(i);
-					Image fi;
+					Image fi = null;
 					try {
-						fi = new Image(id.getURL());
-						is.addImage(id.getQualityAnnotation() + " / " + id.getSubstanceName() + " / " + id.getParentSample().getTimeUnit() + " "
-								+ id.getParentSample().getTime(), fi);
+						if (main)
+							fi = new Image(id.getURL());
+						if (ref) {
+							if (lasturl.equals(id.getLabelURL() + ""))
+								continue;
+							fi = new Image(id.getLabelURL());
+							lasturl = id.getLabelURL() + "";
+						}
+						Long tt = id.getParentSample().getSampleFineTimeOrRowId();
+						String t = "";
+						if (tt != null) {
+							Date date = new Date(tt);
+							t = new SimpleDateFormat("HH:mm").format(date);
+						}
+						Color c = SystemOptions.getInstance().getColor("IAP", "Image View//Snapshot Time Text Color", Color.YELLOW, true);
+						if (main && SystemOptions.getInstance().getBoolean("IAP", "Image View//Add Snapshot Time to Timeline", true))
+							fi = fi.io().canvas().text(10, fi.getHeight() - 10, id.getParentSample().getTimeUnit() + " "
+									+ id.getParentSample().getTime() + " " + t, c, 25).getImage();
+						is.addImage(id.getQualityAnnotation() + "|" + id.getSubstanceName() + "|" + id.getParentSample().getTimeUnit() + " "
+								+ id.getParentSample().getTime() + "|" + id.getRotation(), fi);
 					} catch (Exception e) {
 						e.printStackTrace();
 						err++;
@@ -1967,7 +1987,7 @@ public class IAPservice {
 		Runnable finishSwingTask = new Runnable() {
 			@Override
 			public void run() {
-				is.show("Image Stack");
+				is.show(title);
 			}
 		};
 		

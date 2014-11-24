@@ -54,7 +54,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 	@Override
 	protected synchronized Image processVISmask() {
 		Image vis = input().masks().vis();
-		if (!getBoolean("skeletonize VIS", optionsAndResults.getCameraPosition() == CameraPosition.SIDE))
+		if (!getBoolean("skeletonize VIS", true))
 			return vis;
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		Image res = vis;
@@ -98,7 +98,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 	@Override
 	protected synchronized Image processFLUOmask() {
 		Image vis = input().masks().vis();
-		if (!getBoolean("skeletonize FLUO", optionsAndResults.getCameraPosition() == CameraPosition.SIDE))
+		if (!getBoolean("skeletonize FLUO", true))
 			return input().masks().fluo();
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		if (fluo == null)
