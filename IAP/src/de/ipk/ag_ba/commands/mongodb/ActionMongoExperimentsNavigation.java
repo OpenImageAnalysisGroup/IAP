@@ -134,11 +134,38 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 					String user = IAPoptions.getSetting(IAPoptions.IAPoptionFields.GROUP_BY_COORDINATOR) ? eh.getCoordinator() : eh.getImportusername();
 					if (user == null || user.length() == 0)
 						user = "[no user]";
+					
 					if (eh.inTrash()) {
 						trashed.add(eh);
-						nVis++;
+						if (eh.getHistory() != null) {
+							ArrayList<Long> rem = new ArrayList<Long>();
+							for (Long l : eh.getHistory().keySet()) {
+								rem.add(l);
+								ExperimentHeaderInterface ehh = eh.getHistory().get(l);
+								ehh.clearHistory();
+								trashed.add(ehh);
+								// nVis++;
+							}
+							for (Long l : rem)
+								eh.getHistory().remove(l);
+						}
+						// nVis++;
 						continue;
 					}
+					
+					if (eh.getHistory() != null) {
+						ArrayList<Long> rem = new ArrayList<Long>();
+						for (Long l : eh.getHistory().keySet()) {
+							rem.add(l);
+							ExperimentHeaderInterface ehh = eh.getHistory().get(l);
+							ehh.clearHistory();
+							trashed.add(ehh);
+							// nVis++;
+						}
+						for (Long l : rem)
+							eh.getHistory().remove(l);
+					}
+					
 					if (!experiments.containsKey(type))
 						experiments.put(type, new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
 					if (!experiments.get(type).containsKey(user))
