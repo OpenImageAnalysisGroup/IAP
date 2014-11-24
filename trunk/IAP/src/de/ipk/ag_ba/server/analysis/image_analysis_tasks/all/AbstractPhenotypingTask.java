@@ -346,35 +346,23 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					continue;
 				LocalComputeJob analyze = new LocalComputeJob(
 						() -> {
-							// LinkedList<LocalComputeJob> wait = new LinkedList<LocalComputeJob>();
-						for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
-							if (configAndAngle.startsWith("1st_top"))
-								// wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
-								// @Override
-								// public void run() {
-								processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
-										plantResults, time, configAndAngle);
-							// }
-							// }, "Analyze angle (top) " + configAndAngle));
-						} // for top angle
-							// BackgroundThreadDispatcher.waitFor(wait);
-							// wait.clear();
-						for (final String configAndAngle : imageSetWithSpecificAngle.get(time).keySet()) {
-							if (status.wantsToStop())
-								continue;
+							BackgroundThreadDispatcher.stream("Analyze angles (top)").processSrings(
+									imageSetWithSpecificAngle.get(time).keySet().stream()
+											.filter(s -> s.startsWith("1st_top")),
+									(String configAndAngle) -> {
+										processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
+												plantResults, time, configAndAngle);
+									}, null);
 							
-							if (!configAndAngle.startsWith("1st_top"))
-								// wait.add(BackgroundThreadDispatcher.addTask(new Runnable() {
-								// @Override
-								// public void run() {
-								processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
-										plantResults, time, configAndAngle);
-							// }
-							// }, "Analyze angle (side) " + configAndAngle));
-						} // for side angle
-							// BackgroundThreadDispatcher.waitFor(wait);
-							// wait.clear();
-					}, "Analyze data from " + SystemAnalysis.getCurrentTime(time) + " (" + plantID + ")");
+							BackgroundThreadDispatcher.stream("Analyze angles (side)").processSrings(
+									imageSetWithSpecificAngle.get(time).keySet().stream()
+											.filter(s -> !s.startsWith("1st_top")),
+									(String configAndAngle) -> {
+										processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
+												plantResults, time, configAndAngle);
+									}, null);
+							
+						}, "Analyze data from " + SystemAnalysis.getCurrentTime(time) + " (" + plantID + ")");
 				boolean inTimeOrder = true;
 				if (inTimeOrder)
 					analyze.run();
@@ -398,7 +386,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					addPostprocessingResults(postprocessingResults);
 				}
 			} catch (Exception e) {
-				ErrorMsg.addErrorMessage(e);
+				throw new RuntimeException(e);
 			}
 		}
 		tso.addInt(1);
@@ -439,8 +427,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			ErrorMsg.addErrorMessage(e);
+			throw new RuntimeException(e);
 		}
 		return;
 	}
