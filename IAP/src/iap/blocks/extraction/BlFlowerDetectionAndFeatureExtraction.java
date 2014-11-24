@@ -257,10 +257,10 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			for (Feature p : featureList) {
 				Vector2D direction = (Vector2D) p.getFeature("direction_1");
 				if (direction != null && direction.getX() != 0 && direction.getY() != 0) {
-					ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 3);
+					ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 1);
 					ic.drawLine(new Point((int) (p.getPosition().getX()), (int) (p.getPosition().getY())), new Point((int) (direction.getX()),
 							(int) (direction.getY())),
-							Color.GREEN.getRGB(), 0.0, 2);
+							Color.GREEN.getRGB(), 0.0, 1);
 				}
 			}
 			img = ic.getImage();

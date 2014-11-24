@@ -270,14 +270,15 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 					public Image postProcessMask(Image mask) {
 						ImageCanvas c = mask.io().canvas();
 						if (!isLast) {
-							c = c.drawRectanglePoints(xPos - 4, yPos - 4, 8, 8, colors.get(num), 1);
+							c = c.drawRectanglePoints(xPos - 4, yPos - 4, 1, 1, colors.get(num), 1);
 							if (db)
-								if (angle != null)
+								if (angle != null && false)
 									c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
 											" a: " + angle.intValue(), Color.BLACK);
 								else
-									c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
-											" ", Color.BLACK);
+									if (false)
+										c = c.text(xPos, yPos + 10, "rx: " + xPos_norm + " ry: " + yPos_norm +
+												" ", Color.BLACK);
 						} else {
 							if (direction != null) {
 								Vector2D vv = direction.subtract(new Vector2D(xPos, yPos));
