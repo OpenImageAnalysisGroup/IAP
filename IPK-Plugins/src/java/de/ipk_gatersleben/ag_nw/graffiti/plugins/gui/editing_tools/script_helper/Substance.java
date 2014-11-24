@@ -192,49 +192,18 @@ public class Substance implements SubstanceInterface {
 		}
 	}
 	
-	public static void addAndMergeA(ExperimentInterface result, SubstanceInterface substanceWithNewData, boolean ignoreSnapshotFineTime) {
+	public static void addAndMergeB(ExperimentInterface result, Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample,
+			boolean ignoreSnapshotFineTime) {
 		SubstanceInterface targetSubstance = null;
-		for (ConditionInterface ci : substanceWithNewData) {
-			ConditionInterface targetCondition = null;
-			for (SampleInterface si : ci) {
-				if (targetSubstance == null)
-					synchronized (result) {
-						for (SubstanceInterface m : result)
-							if (substanceWithNewData.equals(m)) {
-								targetSubstance = m;
-								break;
-							}
-					}
-				if (targetSubstance != null) {
-					if (targetCondition == null)
-						synchronized (targetSubstance) {
-							for (ConditionInterface cond : targetSubstance)
-								if (cond.equals(ci)) {
-									targetCondition = cond;
-									break;
-								}
-						}
-				}
-				SampleInterface targetSample = null;
-				if (targetCondition != null) {
-					synchronized (targetCondition) {
-						for (SampleInterface s : targetCondition)
-							if (s.compareTo(si, ignoreSnapshotFineTime) == 0) {
-								targetSample = s;
-								break;
-							}
-					}
-				}
-				addAndMergeB(result, si, ignoreSnapshotFineTime, targetSubstance, targetCondition, targetSample);
-			}
-		}
-	}
-	
-	private static void addAndMergeB(ExperimentInterface result, Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample,
-			boolean ignoreSnapshotFineTime, SubstanceInterface targetSubstance, ConditionInterface targetCondition, SampleInterface targetSample) {
 		SubstanceInterface substanceWithNewData;
 		synchronized (result) {
 			substanceWithNewData = newMeasurementsOfSingleSample.iterator().next().getParentSample().getParentCondition().getParentSubstance();
+			for (SubstanceInterface m : result)
+				if (substanceWithNewData.equals(m)) {
+					targetSubstance = m;
+					break;
+				}
+			
 			if (targetSubstance == null) {
 				// completely new substance with all new data
 				targetSubstance = substanceWithNewData.clone();
@@ -243,12 +212,12 @@ public class Substance implements SubstanceInterface {
 		}
 		processCondition(result, targetSubstance,
 				newMeasurementsOfSingleSample.iterator().next().getParentSample().getParentCondition(),
-				ignoreSnapshotFineTime, true, newMeasurementsOfSingleSample, targetCondition, targetSample);
+				ignoreSnapshotFineTime, true, newMeasurementsOfSingleSample);
 	}
 	
-	// private static void addAndMergeD(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime) {
-	// addAndMergeC(result, newMeasurement, ignoreSnapshotFineTime, false);
-	// }
+	public static void addAndMergeD(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime) {
+		addAndMergeC(result, newMeasurement, ignoreSnapshotFineTime, false);
+	}
 	
 	public static void addAndMergeC(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime,
 			boolean ignoreSubstanceInfo) {
@@ -256,7 +225,7 @@ public class Substance implements SubstanceInterface {
 		SubstanceInterface substanceWithNewData;
 		synchronized (result) {
 			substanceWithNewData = newMeasurement.getParentSample().getParentCondition().getParentSubstance();
-			for (SubstanceInterface m : result) {
+			for (SubstanceInterface m : result)
 				if (ignoreSubstanceInfo) {
 					if (substanceWithNewData.getName().equals(m.getName())) {
 						targetSubstance = m;
@@ -268,7 +237,7 @@ public class Substance implements SubstanceInterface {
 						break;
 					}
 				}
-			}
+			
 			if (targetSubstance == null) {
 				// completely new substance with all new data
 				targetSubstance = substanceWithNewData.clone();
@@ -278,20 +247,35 @@ public class Substance implements SubstanceInterface {
 		processCondition(result, targetSubstance, newMeasurement.getParentSample().getParentCondition(), ignoreSnapshotFineTime, true, newMeasurement);
 	}
 	
+	public static void addAndMergeA(ExperimentInterface result, SubstanceInterface substanceWithNewData, boolean ignoreSnapshotFineTime) {
+		for (ConditionInterface ci : substanceWithNewData)
+			for (SampleInterface si : ci)
+				addAndMergeB(result, si, ignoreSnapshotFineTime);
+	}
+	
 	private static void processCondition(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
 			ConditionInterface condition,
 			boolean ignoreSnapshotFineTime, boolean forSureNewMeasurement,
-			Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample, ConditionInterface targetCondition, SampleInterface targetSample) {
-		if (targetCondition == null) {
-			// completely new substance with all new data
-			targetCondition = condition.clone(targetSubstance);
-			targetSubstance.add(targetCondition);
+			Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample) {
+		ConditionInterface targetCondition = null;
+		synchronized (targetSubstance) {
+			for (ConditionInterface cond : targetSubstance)
+				if (cond.equals(condition)) {
+					targetCondition = cond;
+					break;
+				}
+			
+			if (targetCondition == null) {
+				// completely new substance with all new data
+				targetCondition = condition.clone(targetSubstance);
+				targetSubstance.add(targetCondition);
+			}
 		}
 		processSample(targetExperiment, targetSubstance, targetCondition,
 				newMeasurementsOfSingleSample.iterator().next().getParentSample(),
 				ignoreSnapshotFineTime,
 				forSureNewMeasurement,
-				newMeasurementsOfSingleSample, targetSample);
+				newMeasurementsOfSingleSample);
 	}
 	
 	private static void processCondition(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
@@ -322,8 +306,14 @@ public class Substance implements SubstanceInterface {
 	private static void processSample(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
 			ConditionInterface targetCondition,
 			SampleInterface sample, boolean ignoreSnapshotFineTime, boolean forSureNewMeasurement,
-			Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample, SampleInterface targetSample) {
+			Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample) {
+		SampleInterface targetSample = null;
 		synchronized (targetCondition) {
+			for (SampleInterface s : targetCondition)
+				if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
+					targetSample = s;
+					break;
+				}
 			if (targetSample == null) {
 				// completely new substance with all new data
 				targetSample = sample.clone(targetCondition);
