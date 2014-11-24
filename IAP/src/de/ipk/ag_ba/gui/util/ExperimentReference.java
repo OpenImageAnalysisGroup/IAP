@@ -306,4 +306,9 @@ public class ExperimentReference {
 	public void resetStoredHeader() {
 		this.header = null;
 	}
+	
+	public void setHeader(ExperimentHeaderInterface header) {
+		this.header = header;
+		setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this.getHeader(), m));
+	}
 }
