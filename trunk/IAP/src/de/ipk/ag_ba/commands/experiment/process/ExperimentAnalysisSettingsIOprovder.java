@@ -81,6 +81,8 @@ public class ExperimentAnalysisSettingsIOprovder implements IniIoProvider {
 	@Override
 	public Long lastModified() throws Exception {
 		try {
+			if (header == null || header.getDatabaseId() == null)
+				return null;
 			if (m != null)
 				return m.getExperimentHeaderStorageTime(header);
 			else {
