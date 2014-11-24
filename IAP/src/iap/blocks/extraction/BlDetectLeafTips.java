@@ -216,13 +216,13 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 									
 									for (FirstOrderTextureFeatures tf : FirstOrderTextureFeatures.values()) {
 										getResultSet().setNumericResult(getBlockPosition(),
-												new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip." + c + ".texture." + tf),
+												new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_TEXTURE, "leaftip." + c + ".texture." + tf),
 												it.firstOrderFeatures.get(tf), null, this, imageRef);
 									}
 									
 									for (GLCMTextureFeatures tf : GLCMTextureFeatures.values()) {
 										getResultSet().setNumericResult(getBlockPosition(),
-												new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip." + c + ".texture." + tf),
+												new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_TEXTURE, "leaftip." + c + ".texture." + tf),
 												it.glcmFeatures.get(tf), null, this, imageRef);
 									}
 								}

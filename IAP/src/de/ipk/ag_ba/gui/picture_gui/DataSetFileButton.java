@@ -387,7 +387,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					});
 			
 			JMenuItem debugShowSnapshot = new JMenuItem(
-					"Main, Reference, Annotation (Stack)");
+					"Image, Reference, Annotation (Stack)");
 			
 			debugShowSnapshot.addActionListener(new ActionListener() {
 				@Override
@@ -470,38 +470,52 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			
 			jp.add(debugShowAnnotationImage);
 			
-			JMenuItem stl = new JMenuItem("Show Image Timeline");
-			stl.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Appointment-Soon-64.png").getScaledInstance(16, 16,
+			JMenu snt = new JMenu("Timeline");
+			snt.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Appointment-Soon-64.png").getScaledInstance(16, 16,
 					java.awt.Image.SCALE_SMOOTH)));
-			stl.addActionListener(getListener(targetTreeNode, true,
-					false, false, ImageViewMode.TIMELINE));
-			jp.add(stl);
+			{
+				JMenuItem stl = new JMenuItem("Show Image Timeline");
+				stl.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Appointment-Soon-64.png").getScaledInstance(16, 16,
+						java.awt.Image.SCALE_SMOOTH)));
+				stl.addActionListener(getListener(targetTreeNode, true,
+						false, false, ImageViewMode.TIMELINE));
+				snt.add(stl);
+			}
+			{
+				JMenuItem stl = new JMenuItem("Show Reference Timeline");
+				stl.addActionListener(getListener(targetTreeNode, false,
+						true, false, ImageViewMode.TIMELINE));
+				snt.add(stl);
+			}
+			jp.add(snt);
 			
-			JMenu sn = new JMenu("Show Complete Snapshot Set");
+			JMenu sn = new JMenu("Snapshot");
 			sn.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Photos-64.png").getScaledInstance(16, 16,
 					java.awt.Image.SCALE_SMOOTH)));
-			JMenuItem a = new JMenuItem("Main");
+			JMenuItem a = new JMenuItem("Show Image Set");
+			a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Photos-64.png").getScaledInstance(16, 16,
+					java.awt.Image.SCALE_SMOOTH)));
 			a.addActionListener(getListener(targetTreeNode, true,
 					false, false, ImageViewMode.SHOW));
 			sn.add(a);
-			JMenuItem b = new JMenuItem("Reference");
+			JMenuItem b = new JMenuItem("Reference Images");
 			b.addActionListener(getListener(targetTreeNode, false,
 					true, false, ImageViewMode.SHOW));
 			sn.add(b);
-			JMenuItem c = new JMenuItem("Annotation");
+			JMenuItem c = new JMenuItem("Annotation Images");
 			c.addActionListener(getListener(targetTreeNode, false,
 					false, true, ImageViewMode.SHOW));
 			sn.add(c);
 			
 			JMenuItem debugShowSnapshotNoStack = new JMenuItem(
-					"Main, Reference, Annotation");
+					"Image, Reference, Annotation");
 			debugShowSnapshotNoStack.addActionListener(getListener(
 					targetTreeNode, true, true, true, ImageViewMode.SHOW));
 			sn.add(debugShowSnapshotNoStack);
 			sn.add(debugShowSnapshot);
 			jp.add(sn);
 			
-			JMenu fxCube = new JMenu("Color Analysis (FX Cubes)");
+			JMenu fxCube = new JMenu("Color Analysis");
 			fxCube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
 					java.awt.Image.SCALE_SMOOTH)));
 			{
@@ -528,8 +542,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			{
 				
 				JMenuItem shcube = new JMenuItem("Show 3-D Reference-Difference Histogram Cube");
-				shcube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
-						java.awt.Image.SCALE_SMOOTH)));
 				shcube.addActionListener((ActionEvent ev) -> {
 					IOurl s = imageResult
 							.getBinaryFileInfo()
@@ -1330,13 +1342,16 @@ public class DataSetFileButton extends JButton implements ActionListener {
 					if (match.size() > 0) {
 						ArrayList<ImageData> toBeLoaded = new ArrayList<ImageData>();
 						NumericMeasurementInterface a = match.iterator().next();
-						String pre = "snapshot "
-								+ a.getQualityAnnotation()
-								+ " "
-								+ a.getParentSample().getSampleTime()
-								+ " "
-								+ a.getParentSample().getParentCondition()
-										.getConditionName();
+						String pre =
+								a.getQualityAnnotation()
+										+ " | "
+										+ a.getParentSample().getSampleTime()
+										+ " | deg "
+										+ ((ImageData) a).getPosition()
+										+ " | "
+										+ a.getParentSample().getParentCondition()
+												.getConditionName();
+						
 						String desiredCamera = ((ImageData) imageResult.getBinaryFileInfo().getEntity()).getParentSample().getParentCondition().getParentSubstance()
 								.getName();
 						if (main) {
@@ -1362,7 +1377,6 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							}
 						}
 						if (ref) {
-							ImageStack is = new ImageStack();
 							for (NumericMeasurementInterface nmi : match) {
 								if (viewMode == ImageViewMode.TIMELINE
 										&& !desiredCamera.equals(nmi.getParentSample().getParentCondition().getParentSubstance().getName()))
@@ -1370,22 +1384,19 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								if (nmi instanceof ImageData) {
 									ImageData id = (ImageData) nmi;
 									if (id.getLabelURL() != null) {
-										Image fi = new Image(
-												id.getLabelURL());
 										if (viewMode == ImageViewMode.TIMELINE)
-											is.addImage(id.getQualityAnnotation() + " / " + id.getSubstanceName() + " / " + id.getParentSample().getTimeUnit() + " "
-													+ id.getParentSample().getTime(), fi);
+											toBeLoaded.add(id);
 										else {
+											Image fi = new Image(
+													id.getLabelURL());
 											if (viewMode == ImageViewMode.HISTOGRAM)
 												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
 											else
-												fi.show("Reference " + id.getSubstanceName() + " // " + pre);
+												fi.show("Ref " + id.getSubstanceName() + " // " + pre);
 										}
 									}
 								}
 							}
-							if (viewMode == ImageViewMode.TIMELINE)
-								is.show("Reference " + pre);
 						}
 						if (anno) {
 							ImageStack is = new ImageStack();
@@ -1415,7 +1426,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 								is.show("Annotation " + pre);
 						}
 						if (toBeLoaded.size() > 0) {
-							IAPservice.showImages(toBeLoaded);
+							IAPservice.showImages(toBeLoaded, main, ref, (ref ? "Ref // " : "Img // ") + pre);
 						}
 					}
 				} catch (Exception err) {
