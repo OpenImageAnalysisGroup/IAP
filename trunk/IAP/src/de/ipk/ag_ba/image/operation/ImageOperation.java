@@ -871,9 +871,9 @@ public class ImageOperation implements MemoryHogInterface {
 			gf = ((c & 0x00ff00) >> 8);
 			bf = (c & 0x0000ff);
 			
-			rf = (float) (Math.pow((rf / 255), gamma));
-			gf = (float) (Math.pow((gf / 255), gamma));
-			bf = (float) (Math.pow((bf / 255), gamma));
+			rf = (float) (Math.pow((rf / 255d), 1d / gamma));
+			gf = (float) (Math.pow((gf / 255d), 1d / gamma));
+			bf = (float) (Math.pow((bf / 255d), 1d / gamma));
 			
 			result[idx++] = new Color(rf, gf, bf).getRGB();
 		}
