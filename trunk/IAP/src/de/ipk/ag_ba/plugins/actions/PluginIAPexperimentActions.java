@@ -42,6 +42,8 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		
 		final ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
 		ThreadSafeOptions tsoQuality = new ThreadSafeOptions();
+		tsoQuality.setInt(100); // no size reduction, 100%
+		
 		ThreadSafeOptions exportJPGs = new ThreadSafeOptions();
 		exportJPGs.setBval(0, false);
 		actions.add(new ActionNumericExportCommands(
