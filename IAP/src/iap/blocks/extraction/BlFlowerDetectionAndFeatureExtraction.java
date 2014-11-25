@@ -273,6 +273,8 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower.count"), featureList.size(), "flower", this, imageRef);
 			
 			// save x and y position
+			double avg_angle = 0d;
+			double avg_y_pos = 0d;
 			int num = 1;
 			for (Feature p : featureList) {
 				getResultSet().setNumericResult(getBlockPosition(),
@@ -285,17 +287,37 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 				
 				// save direction_1
 				Vector2D dir = (Vector2D) p.getFeature("direction_1");
+				double angle_norm = dir.getNorm();
+				double angle = dir.angle(dir, new Vector2D(0.0, 1.0));
+				
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".length"),
-						(int) dir.getNorm(), "flower", this, imageRef);
+						angle_norm, "flower", this, imageRef);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".angle"),
-						dir.angle(dir, new Vector2D(0.0, 1.0)), "flower", this, imageRef);
+						angle, "flower", this, imageRef);
 				
+				// calc min distance
+				double min_dist = getMinDist(p.getPosition().getX(), p.getPosition().getY(), featureList);
+				
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".mindist"),
+						min_dist, "flower", this, imageRef);
+				
+				avg_angle += angle;
+				avg_y_pos += p.getPosition().getY();
 				num++;
 			}
 			
+			// save averages
+			double am = (avg_angle / num);
+			getResultSet().setNumericResult(getBlockPosition(),
+					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + "angle.mean"),
+					am, "flower", this, imageRef);
+			getResultSet().setNumericResult(getBlockPosition(),
+					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + "position.y.mean"),
+					avg_y_pos / num, "flower", this, imageRef);
 		}
 		
 		if (saveResultObject) {
@@ -305,6 +327,20 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		}
 		
 		return img;
+	}
+	
+	private double getMinDist(double x, double y, LinkedList<Feature> featureList) {
+		double min_dist = Double.MAX_VALUE;
+		for (Feature f : featureList) {
+			double tempx = f.getPosition().getX();
+			double tempy = f.getPosition().getY();
+			if (tempx == x && tempy == y)
+				continue;
+			double dist = Math.sqrt(((tempx - x) * (tempx - x)) + ((tempy - y) * (tempy - y)));
+			if (dist < min_dist)
+				min_dist = dist;
+		}
+		return min_dist;
 	}
 	
 	@Override
