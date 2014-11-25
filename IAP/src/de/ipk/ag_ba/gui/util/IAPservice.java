@@ -506,7 +506,7 @@ public class IAPservice {
 			if (md instanceof ImageData) {
 				ImageData id = (ImageData) md;
 				if (url.equals(id.getURL())) {
-					String key = id.getParentSample().getFullId(!ignoreTime) + ";" + id.getReplicateID() + ";" + id.getPosition();
+					String key = id.getParentSample().getFullId(!ignoreTime) + ";" + id.getReplicateID() + ";" + id.getPosition() + ";" + id.getQualityAnnotation();
 					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
 					if (name.contains("."))
 						if (LTdataExchange.positionFirst)
@@ -522,7 +522,7 @@ public class IAPservice {
 			for (NumericMeasurementInterface md : ml) {
 				if (md instanceof ImageData) {
 					ImageData id = (ImageData) md;
-					String key = id.getParentSample().getFullId(!ignoreTime) + ";" + id.getReplicateID() + ";" + id.getPosition();
+					String key = id.getParentSample().getFullId(!ignoreTime) + ";" + id.getReplicateID() + ";" + id.getPosition() + ";" + id.getQualityAnnotation();
 					String name = id.getParentSample().getParentCondition().getParentSubstance().getName();
 					if (name.contains("."))
 						if (LTdataExchange.positionFirst)
