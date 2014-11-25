@@ -34,6 +34,7 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -267,7 +268,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 									// bm.getURL().getFileName();
 									
 									MyByteArrayInputStream inSRC = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
-									
+									final SubstanceInterface suf = su;
 									if (inSRC != null) {
 										while (written.getInt() > 0)
 											Thread.sleep(5);
@@ -281,13 +282,26 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 												synchronized (out) {
 													try {
 														if (in.getCount() > 0) {
+															
 															if (jpg.getBval(0, false)) {
 																String ext = bm.getURL().getFileNameExtension().toLowerCase();
 																if (!ext.endsWith("jpg") && !ext.endsWith("jpeg")) {
-																	in = new Image(in).getAsJPGstream((float) tsoQuality.getDouble());
+																	Image img = new Image(in);
+																	int ss = tsoQuality.getInt();
+																	CameraType ct = CameraType.fromString(suf.getName());
+																	if (ss > 0 && ss < 100 && ct != CameraType.NIR && ct != CameraType.IR)
+																		img = img.resize(img.getWidth() * ss / 100, img.getHeight() * ss / 100);
+																	in = img.getAsJPGstream((float) tsoQuality.getDouble());
 																	closed = true;
 																	zefn = StringManipulationTools.removeFileExtension(zefn) + ".jpg";
 																}
+															} else {
+																Image img = new Image(in);
+																int ss = tsoQuality.getInt();
+																CameraType ct = CameraType.fromString(suf.getName());
+																if (ss > 0 && ss < 100 && ct != CameraType.NIR && ct != CameraType.IR)
+																	img = img.resize(img.getWidth() * ss / 100, img.getHeight() * ss / 100);
+																in = img.getAsPNGstream();
 															}
 															ZipArchiveEntry entry = new ZipArchiveEntry(zefn);
 															entry.setSize(in.getCount());
