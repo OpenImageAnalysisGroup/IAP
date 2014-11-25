@@ -61,15 +61,17 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
 	private String errorMessage;
 	private ThreadSafeOptions jpg;
+	private ThreadSafeOptions tsoQuality;
 	
 	public ActionDataExportZIP(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionDataExportZIP(ExperimentReference experimentReference, ThreadSafeOptions jpg) {
+	public ActionDataExportZIP(ExperimentReference experimentReference, ThreadSafeOptions jpg, ThreadSafeOptions tsoQuality) {
 		this("Create ZIP file");
 		this.er = experimentReference;
 		this.jpg = jpg;
+		this.tsoQuality = tsoQuality;
 	}
 	
 	@Override
@@ -88,7 +90,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 	public String getDefaultTitle() {
 		return "<html><cener>"
 				+ "Create ZIP file<br>"
-				+ "<small><font color='gray'>(" + (jpg.getBval(0, false) ? "JPG " : "") + "image export)</font></small>";
+				+ "<small><font color='gray'>(" + (jpg.getBval(0, false) ? "JPG " : "") + "Image Export)</font></small>";
 	}
 	
 	@Override
@@ -248,6 +250,9 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 								if (bm.getURL() == null)
 									continue;
 								
+								if (status.wantsToStop())
+									continue;
+								
 								status.setCurrentStatusValueFine(100d * (idx++) / files);
 								
 								final String zefnSRC;
@@ -279,7 +284,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 															if (jpg.getBval(0, false)) {
 																String ext = bm.getURL().getFileNameExtension().toLowerCase();
 																if (!ext.endsWith("jpg") && !ext.endsWith("jpeg")) {
-																	in = new Image(in).getAsJPGstream();
+																	in = new Image(in).getAsJPGstream((float) tsoQuality.getDouble());
 																	closed = true;
 																	zefn = StringManipulationTools.removeFileExtension(zefn) + ".jpg";
 																}
@@ -319,13 +324,10 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 								} catch (Exception e) {
 									System.out.println("ERROR: " + e.getMessage());
 								}
-								String pre = "Create ZIP: ";
-								status.setCurrentStatusText1(pre + (written.getLong() / 1024 / 1024) + " MB");
-								
+								String pre = "Create ZIP...";
+								status.setCurrentStatusText1(pre);
 								long currTime = System.currentTimeMillis();
-								
-								double speed = written.getLong() * 1000 / (currTime - startTime) / 1024 / 1024;
-								status.setCurrentStatusText2("" + (int) speed + " MB/s");
+								status.setCurrentStatusText2(SystemAnalysis.getDataTransferSpeedString(written.getLong(), startTime, currTime));
 							}
 						}
 					}
@@ -385,18 +387,21 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
+		String stop = "";
+		if (status.wantsToStop())
+			stop = "Cammand has been interrupted by the user. Created ZIP file may be incomplete! ";
 		if (errorMessage == null)
 			errorMessage = "";
 		else {
 			errorMessage = " " + errorMessage + "";
 		}
 		if (fn == null)
-			return new MainPanelComponent("No output file has been generated." + errorMessage);
+			return new MainPanelComponent(stop + "No output file has been generated." + errorMessage);
 		else {
 			if (errorMessage.trim().length() > 0)
-				return new MainPanelComponent("Output incomplete. Error: " + errorMessage);
+				return new MainPanelComponent(stop + "Output incomplete. Error: " + errorMessage);
 			else
-				return new MainPanelComponent("The file " + fn + " has been created (size " + mb + " MB, " + files + " files)." + errorMessage);
+				return new MainPanelComponent(stop + "The file " + fn + " has been created (size " + mb + " MB, " + files + " files)." + errorMessage);
 		}
 	}
 	
