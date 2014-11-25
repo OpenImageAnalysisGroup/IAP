@@ -47,6 +47,8 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 	private int minDistance = 3;
 	private int masksize = 5;
 	
+	private int maxDistance = 15;
+	
 	@Override
 	protected void prepare() {
 		super.prepare();
@@ -60,6 +62,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		
 		masksize = getInt("Masksize For Vizualization", 5);
 		minDistance = getInt("Minimal EDM Value", 3);
+		maxDistance = getInt("Maximal EDM Value", 15);
 	}
 	
 	@Override
@@ -177,6 +180,9 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 						
 						if (masksize < minDistance)
 							continue;
+						
+						if (masksize > maxDistance)
+							masksize = maxDistance;
 						
 						masksize = (masksize * 2) + 1; // double masksize
 				int halfmask = masksize / 2;
