@@ -160,7 +160,8 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		boolean saveLeafCount = true;
 		boolean saveFeaturesInResultSet = getBoolean("Save individual leaf features", true);
 		boolean saveColorFeaturesInResultSet = getBoolean("Save individual leaf color features", true);
-		boolean saveTextureFeaturesInResultSet = getBoolean("Save individual leaf texture features", true);
+		boolean saveTextureFeaturesInResultSet = getBoolean("Save leaf texture features (Mean)", true);
+		boolean saveIndividualTextureFeaturesInResultSet = getBoolean("Save individual leaf texture features", true);
 		
 		if (saveListObject) {
 			saveLeafTipList(peakList, cameraType, maxValidY);
@@ -174,6 +175,8 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		if (saveAddF) {
 			int n = 0, nup = 0, ndown = 0;
 			DescriptiveStatistics statsLeafDirection = new DescriptiveStatistics();
+			HashMap<String, Double> firstOrderMeans = new HashMap<String, Double>();
+			HashMap<String, Double> glcmMeans = new HashMap<String, Double>();
 			
 			for (Feature bf : peakList) {
 				
@@ -199,8 +202,11 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 								ImageOperation img = leafTipImage.io().channels().get(c);
 								double stats = img.getImageAsImagePlus().getStatistics().mean;
 								
-								getResultSet().setNumericResult(getBlockPosition(),
-										new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip." + c + ".mean"), stats, null, this, imageRef);
+								getResultSet().setNumericResult(
+										getBlockPosition(),
+										new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_INTENSITY, "leaftip."
+												+ StringManipulationTools.formatNumberAddZeroInFront(n, 2) + "." + c + ".mean"), stats, null, this,
+										imageRef);
 								
 								if (saveTextureFeaturesInResultSet) {
 									ImageOperation img2d = leafTipImage2d.io().channels().get(c);
@@ -215,15 +221,33 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 									it.calcGLCMTextureFeatures();
 									
 									for (FirstOrderTextureFeatures tf : FirstOrderTextureFeatures.values()) {
-										getResultSet().setNumericResult(getBlockPosition(),
-												new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_TEXTURE, "leaftip." + c + ".texture." + tf),
-												it.firstOrderFeatures.get(tf), null, this, imageRef);
+										if (saveIndividualTextureFeaturesInResultSet)
+											getResultSet().setNumericResult(
+													getBlockPosition(),
+													new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_TEXTURE, "leaftip."
+															+ StringManipulationTools.formatNumberAddZeroInFront(n, 2) + "." + c + ".texture." + tf),
+													it.firstOrderFeatures.get(tf), null, this, imageRef);
+										
+										if (firstOrderMeans.get("" + tf.toString() + ";" + c.toString()) != null)
+											firstOrderMeans.put("" + tf.toString() + ";" + c.toString(),
+													firstOrderMeans.get("" + tf.toString() + ";" + c.toString()) + it.firstOrderFeatures.get(tf));
+										else
+											firstOrderMeans.put("" + tf.toString() + ";" + c.toString(), it.firstOrderFeatures.get(tf));
 									}
 									
 									for (GLCMTextureFeatures tf : GLCMTextureFeatures.values()) {
-										getResultSet().setNumericResult(getBlockPosition(),
-												new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_TEXTURE, "leaftip." + c + ".texture." + tf),
-												it.glcmFeatures.get(tf), null, this, imageRef);
+										if (saveIndividualTextureFeaturesInResultSet)
+											getResultSet().setNumericResult(
+													getBlockPosition(),
+													new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_TEXTURE, "leaftip."
+															+ StringManipulationTools.formatNumberAddZeroInFront(n, 2) + "." + c + ".texture." + tf),
+													it.glcmFeatures.get(tf), null, this, imageRef);
+										
+										if (glcmMeans.get("" + tf.toString() + ";" + c.toString()) != null)
+											glcmMeans.put("" + tf.toString() + ";" + c.toString(), glcmMeans.get("" + tf.toString() + ";" + c.toString())
+													+ it.glcmFeatures.get(tf));
+										else
+											glcmMeans.put("" + tf.toString() + ";" + c.toString(), it.glcmFeatures.get(tf));
 									}
 								}
 							}
@@ -255,6 +279,25 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.kurtosis"), statsLeafDirection.getKurtosis(), null, this,
 						imageRef);
+				
+				// save texture avg
+				for (String name : firstOrderMeans.keySet()) {
+					double val = firstOrderMeans.get(name) / n;
+					String tf = name.split(";")[0];
+					String c = name.split(";")[1];
+					getResultSet().setNumericResult(getBlockPosition(),
+							new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip." + c + ".texture." + tf + ".mean"), val, null, this,
+							imageRef);
+				}
+				
+				for (String name : glcmMeans.keySet()) {
+					double val = glcmMeans.get(name) / n;
+					String tf = name.split(";")[0];
+					String c = name.split(";")[1];
+					getResultSet().setNumericResult(getBlockPosition(),
+							new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip." + c + ".texture." + tf + ".mean"), val, null, this,
+							imageRef);
+				}
 			}
 		}
 		
@@ -275,11 +318,9 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				final Vector2D pos_fin = pos;// .add(sub);
 				final Vector2D direction_fin = direction.add(sub);
 				
-				getResultSet().setNumericResult(
-						0,
+				getResultSet().setNumericResult(0,
 						new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2)
-								+ ".x"),
-						pos_fin.getX(), "px", this, imageRef);
+								+ ".x"), pos_fin.getX(), "px", this, imageRef);
 				getResultSet().setNumericResult(
 						0,
 						new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2)
