@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.graffiti.editor.GravistoService;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.view.View;
 
 import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
@@ -128,7 +129,7 @@ public class SaveAsCsvDataProcessor extends AbstractExperimentDataProcessor {
 			
 			mappingData = null;
 			ActionPdfCreation3.setExcelSheetValues(
-					snapshots, sheet, excelColumnHeaders, status, urlManager, new File(fn).getParent(), exportIndividualAngles);
+					snapshots, sheet, excelColumnHeaders, status, urlManager, new File(fn).getParent(), exportIndividualAngles, new ThreadSafeOptions());
 			wb.write(new FileOutputStream(fn));
 			wb.dispose();
 			String tempDirectory = new File(fn).getParent();

@@ -125,6 +125,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 						new ThreadSafeOptions() /* false */,
 						new ThreadSafeOptions() /* false */,
 						new ThreadSafeOptions(),
+						new ThreadSafeOptions(),
 						false, toggles,
 						togglesForInterestingProperties, tsoBootstrapN,
 						tsoSplitFirst, tsoSplitSecond, false),

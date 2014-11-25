@@ -108,16 +108,20 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	
 	private final ThreadSafeOptions exportImages;
 	
+	private final ThreadSafeOptions tsoQuality;
+	
 	public ActionPdfCreation3(String tooltip,
 			ThreadSafeOptions exportIndividualAngles,
 			ThreadSafeOptions exportIndividualReplicates,
 			ThreadSafeOptions exportImages,
+			ThreadSafeOptions tsoQuality,
 			boolean xlsx,
 			ArrayList<ThreadSafeOptions> divideDatasetBy, boolean exportCommand) {
 		super(tooltip);
 		this.exportIndividualAngles = exportIndividualAngles;
 		this.exportIndividualReplicates = exportIndividualReplicates;
 		this.exportImages = exportImages;
+		this.tsoQuality = tsoQuality;
 		this.xlsx = xlsx;
 		this.divideDatasetBy = divideDatasetBy;
 		this.exportCommand = exportCommand;
@@ -129,6 +133,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			ThreadSafeOptions exportIndividualAngles,
 			ThreadSafeOptions exportIndividualReplicates,
 			ThreadSafeOptions exportImages,
+			ThreadSafeOptions tsoQuality,
 			boolean xlsx,
 			ArrayList<ThreadSafeOptions> togglesFiltering,
 			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
@@ -137,7 +142,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			ThreadSafeOptions tsoSplitSecond,
 			boolean exportCommand) {
 		this(experimentReference, divideDatasetBy, exportIndividualAngles, exportIndividualReplicates, exportImages,
-				xlsx,
+				tsoQuality, xlsx,
 				togglesFiltering, togglesInterestingProperties,
 				tsoBootstrapN,
 				tsoSplitFirst, tsoSplitSecond, null, null, exportCommand);
@@ -149,6 +154,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			ThreadSafeOptions exportIndividualAngles,
 			ThreadSafeOptions exportIndividualReplicates,
 			ThreadSafeOptions exportImages,
+			ThreadSafeOptions tsoQuality,
 			boolean xlsx,
 			ArrayList<ThreadSafeOptions> togglesFiltering,
 			ArrayList<ThreadSafeOptions> togglesInterestingProperties,
@@ -163,7 +169,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				exportImages.getBval(0, false),
 				xlsx,
 				tsoBootstrapN, tsoSplitFirst, tsoSplitSecond),
-				exportIndividualAngles, exportIndividualReplicates, exportImages, xlsx,
+				exportIndividualAngles, exportIndividualReplicates, exportImages, tsoQuality, xlsx,
 				divideDatasetBy, exportCommand);
 		this.experimentReference = experimentReference;
 		this.togglesFiltering = togglesFiltering;
@@ -793,7 +799,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					xlsxJPGdisabled = true;
 				boolean addRowType = (exportIndividualAngles.getBval(0, false)) || (exportIndividualReplicates.getBval(0, false));
 				
-				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status, urlManager, path, addRowType);
+				setExcelSheetValues(snapshots, sheet, excelColumnHeaders, status, urlManager, path, addRowType, tsoQuality);
 				snapshots = null;
 			} else {
 				if (status != null)
@@ -1088,7 +1094,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			Sheet sheet,
 			ArrayList<String> excelColumnHeaders,
 			BackgroundTaskStatusProviderSupportingExternalCall status,
-			UrlCacheManager urlManager, String outpath, boolean addRowTypeAndImages) {
+			UrlCacheManager urlManager, String outpath, boolean addRowTypeAndImages,
+			ThreadSafeOptions tsoQuality) {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Fill workbook");
 		int rowNum = 1;
 		Runtime r = Runtime.getRuntime();
@@ -1247,7 +1254,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 																	Image i;
 																	try {
 																		i = new Image(in);
-																		i.saveToFile(off);
+																		i.saveToFile(off, tsoQuality.getDouble());
 																	} catch (IOException e) {
 																		System.out.println(SystemAnalysis.getCurrentTime()
 																				+ ">WARNING: Could not create image file: "

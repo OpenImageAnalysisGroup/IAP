@@ -19,11 +19,15 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 	private final ArrayList<ThreadSafeOptions> toggles;
 	private ExperimentReference experiment;
 	private NavigationButton src;
+	private final ThreadSafeOptions exportImages;
+	private final ThreadSafeOptions tsoQuality;
 	
 	public ActionNumericExportCommands(
-			String tooltip, ArrayList<ThreadSafeOptions> toggles) {
+			String tooltip, ArrayList<ThreadSafeOptions> toggles, ThreadSafeOptions exportImages, ThreadSafeOptions tsoQuality) {
 		super(tooltip);
 		this.toggles = toggles;
+		this.exportImages = exportImages;
+		this.tsoQuality = tsoQuality;
 	}
 	
 	@Override
@@ -50,11 +54,10 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 		ThreadSafeOptions exportIndividualReplicates = new ThreadSafeOptions();
 		exportIndividualReplicates.setBval(0, true);
 		
-		ThreadSafeOptions exportImages = new ThreadSafeOptions();
-		exportImages.setBval(0, false);
-		
-		res.add(new NavigationButton(new ActionDataExportZIP(experiment, exportImages), guiSetting));
+		res.add(new NavigationButton(new ActionDataExportZIP(experiment, exportImages, tsoQuality), guiSetting));
 		// res.add(new NavigationButton(new ActionDataExportAsFilesAction(m, experiment), src.getGUIsetting()));
+		
+		res.add(new NavigationButton(new ActionDetermineImageFileOutputSize(experiment, exportImages, tsoQuality), guiSetting));
 		
 		res.add(new NavigationButton(
 				new ActionToggle("Enable/disable export of images",
@@ -82,6 +85,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 						exportIndividualAngles,
 						exportIndividualReplicates,
 						exportImages,
+						tsoQuality,
 						true,
 						null, null, null, null, null, null, ExportSetting.ALL, true),
 				guiSetting));
@@ -93,6 +97,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 						exportIndividualAngles,
 						exportIndividualReplicates,
 						exportImages,
+						tsoQuality,
 						false,
 						null, null, null, null, null, true),
 				guiSetting));

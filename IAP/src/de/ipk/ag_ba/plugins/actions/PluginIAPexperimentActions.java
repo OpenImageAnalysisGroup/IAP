@@ -41,8 +41,11 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		actions.add(new ActionViewData());
 		
 		final ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
+		ThreadSafeOptions tsoQuality = new ThreadSafeOptions();
+		ThreadSafeOptions exportJPGs = new ThreadSafeOptions();
+		exportJPGs.setBval(0, false);
 		actions.add(new ActionNumericExportCommands(
-				"Export Numeric Data", toggles));
+				"Export Numeric Data", toggles, exportJPGs, tsoQuality));
 		
 		if (experimentReference.getIniIoProvider() != null && experimentReference.getIniIoProvider().isAbleToSaveData())
 			actions.add(new ActionAnalysis("Analysis Tasks"));

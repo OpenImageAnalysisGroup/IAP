@@ -180,6 +180,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 						new ThreadSafeOptions() /* false */, // all side angles?
 						new ThreadSafeOptions() /* false */, // all replicates or sample averge?
 						new ThreadSafeOptions(), // images?
+						new ThreadSafeOptions(),
 						false, // xlsx?
 						togglesMetaDataFiltering,
 						togglesDataColumns,

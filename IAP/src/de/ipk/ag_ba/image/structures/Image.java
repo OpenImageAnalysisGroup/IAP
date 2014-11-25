@@ -26,16 +26,24 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.PixelGrabber;
 import java.awt.image.RGBImageFilter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Iterator;
 import java.util.WeakHashMap;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.ImageIcon;
 
 import org.SystemAnalysis;
+import org.apache.commons.io.IOUtils;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
@@ -561,7 +569,7 @@ public class Image {
 	}
 	
 	/**
-	 * Saves the image as an PNG.
+	 * Saves the image as an PNG or JPG.
 	 * 
 	 * @param fileName
 	 *           (path)
@@ -576,6 +584,23 @@ public class Image {
 		return this;
 	}
 	
+	public Image saveToFile(String fileName, Double jpgQuality_0_1) throws IOException {
+		if (fileName.toLowerCase().endsWith(".jpg") || fileName.toLowerCase().endsWith(".jpeg")) {
+			if (jpgQuality_0_1 == null || jpgQuality_0_1 < 0.01)
+				io().saveImage(null).saveAsJpeg(fileName);
+			else {
+				MyByteArrayInputStream data = getAsJPGstream(jpgQuality_0_1.floatValue());
+				InputStream in = data;
+				OutputStream out = new FileOutputStream(fileName);
+				IOUtils.copy(in, out);
+				in.close();
+				out.close();
+			}
+		} else
+			io().saveImage(null).saveAsPng(fileName);
+		return this;
+	}
+	
 	public MyByteArrayInputStream getAsPNGstream() throws IOException {
 		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
 		ImageIO.write(getAsBufferedImage(true), "PNG", output);
@@ -585,6 +610,22 @@ public class Image {
 	public MyByteArrayInputStream getAsJPGstream() throws IOException {
 		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
 		ImageIO.write(getAsBufferedImage(false), "JPG", output);
+		return new MyByteArrayInputStream(output.getBuffTrimmed());
+	}
+	
+	public MyByteArrayInputStream getAsJPGstream(float quality_0_1) throws IOException {
+		if (quality_0_1 < 0.01)
+			return getAsJPGstream();
+		MyByteArrayOutputStream output = new MyByteArrayOutputStream();
+		ImageOutputStream ios = ImageIO.createImageOutputStream(output);
+		Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
+		ImageWriter writer = iter.next();
+		ImageWriteParam iwp = writer.getDefaultWriteParam();
+		iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+		iwp.setCompressionQuality(quality_0_1);
+		writer.setOutput(ios);
+		writer.write(null, new IIOImage(getAsBufferedImage(false), null, null), iwp);
+		writer.dispose();
 		return new MyByteArrayInputStream(output.getBuffTrimmed());
 	}
 	
