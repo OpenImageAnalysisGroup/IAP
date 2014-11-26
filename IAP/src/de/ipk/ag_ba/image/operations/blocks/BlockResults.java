@@ -426,6 +426,7 @@ public class BlockResults implements BlockResultSet {
 		return getImage(id, true);
 	}
 	
+	@Override
 	public ImageAndImageData getImage(String id, boolean remove) {
 		synchronized (storedImages) {
 			for (Integer blockPosition : storedImages.keySet()) {

@@ -445,7 +445,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		CameraType ct = img.getCameraType();
 		
 		// get skeleton-image and workimage to connect lose leaves and for optimization
-		Image skel = getResultSet().getImage("skeleton_" + ct.toString()).getImage();
+		Image skel = getResultSet().getImage("skeleton_" + ct.toString(), false).getImage();
 		Image skel_workimge = getResultSet().getImage("skeleton_workimage_" + ct.toString()).getImage();
 		if (skel != null && skel_workimge != null) {
 			img = img.io().or(skel.copy().io().bm().dilate(15).getImage()).or(skel_workimge).getImage()

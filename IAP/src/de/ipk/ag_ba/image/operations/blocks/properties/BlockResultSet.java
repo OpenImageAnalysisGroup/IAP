@@ -117,6 +117,8 @@ public interface BlockResultSet {
 	
 	ImageAndImageData getImage(String id);
 	
+	ImageAndImageData getImage(String id, boolean remove);
+	
 	public void clearNotUsedResults();
 	
 }
