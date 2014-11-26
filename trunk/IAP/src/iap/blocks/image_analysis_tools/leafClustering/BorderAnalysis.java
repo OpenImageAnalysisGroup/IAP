@@ -174,6 +174,7 @@ public class BorderAnalysis {
 		int background = ImageOperation.BACKGROUND_COLORint;
 		int xtemp;
 		int ytemp;
+		
 		int[][] img2d = image.getAs2A();
 		int w = img2d.length;
 		int h = img2d[0].length;
@@ -206,7 +207,13 @@ public class BorderAnalysis {
 							split = isSplit(predefinedRegion, region, radius, debug);
 						if (!split || !checkSplit) {
 							borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key, FeatureObjectType.NUMERIC);
-							borderFeatureList.addFeature(idx / 2, matchWithImage(region, orig, xtemp - radius / 2, ytemp - radius / 2), "pixels",
+							ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
+							// if (matched.size() < 10) {
+							// System.out.println("Warning: small region!! at x: " + (xtemp) + " y: " + (ytemp) + " rx: " + (xtemp - (radius / 2)) + " ry: "
+							// + (ytemp - (radius / 2)));
+							// new Image(copyRegionto2dArray(region)).show("region");
+							// }
+							borderFeatureList.addFeature(idx / 2, matched, "pixels",
 									FeatureObjectType.OBJECT);
 						} else
 							borderFeatureList.addFeature(idx / 2, 0.0, key, FeatureObjectType.NUMERIC);
@@ -220,20 +227,31 @@ public class BorderAnalysis {
 		}
 	}
 	
-	private ArrayList<PositionAndColor> matchWithImage(ArrayList<PositionAndColor> region, Image orig, int xtemp, int ytemp) {
+	private ArrayList<PositionAndColor> matchWithImage(ArrayList<PositionAndColor> region, Image orig, int xtemp, int ytemp, int radius) {
 		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>();
 		
 		int[] origArray = orig.getAs1A();
 		int w = orig.getWidth();
 		int h = orig.getHeight();
 		for (PositionAndColor pix : region) {
-			int idx = pix.x + xtemp + (pix.y + ytemp) * w;
+			int idx = pix.x + xtemp - radius + (pix.y + ytemp - radius) * w;
 			if (idx < origArray.length && pix.x + xtemp < w && pix.y + ytemp < h)
 				if (origArray[idx] != ImageOperation.BACKGROUND_COLORint) {
 					res.add(new PositionAndColor(pix.x + xtemp, pix.y + ytemp, origArray[idx]));
 				}
 		}
 		// new Image(copyRegionto2dArray(res)).show("debug border");
+		// if (res.size() < -1 && xtemp % 20 == 0) {
+		// orig.copy().show("orig");
+		// ImageCanvas ca = orig.io().canvas();
+		// for (PositionAndColor pix : region)
+		// ca.drawCircle(pix.x + xtemp - radius, pix.y + ytemp - radius, 2, Color.YELLOW.getRGB(), 0.8, 2);
+		//
+		// ca
+		// .drawCircle(xtemp, ytemp, 2, Color.RED.getRGB(), 0.3, 3)
+		// .drawCircle(xtemp, ytemp, 20, Color.BLUE.getRGB(), 0.3, 3)
+		// .getImage().show("debug");
+		// }
 		return res;
 	}
 	

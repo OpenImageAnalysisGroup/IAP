@@ -161,7 +161,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		boolean saveFeaturesInResultSet = getBoolean("Save individual leaf features", true);
 		boolean saveColorFeaturesInResultSet = getBoolean("Save individual leaf color features", true);
 		boolean saveTextureFeaturesInResultSet = getBoolean("Save leaf texture features (Mean)", true);
-		boolean saveIndividualTextureFeaturesInResultSet = getBoolean("Save individual leaf texture features", true);
+		boolean saveIndividualTextureFeaturesInResultSet = getBoolean("Save individual leaf texture features", false);
 		
 		if (saveListObject) {
 			saveLeafTipList(peakList, cameraType, maxValidY);
@@ -547,7 +547,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 		
 		for (Channel c : Channel.values()) {
 			for (FirstOrderTextureFeatures tf : FirstOrderTextureFeatures.values()) {
-				desList.add(new CalculatedProperty(c + ".leaftip." + tf, tf.getNiceName()
+				desList.add(new CalculatedProperty(c + ".leaftip.*." + tf, tf.getNiceName()
 						+ " - first order texture property (independent of pixel neighbors). Calculated on grayscale image derived from channel " + c
 						+ " within leftip area." +
 						(tf.getReferenceLink() != null ? " Further information: <a href='" + tf.getReferenceLink() + "'>Link</a>." : "")));
@@ -556,7 +556,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 			for (GLCMTextureFeatures tf : GLCMTextureFeatures.values()) {
 				desList
 						.add(new CalculatedProperty(
-								c + ".leaftip." + tf,
+								c + ".leaftip.*." + tf,
 								tf.getNiceName()
 										+ " - Grey Level Co-occurrence Matrix (GLCM) texture property (independent of pixel neighbors). Calculated on grayscale image derived from channel "
 										+ c + " within leftip area." +
