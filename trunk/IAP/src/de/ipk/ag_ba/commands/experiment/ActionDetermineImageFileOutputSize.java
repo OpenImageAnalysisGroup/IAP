@@ -150,14 +150,20 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 			final ThreadSafeOptions option = new ThreadSafeOptions().setBval(0, true);
 			togglesQuality.add(option);
 			res.add(new NavigationButton(
-					new ActionToggle(null, "Default Quality", togglesQuality.get(togglesQuality.size() - 1)) {
+					new ActionToggle("Use default or automatic JPG compression settings or normal PNG export", "Default Quality", togglesQuality.get(togglesQuality
+							.size() - 1)) {
 						@Override
 						public String getDefaultTitle() {
 							SummaryStatistics stat = summaryStat;
-							if (stat == null || stat.getN() <= 0)
+							if (stat == null || stat.getN() <= 0) {
+								if (option.getBval(0, false))
+									tsoQuality.setParam(0, null);
 								return super.getDefaultTitle() + "<br><font color='gray'>- GB";
-							else
+							} else {
+								if (option.getBval(0, false))
+									tsoQuality.setParam(0, getEstimate(stat, tsoSampleProgres.getDouble()));
 								return super.getDefaultTitle() + "<br><font color='gray'>" + getEstimate(stat, tsoSampleProgres.getDouble()) + "";
+							}
 						}
 						
 						@Override
@@ -199,17 +205,22 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 				final ThreadSafeOptions option = togglesQuality.get(togglesQuality.size() - 1);
 				final int qq = i;
 				res.add(new NavigationButton(
-						new ActionToggle(null, "Quality " + i, option) {
+						new ActionToggle("Use JPG compression level " + i, "Quality " + i, option) {
 							@Override
 							public String getDefaultTitle() {
 								SummaryStatistics stat = null;
 								synchronized (q2stat) {
 									stat = q2stat.get(qq);
 								}
-								if (stat == null || stat.getN() <= 0)
+								if (stat == null || stat.getN() <= 0) {
+									if (option.getBval(0, false))
+										tsoQuality.setParam(0, null);
 									return super.getDefaultTitle() + "<br><font color='gray'>- GB";
-								else
+								} else {
+									if (option.getBval(0, false))
+										tsoQuality.setParam(0, getEstimate(stat, tsoSampleProgres.getDouble()));
 									return super.getDefaultTitle() + "<br><font color='gray'>" + getEstimate(stat, tsoSampleProgres.getDouble()) + "";
+								}
 							}
 							
 							@Override
@@ -247,7 +258,7 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 			}
 		
 		res.add(new NavigationButton(
-				new ActionToggle(null, "Full Size", new ThreadSafeOptions()) {
+				new ActionToggle("Use full source image size", "Full Size", new ThreadSafeOptions()) {
 					@Override
 					public void performActionCalculateResults(NavigationButton src) throws Exception {
 						super.performActionCalculateResults(src);
@@ -279,7 +290,7 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 				guiSetting));
 		
 		res.add(new NavigationButton(
-				new ActionToggle(null, "Half Size", new ThreadSafeOptions()) {
+				new ActionToggle("Scale width and height of source images (if not NIR or IR images) by 50%", "Half Size", new ThreadSafeOptions()) {
 					@Override
 					public void performActionCalculateResults(NavigationButton src) throws Exception {
 						super.performActionCalculateResults(src);
@@ -311,7 +322,7 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 				guiSetting));
 		
 		res.add(new NavigationButton(
-				new ActionToggle(null, "Quarter Size", new ThreadSafeOptions()) {
+				new ActionToggle("Scale width and height of source images (if not NIR or IR images) by 25%", "Quarter Size", new ThreadSafeOptions()) {
 					@Override
 					public void performActionCalculateResults(NavigationButton src) throws Exception {
 						super.performActionCalculateResults(src);
@@ -386,14 +397,23 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 				sp = "<br>{sampling finished}";
 		if (tsoSampleProgres.getInt() > 0)
 			sp = "<br>{" + tsoSampleProgres.getLong() + " sampled (" + (int) (tsoSampleProgres.getLong() * 100d / tsoSampleProgres.getDouble()) + "%)}";
-		if (!exportImages.getBval(0, false))
-			return "Determine PNG Output Size<br><small><font color='gray'>(enable JPG if desired)" + sp
+		if (!exportImages.getBval(0, false)) {
+			String ss = tsoQuality.getInt() + "% size";
+			String sizeEst = (String) tsoQuality.getParam(0, null);
+			return (sizeEst == null ? "Determine PNG Output Size" : "PNG Output Size " + sizeEst) + "<br><small><font color='gray'>(PNG output, " + ss
+					+ ")" + sp
 					+ (tsoSampleProgres.getBval(10, false) ? " - stopped" : "");
+		}
 		String q = "Default Quality Selected";
 		if (tsoQuality.getDouble() >= 0.01)
 			q = "Quality " + ((int) ((tsoQuality.getDouble()) * 100d));
-		String ss = tsoQuality.getInt() + "% size";
-		return "Specify Image Storage Size<br><small><font color='gray'>(" + q + ", " + ss + ")" + sp + (tsoSampleProgres.getBval(10, false) ? " - stopped" : "");
+		{
+			String ss = tsoQuality.getInt() + "% size";
+			String sizeEst = (String) tsoQuality.getParam(0, null);
+			return (sizeEst == null ? "Specify Image Storage Size" : "JPG Output Size " + sizeEst) + "<br><small><font color='gray'>(" + q + ", " + ss
+					+ ")"
+					+ sp + (tsoSampleProgres.getBval(10, false) ? " - stopped" : "");
+		}
 	}
 	
 	@Override
