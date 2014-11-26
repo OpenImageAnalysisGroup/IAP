@@ -156,12 +156,16 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 						public String getDefaultTitle() {
 							SummaryStatistics stat = summaryStat;
 							if (stat == null || stat.getN() <= 0) {
-								if (option.getBval(0, false))
+								if (option.getBval(0, false)) {
 									tsoQuality.setParam(0, null);
+									tsoQuality.setParam(1, null);
+								}
 								return super.getDefaultTitle() + "<br><font color='gray'>- GB";
 							} else {
-								if (option.getBval(0, false))
+								if (option.getBval(0, false)) {
 									tsoQuality.setParam(0, getEstimate(stat, tsoSampleProgres.getDouble()));
+									tsoQuality.setParam(1, getEstimateSize(stat, tsoSampleProgres.getDouble()));
+								}
 								return super.getDefaultTitle() + "<br><font color='gray'>" + getEstimate(stat, tsoSampleProgres.getDouble()) + "";
 							}
 						}
@@ -213,12 +217,16 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 									stat = q2stat.get(qq);
 								}
 								if (stat == null || stat.getN() <= 0) {
-									if (option.getBval(0, false))
+									if (option.getBval(0, false)) {
 										tsoQuality.setParam(0, null);
+										tsoQuality.setParam(1, null);
+									}
 									return super.getDefaultTitle() + "<br><font color='gray'>- GB";
 								} else {
-									if (option.getBval(0, false))
+									if (option.getBval(0, false)) {
 										tsoQuality.setParam(0, getEstimate(stat, tsoSampleProgres.getDouble()));
+										tsoQuality.setParam(1, getEstimateSize(stat, tsoSampleProgres.getDouble()));
+									}
 									return super.getDefaultTitle() + "<br><font color='gray'>" + getEstimate(stat, tsoSampleProgres.getDouble()) + "";
 								}
 							}
@@ -370,6 +378,15 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 		}
 	}
 	
+	private Long getEstimateSize(SummaryStatistics stat, double nImages) {
+		if (stat.getN() <= 0)
+			return null;
+		synchronized (stat) {
+			long dataAmount = (long) (stat.getSum() / stat.getN() * nImages);
+			return dataAmount;
+		}
+	}
+	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
 		return new MainPanelComponent("A random subset of the images is currently loaded. The more images are sampled during this "
@@ -418,7 +435,23 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-Media-Optical-64.png";// Gnome-Media-Flash-64.png";
+		
+		Long sizeEst = (Long) tsoQuality.getParam(1, null);
+		if (sizeEst != null) {
+			if (sizeEst < 1400000l)
+				return "img/ext/gpl2/Gnome-Media-Floppy-64.png";
+			if (sizeEst < 700000000l)
+				return "img/ext/gpl2/Gnome-Media-Optical-64_CD.png";
+			if (sizeEst < 4500000000l)
+				return "img/ext/gpl2/Gnome-Media-Optical-64_DVD.png";
+			if (sizeEst < 8500000000l)
+				return "img/ext/gpl2/Gnome-Media-Optical-64_double.png";
+			if (sizeEst < 64000000000l)
+				return "img/ext/gpl2/Gnome-Media-Flash-64.png";
+			return "img/ext/gpl2/Gnome-Drive-Harddisk-64.png";
+		}
+		
+		return "img/ext/gpl2/Gnome-Multimedia-Volume-Control-64.png";// File-Roller-64-warning.png";
 	}
 	
 }
