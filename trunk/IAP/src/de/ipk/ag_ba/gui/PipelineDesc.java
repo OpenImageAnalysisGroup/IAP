@@ -22,9 +22,10 @@ public class PipelineDesc {
 		this.iniFileName = iniFileName;
 		this.iniIO = iniIO;
 		so = SystemOptions.getInstance(iniFileName, iniIO);
-		so.getString("DESCRIPTION", "pipeline_name", defName);
-		so.getString("DESCRIPTION", "pipeline_description", defDescription);
-		so.getString("DESCRIPTION", "tuned_for_IAP_version", defTestedIAPversion);
+		boolean addDefaultIfNeeded = iniIO != null && iniIO.isAbleToSaveData();
+		so.getString("DESCRIPTION", "pipeline_name", defName, addDefaultIfNeeded);
+		so.getString("DESCRIPTION", "pipeline_description", defDescription, addDefaultIfNeeded);
+		so.getString("DESCRIPTION", "tuned_for_IAP_version", defTestedIAPversion, addDefaultIfNeeded);
 	}
 	
 	public String getTooltip() {
