@@ -100,7 +100,7 @@ public class BlSaveResultImages extends AbstractBlock {
 			}
 			String wells = "";
 			if (optionsAndResults.getWellCnt() > 1) {
-				wells = " " + getWellIdx() + " " + optionsAndResults.getWellIdx() + 1 + "/" + optionsAndResults.getWellCnt();
+				wells = " " + getWellIdx() + " " + (optionsAndResults.getWellIdx() + 1) + "/" + optionsAndResults.getWellCnt();
 			}
 			String r = id.getPosition() != null ? id.getPosition().intValue() + "" : "0";
 			image = image.io().canvas()
