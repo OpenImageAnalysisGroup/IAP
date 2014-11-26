@@ -62,7 +62,14 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 		res.add(new NavigationButton(
 				new ActionToggle("Enable/disable export of images",
 						"<html>"
-								+ "<center>Export of<br>&#8592; JPG images &#8594;", exportImages),
+								+ "<center>Export of<br>&#8592; JPG images &#8594;", exportImages) {
+					
+					@Override
+					public void performActionCalculateResults(NavigationButton src) throws Exception {
+						super.performActionCalculateResults(src);
+						tsoQuality.setParam(0, null); // reset size information string
+					}
+				},
 				guiSetting));
 		
 		res.add(new NavigationButton(
