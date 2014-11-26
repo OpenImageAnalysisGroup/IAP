@@ -62,6 +62,7 @@ public class ImageCanvas {
 			System.out.println("Alpha value 1.0 used, skip drawing.");
 			return this;
 		}
+		int colorBlueRect = (color & 0x0000ff);
 		int wi = image.getWidth();
 		int hi = image.getHeight();
 		if (hi <= 1)
@@ -70,7 +71,6 @@ public class ImageCanvas {
 		int r, g, b, c, red, green, blue;
 		int colorRedRect = (color & 0xff0000) >> 16;
 		int colorGreenRect = (color & 0x00ff00) >> 8;
-		int colorBlueRect = (color & 0x0000ff);
 		boolean doAlpha = Math.abs(alpha) > 0.00001;
 		for (int xi = x; xi <= x + w; xi++)
 			for (int yi = y; yi <= y + h; yi++) {

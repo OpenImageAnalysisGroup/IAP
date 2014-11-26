@@ -108,13 +108,13 @@ public class ImageStack {
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
-					IAPservice.showImageJ();
+					IAPservice.showImageJ(true);
 					image.show(title + " (" + stack.getSize() + ")");
 				}
 			};
 			SwingUtilities.invokeLater(r);
 		} else {
-			IAPservice.showImageJ();
+			IAPservice.showImageJ(true);
 			image.show(title + " (" + stack.getSize() + ")");
 		}
 	}
