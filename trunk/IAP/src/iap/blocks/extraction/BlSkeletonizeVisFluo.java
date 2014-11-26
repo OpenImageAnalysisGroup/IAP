@@ -69,14 +69,14 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 			
 			if (viswork != null)
 				if (vis != null) {
-					calcSkeleton(viswork, vis, fluo, fluo != null ? fluo.copy() : null,
+					calcSkeleton(viswork, vis, fluo,
 							getBoolean("Leaf Width Calculation Type A (VIS)", false),
 							getBoolean("Leaf Width Calculation Type B (VIS)", false),
 							getBoolean("draw_skeleton", true),
 							CameraType.VIS, input().images().getVisInfo());
 				}
 		}
-		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && getResultSet() != null) {
 			Image viswork = vis.copy().io().bm()// .medianFilter32Bit()
 					.erode(getInt("Erode-Cnt-Vis", 12))
 					.dilate(getInt("Dilate-Cnt-Vis", 6)).io()
@@ -84,8 +84,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 					.getImage().show("vis", debug);
 			
 			if (viswork != null)
-				if (vis != null && fluo != null) {
-					calcSkeleton(viswork, vis, fluo, fluo.copy(),
+				if (vis != null) {
+					calcSkeleton(viswork, vis, fluo,
 							getBoolean("Leaf Width Calculation Type A (VIS)", false),
 							getBoolean("Leaf Width Calculation Type B (VIS)", false),
 							getBoolean("draw_skeleton", true),
@@ -114,7 +114,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 			
 			if (fluowork != null)
 				if (vis != null && fluo != null) {
-					calcSkeleton(fluowork, vis, fluo, fluo.copy(),
+					calcSkeleton(fluowork, vis, fluo,
 							getBoolean("Leaf Width Calculation Type A (FLUO)", false),
 							getBoolean("Leaf Width Calculation Type B (FLUO)", false),
 							getBoolean("draw_skeleton", true),
@@ -130,7 +130,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 			
 			if (viswork != null)
 				if (vis != null && fluo != null) {
-					calcSkeleton(viswork, vis, fluo, fluo.copy(),
+					calcSkeleton(viswork, vis, fluo,
 							getBoolean("Leaf Width Calculation Type A (FLUO)", false),
 							getBoolean("Leaf Width Calculation Type B (FLUO)", false),
 							getBoolean("draw_skeleton", true),
@@ -140,9 +140,10 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		return input().masks().fluo();
 	}
 	
-	public synchronized Image calcSkeleton(Image inp, Image vis, Image fluo, Image inpFLUOunchanged,
+	public synchronized Image calcSkeleton(Image inp, Image vis, Image fluo,
 			boolean specialLeafWidthCalculations, boolean specialSkeletonBasedLeafWidthCalculation,
 			boolean addPostProcessor, CameraType cameraType, ImageData imageRef) {
+		Image inpFLUOunchanged = fluo != null ? fluo.copy() : null;
 		// ***skeleton calculations***
 		SkeletonProcessor2d skel2d = inp.io().skeletonize().replaceColor(Color.BLACK.getRGB(), Color.MAGENTA.getRGB()).
 				show("out sk", false).skel2d();

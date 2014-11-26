@@ -108,8 +108,8 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		if (ct == CameraType.VIS) {
 			Image skel = null;
 			if (calculationMode == TextureCalculationMode.SKELETON) {
-				// get skeleton-image and applay distance map
-				skel = getResultSet().getImage("skeleton_" + ct.toString()).getImage();
+				// get skeleton-image and apply distance map
+				skel = getResultSet().getImage("skeleton_" + ct.toString(), false).getImage();
 			}
 			
 			for (Channel c : Channel.values()) {
