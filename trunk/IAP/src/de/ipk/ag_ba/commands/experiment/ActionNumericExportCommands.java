@@ -68,6 +68,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 					public void performActionCalculateResults(NavigationButton src) throws Exception {
 						super.performActionCalculateResults(src);
 						tsoQuality.setParam(0, null); // reset size information string
+						tsoQuality.setParam(1, null);
 					}
 				},
 				guiSetting));
