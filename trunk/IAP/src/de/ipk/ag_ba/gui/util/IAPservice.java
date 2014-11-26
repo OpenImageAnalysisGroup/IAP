@@ -1764,10 +1764,11 @@ public class IAPservice {
 	}
 	
 	public static void showImageJ(boolean alwaysOnTop) {
+		if (SystemAnalysis.isHeadless())
+			return;
+		
 		showImageJ();
-		if (!SystemAnalysis.isHeadless() && (IAPservice.ij == null || !IAPservice.ij.isShowing())) {
-			IAPservice.ij.setAlwaysOnTop(alwaysOnTop);
-		}
+		IAPservice.ij.setAlwaysOnTop(alwaysOnTop);
 	}
 	
 	public static void showImageJ() {
