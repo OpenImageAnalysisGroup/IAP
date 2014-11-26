@@ -315,7 +315,7 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 				
 				// correct positions
 				Vector2D sub = new Vector2D(-borderSize, -borderSize);
-				final Vector2D pos_fin = pos;// .add(sub);
+				final Vector2D pos_fin = pos;
 				final Vector2D direction_fin = direction.add(sub);
 				
 				getResultSet().setNumericResult(0,
@@ -345,12 +345,18 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 						
 						@Override
 						public Image postProcessMask(Image mask) {
+							int xPos = (int) pos_fin.getX();
+							int yPos = (int) pos.getY();
+							Vector2D vv = direction.subtract(new Vector2D(xPos, yPos));
+							Vector2D d = vv.getNorm() > 0.01 ?
+									vv.normalize()
+											.scalarMultiply((1 + (Math.sqrt(2) - 1) * (1 - Math.abs(Math.cos(2 * angle / 180. * Math.PI)))) * searchRadius_fin)
+									: vv;
 							ImageCanvas t = mask
 									.io()
 									.canvas()
 									.drawCircle((int) pos_fin.getX(), (int) pos_fin.getY(), searchRadius_fin, Color.RED.getRGB(), 0.5, 3)
-									.drawLine((int) pos_fin.getX(), (int) pos_fin.getY(), (int) direction_fin.getX(), (int) direction_fin.getY(), Color.BLUE.getRGB(),
-											0.8, 1)
+									.drawLine(xPos, yPos, (int) d.getX() + xPos, (int) d.getY() + yPos, Color.BLUE.getRGB(), 0.8, 1)
 									.text((int) direction_fin.getX() + 10, (int) direction_fin.getY(),
 											"x: " + ((int) pos_fin.getX() + borderSize) + " y: " + ((int) pos_fin.getY() + borderSize),
 											Color.BLACK);
