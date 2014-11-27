@@ -26,6 +26,7 @@ import javax.swing.JTextField;
 
 import org.ErrorMsg;
 import org.SettingsHelperDefaultIsFalse;
+import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
 import org.graffiti.event.AttributeEvent;
@@ -88,7 +89,7 @@ public class TabAglet
 		sendButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String msg = inputField.getText();
+				String msg = SystemAnalysis.getUserName() + ": " + inputField.getText();
 				inputField.setText("");
 				inputField.requestFocusInWindow();
 				try {
