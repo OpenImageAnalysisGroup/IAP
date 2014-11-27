@@ -37,6 +37,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabAglet;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
@@ -123,12 +124,15 @@ public class IAPgui {
 		graphPanel.add(new MainPanelComponent(lbl.getText()).getGUI(), "0,0");
 		graphPanel.revalidate();
 		
+		TabAglet.getInstance();
+		
 		JLabelUpdateReady statusMessage = new JLabelUpdateReady() {
 			@Override
 			public void update() {
 				
 			}
 		};
+		statusMessage.setText("");
 		
 		statusMessage.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
 		
