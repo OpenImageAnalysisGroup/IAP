@@ -10,12 +10,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
@@ -172,13 +174,13 @@ public class BorderAnalysis {
 	// TODO adapt for multiple borders if needed.
 	public void calcSUSAN(int radius, int geometricThresh) {
 		int background = ImageOperation.BACKGROUND_COLORint;
-		int xtemp;
-		int ytemp;
 		
 		int[][] img2d = image.getAs2A();
 		int w = img2d.length;
 		int h = img2d[0].length;
-		int stepsize = 1;
+		int stepsize = radius / 15;
+		if (stepsize < 1)
+			stepsize = 1;
 		boolean debug = false;
 		String key = "susan";
 		// check if stepsize is odd
@@ -188,40 +190,42 @@ public class BorderAnalysis {
 		// iterate list of border-lists
 		for (ArrayList<Integer> tempArray : borderLists) {
 			int listSize = tempArray.size();
-			for (int idx = 0; idx < listSize; idx += 2) {
-				xtemp = tempArray.get(idx);
-				ytemp = tempArray.get(idx + 1);
-				
-				// get region (boundingbox) in size of circle-diameter
-				int[][] predefinedRegion = ImageOperation.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
-				
-				// do region-growing
-				ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, debug);
-				
-				// check area (condition: (region.size() < geometricThresh) => get only positive results)
-				if (region != null) {
-					if (region.size() < geometricThresh) {
-						// test for split region
-						boolean split = false;
-						if (checkSplit)
-							split = isSplit(predefinedRegion, region, radius, debug);
-						if (!split || !checkSplit) {
-							borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key, FeatureObjectType.NUMERIC);
-							ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
-							// if (matched.size() < 10) {
-							// System.out.println("Warning: small region!! at x: " + (xtemp) + " y: " + (ytemp) + " rx: " + (xtemp - (radius / 2)) + " ry: "
-							// + (ytemp - (radius / 2)));
-							// new Image(copyRegionto2dArray(region)).show("region");
-							// }
-							borderFeatureList.addFeature(idx / 2, matched, "pixels",
-									FeatureObjectType.OBJECT);
+			// for (int idx = 0; idx < listSize; idx += 2) {
+			BackgroundThreadDispatcher.stream("Susan Calculation").processInts(IntStream.range(0, listSize).filter((idx) -> idx % 2 == 0),
+					(idx) -> {
+						int xtemp = tempArray.get(idx);
+						int ytemp = tempArray.get(idx + 1);
+						
+						// get region (boundingbox) in size of circle-diameter
+					int[][] predefinedRegion = ImageOperation.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
+					
+					// do region-growing
+					ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, debug);
+					
+					// check area (condition: (region.size() < geometricThresh) => get only positive results)
+					if (region != null) {
+						if (region.size() < geometricThresh) {
+							// test for split region
+							boolean split = false;
+							if (checkSplit)
+								split = isSplit(predefinedRegion, region, radius, debug);
+							if (!split || !checkSplit) {
+								borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key, FeatureObjectType.NUMERIC);
+								ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
+								// if (matched.size() < 10) {
+								// System.out.println("Warning: small region!! at x: " + (xtemp) + " y: " + (ytemp) + " rx: " + (xtemp - (radius / 2)) + " ry: "
+								// + (ytemp - (radius / 2)));
+								// new Image(copyRegionto2dArray(region)).show("region");
+								// }
+								borderFeatureList.addFeature(idx / 2, matched, "pixels",
+										FeatureObjectType.OBJECT);
+							} else
+								borderFeatureList.addFeature(idx / 2, 0.0, key, FeatureObjectType.NUMERIC);
 						} else
 							borderFeatureList.addFeature(idx / 2, 0.0, key, FeatureObjectType.NUMERIC);
 					} else
-						borderFeatureList.addFeature(idx / 2, 0.0, key, FeatureObjectType.NUMERIC);
-				} else
-					borderFeatureList.addFeature(idx / 2, Double.NaN, key, FeatureObjectType.NUMERIC);
-			}
+						borderFeatureList.addFeature(idx / 2, Double.NaN, key, FeatureObjectType.NUMERIC);
+				}, null);
 			if (onlyBiggest)
 				break;
 		}
@@ -482,8 +486,8 @@ public class BorderAnalysis {
 					pmindist = j;
 				}
 			}
-			sorted.add(a.clone());
-			a = pmindist.clone();
+			sorted.add(a);
+			a = pmindist;
 			circleCoordinates.remove(pmindist);
 		}
 		return sorted;
@@ -495,31 +499,60 @@ public class BorderAnalysis {
 	
 	private static LinkedList<int[]> getCircleCoordinatesSorted(int radius) {
 		LinkedList<int[]> res = new LinkedList<int[]>();
-		int x = 0;
-		int y = radius;
-		int f = 1 - radius;
-		res.add(new int[] { 0, radius });
-		res.add(new int[] { radius, 0 });
-		res.add(new int[] { 0, -radius });
-		res.add(new int[] { -radius, 0 });
-		while (x < y) {
-			x = x + 1;
-			if (f < 0) {
-				f = f + 2 * x - 1;
-			} else {
-				f = f + 2 * (x - y);
-				y = y - 1;
+		radius = 5;
+		for (int run = 0; run < 8; run++) {
+			if (run == 0)
+				res.add(new int[] { 0, radius });
+			if (run == 2)
+				res.add(new int[] { radius, 0 });
+			if (run == 4)
+				res.add(new int[] { 0, -radius });
+			if (run == 6)
+				res.add(new int[] { -radius, 0 });
+			
+			int x, y, f;
+			
+			x = 0;
+			y = radius;
+			f = 1 - radius;
+			
+			while (x < y) {
+				x = x + 1;
+				if (f < 0) {
+					f = f + 2 * x - 1;
+				} else {
+					f = f + 2 * (x - y);
+					y = y - 1;
+				}
+				if (run == 0)
+					res.add(new int[] { x, y }); // OK
+				if (run == 1)
+					res.add(new int[] { y, x }); // TURN
+				if (run == 2)
+					res.add(new int[] { y, -x }); // OK ....
+				if (run == 3)
+					res.add(new int[] { x, -y });
+				if (run == 4)
+					res.add(new int[] { -y, -x });
+				if (run == 5)
+					res.add(new int[] { -x, -y });
+				if (run == 6)
+					res.add(new int[] { -y, x });
+				if (run == 7)
+					res.add(new int[] { -x, y });
 			}
-			res.add(new int[] { x, y });
-			res.add(new int[] { y, x });
-			res.add(new int[] { -x, y });
-			res.add(new int[] { y, -x });
-			res.add(new int[] { x, -y });
-			res.add(new int[] { -y, x });
-			res.add(new int[] { -x, -y });
-			res.add(new int[] { -y, -x });
 		}
-		return res = sortCircleCoordinates(res);
+		System.out.println("*********************************************************************");
+		for (int[] s : res) {
+			System.out.println(s[0] + " " + s[1]);
+		}
+		System.out.println("#################################################");
+		res = sortCircleCoordinates(res);
+		for (int[] s : res) {
+			System.out.println(s[0] + " " + s[1]);
+		}
+		
+		return res;
 	}
 	
 	public static ArrayList<PositionAndColor> regionGrowing(int x, int y, int[][] img2d, int background, int radius, int geometricThresh, boolean debug) {
@@ -564,7 +597,7 @@ public class BorderAnalysis {
 		boolean inside = false;
 		double dist = 0.0;
 		Image show = null;
-		boolean speedUpButLossResults = false;
+		boolean speedUpButLossResults = true;
 		if (debug) {
 			show = new Image(imgTemp);
 			show.show("debug");
@@ -580,7 +613,7 @@ public class BorderAnalysis {
 			// update process window for debug
 			if (imgTemp[rx][ry] != background && debug) {
 				show.update(new Image(imgTemp));
-				Thread.sleep(1);
+				Thread.sleep(100);
 			}
 			imgTemp[rx][ry] = background;
 			
