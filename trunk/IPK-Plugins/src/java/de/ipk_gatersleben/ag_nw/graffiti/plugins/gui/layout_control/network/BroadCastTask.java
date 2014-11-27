@@ -23,12 +23,11 @@ import javax.swing.SwingUtilities;
 import org.ErrorMsg;
 
 import de.ipk_gatersleben.ag_nw.graffiti.UDPreceiveStructure;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.database.dbe.DesEncrypter;
 import de.ipk_gatersleben.ag_nw.graffiti.services.network.BroadCastService;
 
 /**
  * @author Christian Klukas
- *         (c) 2004,2012 IPK-Gatersleben
+ *         (c) 2004,2012,2014 IPK-Gatersleben
  */
 public class BroadCastTask extends TimerTask {
 	
@@ -40,7 +39,7 @@ public class BroadCastTask extends TimerTask {
 	private static String chatPass = "CHATSTATICENCRYPTION";
 	
 	// Create encrypter/decrypter class
-	private static DesEncrypter encrypter = new DesEncrypter(chatPass);
+	private static AESDemo encrypter = new AESDemo(chatPass);
 	
 	/**
 	 * Contains byte[] arrays of data that was received.
@@ -57,6 +56,7 @@ public class BroadCastTask extends TimerTask {
 	BroadCastTask(final BroadCastService broadCastService, final Runnable receiver) {
 		this.broadCastService = broadCastService;
 		Thread receiveTask = new Thread(new Runnable() {
+			@Override
 			@SuppressWarnings("deprecation")
 			public void run() {
 				boolean error = false;
@@ -75,7 +75,7 @@ public class BroadCastTask extends TimerTask {
 								ArrayList<InetAddress> toBeDeleted = new ArrayList<InetAddress>();
 								for (Iterator<InetAddress> it = knownHostsAndTime.keySet().iterator(); it.hasNext();) {
 									InetAddress key = it.next();
-									Long accessTime = (Long) knownHostsAndTime.get(key);
+									Long accessTime = knownHostsAndTime.get(key);
 									if (accessTime.longValue() + timeOffline < currentTime)
 										toBeDeleted.add(key);
 								}
@@ -106,7 +106,7 @@ public class BroadCastTask extends TimerTask {
 										ErrorMsg.addErrorMessage("Emtpy String received.");
 								}
 							}
-					} catch (IOException e) {
+					} catch (Exception e) {
 						error = true;
 						ErrorMsg.addErrorMessage(e.getLocalizedMessage());
 					}
@@ -124,7 +124,7 @@ public class BroadCastTask extends TimerTask {
 		receiveTask.start();
 	}
 	
-	public void addMessageToBeSent(String message) {
+	public void addMessageToBeSent(String message) throws Exception {
 		// Encrypt
 		message = encrypter.encrypt(message);
 		
@@ -185,7 +185,7 @@ public class BroadCastTask extends TimerTask {
 		}
 	}
 	
-	public void addBinaryMessage(String fileName, byte[] buff, int count) throws UnsupportedEncodingException {
+	public void addBinaryMessage(String fileName, byte[] buff, int count) throws Exception {
 		fileName = encrypter.encrypt(fileName);
 		byte[] fn = new String("FILENAME:" + fileName + "§§§").getBytes("UTF-8");
 		int maxLen = broadCastService.getMaxBroadCastMessageLen();
