@@ -235,9 +235,9 @@ public class BorderAnalysis {
 		int h = orig.getHeight();
 		for (PositionAndColor pix : region) {
 			int idx = pix.x + xtemp - radius + (pix.y + ytemp - radius) * w;
-			if (idx < origArray.length && pix.x + xtemp < w && pix.y + ytemp < h)
+			if (idx < origArray.length && pix.x + xtemp - radius < w && pix.y + ytemp - radius < h)
 				if (origArray[idx] != ImageOperation.BACKGROUND_COLORint) {
-					res.add(new PositionAndColor(pix.x + xtemp, pix.y + ytemp, origArray[idx]));
+					res.add(new PositionAndColor(pix.x + xtemp - radius, pix.y + ytemp - radius, origArray[idx]));
 				}
 		}
 		// new Image(copyRegionto2dArray(res)).show("debug border");
