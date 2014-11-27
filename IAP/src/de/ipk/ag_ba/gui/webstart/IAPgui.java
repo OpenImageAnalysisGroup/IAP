@@ -9,6 +9,7 @@ package de.ipk.ag_ba.gui.webstart;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
@@ -17,13 +18,17 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.graffiti.editor.MainFrame;
+import org.graffiti.editor.MessageType;
 
 import de.ipk.ag_ba.commands.ActionHome;
+import de.ipk.ag_ba.commands.JLabelUpdateReady;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -118,8 +123,45 @@ public class IAPgui {
 		graphPanel.add(new MainPanelComponent(lbl.getText()).getGUI(), "0,0");
 		graphPanel.revalidate();
 		
+		JLabelUpdateReady statusMessage = new JLabelUpdateReady() {
+			@Override
+			public void update() {
+				
+			}
+		};
+		
+		statusMessage.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+		
+		MainFrame.addMessageReceiver((msg) -> {
+			if (!statusMessage.isDisplayable())
+				throw new UnsupportedOperationException("Receiver is not valid any more");
+			if (msg != null && msg.contains(":")) {
+				String[] m = msg.split(":", 2);
+				MessageType mt = MessageType.valueOf(m[0]);
+				String n = m[1];
+				SwingUtilities.invokeLater(() -> {
+					switch (mt) {
+						case ERROR:
+							statusMessage.setText("<html><b>Error:</b> " + n);
+							break;
+						case INFO:
+							statusMessage.setText("<html><b>Notification:</b> " + n);
+							break;
+						case PERMANENT_INFO:
+							statusMessage.setText("<html><b>Info:</b> " + n);
+							break;
+						default:
+							break;
+					}
+					statusMessage.validate();
+				});
+			}
+		});
+		
 		JComponent res = TableLayout.get3SplitVertical(navigationPanel, TableLayout.getSplit(actionPanel,
-				actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED), graphPanel, TableLayout.PREFERRED,
+				actionPanelRight, TableLayout.FILL, TableLayout.PREFERRED),
+				TableLayout.getSplitVertical(graphPanel, statusMessage, TableLayout.FILL, TableLayout.PREFERRED),
+				TableLayout.PREFERRED,
 				TableLayout.PREFERRED, TableLayout.FILL);
 		
 		res.revalidate();
