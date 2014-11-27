@@ -91,7 +91,11 @@ public class TabAglet
 				String msg = inputField.getText();
 				inputField.setText("");
 				inputField.requestFocusInWindow();
-				broadCastTask.addMessageToBeSent(msg);
+				try {
+					broadCastTask.addMessageToBeSent(msg);
+				} catch (Exception e1) {
+					ErrorMsg.addErrorMessage(e1);
+				}
 				updateNetworkStatus();
 			}
 		});
