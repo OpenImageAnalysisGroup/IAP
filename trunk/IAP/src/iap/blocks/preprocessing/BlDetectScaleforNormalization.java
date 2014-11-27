@@ -12,9 +12,12 @@ import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -22,10 +25,16 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.management.RuntimeErrorException;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 
 import org.ReleaseInfo;
 import org.Vector2i;
 import org.apache.commons.io.IOUtils;
+
+import com.sun.media.jai.codec.ImageCodec;
+import com.sun.media.jai.codec.ImageEncoder;
+import com.sun.media.jai.codec.PNMEncodeParam;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.Lab;
@@ -235,8 +244,8 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 	private String DetectScaleUnit(Image filtered) {
 		String filename = UUID.randomUUID().toString();
 		String out = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch");
-		saveImage(out, filename, "png", filtered);
-		String gocr = "gocr -a 50 " + filename + ".png";
+		saveImage(out, filename, "PNM", filtered);
+		String gocr = "gocr -a 50 " + filename + ".PNM";
 		File dir = new File(out);
 		
 		String resFromShell = execute(dir, gocr);
@@ -246,7 +255,7 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 		
 		String result = filterForLengthScale(resFromShell);
 		
-		new File(out + filename + ".png").delete();
+		new File(out + filename + ".PNM").delete();
 		
 		return result;
 	}
@@ -307,10 +316,26 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 			outputPath = outputPath + "/";
 		File outputfile = new File(outputPath + name + "." + format);
 		try {
-			ImageIO.write(img, format, outputfile);
+			if (format.toUpperCase().equals("PNM")) {
+				// Create the OutputStream.
+				OutputStream out = new FileOutputStream(outputfile);
+				
+				// Create the ParameterBlock.
+				PNMEncodeParam param = new PNMEncodeParam();
+				param.setRaw(true);
+				
+				// Create the PNM image encoder.
+				ImageEncoder encoder = ImageCodec.createImageEncoder("PNM", out, param);
+				
+				ParameterBlock pb = new ParameterBlock();
+				pb.add(img);
+				PlanarImage tPlanarImage = JAI.create("awtImage", pb);
+				encoder.encode(tPlanarImage);
+				out.close();
+			} else
+				ImageIO.write(img, format, outputfile);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 	
