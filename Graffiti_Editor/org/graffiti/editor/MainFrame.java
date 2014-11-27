@@ -61,6 +61,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -2383,6 +2384,20 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 	 *           a type of the message (e.g. MessageType.INFO)
 	 */
 	public static void showMessage(final String message, final MessageType type) {
+		if (messageReceivers != null) {
+			LinkedList<Consumer<String>> invalid = new LinkedList<Consumer<String>>();
+			for (Consumer<String> c : messageReceivers) {
+				try {
+					c.accept(type + ":" + message);
+				} catch (UnsupportedOperationException uso) {
+					invalid.add(c);
+				}
+			}
+			for (Consumer<String> c : invalid) {
+				messageReceivers.remove(c);
+			}
+		}
+		
 		if (SystemAnalysis.isHeadless()) {
 			System.out.println("// MAIN FRAME MESSAGE (" + type + ") //");
 			System.out.println(SystemAnalysis.getCurrentTime() + ">" + message);
@@ -2409,6 +2424,12 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 				}
 			});
 		}
+	}
+	
+	private static ArrayList<Consumer<String>> messageReceivers = new ArrayList<Consumer<String>>();
+	
+	public static void addMessageReceiver(Consumer<String> messageReceiver) {
+		MainFrame.messageReceivers.add(messageReceiver);
 	}
 	
 	/**
