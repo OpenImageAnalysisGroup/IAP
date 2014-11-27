@@ -75,55 +75,23 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			return null;
 	}
 	
-	// @Override
-	// protected Image processFLUOmask() {
-	// if (input().masks().fluo() != null) {
-	// Image fluoSkel = getResultSet().getImage("fluo_skeleton").getImage();
-	// return input().masks().fluo();
-	// } else
-	// return null;
-	// }
-	//
-	// @Override
-	// protected Image processNIRmask() {
-	// Image nirSkel = getResultSet().getImage("nir_skeleton").getImage();
-	// if (nirSkel != null) {
-	// }
-	//
-	// if (input().masks().nir() != null) {
-	// return input().masks().nir();
-	// } else
-	// return null;
-	// }
-	//
-	// @Override
-	// protected Image processIRmask() {
-	// if (input().masks().ir() != null) {
-	// return input().masks().ir();
-	// } else
-	// return null;
-	// }
-	
 	private void calcTextureFeatures(Image img, CameraType ct, int masksize, CameraPosition cp, NumericMeasurement3D imageRef) {
 		if (ct == CameraType.VIS) {
+			// get skeleton-image and apply distance map
 			Image skel = null;
-			if (calculationMode == TextureCalculationMode.SKELETON) {
-				// get skeleton-image and apply distance map
+			if (calculationMode == TextureCalculationMode.SKELETON)
 				skel = getResultSet().getImage("skeleton_" + ct.toString(), false).getImage();
-			}
 			
 			for (Channel c : Channel.values()) {
 				ImageOperation ch_img = img.io().channels().get(c);
 				if (calculationMode == TextureCalculationMode.WHOLE_IMAGE) {
 					calcTextureForImage(new ImageOperation(getGrayImageAs2dArray(ch_img.getImage())), c, ct, cp, imageRef);
 				}
-				if (calculationMode == TextureCalculationMode.SKELETON) {
-					if (skel != null) {
-						ImageOperation dist = ch_img.bm().edmFloatClipped().show("distance clipped", debugValues);
-						Image mapped = dist.applyMask(skel).getImage().show("mapped", debugValues);
-						calcTextureForSkeleton(new ImageOperation(getGrayImageAs2dArray(mapped)), new ImageOperation(getGrayImageAs2dArray(ch_img.getImage())), c,
-								ct, cp, imageRef);
-					}
+				if (calculationMode == TextureCalculationMode.SKELETON && skel != null) {
+					ImageOperation dist = ch_img.bm().edmFloatClipped().show("distance clipped", debugValues);
+					Image mapped = dist.applyMask(skel).getImage().show("mapped", debugValues);
+					calcTextureForSkeleton(new ImageOperation(getGrayImageAs2dArray(mapped)), new ImageOperation(getGrayImageAs2dArray(ch_img.getImage())), c,
+							ct, cp, imageRef);
 				}
 				if (calculationMode == TextureCalculationMode.VISUALIZE) {
 					calcTextureForVizualization(new ImageOperation(getGrayImageAs2dArray(ch_img.crop().resize(0.1).getImage())), masksize, c, ct);
@@ -205,21 +173,13 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 					}
 				}
 				
-				// rotate due to main axis
-				// if (x > 808 && x < 812 && y > 78 && y < 82) {
-				// new Image(masksize, masksize, mask).show("before rot", false);
-				// }
 				ImageMoments im = new ImageMoments(skelMask, masksize, masksize);
 				double angle = im.calcOmega(ImageOperation.BACKGROUND_COLORint);
 				double newMasksize = masksize * Math.sqrt(2) / 2.0;
 				ImageOperation rot = new Image(masksize, masksize, mask).io().rotate(-angle * 180 / Math.PI);
 				int halfdiff_disired = (int) (rot.getWidth() - newMasksize) / 2;
 				ImageOperation crop = rot.cropAbs(halfdiff_disired, rot.getWidth() - halfdiff_disired, halfdiff_disired, rot.getWidth() - halfdiff_disired);
-				// if (x % 10 == 0 && y % 10 == 0) {
-				// if (x > 806 && x < 814 && y > 76 && y < 84) {
-				// crop.show("rotate " + x + " : " + y);
-				// new Image(masksize, masksize, skelMask).show("skalmask");
-				// }
+				
 				final int f_masksize = crop.getWidth();
 				ImageTexture it = new ImageTexture(crop.getAs1D(), f_masksize, f_masksize, true);
 				
