@@ -277,30 +277,32 @@ public class CloudTaskManager {
 							lastN = nowBE;
 						}
 						if (!CloudTaskManager.disableWatchDog)
-							if (lastN == nowBE && lastN > 0 && System.currentTimeMillis() - lastNt > 15 * 60 * 1000) {
+							if (lastN == nowBE && lastN > 0 && System.currentTimeMillis() - lastNt > 30 * 60 * 1000) {
 								Runnable r = new Runnable() {
 									@Override
 									public void run() {
 										try {
-											MongoDB.saveSystemErrorMessage("Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 15 MIN // SYSTEM.EXIT", null);
+											MongoDB.saveSystemErrorMessage("Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 30 MIN // SYSTEM.EXIT", null);
 											Batch.pingHost(m, hostName, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN,
-													"system.exit (no block execution within 15 min)");
+													"system.exit (no block execution within 30 min)");
 										} catch (Exception e) {
 											e.printStackTrace();
 										}
 									}
 								};
-								System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 15 MIN");
+								System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO BLOCK EXECUTION WITHIN 30 MIN");
 								System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
 								Thread msg = new Thread(r);
+								msg.setDaemon(true);
 								msg.start();
 								long startMS = System.currentTimeMillis();
 								long l = 0;
 								do {
 									l++;
-									if (l == Integer.MAX_VALUE) {
+									if (l == 1000) {
 										l = 0;
 									}
+									Thread.sleep(10);
 								} while (System.currentTimeMillis() - startMS < 9000);
 								System.exit(0);
 							}
