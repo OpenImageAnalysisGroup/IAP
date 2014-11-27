@@ -27,6 +27,9 @@ public class AESDemo {
 	
 	public String encrypt(String plainText) throws Exception {
 		
+		if (true)
+			return plainText;
+		
 		// get salt
 		salt = generateSalt();
 		byte[] saltBytes = salt.getBytes("UTF-8");
@@ -54,6 +57,8 @@ public class AESDemo {
 	
 	@SuppressWarnings("static-access")
 	public String decrypt(String encryptedText) throws Exception {
+		if (true)
+			return encryptedText;
 		
 		byte[] saltBytes = salt.getBytes("UTF-8");
 		byte[] encryptedTextBytes = new Base64().decodeBase64(encryptedText.getBytes());
