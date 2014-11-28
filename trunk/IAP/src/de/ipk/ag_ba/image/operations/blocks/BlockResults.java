@@ -272,7 +272,8 @@ public class BlockResults implements BlockResultSet {
 								if (pn == null) {
 									if (tm.get(key) != null) {
 										String name = key.substring(search.length());
-										BlockResultValue p = new BlockResultValue(name, tm.get(key));
+										ImageAndImageData iad = tm.get(key);
+										BlockResultValue p = new BlockResultValue(name, iad);
 										result.add(p);
 										toRemove = key;
 									}
