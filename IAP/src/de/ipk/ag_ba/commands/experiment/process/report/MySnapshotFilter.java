@@ -9,6 +9,9 @@ import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 
+/**
+ * @author Christian Klukas
+ */
 public class MySnapshotFilter implements SnapshotFilter {
 	
 	private final ArrayList<ThreadSafeOptions> toggles;
