@@ -105,7 +105,7 @@ public class BlSaveResultImages extends AbstractBlock {
 			String r = id.getPosition() != null ? id.getPosition().intValue() + "" : "0";
 			image = image.io().canvas()
 					.text(5, 15, "IAP V" + ReleaseInfo.IAP_VERSION_STRING, Color.RED)
-					.text(5, 30, id.getQualityAnnotation() + wells, Color.ORANGE)
+					.text(5, 30, id.getQualityAnnotation() + wells + " R" + id.getReplicateID(), Color.ORANGE)
 					.text(5, 45, ct + " " + cp + " " + r, Color.YELLOW)
 					.text(5, 60, id.getParentSample().getSampleTime() + " " + t, Color.GREEN)
 					.getImage();
