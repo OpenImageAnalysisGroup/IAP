@@ -3,7 +3,6 @@ package iap.blocks.image_analysis_tools.leafClustering;
 import iap.blocks.image_analysis_tools.leafClustering.FeatureObject.FeatureObjectType;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,7 +48,7 @@ public class BorderAnalysis {
 		this.orig = orig;
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
 		borderIO = borderIO.skeletonize().replaceColor(Color.BLACK.getRGB(), Color.BLUE.getRGB());
-		Image boImg = borderIO.getImage().show("borderImg", true);;
+		Image boImg = borderIO.getImage().show("borderImg", debug);;
 		borderLength = boImg.io().countFilledPixels();
 		borderImage = borderIO.getAs2D();
 		borderLists = getBorderLists(borderImage, borderLength, debug);
@@ -749,7 +748,7 @@ public class BorderAnalysis {
 	 * @return 1d array of sorted border-pixels ([obj_1[x_1,y_1,x_2,y_2, ... , x_n, y_n], obj_2[x_1,y_1,x_2,y_2, ... , x_n, y_n], ... , obj_n ])
 	 * @throws InterruptedException
 	 */
-	// TODO adaption for disconnected border has to be checked, loops are not processed properly
+	// TODO adaption for disconnected border has to be checked
 	private static ArrayList<ArrayList<Integer>> getBorderLists(int[][] borderMap, int borderLength, boolean debug) {
 		int w = borderMap.length;
 		int h = borderMap[0].length;
@@ -760,6 +759,9 @@ public class BorderAnalysis {
 		int rx;
 		int ry;
 		ArrayList<ArrayList<Integer>> borderListList = new ArrayList<ArrayList<Integer>>();
+		Stack<int[]> visited = new Stack<int[]>();
+		
+		debug = false;
 		
 		int debugSpeed = 2;
 		Image show = new Image(borderMap);
@@ -774,36 +776,12 @@ public class BorderAnalysis {
 					rx = x;
 					ry = y;
 					boolean inside = false;
-					Point lastCrossing = new Point(-1, -1);
+					visited.push(new int[] { rx, ry });
 					
-					if (rx - 1 >= 0 && ry - 1 >= 0 && rx + 1 < w && ry + 1 < h) {
+					if (rx - 1 >= 0 && ry - 1 >= 0 && rx + 1 < w && ry + 1 < h)
 						inside = true;
-						// // check number of neighbors
-						// int non = 0;
-						// if (rx - 1 != background)
-						// non++;
-						// if (ry - 1 != background)
-						// non++;
-						// if (rx + 1 != background)
-						// non++;
-						// if (ry + 1 != background)
-						// non++;
-						// if (rx + 1 != background && ry + 1 != background)
-						// non++;
-						// if (rx - 1 != background && ry - 1 != background)
-						// non++;
-						// if (rx - 1 != background && ry + 1 != background)
-						// non++;
-						// if (rx + 1 != background && ry - 1 != background)
-						// non++;
-						//
-						// if (non > 2) {
-						// lastCrossing.x = rx;
-						// lastCrossing.y = ry;
-						// }
-					}
 					
-					while (find) {
+					while (!visited.isEmpty()) {
 						borderList.add(rx);
 						borderList.add(ry);
 						
@@ -879,11 +857,17 @@ public class BorderAnalysis {
 								ry = ry - 1;
 							}
 						
-						// if (find = false && lastCrossing.x != -1) {
-						// rx = lastCrossing.x;
-						// ry = lastCrossing.y;
-						// lastCrossing = new Point(-1, -1);
-						// }
+						if (find) {
+							visited.push(new int[] { rx, ry });
+							// no pixel found -> go back
+						} else {
+							if (!visited.empty())
+								visited.pop();
+							if (!visited.empty()) {
+								rx = visited.peek()[0];
+								ry = visited.peek()[1];
+							}
+						}
 					}
 					// check if at least 1 element in list
 					if (borderList.size() > 0 && borderList != null) {
