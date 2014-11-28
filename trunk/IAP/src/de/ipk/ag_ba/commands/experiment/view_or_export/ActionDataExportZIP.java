@@ -378,16 +378,16 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 		
 		return (nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : nm.getReplicateID() + "") +
 				nm.getParentSample().getParentCondition().getParentSubstance().getName() + " " +
-				nm.getParentSample().getTimeUnit() + "_" + nm.getParentSample().getTime() + " " +
+				nm.getParentSample().getTimeUnit() + "_" + StringManipulationTools.formatNumberAddZeroInFront(nm.getParentSample().getTime(), 2) + " " +
 				(id != null ? (id.getPosition() != null ?
 						StringManipulationTools.formatNumber(id.getPosition(), "000")
 								+ "_deg " : "000_deg") : "") + " " +
-				gc.get(GregorianCalendar.YEAR) + "-" +
-				(gc.get(GregorianCalendar.MONTH) + 1) + "-" +
-				gc.get(GregorianCalendar.DAY_OF_MONTH) + " " +
-				gc.get(GregorianCalendar.HOUR_OF_DAY) + "_" +
-				gc.get(GregorianCalendar.MINUTE) + "_" +
-				gc.get(GregorianCalendar.SECOND) + ".png";
+				gc.get(GregorianCalendar.YEAR) + "-"
+				+ StringManipulationTools.formatNumberAddZeroInFront((gc.get(GregorianCalendar.MONTH) + 1), 2) + "-"
+				+ StringManipulationTools.formatNumberAddZeroInFront(gc.get(GregorianCalendar.DAY_OF_MONTH), 2) + " "
+				+ StringManipulationTools.formatNumberAddZeroInFront(gc.get(GregorianCalendar.HOUR_OF_DAY), 2) + "_"
+				+ StringManipulationTools.formatNumberAddZeroInFront(gc.get(GregorianCalendar.MINUTE), 2) + "_"
+				+ StringManipulationTools.formatNumberAddZeroInFront(gc.get(GregorianCalendar.SECOND), 2) + ".png";
 	}
 	
 	private void removeLostEntries() {
