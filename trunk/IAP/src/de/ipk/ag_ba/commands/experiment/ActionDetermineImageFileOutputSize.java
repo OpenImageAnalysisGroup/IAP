@@ -428,7 +428,7 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 		{
 			String ss = tsoQuality.getInt() + "% size";
 			String sizeEst = (String) tsoQuality.getParam(0, null);
-			return (sizeEst == null ? "Specify Image Storage Size" : "JPG Output Size " + sizeEst) + "<br><small><font color='gray'>(" + q + ", " + ss
+			return (sizeEst == null ? "Determine Image Storage Size" : "JPG Output Size " + sizeEst) + "<br><small><font color='gray'>(" + q + ", " + ss
 					+ ")"
 					+ sp + (tsoSampleProgres.getBval(10, false) ? " - stopped" : "");
 		}

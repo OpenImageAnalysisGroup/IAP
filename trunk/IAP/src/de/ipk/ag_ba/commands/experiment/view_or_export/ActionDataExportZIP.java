@@ -89,7 +89,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 	
 	@Override
 	public String getDefaultTitle() {
-		return "<html><cener>"
+		return "<html><center>"
 				+ "Create ZIP file<br>"
 				+ "<small><font color='gray'>(" + (jpg.getBval(0, false) ? "JPG " : "") + "Image Export)</font></small>";
 	}

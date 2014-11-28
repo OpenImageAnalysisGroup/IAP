@@ -59,7 +59,8 @@ public class GetMeasurements implements Runnable {
 					StringBuilder s = new StringBuilder();
 					s.append("<html><table border='1'><th>Property</th><th>Value</th><td>Sample Average</td></tr>");
 					if (sample.getSampleFineTimeOrRowId() != null)
-						s.append("<tr><td>Sample Time</td><td>" + sdf.format(new Date(sample.getSampleFineTimeOrRowId())) + "</td></tr>");
+						s.append("<tr><td>Sample Time</td><td>" + sdf.format(new Date(sample.getSampleFineTimeOrRowId())) + "<br>"
+								+ sample.getSampleFineTimeOrRowId() + "</td></tr>");
 					for (String id : attributes.keySet()) {
 						String idC = id;
 						if (idC != null && idC.equals("replicates"))
