@@ -3,6 +3,7 @@ package iap.blocks.image_analysis_tools.leafClustering;
 import iap.blocks.image_analysis_tools.leafClustering.FeatureObject.FeatureObjectType;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,14 +39,17 @@ public class BorderAnalysis {
 	private LinkedList<Feature> peakList;
 	boolean debug = false;
 	boolean onlyBiggest = true;
-	boolean checkSplit = false;
+	boolean checkSplit = true;
 	private final Image orig;
+	private int radius;
+	private int background;
+	private int geometricThresh;
 	
 	public BorderAnalysis(Image img, Image orig) {
 		this.orig = orig;
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
 		borderIO = borderIO.skeletonize().replaceColor(Color.BLACK.getRGB(), Color.BLUE.getRGB());
-		Image boImg = borderIO.getImage().show("borderImg", debug);;
+		Image boImg = borderIO.getImage().show("borderImg", true);;
 		borderLength = boImg.io().countFilledPixels();
 		borderImage = borderIO.getAs2D();
 		borderLists = getBorderLists(borderImage, borderLength, debug);
@@ -100,6 +104,8 @@ public class BorderAnalysis {
 			peakList.add(borderFeatureList.getFeatureMap(peaks[idx]));
 			peakList.get(idx).addFeature("borderposition", peaks[idx], FeatureObjectType.NUMERIC);
 		}
+		
+		calculateRegions();
 	}
 	
 	public void plot(int waitTime, int radius) {
@@ -175,7 +181,10 @@ public class BorderAnalysis {
 	
 	// TODO adapt for multiple borders if needed.
 	public void calcSUSAN(int radius, int geometricThresh) {
-		int background = ImageOperation.BACKGROUND_COLORint;
+		background = ImageOperation.BACKGROUND_COLORint;
+		
+		this.radius = radius;
+		this.geometricThresh = geometricThresh;
 		
 		int[][] img2d = image.getAs2A();
 		int w = img2d.length;
@@ -213,14 +222,14 @@ public class BorderAnalysis {
 								split = isSplit(predefinedRegion, region, radius, debug);
 							if (!split || !checkSplit) {
 								borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key, FeatureObjectType.NUMERIC);
-								ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
+								// ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
 								// if (matched.size() < 10) {
 								// System.out.println("Warning: small region!! at x: " + (xtemp) + " y: " + (ytemp) + " rx: " + (xtemp - (radius / 2)) + " ry: "
 								// + (ytemp - (radius / 2)));
 								// new Image(copyRegionto2dArray(region)).show("region");
 								// }
-								borderFeatureList.addFeature(idx / 2, matched, "pixels",
-										FeatureObjectType.OBJECT);
+								// borderFeatureList.addFeature(idx / 2, matched, "pixels",
+								// FeatureObjectType.OBJECT);
 							} else
 								borderFeatureList.addFeature(idx / 2, 0.0, key, FeatureObjectType.NUMERIC);
 						} else
@@ -230,6 +239,23 @@ public class BorderAnalysis {
 				}, null);
 			if (onlyBiggest)
 				break;
+		}
+	}
+	
+	private void calculateRegions() {
+		for (Feature p : peakList) {
+			int peakpos = (int) p.getFeature("borderposition");
+			Vector2D imgpos = p.getPosition();
+			int xtemp = (int) imgpos.getX();
+			int ytemp = (int) imgpos.getY();
+			int[][] img2d = image.getAs2A();
+			int w = image.getWidth();
+			int h = image.getHeight();
+			
+			int[][] predefinedRegion = ImageOperation.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
+			ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, debug);
+			ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
+			borderFeatureList.addFeature(peakpos, matched, "pixels", FeatureObjectType.OBJECT);
 		}
 	}
 	
@@ -723,7 +749,7 @@ public class BorderAnalysis {
 	 * @return 1d array of sorted border-pixels ([obj_1[x_1,y_1,x_2,y_2, ... , x_n, y_n], obj_2[x_1,y_1,x_2,y_2, ... , x_n, y_n], ... , obj_n ])
 	 * @throws InterruptedException
 	 */
-	// TODO adaption for disconnected border has to be checked
+	// TODO adaption for disconnected border has to be checked, loops are not processed properly
 	private static ArrayList<ArrayList<Integer>> getBorderLists(int[][] borderMap, int borderLength, boolean debug) {
 		int w = borderMap.length;
 		int h = borderMap[0].length;
@@ -743,19 +769,44 @@ public class BorderAnalysis {
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
 				if (borderMap[x][y] != background) {
-					int i = 0;
+					
 					find = true;
 					rx = x;
 					ry = y;
 					boolean inside = false;
+					Point lastCrossing = new Point(-1, -1);
 					
-					if (rx - 1 >= 0 && ry - 1 >= 0 && rx + 1 < w && ry + 1 < h)
+					if (rx - 1 >= 0 && ry - 1 >= 0 && rx + 1 < w && ry + 1 < h) {
 						inside = true;
+						// // check number of neighbors
+						// int non = 0;
+						// if (rx - 1 != background)
+						// non++;
+						// if (ry - 1 != background)
+						// non++;
+						// if (rx + 1 != background)
+						// non++;
+						// if (ry + 1 != background)
+						// non++;
+						// if (rx + 1 != background && ry + 1 != background)
+						// non++;
+						// if (rx - 1 != background && ry - 1 != background)
+						// non++;
+						// if (rx - 1 != background && ry + 1 != background)
+						// non++;
+						// if (rx + 1 != background && ry - 1 != background)
+						// non++;
+						//
+						// if (non > 2) {
+						// lastCrossing.x = rx;
+						// lastCrossing.y = ry;
+						// }
+					}
 					
 					while (find) {
 						borderList.add(rx);
 						borderList.add(ry);
-						i += 2;
+						
 						borderMap[rx][ry] = background;
 						find = false;
 						
@@ -827,8 +878,13 @@ public class BorderAnalysis {
 								rx = rx + 1;
 								ry = ry - 1;
 							}
+						
+						// if (find = false && lastCrossing.x != -1) {
+						// rx = lastCrossing.x;
+						// ry = lastCrossing.y;
+						// lastCrossing = new Point(-1, -1);
+						// }
 					}
-					
 					// check if at least 1 element in list
 					if (borderList.size() > 0 && borderList != null) {
 						borderListList.add((ArrayList<Integer>) borderList.clone());
