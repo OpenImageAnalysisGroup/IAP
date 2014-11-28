@@ -4,6 +4,7 @@ import iap.blocks.image_analysis_tools.leafClustering.FeatureObject.FeatureObjec
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -15,6 +16,7 @@ import java.util.stream.IntStream;
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
+import org.GapList;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
@@ -36,7 +38,7 @@ public class BorderAnalysis {
 	private LinkedList<Feature> peakList;
 	boolean debug = false;
 	boolean onlyBiggest = true;
-	boolean checkSplit = true;
+	boolean checkSplit = false;
 	private final Image orig;
 	
 	public BorderAnalysis(Image img, Image orig) {
@@ -265,7 +267,7 @@ public class BorderAnalysis {
 		region2d = copyRegiontoArray(region, regionColors);
 		int w = region2d.length;
 		int h = region2d[0].length;
-		LinkedList<int[]> circleCoordinates = getCircleCoordinatesSorted(radius - (int) (radius * 0.05));
+		Collection<int[]> circleCoordinates = getCircleCoordinatesSorted(radius - (int) (radius * 0.05));
 		int splitCount = 0, count = 0;
 		boolean pfound = false, found = false, firstfound = false;
 		int background = ImageOperation.BACKGROUND_COLORint;
@@ -433,7 +435,7 @@ public class BorderAnalysis {
 		int[][] region2d = copyRegiontoArray(dim, region);
 		int w = region2d.length;
 		int h = region2d[0].length;
-		LinkedList<int[]> circleCoordinates = getCircleCoordinatesSorted(radius);
+		Collection<int[]> circleCoordinates = getCircleCoordinatesSorted(radius);
 		
 		int splitCount = 0, count = 0;
 		boolean pfound = false, found = false, firstfound = false;
@@ -471,6 +473,7 @@ public class BorderAnalysis {
 		return splitCount > 1 ? true : false;
 	}
 	
+	@Deprecated
 	private static LinkedList<int[]> sortCircleCoordinates(LinkedList<int[]> circleCoordinates) {
 		LinkedList<int[]> sorted = new LinkedList<int[]>();
 		
@@ -497,9 +500,11 @@ public class BorderAnalysis {
 		return (a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]);
 	}
 	
-	private static LinkedList<int[]> getCircleCoordinatesSorted(int radius) {
-		LinkedList<int[]> res = new LinkedList<int[]>();
-		radius = 5;
+	private static Collection<int[]> getCircleCoordinatesSorted(int radius) {
+		GapList<int[]> res = new GapList<int[]>();
+		
+		int insert = 0;
+		
 		for (int run = 0; run < 8; run++) {
 			if (run == 0)
 				res.add(new int[] { 0, radius });
@@ -510,11 +515,10 @@ public class BorderAnalysis {
 			if (run == 6)
 				res.add(new int[] { -radius, 0 });
 			
-			int x, y, f;
+			int x = 0, y = radius, f = 1 - radius;
 			
-			x = 0;
-			y = radius;
-			f = 1 - radius;
+			if (run % 2 == 1)
+				insert = res.size();
 			
 			while (x < y) {
 				x = x + 1;
@@ -527,29 +531,22 @@ public class BorderAnalysis {
 				if (run == 0)
 					res.add(new int[] { x, y }); // OK
 				if (run == 1)
-					res.add(new int[] { y, x }); // TURN
+					res.add(insert, new int[] { y, x }); // TURN
 				if (run == 2)
 					res.add(new int[] { y, -x }); // OK ....
 				if (run == 3)
-					res.add(new int[] { x, -y });
+					res.add(insert, new int[] { x, -y });
 				if (run == 4)
-					res.add(new int[] { -y, -x });
-				if (run == 5)
 					res.add(new int[] { -x, -y });
+				if (run == 5)
+					res.add(insert, new int[] { -y, -x });
 				if (run == 6)
 					res.add(new int[] { -y, x });
 				if (run == 7)
-					res.add(new int[] { -x, y });
+					res.add(insert, new int[] { -x, y });
 			}
-		}
-		System.out.println("*********************************************************************");
-		for (int[] s : res) {
-			System.out.println(s[0] + " " + s[1]);
-		}
-		System.out.println("#################################################");
-		res = sortCircleCoordinates(res);
-		for (int[] s : res) {
-			System.out.println(s[0] + " " + s[1]);
+			
+			insert = res.size();
 		}
 		
 		return res;
