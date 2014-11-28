@@ -1,6 +1,6 @@
 package iap.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
+import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
@@ -38,17 +38,19 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 /**
  * @author pape, klukas
  */
-public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
+public class BlDetectLeafTips extends AbstractBlock implements CalculatesProperties {
 	
 	boolean ignore = false;
 	boolean debug_borderDetection;
 	double borderSize;
+	private boolean useAdaptiveRadiusEstimation;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
 		
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
+		useAdaptiveRadiusEstimation = getBoolean("Use Addaptive Radius", false);
 	}
 	
 	@Override
@@ -57,101 +59,49 @@ public class BlDetectLeafTips extends AbstractSnapshotAnalysisBlock implements C
 	}
 	
 	@Override
-	protected Image processVISmask() {
-		if (input().masks().vis() == null)
+	protected Image processMask(Image mask) {
+		if (mask == null)
 			return null;
-		boolean isBestAngle = isBestAngle(CameraType.VIS);
+		
+		int searchRadius;
+		if (useAdaptiveRadiusEstimation)
+			searchRadius = (int) (Math.sqrt(mask.io().countFilledPixels()) * 0.25);
+		else
+			searchRadius = getInt("Search-radius (" + mask.getCameraType() + ")", 35);
+		
+		boolean isBestAngle = isBestAngle(mask.getCameraType());
+		CameraType ct = mask.getCameraType();
+		
 		// search for best side image
 		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
 			if (!isBestAngle)
 				ignore = true;
 		}
-		if (getBoolean("Calculate on Visible Image", true) && !ignore) {
-			Image workimg = input().masks().vis().copy();
+		
+		if (getBoolean("Calculate on " + ct.getNiceName() + " Image", true) && !ignore) {
+			Image workimg = mask.copy();
 			
-			int searchRadius = getInt("Search-radius (Vis)", 30);
-			double fillGradeInPercent = getDouble("Fillgrade (Vis)", 0.3);
-			int blurSize = getInt("Size for Bluring (Vis)", 0);
-			int erodeSize = getInt("Masksize Erode (Vis)", 2);
-			int dilateSize = getInt("Masksize Dilate (Vis)", 5);
+			double fillGradeInPercent = getDouble("Fillgrade (" + ct + ")", 0.3);
+			int blurSize = getInt("Size for Bluring (" + ct + ")", 0);
+			int erodeSize = getInt("Masksize Erode (" + ct + ")", 2);
+			int dilateSize = getInt("Masksize Dilate (" + ct + ")", 5);
 			int minHeightPercent = getInt("Minimum Leaf Height Percent", -1);
 			
-			// test sr and fg
-			// int i1 = (int) (optionsAndResults.getUnitTestIdx() / 6);
-			// int i2 = (int) (optionsAndResults.getUnitTestIdx() % 6);
-			//
-			// searchRadius = searchRadius + i1 * 2;
-			// fillGradeInPercent = fillGradeInPercent + (i2 - 2) * 0.025;
-			
-			// searchRadius = searchRadius + (i1 - 2) * 10;
-			// fillGradeInPercent = fillGradeInPercent + (i2 - 2) * 0.05;
-			
 			borderSize = searchRadius / 2;
-			workimg.setCameraType(input().masks().vis().getCameraType());
+			workimg.setCameraType(mask.getCameraType());
 			workimg = preprocessImage(workimg, searchRadius, blurSize, erodeSize, dilateSize);
 			Roi bb = workimg.io().getBoundingBox();
 			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - minHeightPercent / 100d * bb.getBounds().height);
-			workimg.setCameraType(CameraType.VIS);
-			savePeaksAndFeatures(getPeaksFromBorder(workimg, input().masks().vis(), searchRadius, fillGradeInPercent), CameraType.VIS,
+			workimg.setCameraType(mask.getCameraType());
+			ImageData info = (ct == CameraType.VIS) ? input().images().getVisInfo() :
+					(ct == CameraType.FLUO) ? input().images().getFluoInfo() :
+							(ct == CameraType.NIR) ? input().images().getNirInfo() :
+									(ct == CameraType.IR) ? null : null;
+			savePeaksAndFeatures(getPeaksFromBorder(workimg, mask, searchRadius, fillGradeInPercent), ct,
 					optionsAndResults.getCameraPosition(),
-					searchRadius, maxValidY, input().images().getVisInfo(), input().masks().vis());
+					searchRadius, maxValidY, info, input().masks().vis());
 		}
-		return input().masks().vis();
-	}
-	
-	@Override
-	protected Image processFLUOmask() {
-		if (input().masks().fluo() == null)
-			return null;
-		boolean isBestAngle = isBestAngle(CameraType.FLUO);
-		// search for best side image
-		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
-			if (!isBestAngle)
-				ignore = true;
-		}
-		if (getBoolean("Calculate on Fluorescence Image", false) && !ignore) {
-			Image workimg = input().masks().fluo().copy();
-			int searchRadius = getInt("Search-radius (Fluo)", 40);
-			double fillGradeInPercent = getDouble("Fillgrade (Fluo)", 0.3);
-			borderSize = searchRadius / 2;
-			workimg.setCameraType(CameraType.FLUO);
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Fluo)", 0), getInt("Masksize Erode (Fluo)", 2),
-					getInt("Masksize Dilate (Fluo)", 5));
-			Roi bb = workimg.io().getBoundingBox();
-			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", -1) / 100d * bb.getBounds().height);
-			workimg.setCameraType(CameraType.FLUO);
-			savePeaksAndFeatures(getPeaksFromBorder(workimg, input().masks().fluo(), searchRadius, fillGradeInPercent), CameraType.FLUO,
-					optionsAndResults.getCameraPosition(),
-					searchRadius, maxValidY, input().images().getFluoInfo(), input().masks().fluo());
-		}
-		return input().masks().fluo();
-	}
-	
-	@Override
-	protected Image processNIRmask() {
-		if (input().masks().nir() == null)
-			return null;
-		boolean isBestAngle = isBestAngle(CameraType.NIR);
-		// search for best side image
-		if (getBoolean("Only calculate for Best Angle (fits to Main Axis)", true)) {
-			if (!isBestAngle)
-				ignore = true;
-		}
-		if (getBoolean("Calculate on Near-infrared Image", false) && !ignore) {
-			Image workimg = input().masks().nir().copy();
-			int searchRadius = getInt("Search-radius (Nir)", 15);
-			double fillGradeInPercent = getDouble("Fillgrade (Nir)", 0.35);
-			borderSize = searchRadius / 2;
-			workimg.setCameraType(CameraType.NIR);
-			workimg = preprocessImage(workimg, searchRadius, getInt("Size for Bluring (Nir)", 0), getInt("Masksize Erode (Nir)", 2),
-					getInt("Masksize Dilate (Nir)", 5));
-			Roi bb = workimg.io().getBoundingBox();
-			int maxValidY = (int) (bb.getBounds().y + bb.getBounds().height - getInt("Minimum Leaf Height Percent", -1) / 100d * bb.getBounds().height);
-			savePeaksAndFeatures(getPeaksFromBorder(workimg, input().masks().nir(), searchRadius, fillGradeInPercent), CameraType.NIR,
-					optionsAndResults.getCameraPosition(),
-					searchRadius, maxValidY, input().images().getNirInfo(), input().masks().nir());
-		}
-		return input().masks().nir();
+		return mask;
 	}
 	
 	private void savePeaksAndFeatures(LinkedList<Feature> peakList, CameraType cameraType, CameraPosition cameraPosition,
