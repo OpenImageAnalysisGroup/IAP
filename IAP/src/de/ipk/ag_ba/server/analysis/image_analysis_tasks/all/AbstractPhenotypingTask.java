@@ -728,7 +728,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				boolean multiTray = trays > 1;
 				
 				for (String tray : analysisResults.get(time).get(configName).keySet()) {
-					boolean multipleTrays = analysisResults.get(time).get(configName).keySet().size() > 1;
+					// boolean multipleTrays = analysisResults.get(time).get(configName).keySet().size() > 1;
 					for (String volumeID : analysisResults.get(time).get(configName).get(tray).getVolumeNames()) {
 						VolumeData v = analysisResults.get(time).get(configName).get(tray).getVolume(volumeID);
 						if (v != null) {
