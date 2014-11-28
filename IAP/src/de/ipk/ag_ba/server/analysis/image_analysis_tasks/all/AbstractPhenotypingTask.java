@@ -28,6 +28,7 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemHandler;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
+import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -346,15 +347,15 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 					continue;
 				LocalComputeJob analyze = new LocalComputeJob(
 						() -> {
-							BackgroundThreadDispatcher.stream("Analyze angles (top)").processSrings(
+							new StreamBackgroundTaskHelper<String>("Analyze angles (top)").process(
 									imageSetWithSpecificAngle.get(time).keySet().stream()
 											.filter(s -> s.startsWith("1st_top")),
-									(String configAndAngle) -> {
+									(configAndAngle) -> {
 										processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
 												plantResults, time, configAndAngle);
 									}, null);
 							
-							BackgroundThreadDispatcher.stream("Analyze angles (side)").processSrings(
+							new StreamBackgroundTaskHelper<String>("Analyze angles (side)").process(
 									imageSetWithSpecificAngle.get(time).keySet().stream()
 											.filter(s -> !s.startsWith("1st_top")),
 									(String configAndAngle) -> {

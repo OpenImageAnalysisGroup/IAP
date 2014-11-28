@@ -15,7 +15,7 @@ import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.structures.CameraType;
@@ -102,7 +102,8 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 									summaryStat.addValue(fimg.getAsJPGstream().getCount());
 								}
 								IntStream range = IntStream.of(20, 40, 60, 80, 90, 95, 100);
-								BackgroundThreadDispatcher.stream("Size Analysis (JPG Compression)").processInts(range,
+								new StreamBackgroundTaskHelper<Integer>("Size Analysis (JPG Compression)").process(
+										range,
 										(qq) -> {
 											SummaryStatistics qstat = null;
 											synchronized (q2stat) {

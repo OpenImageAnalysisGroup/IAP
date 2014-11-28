@@ -57,7 +57,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MemoryHogInterface;
 
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operation.binarymask.ImageJOperation;
@@ -1989,8 +1989,8 @@ public class ImageOperation implements MemoryHogInterface {
 		final ColorSpaceConverter convert = new ColorSpaceConverter(SystemOptions.getInstance().getStringRadioSelection("IAP", "Color Management//White Point",
 				ColorSpaceConverter.getWhitePointList(), ColorSpaceConverter.getDefaultWhitePoint(), true));
 		
-		BackgroundThreadDispatcher.stream("Construct Lab cube")
-				.processInts(IntStream.range(0, 256), (int red) -> {
+		new StreamBackgroundTaskHelper<Integer>("Construct Lab cube")
+				.process(IntStream.range(0, 256), (red) -> {
 					float[] p;
 					for (int green = 0; green < 256; green++) {
 						p = result[red][green];

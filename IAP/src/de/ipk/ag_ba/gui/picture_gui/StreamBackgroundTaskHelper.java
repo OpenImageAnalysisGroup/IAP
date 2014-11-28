@@ -12,7 +12,7 @@ import org.SystemAnalysis;
 /**
  * @author Christian Klukas
  */
-public class StreamBackgroundTaskHelper {
+public class StreamBackgroundTaskHelper<E> {
 	
 	private final String desc;
 	
@@ -61,7 +61,7 @@ public class StreamBackgroundTaskHelper {
 			return handler;
 	}
 	
-	public void processSrings(Stream<String> values, Consumer<String> c,
+	public void process(Stream<E> values, Consumer<E> c,
 			UncaughtExceptionHandler handler) {
 		UncaughtExceptionHandler handlerF = checkHandler(handler);
 		LinkedList<LocalComputeJob> work = new LinkedList<>();
@@ -82,6 +82,12 @@ public class StreamBackgroundTaskHelper {
 		} catch (InterruptedException e) {
 			handlerF.uncaughtException(Thread.currentThread(), e);
 		}
+	}
+	
+	public void process(IntStream values, IntConsumer c,
+			UncaughtExceptionHandler handler) {
+		processInts(values, c, handler);
+		return;
 	}
 	
 }

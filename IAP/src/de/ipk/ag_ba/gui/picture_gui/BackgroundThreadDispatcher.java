@@ -256,6 +256,11 @@ public class BackgroundThreadDispatcher {
 		return ThreadManager.getInstance().getNumberOfRunningBackgroundTasks();
 	}
 	
+	/**
+	 * Please use new StreamBackgroundTaskHelper<Type> directly, to use Generics.
+	 */
+	@SuppressWarnings("rawtypes")
+	@Deprecated
 	public static StreamBackgroundTaskHelper stream(String desc) {
 		return new StreamBackgroundTaskHelper(desc);
 	}
