@@ -38,6 +38,7 @@ public class CloudTaskManager {
 	LinkedHashSet<TaskDescription> runningTasks = new LinkedHashSet<TaskDescription>();
 	
 	public CloudTaskManager() {
+		
 	}
 	
 	Thread timerThread;

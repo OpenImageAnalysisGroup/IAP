@@ -92,13 +92,13 @@ public class MaskAndImageSet {
 		
 		int idxX = 0;
 		if (imgVis != null && debugStack.getDebugConfig().doVis())
-			io = io.drawAndFillRect(0 * wn, idxX++, imgVis);
+			io = io.drawAndFillRect((idxX++) * wn, 0, imgVis);
 		if (imgFluo != null && debugStack.getDebugConfig().doFluo())
-			io = io.drawAndFillRect(1 * wn, idxX++, imgFluo);
+			io = io.drawAndFillRect((idxX++) * wn, 0, imgFluo);
 		if (imgNir != null && debugStack.getDebugConfig().doNir())
-			io = io.drawAndFillRect(2 * wn, idxX++, imgNir);
+			io = io.drawAndFillRect((idxX++) * wn, 0, imgNir);
 		if (imgIr != null && debugStack.getDebugConfig().doIr())
-			io = io.drawAndFillRect(3 * wn, idxX++, imgIr);
+			io = io.drawAndFillRect((idxX++) * wn, 0, imgIr);
 		
 		if (maskset != null) {
 			ImageSet resizedMasks = maskset.equalize();

@@ -41,7 +41,7 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.images.IAPimages;
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
@@ -119,8 +119,10 @@ public class BlockPipeline {
 			status.setCurrentStatusValue(0);
 		boolean quick = true;
 		if (quick) {
-			BackgroundThreadDispatcher.stream(executionTrayCount > 1 ? "Analyze well" : "Pipeline execution")
-					.processInts(IntStream.range(0, executionTrayCount),
+			new StreamBackgroundTaskHelper<Integer>(
+					(executionTrayCount > 1 ? "Analyze well" : "Pipeline execution")).
+					process(
+							IntStream.range(0, executionTrayCount),
 							(currentWell) -> {
 								if (debugValidTrays != null && !debugValidTrays.contains(currentWell))
 									return;

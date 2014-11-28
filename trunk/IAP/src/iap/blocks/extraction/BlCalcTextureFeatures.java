@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 import org.ErrorMsg;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
 import de.ipk.ag_ba.image.operation.FirstOrderTextureFeatures;
 import de.ipk.ag_ba.image.operation.GLCMTextureFeatures;
 import de.ipk.ag_ba.image.operation.ImageMoments;
@@ -137,8 +137,8 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			glcmArrays.put(f, new SummaryStatistics());
 		}
 		
-		BackgroundThreadDispatcher.stream("Texture analysis").processInts(
-				IntStream.range(0, w), (int x) -> {
+		new StreamBackgroundTaskHelper<Integer>("Texture analysis").process(
+				IntStream.range(0, w), (x) -> {
 					for (int y = 0; y < h; y++) {
 						
 						if (mappedSkel2d[x][y] == ImageOperation.BACKGROUND_COLORint)
@@ -235,43 +235,44 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			glcmArrays.put(f, new double[w][h]);
 		}
 		
-		BackgroundThreadDispatcher.stream("Texture analysis for visualization").processInts(IntStream.range(0, w), (int x) -> {
-			for (int y = 0; y < h; y++) {
-				
-				if (img2d[x][y] == ImageOperation.BACKGROUND_COLORint)
-					continue;
-				
-				for (int i = 0; i < temp.length; i++)
-					temp[i] = ImageOperation.BACKGROUND_COLORint;
-				
-				int count = 0;
-				for (int xMask = -halfmask; xMask < halfmask; xMask++) {
-					for (int yMask = -halfmask; yMask < halfmask; yMask++) {
-						if (x + xMask >= 0 && x + xMask < w && y + yMask >= 0 && y + yMask < h) {
-							temp[count] = img2d[x + xMask][y + yMask];
+		new StreamBackgroundTaskHelper<Integer>("Texture analysis for visualization").process(
+				IntStream.range(0, w), (x) -> {
+					for (int y = 0; y < h; y++) {
+						
+						if (img2d[x][y] == ImageOperation.BACKGROUND_COLORint)
+							continue;
+						
+						for (int i = 0; i < temp.length; i++)
+							temp[i] = ImageOperation.BACKGROUND_COLORint;
+						
+						int count = 0;
+						for (int xMask = -halfmask; xMask < halfmask; xMask++) {
+							for (int yMask = -halfmask; yMask < halfmask; yMask++) {
+								if (x + xMask >= 0 && x + xMask < w && y + yMask >= 0 && y + yMask < h) {
+									temp[count] = img2d[x + xMask][y + yMask];
+								}
+								count++;
+							}
 						}
-						count++;
+						ImageTexture it = new ImageTexture(temp, f_masksize, f_masksize, true);
+						
+						it.calcTextureFeatures();
+						
+						for (FirstOrderTextureFeatures f : FirstOrderTextureFeatures.values()) {
+							double[][] arr = firstArrays.get(f);
+							arr[x][y] = it.firstOrderFeatures.get(f);
+						}
+						
+						it.calcGLCMTextureFeatures();
+						
+						for (GLCMTextureFeatures f : GLCMTextureFeatures.values()) {
+							double[][] arr = glcmArrays.get(f);
+							arr[x][y] = it.glcmFeatures.get(f);
+						}
 					}
-				}
-				ImageTexture it = new ImageTexture(temp, f_masksize, f_masksize, true);
-				
-				it.calcTextureFeatures();
-				
-				for (FirstOrderTextureFeatures f : FirstOrderTextureFeatures.values()) {
-					double[][] arr = firstArrays.get(f);
-					arr[x][y] = it.firstOrderFeatures.get(f);
-				}
-				
-				it.calcGLCMTextureFeatures();
-				
-				for (GLCMTextureFeatures f : GLCMTextureFeatures.values()) {
-					double[][] arr = glcmArrays.get(f);
-					arr[x][y] = it.glcmFeatures.get(f);
-				}
-			}
-		}, (t, e) -> {
-			ErrorMsg.addErrorMessage(new RuntimeException(e));
-		});
+				}, (t, e) -> {
+					ErrorMsg.addErrorMessage(new RuntimeException(e));
+				});
 		
 		ImageStack is = new ImageStack();
 		is.addImage(c.toString(), img.getImage());
