@@ -2,6 +2,8 @@ package de.ipk.ag_ba.plugins.pipelines;
 
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlFilterImagesByAngle;
+import iap.blocks.acquisition.BlFilterImagesByCondition;
+import iap.blocks.acquisition.BlFilterImagesByDate;
 import iap.blocks.acquisition.BlFilterImagesByTopOrSide;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
@@ -158,6 +160,8 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlFlowerDetectionAndFeatureExtraction(),
 				new BlCalcTextureFeatures(),
 				new BlShowThreeDColorHistogram(),
+				new BlFilterImagesByDate(),
+				new BlFilterImagesByCondition(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
