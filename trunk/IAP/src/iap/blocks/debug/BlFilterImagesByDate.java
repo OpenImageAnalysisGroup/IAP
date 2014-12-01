@@ -52,7 +52,7 @@ public class BlFilterImagesByDate extends AbstractSnapshotAnalysisBlock {
 		
 		boolean filterBefore_a = getBoolean("Filter before A", false);
 		boolean filterBetween = getBoolean("Filter between A and B", false);
-		boolean filterAfter_b = getBoolean("Filtr after B", false);
+		boolean filterAfter_b = getBoolean("Filter after B", false);
 		
 		boolean process = true;
 		
