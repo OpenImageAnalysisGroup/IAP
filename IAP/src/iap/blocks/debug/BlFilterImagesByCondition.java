@@ -1,4 +1,4 @@
-package iap.blocks.acquisition;
+package iap.blocks.debug;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
@@ -39,28 +39,29 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 		
 		for (int filterIdx = 0; filterIdx < filterCount; filterIdx++) {
 			Stream<ConditionInfo> possibleValues = ConditionInfo.getList().stream().filter((ConditionInfo f) -> {
-				return ((f == ConditionInfo.IGNORED_FIELD) || (f == ConditionInfo.FILES));
+				return ((f != ConditionInfo.IGNORED_FIELD) && (f != ConditionInfo.FILES));
 			});
-			String calculationMode = optionsAndResults.getStringSettingRadio(this, "Annotation Mode", ConditionInfo.TREATMENT.name(),
+			
+			String calculationMode = optionsAndResults.getStringSettingRadio(this, "Annotation Mode - F " + filterIdx, ConditionInfo.TREATMENT.getNiceString(),
 					StringManipulationTools.getStringListFromStream(possibleValues));
 			
-			ConditionInfo annotationMode = ConditionInfo.valueOf(calculationMode);
+			ConditionInfo annotationMode = ConditionInfo.valueOfString(calculationMode);
 			
-			String[] possibleValues1 = { "must contain", "must not contain" };
-			String calculationMode1 = optionsAndResults.getStringSettingRadio(this, "Calculation Mode", "must contain",
+			String[] possibleValues1 = { "contains", "not contains" };
+			String calculationMode1 = optionsAndResults.getStringSettingRadio(this, "Calculation Mode - F " + filterIdx, "contains",
 					StringManipulationTools.getStringListFromArray(possibleValues1));
 			
 			String containMode = calculationMode1;
 			
-			String value = getString("Condition", "");
+			String value = getString("Condition - F " + filterIdx, "");
 			
 			String condition = processedImages.getAnyInfo().getParentSample().getParentCondition().getField(annotationMode);
-			if (condition != null && containMode.equals("must not contain"))
-				if (condition.equals(value))
+			if (condition != null && containMode.equals("not contains"))
+				if (!condition.equals(value))
 					process = false;
 			
-			if (condition != null && containMode.equals("must contain"))
-				if (!condition.equals(value))
+			if (condition != null && containMode.equals("contains"))
+				if (condition.equals(value))
 					process = false;
 		}
 		
