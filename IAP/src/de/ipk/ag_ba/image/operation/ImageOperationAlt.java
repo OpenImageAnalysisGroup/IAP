@@ -16,7 +16,8 @@ public class ImageOperationAlt {
 		int[] filteredImage = new int[image.length];
 		
 		int n = (int) (6 * sigma + 1);
-		
+		if (n <= 0)
+			return imageOperation;
 		double[] window = new double[n];
 		double s2 = 2 * sigma * sigma;
 		
