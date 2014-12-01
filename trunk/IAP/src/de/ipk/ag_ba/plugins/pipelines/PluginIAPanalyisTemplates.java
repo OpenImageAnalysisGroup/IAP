@@ -1,10 +1,6 @@
 package de.ipk.ag_ba.plugins.pipelines;
 
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
-import iap.blocks.acquisition.BlFilterImagesByAngle;
-import iap.blocks.acquisition.BlFilterImagesByCondition;
-import iap.blocks.acquisition.BlFilterImagesByDate;
-import iap.blocks.acquisition.BlFilterImagesByTopOrSide;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
 import iap.blocks.auto.BlAdaptiveSegmentationFluo;
@@ -13,6 +9,10 @@ import iap.blocks.auto.BlAdaptiveUseFluoMaskToClearOther;
 import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
 import iap.blocks.auto.BlWarpImages;
 import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.blocks.debug.BlFilterImagesByAngle;
+import iap.blocks.debug.BlFilterImagesByCondition;
+import iap.blocks.debug.BlFilterImagesByDate;
+import iap.blocks.debug.BlFilterImagesByTopOrSide;
 import iap.blocks.debug.BlShowThreeDColorHistogram;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;

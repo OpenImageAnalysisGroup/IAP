@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 /**
  * @author klukas
@@ -1069,5 +1070,11 @@ public class StringManipulationTools implements HelperClass {
 		for (int i : values)
 			v.add(i + "");
 		return getStringList(v, div);
+	}
+	
+	public static ArrayList<String> getStringListFromStream(Stream<?> possibleValues) {
+		ArrayList<String> res = new ArrayList<String>();
+		possibleValues.forEach((e) -> res.add(e + ""));
+		return res;
 	}
 }

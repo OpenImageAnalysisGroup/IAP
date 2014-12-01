@@ -1,4 +1,4 @@
-package iap.blocks.acquisition;
+package iap.blocks.debug;
 
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
