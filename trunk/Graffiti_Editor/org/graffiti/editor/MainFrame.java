@@ -584,6 +584,7 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 				addStatusPanel(null);
 			}
 		});
+		
 	}
 	
 	// public void hideSidePanel() {
