@@ -10,6 +10,9 @@ import org.graffiti.graphics.GraphicAttributeConstants;
 import de.ipk_gatersleben.ag_nw.graffiti.NodeTools;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.algorithms.RecolorEdgesAlgorithm;
 
+/**
+ * @author klukas
+ */
 public class HeatMapOptions {
 	public double heatMapLowerBound;
 	public double heatMapMiddleBound;
@@ -17,11 +20,11 @@ public class HeatMapOptions {
 	public Color heatMapLowerColor;
 	public Color heatMapMiddleColor;
 	public Color heatMapUpperColor;
-	private double heatMapGamma;
+	private final double heatMapGamma;
 	
 	public HeatMapOptions(double heatMapLowerBound, double heatMapMiddleBound, double heatMapUpperBound,
-						Color heatMapLowerColor, Color heatMapMiddleColor, Color heatMapUpperColor,
-						double heatMapGamma) {
+			Color heatMapLowerColor, Color heatMapMiddleColor, Color heatMapUpperColor,
+			double heatMapGamma) {
 		this.heatMapLowerBound = heatMapLowerBound;
 		this.heatMapMiddleBound = heatMapMiddleBound;
 		this.heatMapUpperBound = heatMapUpperBound;
@@ -54,6 +57,6 @@ public class HeatMapOptions {
 	
 	public Color getHeatmapColor(double doubleValue) {
 		return RecolorEdgesAlgorithm.get3Color(heatMapLowerBound, heatMapUpperBound, heatMapMiddleBound,
-							doubleValue, heatMapGamma, heatMapLowerColor, heatMapMiddleColor, heatMapUpperColor);
+				doubleValue, heatMapGamma, heatMapLowerColor, heatMapMiddleColor, heatMapUpperColor);
 	}
 }
