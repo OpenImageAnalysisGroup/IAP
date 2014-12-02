@@ -878,7 +878,7 @@ public class GravistoService implements HelperClass {
 			int height = image.getHeight(observer);
 			final Graphics2D g2d = (Graphics2D) g.create(x, y, width, height);
 			
-			g2d.scale(0.5, 0.5);
+			g2d.scale(1f / SystemAnalysis.getHiDPIScaleFactor(), 1f / SystemAnalysis.getHiDPIScaleFactor());
 			g2d.drawImage(image, 0, 0, observer);
 			g2d.scale(1, 1);
 			g2d.dispose();
