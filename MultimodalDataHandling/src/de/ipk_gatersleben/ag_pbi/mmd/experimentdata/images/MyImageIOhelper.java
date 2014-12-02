@@ -42,7 +42,11 @@ import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 public class MyImageIOhelper {
 	
 	public static BufferedImage getPreviewImage(BufferedImage image) {
-		int width = 128, height = 128;
+		return getPreviewImage(image, 128);
+	}
+	
+	public static BufferedImage getPreviewImage(BufferedImage image, int size) {
+		int width = size, height = size;
 		
 		int oldWidth = image.getWidth();
 		int oldHeight = image.getHeight();
@@ -57,8 +61,12 @@ public class MyImageIOhelper {
 	}
 	
 	public static MyByteArrayInputStream getPreviewImageStream(BufferedImage image) throws IOException {
+		return getPreviewImageStream(image, 128);
+	}
+	
+	public static MyByteArrayInputStream getPreviewImageStream(BufferedImage image, int size) throws IOException {
 		try {
-			BufferedImage previewImage = getPreviewImage(image);
+			BufferedImage previewImage = getPreviewImage(image, size);
 			
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(bos);
