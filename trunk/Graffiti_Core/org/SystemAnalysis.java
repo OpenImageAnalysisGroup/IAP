@@ -1,6 +1,7 @@
 package org;
 
 import java.awt.AWTException;
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.InetAddress;
@@ -504,5 +506,45 @@ public class SystemAnalysis {
 	
 	public static String getFileSeparator() {
 		return System.getProperty("file.separator");
+	}
+	
+	public static boolean isRetina() {
+		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		final GraphicsDevice device = env.getDefaultScreenDevice();
+		
+		try {
+			Field field = device.getClass().getDeclaredField("scale");
+			
+			if (field != null) {
+				field.setAccessible(true);
+				Object scale = field.get(device);
+				
+				if (scale instanceof Integer && ((Integer) scale).intValue() == 2) {
+					return true;
+				}
+			}
+		} catch (Exception ignore) {
+		}
+		return false;
+	}
+	
+	public static float getHiDPIScaleFactor() {
+		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		final GraphicsDevice device = env.getDefaultScreenDevice();
+		
+		try {
+			Field field = device.getClass().getDeclaredField("scale");
+			
+			if (field != null) {
+				field.setAccessible(true);
+				Object scale = field.get(device);
+				
+				if (scale instanceof Integer && ((Integer) scale).intValue() == 2) {
+					return ((Integer) scale).intValue();
+				}
+			}
+		} catch (Exception ignore) {
+		}
+		return 1f;
 	}
 }
