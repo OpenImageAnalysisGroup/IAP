@@ -37,19 +37,20 @@ public class FtpFileSystemSource extends HTTPhandler implements DataSource {
 	protected Collection<PathwayWebLinkItem> mainList;
 	private final NavigationImage mainDataSourceIcon;
 	private final String dataSourceName;
-	private final NavigationImage folderIcon;
+	private final NavigationImage folderIcon, folderIconOpened;
 	protected boolean read;
 	protected DataSourceLevel thisLevel;
 	private final Library lib;
 	private String description;
 	
 	public FtpFileSystemSource(Library lib, String dataSourceName, String url, String[] validExtensions,
-			NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
+			NavigationImage mainDataSourceIcon, NavigationImage folderIcon, NavigationImage folderIconOpened) {
 		this.lib = lib;
 		this.url = url;
 		this.validExtensions = validExtensions;
 		this.mainDataSourceIcon = mainDataSourceIcon;
 		this.folderIcon = folderIcon;
+		this.folderIconOpened = folderIconOpened;
 		this.dataSourceName = dataSourceName;
 	}
 	
@@ -64,7 +65,8 @@ public class FtpFileSystemSource extends HTTPhandler implements DataSource {
 		thisLevel = new HTTPdataSourceLevel(lib, dataSourceName, mainList,
 				mainDataSourceIcon,
 				mainDataSourceIcon,
-				folderIcon);
+				folderIcon,
+				folderIconOpened);
 		read = true;
 	}
 	

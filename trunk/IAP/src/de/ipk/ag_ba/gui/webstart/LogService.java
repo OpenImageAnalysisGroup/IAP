@@ -4,8 +4,8 @@ import java.util.Stack;
 
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 public class LogService {
@@ -45,7 +45,7 @@ public class LogService {
 				do {
 					Thread.sleep(10);
 					long current = System.currentTimeMillis();
-					if (current - start > IAPoptions.getInstance().getInteger("NEWS", "read_time_out_ms", 2000)) {
+					if (current - start > SystemOptions.getInstance().getInteger("NEWS", "read_time_out_ms", 2000)) {
 						news.add(preLine
 								+ SystemAnalysis.getCurrentTime()
 								+ ": Could not access latest news (time-out). <b>&quot;Data Processing&quot; function may not work correctly at the moment.</b> (system message)");

@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.plugins.pipelines;
 
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.PipelineDesc;
@@ -16,12 +17,12 @@ public abstract class AbstractPipelineTemplate implements AnalysisPipelineTempla
 				null,
 				getTitle(),
 				getDescription(),
-				getTestedIAPversion());
+				getTestedIAPversion(), true);
 		return pd;
 	}
 	
 	@Override
 	public String getTestedIAPversion() {
-		return "(not tested)";
+		return ReleaseInfo.IAP_VERSION_STRING;
 	}
 }

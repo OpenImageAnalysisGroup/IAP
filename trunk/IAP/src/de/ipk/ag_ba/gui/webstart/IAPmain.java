@@ -46,9 +46,10 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.plugin.view.View;
 import org.graffiti.session.Session;
 
+import com.apple.eawt.Application;
+
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -112,7 +113,7 @@ public class IAPmain extends JApplet {
 		setRunMode(IAPrunMode.SWING_MAIN);
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Initialize IAP start... (run-mode: " + getRunMode() + ")");
-		String title = IAPoptions.getInstance().getString("IAP", "window_title",
+		String title = SystemOptions.getInstance().getString("IAP", "window_title",
 				"IAP - The Integrated Analysis Platform") + "";
 		
 		SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
@@ -125,9 +126,12 @@ public class IAPmain extends JApplet {
 		jf.add("Center", iap.getContentPane());
 		jf.pack();
 		try {
-			jf.setIconImage(AbstractIAPplugin.getIAPicon().getImage());
+			java.awt.Image img = AbstractIAPplugin.getIAPicon().getImage();
+			jf.setIconImage(img);
+			
+			Application.getApplication().setDockIconImage(img);
+			
 		} catch (Exception e) {
-			e.printStackTrace();
 			ErrorMsg.addErrorMessage(e);
 		}
 		final WeakReference<JFrame> fr = new WeakReference<JFrame>(jf);
@@ -181,7 +185,7 @@ public class IAPmain extends JApplet {
 			public void run() {
 				JFrame j = fr.get();
 				if (j != null) {
-					String newTitle = IAPoptions.getInstance().getString("IAP", "window_title", "IAP - The Integrated Analysis Platform");
+					String newTitle = SystemOptions.getInstance().getString("IAP", "window_title", "IAP - The Integrated Analysis Platform");
 					j.setTitle(newTitle + "");
 				}
 			}
@@ -604,7 +608,7 @@ public class IAPmain extends JApplet {
 	}
 	
 	private static SystemOptions getOptions() {
-		return IAPoptions.getInstance();
+		return SystemOptions.getInstance();
 	}
 	
 	private static IAPrunMode currentGuiMode = IAPrunMode.UNKNOWN;

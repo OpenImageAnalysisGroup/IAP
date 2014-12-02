@@ -167,7 +167,9 @@ public class IAPpluginManager {
 			PipelineDesc pd = template.getDefaultPipelineDesc();
 			AbstractPhenotypingTask pt = new TemplatePhenotypingTask(pd, template);
 			try {
-				pt.getImageProcessor().getPipeline(new ImageProcessorOptionsAndResults(pd.getOptions(), null, null));
+				// String pn = so.getString("DESCRIPTION", "pipeline_name", null, false);
+				ImageProcessorOptionsAndResults op = new ImageProcessorOptionsAndResults(pd.getOptions(), null, null);
+				pt.getImageProcessor().getPipeline(op);
 			} catch (Error e) {
 				ErrorMsg.addErrorMessage("Could not process template " + pd.getName() + ": " + e.getMessage());
 			}

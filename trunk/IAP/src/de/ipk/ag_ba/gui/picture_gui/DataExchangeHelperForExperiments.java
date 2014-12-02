@@ -462,7 +462,7 @@ public class DataExchangeHelperForExperiments {
 			}
 		
 		if (addDataChart) {
-			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
+			ImageIcon previewImage = IAPimages.getIcon(IAPimages.getHistogramIcon(), 32, 32);
 			
 			final DataSetFileButton chartingButton = new DataSetFileButton(
 					mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?

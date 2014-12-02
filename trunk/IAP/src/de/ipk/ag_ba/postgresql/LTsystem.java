@@ -1,16 +1,16 @@
 package de.ipk.ag_ba.postgresql;
 
-import de.ipk.ag_ba.gui.IAPoptions;
+import org.SystemOptions;
 
 public enum LTsystem {
 	Barley, Maize, Phytochamber, Unknown;
 	
 	public static LTsystem getTypeFromDatabaseName(String database) {
-		if (database.startsWith(IAPoptions.getInstance().getString("LT-DB", "DBs//db_prefix_Phytochamber", "APH_")))
+		if (database.startsWith(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Phytochamber", "APH_")))
 			return Phytochamber;
-		if (database.startsWith(IAPoptions.getInstance().getString("LT-DB", "DBs//db_prefix_Barley", "BGH_")))
+		if (database.startsWith(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Barley", "BGH_")))
 			return Barley;
-		if (database.startsWith(IAPoptions.getInstance().getString("LT-DB", "DBs//db_prefix_Maize", "CGH_")))
+		if (database.startsWith(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Maize", "CGH_")))
 			return Maize;
 		return Unknown;
 	}

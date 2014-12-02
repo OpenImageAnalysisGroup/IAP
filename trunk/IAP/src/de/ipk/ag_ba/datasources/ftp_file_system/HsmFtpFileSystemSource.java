@@ -37,8 +37,9 @@ public class HsmFtpFileSystemSource extends FtpFileSystemSource {
 	private String login;
 	
 	public HsmFtpFileSystemSource(Library lib, String dataSourceName, String folder, NavigationImage mainDataSourceIcon,
-			NavigationImage folderIcon) {
-		super(lib, dataSourceName, folder, new String[] {}, mainDataSourceIcon, folderIcon);
+			NavigationImage folderIcon, NavigationImage folderIconOpened) {
+		super(lib, dataSourceName, folder, new String[] {},
+				mainDataSourceIcon, folderIcon, folderIconOpened);
 		
 		if (!registeredFolders.contains(folder)) {
 			ResourceIOManager.registerIOHandler(new HsmResourceIoHandler(folder));

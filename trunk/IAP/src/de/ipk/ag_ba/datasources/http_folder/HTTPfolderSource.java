@@ -42,9 +42,10 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 	private final Library lib;
 	private String description;
 	private final DataSourceGroup dsg;
+	private final NavigationImage folderIconOpened;
 	
 	public HTTPfolderSource(DataSourceGroup dsg, Library lib, String dataSourceName, String url, String[] validExtensions,
-			NavigationImage mainDataSourceIcon, NavigationImage folderIcon) {
+			NavigationImage mainDataSourceIcon, NavigationImage folderIcon, NavigationImage folderIconOpened) {
 		this.dsg = dsg;
 		this.lib = lib;
 		this.url = url;
@@ -52,6 +53,7 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 		this.mainDataSourceIcon = mainDataSourceIcon;
 		this.folderIcon = folderIcon;
 		this.dataSourceName = dataSourceName;
+		this.folderIconOpened = folderIconOpened;
 	}
 	
 	@Override
@@ -65,7 +67,8 @@ public class HTTPfolderSource extends HTTPhandler implements DataSource {
 		thisLevel = new HTTPdataSourceLevel(lib, dataSourceName, mainList,
 				mainDataSourceIcon,
 				mainDataSourceIcon,
-				folderIcon);
+				folderIcon,
+				folderIconOpened);
 		read = true;
 	}
 	

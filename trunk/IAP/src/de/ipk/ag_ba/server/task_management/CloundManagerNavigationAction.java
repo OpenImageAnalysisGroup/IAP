@@ -48,7 +48,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/preferences-desktop-screensaver.png";
+		return "img/ext/gpl2/Gnome-utilities-system-monitor.png";// preferences-desktop-screensaver.png";
 	}
 	
 	@Override

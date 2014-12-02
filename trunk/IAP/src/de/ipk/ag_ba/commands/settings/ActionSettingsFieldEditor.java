@@ -417,10 +417,10 @@ public class ActionSettingsFieldEditor extends AbstractNavigationAction {
 					return "img/ext/gpl2/Gnome-Emblem-Unreadable-64.png";// gtcd.png";
 			} else
 				if (isInteger) {
-					return "img/ext/gpl2/Gnome-Accessories-Calculator-64.png";
+					return "img/ext/gpl2/Gnome-Input-dialpad.png";// Gnome-Accessories-Calculator-64.png";
 				} else
 					if (isFloat) {
-						return "img/ext/gpl2/Gnome-Accessories-Calculator-64.png";
+						return "img/ext/gpl2/Gnome-Input-dialpad.png";// Gnome-Accessories-Calculator-64.png";
 					} else {
 						if (setting.equalsIgnoreCase("password"))
 							return "img/ext/gpl2/Gnome-Emblem-Readonly-64.png";

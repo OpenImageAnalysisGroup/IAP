@@ -7,7 +7,6 @@ import org.SystemOptions;
 import de.ipk.ag_ba.commands.load_dataset.ActionLoadDataSet;
 import de.ipk.ag_ba.commands.lt.ActionLTnavigation;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -30,12 +29,12 @@ public class PluginIAPhomeActions extends AbstractIAPplugin {
 		boolean addLoadFilesIcon = SystemOptions.getInstance().getBoolean("File Import", "Show Load Files Icon", true);
 		boolean addLoadExportedIcons = IAPmain.getRunMode() == IAPrunMode.SWING_MAIN || IAPmain.getRunMode() == IAPrunMode.SWING_APPLET;
 		boolean showLoadLocalOrRemote = SystemOptions.getInstance().getBoolean("File Import", "Show Load From Exported VFS Icon", true);
-		boolean showLoadLTfileExport = IAPoptions.getInstance().getBoolean("File Import", "Show LT DB-Import-Export-Tool Import Icon", true);
+		boolean showLoadLTfileExport = SystemOptions.getInstance().getBoolean("File Import", "Show LT DB-Import-Export-Tool Import Icon", true);
 		if (addLoadExportedIcons && (showLoadLocalOrRemote || showLoadLTfileExport || addLoadFilesIcon)) {
 			result.add(new ActionLoadDataSet("Load dataset from local or remote storage"));
 		}
 		
-		boolean lt = IAPoptions.getInstance().getBoolean("LT-DB", "show_icon", true);
+		boolean lt = SystemOptions.getInstance().getBoolean("LT-DB", "show_icon", true);
 		if (lt) {
 			result.add(new ActionLTnavigation());
 		}

@@ -142,7 +142,7 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/user-desktop.png";
+		return "img/ext/gpl2/Gnome-Image-X-Generic-64.png";// user-desktop.png";
 	}
 	
 	@Override

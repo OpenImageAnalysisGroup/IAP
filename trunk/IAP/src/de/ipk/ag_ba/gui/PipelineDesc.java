@@ -19,10 +19,17 @@ public class PipelineDesc {
 	
 	public PipelineDesc(String iniFileName, IniIoProvider iniIO, String defName,
 			String defDescription, String defTestedIAPversion) {
+		this(iniFileName, iniIO, defName, defDescription, defTestedIAPversion, false);
+	}
+	
+	public PipelineDesc(String iniFileName, IniIoProvider iniIO, String defName,
+			String defDescription, String defTestedIAPversion, boolean OVERRaddDefaultIfNeeded) {
 		this.iniFileName = iniFileName;
 		this.iniIO = iniIO;
-		so = SystemOptions.getInstance(iniFileName, iniIO);
 		boolean addDefaultIfNeeded = iniIO != null && iniIO.isAbleToSaveData();
+		if (OVERRaddDefaultIfNeeded)
+			addDefaultIfNeeded = true;
+		so = SystemOptions.getInstance(iniFileName, iniIO);
 		so.getString("DESCRIPTION", "pipeline_name", defName, addDefaultIfNeeded);
 		so.getString("DESCRIPTION", "pipeline_description", defDescription, addDefaultIfNeeded);
 		so.getString("DESCRIPTION", "tuned_for_IAP_version", defTestedIAPversion, addDefaultIfNeeded);

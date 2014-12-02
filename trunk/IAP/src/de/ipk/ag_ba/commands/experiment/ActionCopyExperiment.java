@@ -156,7 +156,7 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/transfer2c.png";
+		return "img/ext/gpl2/Folder-move2.png";// transfer2c.png";
 	}
 	
 	@Override

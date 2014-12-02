@@ -37,7 +37,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/colorhistogram.png";
+		return "img/ext/gpl2/Gnome-X-Office-Spreadsheet-64.png";// colorhistogram.png";
 	}
 	
 	@Override

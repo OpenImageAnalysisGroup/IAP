@@ -152,7 +152,7 @@ public class ActionSettings extends AbstractNavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		ArrayList<NavigationButton> rr = new ArrayList<NavigationButton>(res);
-		Book book = new Book(null, "Help", new IOurl("http://ba-13.ipk-gatersleben.de/iap/documentation.pdf"), "img/dataset.png");
+		Book book = new Book(null, "Help", new IOurl("http://iap.ipk-gatersleben.de/#workflow"), "img/dataset.png");
 		rr.add(0, book.getNavigationButton(src));
 		return rr;
 	}

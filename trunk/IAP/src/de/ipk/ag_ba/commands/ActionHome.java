@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.about.ActionAbout;
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.datasources.DataSourceGroup;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -46,10 +46,7 @@ public final class ActionHome extends AbstractNavigationAction {
 		
 		addDataSourceAndDataSourceGroups(guiSetting);
 		
-		NavigationButton serverStatusEntity = Other.getServerStatusEntity(guiSetting);
-		homePrimaryActions.add(serverStatusEntity);
-		
-		boolean vfs = IAPoptions.getInstance().getBoolean("VFS", "enabled", true);
+		boolean vfs = SystemOptions.getInstance().getBoolean("VFS", "enabled", true);
 		if (vfs) {
 			// add VFS entries
 			for (VirtualFileSystem vfsEntry : VirtualFileSystem.getKnown(true, false)) {
@@ -57,9 +54,12 @@ public final class ActionHome extends AbstractNavigationAction {
 			}
 		}
 		
-		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", true);
+		boolean vanted = SystemOptions.getInstance().getBoolean("VANTED", "show_icon", true);
 		if (vanted)
 			homePrimaryActions.add(new NavigationButton(new ActionShowVANTED(), guiSetting));
+		
+		NavigationButton serverStatusEntity = Other.getServerStatusEntity(guiSetting);
+		homePrimaryActions.add(serverStatusEntity);
 		
 		boolean showSetting = true;// SystemOptions.getInstance().getBoolean("IAP", "show_settings_icon", true);
 		if (showSetting) {

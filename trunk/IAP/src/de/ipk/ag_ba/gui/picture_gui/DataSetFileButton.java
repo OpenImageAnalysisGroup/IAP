@@ -295,8 +295,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			JMenuItem debugPipelineTestShowMainImage = new JMenuItem(
 					"Show Image");
 			
-			debugPipelineTestShowMainImage.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png").getScaledInstance(16, 16,
-					java.awt.Image.SCALE_SMOOTH)));
+			debugPipelineTestShowMainImage.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png", 16, 16));
 			
 			debugPipelineTestShowMainImage
 					.addActionListener(new ActionListener() {
@@ -471,12 +470,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			jp.add(debugShowAnnotationImage);
 			
 			JMenu snt = new JMenu("Timeline");
-			snt.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Appointment-Soon-64.png").getScaledInstance(16, 16,
-					java.awt.Image.SCALE_SMOOTH)));
+			snt.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Appointment-Soon-64.png", 16, 16));
 			{
 				JMenuItem stl = new JMenuItem("Show Image Timeline");
-				stl.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Appointment-Soon-64.png").getScaledInstance(16, 16,
-						java.awt.Image.SCALE_SMOOTH)));
+				stl.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Appointment-Soon-64.png", 16, 16));
 				stl.addActionListener(getListener(targetTreeNode, true,
 						false, false, ImageViewMode.TIMELINE));
 				snt.add(stl);
@@ -490,11 +487,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			jp.add(snt);
 			
 			JMenu sn = new JMenu("Snapshot");
-			sn.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Photos-64.png").getScaledInstance(16, 16,
-					java.awt.Image.SCALE_SMOOTH)));
+			sn.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Emblem-Photos-64.png", 16, 16));
 			JMenuItem a = new JMenuItem("Show Image Set");
-			a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Photos-64.png").getScaledInstance(16, 16,
-					java.awt.Image.SCALE_SMOOTH)));
+			a.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Emblem-Photos-64.png", 16, 16));
 			a.addActionListener(getListener(targetTreeNode, true,
 					false, false, ImageViewMode.SHOW));
 			sn.add(a);
@@ -516,12 +511,10 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			jp.add(sn);
 			
 			JMenu fxCube = new JMenu("Color Analysis");
-			fxCube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
-					java.awt.Image.SCALE_SMOOTH)));
+			fxCube.setIcon(IAPimages.getIcon("img/cube.png", 16, 16));
 			{
 				JMenuItem shcube = new JMenuItem("Show 3-D Histogram Cube");
-				shcube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
-						java.awt.Image.SCALE_SMOOTH)));
+				shcube.setIcon(IAPimages.getIcon("img/cube.png", 16, 16));
 				shcube.addActionListener((ActionEvent ev) -> {
 					IOurl s = imageResult
 							.getBinaryFileInfo()
@@ -585,23 +578,18 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						};
 						jp.add(new JSeparator());
 						JMenuItem mi = new JMenuItem(action);
-						mi.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(16, 16,
-								java.awt.Image.SCALE_SMOOTH)));
+						mi.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Applications-Science-64.png", 16, 16));
 						jp.add(mi);
 						PipelineDesc pd = new PipelineDesc(null, iop, null, null, null);
 						UserDefinedImageAnalysisPipelineTask iat =
 								new UserDefinedImageAnalysisPipelineTask(pd);
 						if (!targetTreeNode.getExperiment().getHeader().getExperimentType().equalsIgnoreCase("Analysis Results")) {
 							JMenuItem debugPipelineTest0a = getMenuItemAnalyseFromMainImage(targetTreeNode, iat);
-							debugPipelineTest0a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png")
-									.getScaledInstance(16, 16,
-											java.awt.Image.SCALE_SMOOTH)));
+							debugPipelineTest0a.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Applications-Engineering-64.png", 16, 16));
 							jp.add(debugPipelineTest0a);
 						} else {
 							JMenuItem debugPipelineTest00a = getMenuItemAnalyseFromLabelImage(targetTreeNode, iat);
-							debugPipelineTest00a.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png")
-									.getScaledInstance(16, 16,
-											java.awt.Image.SCALE_SMOOTH)));
+							debugPipelineTest00a.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Applications-Engineering-64.png", 16, 16));
 							jp.add(debugPipelineTest00a);
 						}
 						jp.add(new JSeparator());
@@ -618,7 +606,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 							
 						};
 						JMenuItem jmc = new JMenuItem(action2);
-						jmc.setIcon(new ImageIcon(IAPimages.getImage("img/close_frame.png")));
+						jmc.setIcon(IAPimages.getIcon("img/close_frame.png", 16, 16));
+						jmc.setDisabledIcon(IAPimages.getIcon("img/close_frame.png", 16, 16));
 						jp.add(jmc);
 						
 						jp.add(new JSeparator());
@@ -700,8 +689,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			if (downloadNeeded) {
 				JMenuItem tempItem = new JMenuItem("Download file...");
 				
-				tempItem.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Emblem-Downloads-64.png").getScaledInstance(16, 16,
-						java.awt.Image.SCALE_SMOOTH)));
+				tempItem.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Emblem-Downloads-64.png", 16, 16));
 				
 				tempItem.setEnabled(false);
 				myPopup.add(tempItem);
@@ -1089,20 +1077,17 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	void addDefaultCommands(final JPopupMenu myPopup) {
 		showImageCmdMain = new JMenuItem("Show Image");
-		showImageCmdMain.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png").getScaledInstance(16, 16,
-				java.awt.Image.SCALE_SMOOTH)));
+		showImageCmdMain.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png", 16, 16));
 		
 		showImageCmdLabel = new JMenuItem("Show Reference Image");
 		showVolumeCmd = new JMenuItem("Show 3D-Volume");
 		saveFileCmdMain = new JMenuItem("Save File As...");
-		saveFileCmdMain.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Document-Save-64.png").getScaledInstance(16, 16,
-				java.awt.Image.SCALE_SMOOTH)));
+		saveFileCmdMain.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Document-Save-64.png", 16, 16));
 		
 		saveFileCmdLabel = new JMenuItem("Save Reference File As...");
 		openFileCmdMain = new JMenuItem(
 				"View/Open with system default application");
-		openFileCmdMain.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-System-Run-64.png").getScaledInstance(16, 16,
-				java.awt.Image.SCALE_SMOOTH)));
+		openFileCmdMain.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-System-Run-64.png", 16, 16));
 		
 		openFileCmdLabel = new JMenuItem(
 				"View/Open Reference file with system default application");
@@ -1529,8 +1514,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 	
 	private JMenu getAnnotationChangerSubmenu() {
 		JMenu fm = new JMenu("Modify Annotation (Outlier/Flag)");
-		fm.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Bookmark-New-64.png").getScaledInstance(16, 16,
-				java.awt.Image.SCALE_SMOOTH)));
+		fm.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Bookmark-New-64.png", 16, 16));
 		fm.add(getCameraSelectionMenu(CameraSelection.THIS_CAMERA));
 		fm.add(getCameraSelectionMenu(CameraSelection.ALL_CAMERAS_AND_MEASURMENT_TYPES));
 		

@@ -38,7 +38,7 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	protected final NavigationImage mainDataSourceIconInactive;
 	protected final NavigationImage mainDataSourceIconActive;
 	protected final String dataSourceName;
-	protected final NavigationImage folderIcon;
+	protected final NavigationImage folderIcon, folderIconOpened;
 	protected boolean read;
 	protected DataSourceLevel thisLevel;
 	protected final Library lib;
@@ -47,13 +47,15 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	public FileSystemSource(Library lib, String dataSourceName, String folder, String[] validExtensions,
 			NavigationImage mainDataSourceIcon,
 			NavigationImage mainDataSourceIconActive,
-			NavigationImage folderIcon) {
+			NavigationImage folderIcon,
+			NavigationImage folderIconOpened) {
 		this.lib = lib;
 		this.url = folder;
 		this.validExtensions = validExtensions;
 		this.mainDataSourceIconInactive = mainDataSourceIcon;
 		this.mainDataSourceIconActive = mainDataSourceIcon;
 		this.folderIcon = folderIcon;
+		this.folderIconOpened = folderIconOpened;
 		this.dataSourceName = dataSourceName;
 		
 		ExperimentReference.registerExperimentLoader(this);
@@ -71,7 +73,8 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 				lib, dataSourceName, mainList,
 				mainDataSourceIconInactive,
 				mainDataSourceIconActive,
-				folderIcon);
+				folderIcon,
+				folderIconOpened);
 		read = true;
 	}
 	

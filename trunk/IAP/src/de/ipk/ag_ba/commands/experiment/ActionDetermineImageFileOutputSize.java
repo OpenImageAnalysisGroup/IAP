@@ -448,7 +448,7 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 			if (sizeEst < 8500000000l)
 				return "img/ext/gpl2/Gnome-Media-Optical-64_double.png";
 			if (sizeEst < 64000000000l)
-				return "img/ext/gpl2/Gnome-Media-Flash-64.png";
+				return "img/ext/gpl2/Gnome-Media-removable.png";
 			return "img/ext/gpl2/Gnome-Drive-Harddisk-64.png";
 		}
 		

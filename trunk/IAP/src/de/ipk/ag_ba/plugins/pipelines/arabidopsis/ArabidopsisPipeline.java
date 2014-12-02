@@ -96,9 +96,4 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 	public boolean analyzeSideImages() {
 		return true;
 	}
-	
-	@Override
-	public String getTestedIAPversion() {
-		return "1.2.0";
-	}
 }

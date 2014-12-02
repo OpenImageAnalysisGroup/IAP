@@ -24,13 +24,13 @@ import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.editor.MessageType;
 
 import de.ipk.ag_ba.commands.ActionHome;
 import de.ipk.ag_ba.commands.JLabelUpdateReady;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -193,7 +193,7 @@ public class IAPgui {
 					+ "<br>"
 					+ "You find information on how to use this software and additional reference information by clicking the command button 'About'.<br>"
 					+ "Use the first row of buttons to go back to any previously selected command or to return to this 'Start'-screen." +
-					new LogService().getLatestNews(IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 0),
+					new LogService().getLatestNews(SystemOptions.getInstance().getInteger("NEWS", "show_n_items", 0),
 							"<br>" +
 									"<p>Latest user-posted news:<br><br><ul>",
 							"<br>" +

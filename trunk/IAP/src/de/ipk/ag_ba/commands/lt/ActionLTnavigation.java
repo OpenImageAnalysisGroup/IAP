@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeMap;
 
+import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -19,7 +20,6 @@ import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.datasources.http_folder.HTTPfolderSource;
 import de.ipk.ag_ba.datasources.http_folder.LTdocuSource;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -180,7 +180,7 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			if (result.size() > 0)
 				result.add(2, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
 			
-			if (IAPoptions.getInstance().getBoolean("Imaging-System-Documentation", "show_icon", false)) {
+			if (SystemOptions.getInstance().getBoolean("Imaging-System-Documentation", "show_icon", false)) {
 				HTTPfolderSource doku = new LTdocuSource();
 				NavigationButton dokuButton = new NavigationButton(new ActionNavigateDataSource(doku), src.getGUIsetting());
 				result.add(dokuButton);
@@ -200,12 +200,12 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/lemna.png";
+		return "img/ext/gpl2/Gnome-Network-Server-64.png";// lemna.png";
 	}
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return "img/ext/lemna-active.png";
+		return "img/ext/gpl2/Gnome-Network-Server-64.png";// lemna-active.png";
 	}
 	
 	@Override

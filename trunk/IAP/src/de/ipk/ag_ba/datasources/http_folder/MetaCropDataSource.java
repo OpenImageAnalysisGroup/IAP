@@ -23,7 +23,9 @@ public class MetaCropDataSource extends HTTPfolderSource {
 	public MetaCropDataSource(DataSourceGroup dsg) {
 		super(dsg, getLib(),
 				"MetaCrop", "http://vanted.ipk-gatersleben.de/addons/metacrop/gml/", new String[] { ".gml" },
-				IAPmain.loadIcon("img/metacrop.png"), IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
+				IAPmain.loadIcon("img/metacrop.png"),
+				IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()),
+				IAPmain.loadIcon(IAPimages.getFolderRemoteOpen()));
 		setDescription("<h2>MetaCrop</h2>"
 				+ "MetaCrop is a web accessible database that summarizes diverse information about metabolic pathways "
 				+ "in crop plants and allows automatic export of information for the creation of detailed metabolic models.<br><br>"
