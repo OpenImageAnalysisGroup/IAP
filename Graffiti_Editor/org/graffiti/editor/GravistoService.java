@@ -1,6 +1,8 @@
 package org.graffiti.editor;
 
+import java.awt.Component;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -10,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.beans.PropertyVetoException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -60,7 +63,6 @@ import org.ObjectRef;
 import org.Release;
 import org.ReleaseInfo;
 import org.Scalr;
-import org.Scalr.Method;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -814,6 +816,8 @@ public class GravistoService implements HelperClass {
 		return ImageIO.read(fileUrl);
 	}
 	
+	private static boolean useRetina = SystemAnalysis.isRetina();
+	
 	/**
 	 * @param w
 	 *           negative values have special meaning, they are ignored
@@ -823,8 +827,9 @@ public class GravistoService implements HelperClass {
 	public static BufferedImage getScaledImage(Image icon, int w, int h) {
 		BufferedImage destImage = new BufferedImage(icon.getWidth(null), icon.getHeight(null),
 				BufferedImage.TYPE_INT_ARGB);
-		Graphics2D graphics = destImage.createGraphics();
-		graphics.drawImage(icon, 0, 0, null);
+		Graphics2D g2d = destImage.createGraphics();
+		g2d.drawImage(icon, 0, 0, null);
+		g2d.dispose();
 		return getScaledImage(destImage, w, h);
 	}
 	
@@ -834,6 +839,50 @@ public class GravistoService implements HelperClass {
 		Graphics2D graphics = destImage.createGraphics();
 		graphics.drawImage(icon, 0, 0, null);
 		return destImage;
+	}
+	
+	public static final class RetinaIcon extends ImageIcon {
+		
+		private static final long serialVersionUID = 1L;
+		private int w;
+		private int h;
+		
+		public RetinaIcon(final Image image) {
+			super(image);
+			this.w = image.getWidth(getImageObserver());
+			this.h = image.getHeight(getImageObserver());
+			this.w = (int) (w / SystemAnalysis.getHiDPIScaleFactor());
+			this.h = (int) (h / SystemAnalysis.getHiDPIScaleFactor());
+		}
+		
+		@Override
+		public int getIconWidth() {
+			return w;
+		}
+		
+		@Override
+		public int getIconHeight() {
+			return h;
+		}
+		
+		@Override
+		public synchronized void paintIcon(Component c, Graphics g, int x, int y) {
+			ImageObserver observer = getImageObserver();
+			
+			if (observer == null) {
+				observer = c;
+			}
+			
+			Image image = getImage();
+			int width = image.getWidth(observer);
+			int height = image.getHeight(observer);
+			final Graphics2D g2d = (Graphics2D) g.create(x, y, width, height);
+			
+			g2d.scale(0.5, 0.5);
+			g2d.drawImage(image, 0, 0, observer);
+			g2d.scale(1, 1);
+			g2d.dispose();
+		}
 	}
 	
 	/**
@@ -859,7 +908,7 @@ public class GravistoService implements HelperClass {
 			boolean useNewCode = true;
 			
 			if (useNewCode) {
-				return Scalr.resize(icon, Method.ULTRA_QUALITY, destWidth, destHeight);
+				return Scalr.resize(icon, Scalr.Method.ULTRA_QUALITY, destWidth, destHeight);
 			}
 			
 			double abc = 2d;
@@ -881,6 +930,41 @@ public class GravistoService implements HelperClass {
 			return icon;
 		}
 	}
+	
+	// public static Image toHiDPIResolution(final Image image) {
+	// if (!SystemAnalysis.isRetina()) {
+	// return image;
+	// }
+	//
+	// Image hiDPICapableImage = image;
+	// try {
+	// final Class cImageClass = Class.forName("apple.awt.CImage");
+	// final Method getCreator = cImageClass.getDeclaredMethod("getCreator");
+	// getCreator.setAccessible(true);
+	// final Object creator = getCreator.invoke(null);
+	// final Image nativeImage = (Image) creator.getClass()
+	// .getMethod("createImage", Image.class).invoke(creator, image);
+	//
+	// final Method getNSImage = nativeImage.getClass()
+	// .getDeclaredMethod("getNSImage");
+	// getNSImage.setAccessible(true);
+	// final Object pointer = getNSImage.invoke(nativeImage);
+	// final float scaleFactor = SystemAnalysis.getHiDPIScaleFactor();
+	// final int scaledWidth = (int) (image.getWidth(null) / scaleFactor);
+	// final int scaledHeight = (int) (image.getHeight(null) / scaleFactor);
+	// hiDPICapableImage = (BufferedImage) creator.getClass()
+	// .getMethod("createImageWithSize", Long.TYPE, Integer.TYPE, Integer.TYPE)
+	// .invoke(creator, pointer, scaledWidth, scaledHeight);
+	//
+	// // dereference first image, to avoid double release
+	// final Field fNSImage = nativeImage.getClass().getDeclaredField("fNSImage");
+	// fNSImage.setAccessible(true);
+	// fNSImage.setLong(nativeImage, 0L);
+	// } catch (Exception e) {
+	// throw new RuntimeException(e);
+	// }
+	// return hiDPICapableImage;
+	// }
 	
 	public static ShowImage showImage(BufferedImage img, String title) {
 		JFrame frame = new JFrame(title);
