@@ -391,7 +391,7 @@ public class DataExchangeHelperForExperiments {
 						previewLoadAndConstructNeeded = true;
 					}
 				} else {
-					previewImage = new ImageIcon(MyImageIcon.loadingIcon.getAsBufferedImage(true));
+					previewImage = IAPimages.getIcon("img/ext/gpl2/Gnome-Image-Loading-64.png", 64, 64);
 					previewLoadAndConstructNeeded = true;
 				}
 				final DataSetFileButton imageButton = new DataSetFileButton(

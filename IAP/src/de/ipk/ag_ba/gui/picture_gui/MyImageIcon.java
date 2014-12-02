@@ -13,6 +13,7 @@ import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.ImageObserver;
 import java.awt.image.PixelGrabber;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -21,6 +22,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 import org.ErrorMsg;
+import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
@@ -55,9 +57,6 @@ public class MyImageIcon extends ImageIcon {
 		initImageData(observer, width, height, fileMain, fileLabel, bfi);
 	}
 	
-	public static final de.ipk.ag_ba.image.structures.Image loadingIcon = IAPimages.getImageIAP("img/ext/gpl2/Gnome-Image-Loading-64.png", 64).io()
-			.replaceColor(0, ImageOperation.BACKGROUND_COLORint).getImage();
-	
 	public synchronized void initImageData(final Component observer, int width, int height, IOurl fileMain, IOurl fileLabel, BinaryFileInfo bfi)
 			throws MalformedURLException {
 		this.bfi = bfi;
@@ -73,10 +72,19 @@ public class MyImageIcon extends ImageIcon {
 			InputStream ins = ioh.getPreviewInputStream(fileURLmain, width);
 			i = ins != null ? ImageIO.read(ins) : null;
 			if (i != null && width != 128) {
-				i = new de.ipk.ag_ba.image.structures.Image(i).io().grayscale().border_4sides(4, java.awt.Color.RED.getRGB())
-						.canvas().drawImage(loadingIcon, i.getWidth() - 64 - 4, i.getHeight() - 64 - 6).getImage()
-						.resize(DataSetFileButton.ICON_HEIGHT, DataSetFileButton.ICON_HEIGHT, true)
-						.io().replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint)
+				i = new de.ipk.ag_ba.image.structures.Image(i)
+						.io()
+						.grayscale()
+						.border_4sides(4, java.awt.Color.RED.getRGB())
+						.canvas()
+						// .drawImage(loadingIcon, i.getWidth() - (int) (64 * SystemAnalysis.getHiDPIScaleFactor()) - 4,
+						// (int) (i.getHeight() * SystemAnalysis.getHiDPIScaleFactor() - 64 * SystemAnalysis.getHiDPIScaleFactor()) - 6)
+						.getImage()
+						.resize((int) (DataSetFileButton.ICON_HEIGHT * SystemAnalysis.getHiDPIScaleFactor()),
+								(int) (DataSetFileButton.ICON_HEIGHT * SystemAnalysis.getHiDPIScaleFactor()), true)
+						.io()
+						.replaceColor(Color.BLACK.getRGB(), ImageOperation.BACKGROUND_COLORint)
+						.replaceColor(Color.WHITE.getRGB(), ImageOperation.BACKGROUND_COLORint)
 						.getImage()
 						.getAsBufferedImage(true);
 			}
@@ -87,7 +95,9 @@ public class MyImageIcon extends ImageIcon {
 					public void run() {
 						BufferedImage i;
 						try {
-							i = new de.ipk.ag_ba.image.structures.Image(fileURLmain).resize(DataSetFileButton.ICON_HEIGHT, DataSetFileButton.ICON_HEIGHT, true)
+							i = new de.ipk.ag_ba.image.structures.Image(fileURLmain).resize(
+									(int) (DataSetFileButton.ICON_HEIGHT * SystemAnalysis.getHiDPIScaleFactor()),
+									(int) (DataSetFileButton.ICON_HEIGHT * SystemAnalysis.getHiDPIScaleFactor()), true)
 									.getAsBufferedImage(true);
 							setImage(i);
 							observer.repaint();
@@ -115,7 +125,7 @@ public class MyImageIcon extends ImageIcon {
 							}
 							if (i != null) {
 								int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
-								double factor = 128 / maxS;
+								double factor = 128 * SystemAnalysis.getHiDPIScaleFactor() / maxS;
 								i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
 								setImage(i);
 							}
@@ -139,7 +149,7 @@ public class MyImageIcon extends ImageIcon {
 					ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
 							FileSystemHandler.getFile(fileURLmain));
 					if (ic == null) {
-						i = loadingIcon.io().replaceColor(ImageOperation.BACKGROUND_COLORint, Color.WHITE.getRGB()).getAsBufferedImage();
+						i = null;
 					} else
 						i = toBufferedImage(ic.getImage());
 				} catch (Exception e2) {
@@ -147,10 +157,19 @@ public class MyImageIcon extends ImageIcon {
 				}
 				
 			}
+			if (i == null)
+				i = IAPimages.getImageIAP("img/ext/gpl2/Gnome-Image-Loading-64b.png", (int) (64 * SystemAnalysis.getHiDPIScaleFactor())).getAsBufferedImage(false);
 			if (i != null) {
 				int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
-				double factor = width / maxS;
-				i = resize(i, (int) (i.getWidth() * factor), (int) (i.getHeight() * factor));
+				double factor = width * SystemAnalysis.getHiDPIScaleFactor() / maxS;
+				int bordersizeSides = (int) (i.getWidth() * factor - i.getWidth()) / 2;
+				int borderSizeTopBottom = (int) (i.getHeight() * factor - i.getHeight()) / 2;
+				int translatex = -i.getWidth() / 2;
+				int translatey = -i.getHeight() / 2;
+				i = new ImageOperation(i)
+						.replaceColor(-16777216, ImageOperation.BACKGROUND_COLORint)
+						.addBorder(bordersizeSides, borderSizeTopBottom, translatex, translatey, ImageOperation.BACKGROUND_COLORint)
+						.getImage().getAsBufferedImage(true);
 				setImage(i);
 			}
 		}
@@ -162,7 +181,7 @@ public class MyImageIcon extends ImageIcon {
 		}
 		
 		// This code ensures that all the pixels in the image are loaded
-		image = new ImageIcon(image).getImage();
+		// image = new ImageIcon(image).getImage();
 		
 		// Determine if the image has transparent pixels; for this method's
 		// implementation, see Determining If an Image Has Transparent Pixels
@@ -228,7 +247,9 @@ public class MyImageIcon extends ImageIcon {
 	
 	public static BufferedImage resize(BufferedImage image, int width, int height) {
 		if (true)
-			return new de.ipk.ag_ba.image.structures.Image(image).io().resize(width, height).getAsBufferedImage();
+			return new de.ipk.ag_ba.image.structures.Image(image).io().resize(width, height)
+					.replaceColor(0, ImageOperation.BACKGROUND_COLORint)
+					.getImage().getAsBufferedImage(true);
 		else {
 			int type = image.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : image.getType();
 			BufferedImage resizedImage = new BufferedImage(width, height, type);
@@ -254,7 +275,25 @@ public class MyImageIcon extends ImageIcon {
 	 */
 	@Override
 	public synchronized void paintIcon(Component c, Graphics g, int x, int y) {
-		g.drawImage(getImage(), x, y, c);
+		ImageObserver observer = getImageObserver();
+		
+		if (observer == null) {
+			observer = c;
+		}
+		
+		Image image = getImage();
+		int width = image.getWidth(observer);
+		int height = image.getHeight(observer);
+		final Graphics2D g2d = (Graphics2D) g.create(x, y, (int) (width * SystemAnalysis.getHiDPIScaleFactor()),
+				(int) (height * SystemAnalysis.getHiDPIScaleFactor()));
+		
+		g2d.scale(1f / SystemAnalysis.getHiDPIScaleFactor(), 1f / SystemAnalysis.getHiDPIScaleFactor());
+		g2d.drawImage(image,
+				(int) (-x / SystemAnalysis.getHiDPIScaleFactor() - x * SystemAnalysis.getHiDPIScaleFactor()),
+				(int) (-y * SystemAnalysis.getHiDPIScaleFactor()),
+				observer);
+		g2d.scale(1, 1);
+		g2d.dispose();
 	}
 	
 	public BinaryFileInfo getBinaryFileInfo() {
