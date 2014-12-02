@@ -3,6 +3,7 @@ package de.ipk.ag_ba.plugins.data_sources;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.datasources.DataSource;
@@ -12,7 +13,6 @@ import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
 import de.ipk.ag_ba.datasources.http_folder.RimasDataSource;
 import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.plugins.AbstractIAPplugin;
@@ -30,7 +30,7 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 		this.dsg = new DataSourceGroup() {
 			@Override
 			public String getTitle() {
-				return "Tools";
+				return "Bioinformatics Tools";
 			}
 			
 			@Override
@@ -40,12 +40,12 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 			
 			@Override
 			public String getImage() {
-				return "img/dbelogo2.png";
+				return "img/ext/gpl2/Gnome-Preferences-Desktop-Remote-Desktop-64.png";// dbelogo2.png";
 			}
 			
 			@Override
 			public String getNavigationImage() {
-				return "img/dbelogo2.png";
+				return "img/ext/gpl2/Gnome-Preferences-Desktop-Remote-Desktop-64.png";// dbelogo2.png";
 			}
 			
 			@Override
@@ -59,8 +59,8 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 			public String getIntroductionText() {
 				return "<h2>Bioinformatics@IPK</h2>IAP additionally provides access and links to various bioinformatics resources, "
 						+ "developed at the IPK. The included data sources and tools have been "
-						+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis, "
-						+ "partly with contributions from the group Bioinformatics and Information Technology. "
+						+ "mainly developed by members of the group Plant Bioinformatics and Image Analysis. "
+						+ "MetaCrop has been partly co-developed by BIT. "
 						+ "To get details about the included data sources and information systems, click the included Website- and Reference-Links.";
 			}
 		};
@@ -70,7 +70,7 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 	public DataSource[] getDataSources() {
 		ArrayList<DataSource> result = new ArrayList<DataSource>();
 		
-		boolean toolLinks = IAPoptions.getInstance().getBoolean("IAP", "Show Bioinformatics Tools", false);
+		boolean toolLinks = SystemOptions.getInstance().getBoolean("IAP", "Show Bioinformatics Tools", true);
 		if (toolLinks) {
 			result.add(new IAPnewsLinksSource(dsg));
 			result.add(new RimasDataSource(dsg));

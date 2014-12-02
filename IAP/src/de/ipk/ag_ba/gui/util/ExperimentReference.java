@@ -84,8 +84,9 @@ public class ExperimentReference {
 							String ico = IAPimages.getFolderRemoteClosed();
 							String ico2 = IAPimages.getFolderRemoteOpen();
 							String ico3 = IAPimages.getFolderRemoteClosed();
+							String ico4 = IAPimages.getFolderRemoteOpen();
 							VfsFileSystemSource dataSource = new VfsFileSystemSource(lib, vfs.getTargetName(), vfs, new String[] {}, IAPmain.loadIcon(ico),
-									IAPmain.loadIcon(ico2), IAPmain.loadIcon(ico3));
+									IAPmain.loadIcon(ico2), IAPmain.loadIcon(ico3), IAPmain.loadIcon(ico4));
 							try {
 								databaseID = StringManipulationTools.stringReplace(databaseID, "\\", "/");
 								for (ExperimentReference ehi : dataSource.getAllExperiments()) {
@@ -310,5 +311,9 @@ public class ExperimentReference {
 	public void setHeader(ExperimentHeaderInterface header) {
 		this.header = header;
 		setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this.getHeader(), m));
+	}
+	
+	public MongoDB getM() {
+		return m;
 	}
 }

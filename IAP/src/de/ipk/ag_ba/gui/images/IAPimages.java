@@ -1,5 +1,10 @@
 package de.ipk.ag_ba.gui.images;
 
+import javax.swing.ImageIcon;
+
+import org.SystemAnalysis;
+import org.graffiti.editor.GravistoService;
+
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.structures.Image;
@@ -8,10 +13,18 @@ public class IAPimages {
 	
 	private static boolean ns = false;
 	
+	/**
+	 * Please use getIcon, if possible, as this function supports high resolution displays.
+	 */
+	@Deprecated
 	public static java.awt.Image getImage(String image) {
 		return IAPservice.getImage(IAPmain.class, image);
 	}
 	
+	/**
+	 * Please use getIcon, if possible, as this function supports high resolution displays.
+	 */
+	@Deprecated
 	public static java.awt.Image getImage(String image, int maxSize) {
 		java.awt.Image img = IAPservice.getImage(IAPmain.class, image);
 		Image f = new Image(img);
@@ -48,10 +61,10 @@ public class IAPimages {
 	}
 	
 	public static String getCheckstatus() {
-		if (ns)
-			return "img/ext/gpl2/Gnome-Utilities-System-Monitor-64.png";
-		else
-			return "img/ext/network-server-status.png";
+		// if (ns )
+		return "img/ext/gpl2/Gnome-Utilities-System-Monitor-64.png";
+		// else
+		// return "img/ext/network-server-status.png";
 	}
 	
 	public static String getCloudComputer() {
@@ -94,7 +107,7 @@ public class IAPimages {
 	}
 	
 	public static String getPhytochamber() {
-		return "img/ext/phyto.png";
+		return "img/ext/arabidopsis.middle.blue.cover.png";// phyto.png";
 	}
 	
 	public static String getBarleyGreenhouse() {
@@ -261,5 +274,20 @@ public class IAPimages {
 	
 	public static String getTobaccoImage() {
 		return "img/tobacco.png";
+	}
+	
+	/**
+	 * With High-Res support (for mac)
+	 */
+	public static ImageIcon getIcon(String img, int w, int h) {
+		ImageIcon icon;
+		if (SystemAnalysis.isRetina())
+			icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(
+					GravistoService.loadIcon(IAPmain.class, img).getImage(),
+					(int) (w * SystemAnalysis.getHiDPIScaleFactor()),
+					(int) (h * SystemAnalysis.getHiDPIScaleFactor())));
+		else
+			icon = GravistoService.loadIcon(IAPmain.class, img, w, h, false);
+		return icon;
 	}
 }

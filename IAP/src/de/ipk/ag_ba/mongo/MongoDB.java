@@ -61,7 +61,6 @@ import com.mongodb.gridfs.GridFSInputFile;
 
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.MongoCollection;
@@ -121,7 +120,7 @@ public class MongoDB {
 	
 	private static ArrayList<MongoDB> initMongoList() {
 		ArrayList<MongoDB> res = new ArrayList<MongoDB>();
-		int n = IAPoptions.getInstance().getInteger("GRID-STORAGE", "n", 1);
+		int n = SystemOptions.getInstance().getInteger("GRID-STORAGE", "n", 1);
 		for (int i = 0; i < n; i++) {
 			MongoDB c = getCloud(i);
 			if (c != null)
@@ -143,18 +142,18 @@ public class MongoDB {
 	public static MongoDB getCloud(int idx) {
 		String sec = "GRID-STORAGE-" + (idx + 1);
 		
-		boolean enabled = IAPoptions.getInstance().getBoolean(sec,
+		boolean enabled = SystemOptions.getInstance().getBoolean(sec,
 				"enabled", false);
-		String displayName = IAPoptions.getInstance().getString(sec,
+		String displayName = SystemOptions.getInstance().getString(sec,
 				"title", "Storage " + (idx + 1));
-		String databaseName = IAPoptions.getInstance().getString(sec,
+		String databaseName = SystemOptions.getInstance().getString(sec,
 				"database_name", "cloud" + (idx + 1));
-		String hostName = IAPoptions.getInstance().getString(sec,
+		String hostName = SystemOptions.getInstance().getString(sec,
 				"host", "ba-13.ipk-gatersleben.de");
-		Integer port = IAPoptions.getInstance().getInteger(sec, "port", 27017);
-		String login = IAPoptions.getInstance().getString(sec,
+		Integer port = SystemOptions.getInstance().getInteger(sec, "port", 27017);
+		String login = SystemOptions.getInstance().getString(sec,
 				"login", null);
-		String password = IAPoptions.getInstance().getString(sec,
+		String password = SystemOptions.getInstance().getString(sec,
 				"password", null);
 		// if (idx == 0) {
 		// if (defaultCloudInstance == null) {

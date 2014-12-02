@@ -24,7 +24,9 @@ public class RimasDataSource extends HTTPfolderSource {
 		super(dsg, getLib(),
 				"RIMAS", "http://rimas.ipk-gatersleben.de/Pathways/",
 				new String[] { ".gml" },
-				IAPmain.loadIcon("img/rimas.png"), IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()));
+				IAPmain.loadIcon("img/rimas.png"),
+				IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()),
+				IAPmain.loadIcon(IAPimages.getFolderRemoteOpen()));
 		setDescription("<h2>RIMAS - Regulatory Interaction Maps of Arabidopsis Seed Development</h2>"
 				+ "RIMAS contains detailed SBGN conforming network diagrams which reflect the interactions "
 				+ "of transcription factor hierarchies, gene promoter elements, hormonal pathways, epigenetic "

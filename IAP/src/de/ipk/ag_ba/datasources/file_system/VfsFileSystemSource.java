@@ -63,25 +63,29 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	private final String subfolder;
 	ArrayList<NavigationAction> folderActions = new ArrayList<NavigationAction>();
 	LinkedHashSet<ExperimentHeaderInterface> trashed = new LinkedHashSet<ExperimentHeaderInterface>();
+	private final NavigationImage folderIconOpened;
 	
 	public VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder,
 			String[] validExtensions,
 			NavigationImage mainDataSourceIcon, NavigationImage mainDataSourceIconActive,
-			NavigationImage folderIcon) {
-		this(lib, dataSourceName, folder, validExtensions, mainDataSourceIcon, mainDataSourceIconActive, folderIcon, null);
+			NavigationImage folderIcon, NavigationImage folderIconOpened) {
+		this(lib, dataSourceName, folder, validExtensions, mainDataSourceIcon, mainDataSourceIconActive, folderIcon,
+				folderIconOpened, null);
 	}
 	
 	private VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder,
 			String[] validExtensions,
 			NavigationImage mainDataSourceIcon, NavigationImage mainDataSourceIconActive,
-			NavigationImage folderIcon, String subfolder) {
+			NavigationImage folderIcon,
+			NavigationImage folderIconOpened, String subfolder) {
 		super(lib, dataSourceName,
 				(folder instanceof VirtualFileSystemFolderStorage ?
 						((VirtualFileSystemFolderStorage) folder).getTargetPathName() : null),
-				mainDataSourceIcon, mainDataSourceIcon, folderIcon);
+				mainDataSourceIcon, mainDataSourceIcon, folderIcon, folderIconOpened);
 		this.url = folder;
 		validExtensions2 = validExtensions;
 		this.subfolder = subfolder;
+		this.folderIconOpened = folderIconOpened;
 	}
 	
 	@Override
@@ -104,7 +108,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 					continue;
 				VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(new Library(),
 						fn, url,
-						validExtensions2, mainDataSourceIconInactive, mainDataSourceIconInactive, folderIcon,
+						validExtensions2, mainDataSourceIconInactive, mainDataSourceIconInactive, folderIcon, folderIconOpened,
 						subfolder != null ? subfolder + File.separator + fn : fn);
 				ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm) {
 					

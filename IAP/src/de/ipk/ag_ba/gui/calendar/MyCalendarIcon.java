@@ -19,6 +19,7 @@ import java.util.GregorianCalendar;
 
 import javax.swing.ImageIcon;
 
+import org.SystemAnalysis;
 import org.graffiti.editor.GravistoService;
 
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -37,41 +38,56 @@ public class MyCalendarIcon extends ImageIcon implements DynamicPaintingIcon {
 		this.imgS = imgS;
 	}
 	
+	@Override
+	public int getIconWidth() {
+		double f = SystemAnalysis.getHiDPIScaleFactor();
+		int w = super.getIconWidth();
+		return (int) (w / f);
+	}
+	
+	@Override
+	public int getIconHeight() {
+		double f = SystemAnalysis.getHiDPIScaleFactor();
+		int h = super.getIconHeight();
+		return (int) (h / f);
+	}
+	
 	private static SimpleDateFormat sdfD = new SimpleDateFormat("d");
 	private static SimpleDateFormat sdfM = new SimpleDateFormat("MMM");
 	private static SimpleDateFormat sdfMMM = new SimpleDateFormat("MMM");
 	private static SimpleDateFormat sdfY = new SimpleDateFormat("yy");
 	private static SimpleDateFormat sdfYY = new SimpleDateFormat("yyyy");
-	private static Font flarge = new Font("SansSerif", Font.BOLD, 17);
-	private static Font flargeM = new Font("SansSerif", Font.BOLD, 14);
-	private static Font fsmall = new Font("SansSerif", Font.BOLD, 8);
+	private static Font flarge = new Font("SansSerif", Font.BOLD, (int) (17 * SystemAnalysis.getHiDPIScaleFactor()));
+	private static Font flargeM = new Font("SansSerif", Font.BOLD, (int) (14 * SystemAnalysis.getHiDPIScaleFactor()));
+	private static Font fsmall = new Font("SansSerif", Font.BOLD, (int) (8 * SystemAnalysis.getHiDPIScaleFactor()));
 	
 	@Override
 	public synchronized void paintIcon(Component c, Graphics g, int x, int y) {
+		((Graphics2D) g).scale(1 / SystemAnalysis.getHiDPIScaleFactor(), 1 / SystemAnalysis.getHiDPIScaleFactor());
 		super.paintIcon(c, g, x, y);
 		paintCalendarInfo(g, x, y);
+		((Graphics2D) g).scale(SystemAnalysis.getHiDPIScaleFactor(), SystemAnalysis.getHiDPIScaleFactor());
 	}
 	
 	@Override
 	public Image getCurrentImage() {
 		Image i = null;
 		try {
-			i = GravistoService.loadImage(IAPmain.class, calendarEntity.getActionImage(), 48, 48);
+			i = GravistoService.loadImage(IAPmain.class, calendarEntity.getActionImage(),
+					(int) (48 * SystemAnalysis.getHiDPIScaleFactor()), (int) (48 * SystemAnalysis.getHiDPIScaleFactor()));
 			paintCalendarInfo(i.getGraphics(), 0, 0);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return i;
 	}
 	
 	private void paintCalendarInfo(Graphics g, int x, int y) {
 		Graphics2D g2d = (Graphics2D) g.create();
-		
 		if (imgS < 48) {
-			g2d.scale(imgS / 48d, imgS / 48d);
-			g2d.translate((48 - imgS) / 2, (48 - imgS) / 3);
+			g2d.scale(imgS / SystemAnalysis.getHiDPIScaleFactor() / 48d, imgS / SystemAnalysis.getHiDPIScaleFactor() / 48d);
+			g2d.translate((48 * SystemAnalysis.getHiDPIScaleFactor() - imgS) / 2, (48 * SystemAnalysis.getHiDPIScaleFactor() - imgS) / 3);
 		}
-		
 		GregorianCalendar cal = calendarEntity.getCalendar();
 		String dateD = sdfD.format(cal.getTime());
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -84,27 +100,27 @@ public class MyCalendarIcon extends ImageIcon implements DynamicPaintingIcon {
 			int w = g2d.getFontMetrics().stringWidth(dateD);
 			int add = -w / 2;
 			g2d.setColor(Color.DARK_GRAY);
-			g2d.drawString(dateD, x + add + 15, y + 39);
+			g2d.drawString(dateD, x + add + 15 * SystemAnalysis.getHiDPIScaleFactor(), y + 39 * SystemAnalysis.getHiDPIScaleFactor());
 			g2d.setFont(fsmall);
 			g2d.setColor(Color.WHITE);
-			g2d.drawString(dateM, x + 2, y + 21);
+			g2d.drawString(dateM, x + 2 * SystemAnalysis.getHiDPIScaleFactor(), y + 21 * SystemAnalysis.getHiDPIScaleFactor());
 			w = g2d.getFontMetrics().stringWidth(dateY);
 			add = -w;
-			g2d.drawString(dateY, x + 31 + add, y + 22);
+			g2d.drawString(dateY, x + 31 * SystemAnalysis.getHiDPIScaleFactor() + add, y + 21 * SystemAnalysis.getHiDPIScaleFactor());
 		} else {
 			String dateYY = sdfYY.format(cal.getTime());
 			String dateM = sdfMMM.format(cal.getTime());
-			g2d.rotate(-0.2);
+			g2d.rotate(-0.19);
 			g2d.setFont(flargeM);
 			int w = g2d.getFontMetrics().stringWidth(dateM);
-			int add = -w / 2;
+			int add = (int) (-w / 1.5);
 			g2d.setColor(Color.DARK_GRAY);
-			g2d.drawString(dateM, x + add + 15, y + 38);
+			g2d.drawString(dateM, x + add + 18 * SystemAnalysis.getHiDPIScaleFactor(), y + 38 * SystemAnalysis.getHiDPIScaleFactor());
 			g2d.setFont(fsmall);
 			g2d.setColor(Color.WHITE);
 			w = g2d.getFontMetrics().stringWidth(dateYY);
 			add = -w / 2;
-			g2d.drawString(dateYY, x + 15 + add, y + 22);
+			g2d.drawString(dateYY, x + 17 * SystemAnalysis.getHiDPIScaleFactor() + add, y + 22 * SystemAnalysis.getHiDPIScaleFactor());
 		}
 	}
 }

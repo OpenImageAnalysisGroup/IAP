@@ -99,7 +99,7 @@ public class ActionSetGlobalOutliers extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-User-Desktop-64.png";
+		return "img/ext/gpl2/Gnome-Accessories-Text-Editor-64.png";// Gnome-User-Desktop-64.png";
 	}
 	
 }

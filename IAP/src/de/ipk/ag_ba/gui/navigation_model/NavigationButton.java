@@ -42,6 +42,7 @@ import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
 import de.ipk.ag_ba.commands.bookmarks.ImageProvider;
 import de.ipk.ag_ba.gui.IAPfeature;
@@ -794,26 +795,53 @@ public class NavigationButton implements StyleAware {
 		if (n != null && n.getAction() != null && (n.getAction() instanceof ImageProvider)) {
 			ImageProvider ip = (ImageProvider) n.getAction();
 			if (ip.getImage() != null) {
-				icon = new ImageIcon(GravistoService.getScaledImage(ip.getImage(), -imgS, imgS));
+				if (SystemAnalysis.isRetina())
+					icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(ip.getImage(),
+							(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+							(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+				else
+					icon = new ImageIcon(GravistoService.getScaledImage(ip.getImage(), -imgS, imgS));
 			}
 		}
 		
 		if (icon == null)
 			if (target == PanelTarget.NAVIGATION && n.getIconActive() != null && n.getIconActive().getImage() != null) {
-				icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgS, imgS));
+				if (SystemAnalysis.isRetina())
+					icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(n.getIconActive().getImage(),
+							(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+							(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+				else
+					icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgS, imgS));
 			} else
 				if (target == PanelTarget.ACTION && n.getIconInactive() != null && n.getIconInactive().getImage() != null) {
-					icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgS, imgS));
+					if (SystemAnalysis.isRetina())
+						icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(),
+								(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+								(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+					else
+						icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgS, imgS));
 				} else {
 					if (target == PanelTarget.NAVIGATION) {
-						icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS, false);
+						if (SystemAnalysis.isRetina() && n.getNavigationImage() != null)
+							icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(
+									GravistoService.loadIcon(IAPmain.class, n.getNavigationImage()).getImage(),
+									(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+									(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+						else
+							icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS, false);
 						if (icon == null && n.getAction() != null) {
 							icon = GravistoService.loadIcon(n.getAction().getClass(), n.getNavigationImage(), -imgS, imgS, true);
 						}
 						
 					}
 					if (target != PanelTarget.NAVIGATION || icon == null) {
-						icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS, false);
+						if (SystemAnalysis.isRetina() && n.getActionImage() != null)
+							icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(
+									GravistoService.loadIcon(IAPmain.class, n.getActionImage()).getImage(),
+									(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+									(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+						else
+							icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS, false);
 						if (icon == null && n.getAction() != null) {
 							icon = GravistoService.loadIcon(n.getAction().getClass(), n.getActionImage(), -imgS, imgS, true);
 						}
@@ -864,6 +892,7 @@ public class NavigationButton implements StyleAware {
 		
 		switch (style) {
 			case FLAT:
+			case FLAT_LARGE:
 			case COMPACT_LIST:
 			case COMPACT_LIST_2:
 				int d = 1;
@@ -883,7 +912,7 @@ public class NavigationButton implements StyleAware {
 					if (target == PanelTarget.NAVIGATION)
 						n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 4 / d, 2 / d, 4 / d));
 					else
-						if (style == ButtonDrawStyle.FLAT)
+						if (style == ButtonDrawStyle.FLAT || style == ButtonDrawStyle.FLAT_LARGE)
 							n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 8 / d, 2 / d, 8 / d));
 						else
 							n1.setBorder(BorderFactory.createEmptyBorder(8 / d, 0 / d, 2 / d, 16 / d));
@@ -1053,6 +1082,9 @@ public class NavigationButton implements StyleAware {
 		
 		n1.setOpaque(false);
 		
+		if (style == ButtonDrawStyle.FLAT_LARGE) {
+			n1.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+		}
 		if (style != ButtonDrawStyle.COMPACT_LIST || target == PanelTarget.ACTION) {
 			n1.setVerticalTextPosition(SwingConstants.BOTTOM);
 			n1.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -1115,11 +1147,14 @@ public class NavigationButton implements StyleAware {
 	private static int getImageSize(ButtonDrawStyle style, final PanelTarget target) {
 		int imgS = defaultButtonSize;
 		
-		if (style == ButtonDrawStyle.COMPACT_LIST || style == ButtonDrawStyle.COMPACT_LIST_2)
-			if (target == PanelTarget.NAVIGATION || style == ButtonDrawStyle.COMPACT_LIST_2)
-				imgS = 25;// 32;
-			else
-				imgS = defaultButtonSize;
+		if (style == ButtonDrawStyle.FLAT_LARGE)
+			imgS = 48 * 2;
+		else
+			if (style == ButtonDrawStyle.COMPACT_LIST || style == ButtonDrawStyle.COMPACT_LIST_2)
+				if (target == PanelTarget.NAVIGATION || style == ButtonDrawStyle.COMPACT_LIST_2)
+					imgS = 25;// 32;
+				else
+					imgS = defaultButtonSize;
 		return imgS;
 	}
 	
@@ -1231,5 +1266,31 @@ public class NavigationButton implements StyleAware {
 	
 	public ActionEvent getEventSource() {
 		return lastEvent;
+	}
+	
+	public static NavigationButton getNavigationButtonGroup(String title, String tooltip, String icon, ArrayList<NavigationButton> nbl, GUIsetting guiSetting) {
+		NavigationAction navigationAction = new AbstractNavigationAction(tooltip) {
+			
+			@Override
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
+				// empty
+			}
+			
+			@Override
+			public String getDefaultTitle() {
+				return title;
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return icon;
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				return nbl;
+			}
+		};
+		return new NavigationButton(navigationAction, guiSetting);
 	}
 }

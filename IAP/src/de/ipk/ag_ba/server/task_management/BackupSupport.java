@@ -10,10 +10,10 @@ import java.util.TimerTask;
 
 import org.ReleaseInfo;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
@@ -85,7 +85,7 @@ public class BackupSupport {
 	}
 	
 	public void makeBackup() {
-		if (!IAPoptions.getInstance().getBoolean("Watch-Service", "Automatic Copy to Archive//enabled", false)) {
+		if (!SystemOptions.getInstance().getBoolean("Watch-Service", "Automatic Copy to Archive//enabled", false)) {
 			print("INFO: BACKUP PROCEDURE IS SKIPPED, BECAUSE BACKUP OPERATION IS DISABLED");
 			return;
 		}

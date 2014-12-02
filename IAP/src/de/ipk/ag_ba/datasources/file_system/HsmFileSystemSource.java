@@ -44,11 +44,13 @@ public class HsmFileSystemSource extends FileSystemSource {
 	public HsmFileSystemSource(Library lib, String dataSourceName, String folder,
 			NavigationImage mainDataSourceIcon,
 			NavigationImage mainDataSourceIconActive,
-			NavigationImage folderIcon) {
+			NavigationImage folderIcon,
+			NavigationImage folderIconOpened) {
 		super(lib, dataSourceName, folder, new String[] {},
 				mainDataSourceIcon,
 				mainDataSourceIconActive,
-				folderIcon);
+				folderIcon,
+				folderIconOpened);
 		
 		if (folder != null && !registeredFolders.contains(folder)) {
 			HsmResourceIoHandler rio = new HsmResourceIoHandler(folder);

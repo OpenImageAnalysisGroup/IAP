@@ -15,11 +15,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -31,9 +33,8 @@ import de.ipk.ag_ba.commands.ActionTrash;
 import de.ipk.ag_ba.commands.DeletionCommand;
 import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.commands.clima.ActionImportClimateData;
-import de.ipk.ag_ba.gui.IAPoptions;
+import de.ipk.ag_ba.gui.ExperimentSortingMode;
 import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
@@ -94,11 +95,20 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		if (error) {
 			res.add(Other.getServerStatusEntity("<html><center>Connection Error<br>(" + errorMsg + ")</center>", src.getGUIsetting()));
 		} else {
+			ExperimentSortingMode mode = ExperimentSortingMode.fromNiceString(SystemOptions.getInstance()
+					.getStringRadioSelection("GRID-STORAGE", "Experiment-Navigation Mode",
+							StringManipulationTools.getStringListFromArray(ExperimentSortingMode.values()),
+							ExperimentSortingMode.GROUP_BY_COORDINATOR_THEN_TYPE.getNiceString(),
+							true));
+			
+			if (mode != ExperimentSortingMode.GROUP_BY_COORDINATOR_THEN_TYPE)
+				System.err.println(SystemAnalysis.getCurrentTime() + ">WARNING: EXPERIMENT SORTING MODE " + mode + " NOT YET IMPLEMENTED OR TESTED!");
+			
 			if (!limitToResuls) {
 				if (IAPmain.getRunMode() == IAPrunMode.WEB)
 					res.add(new NavigationButton(new ActionDomainLogout(), src.getGUIsetting()));
 				
-				if (!SystemAnalysis.isHeadless() && IAPoptions.getInstance().getInteger("NEWS", "show_n_items", 0) > 0)
+				if (!SystemAnalysis.isHeadless() && SystemOptions.getInstance().getInteger("NEWS", "show_n_items", 0) > 0)
 					res.add(new NavigationButton(new AddNewsAction(), src.getGUIsetting()));
 				if (!SystemAnalysis.isHeadless()) {
 					res.add(new NavigationButton(new ActionMongoDatabaseManagement(
@@ -128,12 +138,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 				TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> experiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 				LinkedHashSet<ExperimentHeaderInterface> trashed = new LinkedHashSet<ExperimentHeaderInterface>();
 				for (ExperimentHeaderInterface eh : experimentList) {
-					String type = IAPoptions.getSetting(IAPoptions.IAPoptionFields.GROUP_BY_EXPERIMENT_TYPE) ? eh.getExperimentType() : eh.getImportusergroup();
-					if (type == null || type.length() == 0)
-						type = "[no type]";
-					String user = IAPoptions.getSetting(IAPoptions.IAPoptionFields.GROUP_BY_COORDINATOR) ? eh.getCoordinator() : eh.getImportusername();
-					if (user == null || user.length() == 0)
-						user = "[no user]";
+					String type = mode.getFirstField(eh, "[no type]"); // eh.getExperimentType() // eh.getImportusergroup();
+					String user = mode.getSecondField(eh, "[no user]"); // eh.getCoordinator() : eh.getImportusername();
 					
 					if (eh.inTrash()) {
 						trashed.add(eh);
@@ -239,15 +245,49 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 						res.add(Other.getCalendarEntity(experiments, m, src.getGUIsetting()));
 					}
 				
-				for (String group : experiments.keySet()) {
+				List<String> ll = StringManipulationTools.getStringListFromArray(experiments.keySet().toArray(new String[] {}));
+				Collections.sort(ll, new Comparator<String>() {
+					@Override
+					public int compare(String o1, String o2) {
+						if (o1.contains("(") && o1.indexOf("(") > 1)
+							o1 = o1.substring(o1.indexOf("(") + 1);
+						if (o1.contains(")") && o1.indexOf(")") > 1)
+							o1 = o1.substring(0, o1.indexOf(")"));
+						if (o1.contains("/") && o1.indexOf("/") > 1)
+							o1 = o1.substring(o1.indexOf("/") + 1);
+						if (o2.contains("(") && o2.indexOf("(") > 1)
+							o2 = o2.substring(o2.indexOf("(") + 1);
+						if (o2.contains(")") && o2.indexOf(")") > 1)
+							o2 = o2.substring(0, o2.indexOf(")"));
+						if (o2.contains("/") && o2.indexOf("/") > 1)
+							o2 = o2.substring(o2.indexOf("/") + 1);
+						int v = o1.compareTo(o2);
+						if (v != 0)
+							return v;
+						else
+							return o1.compareTo(o2);
+					}
+				});
+				
+				ArrayList<NavigationButton> unsorted = new ArrayList<NavigationButton>();
+				
+				for (String group : ll) {
 					if (limitToResuls && !group.toUpperCase().contains("ANALYSIS RESULTS"))
 						continue;
 					if (limitToData && group.toUpperCase().contains("ANALYSIS RESULTS"))
 						continue;
-					
-					res.add(new NavigationButton(createMongoGroupNavigationAction(group
+					NavigationButton nb = new NavigationButton(createMongoGroupNavigationAction(mode, group
 							+ " (" + count(experiments.get(group)) + ")", experiments.get(group)), src
-							.getGUIsetting()));
+							.getGUIsetting());
+					if (group.indexOf("(") <= 0)
+						unsorted.add(nb);
+					else
+						res.add(nb);
+				}
+				
+				if (unsorted.size() > 0) {
+					res.add(NavigationButton.getNavigationButtonGroup("Unsorted (" + unsorted.size() + ")", "Unsorted user list",
+							"img/ext/gpl2/Gnome-User-info_unknown.png", unsorted, src.getGUIsetting()));
 				}
 				
 				if (!limitToResuls)
@@ -281,7 +321,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			
 			@Override
 			public String getDefaultImage() {
-				return "img/ext/trash-delete2.png";
+				return "img/ext/gpl2/Gnome-User-Trash-Full-64.png";// trash-delete2.png";
 			}
 			
 			@Override
@@ -318,7 +358,9 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		return res;
 	}
 	
-	private NavigationAction createMongoGroupNavigationAction(final String group,
+	private NavigationAction createMongoGroupNavigationAction(
+			final ExperimentSortingMode sortingMode,
+			final String group,
 			final TreeMap<String, ArrayList<ExperimentHeaderInterface>> user2exp) {
 		NavigationAction groupNav = new AbstractNavigationAction("Show User-Group Folder") {
 			private NavigationButton src;
@@ -327,7 +369,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 				for (String user : user2exp.keySet()) {
-					res.add(new NavigationButton(createMongoUserNavigationAction(user, user2exp.get(user)), src
+					res.add(new NavigationButton(createMongoUserNavigationAction(sortingMode, user, user2exp.get(user)), src
 							.getGUIsetting()));
 				}
 				return res;
@@ -347,86 +389,26 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			
 			@Override
 			public String getDefaultImage() {
-				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
-					return IAPimages.getCloudResult();
-				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.startsWith(IAPexperimentTypes.Phytochamber + ""))
-					return IAPimages.getPhytochamber();
-				else
-					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)")
-							|| group.startsWith(IAPexperimentTypes.BarleyGreenhouse + ""))
-						return IAPimages.getBarleyGreenhouse();
-					else
-						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)")
-								|| group.startsWith(IAPexperimentTypes.MaizeGreenhouse + ""))
-							return IAPimages.getMaizeGreenhouse();
-						else
-							if (group.toUpperCase().startsWith("ROOT_") || group.toUpperCase().contains("(ROOT)")
-									|| group.startsWith(IAPexperimentTypes.RootWaterScan + ""))
-								return IAPimages.getRoots();
-							else
-								if (group.startsWith(IAPexperimentTypes.LeafImages + ""))
-									return IAPimages.getLeafDiseaseImage();
-								else
-									if (group.startsWith(IAPexperimentTypes.Raps + ""))
-										return IAPimages.getRapeseedImage();
-									else
-										if (group.startsWith(IAPexperimentTypes.TobaccoImages + ""))
-											return IAPimages.getTobaccoImage();
-										else
-											return "img/ext/network-workgroup.png";
+				return sortingMode.getIconForGroup1(group);
 			}
 			
 			@Override
 			public String getDefaultNavigationImage() {
-				if (group.toUpperCase().contains("ANALYSIS RESULTS"))
-					return IAPimages.getCloudResultActive();
-				if (group.toUpperCase().startsWith("APH_") || group.toUpperCase().contains("(APH)") || group.startsWith(IAPexperimentTypes.Phytochamber + ""))
-					return IAPimages.getPhytochamber();
-				else
-					if (group.toUpperCase().startsWith("BGH_") || group.toUpperCase().contains("(BGH)")
-							|| group.startsWith(IAPexperimentTypes.BarleyGreenhouse + ""))
-						return IAPimages.getBarleyGreenhouse();
-					else
-						if (group.toUpperCase().startsWith("CGH_") || group.toUpperCase().contains("(CGH)")
-								|| group.startsWith(IAPexperimentTypes.MaizeGreenhouse + ""))
-							return IAPimages.getMaizeGreenhouse();
-						else
-							if (group.toUpperCase().startsWith("ROOT_") || group.toUpperCase().contains("(ROOT)")
-									|| group.startsWith(IAPexperimentTypes.RootWaterScan + ""))
-								return IAPimages.getRoots();
-							else
-								if (group.startsWith(IAPexperimentTypes.LeafImages + ""))
-									return IAPimages.getLeafDiseaseImage();
-								else
-									if (group.startsWith(IAPexperimentTypes.Raps + ""))
-										return IAPimages.getRapeseedImage();
-									else
-										if (group.startsWith(IAPexperimentTypes.TobaccoImages + ""))
-											return IAPimages.getTobaccoImage();
-										else
-											return "img/ext/network-workgroup-power.png";
+				return getDefaultImage();
 			}
 			
 			@Override
 			public String getDefaultTitle() {
-				String db = group;
-				if (db.startsWith("APH_"))
-					return "Phytoch. (20" + db.substring("APH_".length()) + ")";
-				else
-					if (db.startsWith("CGH_"))
-						return "Maize Greenh. (20" + db.substring("CGH_".length()) + ")";
-					else
-						if (db.startsWith("BGH_"))
-							return "Barley Greenh. (20" + db.substring("BGH_".length()) + ")";
-						else
-							return db;
+				return sortingMode.getTitleGroup1(group);
 			}
 			
 		};
 		return groupNav;
 	}
 	
-	protected NavigationAction createMongoUserNavigationAction(final String user,
+	protected NavigationAction createMongoUserNavigationAction(
+			final ExperimentSortingMode sortingMode,
+			final String user,
 			final Collection<ExperimentHeaderInterface> experiments) {
 		NavigationAction userNav = new AbstractNavigationAction("Show user folder") {
 			private NavigationButton src;
@@ -469,12 +451,18 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			
 			@Override
 			public String getDefaultImage() {
-				return IAPimages.getFolderRemoteClosed();
+				if (sortingMode == ExperimentSortingMode.GROUP_BY_COORDINATOR_THEN_TYPE)
+					return sortingMode.getIconForGroup2(user);
+				else
+					return IAPimages.getFolderRemoteClosed();
 			}
 			
 			@Override
 			public String getDefaultNavigationImage() {
-				return IAPimages.getFolderRemoteOpen();
+				if (sortingMode == ExperimentSortingMode.GROUP_BY_COORDINATOR_THEN_TYPE)
+					return sortingMode.getIconForGroup2(user);
+				else
+					return IAPimages.getFolderRemoteOpen();
 			}
 			
 			@Override
@@ -707,12 +695,12 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultNavigationImage() {
-		return "img/ext/network-mongo.png";
+		return "img/ext/gpl2/Gnome-Drive-multidisk.png";// Gnome-Network-Server-64.png";// network-mongo.png";
 	}
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/network-mongo-gray.png";
+		return "img/ext/gpl2/Gnome-Drive-multidisk.png";// Gnome-Network-Server-64.png";// network-mongo-gray.png";
 	}
 	
 	@Override

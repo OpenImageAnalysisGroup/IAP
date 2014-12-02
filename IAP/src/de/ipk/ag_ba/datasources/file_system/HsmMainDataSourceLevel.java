@@ -5,10 +5,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import org.SystemOptions;
+
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.datasources.DataSourceLevel;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -70,9 +71,9 @@ public class HsmMainDataSourceLevel implements DataSourceLevel {
 	@Override
 	public String getName() {
 		if (n > 0)
-			return IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive") + " (" + n + ")";
+			return SystemOptions.getInstance().getString("ARCHIVE", "title", "HSM Archive") + " (" + n + ")";
 		else
-			return IAPoptions.getInstance().getString("ARCHIVE", "title", "HSM Archive");
+			return SystemOptions.getInstance().getString("ARCHIVE", "title", "HSM Archive");
 	}
 	
 	@Override

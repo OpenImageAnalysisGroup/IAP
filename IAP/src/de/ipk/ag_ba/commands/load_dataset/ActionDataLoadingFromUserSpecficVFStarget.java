@@ -12,7 +12,6 @@ import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
@@ -114,28 +113,32 @@ public class ActionDataLoadingFromUserSpecficVFStarget extends AbstractNavigatio
 		String ico = IAPimages.getFolderRemoteClosed();
 		String ico2 = IAPimages.getFolderRemoteOpen();
 		String ico3 = IAPimages.getFolderRemoteClosed();
+		String ico4 = IAPimages.getFolderRemoteOpen();
 		if (vfsEntry.getProtocolName().contains("UDP")) {
 			ico = "img/ext/network-workgroup.png";
 			ico2 = "img/ext/network-workgroup-power.png";
 			ico3 = IAPimages.getFolderRemoteClosed();
+			ico3 = IAPimages.getFolderRemoteOpen();
 		}
 		if (vfsEntry.getDesiredIcon() != null) {
 			ico = vfsEntry.getDesiredIcon();
 			ico2 = vfsEntry.getDesiredIcon();
 			ico3 = vfsEntry.getDesiredIcon();
+			ico4 = vfsEntry.getDesiredIcon();
 		}
 		VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
 				new String[] { ".txt", ".url", ".webloc", ".gml", ".graphml", ".pdf", ".html", ".htm" },
 				IAPmain.loadIcon(ico),
 				IAPmain.loadIcon(ico2),
-				IAPmain.loadIcon(ico3));
+				IAPmain.loadIcon(ico3),
+				IAPmain.loadIcon(ico4));
 		ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
 		for (NavigationAction na : vfsEntry.getAdditionalNavigationActions()) {
 			action.addAdditionalEntity(new NavigationButton(na, guiSetting));
 		}
 		this.vfsAction = action;
 		if (saveVFS) {
-			IAPoptions.getInstance().setBoolean("VFS", "enabled", true);
+			SystemOptions.getInstance().setBoolean("VFS", "enabled", true);
 			int n = SystemOptions.getInstance().getInteger("VFS", "n", 0);
 			int idx = n + 1;
 			SystemOptions.getInstance().setInteger("VFS", "n", n + 1);

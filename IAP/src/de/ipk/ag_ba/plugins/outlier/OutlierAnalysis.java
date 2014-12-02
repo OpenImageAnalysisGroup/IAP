@@ -364,6 +364,6 @@ public class OutlierAnalysis extends AbstractNavigationAction implements ActionD
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png";
+		return "img/ext/gpl2/Gnome-System-search.png";
 	}
 }

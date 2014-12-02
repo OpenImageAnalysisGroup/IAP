@@ -54,7 +54,7 @@ public class Other {
 		final ObjectRef refCalGui = new ObjectRef();
 		
 		NavigationAction calendarAction = new ActionCalendar(refCalEnt, refCalGui, group2ei, m);
-		NavigationButtonCalendar2 calendarEntity = new NavigationButtonCalendar2("Calendar", "img/ext/calendar48.png", calendarAction, guiSettings);
+		NavigationButtonCalendar2 calendarEntity = new NavigationButtonCalendar2("Calendar", "img/ext/calendar.png", calendarAction, guiSettings);
 		calendarEntity.setShowSpecificDay(showOnlySpecificDay);
 		refCalEnt.setObject(calendarEntity);
 		return calendarEntity;

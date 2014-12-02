@@ -14,7 +14,6 @@ import java.util.Stack;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -155,9 +154,9 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		expTree = new JTree(new ExperimentTreeModel(this, doc, readOnly));
 		
 		DBEtreeCellRenderer cir = new DBEtreeCellRenderer();
-		cir.setCameraRendererIcon(new ImageIcon(IAPimages.getImage(IAPimages.getCamera(), 16)));
-		cir.setGroupRendererIcon(new ImageIcon(IAPimages.getImage(IAPimages.getSystemWheel(), 16)));
-		cir.setTimeRendererIcon(new ImageIcon(IAPimages.getImage(IAPimages.getClock(), 16)));
+		cir.setCameraRendererIcon(IAPimages.getIcon(IAPimages.getCamera(), 16, 16));
+		cir.setGroupRendererIcon(IAPimages.getIcon(IAPimages.getSystemWheel(), 16, 16));
+		cir.setTimeRendererIcon(IAPimages.getIcon(IAPimages.getClock(), 16, 16));
 		
 		ToolTipManager.sharedInstance().registerComponent(expTree);
 		

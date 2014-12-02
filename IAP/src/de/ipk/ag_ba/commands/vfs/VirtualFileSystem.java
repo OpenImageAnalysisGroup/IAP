@@ -229,21 +229,25 @@ public abstract class VirtualFileSystem {
 		String ico = IAPimages.getFolderRemoteClosed();
 		String ico2 = IAPimages.getFolderRemoteOpen();
 		String ico3 = IAPimages.getFolderRemoteClosed();
+		String ico4 = IAPimages.getFolderRemoteOpen();
 		if (vfsEntry.getProtocolName().contains("UDP")) {
 			ico = "img/ext/network-workgroup.png";
 			ico2 = "img/ext/network-workgroup-power.png";
 			ico3 = IAPimages.getFolderRemoteClosed();
+			ico4 = IAPimages.getFolderRemoteOpen();
 		}
 		if (vfsEntry.getDesiredIcon() != null) {
 			ico = vfsEntry.getDesiredIcon();
 			ico2 = vfsEntry.getDesiredIcon();
 			ico3 = vfsEntry.getDesiredIcon();
+			ico4 = vfsEntry.getDesiredIcon();
 		}
 		VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
 				new String[] { ".txt", ".url", ".webloc", ".gml", ".graphml", ".pdf", ".html", ".htm" },
 				IAPmain.loadIcon(ico),
 				IAPmain.loadIcon(ico2),
-				IAPmain.loadIcon(ico3));
+				IAPmain.loadIcon(ico3),
+				IAPmain.loadIcon(ico4));
 		ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
 		for (NavigationAction na : vfsEntry.getAdditionalNavigationActions()) {
 			action.addAdditionalEntity(new NavigationButton(na, guiSetting));

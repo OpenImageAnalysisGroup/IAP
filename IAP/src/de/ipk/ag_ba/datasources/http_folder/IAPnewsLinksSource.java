@@ -26,7 +26,7 @@ public class IAPnewsLinksSource extends HTTPfolderSource {
 	public IAPnewsLinksSource(DataSourceGroup dsg) {
 		super(dsg, getLib(),
 				"News and Links", "http://iap.ipk-gatersleben.de/links/", new String[] { ".webloc" },
-				IAPmain.loadIcon("img/public.png"), IAPmain.loadIcon("img/dataset.png"));
+				IAPmain.loadIcon("img/public.png"), IAPmain.loadIcon("img/dataset.png"), IAPmain.loadIcon("img/dataset.png"));
 		setDescription("<h2>Bookmarks</h2>"
 				+ "At this place interesting links regarding interesting bioinformatics " +
 				"research activities are listed.");

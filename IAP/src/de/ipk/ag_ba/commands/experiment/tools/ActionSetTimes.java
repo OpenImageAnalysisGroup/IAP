@@ -218,7 +218,7 @@ public class ActionSetTimes extends AbstractNavigationAction implements ActionDa
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-Image-Loading-64.png";
+		return "img/ext/gpl2/Gnome-Document-open-recent.png";
 	}
 	
 	@Override

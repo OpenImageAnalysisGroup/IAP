@@ -14,7 +14,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -150,8 +149,7 @@ public class ImageStack {
 		image.setStack(stack);
 		if (image.getWidth() > 0 && image.getHeight() > 0) {
 			final JButton jb = new JButton(buttonTitle);
-			jb.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png").getScaledInstance(24, 24,
-					java.awt.Image.SCALE_SMOOTH)));
+			jb.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Applications-Engineering-64.png", 24, 24));
 			
 			final java.awt.Image iconff = IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Engineering-64.png");
 			

@@ -38,7 +38,6 @@ import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.commands.load_lt.TableDataHeadingRow;
 import de.ipk.ag_ba.datasources.ExperimentLoader;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
@@ -79,10 +78,10 @@ public class LTdataExchange implements ExperimentLoader {
 	public static boolean positionFirst = true;
 	
 	public LTdataExchange() {
-		user = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//user", "postgres");
-		password = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//password", "");
-		port = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//port", "5432");
-		host = IAPoptions.getInstance().getString("LT-DB", "PostgreSQL//host", "lemna-db.ipk-gatersleben.de");
+		user = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//user", "postgres");
+		password = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//password", "");
+		port = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//port", "5432");
+		host = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//host", "lemna-db.ipk-gatersleben.de");
 	}
 	
 	public LTdataExchange(String user, String password, String host, String port) {
@@ -107,7 +106,7 @@ public class LTdataExchange implements ExperimentLoader {
 				"CornTest3"
 		};
 		
-		String[] ig = IAPoptions.getInstance().getStringAll("LT-DB", "DBs//ignore_db", defaultIgnored);
+		String[] ig = SystemOptions.getInstance().getStringAll("LT-DB", "DBs//ignore_db", defaultIgnored);
 		if (ig != null)
 			for (String invalid : ig) {
 				invalidDBs.add(invalid);
@@ -1618,6 +1617,6 @@ public class LTdataExchange implements ExperimentLoader {
 	}
 	
 	private static boolean isDebug() {
-		return IAPoptions.getInstance().getBoolean("LT-DB", "PostgreSQL//Print Debug Messages", false);
+		return SystemOptions.getInstance().getBoolean("LT-DB", "PostgreSQL//Print Debug Messages", false);
 	}
 }

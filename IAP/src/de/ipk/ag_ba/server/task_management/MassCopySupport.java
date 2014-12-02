@@ -26,7 +26,6 @@ import de.ipk.ag_ba.commands.experiment.process.ActionPerformGridAnalysis;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoDbCompact;
 import de.ipk.ag_ba.gui.IAPfeature;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_model.RemoteExecutionWrapperAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -380,7 +379,7 @@ public class MassCopySupport {
 					Thread.sleep(1000);
 					boolean onlyMerge = false;
 					int startHour =
-							IAPoptions.getInstance().getInteger("Watch-Service", "Automatic Copy//starttime_h", 1);
+							SystemOptions.getInstance().getInteger("Watch-Service", "Automatic Copy//starttime_h", 1);
 					if (new Date().getHours() != startHour || new Date().getMinutes() != 0)
 						onlyMerge = true;
 					boolean en = new SettingsHelperDefaultIsFalse().isEnabled("Watch-Service|Automatic Copy//enabled");

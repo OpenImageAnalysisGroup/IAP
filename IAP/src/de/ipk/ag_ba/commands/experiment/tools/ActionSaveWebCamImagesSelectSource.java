@@ -34,7 +34,7 @@ public class ActionSaveWebCamImagesSelectSource extends AbstractNavigationAction
 		getStatusProvider().setCurrentStatusText1("Determine Data Availability");
 		
 		try {
-			ArrayList<String> fsl = m.getWebCamStorageFileSystems();
+			ArrayList<String> fsl = m != null ? m.getWebCamStorageFileSystems() : new ArrayList<String>();
 			getStatusProvider().setCurrentStatusText1("Determine Image-Count");
 			for (String fs : fsl) {
 				getStatusProvider().setCurrentStatusText2("Check " + fs);
@@ -88,7 +88,7 @@ public class ActionSaveWebCamImagesSelectSource extends AbstractNavigationAction
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-Appointment-New-64.png";
+		return "img/ext/gpl2/Gnome-Video-X-Generic-64.png";// Gnome-Appointment-New-64.png";
 	}
 	
 	@Override

@@ -7,7 +7,6 @@ import iap.pipelines.ImageProcessorOptionsAndResults;
 import info.StopWatch;
 import info.clearthought.layout.TableLayout;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import java.util.stream.IntStream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -454,8 +452,7 @@ public class BlockPipeline {
 						JButton openSettingsButton = null;
 						if (er.getIniIoProvider() != null) {
 							openSettingsButton = new JButton("Change Analysis Settings");
-							openSettingsButton.setIcon(new ImageIcon(IAPimages.getImage("img/ext/gpl2/Gnome-Applications-Science-64.png").getScaledInstance(24, 24,
-									Image.SCALE_SMOOTH)));
+							openSettingsButton.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Applications-Science-64.png", 24, 24));
 							openSettingsButton.addActionListener(new ActionListener() {
 								@Override
 								public void actionPerformed(ActionEvent arg0) {
@@ -559,7 +556,7 @@ public class BlockPipeline {
 	
 	protected static Action getCloseAction(Runnable runnablePrepare, Runnable runnablePost) {
 		
-		Action action2 = new AbstractAction("Close Additional Image Windows", new ImageIcon(IAPimages.getImage("img/close_frame.png"))) {
+		Action action2 = new AbstractAction("Close Additional Image Windows", IAPimages.getIcon("img/close_frame.png", 32, 32)) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (IAPservice.getIAPimageWindowCount() > 1) {

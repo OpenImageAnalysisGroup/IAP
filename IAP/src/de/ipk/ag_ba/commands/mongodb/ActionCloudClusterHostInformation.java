@@ -217,7 +217,7 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/grid.png";
+		return "img/ext/ibm_supercomputer_edit.png";// grid.png";
 	}
 	
 	@Override

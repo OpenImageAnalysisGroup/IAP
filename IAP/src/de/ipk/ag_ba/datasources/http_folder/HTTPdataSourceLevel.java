@@ -28,6 +28,7 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 	private final NavigationImage iconInactive, iconActive;
 	private final NavigationImage folderIcon;
 	private final Library lib;
+	private final NavigationImage folderIconOpened;
 	
 	private class DataSourceLevelsAndPathways {
 		Collection<DataSourceLevel> levels;
@@ -42,13 +43,15 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 	public HTTPdataSourceLevel(Library lib, String name, Collection<PathwayWebLinkItem> mainList,
 			NavigationImage iconInactive,
 			NavigationImage iconActive,
-			NavigationImage folderIcon) {
+			NavigationImage folderIcon,
+			NavigationImage folderIconOpened) {
 		this.lib = lib;
 		this.mainList = mainList;
 		this.iconInactive = iconInactive;
 		this.iconActive = iconActive;
 		this.folderIcon = folderIcon;
 		this.name = name;
+		this.folderIconOpened = folderIconOpened;
 	}
 	
 	@Override
@@ -78,7 +81,7 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 							subLevel.add(item);
 					}
 				if (!groupName.isEmpty())
-					levels.add(new HTTPdataSourceLevel(lib, groupName, subLevel, folderIcon, folderIcon, folderIcon));
+					levels.add(new HTTPdataSourceLevel(lib, groupName, subLevel, folderIcon, folderIconOpened, folderIcon, folderIconOpened));
 			}
 		} else {
 			groups.clear();
@@ -99,7 +102,7 @@ public class HTTPdataSourceLevel implements DataSourceLevel {
 								subLevel.add(item);
 						}
 					levels.add(new HTTPdataSourceLevel(lib, groupName, subLevel,
-							folderIcon, folderIcon, folderIcon));
+							folderIcon, folderIconOpened, folderIcon, folderIconOpened));
 				}
 			} else {
 				// return all items as pathways at primary level (no grouping

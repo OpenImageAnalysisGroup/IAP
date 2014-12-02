@@ -83,7 +83,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	private final JPanel actionPanelRight;
 	private ButtonDrawStyle buttonStyle = ButtonDrawStyle.FLAT;
 	private final JCheckBoxMenuItem menuItemCompact, menuItemCompact2;
-	private final JCheckBoxMenuItem menuItemFlat;
+	private final JCheckBoxMenuItem menuItemFlat, menuItemFlatLarge;
 	private final JCheckBoxMenuItem menuItemButtons;
 	private JScrollPane scrollpane;
 	private int maxYY;
@@ -116,32 +116,38 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		
 		popup.addSeparator();
 		
-		menuItemCompact = new JCheckBoxMenuItem("Compact (text only)", buttonStyle == ButtonDrawStyle.COMPACT_LIST);
+		menuItemButtons = new JCheckBoxMenuItem("Buttons", buttonStyle == ButtonDrawStyle.BUTTONS);
+		menuItemButtons.putClientProperty("style", ButtonDrawStyle.BUTTONS);
+		menuItemButtons.addActionListener(this);
+		popup.add(menuItemButtons);
+		
+		menuItemCompact = new JCheckBoxMenuItem("Text Only", buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 		menuItemCompact.putClientProperty("style", ButtonDrawStyle.COMPACT_LIST);
 		menuItemCompact.addActionListener(this);
 		
 		popup.add(menuItemCompact);
 		
-		menuItemCompact2 = new JCheckBoxMenuItem("Compact (small icons)", buttonStyle == ButtonDrawStyle.COMPACT_LIST_2);
+		menuItemCompact2 = new JCheckBoxMenuItem("Small", buttonStyle == ButtonDrawStyle.COMPACT_LIST_2);
 		menuItemCompact2.putClientProperty("style", ButtonDrawStyle.COMPACT_LIST_2);
 		menuItemCompact2.addActionListener(this);
 		
 		popup.add(menuItemCompact2);
 		
-		menuItemFlat = new JCheckBoxMenuItem("Flat", buttonStyle == ButtonDrawStyle.FLAT);
+		menuItemFlat = new JCheckBoxMenuItem("Median (default)", buttonStyle == ButtonDrawStyle.FLAT);
 		menuItemFlat.putClientProperty("style", ButtonDrawStyle.FLAT);
 		menuItemFlat.addActionListener(this);
 		popup.add(menuItemFlat);
 		
-		menuItemButtons = new JCheckBoxMenuItem("Buttons", buttonStyle == ButtonDrawStyle.BUTTONS);
-		menuItemButtons.putClientProperty("style", ButtonDrawStyle.BUTTONS);
-		menuItemButtons.addActionListener(this);
-		popup.add(menuItemButtons);
+		menuItemFlatLarge = new JCheckBoxMenuItem("Large", buttonStyle == ButtonDrawStyle.FLAT_LARGE);
+		menuItemFlatLarge.putClientProperty("style", ButtonDrawStyle.FLAT_LARGE);
+		menuItemFlatLarge.addActionListener(this);
+		popup.add(menuItemFlatLarge);
+		
 		// menuItem = new JMenuItem("Text Only");
 		// menuItem.putClientProperty("style", ButtonDrawStyle.TEXT);
 		// menuItem.addActionListener(this);
 		// popup.add(menuItem);
-		boolean vanted = IAPoptions.getInstance().getBoolean("VANTED", "show_icon", true);
+		boolean vanted = SystemOptions.getInstance().getBoolean("VANTED", "show_icon", true);
 		if (vanted) {
 			popup.addSeparator();
 			ActionShowVANTED cmd = new ActionShowVANTED();
@@ -422,6 +428,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		menuItemCompact.setEnabled(true);
 		menuItemCompact2.setEnabled(true);
 		menuItemFlat.setEnabled(true);
+		menuItemFlatLarge.setEnabled(true);
 		menuItemButtons.setEnabled(true);
 	}
 	
@@ -429,6 +436,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		menuItemCompact.setEnabled(false);
 		menuItemCompact2.setEnabled(false);
 		menuItemFlat.setEnabled(false);
+		menuItemFlatLarge.setEnabled(false);
 		menuItemButtons.setEnabled(false);
 	}
 	
@@ -622,11 +630,13 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 			menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 			menuItemCompact2.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST_2);
 			menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
+			menuItemFlatLarge.setSelected(buttonStyle == ButtonDrawStyle.FLAT_LARGE);
 			menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
 			
 			theOther.menuItemCompact.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST);
 			theOther.menuItemCompact2.setSelected(buttonStyle == ButtonDrawStyle.COMPACT_LIST_2);
 			theOther.menuItemFlat.setSelected(buttonStyle == ButtonDrawStyle.FLAT);
+			theOther.menuItemFlatLarge.setSelected(buttonStyle == ButtonDrawStyle.FLAT_LARGE);
 			theOther.menuItemButtons.setSelected(buttonStyle == ButtonDrawStyle.BUTTONS);
 			
 			SwingUtilities.invokeLater(new Runnable() {

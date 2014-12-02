@@ -9,13 +9,16 @@ package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
 
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.ActionTrash;
 import de.ipk.ag_ba.commands.DeletionCommand;
 import de.ipk.ag_ba.commands.experiment.ActionExperimentHistory;
+import de.ipk.ag_ba.commands.experiment.process.ExperimentAnalysisSettingsIOprovder;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
@@ -40,6 +43,7 @@ public class ActionMongoOrLTexperimentNavigation extends
 	private boolean requestTitleUpdates = true;
 	private boolean oldAnalysis;
 	private String domainUser;
+	private String oldRelease;
 	
 	public ActionMongoOrLTexperimentNavigation(
 			ExperimentReference exp) {
@@ -62,6 +66,17 @@ public class ActionMongoOrLTexperimentNavigation extends
 								+ (exp.getHeader().getSizekb() > 0 ? exp.getHeader().getSizekb() / 1024 / 1024 + " GB" : "-") : "")
 				+ "</td></tr>"
 				+ "</td></tr>";
+		
+		ExperimentAnalysisSettingsIOprovder nnn = new ExperimentAnalysisSettingsIOprovder(exp.getHeader(), exp.getM());
+		if (nnn != null) {
+			SystemOptions soi = SystemOptions.getInstance(null, nnn);
+			String v = soi.getString("DESCRIPTION",
+					"tuned_for_IAP_version", null, false);
+			if (v != null && !ReleaseInfo.IAP_VERSION_STRING.equals(v))
+				oldAnalysis = true;
+			this.oldRelease = v;
+		} else
+			this.oldRelease = null;
 		
 		if (exp.getHeader().getRemark() != null && exp.getHeader().getRemark().contains("IAP image analysis")) {
 			if (exp.getHeader().getExperimentType() != null && exp.getHeader().getExperimentType().equals(IAPexperimentTypes.AnalysisResults.toString())) {
@@ -240,7 +255,9 @@ public class ActionMongoOrLTexperimentNavigation extends
 		if (startTime == 0)
 			age = "<br><small><font color='gray'>(start or end time could not be properly processed)</font></small>";
 		if (displayName != null)
-			return "<html><center>" + displayName + (oldAnalysis ? "<br>(analysed with old release)" : "") + age;
+			return "<html><center>" + displayName
+					+ (oldAnalysis ? "<br>(analysis settings tuned for " + (oldRelease != null ? "IAP " + oldRelease : "old release") + ")" : "")
+					+ age;
 		else
 			return "<html><center>" + header.getExperimentName() + (oldAnalysis ? "<br>(analysed with old release)" : "") + age;
 	}
