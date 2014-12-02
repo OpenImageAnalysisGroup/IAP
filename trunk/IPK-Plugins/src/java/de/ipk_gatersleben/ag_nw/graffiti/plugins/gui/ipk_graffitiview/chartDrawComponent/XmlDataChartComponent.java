@@ -342,7 +342,7 @@ public class XmlDataChartComponent extends JComponent {
 				}
 			}
 		}
-		JComponent res = new MyColorGrid(colors, outline_colors, co.orientation, co.outlineBorderWidth);
+		JComponent res = new MyColorGrid(colors, outline_colors, co.orientation, co.outlineBorderWidth / 10);
 		res.setOpaque(opaque);
 		return res;
 	}
