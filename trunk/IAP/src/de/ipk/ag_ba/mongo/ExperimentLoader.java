@@ -288,7 +288,8 @@ public class ExperimentLoader implements RunnableOnDB {
 			throws InterruptedException {
 		final Condition3D condition = new Condition3D(s3d, fv((Map) cond));
 		condition.setExperimentHeader(header);
-		s3d.add(condition);
+		
+		s3d.addAndExtendIfAvailable(condition);
 		final BasicDBList sampList = (BasicDBList) cond.get("samples");
 		cond = null;
 		if (sampList != null) {
