@@ -4882,7 +4882,7 @@ public class ImageOperation implements MemoryHogInterface {
 		return this;
 	}
 	
-	public ArrayList<Vector2i> getForegroundPixels() {
+	public ArrayList<Vector2i> getForegroundCoordinates() {
 		ArrayList<Vector2i> res = new ArrayList<Vector2i>();
 		int[][] img = getAs2D();
 		for (int y = 0; y < getHeight(); y++) {
@@ -4890,6 +4890,20 @@ public class ImageOperation implements MemoryHogInterface {
 				int val = img[x][y];
 				if (val != BACKGROUND_COLORint) {
 					res.add(new Vector2i(x, y));
+				}
+			}
+		}
+		return res;
+	}
+	
+	public ArrayList<PositionAndColor> getForegroundCoordinatesAndIntensities() {
+		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>();
+		int[][] img = getAs2D();
+		for (int y = 0; y < getHeight(); y++) {
+			for (int x = 0; x < getWidth(); x++) {
+				int val = img[x][y];
+				if (val != BACKGROUND_COLORint) {
+					res.add(new PositionAndColor(x, y, (val & 0x0000ff)));
 				}
 			}
 		}
