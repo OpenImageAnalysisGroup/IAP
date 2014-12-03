@@ -57,6 +57,10 @@ public interface NavigationAction {
 	
 	public boolean requestTitleUpdates();
 	
+	public default boolean requestHighTitleUpdates() {
+		return false;
+	}
+	
 	public boolean requestRefresh();
 	
 	public ParameterOptions getParameters();
