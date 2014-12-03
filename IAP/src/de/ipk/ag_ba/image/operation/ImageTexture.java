@@ -27,10 +27,12 @@ import static de.ipk.ag_ba.image.operation.GLCMTextureFeatures.GLCM_VARIANCE_H;
 import static de.ipk.ag_ba.image.operation.GLCMTextureFeatures.GLCM_VARIANCE_V;
 
 import java.util.HashMap;
+import java.util.stream.IntStream;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import Jama.Matrix;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
@@ -47,6 +49,8 @@ public class ImageTexture {
 	
 	boolean ignoreBackground = true;
 	
+	private double[] sqrtList;
+	
 	/**
 	 * Uses only blue channel of input image, this should be an gray-scale image.
 	 */
@@ -59,6 +63,14 @@ public class ImageTexture {
 		}
 		w = inp.getWidth();
 		h = inp.getHeight();
+	}
+	
+	private void calcSqrtLookUp(int i) {
+		sqrtList = new double[i];
+		
+		BackgroundThreadDispatcher.stream("Sqrt Lookup").processInts(IntStream.range(0, i), (idx) -> {
+			sqrtList[idx] = Math.sqrt(idx);
+		}, null);
 	}
 	
 	/**
