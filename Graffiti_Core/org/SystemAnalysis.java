@@ -509,6 +509,8 @@ public class SystemAnalysis {
 	}
 	
 	public static boolean isRetina() {
+		if (isHeadless())
+			return false;
 		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final GraphicsDevice device = env.getDefaultScreenDevice();
 		
@@ -529,6 +531,8 @@ public class SystemAnalysis {
 	}
 	
 	public static float getHiDPIScaleFactor() {
+		if (isHeadless())
+			return 1f;
 		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final GraphicsDevice device = env.getDefaultScreenDevice();
 		
