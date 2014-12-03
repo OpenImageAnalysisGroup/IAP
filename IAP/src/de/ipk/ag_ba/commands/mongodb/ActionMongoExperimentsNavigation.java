@@ -46,6 +46,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
+import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -277,7 +278,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 					if (limitToData && group.toUpperCase().contains("ANALYSIS RESULTS"))
 						continue;
 					NavigationButton nb = new NavigationButton(createMongoGroupNavigationAction(mode, group
-							+ " (" + count(experiments.get(group)) + ")", experiments.get(group)), src
+							+ " (" + count(experiments.get(group)) + ")", group, experiments.get(group)), src
 							.getGUIsetting());
 					if (group.indexOf("(") <= 0)
 						unsorted.add(nb);
@@ -360,7 +361,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	
 	private NavigationAction createMongoGroupNavigationAction(
 			final ExperimentSortingMode sortingMode,
-			final String group,
+			final String groupKey, final String groupFieldValue,
 			final TreeMap<String, ArrayList<ExperimentHeaderInterface>> user2exp) {
 		NavigationAction groupNav = new AbstractNavigationAction("Show User-Group Folder") {
 			private NavigationButton src;
@@ -368,6 +369,55 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
 				ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+				res.add(new NavigationButton(new AbstractNavigationAction("Modify user name of group of experiment") {
+					int nres = 0;
+					String newName = null;
+					
+					@Override
+					public void performActionCalculateResults(NavigationButton src) throws Exception {
+						Object[] res = MyInputHelper.getInput(
+								"This command updates the coordinator field<br>"
+										+ "of the experiments within this group.", "Modify coodinator annotation", new Object[] {
+										"Coordinator", groupFieldValue
+								});
+						if (res != null) {
+							newName = (String) res[0];
+							for (ArrayList<ExperimentHeaderInterface> al : user2exp.values())
+								for (ExperimentHeaderInterface eh : al) {
+									eh.setCoordinator(newName);
+									if (m != null) {
+										m.saveExperimentHeader(eh);
+										nres++;
+									}
+								}
+						}
+					}
+					
+					@Override
+					public MainPanelComponent getResultMainPanel() {
+						if (nres > 0)
+							return new MainPanelComponent("<h2>Updated coordinator annotation of " + nres + " experiments to '" + newName + "'</h2>"
+									+ "<br><b>To update view, please go back "
+									+ "to the main level of this data source or click 'Start'.");
+						else
+							return new MainPanelComponent("<b>Coordinator field has not been updated.</b>");
+					}
+					
+					@Override
+					public String getDefaultTitle() {
+						return "Change Coordinator";
+					}
+					
+					@Override
+					public String getDefaultImage() {
+						return "img/ext/gpl2/Gnome-Format-Text-Direction-Ltr-64.png";
+					}
+					
+					@Override
+					public ArrayList<NavigationButton> getResultNewActionSet() {
+						return new ArrayList<NavigationButton>();
+					}
+				}, src.getGUIsetting()));
 				for (String user : user2exp.keySet()) {
 					res.add(new NavigationButton(createMongoUserNavigationAction(sortingMode, user, user2exp.get(user)), src
 							.getGUIsetting()));
@@ -389,7 +439,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			
 			@Override
 			public String getDefaultImage() {
-				return sortingMode.getIconForGroup1(group);
+				return sortingMode.getIconForGroup1(groupKey);
 			}
 			
 			@Override
@@ -399,7 +449,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			
 			@Override
 			public String getDefaultTitle() {
-				return sortingMode.getTitleGroup1(group);
+				return sortingMode.getTitleGroup1(groupKey);
 			}
 			
 		};
