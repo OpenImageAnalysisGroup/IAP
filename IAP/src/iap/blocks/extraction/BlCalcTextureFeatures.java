@@ -24,6 +24,7 @@ import de.ipk.ag_ba.image.operation.GLCMTextureFeatures;
 import de.ipk.ag_ba.image.operation.ImageMoments;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.ImageTexture;
+import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.channels.Channel;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -48,6 +49,8 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 	private int masksize = 5;
 	
 	private int maxDistance = 15;
+	
+	private static double sqrtOfTwoDivTwo = Math.sqrt(2) / 2.0;
 	
 	@Override
 	protected void prepare() {
@@ -90,7 +93,8 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 				if (calculationMode == TextureCalculationMode.SKELETON && skel != null) {
 					ImageOperation dist = ch_img.bm().edmFloatClipped().show("distance clipped", debugValues);
 					Image mapped = dist.applyMask(skel).getImage().show("mapped", debugValues);
-					calcTextureForSkeleton(new ImageOperation(getGrayImageAs2dArray(mapped)), new ImageOperation(getGrayImageAs2dArray(ch_img.getImage())), c,
+					ArrayList<PositionAndColor> mappedCoordinates = mapped.io().getForegroundCoordinatesAndIntensities();
+					calcTextureForSkeleton(mappedCoordinates, new ImageOperation(getGrayImageAs2dArray(ch_img.getImage())), mapped.io(), c,
 							ct, cp, imageRef);
 				}
 				if (calculationMode == TextureCalculationMode.VISUALIZE) {
@@ -118,12 +122,15 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		}
 	}
 	
-	private void calcTextureForSkeleton(ImageOperation mappedSkel, ImageOperation ch_img, Channel c, CameraType cameraType, CameraPosition cp,
+	private void calcTextureForSkeleton(ArrayList<PositionAndColor> mappedCoordinates, ImageOperation ch_img, ImageOperation skel, Channel c,
+			CameraType cameraType,
+			CameraPosition cp,
 			NumericMeasurement3D imageRef) {
-		int w = mappedSkel.getWidth();
-		int h = mappedSkel.getHeight();
 		int[][] img2d = ch_img.getAs2D();
-		int[][] mappedSkel2d = mappedSkel.getAs2D();
+		int[][] mappedSkel2d = skel.getAs2D();
+		int w = ch_img.getWidth();
+		int h = ch_img.getHeight();
+		int l = mappedCoordinates.size();
 		
 		HashMap<FirstOrderTextureFeatures, SummaryStatistics> firstArrays = new HashMap<>();
 		
@@ -137,67 +144,74 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			glcmArrays.put(f, new SummaryStatistics());
 		}
 		
-		new StreamBackgroundTaskHelper<Integer>("Texture analysis").process(
-				IntStream.range(0, w), (x) -> {
-					for (int y = 0; y < h; y++) {
-						
-						if (mappedSkel2d[x][y] == ImageOperation.BACKGROUND_COLORint)
-							continue;
-						
-						int masksize = mappedSkel2d[x][y];
-						
-						if (masksize < minDistance)
-							continue;
-						
-						if (masksize > maxDistance)
-							masksize = maxDistance;
-						
-						masksize = (masksize * 2) + 1; // double masksize
-				int halfmask = masksize / 2;
-				int[] mask = new int[masksize * masksize];
-				int[] skelMask = new int[masksize * masksize];
-				
-				for (int i = 0; i < mask.length; i++) {
-					mask[i] = ImageOperation.BACKGROUND_COLORint;
-					skelMask[i] = ImageOperation.BACKGROUND_COLORint;
-				}
-				
-				int count = 0;
-				for (int xMask = -halfmask; xMask <= halfmask; xMask++) {
-					for (int yMask = -halfmask; yMask <= halfmask; yMask++) {
-						if (x + xMask >= 0 && x + xMask < w && y + yMask >= 0 && y + yMask < h) {
-							mask[count] = img2d[x + xMask][y + yMask];
-							skelMask[count] = mappedSkel2d[x + xMask][y + yMask];
-						}
-						count++;
+		// new StreamBackgroundTaskHelper<Integer>("Texture analysis").process(
+		// IntStream.range(0, l), (idx) -> {
+		for (int idx = 0; idx < l; idx++) {
+			
+			if (mappedCoordinates.get(idx).intensityInt == ImageOperation.BACKGROUND_COLORint)
+				continue;
+			
+			int masksize = mappedCoordinates.get(idx).intensityInt;
+			
+			if (masksize < minDistance)
+				continue;
+			
+			if (masksize > maxDistance)
+				masksize = maxDistance;
+			
+			masksize = (masksize * 2) + 1; // double masksize
+			int halfmask = masksize / 2;
+			int[] mask = new int[masksize * masksize];
+			int[] skelMask = new int[masksize * masksize];
+			
+			int x = mappedCoordinates.get(idx).x;
+			int y = mappedCoordinates.get(idx).y;
+			
+			for (int i = 0; i < mask.length; i++) {
+				mask[i] = ImageOperation.BACKGROUND_COLORint;
+				skelMask[i] = ImageOperation.BACKGROUND_COLORint;
+			}
+			
+			int sumSkelValInMask = 0;
+			
+			int count = 0;
+			for (int xMask = -halfmask; xMask <= halfmask; xMask++) {
+				for (int yMask = -halfmask; yMask <= halfmask; yMask++) {
+					if (x + xMask >= 0 && x + xMask < w && y + yMask >= 0 && y + yMask < h) {
+						mask[count] = img2d[x + xMask][y + yMask];
+						skelMask[count] = mappedSkel2d[x + xMask][y + yMask];
+						sumSkelValInMask += (mappedSkel2d[x + xMask][y + yMask] & 0x0000ff);
 					}
-				}
-				
-				ImageMoments im = new ImageMoments(skelMask, masksize, masksize);
-				double angle = im.calcOmega(ImageOperation.BACKGROUND_COLORint);
-				double newMasksize = masksize * Math.sqrt(2) / 2.0;
-				ImageOperation rot = new Image(masksize, masksize, mask).io().rotate(-angle * 180 / Math.PI);
-				int halfdiff_disired = (int) (rot.getWidth() - newMasksize) / 2;
-				ImageOperation crop = rot.cropAbs(halfdiff_disired, rot.getWidth() - halfdiff_disired, halfdiff_disired, rot.getWidth() - halfdiff_disired);
-				
-				final int f_masksize = crop.getWidth();
-				ImageTexture it = new ImageTexture(crop.getAs1D(), f_masksize, f_masksize, true);
-				
-				it.calcTextureFeatures();
-				
-				for (FirstOrderTextureFeatures f : FirstOrderTextureFeatures.values()) {
-					firstArrays.get(f).addValue(it.firstOrderFeatures.get(f));
-				}
-				
-				it.calcGLCMTextureFeatures();
-				
-				for (GLCMTextureFeatures f : GLCMTextureFeatures.values()) {
-					glcmArrays.get(f).addValue(it.glcmFeatures.get(f));
+					count++;
 				}
 			}
-		}, (t, e) -> {
-			ErrorMsg.addErrorMessage(new RuntimeException(e));
-		});
+			
+			ImageMoments im = new ImageMoments(skelMask, masksize, masksize);
+			double angle = im.calcOmega(ImageOperation.BACKGROUND_COLORint);
+			double newMasksize = masksize * sqrtOfTwoDivTwo;
+			ImageOperation rot = new Image(masksize, masksize, mask).io().rotate(-angle * 180 / Math.PI);
+			int halfdiff_disired = (int) (rot.getWidth() - newMasksize) / 2;
+			ImageOperation crop = rot.cropAbs(halfdiff_disired, rot.getWidth() - halfdiff_disired, halfdiff_disired, rot.getWidth() - halfdiff_disired);
+			
+			final int f_masksize = crop.getWidth();
+			ImageTexture it = new ImageTexture(crop.getAs1D(), f_masksize, f_masksize, true);
+			
+			it.calcTextureFeatures();
+			
+			for (FirstOrderTextureFeatures f : FirstOrderTextureFeatures.values()) {
+				firstArrays.get(f).addValue(it.firstOrderFeatures.get(f));
+			}
+			
+			it.calcGLCMTextureFeatures();
+			
+			for (GLCMTextureFeatures f : GLCMTextureFeatures.values()) {
+				glcmArrays.get(f).addValue(it.glcmFeatures.get(f));
+			}
+			idx += sumSkelValInMask / count / 2d;
+		}
+		// , (t, e) -> {
+		// ErrorMsg.addErrorMessage(new RuntimeException(e));
+		// });
 		
 		for (FirstOrderTextureFeatures tf : FirstOrderTextureFeatures.values()) {
 			getResultSet().setNumericResult(getBlockPosition(),
