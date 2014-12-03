@@ -21,6 +21,7 @@ import org.ErrorMsg;
 import org.ObjectRef;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.bson.io.BasicOutputBuffer;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.HashType;
 import org.graffiti.editor.MainFrame;
@@ -34,6 +35,7 @@ import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.DefaultDBEncoder;
 import com.mongodb.WriteConcern;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
@@ -336,14 +338,14 @@ public class ExperimentSaver implements RunnableOnDB {
 		ArrayList<DBObject> toBeSaved = new ArrayList<DBObject>();
 		try {
 			for (final ConditionInterface c : s) {
-				BasicDBObject condition = processConditionSaving(cols, db, status,
+				ArrayList<BasicDBObject> condition = processConditionSaving(cols, db, status,
 						keepDataLinksToDataSource_safe_space, attributes,
-						overallFileSize, startTime, conditions,
+						overallFileSize, startTime,
 						errorCount,
 						lastTransferSum, lastTime, count, errors,
 						numberOfBinaryData, conditionIDs, c, mh, m, savedUrls);
 				
-				toBeSaved.add(condition);
+				toBeSaved.addAll(condition);
 				
 				if (toBeSaved.size() >= 50) {
 					conditions.insert(new ArrayList<DBObject>(toBeSaved));
@@ -484,11 +486,11 @@ public class ExperimentSaver implements RunnableOnDB {
 		return map;
 	}
 	
-	private BasicDBObject processConditionSaving(CollectionStorage cols, DB db,
+	private ArrayList<BasicDBObject> processConditionSaving(CollectionStorage cols, DB db,
 			final BackgroundTaskStatusProviderSupportingExternalCall status,
 			boolean keepDataLinksToDataSource_safe_space,
 			final HashMap<String, Object> attributes, final ObjectRef overallFileSize,
-			final ObjectRef startTime, DBCollection conditions,
+			final ObjectRef startTime,
 			final ObjectRef errorCount,
 			final ObjectRef lastTransferSum, final ObjectRef lastTime, final ObjectRef count,
 			final StringBuilder errors, final int numberOfBinaryData,
@@ -496,23 +498,31 @@ public class ExperimentSaver implements RunnableOnDB {
 			ConditionInterface c,
 			MongoDBhandler mh, MongoDB mo, final HashSet<String> savedUrls) throws InterruptedException, ExecutionException {
 		
-		BasicDBObject condition;
-		synchronized (attributes) {
-			attributes.clear();
-			c.fillAttributeMap(attributes);
-			condition = new BasicDBObject(filter(attributes));
-			condition.remove("settings");
-			condition.remove("remark");
-			condition.remove("startdate");
-			condition.remove("experimenttype");
-			condition.remove("importdate");
-			condition.remove("experimentname");
-			condition.remove("coordinator");
-			condition.remove("storagedate");
-		}
+		boolean addNewCondition = true;
+		List<BasicDBObject> dbSamples = null;
 		
-		List<BasicDBObject> dbSamples = new ArrayList<BasicDBObject>();
+		BasicDBObject condition = null;
+		ArrayList<BasicDBObject> newConditions = new ArrayList<BasicDBObject>();
 		for (SampleInterface sa : c) {
+			if (addNewCondition) {
+				dbSamples = new ArrayList<BasicDBObject>();
+				synchronized (attributes) {
+					attributes.clear();
+					c.fillAttributeMap(attributes);
+					condition = new BasicDBObject(filter(attributes));
+					condition.remove("settings");
+					condition.remove("remark");
+					condition.remove("startdate");
+					condition.remove("experimenttype");
+					condition.remove("importdate");
+					condition.remove("experimentname");
+					condition.remove("coordinator");
+					condition.remove("storagedate");
+					
+					newConditions.add(condition);
+				}
+				condition.put("samples", dbSamples);
+			}
 			// if (status != null && status.wantsToStop())
 			// break;
 			final BasicDBObject sample;
@@ -630,10 +640,16 @@ public class ExperimentSaver implements RunnableOnDB {
 				sample.put("volumes", dbVolumes);
 			if (dbNetworks.size() > 0)
 				sample.put("networks", dbVolumes);
+			
+			int size = DefaultDBEncoder.FACTORY.create().
+					writeObject(new BasicOutputBuffer(), sample);
+			if (size > 1024 * 1024 * 2) {
+				addNewCondition = true;
+			} else
+				addNewCondition = false;
 		} // sample
 		
-		condition.put("samples", dbSamples);
-		return condition;
+		return newConditions;
 	}
 	
 	private long lastN = -1;
@@ -1047,7 +1063,12 @@ public class ExperimentSaver implements RunnableOnDB {
 			BasicDBObject dbSubstance, ArrayList<String> conditionIDs) {
 		// if (status != null)
 		// status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
-		
+		HashSet<String> knownIDs = new HashSet<String>();
+		for (String s : conditionIDs) {
+			if (knownIDs.contains(s))
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Duplicate condition ID in list for substance to be saved: '" + s + "'!");
+			knownIDs.add(s);
+		}
 		dbSubstance.put("condition_ids", conditionIDs);
 		substances.insert(dbSubstance);
 	}
