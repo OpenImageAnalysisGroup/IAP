@@ -56,10 +56,9 @@ public class BlShowIntermediateImages extends AbstractBlock {
 		boolean show = false;
 		
 		for (CameraType ct : CameraType.values()) {
-			if (ct == CameraType.UNKNOWN)
-				continue;
-			if (getBoolean("Show " + ct.getNiceName(), false) && mask.getCameraType() == ct)
-				show = true;
+			if (ct != CameraType.UNKNOWN)
+				if (getBoolean("Show " + ct.getNiceName(), false) && mask.getCameraType() == ct)
+					show = true;
 		}
 		
 		if (show)
