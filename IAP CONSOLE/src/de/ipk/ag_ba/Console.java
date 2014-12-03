@@ -8,6 +8,7 @@ import java.util.HashMap;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.editor.SplashScreenInterface;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
@@ -20,7 +21,6 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.IAPfeature;
-import de.ipk.ag_ba.gui.IAPoptions;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
@@ -193,7 +193,7 @@ public class Console {
 				"Watering Table",
 				"Show in IAP/VANTED"
 		};
-		invalid = IAPoptions.getInstance().getStringAll("IAP-CONSOLE-MODE", "invalid_cmds", invalid);
+		invalid = SystemOptions.getInstance().getStringAll("IAP-CONSOLE-MODE", "invalid_cmds", invalid);
 		for (String i : invalid)
 			if (i.equalsIgnoreCase(title))
 				return false;
