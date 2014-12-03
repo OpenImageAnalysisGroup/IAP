@@ -385,4 +385,15 @@ public class Substance3D extends Substance {
 			System.out.println("MORE THAN ONE MATCH !!!!!!!!!!!12345");
 		return res.size() == 1 ? res.get(0) : null;
 	}
+	
+	public void addAndExtendIfAvailable(Condition3D condition) {
+		for (ConditionInterface cond : this) {
+			if (cond.equals(condition)) {
+				for (SampleInterface s : condition)
+					cond.add(s);
+				return;
+			}
+		}
+		add(condition);
+	}
 }
