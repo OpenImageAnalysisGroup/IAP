@@ -154,7 +154,6 @@ public enum ExperimentSortingMode implements NiceStringSupport {
 		if (group.contains(",") && group.indexOf(",") > 1)
 			group = group.substring(0, group.indexOf(","));
 		group = group.trim();
-		System.out.println(group);
 		int b = 0;
 		for (byte v : group.getBytes())
 			b += v;

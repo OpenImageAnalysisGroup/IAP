@@ -92,7 +92,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			}
 			
 			String clusterStatusURL = SystemOptions.getInstance().getString("IAP", "Compute Infrastructure Info URL",
-					"http://pdw-24.ipk-gatersleben.de/ganglia/?m=load_one&r=hour&s=descending&c=Brocken&h=&sh=1&hc=4");
+					"http://iap.ipk-gatersleben.de");
 			if (clusterAvailable) {
 				res.add(
 						new NavigationButton(

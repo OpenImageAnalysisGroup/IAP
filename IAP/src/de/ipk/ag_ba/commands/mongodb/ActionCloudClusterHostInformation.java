@@ -32,7 +32,6 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 	private double loadSum = -1;
 	private int cpuSum = -1;
 	boolean onceExecuted = false;
-	protected long lastUpdate;
 	
 	public ActionCloudClusterHostInformation(final MongoDB m) {
 		super("Compute Grid");
@@ -59,9 +58,15 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 				return lastStatus;
 			}
 			
+			private String lastMessage1 = null;
+			private long lastMessage1check = 0;
+			
 			@Override
 			public String getCurrentStatusMessage1() {
-				ActionCloudClusterHostInformation.this.lastUpdate = System.currentTimeMillis();
+				
+				if (System.currentTimeMillis() - lastMessage1check < 5000)
+					return lastMessage1;
+				
 				try {
 					ArrayList<CloudHost> hl = m.batch().getAvailableHosts(90 * 1000);// 5 * 60 * 1000);
 					int blocksExecutedWithinLastMinute = 0;
@@ -152,7 +157,9 @@ public class ActionCloudClusterHostInformation extends AbstractNavigationAction 
 					rA = blocksExecutedWithinLastMinute + " bpm, ";
 					// else
 					// return ""; // "idle, ";
-					return speed + " p.e./h, " + rA + "t_p=[" + lastPipelineTimeMin + "," + lastPipelineTimeMax + "] s";
+					lastMessage1check = System.currentTimeMillis();
+					lastMessage1 = speed + " p.e./h, " + rA + "t_p=[" + lastPipelineTimeMin + "," + lastPipelineTimeMax + "] s";
+					return lastMessage1;
 				} catch (Exception e) {
 					// empty
 					return e.getMessage() + "";
