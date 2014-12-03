@@ -318,7 +318,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 						if (width < 2) {
 							ImageOperation skeletonImage = tobeSkeletonized.skeletonize();// .resize(0.5d);
 							DescriptiveStatistics skelStat = new DescriptiveStatistics();
-							for (Vector2i i : skeletonImage.getForegroundPixels())
+							for (Vector2i i : skeletonImage.getForegroundCoordinates())
 								skelStat.addValue(distanceMap[i.x][i.y] / 10d / 2d);
 							int endTipps = SkeletonProcessor2d.countEndPoints(skeletonImage.copy().getImage());
 							rt.addValue("roots.volume.skeleton_dist_based", Math.PI * (1 + skelStat.getMean()) * (1 + skelStat.getMean())
