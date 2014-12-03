@@ -52,6 +52,7 @@ import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.calendar.MyCalendarIcon;
 import de.ipk.ag_ba.gui.calendar.NavigationButtonCalendar2;
 import de.ipk.ag_ba.gui.enums.ButtonDrawStyle;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
@@ -1156,11 +1157,12 @@ public class NavigationButton implements StyleAware {
 		if (style == ButtonDrawStyle.FLAT_LARGE)
 			imgS = 48 * 2;
 		else
-			if (style == ButtonDrawStyle.COMPACT_LIST || style == ButtonDrawStyle.COMPACT_LIST_2)
+			if (style == ButtonDrawStyle.COMPACT_LIST || style == ButtonDrawStyle.COMPACT_LIST_2) {
 				if (target == PanelTarget.NAVIGATION || style == ButtonDrawStyle.COMPACT_LIST_2)
 					imgS = 25;// 32;
 				else
 					imgS = defaultButtonSize;
+			}
 		return imgS;
 	}
 	
@@ -1179,16 +1181,20 @@ public class NavigationButton implements StyleAware {
 					return;
 				ImageIcon icon;
 				if (target == PanelTarget.NAVIGATION && n.getIconActive() != null) {
-					icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgSf, imgSf));
+					icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(n.getIconActive().getImage(),
+							(int) (-imgSf * SystemAnalysis.getHiDPIScaleFactor()),
+							(int) (imgSf * SystemAnalysis.getHiDPIScaleFactor())));
 				} else
 					if (target == PanelTarget.ACTION && n.getIconInactive() != null) {
-						icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgSf, imgSf));
+						icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(),
+								(int) (-imgSf * SystemAnalysis.getHiDPIScaleFactor()),
+								(int) (imgSf * SystemAnalysis.getHiDPIScaleFactor())));
 					}
 					else {
 						if (target == PanelTarget.NAVIGATION)
-							icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgSf, imgSf);
+							icon = IAPimages.getIcon(n.getNavigationImage(), -imgSf, imgSf);
 						else
-							icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgSf, imgSf);
+							icon = IAPimages.getIcon(n.getActionImage(), -imgSf, imgSf);
 					}
 				if (icon != null)
 					icon.setDescription(imgSf + "");
