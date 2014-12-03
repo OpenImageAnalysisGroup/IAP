@@ -248,7 +248,7 @@ public class NavigationButton implements StyleAware {
 			title = overrideTitle;
 		
 		long compTime = System.currentTimeMillis() - processingStart;
-		if (!forceProgressText && !(isProcessing() || requestsTitleUpdates()) || compTime < 1000) {
+		if (!forceProgressText && !(isProcessing() || requestsTitleUpdates() != TitleUpdateMode.STATIC) || compTime < 1000) {
 			if (title != null && title.contains("<br>") && !title.startsWith("<html>"))
 				return "<html><center>" + title;
 			return title;
@@ -276,7 +276,7 @@ public class NavigationButton implements StyleAware {
 			// if (ndots == 4)
 			// cc = (char) 0x25CB + "";// "-";
 			
-			if (requestsTitleUpdates()) {
+			if (requestsTitleUpdates() != TitleUpdateMode.STATIC) {
 				cc = "";
 				cc2 = "";
 			}
@@ -387,8 +387,14 @@ public class NavigationButton implements StyleAware {
 		return processing;
 	}
 	
-	public boolean requestsTitleUpdates() {
-		return action != null && action.requestTitleUpdates();
+	public TitleUpdateMode requestsTitleUpdates() {
+		if (action != null && action.requestHighTitleUpdates())
+			return TitleUpdateMode.HIGH;
+		if (action != null && action.requestTitleUpdates())
+			return TitleUpdateMode.DYNAMIC;
+		else
+			return TitleUpdateMode.STATIC;
+		
 	}
 	
 	public void setSideGUI(JComponent sideGui, double sideGuiSpace, double sideGuiWidth) {
@@ -488,7 +494,7 @@ public class NavigationButton implements StyleAware {
 					return;
 				if (n1 == null)
 					return;
-				if ((n.isProcessing() || n.requestsTitleUpdates()) && !n.isRemoved()) {
+				if ((n.isProcessing() || n.requestsTitleUpdates() != TitleUpdateMode.STATIC) && !n.isRemoved()) {
 					if (n.getAction() != null && n.getAction().requestRefresh()) {
 						BackgroundTaskHelper.executeLaterOnSwingTask(1000, new Runnable() {
 							@Override
@@ -522,7 +528,7 @@ public class NavigationButton implements StyleAware {
 							// if (n.getRunnableIconCheck() == null || n.getRunnableIconCheck() == rr.getObject()) {
 							n.setRunnableIconCheck(rr.getObject());
 							BackgroundTaskHelper.executeLaterOnSwingTask(
-									imageUpdated ? 500 : 500,
+									imageUpdated ? (n.requestsTitleUpdates() == TitleUpdateMode.HIGH ? 100 : 500) : 500,
 									(Runnable) rr.getObject());
 							// }
 						} else
@@ -566,19 +572,19 @@ public class NavigationButton implements StyleAware {
 						}
 					});
 				}
-				if ((n.isProcessing() || n.requestsTitleUpdates()) && n1.isVisible()) {
+				if ((n.isProcessing() || n.requestsTitleUpdates() != TitleUpdateMode.STATIC) && n1.isVisible()) {
 					String title = n.getTitle();
 					n1.setText(title);
 					if (n1.getText().indexOf("Please wait") >= 0)
 						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
 					else
-						BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
+						BackgroundTaskHelper.executeLaterOnSwingTask(n.requestsTitleUpdates() == TitleUpdateMode.HIGH ? 50 : 500, (Runnable) rr.getObject());
 				} else {
 					if (n1.isVisible()) {
 						String title = n.getTitle();
 						n1.setText(title);
 					}
-					BackgroundTaskHelper.executeLaterOnSwingTask(500, (Runnable) rr.getObject());
+					BackgroundTaskHelper.executeLaterOnSwingTask(n.requestsTitleUpdates() == TitleUpdateMode.HIGH ? 50 : 500, (Runnable) rr.getObject());
 				}
 			}
 		};
@@ -1065,7 +1071,7 @@ public class NavigationButton implements StyleAware {
 		
 		final Runnable iconUpdateCheck;
 		
-		if (n.isProcessing() || n.requestsTitleUpdates()) {
+		if (n.isProcessing() || n.requestsTitleUpdates() != TitleUpdateMode.STATIC) {
 			iconUpdateCheck = getIconUpdateCheckRunnable(
 					new WeakReference<NavigationButton>(n), target,
 					new WeakReference<JButton>(n1), imgSf);

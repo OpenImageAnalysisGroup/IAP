@@ -36,6 +36,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	private HashMap<String, CloudAnalysisStatus> setKey2status;
 	private ArrayList<NavigationButton> res;
 	ThreadSafeOptions tsoActivated = new ThreadSafeOptions();
+	protected boolean inProgress;
 	
 	public ActionJobStatus(MongoDB m) {
 		super("Analyze or Modify Workload");
@@ -81,12 +82,17 @@ public class ActionJobStatus extends AbstractNavigationAction {
 				Long firstSubmission = null;
 				try {
 					sss.clear();
+					boolean ip = false;
 					for (BatchCmd b : ActionJobStatus.this.m.batch().getAll()) {
 						String jid = b.getString("_id");
 						// System.out.println(b.getRunStatus());
 						if (jid != null && b.getRunStatus() != CloudAnalysisStatus.FINISHED)
 							activeJobsIds.add(jid);
 						double fs = b.getCurrentStatusValueFine();
+						
+						if (b.getRunStatus() == CloudAnalysisStatus.IN_PROGRESS) {
+							ip = true;
+						}
 						
 						CloudAnalysisStatus rs = b.getRunStatus();
 						if (!sss.containsKey(rs))
@@ -112,6 +118,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 								submission2partCnt.put(id, b.getPartCnt());
 						}
 					}
+					ActionJobStatus.this.inProgress = ip;
 					part_cnt = 0;
 					for (Integer cnt : submission2partCnt.values())
 						part_cnt += cnt;
@@ -387,26 +394,18 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultImage() {
-		this.sec++;
-		switch (sec % 6) {
-			case 0:
-				return "img/ext/applications-system-07.5.png";
-			case 1:
-				return "img/ext/applications-system-15.png";
-			case 2:
-				return "img/ext/applications-system-22.5.png";
-			case 3:
-				return "img/ext/applications-system-30.png";
-			case 4:
-				return "img/ext/applications-system-37.5.png";
-			case 5:
-				return "img/ext/applications-system-45.png";
-		}
-		return null;
+		if (inProgress)
+			this.sec++;
+		return "img/ext/gears/gear" + ((sec % 12) + 1) + ".png";
 	}
 	
 	@Override
 	public boolean requestTitleUpdates() {
+		return true;
+	}
+	
+	@Override
+	public boolean requestHighTitleUpdates() {
 		return true;
 	}
 }

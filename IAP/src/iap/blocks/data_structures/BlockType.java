@@ -16,7 +16,7 @@ public enum BlockType {
 			case SEGMENTATION:
 				return "Segmentation";
 			case DEBUG:
-				return "Debug";
+				return "Utility";
 			default:
 				return "[Unknown BlockType]";
 		}
