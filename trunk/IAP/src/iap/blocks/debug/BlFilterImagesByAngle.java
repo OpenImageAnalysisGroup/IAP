@@ -66,7 +66,7 @@ public class BlFilterImagesByAngle extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Filter Images By Angle";
+		return "Filter Images by Angle";
 	}
 	
 	@Override
