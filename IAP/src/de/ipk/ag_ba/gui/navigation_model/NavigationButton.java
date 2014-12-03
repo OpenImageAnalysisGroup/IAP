@@ -578,13 +578,13 @@ public class NavigationButton implements StyleAware {
 					if (n1.getText().indexOf("Please wait") >= 0)
 						BackgroundTaskHelper.executeLaterOnSwingTask(2000, (Runnable) rr.getObject());
 					else
-						BackgroundTaskHelper.executeLaterOnSwingTask(n.requestsTitleUpdates() == TitleUpdateMode.HIGH ? 50 : 500, (Runnable) rr.getObject());
+						BackgroundTaskHelper.executeLaterOnSwingTask(n.requestsTitleUpdates() == TitleUpdateMode.HIGH ? 100 : 500, (Runnable) rr.getObject());
 				} else {
 					if (n1.isVisible()) {
 						String title = n.getTitle();
 						n1.setText(title);
 					}
-					BackgroundTaskHelper.executeLaterOnSwingTask(n.requestsTitleUpdates() == TitleUpdateMode.HIGH ? 50 : 500, (Runnable) rr.getObject());
+					BackgroundTaskHelper.executeLaterOnSwingTask(n.requestsTitleUpdates() == TitleUpdateMode.HIGH ? 100 : 500, (Runnable) rr.getObject());
 				}
 			}
 		};
