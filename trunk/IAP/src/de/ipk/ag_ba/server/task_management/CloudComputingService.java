@@ -61,9 +61,9 @@ public class CloudComputingService {
 	public String getStatusImageName() {
 		checkStatus();
 		if (active)
-			return "img/ext/network-workgroup-power.png";
+			return "img/ext/gpl2/Gnome-Network-Server-64_power.png";
 		else
-			return "img/ext/network-workgroup.png";
+			return "img/ext/gpl2/Gnome-Network-Server-64.png";
 	}
 	
 	public String getTaskNameEnableOrDisableActionText() {

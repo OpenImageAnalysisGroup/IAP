@@ -71,9 +71,14 @@ public class ActionJobStatus extends AbstractNavigationAction {
 			
 			private long firstStatusUpdate = -1l;
 			private double firstStatusProgress = 0d;
+			private long lastStatusUpdate = 0;
+			private double lastFineValue = -1d;
 			
 			@Override
 			public double getCurrentStatusValueFine() {
+				if (System.currentTimeMillis() - lastStatusUpdate < 5000)
+					return lastFineValue;
+				
 				if (tsoActivated.getBval(0, false))
 					return tsoActivated.getDouble();
 				double finishedJobs = 0.00001;
@@ -173,6 +178,9 @@ public class ActionJobStatus extends AbstractNavigationAction {
 						}
 					} else
 						remain = "";
+					lastStatusUpdate = System.currentTimeMillis();
+					
+					lastFineValue = value;
 					return value;
 				} else {
 					status3provider.setCurrentStatusValueFine(-1);
@@ -395,7 +403,7 @@ public class ActionJobStatus extends AbstractNavigationAction {
 	@Override
 	public String getDefaultImage() {
 		if (inProgress)
-			this.sec++;
+			sec = (int) ((System.currentTimeMillis() / 100) % 12);
 		return "img/ext/gears/gear" + ((sec % 12) + 1) + ".png";
 	}
 	
