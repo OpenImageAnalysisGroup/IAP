@@ -99,7 +99,7 @@ public class BlFilterImagesByDate extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Filter Images By Date";
+		return "Filter Images by Date";
 	}
 	
 	@Override
