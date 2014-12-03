@@ -830,7 +830,10 @@ public class GravistoService implements HelperClass {
 		Graphics2D g2d = destImage.createGraphics();
 		g2d.drawImage(icon, 0, 0, null);
 		g2d.dispose();
-		return getScaledImage(destImage, w, h);
+		if (w == Integer.MAX_VALUE && h == Integer.MAX_VALUE)
+			return destImage;
+		else
+			return getScaledImage(destImage, w, h);
 	}
 	
 	public static BufferedImage getBufferedImage(Image icon) {
@@ -1036,11 +1039,7 @@ public class GravistoService implements HelperClass {
 	
 	@SuppressWarnings("unchecked")
 	public static ImageIcon loadIcon(Class class1, String name) {
-		URL url = getResource(class1, name);
-		if (url == null)
-			return null;
-		else
-			return new ImageIcon(url);
+		return loadIcon(class1, name, Integer.MAX_VALUE, Integer.MAX_VALUE);
 	}
 	
 	private static WeakHashMap<String, BufferedImage> cachedIcons = new WeakHashMap<String, BufferedImage>();
