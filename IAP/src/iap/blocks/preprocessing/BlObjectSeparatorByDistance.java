@@ -5,8 +5,11 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.postprocessing.WellProcessing;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.Colors;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -59,8 +62,8 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 		
 		int wellcount = getDefinedWellCount(optionsAndResults);
 		
-		final double SCALE_X = mask.getWidth() / input().masks().vis().getWidth();
-		final double SCALE_Y = mask.getHeight() / input().masks().vis().getHeight();
+		final double SCALE_X = mask.getWidth() / (double) input().masks().vis().getWidth();
+		final double SCALE_Y = mask.getHeight() / (double) input().masks().vis().getHeight();
 		
 		int[][] result = mask.getAs2A();
 		
@@ -72,11 +75,21 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 			
 			centerpoints[i] = new Vector2i(cx, cy);
 		}
+		boolean debug = getBoolean("debug", false);
+		ArrayList<Color> wellColorsC = Colors.get(wellcount);
+		int[] wellColors = new int[wellColorsC.size()];
+		{
+			int idx = 0;
+			for (Color c : wellColorsC) {
+				wellColors[idx++] = c.getRGB();
+			}
+		}
 		
 		for (int x = 0; x < mask.getWidth(); x++) {
 			for (int y = 0; y < mask.getHeight(); y++) {
 				double minWellDistance = Integer.MAX_VALUE;
 				String minWellIDX = null;
+				int min_well_idx = -1;
 				
 				for (int well_idx = 0; well_idx < wellcount; well_idx++) {
 					
@@ -87,15 +100,18 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 					int tempDist = distance_to_cluster;
 					
 					if (tempDist < minWellDistance) {
-						
 						minWellDistance = tempDist;
 						minWellIDX = WellProcessing.getWellID(well_idx, wellcount, input().images().getAnyInfo(), optionsAndResults);
+						min_well_idx = well_idx;
 					}
 				}
-				
-				if (minWellIDX != getWellIdx()) {
-					result[x][y] = ImageOperation.BACKGROUND_COLORint;
-				}
+				if (debug) {
+					if (min_well_idx >= 0 && (((x + y) % 2) == 0))
+						result[x][y] = wellColors[min_well_idx];
+				} else
+					if (minWellIDX != getWellIdx()) {
+						result[x][y] = ImageOperation.BACKGROUND_COLORint;
+					}
 			}
 		}
 		return new Image(result);
