@@ -2,6 +2,7 @@ package iap.blocks.postprocessing;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
@@ -92,28 +93,33 @@ public class BlSaveResultImages extends AbstractBlock {
 			final String tray,
 			final ImageData id, Image image) throws Exception {
 		if (id != null && id.getParentSample() != null) {
-			Long tt = id.getParentSample().getSampleFineTimeOrRowId();
-			String t = "";
-			if (tt != null) {
-				Date date = new Date(tt);
-				t = new SimpleDateFormat("HH:mm").format(date);
-			}
-			String wells = "";
-			if (optionsAndResults.getWellCnt() > 1) {
-				wells = " " + getWellIdx() + " " + (optionsAndResults.getWellIdx() + 1) + "/" + optionsAndResults.getWellCnt();
-			}
-			String r = id.getPosition() != null ? id.getPosition().intValue() + "" : "0";
-			image = image.io().canvas()
-					.text(5, 15, "IAP V" + ReleaseInfo.IAP_VERSION_STRING, Color.RED)
-					.text(5, 30, id.getQualityAnnotation() + wells + " R" + id.getReplicateID(), Color.ORANGE)
-					.text(5, 45, ct + " " + cp + " " + r, Color.YELLOW)
-					.text(5, 60, id.getParentSample().getSampleTime() + " " + t, Color.GREEN)
-					.getImage();
+			image = markWithImageInfos(image, id, optionsAndResults, getWellIdx());
 			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage(true));
 			// loadedImage.getParentSample().getParentCondition().getParentSubstance().setInfo(null); // remove information about source camera
 			return saveImageAndUpdateURL(ct, cp, loadedImage, optionsAndResults.databaseTarget, false, tray);
 		} else
 			return null;
+	}
+	
+	public static Image markWithImageInfos(Image image, ImageData id, ImageProcessorOptionsAndResults optionsAndResults, String wellidx) {
+		Long tt = id.getParentSample().getSampleFineTimeOrRowId();
+		String t = "";
+		if (tt != null) {
+			Date date = new Date(tt);
+			t = new SimpleDateFormat("HH:mm").format(date);
+		}
+		String wells = "";
+		if (optionsAndResults.getWellCnt() > 1) {
+			wells = " " + wellidx + " " + (optionsAndResults.getWellIdx() + 1) + "/" + optionsAndResults.getWellCnt();
+		}
+		String r = id.getPosition() != null ? id.getPosition().intValue() + "" : "0";
+		image = image.io().canvas()
+				.text(5, 15, "IAP V" + ReleaseInfo.IAP_VERSION_STRING, Color.RED)
+				.text(5, 30, id.getQualityAnnotation() + wells + " R" + id.getReplicateID(), Color.ORANGE)
+				.text(5, 45, image.getCameraType() + " " + optionsAndResults.getCameraPosition() + " " + r, Color.YELLOW)
+				.text(5, 60, id.getParentSample().getSampleTime() + " " + t, Color.GREEN)
+				.getImage();
+		return image;
 	}
 	
 	private String addTrayInfo(CameraType ct, CameraPosition cp, String tray, String fileName, ImageData image) {
