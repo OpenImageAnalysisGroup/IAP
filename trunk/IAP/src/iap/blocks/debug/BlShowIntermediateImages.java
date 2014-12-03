@@ -54,14 +54,13 @@ public class BlShowIntermediateImages extends AbstractBlock {
 	@Override
 	protected Image processMask(Image mask) {
 		boolean show = false;
-		if (getBoolean("Show Visible", false) && mask.getCameraType() == CameraType.VIS)
-			show = true;
-		if (getBoolean("Show Flourescence", false) && mask.getCameraType() == CameraType.FLUO)
-			show = true;
-		if (getBoolean("Show Near-infrared", false) && mask.getCameraType() == CameraType.NIR)
-			show = true;
-		if (getBoolean("Show Infrared", false) && mask.getCameraType() == CameraType.IR)
-			show = true;
+		
+		for (CameraType ct : CameraType.values()) {
+			if (ct == CameraType.UNKNOWN)
+				continue;
+			if (getBoolean("Show " + ct.getNiceName(), false) && mask.getCameraType() == ct)
+				show = true;
+		}
 		
 		if (show)
 			if (getBoolean("Include Image Information", false))
