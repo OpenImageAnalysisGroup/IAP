@@ -80,8 +80,11 @@ public class CloudTaskManager {
 	}
 	
 	public void stopWork() {
-		this.m = null;
 		setProcess(false);
+		for (TaskDescription rt : runningTasks) {
+			rt.getBatchCmd().getStatusProvider().pleaseStop();
+		}
+		this.m = null;
 	}
 	
 	private void run() throws Exception {
@@ -113,17 +116,22 @@ public class CloudTaskManager {
 					MongoDB.saveSystemErrorMessage("Error processing running tasks.", e);
 				}
 				
-				Batch.pingHost(m, hostName,
-						BlockPipeline.getBlockExecutionsWithinLastMinute(),
-						BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
-						BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
-						progressSum,
-						(CloudTaskManager.this.process ? "" : "(processing disabled)<br>") +
-								(names.size() > 0 ? "Process: " + StringManipulationTools.getStringList(names, ", ") + // "<br>" +
-										"" + StringManipulationTools.getStringList(progress, ", ") +
-										(progress.size() > 1 ?
-												"<br>" +
-														status3provider.getCurrentStatusMessage3() : "") : "(no task)"));
+				try {
+					if (this.process)
+						Batch.pingHost(m, hostName,
+								BlockPipeline.getBlockExecutionsWithinLastMinute(),
+								BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
+								BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
+								progressSum,
+								(CloudTaskManager.this.process ? "" : "(processing disabled)<br>") +
+										(names.size() > 0 ? "Process: " + StringManipulationTools.getStringList(names, ", ") + // "<br>" +
+												"" + StringManipulationTools.getStringList(progress, ", ") +
+												(progress.size() > 1 ?
+														"<br>" +
+																status3provider.getCurrentStatusMessage3() : "") : "(no task)"));
+				} catch (Exception e) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Pinging host '" + hostName + "' produced an error: " + e.getMessage());
+				}
 				
 				if (CloudTaskManager.this.process || fixedDisableProcess) {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
@@ -321,7 +329,7 @@ public class CloudTaskManager {
 		this.fixedDisableProcess = fixedDisableProcess;
 	}
 	
-	public boolean isDisableProces() {
+	public boolean isDisableProcess() {
 		return fixedDisableProcess;
 	}
 	

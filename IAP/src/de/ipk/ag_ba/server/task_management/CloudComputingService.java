@@ -69,7 +69,7 @@ public class CloudComputingService {
 	public String getTaskNameEnableOrDisableActionText() {
 		checkStatus();
 		if (active)
-			return "Shutdown This Node";
+			return "Computer is Part of Grid<br><small>click here to stop</small>";
 		else
 			return "Join Compute Grid";
 	}
@@ -404,7 +404,7 @@ public class CloudComputingService {
 	}
 	
 	public boolean getIsCalculationPossible() {
-		return !cloudTaskManager.isDisableProces();
+		return !cloudTaskManager.isDisableProcess();
 	}
 	
 }
