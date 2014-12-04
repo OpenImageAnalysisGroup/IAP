@@ -535,7 +535,10 @@ public class DataExchangeHelperForExperiments {
 					stop, executeLater, null, chartingButton, false, false, isAnnotationSavePossible, true));
 		}
 		if (addDataChart) {
-			ImageIcon previewImage = new ImageIcon(IAPimages.getImage(IAPimages.getHistogramIcon()));
+			ImageIcon previewImage = IAPimages.getIcon(
+					"img/ext/gpl2/Gnome-Document-Save-64.png",
+					// IAPimages.getHistogramIcon(),
+					32, 32);
 			
 			final DataSetFileButton chartingButton = new DataSetFileButton(
 					mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
