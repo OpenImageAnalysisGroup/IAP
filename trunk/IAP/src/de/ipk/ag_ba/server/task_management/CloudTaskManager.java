@@ -186,32 +186,36 @@ public class CloudTaskManager {
 					
 					int nn = 0;
 					progressSum = 0;
-					ArrayList<TaskDescription> del = new ArrayList<TaskDescription>();
-					// System.out.println("RUNNING: " + runningTasks.size());
-					for (TaskDescription td : runningTasks) {
-						if (td.analysisFinishedComplete()) {
-							td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.FINISHED);
-							del.add(td);
-						} else
-							if (td.analysisFinishedIncomplete()) {
-								td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.FINISHED_INCOMPLETE);
-								del.add(td);
-							} else {
-								if (!td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS))
-									td.getBatchCmd().getStatusProvider().pleaseStop();
-								progressSum += td.getBatchCmd().getCurrentStatusValueFine();
-								nn++;
+					{
+						ArrayList<TaskDescription> delTaskFromMongo = new ArrayList<TaskDescription>();
+						ArrayList<TaskDescription> delTaskFromInternalQueue = new ArrayList<TaskDescription>();
+						// System.out.println("RUNNING: " + runningTasks.size());
+						for (TaskDescription td : runningTasks) {
+							if (td.analysisFinishedComplete()) {
+								td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.FINISHED);
+								delTaskFromInternalQueue.add(td);
+								delTaskFromMongo.add(td);
+							} else
+								if (td.analysisFinishedIncomplete()) {
+									td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.FINISHED_INCOMPLETE);
+									delTaskFromInternalQueue.add(td);
+								} else {
+									if (!td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS))
+										td.getBatchCmd().getStatusProvider().pleaseStop();
+									progressSum += td.getBatchCmd().getCurrentStatusValueFine();
+									nn++;
+								}
+							progressSum += td.getBatchCmd().getCurrentStatusValueFine();
+							nn++;
+						}
+						if (delTaskFromInternalQueue.size() > 0)
+							runningTasks.removeAll(delTaskFromInternalQueue);
+						if (delTaskFromMongo.size() > 0) {
+							for (TaskDescription finished : delTaskFromMongo) {
+								finished.getBatchCmd().delete(m);
 							}
-						progressSum += td.getBatchCmd().getCurrentStatusValueFine();
-						nn++;
-					}
-					if (del.size() > 0) {
-						runningTasks.removeAll(del);
-						for (TaskDescription finished : del) {
-							finished.getBatchCmd().delete(m);
 						}
 					}
-					
 					if (!disallownewtasks)
 						for (TaskDescription td : commands_to_start) {
 							if (!runningTasks.contains(td)) {

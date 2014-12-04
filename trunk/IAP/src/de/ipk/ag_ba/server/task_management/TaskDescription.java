@@ -130,6 +130,13 @@ public class TaskDescription {
 					finishedIncomplete = true;
 					return;
 				}
+				if (experiment != null) {
+					if (cmd != null && cmd.getStatusProvider() != null && cmd.getStatusProvider().wantsToStop()) {
+						cmd.getStatusProvider().setCurrentStatusText2("INFO: EXECUTION INTERRUPTED BY USER REQUEST");
+						finishedIncomplete = true;
+						return;
+					}
+				}
 				if (batch.getStatusProvider() != null)
 					batch.getStatusProvider().setCurrentStatusText2("INFO: SAVING RESULT");
 				if (cmd != null && cmd.getStatusProvider() != null)
