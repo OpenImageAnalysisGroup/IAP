@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.StringManipulationTools;
 import org.Vector2i;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
@@ -114,14 +115,17 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 						
 						if (directionNextSekeltonPoint.x == -1)
 							directionNextSekeltonPoint = new Point(coGWeighted.x + bounds.getLeftX(), coGWeighted.x + bounds.getTopY());
+						
 						double ec = im.getEccentricity();
+						
 						// direction
 						Vector2D direction = new Vector2D(directionNextSekeltonPoint.x, directionNextSekeltonPoint.y);
 						
+						int centerX = centerPoint.x - bounds.getLeftX();
+						int centerY = centerPoint.y - bounds.getTopY();
+						
 						if (true) {
 							ImageCanvas ic = new ImageCanvas(im.drawMoments().copy());
-							int centerX = centerPoint.x - bounds.getLeftX();
-							int centerY = centerPoint.y - bounds.getTopY();
 							ic.drawCircle(centerX, centerY, 5, Color.BLUE.getRGB(), 0, 1);
 							ic.drawCircle(coG.x, coG.y, 5, Color.YELLOW.getRGB(), 0, 1);
 							ic.drawCircle(coGWeighted.x, coGWeighted.y, 5, Color.RED.getRGB(), 0, 1);
@@ -137,6 +141,10 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 						tempFeature.addFeature("eccentricity", ec, FeatureObjectType.NUMERIC);
 						tempFeature.addFeature("minDistToOtherRegion", minDistanceToOtherRegion, FeatureObjectType.NUMERIC);
 						tempFeature.addFeature("direction_1", direction, FeatureObjectType.VECTOR);
+						// tempFeature.addFeature("angle_1",
+						// angle(new Vector2D(direction.getX() - centerX, direction.getY() - centerY), new Vector2D(centerX - centerX, (centerY + 1) - centerY))
+						// * 180 / Math.PI,
+						// FeatureObjectType.NUMERIC);
 						flist.add(tempFeature);
 					}
 				}
@@ -256,11 +264,14 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			ImageCanvas ic = new ImageCanvas(img);
 			for (Feature p : featureList) {
 				Vector2D direction = (Vector2D) p.getFeature("direction_1");
+				Vector2D direction_norm = new Vector2D(direction.getX() - p.getPosition().getX(), direction.getY() - p.getPosition().getY());
+				Vector2D up = new Vector2D(0, 1);
+				double angle = 180d - (angle(direction_norm, up) * 180 / Math.PI);
 				if (direction != null && direction.getX() != 0 && direction.getY() != 0) {
 					ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 1);
 					ic.drawLine(new Point((int) (p.getPosition().getX()), (int) (p.getPosition().getY())), new Point((int) (direction.getX()),
-							(int) (direction.getY())),
-							Color.GREEN.getRGB(), 0.0, 1);
+							(int) (direction.getY())), Color.GREEN.getRGB(), 0.0, 1);
+					ic.text((int) direction.getX(), (int) direction.getY() + 30, "A: " + StringManipulationTools.formatNumber(angle, 0), Color.BLACK, 15);
 				}
 			}
 			img = ic.getImage();
@@ -286,17 +297,15 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 						(int) p.getPosition().getY(), "flower", this, imageRef);
 				
 				// save direction_1
-				Vector2D dir = (Vector2D) p.getFeature("direction_1");
-				double angle_norm = dir.getNorm();
-				double angle = dir.angle(dir, new Vector2D(0.0, 1.0));
+				Vector2D direction = (Vector2D) p.getFeature("direction_1");
+				double angle_norm = direction.getNorm();
+				Vector2D direction_norm = new Vector2D(direction.getX() - p.getPosition().getX(), direction.getY() - p.getPosition().getY());
+				Vector2D up = new Vector2D(0, 1);
+				double angle = 180d - (angle(direction_norm, up) * 180 / Math.PI);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".length"),
 						angle_norm, "flower", this, imageRef);
-				
-				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".angle"),
-						angle, "flower", this, imageRef);
 				
 				// calc min distance
 				double min_dist = getMinDist(p.getPosition().getX(), p.getPosition().getY(), featureList);
@@ -304,6 +313,10 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".mindist"),
 						min_dist, "flower", this, imageRef);
+				
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".angle"),
+						angle, "flower", this, imageRef);
 				
 				avg_angle += angle;
 				avg_y_pos += p.getPosition().getY();
@@ -327,6 +340,11 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		}
 		
 		return img;
+	}
+	
+	private double angle(Vector2D a, Vector2D b) {
+		return Math.acos((a.getX() * b.getX() + a.getY() * b.getY())
+				/ (Math.sqrt((a.getX() * a.getX() + a.getY() * a.getY())) * Math.sqrt((b.getX() * b.getX() + b.getY() * b.getY()))));
 	}
 	
 	private double getMinDist(double x, double y, LinkedList<Feature> featureList) {
