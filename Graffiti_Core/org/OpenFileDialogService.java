@@ -11,6 +11,8 @@ import javafx.stage.FileChooser;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.collections.ListUtils;
+
 /**
  * @author Christian Klukas
  *         (c) 2014 IPK-Gatersleben
@@ -123,10 +125,18 @@ public class OpenFileDialogService implements HelperClass {
 			fc.setInitialDirectory(openDialog.getCurrentDirectory());
 		fc.setTitle(description);
 		
+		fc.getExtensionFilters().add(
+				new FileChooser.ExtensionFilter("Images", ListUtils.union(
+						StringManipulationTools.getStringListFromStream(StringManipulationTools.getStringListFromArray(valid_extensions).stream()
+								.map(s -> "*." + s.toLowerCase()))
+						, (StringManipulationTools.getStringListFromStream(StringManipulationTools.getStringListFromArray(valid_extensions).stream()
+								.map(s -> "*." + s.toUpperCase()))))));
+		
 		for (String ext : valid_extensions) {
 			fc.getExtensionFilters().add(
 					new FileChooser.ExtensionFilter(StringManipulationTools.stringReplace(ext, "*.", "").toUpperCase() + " (*." + ext + ")", "*."
-							+ ext.toUpperCase()));
+							+ ext.toUpperCase(), "*."
+							+ ext.toLowerCase()));
 		}
 		if (Platform.isFxApplicationThread()) {
 			List<File> f = fc.showOpenMultipleDialog(null);
