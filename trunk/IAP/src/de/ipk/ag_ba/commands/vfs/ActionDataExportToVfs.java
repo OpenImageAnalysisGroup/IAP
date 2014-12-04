@@ -207,6 +207,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					for (ConditionInterface co : su)
 						for (SampleInterface sa : co) {
 							for (NumericMeasurementInterface nm : sa) {
+								if (status.wantsToStop())
+									break;
 								if (simulate) {
 									; // System.out.println("backup to hsm simu");
 								} else
@@ -220,46 +222,53 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				es.shutdown();
 				es.awaitTermination(31, TimeUnit.DAYS);
 				
-				if (errorCount == 0) {
-					status.setCurrentStatusText1("Finalize storage");
-					status.setCurrentStatusText2("Write Index...");
-					// save XML and header
-					System.out.println("OK: VfsFile transfer of experiment "
-							+ experimentReference.getExperimentName()
-							+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " complete (saved " + idx
-							+ " files). Saving XML... // "
-							+ SystemAnalysis.getCurrentTime());
-					status.setCurrentStatusText1("Finalize storage");
-					status.setCurrentStatusText2("Index Created");
-					postResult = "Saved Changes (" + SystemAnalysis.getCurrentTime() + ")";
+				if (status.wantsToStop()) {
+					errorCount++;
+					tso.setParam(2, true);
+					this.errorMessage = "Operation interrupted (by user request). Index files are not created.";
+					postResult = "Operation interrupted. Dataset incomplete.<br>(" + SystemAnalysis.getCurrentTime() + ")";;
 				} else {
-					status.setCurrentStatusText1("Data Transfer Incomplete");
-					status.setCurrentStatusText2("Could not save valid dataset");
-					System.out.println("ERROR: VfsFile transfer of experiment "
-							+ experimentReference.getExperimentName()
-							+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " incomplete (" + errorCount + " errors). // "
-							+ SystemAnalysis.getCurrentTime());
-					postResult = "<html>Saved Incomplete (" + errorCount + " errors)<br>(" + SystemAnalysis.getCurrentTime() + ")";
+					if (errorCount == 0) {
+						status.setCurrentStatusText1("Finalize storage");
+						status.setCurrentStatusText2("Write Index...");
+						// save XML and header
+						System.out.println("OK: VfsFile transfer of experiment "
+								+ experimentReference.getExperimentName()
+								+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " complete (saved " + idx
+								+ " files). Saving XML... // "
+								+ SystemAnalysis.getCurrentTime());
+						status.setCurrentStatusText1("Finalize storage");
+						status.setCurrentStatusText2("Index Created");
+						postResult = "Saved Changes (" + SystemAnalysis.getCurrentTime() + ")";
+					} else {
+						status.setCurrentStatusText1("Data Transfer Incomplete");
+						status.setCurrentStatusText2("Could not save valid dataset");
+						System.out.println("ERROR: VfsFile transfer of experiment "
+								+ experimentReference.getExperimentName()
+								+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " incomplete (" + errorCount + " errors). // "
+								+ SystemAnalysis.getCurrentTime());
+						postResult = "<html>Saved Incomplete (" + errorCount + " errors)<br>(" + SystemAnalysis.getCurrentTime() + ")";
+					}
+					if (errorCount > 0)
+						experiment.getHeader().setRemark(
+								(experiment.getHeader().getRemark() != null && !experiment.getHeader().getRemark().isEmpty() ?
+										experiment.getHeader().getRemark() + " // " : "") + "data transfer errors: " + errorCount);
+					experiment.getHeader().setStorageTime(new Date());
+					long kb = (written.getLong() + skipped.getLong()) / 1024;
+					experiment.getHeader().setSizekb(kb);
+					int files = Substance3D.countMeasurementValues(experiment, MeasurementNodeType.binaryTypes());
+					experiment.getHeader().setNumberOfFiles(files);
+					
+					String indexFileName = createIndexFiles(experiment, hsmManager, status, experimentReference.getExperimentName());
+					experiment.getHeader().setDatabaseId(vfs.getPrefix() + ":" + indexFileName);
+					if (optFileSystemSource != null)
+						experimentReference.getHeader().setExperimentHeaderHelper(
+								optFileSystemSource.getExperimentHeaderHelper(vfs, indexFileName, experimentReference.getHeader()));
+					experiment.getHeader().setDatabaseId(vfs.getPrefix() + ":" + indexFileName);
+					status.setCurrentStatusValueFine(100d);
+					this.mb = ((written.getLong() + skipped.getLong()) / 1024 / 1024) + "";
+					tso.setParam(2, true);
 				}
-				if (errorCount > 0)
-					experiment.getHeader().setRemark(
-							(experiment.getHeader().getRemark() != null && !experiment.getHeader().getRemark().isEmpty() ?
-									experiment.getHeader().getRemark() + " // " : "") + "data transfer errors: " + errorCount);
-				experiment.getHeader().setStorageTime(new Date());
-				long kb = (written.getLong() + skipped.getLong()) / 1024;
-				experiment.getHeader().setSizekb(kb);
-				int files = Substance3D.countMeasurementValues(experiment, MeasurementNodeType.binaryTypes());
-				experiment.getHeader().setNumberOfFiles(files);
-				
-				String indexFileName = createIndexFiles(experiment, hsmManager, status, experimentReference.getExperimentName());
-				experiment.getHeader().setDatabaseId(vfs.getPrefix() + ":" + indexFileName);
-				if (optFileSystemSource != null)
-					experimentReference.getHeader().setExperimentHeaderHelper(
-							optFileSystemSource.getExperimentHeaderHelper(vfs, indexFileName, experimentReference.getHeader()));
-				experiment.getHeader().setDatabaseId(vfs.getPrefix() + ":" + indexFileName);
-				status.setCurrentStatusValueFine(100d);
-				this.mb = ((written.getLong() + skipped.getLong()) / 1024 / 1024) + "";
-				tso.setParam(2, true);
 			}
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
