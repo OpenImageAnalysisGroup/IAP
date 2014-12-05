@@ -362,39 +362,25 @@ public class ImageOperation implements MemoryHogInterface {
 			int gf = (c & 0x00ff00) >> 8;
 			// int bf = (c & 0x0000ff);
 			
-			// float[] hsbvals = Color.RGBtoHSB(rf, gf, bf, null);
-			//
-			// int rgb = Color.HSBtoRGB(hsbvals[0], hsbvals[1], (float) (hsbvals[2]));
-			// int r = (rgb & 0xff0000) >> 16;
-			// int g = (rgb & 0x00ff00) >> 8;
-			
-			// float intensityA = 1 - r * max(r, g) / ((255 * 255) + 255 * g);
-			
 			float intensity = Float.NaN;
 			
-			intensity = 1 - rf / (float) ((255) + gf);
-			double min = minimumIntensity / 255f;
-			
-			if (intensity > min)
-				intensity = 1;
-			else
-				switch (type) {
-					case CLASSIC:
-						// intensity = intensity / 0.825f;
-						break;
-					case CHLOROPHYL:
-						Color.RGBtoHSB(rf, gf, 0, hsb);
-						hsb[2] = rf / 255f;
-						intensity = 1 - (1 - distanceToRed(hsb[0])) * (hsb[2]);
-						break;
-					case PHENOL:
-						Color.RGBtoHSB(rf, gf, 0, hsb);
-						hsb[2] = rf / 255f;
-						intensity = 1 - distanceToRed(hsb[0]) * (hsb[2]);
-						break;
-					default:
-						throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");
-				}
+			switch (type) {
+				case CLASSIC:
+					intensity = 1 - rf / (float) ((255) + gf);
+					break;
+				case CHLOROPHYL:
+					Color.RGBtoHSB(rf, gf, 0, hsb);
+					hsb[2] = rf / 255f;
+					intensity = 1 - (1 - distanceToRed(hsb[0])) * (hsb[2]);
+					break;
+				case PHENOL:
+					Color.RGBtoHSB(rf, gf, 0, hsb);
+					hsb[2] = rf / 255f;
+					intensity = 1 - distanceToRed(hsb[0]) * (hsb[2]);
+					break;
+				default:
+					throw new UnsupportedOperationException("INTERNAL ERROR: Invalid Fluo Analysis Mode");
+			}
 			
 			int i = (int) (intensity * 255d);
 			if (i > minimumIntensity)
