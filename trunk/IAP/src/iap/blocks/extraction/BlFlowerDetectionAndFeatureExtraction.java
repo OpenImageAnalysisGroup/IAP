@@ -324,13 +324,13 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			}
 			
 			// save averages
-			double am = (avg_angle / num);
+			double am = (avg_angle / (num - 1));
 			getResultSet().setNumericResult(getBlockPosition(),
 					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + "angle.mean"),
 					am, "flower", this, imageRef);
 			getResultSet().setNumericResult(getBlockPosition(),
 					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + "position.y.mean"),
-					avg_y_pos / num, "flower", this, imageRef);
+					avg_y_pos / (num - 1), "flower", this, imageRef);
 		}
 		
 		if (saveResultObject) {
