@@ -310,6 +310,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 						}
 					} else {
 						if (cube[x][y][z] != 0) {
+							double rand = (Math.random() - 1) * radius * 0.5;
 							double ss = 0.5 * radius * Math.pow(cube[x][y][z] / maxValue, 1 / gamma);
 							Shape3D c;
 							if (cube[x][y][z] < 0)
@@ -318,9 +319,9 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 								c = new Sphere(ss, 1 + 256 / numberOfBins);
 							Material material = getMaterial(x, y, z, n, colorspace);
 							c.setMaterial(material);
-							c.setTranslateX(xc + (x - n / 2d) * radius);
-							c.setTranslateY(yc + (y - n / 2d) * radius);
-							c.setTranslateZ((z - n / 2d) * radius);
+							c.setTranslateX(rand + xc + (x - n / 2d) * radius);
+							c.setTranslateY(rand + yc + (y - n / 2d) * radius);
+							c.setTranslateZ(rand + (z - n / 2d) * radius);
 							res.add(c);
 						}
 					}

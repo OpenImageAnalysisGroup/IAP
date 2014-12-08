@@ -4,19 +4,17 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
-import java.util.stream.Stream;
 
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.ImageSet;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 
 /**
- * @author pape, klukas
+ * @author pape
  */
 
-public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
+public class BlFilterImagesByPlantID extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public boolean isChangingImages() {
@@ -38,31 +36,26 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 		boolean process = true;
 		
 		for (int filterIdx = 0; filterIdx < filterCount; filterIdx++) {
-			Stream<ConditionInfo> possibleValues = ConditionInfo.getList().stream().filter((ConditionInfo f) -> {
-				return ((f != ConditionInfo.IGNORED_FIELD) && (f != ConditionInfo.FILES));
-			});
-			
-			String calculationMode = optionsAndResults.getStringSettingRadio(this, "Annotation Mode - F " + filterIdx, ConditionInfo.TREATMENT.getNiceString(),
-					StringManipulationTools.getStringListFromStream(possibleValues));
-			
-			ConditionInfo annotationMode = ConditionInfo.valueOfString(calculationMode);
-			
-			String[] possibleValues1 = { "contains", "does not contain" };
-			String calculationMode1 = optionsAndResults.getStringSettingRadio(this, "Calculation Mode - F " + filterIdx, "contains",
+			String[] possibleValues1 = { "include only defined plant", "exclude defined plant" };
+			String calculationMode1 = optionsAndResults.getStringSettingRadio(this, "Calculation Mode - F " + filterIdx + 1, "include only defined plant",
 					StringManipulationTools.getStringListFromArray(possibleValues1));
 			
 			String containMode = calculationMode1;
 			
-			String value = getString("Condition - F " + filterIdx, "");
+			String value = getString("Plant ID " + filterIdx, "");
+			String id = processedImages.getAnyInfo().getQualityAnnotation() + "";
 			
-			String condition = processedImages.getAnyInfo().getParentSample().getParentCondition().getField(annotationMode);
-			if (condition != null && containMode.equals("does not contain"))
-				if (!condition.equals(value))
+			if (value.equals(id)) {
+				if (containMode.equals("include only defined plant"))
+					process = true;
+				else
 					process = false;
-			
-			if (condition != null && containMode.equals("contains"))
-				if (condition.equals(value))
+			} else {
+				if (containMode.equals("include only defined plant"))
 					process = false;
+				else
+					process = true;
+			}
 		}
 		
 		if (!process) {
@@ -95,11 +88,11 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getName() {
-		return "Filter Images By Condition";
+		return "Filter Images By Plant ID";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Removes images due to specific experiment condition.";
+		return "Removes images due to specific plant ID.";
 	}
 }
