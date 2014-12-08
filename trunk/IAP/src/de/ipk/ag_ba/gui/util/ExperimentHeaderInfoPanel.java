@@ -23,6 +23,7 @@ import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -406,8 +407,16 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		
 		final JButton editB = new JMButton("Edit");
 		final JButton saveB = new JMButton("Save Changes");
-		if (!editPossible)
+		final JCheckBox saveMode = new JCheckBox("Non-persistent save (update in memory)");
+		saveMode.setOpaque(false);
+		if (experimentHeader.getExperimentHeaderHelper() == null && (m == null)) {
+			saveMode.setSelected(true);
+			saveMode.setEnabled(false);
+		}
+		if (!editPossible) {
 			saveB.setEnabled(false);
+			saveMode.setEnabled(false);
+		}
 		// setText("Create Calendar Entry");
 		
 		editB.addActionListener(new ActionListener() {
@@ -464,85 +473,90 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					experimentHeader.setGlobalOutlierInfo(outliers.getText());
 					experimentHeader.setAnnotation((String) annotation.getClientProperty("fulltext"));
 					experimentHeader.setCoordinator(coordinator.getText());
-					if (saveAction != null) {
-						if (saveAction != null)
-							saveAction.run(experimentHeader);
+					if (saveMode.isSelected()) {
+						// in memory save requested
+						saveB.setText("Updated (in memory)");
 					} else {
-						if (editPossibleBBB) {
-							if (experimentHeader.getExperimentHeaderHelper() != null) {
-								saveB.setText("Save data...");
-								boolean ok = false;
-								String dbId = experimentHeader != null ? experimentHeader.getDatabaseId() : null;
-								if (dbId != null) {
-									String id = dbId.contains(":") ? dbId.substring(0, dbId.indexOf(":")) : null;
-									if (id != null && !id.isEmpty()) {
-										ResourceIOHandler vfs = ResourceIOManager.getHandlerFromPrefix(id);
-										if (vfs instanceof VirtualFileSystemHandler) {
-											VirtualFileSystemHandler vv = (VirtualFileSystemHandler) vfs;
-											if (vv.getVFS() instanceof VirtualFileSystemVFS2) {
-												VirtualFileSystemVFS2 vv2 = (VirtualFileSystemVFS2) vv.getVFS();
-												if (vv2.isAbleToSaveData()) {
-													final ActionDataExportToVfs acc = getCopyAction(experimentReference, vv2);
-													acc.setStatusProvider(BackgroundTaskHelper.getStatusHelperFor(saveB));
-													BackgroundTaskHelper.issueSimpleTask("Save header changes", "Save changes", new Runnable() {
-														@Override
-														public void run() {
-															try {
-																HSMfolderTargetDataManager.clearPathCache();
-																acc.setSkipClone(true);
-																acc.setSkipUpdateDBid(true);
-																acc.performActionCalculateResults(null);
-																experimentReference.getHeader().getExperimentHeaderHelper().saveUpdatedProperties(acc.getStatusProvider());
-															} catch (Exception e) {
-																acc.getStatusProvider().setCurrentStatusText1("Error: " + e.getMessage());
+						if (saveAction != null) {
+							if (saveAction != null)
+								saveAction.run(experimentHeader);
+						} else {
+							if (editPossibleBBB) {
+								if (experimentHeader.getExperimentHeaderHelper() != null) {
+									saveB.setText("Save data...");
+									boolean ok = false;
+									String dbId = experimentHeader != null ? experimentHeader.getDatabaseId() : null;
+									if (dbId != null) {
+										String id = dbId.contains(":") ? dbId.substring(0, dbId.indexOf(":")) : null;
+										if (id != null && !id.isEmpty()) {
+											ResourceIOHandler vfs = ResourceIOManager.getHandlerFromPrefix(id);
+											if (vfs instanceof VirtualFileSystemHandler) {
+												VirtualFileSystemHandler vv = (VirtualFileSystemHandler) vfs;
+												if (vv.getVFS() instanceof VirtualFileSystemVFS2) {
+													VirtualFileSystemVFS2 vv2 = (VirtualFileSystemVFS2) vv.getVFS();
+													if (vv2.isAbleToSaveData()) {
+														final ActionDataExportToVfs acc = getCopyAction(experimentReference, vv2);
+														acc.setStatusProvider(BackgroundTaskHelper.getStatusHelperFor(saveB));
+														BackgroundTaskHelper.issueSimpleTask("Save header changes", "Save changes", new Runnable() {
+															@Override
+															public void run() {
+																try {
+																	HSMfolderTargetDataManager.clearPathCache();
+																	acc.setSkipClone(true);
+																	acc.setSkipUpdateDBid(true);
+																	acc.performActionCalculateResults(null);
+																	experimentReference.getHeader().getExperimentHeaderHelper().saveUpdatedProperties(acc.getStatusProvider());
+																} catch (Exception e) {
+																	acc.getStatusProvider().setCurrentStatusText1("Error: " + e.getMessage());
+																}
 															}
-														}
-													}, new Runnable() {
-														@Override
-														public void run() {
-															editName.setText(experimentHeader.getExperimentName());
-															editDBid.setText(experimentHeader.getDatabaseId());
-															coordinator.setText(experimentHeader.getCoordinator());
-															groupVisibility.setText(experimentHeader.getImportusergroup());
-															// groupVisibility.setSelectedItem(experimentHeader.getImportusergroup());
-															if (experimentHeader.getExperimentType() != null)
-																experimentTypeSelection.setSelectedItem(experimentHeader.getExperimentType());
-															else
-																experimentTypeSelection.setSelectedIndex(0);
-															expStart.setDate(experimentHeader.getStartdate());
-															expEnd.setDate(experimentHeader.getImportdate());
-															sequence.setText(experimentHeader.getSequence());
-															remark.setText(experimentHeader.getRemark());
-															outliers.setText(experimentHeader.getGlobalOutlierInfo());
-															annotation.putClientProperty("fulltext", experimentHeader.getAnnotation());
-															annotation.setText(new DCexperimentHeader(experimentHeader).getHTMLoverview(null));
-															saveB.setText(acc.postResult);
-														}
-													});
-													ok = true;
+														}, new Runnable() {
+															@Override
+															public void run() {
+																editName.setText(experimentHeader.getExperimentName());
+																editDBid.setText(experimentHeader.getDatabaseId());
+																coordinator.setText(experimentHeader.getCoordinator());
+																groupVisibility.setText(experimentHeader.getImportusergroup());
+																// groupVisibility.setSelectedItem(experimentHeader.getImportusergroup());
+																if (experimentHeader.getExperimentType() != null)
+																	experimentTypeSelection.setSelectedItem(experimentHeader.getExperimentType());
+																else
+																	experimentTypeSelection.setSelectedIndex(0);
+																expStart.setDate(experimentHeader.getStartdate());
+																expEnd.setDate(experimentHeader.getImportdate());
+																sequence.setText(experimentHeader.getSequence());
+																remark.setText(experimentHeader.getRemark());
+																outliers.setText(experimentHeader.getGlobalOutlierInfo());
+																annotation.putClientProperty("fulltext", experimentHeader.getAnnotation());
+																annotation.setText(new DCexperimentHeader(experimentHeader).getHTMLoverview(null));
+																saveB.setText(acc.postResult);
+															}
+														});
+														ok = true;
+													}
 												}
 											}
 										}
 									}
+									if (!ok)
+										saveB.setText("Updated (saved)");
+									// MyExperimentInfoPanel.this.setExperimentInfo(m, experimentHeader,
+									// true, null);
+								} else {
+									if (m != null)
+										m.saveExperimentHeader(experimentHeader);
+									if (m != null)
+										saveB.setText("Updated (in database)");
+									else
+										saveB.setText("Updated (in memory)");
 								}
-								if (!ok)
-									saveB.setText("Updated (saved)");
-								// MyExperimentInfoPanel.this.setExperimentInfo(m, experimentHeader,
-								// true, null);
 							} else {
-								if (m != null)
-									m.saveExperimentHeader(experimentHeader);
-								if (m != null)
-									saveB.setText("Updated (in database)");
-								else
-									saveB.setText("Updated (in memory)");
+								Experiment exp = new Experiment();
+								exp.setHeader(experimentHeader);
+								m.saveExperiment(exp, null);
+								saveB.setText("Experiment saved in database");
+								editPossibleBBB = false;
 							}
-						} else {
-							Experiment exp = new Experiment();
-							exp.setHeader(experimentHeader);
-							m.saveExperiment(exp, null);
-							saveB.setText("Experiment saved in database");
-							editPossibleBBB = false;
 						}
 					}
 					saveB.setEnabled(false);
@@ -565,9 +579,12 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		styles(startEnabled, editName, coordinator, groupVisibility, experimentTypeSelection, expStart, expEnd,
 				sequence, remark, outliers, annotationB,
 				editB, saveB, editPossible, true);
-		
-		GuiRow gr = new GuiRow(TableLayout.getSplitVertical(null, TableLayout.get3Split(null, TableLayout.get3Split(
-				editB, null, saveB, TableLayout.PREFERRED, 10, TableLayout.PREFERRED), null, TableLayout.FILL,
+		JComponent fff = TableLayout.get3Split(saveB, (JComponent) null, saveMode, TableLayout.PREFERRED, 10d, TableLayout.PREFERRED);
+		GuiRow gr = new GuiRow(TableLayout.getSplitVertical(null, TableLayout.get3Split(null,
+				TableLayout.get3Split(
+						editB, null,
+						fff,
+						TableLayout.PREFERRED, 10, TableLayout.PREFERRED), null, TableLayout.FILL,
 				TableLayout.PREFERRED, TableLayout.FILL), 5, TableLayout.PREFERRED), null);
 		gr.span = true;
 		
