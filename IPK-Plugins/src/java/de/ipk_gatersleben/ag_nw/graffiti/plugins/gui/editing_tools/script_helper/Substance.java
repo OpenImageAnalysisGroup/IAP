@@ -352,11 +352,8 @@ public class Substance implements SubstanceInterface {
 	
 	private static SampleInterface aa(ConditionInterface targetCondition, SampleInterface sample, boolean ignoreSnapshotFineTime, SampleInterface targetSample) {
 		synchronized (targetCondition) {
-			for (SampleInterface s : targetCondition)
-				if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
-					targetSample = s;
-					break;
-				}
+			if (targetSample == null)
+				targetSample = findTargetSample(targetCondition, sample, ignoreSnapshotFineTime, targetSample);
 			if (targetSample == null) {
 				// completely new substance with all new data
 				targetSample = sample.clone(targetCondition);
@@ -366,6 +363,28 @@ public class Substance implements SubstanceInterface {
 				
 			}
 			targetSample.setParent(targetCondition);
+		}
+		return targetSample;
+	}
+	
+	private static SampleInterface findTargetSample(ConditionInterface targetCondition, SampleInterface sample,
+			boolean ignoreSnapshotFineTime, SampleInterface targetSample) {
+		Long sFT = sample.getSampleFineTimeOrRowId();
+		int sDay = ((Sample) sample).time;
+		for (SampleInterface s : targetCondition) {
+			if (sDay != ((Sample) s).time)
+				continue;
+			Long ssFT = s.getSampleFineTimeOrRowId();
+			if (sFT != null && ssFT != null) {
+				if (sFT.longValue() == ssFT.longValue()) {
+					targetSample = s;
+					break;
+				}
+			} else
+				if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
+					targetSample = s;
+					break;
+				}
 		}
 		return targetSample;
 	}
