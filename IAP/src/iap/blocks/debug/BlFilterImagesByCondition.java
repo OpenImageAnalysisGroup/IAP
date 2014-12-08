@@ -31,6 +31,9 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
+		if (processedImages.getAnyInfo() == null)
+			return;
+		
 		if (processedImages.getAnyInfo().getParentSample().getSampleFineTimeOrRowId() == null)
 			return;
 		
@@ -66,6 +69,16 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 		}
 		
 		if (!process) {
+			processedImages.setVisInfo(null);
+			processedImages.setFluoInfo(null);
+			processedImages.setNirInfo(null);
+			processedImages.setIrInfo(null);
+			
+			processedMasks.setVisInfo(null);
+			processedMasks.setFluoInfo(null);
+			processedMasks.setNirInfo(null);
+			processedMasks.setIrInfo(null);
+			
 			processedImages.setVis(null);
 			processedImages.setFluo(null);
 			processedImages.setNir(null);

@@ -27,6 +27,9 @@ public class BlFilterImagesByTopOrSide extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	protected void postProcess(ImageSet processedImages, ImageSet processedMasks) {
+		if (processedImages.getAnyInfo() == null)
+			return;
+		
 		Double p = processedImages.getAnyInfo().getPosition();
 		if (p == null)
 			p = 0d;
@@ -37,6 +40,16 @@ public class BlFilterImagesByTopOrSide extends AbstractSnapshotAnalysisBlock {
 			u = " " + u;
 		boolean process = getBoolean("Process " + optionsAndResults.getCameraPosition() + " view images", true);
 		if (!process) {
+			processedImages.setVisInfo(null);
+			processedImages.setFluoInfo(null);
+			processedImages.setNirInfo(null);
+			processedImages.setIrInfo(null);
+			
+			processedMasks.setVisInfo(null);
+			processedMasks.setFluoInfo(null);
+			processedMasks.setNirInfo(null);
+			processedMasks.setIrInfo(null);
+			
 			processedImages.setVis(null);
 			processedImages.setFluo(null);
 			processedImages.setNir(null);
