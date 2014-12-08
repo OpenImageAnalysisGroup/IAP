@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.RunnableExecutor;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -91,9 +92,13 @@ public class MappingData3DPath {
 	
 	public static ExperimentInterface merge(ArrayList<MappingData3DPath> mappingpaths, final boolean ignoreSnapshotFineTime,
 			final BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		return merge(mappingpaths, ignoreSnapshotFineTime, optStatus, null);
+	}
+	
+	public static ExperimentInterface merge(ArrayList<MappingData3DPath> mappingpaths, final boolean ignoreSnapshotFineTime,
+			final BackgroundTaskStatusProviderSupportingExternalCall optStatus, RunnableExecutor re) {
 		
 		final Experiment experiment = new Experiment();
-		// try {
 		final ThreadSafeOptions idx = new ThreadSafeOptions();
 		final int max = mappingpaths.size();
 		final TreeMap<String, LinkedList<MappingData3DPath>> data = new TreeMap<String, LinkedList<MappingData3DPath>>();
@@ -105,10 +110,11 @@ public class MappingData3DPath {
 			data.get(p.getSubstance().getName()).add(p);
 		}
 		
-		// final Semaphore lock = BackgroundTaskHelper.lockGetSemaphore(null, SystemAnalysis.getNumberOfCPUs());
-		try {
-			for (String substance : data.keySet()) {
-				// System.out.println("MERGE SUBSET SUBSTANCE " + substance + " (" + data.get(substance).size() + " values)...");
+		ArrayList<Runnable> todo = new ArrayList<>();
+		for (String substance : data.keySet()) {
+			if (optStatus != null && optStatus.wantsToStop())
+				break;
+			Runnable r = () -> {
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Process " + substance);
 				while (!data.get(substance).isEmpty()) {
@@ -127,9 +133,14 @@ public class MappingData3DPath {
 					if (optStatus != null && optStatus.wantsToStop())
 						break;
 				}
-			}
-		} finally {
-			// lock.release();
+			};
+			todo.add(r);
+		}
+		if (re != null)
+			re.execInParallel(todo, "Merge mapping path objects", null);
+		else {
+			for (Runnable r : todo)
+				r.run();
 		}
 		for (SubstanceInterface si : experiment)
 			for (ConditionInterface ci : si)

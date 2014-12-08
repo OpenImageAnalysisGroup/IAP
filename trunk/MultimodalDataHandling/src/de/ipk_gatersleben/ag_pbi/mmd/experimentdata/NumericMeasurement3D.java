@@ -20,6 +20,7 @@ import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.RunnableExecutor;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -146,6 +147,12 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	public static ExperimentInterface getExperiment(final ArrayList<NumericMeasurementInterface> measurements, boolean sortConditionsByName,
 			boolean ignoreSnapshotFineTime, final boolean cloneElements,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus) {
+		return getExperiment(measurements, sortConditionsByName, ignoreSnapshotFineTime, cloneElements, optStatus, null);
+	}
+	
+	public static ExperimentInterface getExperiment(final ArrayList<NumericMeasurementInterface> measurements, boolean sortConditionsByName,
+			boolean ignoreSnapshotFineTime, final boolean cloneElements,
+			BackgroundTaskStatusProviderSupportingExternalCall optStatus, RunnableExecutor re) {
 		
 		final ThreadSafeOptions nextObjectIndex = new ThreadSafeOptions();
 		nextObjectIndex.setInt(-1);
@@ -206,7 +213,7 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		for (ArrayList<MappingData3DPath> values : result.values())
 			mappingpaths.addAll(values);
 		
-		Experiment res = new Experiment(MappingData3DPath.merge(mappingpaths, ignoreSnapshotFineTime, optStatus));
+		Experiment res = new Experiment(MappingData3DPath.merge(mappingpaths, ignoreSnapshotFineTime, optStatus, re));
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Finished Construction");
 		return res;
