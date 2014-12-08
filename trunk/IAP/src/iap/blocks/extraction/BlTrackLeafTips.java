@@ -42,12 +42,16 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 	
 	@Override
 	public void prepare() {
+		if (input().images().getAnyInfo() == null)
+			return;
+		
 		// get parms
 		maxDistBetweenLeafTips = getDouble("Maximal distance between leaf-tips", 100.0);
 		boolean useNormalization = getBoolean("Do Normalization using BM", true);
 		debug = getBoolean("Debug", false);
 		
 		CameraPosition cp = optionsAndResults.getCameraPosition();
+		
 		for (CameraType ct : CameraType.values()) {
 			TreeMap<Long, ArrayList<BlockResultValue>> oldResults = optionsAndResults.searchPreviousResults("plant_" + ct, true, getWellIdx(),
 					optionsAndResults.getConfigAndAngle(), true);
