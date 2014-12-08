@@ -40,11 +40,14 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 	private ArrayList<String> listOfDatabases = new ArrayList<String>();
 	private final TreeMap<String, ArrayList<ExperimentHeaderInterface>> experimentMap = new TreeMap<String, ArrayList<ExperimentHeaderInterface>>();
 	private String errorMessage;
+	private final boolean enumerateAllDBsForDetails;
 	
 	public ActionLTnavigation() {
 		super("Access LT-DB");
 		@SuppressWarnings("unused")
 		LTdataExchange ltInitVariablesAndSettings = new LTdataExchange();
+		this.enumerateAllDBsForDetails = SystemOptions.getInstance().getBoolean("LT-DB", "Load Complete Experiment-List for Overview", false);
+		
 	}
 	
 	public void setLogin(String user) {
@@ -146,39 +149,43 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 				status.setCurrentStatusValueFine(idx / (double) max * 100d);
 				if (!LTdataExchange.known(db))
 					continue;
-				status.setCurrentStatusText1(n + " experiments");
-				try {
-					if (!experimentMap.containsKey(db)) {
-						ArrayList<ExperimentHeaderInterface> res = new LTdataExchange().
-								getExperimentsInDatabase(login, db, status);
-						n += res.size();
-						experimentMap.put(db, res);
+				if (enumerateAllDBsForDetails) {
+					status.setCurrentStatusText1(n + " experiments");
+					try {
+						if (!experimentMap.containsKey(db)) {
+							ArrayList<ExperimentHeaderInterface> res = new LTdataExchange().
+									getExperimentsInDatabase(login, db, status);
+							n += res.size();
+							experimentMap.put(db, res);
+						}
+						ArrayList<ExperimentHeaderInterface> experiments = experimentMap.get(db);
+						if (experiments.size() > 0) {
+							if (!LTdataExchange.known(db))
+								unsorted.add(new NavigationButton(new ActionLemnaDb(db, experiments, login), src.getGUIsetting()));
+							else
+								result.add(new NavigationButton(new ActionLemnaDb(db, experiments, login), src.getGUIsetting()));
+						}
+						// else System.out.println("Database " + db + " is empty.");
+						for (ExperimentHeaderInterface ehi : experiments) {
+							allExperiments.get("").get("").add(ehi);
+						}
+						
+					} catch (Exception e) {
+						if (e.getMessage() == null || !e.getMessage().equals("ERROR: relation \"snapshot\" does not exist"))
+							System.out.println("Database " + db + " could not be processed. (" + e.getMessage() + ")");
 					}
-					ArrayList<ExperimentHeaderInterface> experiments = experimentMap.get(db);
-					if (experiments.size() > 0) {
-						if (!LTdataExchange.known(db))
-							unsorted.add(new NavigationButton(new ActionLemnaDb(db, experiments), src.getGUIsetting()));
-						else
-							result.add(new NavigationButton(new ActionLemnaDb(db, experiments), src.getGUIsetting()));
-					}
-					// else System.out.println("Database " + db + " is empty.");
-					for (ExperimentHeaderInterface ehi : experiments) {
-						allExperiments.get("").get("").add(ehi);
-					}
-					
-				} catch (Exception e) {
-					if (e.getMessage() == null || !e.getMessage().equals("ERROR: relation \"snapshot\" does not exist"))
-						System.out.println("Database " + db + " could not be processed. (" + e.getMessage() + ")");
+				} else {
+					result.add(new NavigationButton(new ActionLemnaDb(db, null, login), src.getGUIsetting()));
 				}
 			}
 			if (unsorted.size() > 0)
 				result.add(nb);
 			
-			if (result.size() > 0)
+			if (result.size() > 0 && enumerateAllDBsForDetails)
 				result.add(1, Other.getCalendarEntity(allExperiments, null, src.getGUIsetting()));
 			
 			if (result.size() > 0)
-				result.add(2, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
+				result.add(enumerateAllDBsForDetails ? 2 : 1, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
 			
 			if (SystemOptions.getInstance().getBoolean("Imaging-System-Documentation", "show_icon", false)) {
 				HTTPfolderSource doku = new LTdocuSource();
@@ -190,7 +197,10 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 				result.add(new NavigationButton(new ActionLemnaAssessment(), src.getGUIsetting()));
 			
 			status.setCurrentStatusValueFine(100d);
-			status.setCurrentStatusText1("Found " + n + " experiments");
+			if (enumerateAllDBsForDetails)
+				status.setCurrentStatusText1("Found " + n + " experiments");
+			else
+				status.setCurrentStatusText1("Processing finished");
 			
 		} catch (Exception e) {
 			// error
