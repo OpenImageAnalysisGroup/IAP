@@ -215,13 +215,13 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 		
 		for (FirstOrderTextureFeatures tf : FirstOrderTextureFeatures.values()) {
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(cp, cameraType, TraitCategory.TEXTURE, c + ".mean." + tf),
+					new Trait(cp, cameraType, TraitCategory.TEXTURE, c + "." + tf),
 					firstArrays.get(tf).getMean(), null, this, imageRef);
 		}
 		
 		for (GLCMTextureFeatures tf : GLCMTextureFeatures.values()) {
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(cp, cameraType, TraitCategory.TEXTURE, c + ".mean." + tf),
+					new Trait(cp, cameraType, TraitCategory.TEXTURE, c + "." + tf),
 					glcmArrays.get(tf).getMean(), null, this, imageRef);
 		}
 	}
