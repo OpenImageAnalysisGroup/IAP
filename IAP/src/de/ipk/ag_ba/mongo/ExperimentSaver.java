@@ -244,7 +244,10 @@ public class ExperimentSaver implements RunnableOnDB {
 			wait.add(BackgroundThreadDispatcher.addTask(rrr, "Substance Saving " + s.getName()));
 		} // substance
 		BackgroundThreadDispatcher.waitFor(wait);
-		
+		if (status != null && status.wantsToStop()) {
+			status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">Stop Requested, Interrupting Operation");
+			return;
+		}
 		System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 				+ " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
 		if (status != null)
@@ -321,6 +324,8 @@ public class ExperimentSaver implements RunnableOnDB {
 			SubstanceInterface s,
 			int substanceIndex, int substanceCount) throws InterruptedException {
 		if (status != null) {
+			if (status.wantsToStop())
+				return;
 			status.setCurrentStatusValueFine(100d * substanceIndex / substanceCount);
 			status.setCurrentStatusText1("Save " + substanceIndex + "/" + substanceCount);
 			status.setCurrentStatusText2("<small><font color='gray'>(" + s.getName() + ")</font></small>");

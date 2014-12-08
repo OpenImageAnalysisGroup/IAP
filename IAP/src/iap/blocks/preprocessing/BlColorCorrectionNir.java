@@ -95,7 +95,12 @@ public class BlColorCorrectionNir extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Corrects illumination of the Nir-image by modelling shading by gaussian blur.";
+		return "Corrects illumination of the Nir-image by modelling shading by gaussian blur."
+				+ "To normalize fluctuating intensities between different camera configurations and to reduce shading effects caused by "
+				+ "vignetting a artificial flat image is subtracted from the input image. The artificial flat image is created by applying "
+				+ "a Gaussian blur filter on the input image with a large filter kernel of radius size 100 pixels. The background of the "
+				+ "imaging chamber appears light-gray and parts of the carrier appears dark-gray. This forms the basis for the contrast "
+				+ "enhancement using the ImageJ “Brightness/Contrast” adjustment command.";
 	}
 	
 	@Override
