@@ -20,7 +20,7 @@ public class Sample implements SampleInterface {
 	 */
 	private String measurementtool;
 	private Long rowId;
-	private int time = -1;
+	public int time = -1;
 	private String timeUnit = "-1";
 	private TtestInfo ttestInfo = TtestInfo.EMPTY;
 	String files;
@@ -407,9 +407,10 @@ public class Sample implements SampleInterface {
 	@Override
 	public int compareTo(SampleInterface sd, boolean ignoreSnapshotFineTime) {
 		if (!ignoreSnapshotFineTime) {
-			if (getSampleFineTimeOrRowId() == null || sd.getSampleFineTimeOrRowId() == 1)
+			Long ft = getSampleFineTimeOrRowId();
+			if (ft == null)
 				return compareTo(sd);
-			int rr = getSampleFineTimeOrRowId().compareTo(sd.getSampleFineTimeOrRowId());
+			int rr = ft.compareTo(sd.getSampleFineTimeOrRowId());
 			if (rr != 0)
 				return rr;
 		}
