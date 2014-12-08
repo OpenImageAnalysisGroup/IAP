@@ -11,10 +11,8 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.Other;
-import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.IAPservice;
-import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 public class ActionScreenshotStorage extends AbstractNavigationAction {
 	public ActionScreenshotStorage(String tooltip) {
@@ -25,16 +23,6 @@ public class ActionScreenshotStorage extends AbstractNavigationAction {
 	public String getDefaultTitle() {
 		boolean enabled = SystemOptions.getInstance().getBoolean("Watch-Service", "Screenshot//Publish Desktop", false);
 		return enabled ? "Screenshot Storage Enabled" : "Screenshot Storage Disabled";
-	}
-	
-	@Override
-	public NavigationImage getImageIconInactive() {
-		return getImageIconActive();
-	}
-	
-	@Override
-	public NavigationImage getImageIconActive() {
-		return IAPmain.loadIcon(getDefaultImage());
 	}
 	
 	@Override
