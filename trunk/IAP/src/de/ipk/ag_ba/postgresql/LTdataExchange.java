@@ -653,6 +653,8 @@ public class LTdataExchange implements ExperimentLoader {
 			
 			rs = ps.executeQuery();
 			
+			HashMap<String, String> lbl2cn = new HashMap<>();
+			
 			while (rs.next()) {
 				Snapshot snapshot = new Snapshot();
 				
@@ -673,7 +675,11 @@ public class LTdataExchange implements ExperimentLoader {
 					snapshot.setWeight_before(w);
 				
 				String camLbl = rs.getString("camera_label");
-				String lbl = getIAPcameraNameFromConfigLabel(camLbl);
+				String lbl = lbl2cn.get(camLbl);
+				if (lbl == null) {
+					lbl = getIAPcameraNameFromConfigLabel(camLbl);
+					lbl2cn.put(camLbl, lbl);
+				}
 				if (lbl.isEmpty())
 					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: NO CAMERA CONFIG FOR IMAGE-CONFIG '" + camLbl + "'!");
 				snapshot.setCamera_label(lbl);// rs.getString("compname"));
@@ -1329,7 +1335,7 @@ public class LTdataExchange implements ExperimentLoader {
 			String initSpecies = species;
 			
 			ps.setString(1, header.getExperimentName());
-			HashSet<String> printedMetaData = new HashSet<String>();
+			// HashSet<String> printedMetaData = new HashSet<String>();
 			try {
 				ResultSet rs = ps.executeQuery();
 				
@@ -1350,10 +1356,10 @@ public class LTdataExchange implements ExperimentLoader {
 					metaValue = metaValue.trim();
 					if (metaValue.isEmpty())
 						continue;
-					String o = plantID + " / " + metaName + " / " + metaValue;
-					if (!printedMetaData.contains(o))
-						System.out.println(o);
-					printedMetaData.add(o);
+					// String o = plantID + " / " + metaName + " / " + metaValue;
+					// if (!printedMetaData.contains(o))
+					// System.out.println(o);
+					// printedMetaData.add(o);
 					if (!res.containsKey(plantID)) {
 						// System.out.println(plantID);
 						res.put(plantID, new Condition(null));
