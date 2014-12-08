@@ -12,6 +12,7 @@ import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.debug.BlFilterImagesByAngle;
 import iap.blocks.debug.BlFilterImagesByCondition;
 import iap.blocks.debug.BlFilterImagesByDate;
+import iap.blocks.debug.BlFilterImagesByPlantID;
 import iap.blocks.debug.BlFilterImagesByTopOrSide;
 import iap.blocks.debug.BlShowIntermediateImages;
 import iap.blocks.debug.BlShowThreeDColorHistogram;
@@ -164,6 +165,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlFilterImagesByDate(),
 				new BlFilterImagesByCondition(),
 				new BlShowIntermediateImages(),
+				new BlFilterImagesByPlantID(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
