@@ -1,9 +1,20 @@
 package de.ipk.ag_ba.postgresql;
 
+import java.util.HashSet;
+
 import org.SystemOptions;
 
 public enum LTsystem {
 	Barley, Maize, Phytochamber, Unknown;
+	
+	public static HashSet<String> getKnownDBprefixTerms() {
+		HashSet<String> res = new HashSet<>();
+		res.add(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Phytochamber", "APH_"));
+		res.add(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Barley", "BGH_"));
+		res.add(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Maize", "CGH_"));
+		res.add(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Generic", "DB_"));
+		return res;
+	}
 	
 	public static LTsystem getTypeFromDatabaseName(String database) {
 		if (database.startsWith(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Phytochamber", "APH_")))
@@ -12,6 +23,8 @@ public enum LTsystem {
 			return Barley;
 		if (database.startsWith(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Maize", "CGH_")))
 			return Maize;
+		if (database.startsWith(SystemOptions.getInstance().getString("LT-DB", "DBs//db_prefix_Generic", "DB_")))
+			return Unknown;
 		return Unknown;
 	}
 	
@@ -31,5 +44,13 @@ public enum LTsystem {
 				return false;
 		}
 		return false;
+	}
+	
+	public static String getTypeString(String db) {
+		if (db != null)
+			for (String t : getKnownDBprefixTerms())
+				if (db.startsWith(t))
+					return t;
+		return null;
 	}
 }

@@ -1635,13 +1635,22 @@ public class MongoDB {
 				// inputFile.setMetaData(new BasicDBObject("time", screenshot.getTime()));
 				// inputFile.setMetaData(new BasicDBObject("host", SystemAnalysisExt.getHostNameNoError()));
 				long t = 0;
+				ArrayList<GridFSDBFile> del = new ArrayList<GridFSDBFile>();
 				for (GridFSDBFile o : files) {
 					Long time = (Long) o.get("time");
 					if (time == null)
 						time = t++;
-					String fn = "" + o.get("_id");
-					fn2newestFile.put(fn, o);
-					fn2newestStorageTime.put(fn, time);
+					if (System.currentTimeMillis() - time > 24 * 60 * 60 * 1000) {
+						del.add(o);
+					} else {
+						String fn = "" + o.get("_id");
+						fn2newestFile.put(fn, o);
+						fn2newestStorageTime.put(fn, time);
+					}
+				}
+				for (GridFSDBFile d : del) {
+					MongoDB.saveSystemMessage("Remove outdated (24h limit) screenshot information of '" + d.getFilename() + "'.");
+					gridfs_webcam_files.remove(d);
 				}
 			}
 			

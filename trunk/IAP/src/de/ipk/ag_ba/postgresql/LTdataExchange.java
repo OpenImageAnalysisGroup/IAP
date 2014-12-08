@@ -150,7 +150,12 @@ public class LTdataExchange implements ExperimentLoader {
 	}
 	
 	public static boolean known(String dbName) {
-		return dbName != null && (dbName.startsWith("CGH_") || dbName.startsWith("BGH_") || dbName.startsWith("APH_"));
+		if (dbName == null)
+			return false;
+		for (String pref : LTsystem.getKnownDBprefixTerms())
+			if (dbName.startsWith(pref))
+				return true;
+		return false;
 	}
 	
 	public synchronized ArrayList<ExperimentHeaderInterface> getExperimentsInDatabase(final String user, final String database,
