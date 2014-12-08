@@ -283,7 +283,8 @@ public class MongoDB {
 		processDB(r);
 		if (err.getParam(0, null) != null)
 			throw (Exception) err.getParam(0, null);
-		
+		if (status != null && status.wantsToStop())
+			return null;
 		return experiment;
 	}
 	
