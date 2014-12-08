@@ -117,7 +117,8 @@ public class ExperimentSaver implements RunnableOnDB {
 		
 		for (ExperimentHeaderInterface ehi : experimentList) {
 			if (ehi.getOriginDbId() != null && !ehi.getOriginDbId().isEmpty()
-					&& ehi.getOriginDbId().equals(experiment.getHeader().getDatabaseId())) {
+					&& ehi.getOriginDbId().equals(experiment.getHeader().getDatabaseId())
+					&& ehi.getExperimentName() != null && ehi.getExperimentName().equals(experiment.getName())) {
 				// preserve outlier info (add values, available at destination)
 				if (ehi.getGlobalOutlierInfo() != null && !ehi.getGlobalOutlierInfo().isEmpty()) {
 					String outliers = StringManipulationTools.getMergedStringItems(
