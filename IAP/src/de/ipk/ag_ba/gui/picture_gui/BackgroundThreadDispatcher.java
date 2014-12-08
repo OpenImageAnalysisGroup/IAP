@@ -2,18 +2,17 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 
 import javax.swing.Timer;
 
+import org.RunnableExecutor;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.gui.picture_gui.system.ThreadManager;
-import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 
 /**
  * @author klukas
@@ -155,26 +154,27 @@ public class BackgroundThreadDispatcher {
 		} while (threads.size() > 0);
 	}
 	
-	private static void updateTaskStatistics() {
-		Calendar calendar = new GregorianCalendar();
-		int minute = calendar.get(Calendar.MINUTE);
-		synchronized (BlockPipeline.class) {
-			taskExecutionsWithinCurrentMinute++;
-			if (currentMinute != minute) {
-				taskExecutionsWithinLastMinute = taskExecutionsWithinCurrentMinute;
-				taskExecutionsWithinCurrentMinute = 0;
-				currentMinute = minute;
-			}
-		}
-	}
+	// private static void updateTaskStatistics() {
+	// Calendar calendar = new GregorianCalendar();
+	// int minute = calendar.get(Calendar.MINUTE);
+	// synchronized (BlockPipeline.class) {
+	// taskExecutionsWithinCurrentMinute++;
+	// if (currentMinute != minute) {
+	// taskExecutionsWithinLastMinute = taskExecutionsWithinCurrentMinute;
+	// taskExecutionsWithinCurrentMinute = 0;
+	// currentMinute = minute;
+	// }
+	// }
+	// }
 	
 	public static int getTaskExecutionsWithinLastMinute() {
 		return taskExecutionsWithinLastMinute;
 	}
 	
 	private static int taskExecutionsWithinLastMinute = 0;
-	private static int taskExecutionsWithinCurrentMinute = 0;
-	private static int currentMinute = -1;
+	
+	// private static int taskExecutionsWithinCurrentMinute = 0;
+	// private static int currentMinute = -1;
 	
 	public static void waitSec(int secondsDelay) {
 		try {
@@ -263,5 +263,15 @@ public class BackgroundThreadDispatcher {
 	@Deprecated
 	public static StreamBackgroundTaskHelper stream(String desc) {
 		return new StreamBackgroundTaskHelper(desc);
+	}
+	
+	public static RunnableExecutor getRE() {
+		return new RunnableExecutor() {
+			
+			@Override
+			public void execInParallel(ArrayList<Runnable> rl, String desc, UncaughtExceptionHandler handler) {
+				new StreamBackgroundTaskHelper<>("RE").process(rl, desc, handler);
+			}
+		};
 	}
 }
