@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
@@ -88,6 +89,26 @@ public class StreamBackgroundTaskHelper<E> {
 			UncaughtExceptionHandler handler) {
 		processInts(values, c, handler);
 		return;
+	}
+	
+	public void process(ArrayList<Runnable> rl, String desc, UncaughtExceptionHandler handler) {
+		UncaughtExceptionHandler handlerF = checkHandler(handler);
+		LinkedList<LocalComputeJob> work = new LinkedList<>();
+		int threads = SystemAnalysis.getNumberOfCPUs();
+		if (threads < 1)
+			threads = 1;
+		rl.forEach((v) -> {
+			try {
+				work.add(BackgroundThreadDispatcher.addTask(v, desc, true, false));
+			} catch (Exception e) {
+				handlerF.uncaughtException(Thread.currentThread(), e);
+			}
+		});
+		try {
+			BackgroundThreadDispatcher.waitFor(work);
+		} catch (InterruptedException e) {
+			handlerF.uncaughtException(Thread.currentThread(), e);
+		}
 	}
 	
 }
