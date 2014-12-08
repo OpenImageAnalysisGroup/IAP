@@ -707,7 +707,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						m.setValue(bpv.getValue());
 						m.setUnit(bpv.getUnit());
 						if (multiTray)
-							m.setQualityAnnotation(m.getQualityAnnotation() + "_" + tray);
+							m.setQualityAnnotation(m.getQualityAnnotation() + ".._" + tray);
 						
 						outputAdd(m);
 					}

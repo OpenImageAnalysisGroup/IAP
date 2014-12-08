@@ -20,6 +20,8 @@ public class BlockResultValue {
 		this.binary.setUnit(unit);
 		this.binary.setQualityAnnotation(imageRef.getQualityAnnotation());
 		this.binary.setReplicateID(imageRef.getReplicateID());
+		this.binary.setPosition(imageRef.getPosition());
+		this.binary.setPositionUnit(imageRef.getPositionUnit());
 	}
 	
 	public BlockResultValue(String name, Object object) {
