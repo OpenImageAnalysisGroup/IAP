@@ -509,6 +509,14 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 						+ "different ranges, e.g. higher negative values together with higher positive values."));
 		desList.add(new CalculatedProperty("leaftip.up.count", "The number of leaf tips pointing upwards (greater 90 degree)."));
 		desList.add(new CalculatedProperty("leaftip.down.count", "The number of leaf tips pointing downwards (less than 90 degree)."));
+		desList.add(new CalculatedProperty("leaftip.corner.angle.mean", "The average leaf tip corner angle. (sharpness of leaf tip)"));
+		desList.add(new CalculatedProperty("leaftip.corner.angle.stdev", "The standard deviation of the leaf corner angles. "
+				+ "The lower this value, the more uniform are the leaf tip corner angles."));
+		desList.add(new CalculatedProperty("leaftip.corner.angle.skewness",
+				"The 'skewness' of the leaf tip corner angle values. 'Skewness' is a statistical term, "
+						+ "indicating the tendency of the value distribution to lean to one side of the value range."));
+		desList.add(new CalculatedProperty("leaftip.corner.angle.kurtosis",
+				"The 'kurtosis' of the leaf tip corner angle values. 'Kurtosis' is a statistical term, indicating the 'peakedness' of the value distribution."));
 		desList.add(new CalculatedProperty("leaftip.angle.mean", "The average leaf tip angle."));
 		desList.add(new CalculatedProperty("leaftip.angle.stdev", "The standard deviation of the leaf angles. "
 				+ "The lower this value, the more uniform are the leaf tip angles."));
