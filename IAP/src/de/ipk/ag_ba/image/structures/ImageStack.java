@@ -230,4 +230,9 @@ public class ImageStack {
 	public void setStack(ij.ImageStack stack) {
 		this.stack = stack;
 	}
+	
+	public Image getImage(int n) {
+		return new Image(this.stack.getProcessor(1).getBufferedImage());
+		
+	}
 }
