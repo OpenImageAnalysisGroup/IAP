@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
 import ij.gui.StackWindow;
+import ij.process.ImageProcessor;
 import info.clearthought.layout.TableLayout;
 
 import java.awt.Component;
@@ -13,6 +14,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -29,7 +32,7 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 /**
  * @author klukas
  */
-public class ImageStack {
+public class ImageStack implements Iterable<ImageProcessor> {
 	
 	ij.ImageStack stack;
 	
@@ -46,6 +49,8 @@ public class ImageStack {
 	private int well;
 	
 	private int wellCnt;
+	
+	private ImageType imageType;
 	
 	public ImageStack() {
 		this.well = -1;
@@ -229,6 +234,72 @@ public class ImageStack {
 	
 	public void setStack(ij.ImageStack stack) {
 		this.stack = stack;
+	}
+	
+	public void addImage(String label, ImagePlus ip) {
+		ImageProcessor pro = ip.getProcessor();
+		addImage(label, pro);
+	}
+	
+	public void addImage(String label, ImageProcessor pro) {
+		if (!sizeKnown) {
+			sizeKnown = true;
+			this.w = pro.getWidth();
+			this.h = pro.getHeight();
+			stack = new ij.ImageStack(w, h);
+		}
+		// else {
+		// if (w > 1 && h > 1)
+		// pro = pro.resize(w, h);
+		// }
+		if (pro.getWidth() != w || pro.getHeight() != h) {
+			System.out.println(SystemAnalysis.getCurrentTime() + "ERROR: mismatching image size: " + h + " <!> " + pro.getHeight());
+			return;
+		}
+		try {
+			stack.addSlice(label, pro);
+			this.setImageType(pro.getBitDepth());
+		} catch (Exception e) {
+			System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: COULD NOT ADD IMAGE TO IMAGE-STACK: " +
+					e.getMessage());
+		}
+	}
+	
+	private void setImageType(int bitDepth) {
+		for (ImageType it : ImageType.values())
+			if (it.getDepth() == bitDepth)
+				imageType = it;
+	}
+	
+	public String getImageLabel(int n) {
+		return this.stack.getSliceLabel(n);
+	}
+	
+	public String getImageType() {
+		return imageType.toString();
+	}
+	
+	@Override
+	public Iterator<ImageProcessor> iterator() {
+		return new Iterator<ImageProcessor>() {
+			int count = 1;
+			
+			@Override
+			public boolean hasNext() {
+				if (count < stack.getSize())
+					return true;
+				
+				return false;
+			}
+			
+			@Override
+			public ImageProcessor next() {
+				if (count == stack.getSize())
+					throw new NoSuchElementException();
+				
+				return stack.getProcessor(count++);
+			}
+		};
 	}
 	
 	public Image getImage(int n) {
