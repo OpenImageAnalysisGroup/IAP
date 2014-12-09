@@ -108,10 +108,13 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 			int searchRadius, int maxValidY, ImageData imageRef, Image orig_image) {
 		boolean saveListObject = true;
 		boolean saveLeafCount = true;
+		boolean saveAdditionalFeatures = true;
 		boolean saveFeaturesInResultSet = getBoolean("Save individual leaf features", true);
 		boolean saveColorFeaturesInResultSet = getBoolean("Save individual leaf color features", true);
 		boolean saveTextureFeaturesInResultSet = getBoolean("Save leaf texture features (Mean)", true);
 		boolean saveIndividualTextureFeaturesInResultSet = getBoolean("Save individual leaf texture features", false);
+		
+		double circleArea = searchRadius * searchRadius * Math.PI;
 		
 		if (saveListObject) {
 			saveLeafTipList(peakList, cameraType, maxValidY);
@@ -121,9 +124,9 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 			saveLeafCount(cameraType, cameraPosition, peakList.size(), imageRef);
 		}
 		
-		boolean saveAddF = true;
-		if (saveAddF) {
+		if (saveAdditionalFeatures) {
 			int n = 0, nup = 0, ndown = 0;
+			DescriptiveStatistics StatsArea = new DescriptiveStatistics();
 			DescriptiveStatistics statsLeafDirection = new DescriptiveStatistics();
 			HashMap<String, Double> firstOrderMeans = new HashMap<String, Double>();
 			HashMap<String, Double> glcmMeans = new HashMap<String, Double>();
@@ -134,9 +137,10 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 				Vector2D direction = (Vector2D) bf.getFeature("direction");
 				
 				if (angle != null) {
-					
+					ArrayList<PositionAndColor> temp_area = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
+					StatsArea.addValue(temp_area.size());
 					if (saveColorFeaturesInResultSet) {
-						ArrayList<PositionAndColor> pixels = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
+						ArrayList<PositionAndColor> pixels = temp_area;
 						
 						if (pixels != null && pixels.size() > 0) {
 							Image leafTipImage, leafTipImage2d = null;
@@ -218,6 +222,19 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.up.count"), nup, "leaftips", this, imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.down.count"), ndown, "leaftips", this, imageRef);
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.corner.angle.mean"), 360 * StatsArea.getMean() / circleArea, null,
+						this, imageRef);
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.corner.angle.stdev"), StatsArea.getStandardDeviation(), null, this,
+						imageRef);
+				getResultSet()
+						.setNumericResult(getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.corner.angle.skewness"), StatsArea.getSkewness(), null, this,
+								imageRef);
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.corner.angle.mean.kurtosis"), StatsArea.getKurtosis(), null, this,
+						imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.mean"), statsLeafDirection.getMean(), "degree", this, imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
