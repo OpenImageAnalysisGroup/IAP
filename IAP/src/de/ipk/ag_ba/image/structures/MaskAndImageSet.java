@@ -74,7 +74,7 @@ public class MaskAndImageSet {
 		
 		int b_ = width;
 		int h_ = targetHeight;
-		int wn = b_ / debugStack.getDebugConfig().getN();
+		int wn = b_ / (debugStack.getDebugConfig().getN() > 0 ? debugStack.getDebugConfig().getN() : 1);
 		int hn = h_ / 2;
 		
 		double s1 = (double) wn / resizedImages.getLargestWidth();
