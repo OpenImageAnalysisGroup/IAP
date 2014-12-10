@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.ObjectRef;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import com.mongodb.BasicDBObject;
@@ -494,6 +496,36 @@ public class Batch {
 			}
 		});
 		return (CloudHost) r.getObject();
+	}
+	
+	public static boolean checkIfHostHasMostMemory(final MongoDB m) throws Exception {
+		boolean hasMaxMem = true;
+		long myMem = SystemAnalysis.getMemoryMB();
+		String myID = CloudHost.getHostId();
+		boolean iamFirstWithThisAmountOfMemory = true;
+		boolean equalFound = false;
+		for (CloudHost ch : m.batch().getAvailableHosts(5 * 60 * 1000)) {
+			if (ch.getMaxMem() == myMem && !equalFound) {
+				equalFound = true;
+				if (!myID.equals(ch.getHostId()))
+					iamFirstWithThisAmountOfMemory = false;
+			} else
+				if (ch.getMaxMem() > myMem) {
+					hasMaxMem = false;
+					break;
+				}
+		}
+		return hasMaxMem && iamFirstWithThisAmountOfMemory;
+	}
+	
+	public static void checkForMergePosibility(final MongoDB m, final BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
+		boolean saveOverallDatasetIfPossible = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_merge_batch_results", true);
+		if (saveOverallDatasetIfPossible) {
+			// find out if this computer has most memory of online grid nodes
+			boolean hasMaxMem = Batch.checkIfHostHasMostMemory(m);
+			if (hasMaxMem)
+				m.processSplitResults().merge(false, statusProvider);
+		}
 	}
 	
 	public static void pingHost(final MongoDB mongoDB, final String ip,
