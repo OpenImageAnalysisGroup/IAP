@@ -273,39 +273,49 @@ public class ExperimentSaver implements RunnableOnDB {
 		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
 		if (true) {// || (status != null && !status.wantsToStop())
-			experiments.insert(dbExperiment);
-			String id = dbExperiment.get("_id").toString();
-			System.out.println(SystemAnalysis.getCurrentTime() + ">STORED EXPERIMENT " + experiment.getHeader().getExperimentName() + " // DB-ID: " + id);
-			for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
-				eh.setDatabaseId(id);
+			{
+				int size = DefaultDBEncoder.FACTORY.create().
+						writeObject(new BasicOutputBuffer(), dbExperiment);
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: About to insert a experiment structure into DB. Size=" + size);
+				dbExperiment.remove("_id");
 			}
-			boolean storeXML = false;
-			if (storeXML) {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML");
-				try {
-					// store XML experiment bin and attach Hash value to header
-					// when loading a experiment, the quick XML bin is loaded and then the header updated from the database content
-					db.getCollection("xmlFiles");
-					GridFS gridfsExperimentStorage = new GridFS(db, "gridfsExperimentStorage");
-					GridFSDBFile fffMain = gridfsExperimentStorage.findOne(id);
-					if (fffMain != null)
-						gridfsExperimentStorage.remove(fffMain);
-					System.out.println(SystemAnalysis.getCurrentTime() + ">CREATE BINARY XML BYTES (UTF-8)");
-					String ss = experiment.toStringWithErrorThrowing();
-					byte[] bb = ss.getBytes("UTF-8");
-					ss = null;
-					ByteArrayInputStream in = new ByteArrayInputStream(bb);
-					bb = null;
-					System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML BYTES");
-					gridfsExperimentStorage.createFile(in, id, true);
-					in = null;
-					System.out.println(SystemAnalysis.getCurrentTime() + ">BINARY XML STORED");
-				} catch (Exception e) {
-					MongoDB.saveSystemErrorMessage("Could not save quick XML file for experiment " + experiment.getName(), e);
+			WriteResult wr = experiments.insert(dbExperiment);
+			if (!wr.getLastError().ok()) {
+				ErrorMsg.addErrorMessage("Could not save experiment " + dbExperiment.get("name") + ". Error: " + wr);
+			} else {
+				String id = dbExperiment.get("_id").toString();
+				System.out.println(SystemAnalysis.getCurrentTime() + ">STORED EXPERIMENT " + experiment.getHeader().getExperimentName() + " // DB-ID: " + id);
+				for (ExperimentHeaderInterface eh : experiment.getHeaders()) {
+					eh.setDatabaseId(id);
 				}
+				boolean storeXML = false;
+				if (storeXML) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML");
+					try {
+						// store XML experiment bin and attach Hash value to header
+						// when loading a experiment, the quick XML bin is loaded and then the header updated from the database content
+						db.getCollection("xmlFiles");
+						GridFS gridfsExperimentStorage = new GridFS(db, "gridfsExperimentStorage");
+						GridFSDBFile fffMain = gridfsExperimentStorage.findOne(id);
+						if (fffMain != null)
+							gridfsExperimentStorage.remove(fffMain);
+						System.out.println(SystemAnalysis.getCurrentTime() + ">CREATE BINARY XML BYTES (UTF-8)");
+						String ss = experiment.toStringWithErrorThrowing();
+						byte[] bb = ss.getBytes("UTF-8");
+						ss = null;
+						ByteArrayInputStream in = new ByteArrayInputStream(bb);
+						bb = null;
+						System.out.println(SystemAnalysis.getCurrentTime() + ">STORE BINARY XML BYTES");
+						gridfsExperimentStorage.createFile(in, id, true);
+						in = null;
+						System.out.println(SystemAnalysis.getCurrentTime() + ">BINARY XML STORED");
+					} catch (Exception e) {
+						MongoDB.saveSystemErrorMessage("Could not save quick XML file for experiment " + experiment.getName(), e);
+					}
+				}
+				if (!updatedSizeAvailable)
+					m.updateExperimentSize(db, experiment, status);
 			}
-			if (!updatedSizeAvailable)
-				m.updateExperimentSize(db, experiment, status);
 		}
 		// System.out.print(SystemAnalysis.getCurrentTime() + ">" + r.freeMemory() / 1024 / 1024 + " MB free, " + r.totalMemory() / 1024 / 1024
 		// + " total MB, " + r.maxMemory() / 1024 / 1024 + " max MB>");
@@ -354,24 +364,31 @@ public class ExperimentSaver implements RunnableOnDB {
 				
 				toBeSaved.addAll(condition);
 				
-				if (toBeSaved.size() >= 50) {
-					conditions.insert(new ArrayList<DBObject>(toBeSaved));
-					for (DBObject ci : toBeSaved)
-						conditionIDs.add(((BasicDBObject) ci).getString("_id"));
-					
-					toBeSaved.clear();
-				}
+				// if (toBeSaved.size() >= 50) {
+				// conditions.insert(new ArrayList<DBObject>(toBeSaved));
+				// for (DBObject ci : toBeSaved)
+				// conditionIDs.add(((BasicDBObject) ci).getString("_id"));
+				//
+				// toBeSaved.clear();
+				// }
 				
 			} // condition
 			if (toBeSaved.size() > 0) {
 				for (DBObject tbs : toBeSaved) {
+					{
+						int size = DefaultDBEncoder.FACTORY.create().
+								writeObject(new BasicOutputBuffer(), tbs);
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: About to insert a condition structure into DB. Size=" + size);
+						((BasicDBObject) tbs).remove("_id");
+					}
+					
 					WriteResult wr = conditions.insert(tbs); // new ArrayList<DBObject>(toBeSaved)
 					if (!wr.getLastError().ok()) {
 						ErrorMsg.addErrorMessage("Could not save condition. Error: " + wr);
+					} else {
+						conditionIDs.add(((BasicDBObject) tbs).getString("_id"));
 					}
 				}
-				for (DBObject ci : toBeSaved)
-					conditionIDs.add(((BasicDBObject) ci).getString("_id"));
 				
 				toBeSaved.clear();
 			}
@@ -381,8 +398,7 @@ public class ExperimentSaver implements RunnableOnDB {
 			errorCount.addLong(1);
 			errors.append("<li>" + e.getMessage());
 		}
-		processSubstanceSaving(status, substances, substance, conditionIDs);
-		substanceIDs.add((substance).getString("_id"));
+		processSubstanceSaving(status, substances, substance, conditionIDs, substanceIDs);
 	}
 	
 	public static DatabaseStorageResult saveVolumeFile(
@@ -1072,7 +1088,7 @@ public class ExperimentSaver implements RunnableOnDB {
 	}
 	
 	private void processSubstanceSaving(BackgroundTaskStatusProviderSupportingExternalCall status, DBCollection substances,
-			BasicDBObject dbSubstance, ArrayList<String> conditionIDs) {
+			BasicDBObject dbSubstance, ArrayList<String> conditionIDs, ArrayList<String> substanceIDs) {
 		// if (status != null)
 		// status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">INSERT SUBSTANCE " + dbSubstance.get("name"));
 		HashSet<String> knownIDs = new HashSet<String>();
@@ -1082,7 +1098,18 @@ public class ExperimentSaver implements RunnableOnDB {
 			knownIDs.add(s);
 		}
 		dbSubstance.put("condition_ids", conditionIDs);
-		substances.insert(dbSubstance);
+		{
+			int size = DefaultDBEncoder.FACTORY.create().
+					writeObject(new BasicOutputBuffer(), dbSubstance);
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: About to insert substance structure into DB. Size=" + size);
+			dbSubstance.remove("_id");
+		}
+		WriteResult wr = substances.insert(dbSubstance);
+		if (!wr.getLastError().ok()) {
+			ErrorMsg.addErrorMessage("Could not save substance " + dbSubstance.get("name") + ". Error: " + wr);
+		} else {
+			substanceIDs.add(dbSubstance.getString("_id"));
+		}
 	}
 	
 	// public static long saveAnnotationFile(GridFS gridfs_annotation, String hash, File file) throws IOException {
