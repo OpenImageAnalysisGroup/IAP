@@ -1,5 +1,6 @@
 package iap.blocks.image_analysis_tools.leafClustering;
 
+import iap.blocks.extraction.Numeric;
 import iap.blocks.image_analysis_tools.leafClustering.FeatureObject.FeatureObjectType;
 
 import java.util.HashMap;
@@ -11,7 +12,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 /**
  * @author pape
  */
-public class Feature {
+public class Feature implements Numeric {
 	HashMap<String, FeatureObject> featureMap = new HashMap<String, FeatureObject>();
 	
 	public Feature(Integer X, Integer Y) {
@@ -69,4 +70,8 @@ public class Feature {
 		featureMap.get("y").feature = y;
 	}
 	
+	@Override
+	public Double getValue() {
+		return (Double) getFeature("angle");
+	}
 }
