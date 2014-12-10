@@ -34,6 +34,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBEncoder;
 import com.mongodb.DBObject;
 import com.mongodb.DefaultDBEncoder;
 import com.mongodb.WriteConcern;
@@ -525,10 +526,11 @@ public class ExperimentSaver implements RunnableOnDB {
 			ArrayList<String> conditionIDs,
 			ConditionInterface c,
 			MongoDBhandler mh, MongoDB mo, final HashSet<String> savedUrls) throws InterruptedException, ExecutionException {
+		DBEncoder creator = DefaultDBEncoder.FACTORY.create();
 		
 		boolean addNewCondition = true;
 		List<BasicDBObject> dbSamples = null;
-		
+		long currentSizeEst = 0;
 		BasicDBObject condition = null;
 		ArrayList<BasicDBObject> newConditions = new ArrayList<BasicDBObject>();
 		for (SampleInterface sa : c) {
@@ -548,6 +550,7 @@ public class ExperimentSaver implements RunnableOnDB {
 					condition.remove("storagedate");
 					
 					newConditions.add(condition);
+					currentSizeEst = 0;
 				}
 				condition.put("samples", dbSamples);
 			}
@@ -669,9 +672,13 @@ public class ExperimentSaver implements RunnableOnDB {
 			if (dbNetworks.size() > 0)
 				sample.put("networks", dbVolumes);
 			
-			int size = DefaultDBEncoder.FACTORY.create().
+			int size = creator.
 					writeObject(new BasicOutputBuffer(), sample);
-			if (size > 1024 * 1024 * 2) {
+			currentSizeEst += size;
+			condition.remove("_id");
+			if (currentSizeEst > 1024 * 1024 * 2) {
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Condition size over threshold, request split to stop here. Size=" + currentSizeEst
+						+ " - s=" + c.getParentSubstance().getName());
 				addNewCondition = true;
 			} else
 				addNewCondition = false;
@@ -1101,7 +1108,8 @@ public class ExperimentSaver implements RunnableOnDB {
 		{
 			int size = DefaultDBEncoder.FACTORY.create().
 					writeObject(new BasicOutputBuffer(), dbSubstance);
-			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: About to insert substance structure into DB. Size=" + size);
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: About to insert substance structure into DB. Size=" + size + ", s="
+					+ dbSubstance.get("name"));
 			dbSubstance.remove("_id");
 		}
 		WriteResult wr = substances.insert(dbSubstance);
