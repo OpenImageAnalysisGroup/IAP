@@ -48,7 +48,7 @@ public class BorderAnalysis {
 		this.orig = orig;
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
 		borderIO = borderIO.skeletonize().replaceColor(Color.BLACK.getRGB(), Color.BLUE.getRGB());
-		Image boImg = borderIO.getImage().show("borderImg", debug);;
+		Image boImg = borderIO.getImage().show("borderImg", true);;
 		borderLength = boImg.io().countFilledPixels();
 		borderImage = borderIO.getAs2D();
 		borderLists = getBorderLists(borderImage, borderLength, debug);
@@ -782,8 +782,10 @@ public class BorderAnalysis {
 						inside = true;
 					
 					while (!visited.isEmpty()) {
-						borderList.add(rx);
-						borderList.add(ry);
+						if (borderMap[rx][ry] != background) {
+							borderList.add(rx);
+							borderList.add(ry);
+						}
 						
 						borderMap[rx][ry] = background;
 						find = false;
