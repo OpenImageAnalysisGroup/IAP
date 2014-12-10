@@ -20,7 +20,7 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public boolean isChangingImages() {
-		return true;
+		return false;
 	}
 	
 	@Override
@@ -37,7 +37,7 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 		if (processedImages.getAnyInfo().getParentSample().getSampleFineTimeOrRowId() == null)
 			return;
 		
-		int filterCount = getInt("Filter Count", 1);
+		int filterCount = getInt("Filter Count", 0);
 		boolean process = true;
 		
 		boolean or = getBoolean("Use OR instead of AND", true);
@@ -58,25 +58,32 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 			
 			ConditionInfo annotationMode = ConditionInfo.valueOfString(calculationMode);
 			
-			String containMode = calculationMode1;
-			
 			String value = getString("Condition - F " + filterIdx, "");
 			
 			String condition = processedImages.getAnyInfo().getParentSample().getParentCondition().getField(annotationMode);
-			if (condition != null && containMode.equals("does not contain"))
+			if (condition != null && calculationMode1.equals("does not contain"))
 				if (!condition.contains(value))
 					pf++;
 			
-			if (condition != null && containMode.equals("contains"))
+			if (condition != null && calculationMode1.equals("contains"))
 				if (condition.contains(value))
 					pf++;
 		}
 		
-		if (or) {
-			process = pf > 0;
-		} else {
-			process = pf == filterCount;
-		}
+		if (filterCount > 0)
+			if (calculationMode1.equals("does not contain")) {
+				if (or) {
+					process = pf < filterCount;
+				} else {
+					process = pf == filterCount;
+				}
+			} else {
+				if (or) {
+					process = pf > 0;
+				} else {
+					process = pf == filterCount;
+				}
+			}
 		
 		if (!process) {
 			processedImages.setVisInfo(null);
