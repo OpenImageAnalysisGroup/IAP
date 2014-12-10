@@ -60,11 +60,11 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 			
 			String condition = processedImages.getAnyInfo().getParentSample().getParentCondition().getField(annotationMode);
 			if (condition != null && containMode.equals("does not contain"))
-				if (!condition.equals(value))
+				if (!condition.contains(value))
 					process = false;
 			
 			if (condition != null && containMode.equals("contains"))
-				if (condition.equals(value))
+				if (condition.contains(value))
 					process = false;
 		}
 		
