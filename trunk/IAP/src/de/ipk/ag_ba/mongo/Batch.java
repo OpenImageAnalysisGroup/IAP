@@ -533,6 +533,7 @@ public class Batch {
 					res.setClusterExecutionMode(IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE);
 					res.setExecutionMode(IAPmain.getRunMode());
 					res.setOperatingSystem(SystemAnalysis.getOperatingSystem());
+					res.setMaxMem(SystemAnalysis.getMemoryMB());
 					res.setBlocksExecutedWithinLastMinute(blocksExecutedWithinLastMinute);
 					res.setPipelineExecutedWithinCurrentHour(pipelineExecutedWithinCurrentHour);
 					res.setTasksExecutedWithinLastMinute(tasksExecutedWithinLastMinute);
