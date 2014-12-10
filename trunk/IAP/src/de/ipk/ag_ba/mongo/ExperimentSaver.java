@@ -37,6 +37,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DefaultDBEncoder;
 import com.mongodb.WriteConcern;
+import com.mongodb.WriteResult;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
@@ -363,7 +364,12 @@ public class ExperimentSaver implements RunnableOnDB {
 				
 			} // condition
 			if (toBeSaved.size() > 0) {
-				conditions.insert(new ArrayList<DBObject>(toBeSaved));
+				for (DBObject tbs : toBeSaved) {
+					WriteResult wr = conditions.insert(tbs); // new ArrayList<DBObject>(toBeSaved)
+					if (!wr.getLastError().ok()) {
+						ErrorMsg.addErrorMessage("Could not save condition. Error: " + wr);
+					}
+				}
 				for (DBObject ci : toBeSaved)
 					conditionIDs.add(((BasicDBObject) ci).getString("_id"));
 				
