@@ -22,6 +22,7 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.mongo.Batch;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -156,6 +157,9 @@ public class CloudTaskManager {
 					if (!fixedDisableProcess && cpuDesire < maxTasks && !disallownewtasks) {
 						if (m == null)
 							return;
+						
+						TaskDescription.checkForMergePosibility(m, new BackgroundTaskConsoleLogger());
+						
 						for (BatchCmd batch : m.batch().getScheduledForStart(maxTasks - cpuDesire)) {
 							ExperimentHeaderInterface header = batch.getExperimentHeader();
 							if (header != null) {

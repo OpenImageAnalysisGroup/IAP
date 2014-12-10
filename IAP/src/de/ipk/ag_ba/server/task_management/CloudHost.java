@@ -123,6 +123,17 @@ public class CloudHost extends BasicDBObject {
 			return -1;
 	}
 	
+	public Long getMaxMem() {
+		if (get("max-mem") != null)
+			return (Long) get("max-mem");
+		else
+			return -1l;
+	}
+	
+	public void setMaxMem(long mem) {
+		put("max-mem", mem);
+	}
+	
 	public void setOperatingSystem(String operatingSystem) {
 		put("operatingSystem", operatingSystem);
 	}
