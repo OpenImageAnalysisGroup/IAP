@@ -40,6 +40,14 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 		int filterCount = getInt("Filter Count", 1);
 		boolean process = true;
 		
+		boolean or = getBoolean("Use OR instead of AND", true);
+		
+		String[] possibleValues1 = { "contains", "does not contain" };
+		String calculationMode1 = optionsAndResults.getStringSettingRadio(this, "Calculation Mode", "contains",
+				StringManipulationTools.getStringListFromArray(possibleValues1));
+		
+		int pf = 0;
+		
 		for (int filterIdx = 0; filterIdx < filterCount; filterIdx++) {
 			Stream<ConditionInfo> possibleValues = ConditionInfo.getList().stream().filter((ConditionInfo f) -> {
 				return ((f != ConditionInfo.IGNORED_FIELD) && (f != ConditionInfo.FILES));
@@ -50,10 +58,6 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 			
 			ConditionInfo annotationMode = ConditionInfo.valueOfString(calculationMode);
 			
-			String[] possibleValues1 = { "contains", "does not contain" };
-			String calculationMode1 = optionsAndResults.getStringSettingRadio(this, "Calculation Mode - F " + filterIdx, "contains",
-					StringManipulationTools.getStringListFromArray(possibleValues1));
-			
 			String containMode = calculationMode1;
 			
 			String value = getString("Condition - F " + filterIdx, "");
@@ -61,11 +65,17 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 			String condition = processedImages.getAnyInfo().getParentSample().getParentCondition().getField(annotationMode);
 			if (condition != null && containMode.equals("does not contain"))
 				if (!condition.contains(value))
-					process = false;
+					pf++;
 			
 			if (condition != null && containMode.equals("contains"))
 				if (condition.contains(value))
-					process = false;
+					pf++;
+		}
+		
+		if (or) {
+			process = pf > 0;
+		} else {
+			process = pf == filterCount;
 		}
 		
 		if (!process) {
