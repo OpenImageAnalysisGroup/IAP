@@ -113,15 +113,24 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		boolean saveColorFeaturesInResultSet = getBoolean("Save individual leaf color features", true);
 		boolean saveTextureFeaturesInResultSet = getBoolean("Save leaf texture features (Mean)", true);
 		boolean saveIndividualTextureFeaturesInResultSet = getBoolean("Save individual leaf texture features", false);
+		boolean removeOutliers = getBoolean("Outlier removal based on leaf tip angle", true);
 		
+		double alpha = getDouble("Grubbs alpha level", 0.05);
 		double circleArea = searchRadius * searchRadius * Math.PI;
 		
+		LinkedList<Feature> lowerOutlier = new LinkedList<Feature>();
+		LinkedList<Feature> upperOutlier = new LinkedList<Feature>();
+		
+		if (removeOutliers) {
+			int removed = Outlier.doGrubbsTest((LinkedList) peakList, alpha, (LinkedList) lowerOutlier, (LinkedList) upperOutlier);
+		}
+		
 		if (saveListObject) {
-			saveLeafTipList(peakList, cameraType, maxValidY);
+			saveAndCorrectBorderLeafTipList(peakList, lowerOutlier, upperOutlier, cameraType, maxValidY);
 		}
 		
 		if (saveLeafCount) {
-			saveLeafCount(cameraType, cameraPosition, peakList.size(), imageRef);
+			saveLeafCount(cameraType, cameraPosition, peakList.size(), lowerOutlier.size() + upperOutlier.size(), removeOutliers, imageRef);
 		}
 		
 		if (saveAdditionalFeatures) {
@@ -346,13 +355,72 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 					});
 				}
 			}
+			
+			// outlier marking
+			{
+				LinkedList<Feature> outlierList = new LinkedList<>();
+				outlierList.addAll(lowerOutlier);
+				outlierList.addAll(upperOutlier);
+				
+				for (Feature bf : outlierList) {
+					Vector2D pos = bf.getPosition();
+					final Double angle = (Double) bf.getFeature("angle");
+					Vector2D direction = (Vector2D) bf.getFeature("direction");
+					final CameraType cameraType_fin = cameraType;
+					
+					if (pos == null || cameraPosition == null || cameraType == null) {
+						continue;
+					}
+					
+					// correct positions
+					final Vector2D pos_fin = pos;
+					
+					if (searchRadius > 0) {
+						final int searchRadius_fin = searchRadius;
+						
+						getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
+							
+							@Override
+							public Image postProcessMask(Image mask) {
+								int xPos = (int) pos_fin.getX();
+								int yPos = (int) pos.getY();
+								Vector2D vv = direction.subtract(new Vector2D(xPos, yPos));
+								Vector2D d = vv.getNorm() > 0.01 ?
+										vv.normalize()
+												.scalarMultiply((1 + (Math.sqrt(2) - 1) * (1 - Math.abs(Math.cos(2 * angle / 180. * Math.PI)))) * searchRadius_fin)
+										: vv;
+								ImageCanvas t = mask
+										.io()
+										.canvas()
+										.drawCircle((int) pos_fin.getX(), (int) pos_fin.getY(), searchRadius_fin, Color.GRAY.getRGB(), 0.3, 1)
+										.drawLine(xPos, yPos, (int) d.getX() + xPos, (int) d.getY() + yPos, Color.GRAY.getRGB(), 0.3, 1);
+								return t.getImage();
+							}
+							
+							@Override
+							public Image postProcessImage(Image image) {
+								return image;
+							}
+							
+							@Override
+							public CameraType getConfig() {
+								return cameraType_fin;
+							}
+						});
+					}
+				}
+			}
 		}
 	}
 	
-	private void saveLeafCount(CameraType cameraType, CameraPosition cameraPosition, int count, ImageData imageRef) {
+	private void saveLeafCount(CameraType cameraType, CameraPosition cameraPosition, int count, int outlierCount, boolean rmOutlier, ImageData imageRef) {
 		// save leaf count
 		getResultSet().setNumericResult(getBlockPosition(),
 				new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.count"), count, "leaftips", this, imageRef);
+		
+		if (rmOutlier)
+			getResultSet().setNumericResult(getBlockPosition(),
+					new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.outlier.count"), outlierCount, "leaftips", this, imageRef);
 		
 		if (cameraPosition == CameraPosition.SIDE) {
 			boolean isBestAngle = isBestAngle(cameraType);
@@ -368,24 +436,27 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		}
 	}
 	
-	private void saveLeafTipList(LinkedList<Feature> peakList, CameraType cameraType, int maxValidY) {
-		ArrayList<Feature> toRemove = new ArrayList<Feature>();
+	private void saveAndCorrectBorderLeafTipList(LinkedList<Feature> pk, LinkedList<Feature> pl, LinkedList<Feature> pu, CameraType cameraType, int maxValidY) {
 		// remove bordersize from all position-features
-		for (Feature bf : peakList) {
-			HashMap<String, FeatureObject> fm = bf.getFeatureMap();
-			if (bf.getPosition().getY() > maxValidY)
-				toRemove.add(bf);
-			for (FeatureObject fo : fm.values()) {
-				if (fo.featureObjectType == FeatureObjectType.POSITION) {
-					fo.feature = (int) ((Integer) (fo.feature) - borderSize);
-				}
-				if (fo.featureObjectType == FeatureObjectType.VECTOR) {
-					fo.feature = ((Vector2D) fo.feature).add(new Vector2D(-borderSize, -borderSize));
+		for (LinkedList<Feature> peakList : new LinkedList[] { pk, pl, pu }) {
+			ArrayList<Feature> toRemove = new ArrayList<Feature>();
+			for (Feature bf : peakList) {
+				HashMap<String, FeatureObject> fm = bf.getFeatureMap();
+				if (bf.getPosition().getY() > maxValidY)
+					toRemove.add(bf);
+				for (FeatureObject fo : fm.values()) {
+					if (fo.featureObjectType == FeatureObjectType.POSITION) {
+						fo.feature = (int) ((Integer) (fo.feature) - borderSize);
+					}
+					if (fo.featureObjectType == FeatureObjectType.VECTOR) {
+						fo.feature = ((Vector2D) fo.feature).add(new Vector2D(-borderSize, -borderSize));
+					}
 				}
 			}
+			
+			peakList.removeAll(toRemove);
 		}
-		peakList.removeAll(toRemove);
-		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, peakList);
+		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, pk);
 	}
 	
 	private LinkedList<Feature> getPeaksFromBorder(Image img, Image orig, int searchRadius, double fillGradeInPercent) {

@@ -194,6 +194,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 			final int xPos_norm = ltLast.getRealWorldX();
 			final int yPos_norm = ltLast.getRealWorldY();
 			Double angle = null;
+			Object pixels = ltLast.getFeature("pixels");
 			if (ltLast.getFeature("angle") != null)
 				angle = (Double) ltLast.getFeature("angle");
 			
@@ -216,6 +217,16 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 										+ StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".angle"),
 								angle, "degree", this, imageRef);
 			}
+			
+			// if (pixels != null) {
+			// int area = ((ArrayList<PositionAndColor>) pixels).size();
+			// getResultSet()
+			// .setNumericResult(
+			// 0,
+			// new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip."
+			// + StringManipulationTools.formatNumberAddZeroInFront(num, 2) + ".corner.angle"),
+			// 360 * area /, "degree", this, imageRef);
+			// }
 			
 			boolean saveDistToCenter = true;
 			
