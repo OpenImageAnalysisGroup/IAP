@@ -14,7 +14,6 @@ import java.util.Date;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.SystemAnalysis;
-import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
@@ -169,7 +168,7 @@ public class TaskDescription {
 							
 							boolean deleteCompletedJobs = true;
 							if (deleteCompletedJobs)
-								m.batch().delete(batch);				
+								m.batch().delete(batch);
 						} else {
 							MongoDB.saveSystemMessage("INFO: Batch command, processed by " + SystemAnalysisExt.getHostNameNiceNoError()
 									+ " has been claimed by " + bcmd.getOwner()
@@ -225,23 +224,6 @@ public class TaskDescription {
 	
 	public BatchCmd getBatchCmd() {
 		return cmd;
-	}
-	
-	public static void checkForMergePosibility(final MongoDB m, final BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
-		boolean saveOverallDatasetIfPossible = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_merge_batch_results", true);
-		if (saveOverallDatasetIfPossible) {
-			// find out if this computer has most memory of online grid nodes
-			boolean hasMaxMem = true;
-			long myMem = SystemAnalysis.getMemoryMB();
-			for (CloudHost ch : m.batch().getAvailableHosts(5 * 60 * 1000)) {
-				if (ch.getMaxMem() > myMem) {
-					hasMaxMem = false;
-					break;
-				}
-			}
-			if (hasMaxMem)
-				m.processSplitResults().merge(false, statusProvider);
-		}
 	}
 	
 }

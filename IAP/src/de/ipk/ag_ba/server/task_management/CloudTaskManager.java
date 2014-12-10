@@ -158,7 +158,7 @@ public class CloudTaskManager {
 						if (m == null)
 							return;
 						
-						TaskDescription.checkForMergePosibility(m, new BackgroundTaskConsoleLogger());
+						Batch.checkForMergePosibility(m, new BackgroundTaskConsoleLogger());
 						
 						for (BatchCmd batch : m.batch().getScheduledForStart(maxTasks - cpuDesire)) {
 							ExperimentHeaderInterface header = batch.getExperimentHeader();
