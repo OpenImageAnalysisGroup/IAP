@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.MergeCompareRequirements;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.bson.types.ObjectId;
@@ -46,8 +47,8 @@ public class SplitResult {
 		HashSet<TempDataSetDescription> availableTempDatasets = new HashSet<TempDataSetDescription>();
 		HashSet<String> processedSubmissionTimes = new HashSet<String>();
 		for (ExperimentHeaderInterface i : el) {
-			if ((i.getExperimentType() + "").contains("Trash"))
-				continue;
+			// if ((i.getExperimentType() + "").contains("Trash"))
+			// continue;
 			String[] cc = i.getExperimentName().split("§");
 			if (i.getImportusergroup() != null && i.getImportusergroup().equals("Temp") &&
 					(cc.length == 4 || cc.length == 5)) {
@@ -163,7 +164,10 @@ public class SplitResult {
 				mergedExperiment.getHeader().setAttributesFromMap(sourceHeader.getAttributeMap());
 				mergedExperiment.getHeader().setDatabaseId(null);
 			}
-			mergedExperiment.addAndMerge(ei, BackgroundThreadDispatcher.getRE());
+			MergeCompareRequirements mcr = new MergeCompareRequirements();
+			mcr.setCompareSamples(false);
+			mcr.setCompareValues(false);
+			mergedExperiment.addAndMerge(ei, BackgroundThreadDispatcher.getRE(), mcr);
 			System.out.println(" // merged in " + s.getTime() + " ms // " + mergedExperiment.getNumberOfMeasurementValues() + " values in dataset");
 			if (optStatus != null)
 				optStatus.setCurrentStatusText2("Processed " + (nnii - 1) + "/" + tempDataSetDescription.getPartCntI() + ", "

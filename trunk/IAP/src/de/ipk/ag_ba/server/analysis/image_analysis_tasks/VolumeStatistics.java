@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.MergeCompareRequirements;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -112,7 +113,7 @@ public class VolumeStatistics implements ImageAnalysisTask {
 	public ExperimentInterface getOutput() {
 		Experiment res = new Experiment();
 		for (NumericMeasurementInterface nmi : output) {
-			Substance3D.addAndMergeA(res, new MappingData3DPath(nmi, false).getSubstance(), false);
+			Substance3D.addAndMergeA(res, new MappingData3DPath(nmi, false).getSubstance(), false, null, new MergeCompareRequirements());
 		}
 		output.clear();
 		return res;
