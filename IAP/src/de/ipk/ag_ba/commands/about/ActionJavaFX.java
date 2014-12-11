@@ -1,6 +1,5 @@
 package de.ipk.ag_ba.commands.about;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 
 import javafx.animation.Animation;
@@ -29,6 +28,7 @@ import javax.swing.border.BevelBorder;
 
 import org.SystemOptions;
 
+import application.AnimateLogoIAP;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -57,7 +57,7 @@ public class ActionJavaFX extends AbstractNavigationAction {
 	
 	private JComponent getFX() {
 		JFXPanel jp = new JFXPanel();
-		jp.setPreferredSize(new Dimension(800, 600));
+		// jp.setPreferredSize(new Dimension(800, 600));
 		
 		Platform.runLater(() -> {
 			initFX(jp);
@@ -67,7 +67,8 @@ public class ActionJavaFX extends AbstractNavigationAction {
 	}
 	
 	private void initFX(JFXPanel jp) {
-		Scene s = createScene(jp);
+		Scene s = new AnimateLogoIAP().getScene();
+		// createScene(jp);
 		jp.setScene(s);
 	}
 	
