@@ -84,9 +84,9 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		// the subscene contains the 3d rotating earth sphere
 		int offx = 50;
 		int offy = 20;
-		int offxx = -50;
+		int offxx = -20;
 		int offyy = 00;
-		SubScene subscene1 = new SubScene(eaarthScene, offx + 81, offy + height - 5, true, SceneAntialiasing.BALANCED);
+		SubScene subscene1 = new SubScene(eaarthScene, offx + 81 + 200, offy + height - 5, true, SceneAntialiasing.BALANCED);
 		subscene1.setCamera(camera_subscene1);
 		subscene1.setTranslateX(0);
 		subscene1.setFill(Color.BLACK);
@@ -119,7 +119,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 				subscene1, subscene2, subscene3, subscene4);
 		
 		try {
-			object.buildEarth(eaarthScene, -3, 12, 22, 150);
+			object.buildEarth(eaarthScene, -3, 11, 22, 150);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -157,7 +157,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		
 		eaarthScene.getChildren().addAll(Appearance.getPointLight_earth(Color.WHITE, 0, 300));
 		
-		CameraView.buildCamera_subscene(eaarthScene, camera_subscene1, cameraDistanceToEarth, 11, 12);
+		CameraView.buildCamera_subscene(eaarthScene, camera_subscene1, cameraDistanceToEarth - 80, 11, 12);
 		CameraView.buildCamera_subscenes(root_subscene2, camera_subscene2, cameraDistanceToLetter, 0, 0);
 		CameraView.buildCamera_subscenes(root_subscene3, camera_subscene3, cameraDistanceToLetter, 0, 0);
 		CameraView.buildCamera_subscenes(root_subscene4, camera_subscene4, cameraDistanceToLetter, 0, 0);
