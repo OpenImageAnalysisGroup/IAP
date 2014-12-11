@@ -91,7 +91,7 @@ public class SplitResult {
 		return deletedTempDatasets;
 	}
 	
-	private void doMerge(TempDataSetDescription tempDataSetDescription,
+	private ExperimentInterface doMerge(TempDataSetDescription tempDataSetDescription,
 			ArrayList<ExperimentHeaderInterface> knownResults, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			ExperimentReference optPreviousResultsToBeMerged) throws Exception {
 		System.out.println("*****************************");
@@ -226,7 +226,8 @@ public class SplitResult {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Merged Measurements: " + mergedExperiment.getNumberOfMeasurementValues());
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: SAVE COMBINED EXPERIMENT...");
-		m.saveExperiment(mergedExperiment, optStatus == null ? new BackgroundTaskConsoleLogger("", "", true) : optStatus, true, true);
+		ExperimentInterface resExp = m
+				.saveExperiment(mergedExperiment, optStatus == null ? new BackgroundTaskConsoleLogger("", "", true) : optStatus, true, true);
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COMBINED EXPERIMENT HAS BEEN SAVED");
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved combined experiment " + mergedExperiment.getName());
@@ -282,13 +283,17 @@ public class SplitResult {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Completed in " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish) + "");
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COMPLETED");
+		return resExp;
 	}
 	
-	public void merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
-		merge(interactive, optStatus, null);
+	public int merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus, ArrayList<ExperimentReference> newExperiments)
+			throws Exception {
+		return merge(interactive, optStatus, null, newExperiments);
 	}
 	
-	public void merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus, BatchCmd optRefCmd) throws Exception {
+	public int merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus, BatchCmd optRefCmd,
+			ArrayList<ExperimentReference> newExperiments) throws Exception {
+		int nres = 0;
 		DataMappingTypeManager3D.replaceVantedMappingTypeManager();
 		
 		HashSet<TempDataSetDescription> availableTempDatasets = getSplitResultExperimentSets(optRefCmd);
@@ -417,7 +422,6 @@ public class SplitResult {
 				if (optStatus != null)
 					optStatus.setCurrentStatusText1("Processing cancelled");
 				System.out.println(SystemAnalysis.getCurrentTime() + ">Processing cancelled upon user input.");
-				return;
 			} else {
 				if (res[0] instanceof String)
 					addNewTasksIfMissing = !((String) res[0]).contains("n");
@@ -459,14 +463,17 @@ public class SplitResult {
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("About to merge split result datasets");
 						CloudTaskManager.disableWatchDog = true;
-						doMerge(tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
+						ExperimentInterface ne = doMerge(tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
+						newExperiments.add(new ExperimentReference(ne.getHeader()));
 						BlockPipeline.ping();
 						CloudTaskManager.disableWatchDog = false;
+						nres += knownResults.size();
 					} catch (Exception e) {
 						MongoDB.saveSystemErrorMessage("Could not properly merge temporary datasets.", e);
 					}
 				}
 		}
+		return nres;
 	}
 	
 }
