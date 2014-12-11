@@ -22,6 +22,7 @@ import java.util.List;
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.MergeCompareRequirements;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 
@@ -258,7 +259,7 @@ public class SpatialExperimentDataLoader extends TemplateLoader {
 				sample.add(getMeasurementData(tabledata, sample, columnMeasurement, columnList, row, od));
 			condition.add(sample);
 			substancecopy.add(condition);
-			Substance.addAndMergeA(experiment, substancecopy, false);
+			Substance.addAndMergeA(experiment, substancecopy, false, null, new MergeCompareRequirements());
 		}
 		return experiment;
 	}
