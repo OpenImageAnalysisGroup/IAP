@@ -18,7 +18,7 @@ public class BlFilterImagesByPlantID extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public boolean isChangingImages() {
-		return true;
+		return false;
 	}
 	
 	@Override

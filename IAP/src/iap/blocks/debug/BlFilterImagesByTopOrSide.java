@@ -16,7 +16,7 @@ public class BlFilterImagesByTopOrSide extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public boolean isChangingImages() {
-		return true;
+		return false;
 	}
 	
 	@Override
