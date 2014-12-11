@@ -32,6 +32,7 @@ import javax.xml.transform.TransformerException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.RunnableExecutor;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.XMLHelper;
@@ -512,7 +513,7 @@ public class Experiment implements ExperimentInterface {
 	// }
 	
 	public static ExperimentInterface getExperiment(
-			List<org.jdom.Document> documents) {
+			List<org.jdom.Document> documents, RunnableExecutor re) {
 		List<Experiment> results = new ArrayList<Experiment>();
 		for (org.jdom.Document doc : documents)
 			results.add(Substance.getData(doc.getRootElement(), null));
@@ -525,7 +526,7 @@ public class Experiment implements ExperimentInterface {
 			Experiment mainDataset = results.get(0);
 			for (int i = 1; i < results.size(); i++) {
 				ExperimentInterface toBeAdded = results.get(i);
-				mainDataset.addAndMerge(toBeAdded);
+				mainDataset.addAndMerge(toBeAdded, re);
 			}
 			return mainDataset;
 		}
@@ -827,22 +828,26 @@ public class Experiment implements ExperimentInterface {
 		return clone;
 	}
 	
-	/**
-	 * Use experiment.addAndMerge instead.
-	 */
-	@Deprecated
-	public static void addAndMerge(ExperimentInterface result,
-			ExperimentInterface toBeAdded) {
-		result.addAndMerge(toBeAdded);
+	@Override
+	public void addAndMerge(ExperimentInterface toBeAdded) {
+		addAndMerge(toBeAdded, (RunnableExecutor) null);
 	}
 	
 	@Override
-	public void addAndMerge(ExperimentInterface toBeAdded) {
+	public void addAndMerge(ExperimentInterface toBeAdded, RunnableExecutor re) {
 		if (isEmpty() && toBeAdded.isEmpty())
 			header = toBeAdded.getHeader().clone();
-		else
-			for (SubstanceInterface tobeMerged : toBeAdded)
-				Substance.addAndMergeA(this, tobeMerged, false);
+		else {
+			if (re == null)
+				for (SubstanceInterface tobeMerged : toBeAdded)
+					Substance.addAndMergeA(this, tobeMerged, false);
+			else {
+				ArrayList<Runnable> todo = new ArrayList<>();
+				for (SubstanceInterface tobeMerged : toBeAdded)
+					todo.add(() -> Substance.addAndMergeA(this, tobeMerged, false));
+				re.execInParallel(todo, "Merge substance data", null);
+			}
+		}
 	}
 	
 	public static String[] getTimes(ExperimentInterface experimentData) {
