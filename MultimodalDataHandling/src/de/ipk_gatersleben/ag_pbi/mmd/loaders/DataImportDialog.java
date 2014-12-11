@@ -30,6 +30,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.FolderPanel;
 import org.FolderPanel.Iconsize;
+import org.MergeCompareRequirements;
 import org.SystemAnalysis;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
@@ -186,7 +187,7 @@ public class DataImportDialog {
 			
 			if (e1 != null) {
 				sample.addAll(e1);
-				Substance3D.addAndMergeA(experiment, md, false);
+				Substance3D.addAndMergeA(experiment, md, false, null, new MergeCompareRequirements());
 				File f = idf.getFile();
 				if (f != null && f.exists() && f.canRead()) {
 					fs += f.length();
