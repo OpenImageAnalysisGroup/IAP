@@ -192,6 +192,10 @@ public class ZoomedImage extends JPanel implements Scrollable, MouseMotionListen
 		repaint();
 	}
 	
+	public BufferedImage getImage() {
+		return image;
+	}
+	
 	public static JComponent getImageZoomSlider(final ArrayList<ZoomedImage> zoomedImages, Integer oldZoom) {
 		
 		int FPS_MIN = 0;
