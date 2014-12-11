@@ -524,7 +524,7 @@ public class Batch {
 			// find out if this computer has most memory of online grid nodes
 			boolean hasMaxMem = Batch.checkIfHostHasMostMemory(m);
 			if (hasMaxMem)
-				m.processSplitResults().merge(false, statusProvider);
+				m.processSplitResults().merge(false, statusProvider, new ArrayList<>());
 		}
 	}
 	

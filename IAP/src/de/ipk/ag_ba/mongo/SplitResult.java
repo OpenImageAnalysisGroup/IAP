@@ -464,7 +464,7 @@ public class SplitResult {
 							optStatus.setCurrentStatusText1("About to merge split result datasets");
 						CloudTaskManager.disableWatchDog = true;
 						ExperimentInterface ne = doMerge(tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
-						newExperiments.add(new ExperimentReference(ne.getHeader()));
+						newExperiments.add(new ExperimentReference(ne.getHeader(), m));
 						BlockPipeline.ping();
 						CloudTaskManager.disableWatchDog = false;
 						nres += knownResults.size();
