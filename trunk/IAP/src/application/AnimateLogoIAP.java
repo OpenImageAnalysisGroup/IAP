@@ -61,7 +61,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	// build all necessary components in the scene
 	private Scene buildScene(double width, double height) {
 		
-		int STAR_COUNT = 500;
+		int STAR_COUNT = 1500;
 		boolean star = false;
 		Rectangle[] nodes = new Rectangle[STAR_COUNT];
 		double[] angles = new double[STAR_COUNT];
@@ -75,9 +75,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		else
 			root = new Pane();
 		// define main scene which contains the rectangle with white border
-		Scene scene = new Scene(root, width, height, false, SceneAntialiasing.DISABLED);
-		// scene.getStylesheets().add("application/application.css");
-		scene.setFill(Color.BLACK);
+		Scene scene = new Scene(root, width, height, Color.BLACK);
 		
 		if (star)
 			prepareStarAnim(scene, STAR_COUNT, nodes, angles, sx, sy, ss);
@@ -130,7 +128,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 			animTime = 1000;
 		if (animTime > 10000)
 			animTime = 10000;
-		double ts = animTime / 10000d;
+		double ts = animTime / 12000d;
 		int start = (int) (65 * 7 * ts + 700 * ts);
 		int step = (int) (60 * 7 * ts);
 		int delay = (int) (70 * 7 * ts);
@@ -185,7 +183,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		// define main scene which contains the rectangle with white border
 		Scene scene = new Scene(root, width, height, false, SceneAntialiasing.DISABLED);
 		// scene.getStylesheets().add("application/application.css");
-		scene.setFill(Color.BLACK);
+		// scene.setFill(Color.BLACK);
 		
 		if (star)
 			prepareStarAnim(scene, STAR_COUNT, nodes, angles, sx, sy, ss);
@@ -265,7 +263,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 			new AnimationTimer() {
 				@Override
 				public void handle(long now) {
-					final double width = 260;// 0.5 * s.getWidth();
+					final double width = 00;// 0.5 * s.getWidth();
 					final double height = 130;// 0.5 * s.getHeight();
 					final double radius = Math.sqrt(2) * Math.max(s.getWidth(), s.getHeight());
 					for (int i = 0; i < STAR_COUNT; i++) {
@@ -273,7 +271,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 						double angle = angles[i];
 						long t = ((now - start[i]) / 2) % 1000000000;
 						double d = t / 2 * radius / 1000000000.0;
-						double offX = i < STAR_COUNT / 3 ? 0 : (i < STAR_COUNT * 2 / 3 ? 100 : 200);
+						double offX = i < STAR_COUNT / 3 ? 0 : (i < STAR_COUNT * 2 / 3 ? 150 : 280);
 						// node.setTranslateX(Math.cos(angle) * d + width + sx[i] + offX);
 						// node.setTranslateY(Math.sin(angle) * d + height + sy[i]);
 						node.setTranslateX(
@@ -292,7 +290,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		Random random1 = new Random();
 		Random random2 = new Random();
 		Random random3 = new Random();
-		int bound = 400000000;
+		int bound = 200000000;
 		for (int i = 0; i < STAR_COUNT / 3; i++) {
 			random1.nextInt(bound);
 			random1.nextInt(bound);
@@ -304,8 +302,8 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 			angles[i] = 2.0 * Math.PI * random1.nextDouble();
 			start[i] =
 					i < STAR_COUNT / 3 ? random1.nextInt(bound) : (i < (STAR_COUNT * 2) / 3 ? random2.nextInt(bound) : random3.nextInt(bound));
-			sx[i] = 25 + random1.nextDouble() * 60 - 30;
-			sy[i] = random1.nextDouble() * 60 - 30;
+			sx[i] = random1.nextDouble() * 300;
+			sy[i] = random1.nextDouble() * 100 - 50;
 		}
 		return new Group(nodes);
 	}
@@ -314,7 +312,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	public void start(Stage primaryStage) {
 		
 		// output window as stage
-		final double STAGEWIDTH = 601;
+		final double STAGEWIDTH = 621;
 		final double STAGEHEIGHT = 261;
 		
 		Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -388,6 +386,8 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	private void initFX(JFXPanel jp) {
 		Scene s = buildScene(STAGEWIDTH, STAGEHEIGHT);
 		// s.getRoot().setPickOnBounds(true);
+		s.setFill(Color.BLACK);
+		
 		jp.setScene(s);
 		this.mainScene = s;
 	}
@@ -426,14 +426,14 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	public Scene getScene() {
 		
 		Scene s = buildScene(STAGEWIDTH, STAGEHEIGHT);
-		
+		s.setFill(Color.BLACK);
 		return s;
 	}
 	
 	public Scene getScene2() {
 		
 		Scene s = buildScene2(STAGEWIDTH, STAGEHEIGHT);
-		
+		s.setFill(Color.BLACK);
 		return s;
 	}
 }
