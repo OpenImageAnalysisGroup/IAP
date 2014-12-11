@@ -2,6 +2,8 @@ package application;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -17,7 +19,6 @@ import javafx.stage.StageStyle;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.border.BevelBorder;
 
 import util.Appearance;
 import util.CameraView;
@@ -93,11 +94,27 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		
 		object.buildEarth(root_subscene1);
 		
-		object.buildSingleLetter(root_subscene2, "I.fxml", 0.15, 250, 333, -90, -2.01, 0, 90, 80, 333);
-		object.buildSingleLetter(root_subscene3, "A.fxml", 0.25, 500, 666, -85, -2.75, 0, 90, 130, 333);
-		object.buildSingleLetter(root_subscene4, "P.fxml", 0.35, 833, 999, -90, -2.7, 0, 85, 240, 333);
+		int start = 65;
+		int step = 50;
+		int delay = 20;
+		int add = 1;
+		// Group group, String fxmlFile, double rate, int rotFromTime, int rotToTime, double angleStart, double xpos,
+		// double angleFrom, double angleTo, double colorFadeFrom, double colorFadeTo
+		object.buildSingleLetter(root_subscene2, "I.fxml", 0.15,
+				start + 3 * step + 3 * delay, start + (4 + add) * step + 3 * delay,
+				-90, -2.01,
+				0, 90,
+				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay);
+		object.buildSingleLetter(root_subscene3, "A.fxml", 0.15,
+				start + 4 * step + 4 * delay, start + (5 + add) * step + 4 * delay,
+				-85, -2.75, 0, 90,
+				start + 1 * step + 1 * delay, start + (2 + add) * step + 1 * delay);
+		object.buildSingleLetter(root_subscene4, "P.fxml", 0.15,
+				start + 5 * step + 5 * delay, start + (6 + add) * step + 4 * delay,
+				-90, -2.7, 0, 85,
+				start + 2 * step + 2 * delay, start + (3 + add) * step + 2 * delay);
 		
-		root_subscene1.getChildren().addAll(Appearance.getPointLight_earth(Color.WHITE, 50, 65));
+		root_subscene1.getChildren().addAll(Appearance.getPointLight_earth(Color.WHITE, 0, 65));
 		
 		CameraView.buildCamera_subscene(root_subscene1, camera_subscene1, cameraDistanceToEarth, 11, 12);
 		CameraView.buildCamera_subscenes(root_subscene2, camera_subscene2, cameraDistanceToLetter + 73, 0, 0);
@@ -130,11 +147,46 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	final double STAGEHEIGHT = 261;
 	private FXsplash jf;
 	private Scene mainScene;
+	protected boolean keep;
 	
-	public JComponent getFX(boolean directInit) {
+	public JComponent getFX(boolean directInit, boolean undecorated) {
 		JFXPanel jp = new JFXPanel();
-		jp.setPreferredSize(new Dimension(800, 600));
-		jp.setSize(new Dimension(800, 600));
+		if (undecorated)
+			jp.addMouseListener(new MouseListener() {
+				
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mousePressed(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mouseExited(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					AnimateLogoIAP.this.hide();
+					ProgressWindow progressWindow = new AnimateLogoIAP();
+					progressWindow.show(false);
+				}
+			});
+		jp.setPreferredSize(new Dimension((int) STAGEWIDTH, (int) STAGEHEIGHT));
+		// jp.setSize(new Dimension(800, 600));
 		
 		if (directInit) {
 			initFX(jp);
@@ -142,26 +194,46 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 			Platform.runLater(() -> {
 				initFX(jp);
 			});
-		jp.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
+		jp.setBorder(BorderFactory.createLineBorder(java.awt.Color.DARK_GRAY));
+		// jp.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
 		return jp;
 	}
 	
 	private void initFX(JFXPanel jp) {
 		Scene s = buildScene(STAGEWIDTH, STAGEHEIGHT);
+		// s.getRoot().setPickOnBounds(true);
 		jp.setScene(s);
 		this.mainScene = s;
 	}
 	
 	@Override
-	public void show() {
-		this.jf = new FXsplash((int) STAGEWIDTH, (int) STAGEHEIGHT, getFX(false));
-		jf.setTitle("Initialize Application");
+	public void show(boolean undecorated) {
+		this.jf = new FXsplash((int) STAGEWIDTH, (int) STAGEHEIGHT, getFX(false, undecorated), undecorated);
+		// center on display
+		Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
+		int w = jf.getWidth();
+		int h = jf.getHeight();
+		jf.setLocation((screenDim.width - w) / 2,
+				(screenDim.height - h) / 2);
+		
 		jf.setVisible(true);
+		
+		// center on display
+		jf.setLocation((screenDim.width - w) / 2,
+				(screenDim.height - h) / 2);
+		
 	}
 	
 	@Override
 	public void hide() {
-		jf.setVisible(false);
-		jf.dispose();
+		if (!jf.isVisible())
+			return;
+		if (keep) {
+			// jf.setVisible(false);
+			// jf.dispose();
+		} else {
+			jf.setVisible(false);
+			// jf.dispose();
+		}
 	}
 }
