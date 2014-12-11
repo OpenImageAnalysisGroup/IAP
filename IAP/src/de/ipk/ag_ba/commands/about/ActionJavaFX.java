@@ -22,9 +22,7 @@ import javafx.scene.shape.Shape3D;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.border.BevelBorder;
 
 import org.SystemOptions;
 
@@ -62,13 +60,13 @@ public class ActionJavaFX extends AbstractNavigationAction {
 		Platform.runLater(() -> {
 			initFX(jp);
 		});
-		jp.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
+		// jp.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
 		return jp;
 	}
 	
 	private void initFX(JFXPanel jp) {
 		
-		Scene s = new AnimateLogoIAP().getScene();
+		Scene s = new AnimateLogoIAP().getScene2();
 		
 		// createScene(jp);
 		jp.setScene(s);
