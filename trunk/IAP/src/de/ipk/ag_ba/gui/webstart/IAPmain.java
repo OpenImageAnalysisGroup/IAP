@@ -46,6 +46,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.plugin.view.View;
 import org.graffiti.session.Session;
 
+import application.AnimateLogoIAP;
 import bsh.Interpreter;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
@@ -112,6 +113,10 @@ public class IAPmain extends JApplet {
 		setRunMode(IAPrunMode.SWING_MAIN);
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Initialize IAP start... (run-mode: " + getRunMode() + ")");
+		
+		ProgressWindow progressWindow = new AnimateLogoIAP();
+		progressWindow.show();
+		
 		String title = SystemOptions.getInstance().getString("IAP", "window_title",
 				"IAP - The Integrated Analysis Platform") + "";
 		
@@ -139,6 +144,8 @@ public class IAPmain extends JApplet {
 		jf.addWindowListener(new WindowListener() {
 			@Override
 			public void windowOpened(WindowEvent e) {
+				if (progressWindow != null)
+					progressWindow.hide();
 			}
 			
 			@Override
@@ -179,6 +186,11 @@ public class IAPmain extends JApplet {
 			// jf.setExtendedState(jf.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 			jf.setBounds(0, 0, dim.width, dim.height);
+		} else {
+			Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
+			jf.setSize((int) (screenDim.width * 0.75), (int) (screenDim.height * 0.75));
+			jf.setLocation((screenDim.width - jf.getWidth()) / 2,
+					(screenDim.height - jf.getHeight()) / 2);
 		}
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SystemOptions.getInstance().addChangeListener("IAP", "window_title", new Runnable() {
