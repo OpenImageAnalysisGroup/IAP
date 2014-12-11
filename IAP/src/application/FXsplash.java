@@ -22,6 +22,8 @@ public class FXsplash extends JFrame {
 	private void init(int width, int height, JComponent mainGUI, boolean undecorated) {
 		setBackground(Color.BLACK);
 		JComponent contentPane = new JPanel();
+		contentPane.setOpaque(true);
+		contentPane.setBackground(Color.BLACK);
 		if (undecorated) {
 			setResizable(undecorated);
 			setUndecorated(undecorated);
