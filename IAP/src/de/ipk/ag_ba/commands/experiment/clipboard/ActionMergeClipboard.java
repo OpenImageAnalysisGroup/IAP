@@ -3,6 +3,7 @@ package de.ipk.ag_ba.commands.experiment.clipboard;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.MergeCompareRequirements;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 
@@ -74,7 +75,7 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 					else
 						ci.setGrowthconditions(eCopy.getName());
 				}
-			e.addAndMerge(eCopy, BackgroundThreadDispatcher.getRE());
+			e.addAndMerge(eCopy, BackgroundThreadDispatcher.getRE(), new MergeCompareRequirements());
 			iii++;
 			if (status != null) {
 				status.setCurrentStatusText1("Merged dataset " + iii + "/" + nTodo);

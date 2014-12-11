@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.MergeCompareRequirements;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -11,6 +12,7 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
@@ -71,7 +73,7 @@ public class ActionRemerge extends AbstractNavigationAction implements ActionDat
 					optStatus.setCurrentStatusText2("Process substance " + +idx + "/" + max);
 				if (optStatus != null)
 					optStatus.setCurrentStatusValueFine(100d / max * idx);
-				Substance3D.addAndMergeA(e, s, false);
+				Substance3D.addAndMergeA(e, s, false, BackgroundThreadDispatcher.getRE(), new MergeCompareRequirements());
 			}
 			if (optStatus != null)
 				optStatus.setCurrentStatusText1("Created unified experiment");
