@@ -15,7 +15,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.border.BevelBorder;
 
 import util.Appearance;
 import util.CameraView;
@@ -43,11 +45,15 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	private final double cameraDistanceToLetter = -80;
 	private final Objects object = new Objects();
 	
+	public AnimateLogoIAP() {
+		// empty
+	}
+	
 	// build all necessary components in the scene
 	private Scene buildScene(double width, double height) {
 		
 		// define main scene which contains the rectangle with white border
-		Scene scene = new Scene(root, width, height, false, SceneAntialiasing.BALANCED);
+		Scene scene = new Scene(root, width, height, false, SceneAntialiasing.DISABLED);
 		scene.getStylesheets().add("application/application.css");
 		scene.setFill(Color.BLACK);
 		
@@ -125,14 +131,18 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	private FXsplash jf;
 	private Scene mainScene;
 	
-	private JComponent getFX() {
+	public JComponent getFX(boolean directInit) {
 		JFXPanel jp = new JFXPanel();
 		jp.setPreferredSize(new Dimension(800, 600));
+		jp.setSize(new Dimension(800, 600));
 		
-		Platform.runLater(() -> {
+		if (directInit) {
 			initFX(jp);
-		});
-		// jp.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
+		} else
+			Platform.runLater(() -> {
+				initFX(jp);
+			});
+		jp.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, java.awt.Color.LIGHT_GRAY, java.awt.Color.DARK_GRAY));
 		return jp;
 	}
 	
@@ -144,7 +154,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	
 	@Override
 	public void show() {
-		this.jf = new FXsplash((int) STAGEWIDTH, (int) STAGEHEIGHT, getFX());
+		this.jf = new FXsplash((int) STAGEWIDTH, (int) STAGEHEIGHT, getFX(false));
 		jf.setTitle("Initialize Application");
 		jf.setVisible(true);
 	}

@@ -1,16 +1,23 @@
 package de.ipk.ag_ba.commands.about;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JPanel;
 
 import org.StringManipulationTools;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import application.AnimateLogoIAP;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.workflow.WorkflowHelper;
@@ -67,6 +74,26 @@ public class ActionAbout extends AbstractNavigationAction {
 				+ "<tr><td>" + f + "System Load" + fe + "</td><td>" + f + StringManipulationTools.formatNumber(SystemAnalysisExt.getRealSystemCpuLoad(), 1) + fe
 				+ "</td></tr></table>");
 		MainPanelComponent mp = new MainPanelComponent(ll);// , new Color(0, 0, 20));
+		
+		boolean addThreeD = false;
+		if (addThreeD) {
+			ArrayList<JComponent> infos = new ArrayList<JComponent>();
+			infos.add(new AnimateLogoIAP().getFX(false));
+			
+			for (String txt : ll) {
+				final JEditorPane jep = MainPanelComponent.getTextComponent(Color.WHITE, txt);
+				infos.add(jep);
+			}
+			JComponent jp = new JPanel(new FlowLayoutImproved(FlowLayout.LEFT, 20, 20));
+			jp.setOpaque(false);
+			
+			for (JComponent jc : infos)
+				jp.add(jc);
+			
+			jp.validate();
+			
+			mp = new MainPanelComponent(jp);
+		}
 		return mp;
 	}
 	
