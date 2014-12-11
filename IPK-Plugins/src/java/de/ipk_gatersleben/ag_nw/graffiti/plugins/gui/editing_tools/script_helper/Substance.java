@@ -19,6 +19,8 @@ import java.util.Map.Entry;
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.MergeCompareRequirements;
+import org.RunnableExecutor;
 import org.StringManipulationTools;
 import org.graffiti.plugin.XMLHelper;
 import org.jdom.Attribute;
@@ -193,7 +195,7 @@ public class Substance implements SubstanceInterface {
 	}
 	
 	public static void addAndMergeB(ExperimentInterface result, Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample,
-			boolean ignoreSnapshotFineTime) {
+			boolean ignoreSnapshotFineTime, MergeCompareRequirements mcr) {
 		SubstanceInterface targetSubstance = null;
 		SubstanceInterface substanceWithNewData;
 		synchronized (result) {
@@ -212,7 +214,7 @@ public class Substance implements SubstanceInterface {
 		}
 		processCondition(result, targetSubstance,
 				newMeasurementsOfSingleSample.iterator().next().getParentSample().getParentCondition(),
-				ignoreSnapshotFineTime, true, newMeasurementsOfSingleSample);
+				ignoreSnapshotFineTime, true, newMeasurementsOfSingleSample, mcr);
 	}
 	
 	public static void addAndMergeD(ExperimentInterface result, NumericMeasurementInterface newMeasurement, boolean ignoreSnapshotFineTime) {
@@ -247,23 +249,35 @@ public class Substance implements SubstanceInterface {
 		processCondition(result, targetSubstance, newMeasurement.getParentSample().getParentCondition(), ignoreSnapshotFineTime, true, newMeasurement);
 	}
 	
-	public static void addAndMergeA(ExperimentInterface result, SubstanceInterface substanceWithNewData, boolean ignoreSnapshotFineTime) {
-		for (ConditionInterface ci : substanceWithNewData)
-			for (SampleInterface si : ci)
-				addAndMergeB(result, si, ignoreSnapshotFineTime);
+	public static void addAndMergeA(ExperimentInterface result, SubstanceInterface substanceWithNewData,
+			boolean ignoreSnapshotFineTime, RunnableExecutor re, MergeCompareRequirements mcr) {
+		if (re == null) {
+			for (ConditionInterface ci : substanceWithNewData)
+				for (SampleInterface si : ci)
+					addAndMergeB(result, si, ignoreSnapshotFineTime, mcr);
+		} else {
+			ArrayList<Runnable> todo = new ArrayList<>();
+			for (ConditionInterface ci : substanceWithNewData)
+				todo.add(() -> {
+					for (SampleInterface si : ci)
+						addAndMergeB(result, si, ignoreSnapshotFineTime, mcr);
+				});
+			re.execInParallel(todo, "Merge condition data", null);
+		}
 	}
 	
 	private static void processCondition(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
 			ConditionInterface condition,
 			boolean ignoreSnapshotFineTime, boolean forSureNewMeasurement,
-			Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample) {
+			Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample, MergeCompareRequirements mcr) {
 		ConditionInterface targetCondition = null;
 		synchronized (targetSubstance) {
-			for (ConditionInterface cond : targetSubstance)
-				if (cond.equals(condition)) {
-					targetCondition = cond;
-					break;
-				}
+			if (mcr.needsCompareConditions())
+				for (ConditionInterface cond : targetSubstance)
+					if (cond.equals(condition)) {
+						targetCondition = cond;
+						break;
+					}
 			
 			if (targetCondition == null) {
 				// completely new substance with all new data
@@ -275,7 +289,7 @@ public class Substance implements SubstanceInterface {
 				newMeasurementsOfSingleSample.iterator().next().getParentSample(),
 				ignoreSnapshotFineTime,
 				forSureNewMeasurement,
-				newMeasurementsOfSingleSample);
+				newMeasurementsOfSingleSample, mcr);
 	}
 	
 	private static void processCondition(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
@@ -306,14 +320,25 @@ public class Substance implements SubstanceInterface {
 	private static void processSample(ExperimentInterface targetExperiment, SubstanceInterface targetSubstance,
 			ConditionInterface targetCondition,
 			SampleInterface sample, boolean ignoreSnapshotFineTime, boolean forSureNewMeasurement,
-			Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample) {
+			Collection<NumericMeasurementInterface> newMeasurementsOfSingleSample, MergeCompareRequirements mcr) {
 		SampleInterface targetSample = null;
 		synchronized (targetCondition) {
-			for (SampleInterface s : targetCondition)
-				if (s.compareTo(sample, ignoreSnapshotFineTime) == 0) {
-					targetSample = s;
-					break;
-				}
+			int day = sample.getTime();
+			if (mcr.needsCompareSamples())
+				for (SampleInterface s : targetCondition)
+					if (s.getTime() == day) {
+						if (ignoreSnapshotFineTime) {
+							targetSample = s;
+							break;
+						} else {
+							long a = s.getSampleFineTimeOrRowId();
+							long b = sample.getSampleFineTimeOrRowId();
+							if (a == b) {
+								targetSample = s;
+								break;
+							}
+						}
+					}
 			if (targetSample == null) {
 				// completely new substance with all new data
 				targetSample = sample.clone(targetCondition);
@@ -328,7 +353,7 @@ public class Substance implements SubstanceInterface {
 		}
 		synchronized (targetSample) {
 			for (NumericMeasurementInterface newMeasurement : newMeasurementsOfSingleSample)
-				if (targetSample != sample && (forSureNewMeasurement || !targetSample.contains(newMeasurement))) {
+				if (targetSample != sample && (!mcr.needsCompareSamples() || forSureNewMeasurement || !targetSample.contains(newMeasurement))) {
 					NumericMeasurementInterface nmn = newMeasurement.clone(targetSample);
 					targetSample.add(nmn);
 				}

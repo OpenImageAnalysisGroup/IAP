@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.MergeCompareRequirements;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.GraphElement;
 import org.graffiti.plugin.algorithm.AbstractAlgorithm;
@@ -133,7 +134,7 @@ public class ExtractMappingDataAlgorithm extends AbstractAlgorithm {
 		if (onlyOne) {
 			ExperimentInterface all = new Experiment();
 			for (ExperimentInterface e : allData.values())
-				all.addAndMerge(e, re);
+				all.addAndMerge(e, re, new MergeCompareRequirements());
 			ArrayList<ExperimentInterface> lst = new ArrayList<ExperimentInterface>();
 			lst.add(all.clone());
 			return lst;

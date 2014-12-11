@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import javax.xml.transform.TransformerException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.MergeCompareRequirements;
 import org.RunnableExecutor;
 import org.jdom.JDOMException;
 
@@ -142,5 +143,5 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	
 	public void mergeBiologicalReplicates(BackgroundTaskStatusProviderSupportingExternalCall status);
 	
-	public void addAndMerge(ExperimentInterface ei, RunnableExecutor re);
+	public void addAndMerge(ExperimentInterface ei, RunnableExecutor re, MergeCompareRequirements mcr);
 }
