@@ -72,7 +72,7 @@ public class Appearance {
 		PointLight light_p = new PointLight();
 		
 		light_p.setTranslateX(1900);
-		light_p.setTranslateY(-800);
+		light_p.setTranslateY(-3800);
 		light_p.setTranslateZ(-15000);
 		
 		Timeline rot = new Timeline();
