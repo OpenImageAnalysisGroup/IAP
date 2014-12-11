@@ -33,7 +33,7 @@ import de.ipk.ag_ba.gui.webstart.ProgressWindow;
 
 public class AnimateLogoIAP extends Application implements ProgressWindow {
 	
-	private final Pane root = new Pane();
+	private Pane root;
 	private final Group root_subscene1 = new Group();
 	private final Group root_subscene2 = new Group();
 	private final Group root_subscene3 = new Group();
@@ -51,9 +51,16 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		// empty
 	}
 	
-	// build all necessary components in the scene
 	private Scene buildScene(double width, double height) {
-		
+		return buildScene(width, height, null);
+	}
+	
+	// build all necessary components in the scene
+	private Scene buildScene(double width, double height, Group group) {
+		if (group != null)
+			root = new Pane(group);
+		else
+			root = new Pane();
 		// define main scene which contains the rectangle with white border
 		Scene scene = new Scene(root, width, height, false, SceneAntialiasing.DISABLED);
 		scene.getStylesheets().add("application/application.css");
@@ -68,17 +75,17 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		
 		SubScene subscene2 = new SubScene(root_subscene2, 80, 212, true, SceneAntialiasing.BALANCED);
 		subscene2.setCamera(camera_subscene2);
-		subscene2.setTranslateX(205);
+		subscene2.setTranslateX(205 + 20);
 		subscene2.setTranslateY(35);
 		
 		SubScene subscene3 = new SubScene(root_subscene3, 150, 212, true, SceneAntialiasing.BALANCED);
 		subscene3.setCamera(camera_subscene3);
-		subscene3.setTranslateX(268);
+		subscene3.setTranslateX(268 + 20);
 		subscene3.setTranslateY(35);
 		
 		SubScene subscene4 = new SubScene(root_subscene4, 150, 212, true, SceneAntialiasing.BALANCED);
 		subscene4.setCamera(camera_subscene4);
-		subscene4.setTranslateX(370);// 408);
+		subscene4.setTranslateX(370 + 20);// 408);
 		subscene4.setTranslateY(35);
 		root.setScaleX(sc);
 		root.setScaleY(sc);
@@ -140,8 +147,8 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		launch(args);
 	}
 	
-	final double STAGEWIDTH = 601;
-	final double STAGEHEIGHT = 261;
+	final double STAGEWIDTH = 580;// 601;
+	final double STAGEHEIGHT = 260;// 1;
 	private FXsplash jf;
 	private Scene mainScene;
 	protected boolean keep;
@@ -234,7 +241,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		}
 	}
 	
-	public Scene getScene() {
-		return buildScene(STAGEWIDTH, STAGEHEIGHT);
+	public Scene getScene(Group group) {
+		return buildScene(STAGEWIDTH, STAGEHEIGHT, group);
 	}
 }
