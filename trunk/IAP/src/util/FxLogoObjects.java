@@ -21,7 +21,6 @@ public class FxLogoObjects {
 	// create the rotating earth
 	public void buildEarth(Group group, double x, double y, double r, int div) throws IOException {
 		
-		Group gsphere = new Group();
 		Sphere s1 = new Sphere(r, div);
 		s1.setTranslateX(x);
 		s1.setTranslateY(y);
@@ -29,11 +28,9 @@ public class FxLogoObjects {
 		s1.setRotate(-90);
 		s1.setMaterial(Appearance.getMaterial4());
 		
-		gsphere.getChildren().addAll(s1);
-		
 		// pane for rotation
 		Group branch_rot_earth = new Group();
-		branch_rot_earth.getChildren().addAll(gsphere);
+		branch_rot_earth.getChildren().addAll(s1);
 		branch_rot_earth.setRotationAxis(Rotate.X_AXIS);
 		int sw = 0;
 		Timeline rot_earth = MakeAnimation.rotateTimeline(branch_rot_earth, 1, 0, 4 * 60 * 1000, Timeline.INDEFINITE, sw, 360 + sw);
@@ -65,7 +62,7 @@ public class FxLogoObjects {
 		
 		m.setDrawMode(DrawMode.FILL);
 		m.setCullFace(CullFace.NONE);
-		m.setMaterial(new PhongMaterial(Color.rgb(113, 103, 192).darker()));
+		m.setMaterial(new PhongMaterial(Color.rgb(103, 103, 192).darker()));
 		// m.setMaterial(new PhongMaterial(Color.rgb(123, 93, 172)));
 		
 		m.setDepthTest(DepthTest.ENABLE);
