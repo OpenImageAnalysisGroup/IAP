@@ -1,6 +1,7 @@
 package util;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
@@ -15,17 +16,15 @@ import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 
-import org.ErrorMsg;
-
-public class Objects {
+public class FxLogoObjects {
 	
 	// create the rotating earth
-	public void buildEarth(Group group) {
+	public void buildEarth(Group group, double x, double y, double r, int div) throws IOException {
 		
 		Group gsphere = new Group();
-		Sphere s1 = new Sphere(12, 50);
-		s1.setTranslateX(12);
-		s1.setTranslateY(12);
+		Sphere s1 = new Sphere(r, div);
+		s1.setTranslateX(x);
+		s1.setTranslateY(y);
 		s1.setRotationAxis(Rotate.Z_AXIS);
 		s1.setRotate(-90);
 		s1.setMaterial(Appearance.getMaterial4());
@@ -37,15 +36,15 @@ public class Objects {
 		branch_rot_earth.getChildren().addAll(gsphere);
 		branch_rot_earth.setRotationAxis(Rotate.X_AXIS);
 		int sw = 0;
-		Timeline rot_earth = MakeAnimation.rotateTimeline(branch_rot_earth, 0.035 / 1.4, 0, 4000, Timeline.INDEFINITE, sw, 360 + sw);
-		// Timeline rot_earth = MakeAnimation.rotateTimeline(branch_rot_earth,0.2, 0,25,Timeline.INDEFINITE,0,360);
+		Timeline rot_earth = MakeAnimation.rotateTimeline(branch_rot_earth, 1, 0, 4 * 60 * 1000, Timeline.INDEFINITE, sw, 360 + sw);
 		rot_earth.playFromStart();
 		
 		group.getChildren().add(branch_rot_earth);
 		
 	}
 	
-	public void buildSingleLetter(Group group, String fxmlFile, double rate, int rotFromTime, int rotToTime, double angleStart, double xpos,
+	public void buildSingleLetter(Group group, String fxmlFile, double rate, double xpos, double ypos, double zpos,
+			double angleStart, int rotFromTime, int rotToTime,
 			double angleFrom, double angleTo, double colorFadeFrom, double colorFadeTo) {
 		
 		Group mv = new Group();
@@ -53,25 +52,27 @@ public class Objects {
 		MeshView m = new MeshView();
 		
 		try {
-			m = FXMLLoader.load(getClass().getResource("../util/fxml/" + fxmlFile));
-		} catch (IOException e) {
-			ErrorMsg.addErrorMessage(e);
+			InputStream s = new Appearance().getClass().getResource("fxml/" + fxmlFile).openStream();
+			m = new FXMLLoader().load(s);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
-		PointLight pl = Appearance.getPointLight_letter(
+		PointLight pl = Appearance.getPointLight_letter(rate,
 				// Color.rgb(123, 93, 172),
 				Color.WHITE,
 				colorFadeFrom, colorFadeTo);
 		
 		m.setDrawMode(DrawMode.FILL);
 		m.setCullFace(CullFace.NONE);
-		m.setMaterial(new PhongMaterial(Color.rgb(123, 93, 172)));
+		m.setMaterial(new PhongMaterial(Color.rgb(113, 103, 192).darker()));
+		// m.setMaterial(new PhongMaterial(Color.rgb(123, 93, 172)));
 		
 		m.setDepthTest(DepthTest.ENABLE);
 		
 		mv.setTranslateX(xpos);
-		mv.setTranslateY(2);
-		mv.setTranslateZ(0);
+		mv.setTranslateY(ypos);
+		mv.setTranslateZ(zpos);
 		mv.setRotationAxis(Rotate.Y_AXIS);
 		mv.setRotate(angleStart);
 		
