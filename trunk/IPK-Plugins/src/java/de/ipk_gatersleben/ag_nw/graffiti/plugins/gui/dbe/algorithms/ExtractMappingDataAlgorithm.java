@@ -33,6 +33,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProvi
  */
 public class ExtractMappingDataAlgorithm extends AbstractAlgorithm {
 	
+	@Override
 	public String getName() {
 		return "Extract Mapped Data";
 	}
@@ -53,7 +54,7 @@ public class ExtractMappingDataAlgorithm extends AbstractAlgorithm {
 	@Override
 	public Parameter[] getParameters() {
 		return new Parameter[] { new BooleanParameter(onlyOne, "Extract single experiment",
-							"<html>If enabled, all experiments will be merged together") };
+				"<html>If enabled, all experiments will be merged together") };
 	}
 	
 	@Override
@@ -66,13 +67,15 @@ public class ExtractMappingDataAlgorithm extends AbstractAlgorithm {
 	 * (non-Javadoc)
 	 * @see org.graffiti.plugin.algorithm.Algorithm#execute()
 	 */
+	@Override
 	public void execute() {
 		// graph.getListenerManager().transactionStarted(this);
 		final Collection<GraphElement> workNodes = getSelectedOrAllGraphElements();
 		final BackgroundTaskStatusProviderSupportingExternalCall status =
-							new BackgroundTaskStatusProviderSupportingExternalCallImpl("Initialize...", "");
+				new BackgroundTaskStatusProviderSupportingExternalCallImpl("Initialize...", "");
 		if (workNodes.size() > 0)
 			BackgroundTaskHelper.issueSimpleTask(getName(), "Initialize...", new Runnable() {
+				@Override
 				public void run() {
 					status.setCurrentStatusValue(-1);
 					status.setCurrentStatusText1("Extracting mapped data...");
@@ -83,7 +86,7 @@ public class ExtractMappingDataAlgorithm extends AbstractAlgorithm {
 						status.setCurrentStatusText2("Getting mapped data from elements");
 						status.setCurrentStatusValue(0);
 						
-						for (ExperimentInterface e : getExperiments(workNodes, onlyOne, status)) {
+						for (ExperimentInterface e : getExperiments(workNodes, onlyOne, status, null)) {
 							String expname = e.getName();
 							if (expname == null) {
 								ErrorMsg.addErrorMessage("Error occured: could not determine experiment name!");
@@ -109,7 +112,7 @@ public class ExtractMappingDataAlgorithm extends AbstractAlgorithm {
 	}
 	
 	public static Collection<ExperimentInterface> getExperiments(Collection<GraphElement> workNodes, boolean onlyOne,
-			BackgroundTaskStatusProviderSupportingExternalCall status) {
+			BackgroundTaskStatusProviderSupportingExternalCall status, org.RunnableExecutor re) {
 		HashMap<String, ExperimentInterface> allData = new HashMap<String, ExperimentInterface>();
 		for (GraphElement ge : workNodes) {
 			if (status != null && status.wantsToStop())
@@ -130,7 +133,7 @@ public class ExtractMappingDataAlgorithm extends AbstractAlgorithm {
 		if (onlyOne) {
 			ExperimentInterface all = new Experiment();
 			for (ExperimentInterface e : allData.values())
-				all.addAndMerge(e);
+				all.addAndMerge(e, re);
 			ArrayList<ExperimentInterface> lst = new ArrayList<ExperimentInterface>();
 			lst.add(all.clone());
 			return lst;
