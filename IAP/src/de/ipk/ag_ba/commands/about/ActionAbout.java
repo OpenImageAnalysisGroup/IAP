@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import org.StringManipulationTools;
 import org.graffiti.plugin.io.resources.IOurl;
 
-import application.AnimateLogoIAP;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.gui.MainPanelComponent;
@@ -78,7 +77,7 @@ public class ActionAbout extends AbstractNavigationAction {
 		boolean addThreeD = false;
 		if (addThreeD) {
 			ArrayList<JComponent> infos = new ArrayList<JComponent>();
-			infos.add(new AnimateLogoIAP().getFX(false));
+			// infos.add(new AnimateLogoIAP().getFX(false));
 			
 			for (String txt : ll) {
 				final JEditorPane jep = MainPanelComponent.getTextComponent(Color.WHITE, txt);
