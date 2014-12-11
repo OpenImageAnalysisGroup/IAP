@@ -32,6 +32,7 @@ import javax.xml.transform.TransformerException;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.MergeCompareRequirements;
 import org.RunnableExecutor;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -209,7 +210,7 @@ public class Experiment implements ExperimentInterface {
 						samnew.add(mnew);
 					}
 				}
-				Substance.addAndMergeA(e, sub, false);
+				Substance.addAndMergeA(e, sub, false, null, new MergeCompareRequirements());
 			}
 			result.put(expn, e);
 		}
@@ -526,7 +527,7 @@ public class Experiment implements ExperimentInterface {
 			Experiment mainDataset = results.get(0);
 			for (int i = 1; i < results.size(); i++) {
 				ExperimentInterface toBeAdded = results.get(i);
-				mainDataset.addAndMerge(toBeAdded, re);
+				mainDataset.addAndMerge(toBeAdded, re, new MergeCompareRequirements());
 			}
 			return mainDataset;
 		}
@@ -830,21 +831,21 @@ public class Experiment implements ExperimentInterface {
 	
 	@Override
 	public void addAndMerge(ExperimentInterface toBeAdded) {
-		addAndMerge(toBeAdded, (RunnableExecutor) null);
+		addAndMerge(toBeAdded, (RunnableExecutor) null, null);
 	}
 	
 	@Override
-	public void addAndMerge(ExperimentInterface toBeAdded, RunnableExecutor re) {
+	public void addAndMerge(ExperimentInterface toBeAdded, RunnableExecutor re, MergeCompareRequirements mcr) {
 		if (isEmpty() && toBeAdded.isEmpty())
 			header = toBeAdded.getHeader().clone();
 		else {
 			if (re == null)
 				for (SubstanceInterface tobeMerged : toBeAdded)
-					Substance.addAndMergeA(this, tobeMerged, false);
+					Substance.addAndMergeA(this, tobeMerged, false, re, mcr);
 			else {
 				ArrayList<Runnable> todo = new ArrayList<>();
 				for (SubstanceInterface tobeMerged : toBeAdded)
-					todo.add(() -> Substance.addAndMergeA(this, tobeMerged, false));
+					todo.add(() -> Substance.addAndMergeA(this, tobeMerged, false, re, mcr));
 				re.execInParallel(todo, "Merge substance data", null);
 			}
 		}

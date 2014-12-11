@@ -925,9 +925,10 @@ public class Condition implements ConditionInterface {
 			return false;
 		if (!(obj instanceof Condition))
 			return false;
+		Condition c = (Condition) obj;
+		
 		String s1 = species + ";" + genotype + ";" + growthconditions + ";" + treatment + ";" + variety + ";" + sequence + ";"
 				+ rowId;
-		Condition c = (Condition) obj;
 		String s2 = c.species + ";" + c.genotype + ";" + c.growthconditions + ";" + c.treatment + ";" + c.variety + ";" + c.sequence + ";"
 				+ c.rowId;
 		return s1.equals(s2);
