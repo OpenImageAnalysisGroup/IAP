@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
@@ -162,7 +163,7 @@ public class SplitResult {
 				mergedExperiment.getHeader().setAttributesFromMap(sourceHeader.getAttributeMap());
 				mergedExperiment.getHeader().setDatabaseId(null);
 			}
-			mergedExperiment.addAndMerge(ei);
+			mergedExperiment.addAndMerge(ei, BackgroundThreadDispatcher.getRE());
 			System.out.println(" // merged in " + s.getTime() + " ms // " + mergedExperiment.getNumberOfMeasurementValues() + " values in dataset");
 			if (optStatus != null)
 				optStatus.setCurrentStatusText2("Processed " + (nnii - 1) + "/" + tempDataSetDescription.getPartCntI() + ", "
