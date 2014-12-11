@@ -12,8 +12,10 @@ import java.util.TreeMap;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
+import org.MergeCompareRequirements;
 import org.StringManipulationTools;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
@@ -57,7 +59,8 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	public ExperimentInterface getOutput() {
 		Experiment res = new Experiment();
 		for (NumericMeasurementInterface nmi : output) {
-			Substance3D.addAndMergeA(res, new MappingData3DPath(nmi, false).getSubstance(), false);
+			Substance3D.addAndMergeA(res, new MappingData3DPath(nmi, false).getSubstance(), false, BackgroundThreadDispatcher.getRE(),
+					new MergeCompareRequirements());
 		}
 		output.clear();
 		return res;
