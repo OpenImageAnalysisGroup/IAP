@@ -11,8 +11,9 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -73,7 +74,7 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 					else
 						ci.setGrowthconditions(eCopy.getName());
 				}
-			e.addAndMerge(eCopy);
+			e.addAndMerge(eCopy, BackgroundThreadDispatcher.getRE());
 			iii++;
 			if (status != null) {
 				status.setCurrentStatusText1("Merged dataset " + iii + "/" + nTodo);
