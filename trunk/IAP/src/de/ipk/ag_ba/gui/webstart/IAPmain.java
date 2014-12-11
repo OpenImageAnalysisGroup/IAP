@@ -115,7 +115,7 @@ public class IAPmain extends JApplet {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		
 		ProgressWindow progressWindow = new AnimateLogoIAP();
-		progressWindow.show();
+		progressWindow.show(true);
 		
 		String title = SystemOptions.getInstance().getString("IAP", "window_title",
 				"IAP - The Integrated Analysis Platform") + "";
@@ -181,16 +181,17 @@ public class IAPmain extends JApplet {
 			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 			jf.setBounds(0, 0, dim.width, dim.height);
 		}
-		jf.setVisible(true);
 		if (startMaximized) {
 			// jf.setExtendedState(jf.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 			jf.setBounds(0, 0, dim.width, dim.height);
+			jf.setVisible(true);
 		} else {
 			Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
 			jf.setSize((int) (screenDim.width * 0.75), (int) (screenDim.height * 0.75));
 			jf.setLocation((screenDim.width - jf.getWidth()) / 2,
 					(screenDim.height - jf.getHeight()) / 2);
+			jf.setVisible(true);
 		}
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SystemOptions.getInstance().addChangeListener("IAP", "window_title", new Runnable() {
