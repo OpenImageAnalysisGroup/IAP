@@ -12,9 +12,11 @@ import java.util.HashSet;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.SplitResult;
 import de.ipk.ag_ba.server.task_management.TempDataSetDescription;
@@ -93,6 +95,11 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 		this.src = src;
 		mergedDocuments.clear();
 		status.setCurrentStatusText1("Initialize Command Operation");
-		m.processSplitResults().merge(true, status);
+		ArrayList<ExperimentReference> newExperiments = new ArrayList<>();
+		nSplit = m.processSplitResults().merge(true, status, newExperiments);
+		for (ExperimentReference er : newExperiments) {
+			er.m = m;
+			mergedDocuments.add(new NavigationButton(new ActionMongoOrLTexperimentNavigation(er), src.getGUIsetting()));
+		}
 	}
 }
