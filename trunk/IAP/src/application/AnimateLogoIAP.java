@@ -4,17 +4,21 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Random;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -51,12 +55,18 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		// empty
 	}
 	
-	private Scene buildScene(double width, double height) {
-		return buildScene(width, height, null);
-	}
-	
 	// build all necessary components in the scene
-	private Scene buildScene(double width, double height, Group group) {
+	private Scene buildScene(double width, double height) {
+		
+		int STAR_COUNT = 2000;
+		
+		Rectangle[] nodes = new Rectangle[STAR_COUNT];
+		double[] angles = new double[STAR_COUNT];
+		double[] sx = new double[STAR_COUNT];
+		double[] sy = new double[STAR_COUNT];
+		long[] ss = new long[STAR_COUNT];
+		
+		Group group = getStarGroup(STAR_COUNT, nodes, angles, sx, sy, ss);
 		if (group != null)
 			root = new Pane(group);
 		else
@@ -65,6 +75,8 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		Scene scene = new Scene(root, width, height, false, SceneAntialiasing.DISABLED);
 		scene.getStylesheets().add("application/application.css");
 		scene.setFill(Color.BLACK);
+		
+		prepareStarAnim(scene, STAR_COUNT, nodes, angles, sx, sy, ss);
 		
 		double sc = 1;
 		// the subscene contains the 3d rotating earth sphere
@@ -126,6 +138,53 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		CameraView.buildCamera_subscenes(root_subscene4, camera_subscene4, cameraDistanceToLetter, 0, 0);
 		
 		return scene;
+	}
+	
+	private void prepareStarAnim(Scene s, int STAR_COUNT, Node[] nodes, double[] angles, double[] sx, double[] sy,
+			long[] start) {
+		new AnimationTimer() {
+			@Override
+			public void handle(long now) {
+				final double width = 260;// 0.5 * s.getWidth();
+				final double height = 130;// 0.5 * s.getHeight();
+				final double radius = Math.sqrt(2) * Math.max(s.getWidth(), s.getHeight());
+				for (int i = 0; i < STAR_COUNT; i++) {
+					Node node = nodes[i];
+					double angle = angles[i];
+					long t = ((now - start[i]) / 2) % 1000000000;
+					double d = t / 2 * radius / 1000000000.0;
+					double offX = i < STAR_COUNT / 3 ? 0 : (i < STAR_COUNT * 2 / 3 ? 100 : 200);
+					// node.setTranslateX(Math.cos(angle) * d + width + sx[i] + offX);
+					// node.setTranslateY(Math.sin(angle) * d + height + sy[i]);
+					node.setTranslateX(Math.cos(angle) * Math.sin(d) * 2 + width + sx[i] + offX);
+					node.setTranslateY(Math.sin(angle) * d + height + sy[i]);
+				}
+			}
+		}.start();
+	}
+	
+	private Group getStarGroup(int STAR_COUNT, Node[] nodes, double[] angles, double[] sx, double[] sy,
+			long[] start) {
+		
+		Random random1 = new Random();
+		Random random2 = new Random();
+		Random random3 = new Random();
+		int bound = 400000000;
+		for (int i = 0; i < STAR_COUNT / 3; i++) {
+			random1.nextInt(bound);
+			random1.nextInt(bound);
+		}
+		for (int i = 0; i < STAR_COUNT / 3; i++)
+			random2.nextInt(bound);
+		for (int i = 0; i < STAR_COUNT; i++) {
+			nodes[i] = new Rectangle(1, 1, i < STAR_COUNT / 3 ? Color.RED : (i < (STAR_COUNT * 2) / 3 ? Color.GREEN : Color.BLUE));
+			angles[i] = 2.0 * Math.PI * random1.nextDouble();
+			start[i] =
+					i < STAR_COUNT / 3 ? random1.nextInt(bound) : (i < (STAR_COUNT * 2) / 3 ? random2.nextInt(bound) : random3.nextInt(bound));
+			sx[i] = random1.nextDouble() * 60 - 30;
+			sy[i] = random1.nextDouble() * 60 - 30;
+		}
+		return new Group(nodes);
 	}
 	
 	@Override
@@ -241,7 +300,10 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		}
 	}
 	
-	public Scene getScene(Group group) {
-		return buildScene(STAGEWIDTH, STAGEHEIGHT, group);
+	public Scene getScene() {
+		
+		Scene s = buildScene(STAGEWIDTH, STAGEHEIGHT);
+		
+		return s;
 	}
 }

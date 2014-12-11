@@ -67,7 +67,9 @@ public class ActionJavaFX extends AbstractNavigationAction {
 	}
 	
 	private void initFX(JFXPanel jp) {
+		
 		Scene s = new AnimateLogoIAP().getScene();
+		
 		// createScene(jp);
 		jp.setScene(s);
 	}
