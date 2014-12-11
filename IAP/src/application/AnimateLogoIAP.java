@@ -51,7 +51,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	private final PerspectiveCamera camera_subscene3 = new PerspectiveCamera(true);
 	private final PerspectiveCamera camera_subscene4 = new PerspectiveCamera(true);
 	private final double cameraDistanceToEarth = -70;
-	private final double cameraDistanceToLetter = -30; // -7
+	private final double cameraDistanceToLetter = -50;// -30; // -7
 	private final FxLogoObjects object = new FxLogoObjects();
 	
 	public AnimateLogoIAP() {
