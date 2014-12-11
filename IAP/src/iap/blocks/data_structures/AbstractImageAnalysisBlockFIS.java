@@ -35,6 +35,7 @@ import org.graffiti.editor.MainFrame;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.ZoomedImage;
+import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -484,8 +485,9 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				}
 			}
 		});
+		okButton.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Applications-Engineering-64.png", 24, 24));
 		
-		Action action2 = new AbstractAction("<html>Close Additional<br>"
+		Action action2 = new AbstractAction("<html><center>Close Additional<br>"
 				+ "Image Windows (" + IAPservice.getIAPimageWindowCount() + ")") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -498,6 +500,18 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			}
 			
 		};
+		final JButton showInEditor = new JButton(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ZoomedImage zi = (ZoomedImage) jsp.getViewport().getView();
+				if (zi != null && zi.getImage() != null)
+					new Image(zi.getImage()).show(inpImageType.name() + " / " + blockType.getName());
+				else
+					MainFrame.showMessageDialog("No result image calculated", "Error");
+			}
+		});
+		showInEditor.setText("<html><center>Show Image<br>in Editor");
+		showInEditor.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Zoom-Fit-Best-64.png", 24, 24));
 		final JButton closeWindows = new JButton(action2);
 		closeWindows.setEnabled(IAPservice.getIAPimageWindowCount() > 0);
 		closeWindows.addMouseListener(new MouseListener() {
@@ -529,12 +543,17 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			}
 		});
 		
+		closeWindows.setIcon(IAPimages.getIcon("img/close_frame.png", 24, 24));
+		closeWindows.setDisabledIcon(IAPimages.getIcon("img/close_frame.png", 24, 24));
+		
 		JComponent editAndUpdate = TableLayout.get3Split(
 				null,
 				null,
 				TableLayout.get3Split(
 						ic.getZoomSlider(-1), null,
-						TableLayout.get3Split(okButton, null, closeWindows, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
+						TableLayout.get3Split(okButton, null,
+								TableLayout.get3Split(showInEditor, null, closeWindows, TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
+								TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
 						TableLayout.PREFERRED, 5, TableLayout.PREFERRED),
 				TableLayout.FILL, 5, TableLayout.PREFERRED);
 		JComponent v = TableLayout.get3SplitVertical(
