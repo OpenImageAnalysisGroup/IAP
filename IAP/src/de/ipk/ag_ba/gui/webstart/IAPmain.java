@@ -107,6 +107,7 @@ public class IAPmain extends JApplet {
 	}
 	
 	public static void main(String[] args, String[] addons) {
+		long startmaintime = System.currentTimeMillis();
 		for (String info : IAPmain.getMainInfoLines())
 			System.out.println(info);
 		
@@ -193,6 +194,8 @@ public class IAPmain extends JApplet {
 					(screenDim.height - jf.getHeight()) / 2);
 			jf.setVisible(true);
 		}
+		long endmaintime = System.currentTimeMillis();
+		SystemOptions.getInstance().setInteger("IAP", "FX//Last Startup Time", (int) (endmaintime - startmaintime));
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SystemOptions.getInstance().addChangeListener("IAP", "window_title", new Runnable() {
 			@Override
