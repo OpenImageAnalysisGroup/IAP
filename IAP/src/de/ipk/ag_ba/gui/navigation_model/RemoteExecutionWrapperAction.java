@@ -83,8 +83,10 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
-		res.add(currentSet.get(0));
-		res.add(currentSet.get(1));
+		if (currentSet != null && currentSet.size() > 2) {
+			res.add(currentSet.get(0));
+			res.add(currentSet.get(1));
+		}
 		res.add(cm);
 		return res;
 	}
