@@ -47,8 +47,8 @@ public class SplitResult {
 		HashSet<TempDataSetDescription> availableTempDatasets = new HashSet<TempDataSetDescription>();
 		HashSet<String> processedSubmissionTimes = new HashSet<String>();
 		for (ExperimentHeaderInterface i : el) {
-			// if ((i.getExperimentType() + "").contains("Trash"))
-			// continue;
+			if ((i.getExperimentType() + "").contains("Trash"))
+				continue;
 			String[] cc = i.getExperimentName().split("§");
 			if (i.getImportusergroup() != null && i.getImportusergroup().equals("Temp") &&
 					(cc.length == 4 || cc.length == 5)) {
