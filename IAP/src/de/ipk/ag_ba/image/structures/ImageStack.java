@@ -282,7 +282,7 @@ public class ImageStack implements Iterable<ImageProcessor> {
 	@Override
 	public Iterator<ImageProcessor> iterator() {
 		return new Iterator<ImageProcessor>() {
-			int count = 1;
+			int count = 0;
 			
 			@Override
 			public boolean hasNext() {
@@ -297,7 +297,7 @@ public class ImageStack implements Iterable<ImageProcessor> {
 				if (count == stack.getSize())
 					throw new NoSuchElementException();
 				
-				return stack.getProcessor(count++);
+				return stack.getProcessor(1 + count++);
 			}
 		};
 	}
