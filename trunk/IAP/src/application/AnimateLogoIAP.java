@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Random;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -141,19 +142,19 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 				-20, -90,
 				id + start + 3 * step + 3 * delay, id + start + (4 + add) * step + 3 * delay,
 				0, 90,
-				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay);
+				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, 1);
 		object.buildSingleLetter(root_subscene3, "A.fxml", 1,
 				-2.7, 2,
 				-20, -90,
 				id + start + 4 * step + 4 * delay, id + start + (5 + add) * step + 4 * delay,
 				0, 90,
-				start + 1 * step + 1 * delay, start + (2 + add) * step + 1 * delay);
+				start + 1 * step + 1 * delay, start + (2 + add) * step + 1 * delay, 1);
 		object.buildSingleLetter(root_subscene4, "P.fxml", 1,
 				-2.7, 2,
 				-20, -90,
 				id + start + 5 * step + 5 * delay, id + start + (6 + add) * step + 4 * delay,
 				0, 85,
-				start + 2 * step + 2 * delay, start + (3 + add) * step + 2 * delay);
+				start + 2 * step + 2 * delay, start + (3 + add) * step + 2 * delay, 1);
 		
 		eaarthScene.getChildren().addAll(Appearance.getPointLight_earth(Color.WHITE, 0, 300));
 		
@@ -228,24 +229,23 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		}
 		
 		int start = 65 * 7 + 700;
-		int step = 50 * 7;
+		int step = 550 * 7;
 		int delay = 20 * 7;
 		int add = 1;
 		// Group group, String fxmlFile, double rate, int rotFromTime, int rotToTime, double angleStart, double xpos,
 		// double angleFrom, double angleTo, double colorFadeFrom, double colorFadeTo
 		object.buildSingleLetter(root_subscene2, "I.fxml", 1,
 				-2.01, 2,
-				0, -90, start + 3 * step + 3 * delay, start + (4 + add) * step + 3 * delay,
-				0, 90,
-				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay);
+				0, -90, start + 3 * step + 3 * delay, start + (4 + add) * step + 3 * delay, 90, 0,
+				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE);
 		object.buildSingleLetter(root_subscene3, "A.fxml", 1,
 				-2.75, 2,
-				0, -85, start + 4 * step + 4 * delay, start + (5 + add) * step + 4 * delay, 90, 0,
-				start + 1 * step + 1 * delay, start + (2 + add) * step + 1 * delay);
+				0, -90, start + 3 * step + 3 * delay, start + (4 + add) * step + 3 * delay, 90, 0,
+				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE);
 		object.buildSingleLetter(root_subscene4, "P.fxml", 1,
 				-2.7, 2,
-				0, -90, start + 5 * step + 5 * delay, start + (6 + add) * step + 4 * delay, 85, 0,
-				start + 2 * step + 2 * delay, start + (3 + add) * step + 2 * delay);
+				0, -90, start + 3 * step + 3 * delay, start + (4 + add) * step + 3 * delay, 90, 0,
+				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE);
 		
 		eaarthScene.getChildren().addAll(Appearance.getPointLight_earth(Color.WHITE, 0, 300));
 		
