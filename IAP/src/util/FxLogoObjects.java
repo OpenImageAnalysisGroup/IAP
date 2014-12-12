@@ -42,7 +42,7 @@ public class FxLogoObjects {
 	
 	public void buildSingleLetter(Group group, String fxmlFile, double rate, double xpos, double ypos, double zpos,
 			double angleStart, int rotFromTime, int rotToTime,
-			double angleFrom, double angleTo, double colorFadeFrom, double colorFadeTo) {
+			double angleFrom, double angleTo, double colorFadeFrom, double colorFadeTo, int nn) {
 		
 		Group mv = new Group();
 		Group branch_rot_letter = new Group();
@@ -78,7 +78,7 @@ public class FxLogoObjects {
 		// group for rotation
 		branch_rot_letter.getChildren().addAll(mv);
 		branch_rot_letter.setRotationAxis(Rotate.Y_AXIS);
-		Timeline rot_letter = MakeAnimation.rotateTimeline(branch_rot_letter, rate, rotFromTime, rotToTime, 1, angleFrom, angleTo);
+		Timeline rot_letter = MakeAnimation.rotateTimeline(branch_rot_letter, rate, rotFromTime, rotToTime, nn, angleFrom, angleTo);
 		rot_letter.playFromStart();
 		
 		// group.getChildren().addAll(branch_rot_letter, Appearance.getPointLight_letter(Color.rgb(123,93,172), colorFadeFrom, colorFadeTo));
