@@ -274,7 +274,8 @@ public class ExperimentSaver implements RunnableOnDB {
 		DBCollection experiments = db.getCollection(MongoExperimentCollections.EXPERIMENTS.toString());
 		
 		if (true) {// || (status != null && !status.wantsToStop())
-			{
+		
+			if (false) {
 				int size = DefaultDBEncoder.FACTORY.create().
 						writeObject(new BasicOutputBuffer(), dbExperiment);
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: About to insert a experiment structure into DB. Size=" + size);
@@ -376,7 +377,7 @@ public class ExperimentSaver implements RunnableOnDB {
 			} // condition
 			if (toBeSaved.size() > 0) {
 				for (DBObject tbs : toBeSaved) {
-					{
+					if (false) {
 						int size = DefaultDBEncoder.FACTORY.create().
 								writeObject(new BasicOutputBuffer(), tbs);
 						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: About to insert a condition structure into DB. Size=" + size);
@@ -1105,7 +1106,7 @@ public class ExperimentSaver implements RunnableOnDB {
 			knownIDs.add(s);
 		}
 		dbSubstance.put("condition_ids", conditionIDs);
-		{
+		if (false) {
 			int size = DefaultDBEncoder.FACTORY.create().
 					writeObject(new BasicOutputBuffer(), dbSubstance);
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: About to insert substance structure into DB. Size=" + size + ", s="
