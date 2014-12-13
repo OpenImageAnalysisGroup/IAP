@@ -78,7 +78,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 				ignore = true;
 		}
 		
-		if (getBoolean("Calculate on " + ct.getNiceName() + " Image", true) && !ignore) {
+		if (getBoolean("Calculate on " + ct.getNiceName() + " Image", ct == CameraType.VIS) && !ignore) {
 			Image workimg = mask.copy();
 			
 			double fillGradeInPercent = getDouble("Fillgrade (" + ct + ")", 0.3);
@@ -109,8 +109,8 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		boolean saveListObject = true;
 		boolean saveLeafCount = true;
 		boolean saveAdditionalFeatures = true;
-		boolean saveFeaturesInResultSet = getBoolean("Save individual leaf features", true);
-		boolean saveColorFeaturesInResultSet = getBoolean("Save individual leaf color features", true);
+		boolean saveFeaturesInResultSet = getBoolean("Save individual leaf features", false);
+		boolean saveColorFeaturesInResultSet = getBoolean("Save individual leaf color features", false);
 		boolean saveTextureFeaturesInResultSet = getBoolean("Save leaf texture features (Mean)", true);
 		boolean saveIndividualTextureFeaturesInResultSet = getBoolean("Save individual leaf texture features", false);
 		boolean removeOutliers = getBoolean("Outlier removal based on leaf tip angle", true);
