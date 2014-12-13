@@ -2,7 +2,6 @@ package iap.blocks.preprocessing;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.blocks.postprocessing.WellProcessing;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 
 import java.awt.Color;
@@ -84,15 +83,13 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 				wellColors[idx++] = c.getRGB();
 			}
 		}
-		
+		int currentwell = optionsAndResults.getWellIdx();
 		for (int x = 0; x < mask.getWidth(); x++) {
 			for (int y = 0; y < mask.getHeight(); y++) {
-				double minWellDistance = Integer.MAX_VALUE;
-				String minWellIDX = null;
+				int minWellDistance = Integer.MAX_VALUE;
 				int min_well_idx = -1;
 				
 				for (int well_idx = 0; well_idx < wellcount; well_idx++) {
-					
 					// distance for each pixel to center point from each cluster
 					int distance_to_cluster = (x - centerpoints[well_idx].x) * (x - centerpoints[well_idx].x) +
 							(y - centerpoints[well_idx].y) * (y - centerpoints[well_idx].y);
@@ -101,7 +98,6 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 					
 					if (tempDist < minWellDistance) {
 						minWellDistance = tempDist;
-						minWellIDX = WellProcessing.getWellID(well_idx, wellcount, input().images().getAnyInfo(), optionsAndResults);
 						min_well_idx = well_idx;
 					}
 				}
@@ -109,7 +105,7 @@ public class BlObjectSeparatorByDistance extends AbstractBlock implements WellPr
 					if (min_well_idx >= 0 && (((x + y) % 2) == 0))
 						result[x][y] = wellColors[min_well_idx];
 				} else
-					if (minWellIDX != getWellIdx()) {
+					if (min_well_idx != currentwell) {
 						result[x][y] = ImageOperation.BACKGROUND_COLORint;
 					}
 			}
