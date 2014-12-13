@@ -52,7 +52,7 @@ public class BlFilterImagesByRegularExpression extends AbstractSnapshotAnalysisB
 		
 		ConditionInfo annotationMode = ConditionInfo.valueOfString(calculationMode);
 		
-		String regex = getString("Regex: ", "");
+		String regex = getString("Regex", "");
 		
 		String condition = processedImages.getAnyInfo().getParentSample().getParentCondition().getField(annotationMode);
 		
