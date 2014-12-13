@@ -75,7 +75,7 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 					else
 						ci.setGrowthconditions(eCopy.getName());
 				}
-			e.addAndMerge(eCopy, BackgroundThreadDispatcher.getRE(), new MergeCompareRequirements());
+			e.addAndMerge(null, eCopy, BackgroundThreadDispatcher.getRE(), new MergeCompareRequirements());
 			iii++;
 			if (status != null) {
 				status.setCurrentStatusText1("Merged dataset " + iii + "/" + nTodo);
