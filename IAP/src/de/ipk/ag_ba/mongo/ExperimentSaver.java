@@ -361,7 +361,7 @@ public class ExperimentSaver implements RunnableOnDB {
 						overallFileSize, startTime,
 						errorCount,
 						lastTransferSum, lastTime, count, errors,
-						numberOfBinaryData, conditionIDs, c, mh, m, savedUrls);
+						numberOfBinaryData, c, mh, m, savedUrls);
 				
 				toBeSaved.addAll(condition);
 				
@@ -523,9 +523,9 @@ public class ExperimentSaver implements RunnableOnDB {
 			final ObjectRef errorCount,
 			final ObjectRef lastTransferSum, final ObjectRef lastTime, final ObjectRef count,
 			final StringBuilder errors, final int numberOfBinaryData,
-			ArrayList<String> conditionIDs,
 			ConditionInterface c,
-			MongoDBhandler mh, MongoDB mo, final HashSet<String> savedUrls) throws InterruptedException, ExecutionException {
+			MongoDBhandler mh,
+			MongoDB mo, final HashSet<String> savedUrls) throws InterruptedException, ExecutionException {
 		DBEncoder creator = DefaultDBEncoder.FACTORY.create();
 		
 		boolean addNewCondition = true;
