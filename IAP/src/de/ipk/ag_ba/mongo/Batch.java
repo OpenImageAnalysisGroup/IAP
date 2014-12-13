@@ -504,17 +504,26 @@ public class Batch {
 		String myID = CloudHost.getHostId();
 		boolean iamFirstWithThisAmountOfMemory = true;
 		boolean equalFound = false;
-		for (CloudHost ch : m.batch().getAvailableHosts(5 * 60 * 1000)) {
-			if (ch.getMaxMem() == myMem && !equalFound) {
-				equalFound = true;
-				if (!myID.equals(ch.getHostId()))
-					iamFirstWithThisAmountOfMemory = false;
-			} else
-				if (ch.getMaxMem() > myMem) {
+		long maxMem = -1;
+		ArrayList<CloudHost> hl = m.batch().getAvailableHosts(5 * 60 * 1000);
+		for (CloudHost ch : hl) {
+			if (ch.getMaxMem() > maxMem) {
+				maxMem = ch.getMaxMem();
+				if (!myID.equals(ch.getHostId()) && maxMem > myMem) {
 					hasMaxMem = false;
-					break;
 				}
+			}
 		}
+		if (hasMaxMem) {
+			for (CloudHost ch : hl) {
+				if (ch.getMaxMem() == maxMem && !equalFound) {
+					equalFound = true;
+					if (!myID.equals(ch.getHostId()))
+						iamFirstWithThisAmountOfMemory = false;
+				}
+			}
+		} else
+			iamFirstWithThisAmountOfMemory = false;
 		return hasMaxMem && iamFirstWithThisAmountOfMemory;
 	}
 	
