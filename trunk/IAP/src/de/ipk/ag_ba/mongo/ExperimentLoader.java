@@ -178,43 +178,49 @@ public class ExperimentLoader implements RunnableOnDB {
 					fields.put("experimentname", 0);
 					fields.put("coordinator", 0);
 					fields.put("storagedate", 0);
-					
-					DBCursor condL = collCond.find(
-							new BasicDBObject("_id", new BasicDBObject("$in", llCond)), fields);
-					// .hint(new BasicDBObject("_id", 1));// .batchSize(Math.min(ll.size(), 500));
 					idx = 0;
-					max = condId2substanceId.size();
-					ArrayList<LocalComputeJob> threads = new ArrayList<>();
-					for (DBObject cond : condL) {
-						String id = cond.get("_id") + "";
-						Substance3D subID = condId2substanceId.get(id);
-						
-						LocalComputeJob res;
+					while (!llCond.isEmpty()) {
+						BasicDBList limit_llCond = new BasicDBList();
+						while (!llCond.isEmpty() && limit_llCond.size() < 5000) {
+							limit_llCond.add(llCond.remove(0));
+						}
+						DBCursor condL = collCond.find(
+								new BasicDBObject("_id", new BasicDBObject("$in", limit_llCond)), fields);
+						// .hint(new BasicDBObject("_id", 1));// .batchSize(Math.min(ll.size(), 500));
+						max = condId2substanceId.size();
+						ArrayList<LocalComputeJob> threads = new ArrayList<>();
+						for (DBObject cond : condL) {
+							String id = cond.get("_id") + "";
+							Substance3D subID = condId2substanceId.get(id);
+							
+							LocalComputeJob res;
+							try {
+								res = processCondition(subID, cond, optStatusProvider, max);
+								if (res != null)
+									threads.add(res);
+							} catch (InterruptedException e) {
+								ErrorMsg.addErrorMessage(e);
+							}
+							idx++;
+							if (optStatusProvider != null)
+								optStatusProvider.setCurrentStatusValueFine(100d * idx / max);
+							if (optStatusProvider != null) {
+								long sysmem = SystemAnalysis.getMemoryMB();
+								long usedmem = SystemAnalysis.getUsedMemoryInMB();
+								String memInfo = StringManipulationTools.formatNumber(usedmem * 100d / sysmem, 0) + "%";
+								optStatusProvider.setCurrentStatusText1("Load condition data (" + idx + "/" + condId2substanceId.size() + ")");
+								optStatusProvider.setCurrentStatusText2("<font color='gray'><small>(" + usedmem + " / " + sysmem + " MB RAM used [" + memInfo
+										+ "])</small></font>");
+							}
+						}
+						condL.close();
 						try {
-							res = processCondition(subID, cond, optStatusProvider, max);
-							if (res != null)
-								threads.add(res);
+							BackgroundThreadDispatcher.waitFor(threads);
 						} catch (InterruptedException e) {
 							ErrorMsg.addErrorMessage(e);
 						}
-						idx++;
-						if (optStatusProvider != null)
-							optStatusProvider.setCurrentStatusValueFine(100d * idx / max);
-						if (optStatusProvider != null) {
-							long sysmem = SystemAnalysis.getMemoryMB();
-							long usedmem = SystemAnalysis.getUsedMemoryInMB();
-							String memInfo = StringManipulationTools.formatNumber(usedmem * 100d / sysmem, 0) + "%";
-							optStatusProvider.setCurrentStatusText1("Load condition data (" + idx + "/" + condId2substanceId.size() + ")");
-							optStatusProvider.setCurrentStatusText2("<font color='gray'><small>(" + usedmem + " / " + sysmem + " MB RAM used [" + memInfo
-									+ "])</small></font>");
-						}
 					}
-					condL.close();
-					try {
-						BackgroundThreadDispatcher.waitFor(threads);
-					} catch (InterruptedException e) {
-						ErrorMsg.addErrorMessage(e);
-					}
+					
 					if (optStatusProvider != null) {
 						optStatusProvider.setCurrentStatusText1("Dataset loaded");
 					}
