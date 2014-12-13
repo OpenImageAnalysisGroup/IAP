@@ -498,18 +498,20 @@ public class Batch {
 		return (CloudHost) r.getObject();
 	}
 	
-	public static boolean checkIfHostHasMostMemory(final MongoDB m) throws Exception {
+	public static boolean checkIfHostHasMostMemory(final MongoDB m, BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
 		boolean hasMaxMem = true;
 		long myMem = SystemAnalysis.getMemoryMB();
-		String myID = CloudHost.getHostId();
+		String myID = SystemAnalysisExt.getHostName();
+		// System.out.println("My ID=" + myID + ", MEM=" + SystemAnalysis.getDataAmountString(myMem * 1024 * 1024));
 		boolean iamFirstWithThisAmountOfMemory = true;
 		boolean equalFound = false;
 		long maxMem = -1;
 		ArrayList<CloudHost> hl = m.batch().getAvailableHosts(5 * 60 * 1000);
 		for (CloudHost ch : hl) {
+			// System.out.println("Other? ID=" + ch.getHostName() + ", MEM=" + SystemAnalysis.getDataAmountString(ch.getMaxMem() * 1024 * 1024));
 			if (ch.getMaxMem() > maxMem) {
 				maxMem = ch.getMaxMem();
-				if (!myID.equals(ch.getHostId()) && maxMem > myMem) {
+				if (!myID.equals(ch.getHostName())) {
 					hasMaxMem = false;
 				}
 			}
@@ -518,23 +520,29 @@ public class Batch {
 			for (CloudHost ch : hl) {
 				if (ch.getMaxMem() == maxMem && !equalFound) {
 					equalFound = true;
-					if (!myID.equals(ch.getHostId()))
+					if (!myID.equals(ch.getHostName()))
 						iamFirstWithThisAmountOfMemory = false;
 				}
 			}
 		} else
 			iamFirstWithThisAmountOfMemory = false;
+		// System.out.println("HasMaxMem?=" + hasMaxMem + ", isFirstWithMaxMem?=" + iamFirstWithThisAmountOfMemory);
+		statusProvider.setCurrentStatusText1(SystemAnalysis.getDataAmountString(myMem * 1024l * 1024l) + (hasMaxMem ? "*" : "")
+				+ (iamFirstWithThisAmountOfMemory ? "*" : "") + " Max Mem, " +
+				SystemAnalysis.getDataAmountString(SystemAnalysis.getRealSystemMemoryInMB() * 1024l * 1024l) + " Syst. RAM");
 		return hasMaxMem && iamFirstWithThisAmountOfMemory;
 	}
 	
-	public static void checkForMergePosibility(final MongoDB m, final BackgroundTaskStatusProviderSupportingExternalCall statusProvider) throws Exception {
+	public static void checkForMergePosibility(final MongoDB m, final BackgroundTaskStatusProviderSupportingExternalCall statusProvider, Runnable optPingCode)
+			throws Exception {
 		boolean saveOverallDatasetIfPossible = SystemOptions.getInstance().getBoolean("IAP", "grid_auto_merge_batch_results", true);
 		if (saveOverallDatasetIfPossible) {
 			// find out if this computer has most memory of online grid nodes
-			boolean hasMaxMem = Batch.checkIfHostHasMostMemory(m);
+			boolean hasMaxMem = Batch.checkIfHostHasMostMemory(m, statusProvider);
 			if (hasMaxMem)
-				m.processSplitResults().merge(false, statusProvider, new ArrayList<>());
-		}
+				m.processSplitResults().merge(optPingCode, false, statusProvider, new ArrayList<>());
+		} else
+			statusProvider.setCurrentStatusText1("<small>[no merge check]</small>");
 	}
 	
 	public static void pingHost(final MongoDB mongoDB, final String ip,

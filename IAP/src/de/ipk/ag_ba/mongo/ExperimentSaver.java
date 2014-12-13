@@ -676,7 +676,7 @@ public class ExperimentSaver implements RunnableOnDB {
 					writeObject(new BasicOutputBuffer(), sample);
 			currentSizeEst += size;
 			condition.remove("_id");
-			if (currentSizeEst > 1024 * 1024 * 2) {
+			if (currentSizeEst > 1024d * 1024d * 0.5d) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Condition size over threshold, request split to stop here. Size=" + currentSizeEst
 						+ " - s=" + c.getParentSubstance().getName());
 				addNewCondition = true;

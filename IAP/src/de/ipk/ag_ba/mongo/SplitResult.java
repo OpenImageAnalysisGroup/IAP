@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
+import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.MergeCompareRequirements;
@@ -30,6 +31,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.DataMappingTypeManager3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
@@ -91,7 +93,7 @@ public class SplitResult {
 		return deletedTempDatasets;
 	}
 	
-	private ExperimentInterface doMerge(TempDataSetDescription tempDataSetDescription,
+	private ExperimentInterface doMerge(Runnable optPingCode, TempDataSetDescription tempDataSetDescription,
 			ArrayList<ExperimentHeaderInterface> knownResults, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
 			ExperimentReference optPreviousResultsToBeMerged) throws Exception {
 		System.out.println("*****************************");
@@ -116,11 +118,13 @@ public class SplitResult {
 		HashMap<ExperimentHeaderInterface, String> experiment2id =
 				new HashMap<ExperimentHeaderInterface, String>();
 		String originName = null;
-		int nnii = 1;
+		ThreadSafeOptions nnii = new ThreadSafeOptions();
+		nnii.setInt(1);
 		ExperimentHeaderInterface sourceHeader = null;
+		Semaphore lock = BackgroundTaskHelper.lockGetSemaphore(this, 1);
 		for (ExperimentHeaderInterface ii : knownResults) {
 			experiment2id.put(ii, ii.getDatabaseId());
-			nnii++;
+			nnii.addInt(1);
 			if (sourceHeader == null) {
 				ExperimentReference eRef = new ExperimentReference(ii.getOriginDbId());
 				ExperimentHeaderInterface oriH = eRef.getHeader();
@@ -145,39 +149,61 @@ public class SplitResult {
 			}
 			StopWatch s1 = new StopWatch(">m.getExperiment");
 			BackgroundTaskConsoleLogger status = new BackgroundTaskConsoleLogger("", "", false);
+			if (optPingCode != null)
+				optPingCode.run();
 			ExperimentInterface ei = m.getExperiment(ii, false, status);
-			if (s1.getTime() > 30000)
-				s1.printTime();
+			// if (s1.getTime() > 30000)
+			// s1.printTime();
 			String[] cc = ii.getExperimentName().split("§");
 			tso.addInt(1);
-			String msg = "loading: " + s1.getTime() + " ms";
-			System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: " + (tso.getInt()) + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]
-					+ " // loaded in " + s1.getTime() + " ms");
-			if (optStatus != null)
-				optStatus.setCurrentStatusValueFine(100d * tso.getInt() / wl);
+			if (optPingCode != null)
+				optPingCode.run();
+			BlockPipeline.ping();
+			
 			// for (String c : condS)
 			// System.out.println(">Condition: " + c);
-			
-			StopWatch s = new StopWatch(">e.addMerge");
+			long tt = s1.getTime();
+			lock.acquire();
+			String msg = "loading: " + tt + " ms";
+			System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: " + (tso.getInt()) + "/" + wl + " // dataset: " + cc[1] + "/" + cc[2]
+					+ " // loaded in " + tt + " ms");
+			if (optStatus != null)
+				optStatus.setCurrentStatusValueFine(100d * tso.getInt() / wl);
 			if (mergedExperiment == null) {
 				mergedExperiment = new Experiment();
 				mergedExperiment.getHeader().setAttributesFromMap(sourceHeader.getAttributeMap());
 				mergedExperiment.getHeader().setDatabaseId(null);
 			}
-			MergeCompareRequirements mcr = new MergeCompareRequirements();
-			mcr.setCompareSamples(false);
-			mcr.setCompareValues(false);
-			mergedExperiment.addAndMerge(ei, BackgroundThreadDispatcher.getRE(), mcr);
-			System.out.println(" // merged in " + s.getTime() + " ms // " + mergedExperiment.getNumberOfMeasurementValues() + " values in dataset");
-			if (optStatus != null)
-				optStatus.setCurrentStatusText2("Processed " + (nnii - 1) + "/" + tempDataSetDescription.getPartCntI() + ", "
-						+ mergedExperiment.getNumberOfMeasurementValues() + " values in dataset"
-						+ "<br>" +
-						"<small><font color='gray'>(" + msg + ", merging: " + s.getTime() + " ms)</font></small>");
+			final ExperimentInterface mef = mergedExperiment;
+			BackgroundThreadDispatcher.addTask(() -> {
+				try {
+					StopWatch s = new StopWatch(">e.addMerge");
+					
+					MergeCompareRequirements mcr = new MergeCompareRequirements();
+					mcr.setCompareSamples(false);
+					mcr.setCompareValues(false);
+					mef.addAndMerge(optPingCode, ei, BackgroundThreadDispatcher.getRE(), mcr);
+					if (optPingCode != null)
+						optPingCode.run();
+					BlockPipeline.ping();
+					System.out.println(" // merged in " + s.getTime() + " ms // " + mef.getNumberOfMeasurementValues() + " values in dataset");
+					if (optPingCode != null)
+						optPingCode.run();
+					// if (s.getTime() > 30000)
+					// s.printTime();
+					if (optStatus != null)
+						optStatus.setCurrentStatusText2("Processed " + (nnii.getInt() - 1) + "/" + tempDataSetDescription.getPartCntI() + ", "
+								+ mef.getNumberOfMeasurementValues() + " values in dataset"
+								+ "<br>" +
+								"<small><font color='gray'>(" + msg + ", merging: " + s.getTime() + " ms)</font></small>");
+				} finally {
+					lock.release();
+				}
+			}, "merge data");
 			
-			if (s.getTime() > 30000)
-				s.printTime();
 		}
+		lock.acquire();
+		lock.release();
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Merged data, prepare saving...");
 		String sn = tempDataSetDescription.getRemoteCapableAnalysisActionClassName();
@@ -286,12 +312,13 @@ public class SplitResult {
 		return resExp;
 	}
 	
-	public int merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus, ArrayList<ExperimentReference> newExperiments)
+	public int merge(Runnable optPingCode, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
+			ArrayList<ExperimentReference> newExperiments)
 			throws Exception {
-		return merge(interactive, optStatus, null, newExperiments);
+		return merge(optPingCode, interactive, optStatus, null, newExperiments);
 	}
 	
-	public int merge(boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus, BatchCmd optRefCmd,
+	public int merge(Runnable optPingCode, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus, BatchCmd optRefCmd,
 			ArrayList<ExperimentReference> newExperiments) throws Exception {
 		int nres = 0;
 		DataMappingTypeManager3D.replaceVantedMappingTypeManager();
@@ -344,6 +371,8 @@ public class SplitResult {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Delete " + r.getExperimentName());
 						m.deleteExperiment(r.getDatabaseId());
 						knownResults.remove(r);
+						if (optPingCode != null)
+							optPingCode.run();
 					}
 					continue;
 				}
@@ -366,6 +395,8 @@ public class SplitResult {
 						MongoDB.saveSystemMessage(msg);
 						for (ExperimentHeaderInterface r : knownResults) {
 							m.deleteExperiment(r.getDatabaseId());
+							if (optPingCode != null)
+								optPingCode.run();
 						}
 						continue;
 					} else {
@@ -456,6 +487,8 @@ public class SplitResult {
 						BatchCmd.enqueueBatchCmd(m, cmd);
 						System.out.println("Enqueued new analysis task with ID " + jobID);
 					}
+					if (optPingCode != null)
+						optPingCode.run();
 				}
 			} else
 				if (knownResults.size() >= tempDataSetDescription.getPartCntI()) {
@@ -463,8 +496,10 @@ public class SplitResult {
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("About to merge split result datasets");
 						CloudTaskManager.disableWatchDog = true;
-						ExperimentInterface ne = doMerge(tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
+						ExperimentInterface ne = doMerge(optPingCode, tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
 						newExperiments.add(new ExperimentReference(ne.getHeader(), m));
+						if (optPingCode != null)
+							optPingCode.run();
 						BlockPipeline.ping();
 						CloudTaskManager.disableWatchDog = false;
 						nres += knownResults.size();
