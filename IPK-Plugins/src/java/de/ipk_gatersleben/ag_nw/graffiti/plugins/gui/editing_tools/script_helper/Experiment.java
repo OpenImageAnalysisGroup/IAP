@@ -527,7 +527,7 @@ public class Experiment implements ExperimentInterface {
 			Experiment mainDataset = results.get(0);
 			for (int i = 1; i < results.size(); i++) {
 				ExperimentInterface toBeAdded = results.get(i);
-				mainDataset.addAndMerge(toBeAdded, re, new MergeCompareRequirements());
+				mainDataset.addAndMerge(null, toBeAdded, re, new MergeCompareRequirements());
 			}
 			return mainDataset;
 		}
@@ -831,22 +831,98 @@ public class Experiment implements ExperimentInterface {
 	
 	@Override
 	public void addAndMerge(ExperimentInterface toBeAdded) {
-		addAndMerge(toBeAdded, (RunnableExecutor) null, null);
+		addAndMerge(null, toBeAdded, (RunnableExecutor) null, null);
 	}
 	
 	@Override
-	public void addAndMerge(ExperimentInterface toBeAdded, RunnableExecutor re, MergeCompareRequirements mcr) {
+	public void addAndMerge(Runnable optPingCode, ExperimentInterface toBeAdded, RunnableExecutor re, MergeCompareRequirements mcr) {
 		if (isEmpty() && toBeAdded.isEmpty())
 			header = toBeAdded.getHeader().clone();
 		else {
-			if (re == null)
-				for (SubstanceInterface tobeMerged : toBeAdded)
-					Substance.addAndMergeA(this, tobeMerged, false, re, mcr);
-			else {
-				ArrayList<Runnable> todo = new ArrayList<>();
-				for (SubstanceInterface tobeMerged : toBeAdded)
-					todo.add(() -> Substance.addAndMergeA(this, tobeMerged, false, re, mcr));
-				re.execInParallel(todo, "Merge substance data", null);
+			boolean ng = true;
+			if (ng) {
+				ArrayList<Runnable> todo = new ArrayList<Runnable>();
+				for (SubstanceInterface substToBeAdded : toBeAdded) {
+					ExperimentInterface expf = this;
+					Runnable r = () -> {
+						SubstanceInterface addHereSF = null;
+						ArrayList<SubstanceInterface> knownSubst = new ArrayList<>();
+						synchronized (expf) {
+							knownSubst.addAll(expf);
+						}
+						for (SubstanceInterface ts : knownSubst) {
+							if (ts.equals(substToBeAdded)) {
+								addHereSF = ts;
+								break;
+							}
+						}
+						if (addHereSF == null) {
+							synchronized (expf) {
+								add(substToBeAdded);
+							}
+							for (ConditionInterface c : substToBeAdded) {
+								c.setExperimentHeader(getHeader());
+							}
+						} else {
+							for (ConditionInterface condToBeAdded : substToBeAdded) {
+								ConditionInterface addHereC = null;
+								for (ConditionInterface tc : addHereSF) {
+									if (tc.equals(condToBeAdded)) {
+										addHereC = tc;
+										break;
+									}
+								}
+								if (addHereC == null) {
+									addHereSF.add(condToBeAdded);
+									condToBeAdded.setParent(addHereSF);
+								} else {
+									for (SampleInterface sampleToBeAdded : condToBeAdded) {
+										SampleInterface addHereSample = null;
+										for (SampleInterface si : addHereC) {
+											if (si.compareTo(sampleToBeAdded, false) == 0) {
+												addHereSample = si;
+												break;
+											}
+										}
+										if (addHereSample == null) {
+											addHereC.add(sampleToBeAdded);
+											sampleToBeAdded.setParent(addHereC);
+										} else {
+											for (NumericMeasurementInterface m : sampleToBeAdded) {
+												addHereSample.add(m);
+												m.setParentSample(addHereSample);
+											}
+										}
+									}
+								}
+							}
+						}
+					};
+					todo.add(r);
+				}
+				if (re == null) {
+					for (Runnable r : todo)
+						r.run();
+				} else {
+					re.execInParallel(todo, "merge substance data", null);
+				}
+			} else {
+				if (re == null)
+					for (SubstanceInterface tobeMerged : toBeAdded) {
+						Substance.addAndMergeA(this, tobeMerged, false, re, mcr);
+						if (optPingCode != null)
+							optPingCode.run();
+					}
+				else {
+					ArrayList<Runnable> todo = new ArrayList<>();
+					for (SubstanceInterface tobeMerged : toBeAdded)
+						todo.add(() -> {
+							Substance.addAndMergeA(this, tobeMerged, false, re, mcr);
+							if (optPingCode != null)
+								optPingCode.run();
+						});
+					re.execInParallel(todo, "Merge substance data", null);
+				}
 			}
 		}
 	}

@@ -134,7 +134,7 @@ public class ExtractMappingDataAlgorithm extends AbstractAlgorithm {
 		if (onlyOne) {
 			ExperimentInterface all = new Experiment();
 			for (ExperimentInterface e : allData.values())
-				all.addAndMerge(e, re, new MergeCompareRequirements());
+				all.addAndMerge(null, e, re, new MergeCompareRequirements());
 			ArrayList<ExperimentInterface> lst = new ArrayList<ExperimentInterface>();
 			lst.add(all.clone());
 			return lst;
