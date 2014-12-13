@@ -406,6 +406,10 @@ public class Sample implements SampleInterface {
 	
 	@Override
 	public int compareTo(SampleInterface sd, boolean ignoreSnapshotFineTime) {
+		if (getTime() < sd.getTime())
+			return -1;
+		if (getTime() > sd.getTime())
+			return 1;
 		if (!ignoreSnapshotFineTime) {
 			Long ft = getSampleFineTimeOrRowId();
 			if (ft == null)
