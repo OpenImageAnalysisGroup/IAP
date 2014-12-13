@@ -188,7 +188,8 @@ public class CloudComputingService {
 																for (MongoDB m : MongoDB.getMongos()) {
 																	System.out.println(":merge - about to merge temporary data sets in database " + m.getDatabaseName());
 																	try {
-																		m.processSplitResults().merge(true, null, new ArrayList<>());
+																		m.processSplitResults().merge(
+																				null, true, null, new ArrayList<>());
 																		System.out.println(":merge - ^^^ merged temporary data sets in database " + m.getDatabaseName());
 																	} catch (Exception e1) {
 																		e1.printStackTrace();

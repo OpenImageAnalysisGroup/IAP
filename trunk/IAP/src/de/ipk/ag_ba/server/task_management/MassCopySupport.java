@@ -167,7 +167,7 @@ public class MassCopySupport {
 			// if (analyzeAllExperiments) {
 			for (MongoDB m : MongoDB.getMongos()) {
 				status.setCurrentStatusText2("Merge task results");
-				m.processSplitResults().merge(false, getStatusProvider(), new ArrayList<>());
+				m.processSplitResults().merge(null, false, getStatusProvider(), new ArrayList<>());
 				status.setCurrentStatusText2("Merged task results (" + SystemAnalysis.getCurrentTime() + ")");
 				
 				if (!onlyMerge) {

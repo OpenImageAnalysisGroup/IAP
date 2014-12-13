@@ -13,6 +13,7 @@ import org.ErrorMsg;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
@@ -22,7 +23,6 @@ import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.mongo.Batch;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 
 /**
@@ -92,14 +92,60 @@ public class CloudTaskManager {
 		if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE) {
 			installWatchDog();
 		}
+		
+		BackgroundTaskStatusProviderSupportingExternalCallImpl status3provider = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
+		ArrayList<String> names = new ArrayList<String>();
+		ArrayList<String> progress = new ArrayList<String>();
+		ThreadSafeOptions progressSum = new ThreadSafeOptions();
+		progressSum.setDouble(-1);
+		
+		Runnable ping = () -> {
+			try {
+				String l1 = status3provider.getCurrentStatusMessage1();
+				if (l1 == null)
+					l1 = "";
+				String l2 = status3provider.getCurrentStatusMessage2();
+				if (l2 == null)
+					l2 = "";
+				String l3 = status3provider.getCurrentStatusMessage3();
+				if (l3 == null)
+					l3 = "";
+				if (!l2.isEmpty()) {
+					if (!l1.isEmpty())
+						l1 = l1 + "<br>";
+					l1 = l1 + l2;
+				}
+				if (!l3.isEmpty()) {
+					if (!l1.isEmpty())
+						l1 = l1 + "<br>";
+					l1 = l1 + l3;
+				}
+				
+				Batch.pingHost(m, hostName,
+						BlockPipeline.getBlockExecutionsWithinLastMinute(),
+						BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
+						BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
+						progressSum.getDouble(),
+						(runningTasks.isEmpty() && !l1.isEmpty() ?
+								l1 + "<br>"
+								: "") +
+								(CloudTaskManager.this.process ? "" : "(processing disabled)<br>") +
+								(names.size() > 0 ? "Process: " + StringManipulationTools.getStringList(names, ", ") + // "<br>" +
+										"" + StringManipulationTools.getStringList(progress, ", ") +
+										(progress.size() > 1 ?
+												"<br>" +
+														status3provider.getCurrentStatusMessage3() : "") : "(no task)"));
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+			}
+		};
+		
 		long startTime = System.currentTimeMillis();
 		boolean disallownewtasks = false; // in batch mode only one task is allowed to be started
 		try {
-			BackgroundTaskStatusProviderSupportingExternalCallImpl status3provider = new BackgroundTaskStatusProviderSupportingExternalCallImpl("", "");
-			double progressSum = -1;
 			do {
-				ArrayList<String> names = new ArrayList<String>();
-				ArrayList<String> progress = new ArrayList<String>();
+				names.clear();
+				progress.clear();
 				try {
 					for (TaskDescription td : runningTasks) {
 						String name;
@@ -119,17 +165,7 @@ public class CloudTaskManager {
 				
 				try {
 					if (this.process)
-						Batch.pingHost(m, hostName,
-								BlockPipeline.getBlockExecutionsWithinLastMinute(),
-								BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
-								BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
-								progressSum,
-								(CloudTaskManager.this.process ? "" : "(processing disabled)<br>") +
-										(names.size() > 0 ? "Process: " + StringManipulationTools.getStringList(names, ", ") + // "<br>" +
-												"" + StringManipulationTools.getStringList(progress, ", ") +
-												(progress.size() > 1 ?
-														"<br>" +
-																status3provider.getCurrentStatusMessage3() : "") : "(no task)"));
+						ping.run();
 				} catch (Exception e) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Pinging host '" + hostName + "' produced an error: " + e.getMessage());
 				}
@@ -137,7 +173,7 @@ public class CloudTaskManager {
 				if (CloudTaskManager.this.process || fixedDisableProcess) {
 					ArrayList<TaskDescription> commands_to_start = new ArrayList<TaskDescription>();
 					
-					status3provider.setCurrentStatusValueFine(progressSum);
+					status3provider.setCurrentStatusValueFine(progressSum.getDouble());
 					
 					int maxTasks = SystemOptions.getInstance().getInteger("IAP", "Max-Concurrent-Phenotyping-Tasks", 1);
 					if (maxTasks < 1)
@@ -157,8 +193,10 @@ public class CloudTaskManager {
 					if (!fixedDisableProcess && cpuDesire < maxTasks && !disallownewtasks) {
 						if (m == null)
 							return;
-						
-						Batch.checkForMergePosibility(m, new BackgroundTaskConsoleLogger());
+						if (runningTasks.isEmpty()) {
+							Thread.sleep(5000);
+							Batch.checkForMergePosibility(m, status3provider, ping);
+						}
 						
 						for (BatchCmd batch : m.batch().getScheduledForStart(maxTasks - cpuDesire)) {
 							ExperimentHeaderInterface header = batch.getExperimentHeader();
@@ -189,7 +227,7 @@ public class CloudTaskManager {
 								" (" + StringManipulationTools.getStringList(commands_to_start, ", ") + ")");
 					
 					int nn = 0;
-					progressSum = 0;
+					progressSum.setDouble(0);
 					{
 						ArrayList<TaskDescription> delTaskFromMongo = new ArrayList<TaskDescription>();
 						ArrayList<TaskDescription> delTaskFromInternalQueue = new ArrayList<TaskDescription>();
@@ -206,10 +244,10 @@ public class CloudTaskManager {
 								} else {
 									if (!td.getBatchCmd().updateRunningStatus(m, CloudAnalysisStatus.IN_PROGRESS))
 										td.getBatchCmd().getStatusProvider().pleaseStop();
-									progressSum += td.getBatchCmd().getCurrentStatusValueFine();
+									progressSum.addDouble(td.getBatchCmd().getCurrentStatusValueFine());
 									nn++;
 								}
-							progressSum += td.getBatchCmd().getCurrentStatusValueFine();
+							progressSum.addDouble(td.getBatchCmd().getCurrentStatusValueFine());
 							nn++;
 						}
 						if (delTaskFromInternalQueue.size() > 0)
@@ -254,13 +292,13 @@ public class CloudTaskManager {
 							}
 						}
 					if (nn == 0)
-						progressSum = -1;
+						progressSum.setDouble(-1);
 					else
-						progressSum /= (nn);
+						progressSum.setDouble(progressSum.getDouble() / nn);
 				} else {
 					// System.out.println(SystemAnalysis.getCurrentTime() + "> Cloud Task Manager: Processing Disabled // " + SystemAnalysis.getCurrentTime());
 				}
-				Thread.sleep(1000);
+				Thread.sleep(5000);
 				if (IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE && System.currentTimeMillis() - startTime > 1000 * 60 * 10) {
 					if (runningTasks.isEmpty() && System.currentTimeMillis() - BlockPipeline.getLastBlockUpdateTime() > 1 * 60 * 1000) {
 						Batch.pingHost(m, hostName, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN, "system.exit");
