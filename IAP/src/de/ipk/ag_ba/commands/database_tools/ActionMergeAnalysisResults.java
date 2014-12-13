@@ -96,7 +96,7 @@ public class ActionMergeAnalysisResults extends AbstractNavigationAction {
 		mergedDocuments.clear();
 		status.setCurrentStatusText1("Initialize Command Operation");
 		ArrayList<ExperimentReference> newExperiments = new ArrayList<>();
-		nSplit = m.processSplitResults().merge(true, status, newExperiments);
+		nSplit = m.processSplitResults().merge(null, true, status, newExperiments);
 		for (ExperimentReference er : newExperiments) {
 			er.m = m;
 			mergedDocuments.add(new NavigationButton(new ActionMongoOrLTexperimentNavigation(er), src.getGUIsetting()));
