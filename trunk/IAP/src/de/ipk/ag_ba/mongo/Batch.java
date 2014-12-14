@@ -505,7 +505,7 @@ public class Batch {
 		// System.out.println("My ID=" + myID + ", MEM=" + SystemAnalysis.getDataAmountString(myMem * 1024 * 1024));
 		boolean iamFirstWithThisAmountOfMemory = true;
 		boolean equalFound = false;
-		long maxMem = -1;
+		long maxMem = myMem;
 		ArrayList<CloudHost> hl = m.batch().getAvailableHosts(5 * 60 * 1000);
 		for (CloudHost ch : hl) {
 			// System.out.println("Other? ID=" + ch.getHostName() + ", MEM=" + SystemAnalysis.getDataAmountString(ch.getMaxMem() * 1024 * 1024));
@@ -527,7 +527,7 @@ public class Batch {
 		} else
 			iamFirstWithThisAmountOfMemory = false;
 		// System.out.println("HasMaxMem?=" + hasMaxMem + ", isFirstWithMaxMem?=" + iamFirstWithThisAmountOfMemory);
-		statusProvider.setCurrentStatusText1(SystemAnalysis.getDataAmountString(myMem * 1024l * 1024l) + (hasMaxMem ? "*" : "")
+		statusProvider.setCurrentStatusText1(SystemAnalysis.getDataAmountString(myMem * 1024l * 1024l) + (hasMaxMem ? "^" : "")
 				+ (iamFirstWithThisAmountOfMemory ? "*" : "") + " Max Mem, " +
 				SystemAnalysis.getDataAmountString(SystemAnalysis.getRealSystemMemoryInMB() * 1024l * 1024l) + " Syst. RAM");
 		return hasMaxMem && iamFirstWithThisAmountOfMemory;
