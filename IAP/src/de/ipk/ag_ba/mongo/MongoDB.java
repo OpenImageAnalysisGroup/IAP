@@ -1590,7 +1590,7 @@ public class MongoDB {
 						m.addNewsItem(msg,
 								"system-msg");
 				} catch (Exception e1) {
-					ErrorMsg.addErrorMessage(e1);
+					ErrorMsg.addErrorMessage(e1.getLocalizedMessage() + " (failed to add news '" + msg + "')");
 				}
 			}
 		}, "Save msg to DB (" + msg + ")");

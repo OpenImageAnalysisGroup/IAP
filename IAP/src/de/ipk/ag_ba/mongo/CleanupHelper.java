@@ -123,13 +123,13 @@ public class CleanupHelper implements RunnableOnDB {
 			long nn = 0;// , max = conditions.count();
 			status.setCurrentStatusText2("Read list of condition IDs");// (" + max + ")");
 			DBCursor condCur = conditions
-					.find(new BasicDBObject(), new BasicDBObject("_id", 1));// .hint(new BasicDBObject("_id", 1))
+					.find(new BasicDBObject(), new BasicDBObject("_id", 1)).batchSize(50);// .hint(new BasicDBObject("_id", 1))
 			// .batchSize(10000);
 			while (condCur.hasNext()) {
 				ObjectId condO = (ObjectId) condCur.next().get("_id");
 				dbIdsOfConditions.add(condO.toString());
 				nn++;
-				if (nn % 500 == 0) {
+				if (nn % 50 == 0) {
 					status.setCurrentStatusText2("Read list of condition IDs (" + nn /* + "/" + max */+ ")");
 					status.setCurrentStatusValueFine(-1);// 100d * nn / max);
 				}
@@ -334,8 +334,10 @@ public class CleanupHelper implements RunnableOnDB {
 								toBeDeleted.clear();
 							}
 							synchronized (conditions) {
-								conditions.remove(
-										new BasicDBObject("_id", new BasicDBObject("$in", list)));
+								WriteResult rs = conditions.remove(
+										new BasicDBObject("_id", new BasicDBObject("$in", list)), WriteConcern.SAFE);
+								if (!rs.getLastError(WriteConcern.SAFE).ok())
+									throw new RuntimeException("Remove condtions error: " + rs.getError());
 							}
 							status.setCurrentStatusValueFine(100d / max * n.getLong());
 							status.setCurrentStatusText2(n.getLong() + "/" + max + " (" + (int) (100d / max * n.getLong()) + "%)");
