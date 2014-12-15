@@ -274,4 +274,10 @@ public class BackgroundThreadDispatcher {
 			}
 		};
 	}
+	
+	public static void runInSeparateThread(Runnable r, String task) {
+		Thread t = new Thread(r);
+		t.setName(task);
+		t.start();
+	}
 }
