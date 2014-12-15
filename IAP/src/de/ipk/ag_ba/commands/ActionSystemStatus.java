@@ -82,7 +82,7 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 													src.getGUIsetting()));
 							}
 						} catch (Exception e) {
-							ErrorMsg.addErrorMessage(e);
+							ErrorMsg.addErrorMessage(e.getLocalizedMessage() + " (failed to read screenshot list)");
 						}
 					}
 				}
