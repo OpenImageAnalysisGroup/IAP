@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
@@ -33,6 +34,7 @@ import de.ipk.ag_ba.server.task_management.CloudAnalysisStatus;
 import de.ipk.ag_ba.server.task_management.CloudComputingService;
 import de.ipk.ag_ba.server.task_management.CloudHost;
 import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public class Batch {
 	
@@ -539,8 +541,22 @@ public class Batch {
 		if (saveOverallDatasetIfPossible) {
 			// find out if this computer has most memory of online grid nodes
 			boolean hasMaxMem = Batch.checkIfHostHasMostMemory(m, statusProvider);
-			if (hasMaxMem)
+			if (hasMaxMem) {
+				Semaphore lock = BackgroundTaskHelper.lockGetSemaphore(null, 1);
+				lock.acquire();
+				BackgroundThreadDispatcher.runInSeparateThread(() -> {
+					try {
+						do {
+							optPingCode.run();
+							Thread.sleep(5000);
+						} while (!lock.tryAcquire());
+					} catch (Exception e) {
+						ErrorMsg.addErrorMessage(e);
+					}
+				}, "Ping While Merging");
 				m.processSplitResults().merge(optPingCode, false, statusProvider, new ArrayList<>());
+				lock.release();
+			}
 		} else
 			statusProvider.setCurrentStatusText1("<small>[no merge check]</small>");
 	}
