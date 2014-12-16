@@ -75,7 +75,11 @@ public class ActionCopyToMongo extends AbstractExperimentDataNavigationAction {
 			} else
 				exp.getHeader().setOriginDbId(exp.getHeader().getDatabaseId() + "");
 			
-			ExperimentInterface ue = m.saveExperiment(exp, status);
+			ExperimentInterface ue;
+			if (saveAnnotation)
+				ue = m.saveExperiment(exp, status, true, true);
+			else
+				ue = m.saveExperiment(exp, status);
 			if (ue != null) {
 				experiment.setExperimentData(ue);
 				experiment.setHeader(ue.getHeader());
