@@ -200,7 +200,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		boolean updatedSizeAvailable = false;
 		boolean determineSizeFromSource = false;
 		
-		if (determineSizeFromSource) {
+		if (determineSizeFromSource && !skipStorage) {
 			if (status != null)
 				status.setCurrentStatusText1(SystemAnalysis.getCurrentTime() + ">Determine Size");
 			{
@@ -315,7 +315,7 @@ public class ExperimentSaver implements RunnableOnDB {
 						MongoDB.saveSystemErrorMessage("Could not save quick XML file for experiment " + experiment.getName(), e);
 					}
 				}
-				if (!updatedSizeAvailable)
+				if (!updatedSizeAvailable && !skipStorage)
 					m.updateExperimentSize(db, experiment, status);
 			}
 		}
