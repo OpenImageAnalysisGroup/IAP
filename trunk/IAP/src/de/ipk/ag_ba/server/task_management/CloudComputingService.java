@@ -93,7 +93,7 @@ public class CloudComputingService {
 			System.out.println("System load    : " + StringManipulationTools.formatNumber(info.getLoad(), "#.#"));
 			System.exit(0);
 		} else
-			if ((args[0] + "").toLowerCase().startsWith("gui")) {
+			if (args.length > 0 && (args[0] + "").toLowerCase().startsWith("gui")) {
 				{
 					System.out.println(SystemAnalysis.getCurrentTime()
 							+ ">'gui' - Start graphical GUI");
