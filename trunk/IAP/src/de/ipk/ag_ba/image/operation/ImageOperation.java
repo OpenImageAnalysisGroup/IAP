@@ -344,10 +344,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 */
 	public ImageOperation convertFluo2intensity(FluoAnalysis type, double minimumIntensity) {
 		int background = ImageOperation.BACKGROUND_COLORint;
-		
-		if (minimumIntensity < 0)
-			minimumIntensity = 150;
-		int[] in = getAs1D(); // gamma(0.1) // 99999999999999999999999999999999
+		int[] in = getAs1D();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int idx = 0;
@@ -384,9 +381,11 @@ public class ImageOperation implements MemoryHogInterface {
 			
 			int i = (int) (intensity * 255d);
 			if (i > minimumIntensity)
-				i = 255;
-			int val = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
-			in[idx++] = val;
+				in[idx++] = background;
+			else {
+				int val = (0xFF << 24 | (i & 0xFF) << 16) | ((i & 0xFF) << 8) | ((i & 0xFF) << 0);
+				in[idx++] = val;
+			}
 		}
 		return new ImageOperation(in, w, h); // new ImageOperation(new FlexibleImage(in)).enhanceContrast();// .dilate();
 	}

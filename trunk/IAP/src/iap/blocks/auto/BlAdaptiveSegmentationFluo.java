@@ -1,6 +1,6 @@
 package iap.blocks.auto;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
+import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
 import ij.process.AutoThresholder;
 import ij.process.AutoThresholder.Method;
@@ -21,7 +21,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * 
  * @author klukas
  */
-public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
+public class BlAdaptiveSegmentationFluo extends AbstractBlock {
 	
 	public static final String RESULT_OF_FLUO_INTENSITY = "result of fluo intensity";
 	private boolean auto_tune, auto_tune_process_red_by_green;
@@ -42,29 +42,29 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 	}
 	
 	@Override
-	protected synchronized Image processFLUOmask() {
-		if (input().masks().fluo() == null) {
+	protected synchronized Image processMask(Image mask) {
+		if (mask == null) {
 			return null;
 		}
 		
 		if (debugValues) {
-			input().masks().fluo().show("inp fluo");
+			mask.show("inp fluo");
 		}
-		
-		ImageOperation io = input().masks().fluo().io();
+		mask = mask.copy();
+		ImageOperation io = mask.io();
 		
 		Image resClassic, resChlorophyll, resPhenol;
 		if (!auto_tune) {
 			double p1 = getDouble("minimum-intensity-classic", 220);
 			double p2 = getDouble("minimum-intensity-chloro", 220);
 			double p3 = getDouble("minimum-intensity-phenol", 170);
-			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, p1).getImage();
-			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, p2).getImage();
-			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, p3).getImage();
+			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, p1).getImage().show("classic res", false);
+			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, p2).getImage().show("chloro res", false);
+			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, p3).getImage().show("phenol res", false);
 		} else {
 			ImageOperation filterInp = io.copy();
 			if (auto_tune_process_red_by_green)
-				filterInp = filterInp.replaceColor(optionsAndResults.getBackground(), Color.BLACK.getRGB()).getR();
+				filterInp = filterInp.replaceColor(optionsAndResults.getBackground(), Color.BLACK.getRGB()).channels().getR();
 			else
 				filterInp = filterInp.convertFluo2intensity(FluoAnalysis.CLASSIC, 255);
 			ImageOperation filter = filterInp;
@@ -92,9 +92,9 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 			resClassic = io.copy().convertFluo2intensity(FluoAnalysis.CLASSIC, 256).getImage();
 			resChlorophyll = io.copy().convertFluo2intensity(FluoAnalysis.CHLOROPHYL, 256).getImage();
 			resPhenol = io.copy().convertFluo2intensity(FluoAnalysis.PHENOL, 256).getImage();
-			Image res = new Image(resClassic, resChlorophyll, resPhenol);
-			res.show("res", debugValues);
 		}
+		Image res = new Image(resClassic, resChlorophyll, resPhenol);
+		res.show("res", debugValues);
 		Image r = new Image(resClassic, resChlorophyll, resPhenol);
 		if (auto_tune && auto_tune_process_red_by_green) {
 			r = r.io().show("BEFORE HUE", false).filterByHSV_hue(getDouble("Auto-Tune - Minimum Result Hue", 0.4), optionsAndResults.getBackground())
@@ -102,7 +102,7 @@ public class BlAdaptiveSegmentationFluo extends AbstractSnapshotAnalysisBlock {
 		}
 		getResultSet().setImage(getBlockPosition(), RESULT_OF_FLUO_INTENSITY,
 				new ImageAndImageData(r, input().masks().getFluoInfo()), true);
-		return input().images().fluo().io().applyMask(r).getImage();
+		return mask.io().applyMask(r).getImage();
 	}
 	
 	@Override
