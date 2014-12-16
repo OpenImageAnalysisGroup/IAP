@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ErrorMsg;
 import org.MergeCompareRequirements;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -496,8 +497,25 @@ public class SplitResult {
 						if (optStatus != null)
 							optStatus.setCurrentStatusText1("About to merge split result datasets");
 						CloudTaskManager.disableWatchDog = true;
-						ExperimentInterface ne = doMerge(optPingCode, tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
-						newExperiments.add(new ExperimentReference(ne.getHeader(), m));
+						Semaphore lock = BackgroundTaskHelper.lockGetSemaphore(null, 1);
+						try {
+							lock.acquire();
+							BackgroundThreadDispatcher.runInSeparateThread(() -> {
+								try {
+									do {
+										optPingCode.run();
+										Thread.sleep(5000);
+									} while (!lock.tryAcquire());
+								} catch (Exception e) {
+									ErrorMsg.addErrorMessage(e);
+								}
+							}, "Ping While Merging");
+							
+							ExperimentInterface ne = doMerge(optPingCode, tempDataSetDescription, knownResults, interactive, optStatus, optPreviousResultsToBeMerged);
+							newExperiments.add(new ExperimentReference(ne.getHeader(), m));
+						} finally {
+							lock.release();
+						}
 						if (optPingCode != null)
 							optPingCode.run();
 						BlockPipeline.ping();
