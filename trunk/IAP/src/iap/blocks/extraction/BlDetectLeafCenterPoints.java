@@ -16,6 +16,8 @@ import java.awt.Color;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -92,24 +94,28 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		
 		MaximumFinder mf = new MaximumFinder();
 		int maxTolerance = getInt("Maximum Tolerance", 5);
-		ByteProcessor bp = mf.findMaxima(edmfp, maxTolerance, 1, mf.LIST, true, true);
-		
-		if (debugValues && bp != null)
-			new Image(bp.getBufferedImage()).show("Maximas");
-		
-		ResultsTable rt = mf.getRt();
-		
-		if (debugValues)
-			rt.show("results");
 		
 		LinkedList<Feature> centerPoints = new LinkedList<Feature>();
-		
-		for (int i = 0; i < rt.getCounter(); i++) {
-			int x = (int) rt.getValue("X", i);
-			int y = (int) rt.getValue("Y", i);
-			centerPoints.add(new Feature(x, y));
+		try {
+			ByteProcessor bp = mf.findMaxima(edmfp, maxTolerance, 1, mf.LIST, true, true);
+			
+			if (debugValues && bp != null)
+				new Image(bp.getBufferedImage()).show("Maximas");
+			
+			ResultsTable rt = mf.getRt();
+			
+			if (debugValues)
+				rt.show("results");
+			
+			for (int i = 0; i < rt.getCounter(); i++) {
+				int x = (int) rt.getValue("X", i);
+				int y = (int) rt.getValue("Y", i);
+				centerPoints.add(new Feature(x, y));
+			}
+		} catch (Exception e) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Could not calculate leaf center points for image (forground pixels: "
+					+ img.io().countFilledPixels() + ")!");
 		}
-		
 		return centerPoints;
 	}
 	
