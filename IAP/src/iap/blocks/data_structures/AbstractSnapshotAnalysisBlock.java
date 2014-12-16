@@ -3,6 +3,7 @@ package iap.blocks.data_structures;
 import info.StopWatch;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
+import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
@@ -20,8 +21,6 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 	protected MaskAndImageSet run() throws InterruptedException {
 		if (!getBoolean("enabled", true))
 			return input();
-		final ImageSet processedImages = new ImageSet(input().images());
-		final ImageSet processedMasks = new ImageSet(input().images());
 		
 		StopWatch ppw = new StopWatch(ExecutionTimeStep.BLOCK_PREPARE + "");
 		try {
@@ -39,9 +38,11 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 		boolean directRun = true;
 		final LocalComputeJob[] work = new LocalComputeJob[] {
 				BackgroundThreadDispatcher.addTask(() -> {
+						if (!getCameraInputTypes().contains(CameraType.NIR))
+							return;
 						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_NIR + "");
 						try {
-							processedImages.setNir(processNIRimage());
+							input().images().setNir(processNIRimage());
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, pw.getTime());
 						} catch (Error er) {
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, -pw.getTime());
@@ -52,9 +53,11 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 						}
 					}, name + " process NIR image", false, directRun),
 				BackgroundThreadDispatcher.addTask(() -> {
+						if (!getCameraInputTypes().contains(CameraType.IR))
+							return;
 						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_IR + "");
 						try {
-							processedImages.setIr(processIRimage());
+							input().images().setIr(processIRimage());
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, pw.getTime());
 						} catch (Error er) {
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, -pw.getTime());
@@ -65,9 +68,11 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 						}
 					}, name + " process IR image", false, directRun),
 				BackgroundThreadDispatcher.addTask(() -> {
+						if (!getCameraInputTypes().contains(CameraType.NIR))
+							return;
 						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_NIR + "");
 						try {
-							processedMasks.setNir(processNIRmask());
+							input().masks().setNir(processNIRmask());
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, pw.getTime());
 						} catch (Error er) {
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_NIR, -pw.getTime());
@@ -78,9 +83,11 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 						}
 					}, name + " process NIR mask", false, directRun),
 				BackgroundThreadDispatcher.addTask(() -> {
+						if (!getCameraInputTypes().contains(CameraType.IR))
+							return;
 						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_IR + "");
 						try {
-							processedMasks.setIr(processIRmask());
+							input().masks().setIr(processIRmask());
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, pw.getTime());
 						} catch (Error er) {
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_IR, -pw.getTime());
@@ -91,9 +98,11 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 						}
 					}, name + " process IR mask", false, directRun),
 				BackgroundThreadDispatcher.addTask(() -> {
+						if (!getCameraInputTypes().contains(CameraType.VIS))
+							return;
 						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
 						try {
-							processedImages.setVis(processVISimage());
+							input().images().setVis(processVISimage());
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
 						} catch (Error er) {
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
@@ -104,9 +113,11 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 						}
 					}, name + " process VIS image", false, directRun),
 				BackgroundThreadDispatcher.addTask(() -> {
+						if (!getCameraInputTypes().contains(CameraType.VIS))
+							return;
 						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_VIS + "");
 						try {
-							processedMasks.setVis(processVISmask());
+							input().masks().setVis(processVISmask());
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, pw.getTime());
 						} catch (Error er) {
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_VIS, -pw.getTime());
@@ -119,9 +130,11 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 				BackgroundThreadDispatcher.addTask(new Runnable() {
 					@Override
 					public void run() {
+						if (!getCameraInputTypes().contains(CameraType.FLUO))
+							return;
 						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
 						try {
-							processedImages.setFluo(processFLUOimage());
+							input().images().setFluo(processFLUOimage());
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
 						} catch (Error er) {
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
@@ -133,9 +146,11 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 					}
 				}, name + " process FLU image", false, directRun),
 				BackgroundThreadDispatcher.addTask(() -> {
+						if (!getCameraInputTypes().contains(CameraType.FLUO))
+							return;
 						StopWatch pw = new StopWatch(ExecutionTimeStep.BLOCK_PROCESS_FLUO + "");
 						try {
-							processedMasks.setFluo(processFLUOmask());
+							input().masks().setFluo(processFLUOmask());
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, pw.getTime());
 						} catch (Error er) {
 							addExecutionTime(ExecutionTimeStep.BLOCK_PROCESS_FLUO, -pw.getTime());
@@ -150,7 +165,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 		
 		ppw = new StopWatch(ExecutionTimeStep.BLOCK_POST_PROCESS + "");
 		try {
-			postProcess(processedImages, processedMasks);
+			postProcess(input().images(), input().masks());
 			addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, ppw.getTime());
 		} catch (Error e) {
 			addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, -ppw.getTime());
@@ -159,7 +174,7 @@ public abstract class AbstractSnapshotAnalysisBlock extends AbstractImageAnalysi
 			addExecutionTime(ExecutionTimeStep.BLOCK_POST_PROCESS, -ppw.getTime());
 			reportError(e, "Could not perform post-processing - exception");
 		}
-		return new MaskAndImageSet(processedImages, processedMasks);
+		return input();
 	}
 	
 	protected Image processVISimage() {
