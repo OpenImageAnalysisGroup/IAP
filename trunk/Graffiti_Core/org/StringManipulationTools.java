@@ -734,11 +734,11 @@ public class StringManipulationTools implements HelperClass {
 		return al;
 	}
 	
-	public static ArrayList<String> getStringListFromArray(NiceStringSupport[] elements) {
+	public static ArrayList<String> getStringListFromArray(NiceNameSupport[] elements) {
 		ArrayList<String> al = new ArrayList<String>();
 		if (elements != null)
-			for (NiceStringSupport o : elements)
-				al.add(o.getNiceString());
+			for (NiceNameSupport o : elements)
+				al.add(o.getNiceName());
 		return al;
 	}
 	
