@@ -1,6 +1,8 @@
 package de.ipk.ag_ba.gui.webstart;
 
-public interface ProgressWindow {
+import org.graffiti.editor.SplashScreenInterface;
+
+public interface ProgressWindow extends SplashScreenInterface {
 	
 	void show(boolean undecorated);
 	

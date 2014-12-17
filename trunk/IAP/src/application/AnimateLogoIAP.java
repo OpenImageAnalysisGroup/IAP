@@ -332,6 +332,8 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	private FXsplash jf;
 	private Scene mainScene;
 	protected boolean keep;
+	private int value;
+	private int maximum;
 	
 	public JComponent getFX(boolean directInit, boolean undecorated) {
 		JFXPanel jp = new JFXPanel();
@@ -435,5 +437,43 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		Scene s = buildScene2(STAGEWIDTH, STAGEHEIGHT);
 		s.setFill(Color.BLACK);
 		return s;
+	}
+	
+	@Override
+	public void setMaximum(int maximum) {
+		this.maximum = maximum;
+	}
+	
+	@Override
+	public void setText(String text) {
+		// empty
+	}
+	
+	@Override
+	public void setValue(int value) {
+		this.value = value;
+	}
+	
+	@Override
+	public int getValue() {
+		return value;
+	}
+	
+	@Override
+	public void setVisible(boolean b) {
+		if (b)
+			show(true);
+		else
+			hide();
+	}
+	
+	@Override
+	public void setInitialisationFinished() {
+		// empty
+	}
+	
+	@Override
+	public int getMaximum() {
+		return maximum;
 	}
 }
