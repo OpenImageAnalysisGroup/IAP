@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
-import org.NiceStringSupport;
+import org.NiceNameSupport;
 import org.StringManipulationTools;
 import org.jdom.Attribute;
 import org.jdom.Element;
@@ -22,7 +22,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
 
 public class Condition implements ConditionInterface {
 	
-	public enum ConditionInfo implements NiceStringSupport {
+	public enum ConditionInfo implements NiceNameSupport {
 		IGNORED_FIELD("---"), SPECIES("Species"), GENOTYPE("Genotype"), VARIETY("Variety"),
 		GROWTHCONDITIONS("Growth Condititions"), TREATMENT("Treatment"),
 		SEQUENCE("Sequence"), FILES("Files");
@@ -53,7 +53,7 @@ public class Condition implements ConditionInterface {
 		}
 		
 		@Override
-		public String getNiceString() {
+		public String getNiceName() {
 			return org.apache.commons.lang.WordUtils.capitalize(this.name().toLowerCase());
 		}
 	}
