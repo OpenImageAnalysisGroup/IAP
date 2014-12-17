@@ -24,6 +24,7 @@ import iap.blocks.extraction.BlCalcConvexHull;
 // import iap.blocks.extraction.BlCalcIntensityFeature3DHistogram;
 import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcMoments;
+import iap.blocks.extraction.BlCalcRGBfeatures;
 import iap.blocks.extraction.BlCalcTextureFeatures;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
@@ -162,6 +163,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlObjectSeparatorByDistance(),
 				new BlFlowerDetectionAndFeatureExtraction(),
 				new BlCalcTextureFeatures(),
+				new BlCalcRGBfeatures(),
 				new BlShowThreeDColorHistogram(),
 				new BlFilterImagesByDate(),
 				new BlFilterImagesByCondition(),
