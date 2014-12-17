@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con"  path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-discovery.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/activation.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/axis.jar"/>
@@ -60,6 +60,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
 	<classpathentry kind="lib" path="/IAP/lib/platform.jar"/>
 	<classpathentry kind="lib" path="/IAP/lib/jna.jar"/>
-	<classpathentry kind="lib" path="/IAP/lib/ij-1.48r.jar"/>
+	<classpathentry kind="lib" path="/IAP/lib/ij-1.49m.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
