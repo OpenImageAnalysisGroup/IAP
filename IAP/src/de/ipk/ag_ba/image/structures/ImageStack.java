@@ -303,7 +303,14 @@ public class ImageStack implements Iterable<ImageProcessor> {
 	}
 	
 	public Image getImage(int n) {
-		return new Image(this.stack.getProcessor(1).getBufferedImage());
-		
+		return new Image(this.stack.getProcessor(n + 1).getBufferedImage());
+	}
+	
+	public String[] getLabels() {
+		return this.stack.getSliceLabels();
+	}
+	
+	public ImageProcessor getProcessor(int n) {
+		return this.stack.getProcessor(n + 1);
 	}
 }
