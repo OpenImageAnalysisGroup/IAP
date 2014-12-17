@@ -47,7 +47,7 @@ public class BlFilterImagesByRegularExpression extends AbstractSnapshotAnalysisB
 			return ((f != ConditionInfo.IGNORED_FIELD) && (f != ConditionInfo.FILES));
 		});
 		
-		String calculationMode = optionsAndResults.getStringSettingRadio(this, "Annotation Mode", ConditionInfo.TREATMENT.getNiceString(),
+		String calculationMode = optionsAndResults.getStringSettingRadio(this, "Annotation Mode", ConditionInfo.TREATMENT.getNiceName(),
 				StringManipulationTools.getStringListFromStream(possibleValues));
 		
 		ConditionInfo annotationMode = ConditionInfo.valueOfString(calculationMode);

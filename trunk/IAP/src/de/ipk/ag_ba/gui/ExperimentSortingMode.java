@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.gui;
 
-import org.NiceStringSupport;
+import org.NiceNameSupport;
 import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
@@ -10,7 +10,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public enum ExperimentSortingMode implements NiceStringSupport {
+public enum ExperimentSortingMode implements NiceNameSupport {
 	GROUP_BY_TYPE_THEN_COORDINATOR("Group by type then coordinator"),
 	GROUP_BY_TYPE_THEN_IMPORT_USER("Group by type then import user"),
 	GROUP_BY_GROUP_THEN_IMPORT_USER("Group by import user group then import user"),
@@ -25,13 +25,13 @@ public enum ExperimentSortingMode implements NiceStringSupport {
 	}
 	
 	@Override
-	public String getNiceString() {
+	public String getNiceName() {
 		return nice;
 	}
 	
 	public static ExperimentSortingMode fromNiceString(String stringRadioSelection) {
 		for (ExperimentSortingMode e : values())
-			if (e.getNiceString().equals(stringRadioSelection))
+			if (e.getNiceName().equals(stringRadioSelection))
 				return e;
 		return GROUP_BY_TYPE_THEN_COORDINATOR;
 	}

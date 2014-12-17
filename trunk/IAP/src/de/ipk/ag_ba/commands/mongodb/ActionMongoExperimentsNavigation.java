@@ -99,7 +99,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			ExperimentSortingMode mode = ExperimentSortingMode.fromNiceString(SystemOptions.getInstance()
 					.getStringRadioSelection("GRID-STORAGE", "Experiment-Navigation Mode",
 							StringManipulationTools.getStringListFromArray(ExperimentSortingMode.values()),
-							ExperimentSortingMode.GROUP_BY_COORDINATOR_THEN_TYPE.getNiceString(),
+							ExperimentSortingMode.GROUP_BY_COORDINATOR_THEN_TYPE.getNiceName(),
 							true));
 			
 			if (mode != ExperimentSortingMode.GROUP_BY_COORDINATOR_THEN_TYPE)
