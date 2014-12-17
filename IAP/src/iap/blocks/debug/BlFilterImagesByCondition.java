@@ -53,7 +53,7 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 				return ((f != ConditionInfo.IGNORED_FIELD) && (f != ConditionInfo.FILES));
 			});
 			
-			String calculationMode = optionsAndResults.getStringSettingRadio(this, "Annotation Mode - F " + filterIdx, ConditionInfo.TREATMENT.getNiceString(),
+			String calculationMode = optionsAndResults.getStringSettingRadio(this, "Annotation Mode - F " + filterIdx, ConditionInfo.TREATMENT.getNiceName(),
 					StringManipulationTools.getStringListFromStream(possibleValues));
 			
 			ConditionInfo annotationMode = ConditionInfo.valueOfString(calculationMode);

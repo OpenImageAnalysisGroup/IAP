@@ -47,8 +47,6 @@ public class ImageTexture {
 	public HashMap<FirstOrderTextureFeatures, Double> firstOrderFeatures = new HashMap<>();
 	public HashMap<GLCMTextureFeatures, Double> glcmFeatures = new HashMap<>();
 	
-	boolean ignoreBackground = true;
-	
 	private double[] sqrtList;
 	
 	/**
@@ -59,7 +57,10 @@ public class ImageTexture {
 		img = new int[pix.length];
 		int i = 0;
 		for (int p : pix) {
-			img[i++] = p & 0x0000ff;
+			if (p != ImageOperation.BACKGROUND_COLORint)
+				img[i++] = p & 0x0000ff;
+			else
+				img[i++] = p;
 		}
 		w = inp.getWidth();
 		h = inp.getHeight();
@@ -76,11 +77,10 @@ public class ImageTexture {
 	/**
 	 * Use array with saved gray-scale values as input.
 	 */
-	public ImageTexture(int[] inp, int width, int height, boolean ignoreBack) {
+	public ImageTexture(int[] inp, int width, int height) {
 		img = inp;
 		w = width;
 		h = height;
-		ignoreBackground = ignoreBack;
 	}
 	
 	public void calcTextureFeatures() {

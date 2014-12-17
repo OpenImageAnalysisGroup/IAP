@@ -194,7 +194,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			ImageOperation crop = rot.cropAbs(halfdiff_disired, rot.getWidth() - halfdiff_disired, halfdiff_disired, rot.getWidth() - halfdiff_disired);
 			
 			final int f_masksize = crop.getWidth();
-			ImageTexture it = new ImageTexture(crop.getAs1D(), f_masksize, f_masksize, true);
+			ImageTexture it = new ImageTexture(crop.getAs1D(), f_masksize, f_masksize);
 			
 			it.calcTextureFeatures();
 			
@@ -268,7 +268,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 								count++;
 							}
 						}
-						ImageTexture it = new ImageTexture(temp, f_masksize, f_masksize, true);
+						ImageTexture it = new ImageTexture(temp, f_masksize, f_masksize);
 						
 						it.calcTextureFeatures();
 						

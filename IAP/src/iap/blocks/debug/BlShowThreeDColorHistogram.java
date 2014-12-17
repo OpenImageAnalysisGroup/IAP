@@ -76,7 +76,7 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 	protected Image processMask(Image mask) {
 		CameraType ct = mask.getCameraType();
 		ArrayList<String> possibleValues = StringManipulationTools.getStringListFromArray(ColorSpace.values());
-		String calculationMode = optionsAndResults.getStringSettingRadio(this, "Calculation Mode", ColorSpace.RGB.getNiceString(), possibleValues);
+		String calculationMode = optionsAndResults.getStringSettingRadio(this, "Calculation Mode", ColorSpace.RGB.getNiceName(), possibleValues);
 		ColorSpace colorspace = ColorSpace.valueOfNiceString(calculationMode);
 		
 		if ((ct == CameraType.VIS && processVis) ||
