@@ -51,6 +51,7 @@ import bsh.Interpreter;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.SaveAsCsvDataProcessor;
@@ -127,7 +128,7 @@ public class IAPmain extends JApplet {
 		SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70);
 		
 		JFrame jf = new JFrame(title);
-		IAPmain iap = new IAPmain(addons);
+		IAPmain iap = new IAPmain(addons, progressWindow);
 		jf.add("Center", iap.getContentPane());
 		jf.pack();
 		try {
@@ -210,10 +211,10 @@ public class IAPmain extends JApplet {
 	}
 	
 	public IAPmain() {
-		this(null);
+		this(null, null);
 	}
 	
-	public IAPmain(final String[] addons) {
+	public IAPmain(final String[] addons, ProgressWindow progressWindow) {
 		if (getRunMode() == IAPrunMode.UNKNOWN)
 			setRunMode(IAPrunMode.SWING_APPLET);
 		if (getRunMode() == IAPrunMode.SWING_APPLET)
@@ -280,7 +281,7 @@ public class IAPmain extends JApplet {
 				// }
 				// IAPmain.myClassKnown = true;
 				// System.out.println("Class Loader: " + InstanceLoader.getCurrentLoader().getClass().getCanonicalName());
-				myAppletLoad(mainFrame1, myStatus, addons);
+				myAppletLoad(mainFrame1, myStatus, addons, progressWindow);
 				// myAppletLoad(mainFrame2, myStatus);
 			}
 		};
@@ -324,7 +325,7 @@ public class IAPmain extends JApplet {
 	public void myAppletLoad(
 			final MainFrame statusPanel,
 			final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus,
-			final String[] addons) {
+			final String[] addons, ProgressWindow progressWindow) {
 		String stS = "<font color=\"#9500C0\"><b>";
 		String stE = "</b></font>";
 		DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT = "IAP";
@@ -357,7 +358,7 @@ public class IAPmain extends JApplet {
 		ReleaseInfo.setHelpIntroductionText(s);
 		
 		// URL config,
-		final SplashScreenInterface splashScreen = new SplashScreenInterface() {
+		final SplashScreenInterface splashScreen = progressWindow != null ? progressWindow : new SplashScreenInterface() {
 			
 			private int max, val;
 			
@@ -399,6 +400,7 @@ public class IAPmain extends JApplet {
 				return max;
 			}
 		};
+		
 		ClassLoader cl = this.getClass().getClassLoader();
 		
 		String path = // this.getClass().getPackage().getName()
@@ -468,16 +470,26 @@ public class IAPmain extends JApplet {
 		} catch (IOException e) {
 			ErrorMsg.addErrorMessage(e.getLocalizedMessage());
 		} catch (NullPointerException npe) {
+			if (splashScreen != null)
+				splashScreen.setVisible(false);
 			System.err.println("Internal error: Plugin Description files could not be loaded.");
 			System.err.println("-- Program needs to be stopped");
+			System.err.println("EXIT in 10 seconds.");
+			BackgroundThreadDispatcher.runInSeparateThread(() -> {
+				try {
+					Thread.sleep(10000);
+				} catch (Exception e) {
+					//
+				}
+				System.exit(1);
+			}, "System.exit in 60 seconds");
 			JOptionPane.showMessageDialog(null, "<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
-					+ "Program execution can not continue.<br>" + "The application needs to be closed.<br>" +
+					+ "Program execution can not continue.<br>" + "The application needs to be closed (and will be closed in 10 sec.).<br>" +
 					"<br>" +
 					"Create description files by executing the script createfilelist.cmd from the console (Linux/Mac)<br>" +
 					"or by executing createfilelist.bat directly from within Eclipse (works only on Windows).<br>" +
 					"These scripts are stored and available within the 'make' project." +
 					"</html>");
-			System.err.println("EXIT");
 			System.exit(1);
 		}
 		
