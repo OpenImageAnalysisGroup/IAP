@@ -537,7 +537,8 @@ public class IAPmain extends JApplet {
 		ExperimentDataProcessingManager.addExperimentDataProcessor(new SaveAsCsvDataProcessor());
 		
 		splashScreen.setText("Initialize GUI...");
-		splashScreen.setVisible(false);
+		if (progressWindow == null)
+			splashScreen.setVisible(false);
 		splashScreen.setInitialisationFinished();
 		ErrorMsg.setAppLoadingCompleted(ApplicationStatus.PROGRAM_LOADING_FINISHED);
 	}
