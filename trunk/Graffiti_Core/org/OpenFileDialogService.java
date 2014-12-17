@@ -243,7 +243,7 @@ public class OpenFileDialogService implements HelperClass {
 		}
 		JavaFX.init();
 		DirectoryChooser dc = new DirectoryChooser();
-		if (openDialog.getCurrentDirectory() != null)
+		if (openDialog.getCurrentDirectory() != null && openDialog.getCurrentDirectory().exists())
 			dc.setInitialDirectory(openDialog.getCurrentDirectory());
 		dc.setTitle(okButtonText);
 		if (Platform.isFxApplicationThread()) {
