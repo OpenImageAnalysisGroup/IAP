@@ -50,7 +50,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 	
 	private int maxDistance = 15;
 	
-	private static double sqrtOfTwoDivTwo = Math.sqrt(2) / 2.0;
+	private static final double sqrtOfTwoDivTwo = Math.sqrt(2) / 2.0;
 	
 	@Override
 	protected void prepare() {
