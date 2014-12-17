@@ -170,6 +170,7 @@ public class ExperimentSaver implements RunnableOnDB {
 		System.out.println("Exp.type        : " + experiment.getHeader().getExperimentType());
 		System.out.println("Group           : " + experiment.getHeader().getImportusergroup());
 		System.out.println("Username        : " + experiment.getHeader().getImportusername());
+		System.out.println("Coordinator     : " + experiment.getHeader().getCoordinator());
 		System.out.println("Remark          : " + experiment.getHeader().getRemark());
 		System.out.println(">>> KEEP EXTERNAL REFS?  : " + keepDataLinksToDataSource_safe_space);
 		// experiment.getHeader().setImportusername(SystemAnalysis.getUserName());

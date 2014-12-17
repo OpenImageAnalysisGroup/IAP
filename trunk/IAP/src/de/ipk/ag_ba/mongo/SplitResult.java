@@ -34,7 +34,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.BackgroundTaskConsoleLogger;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.DataMappingTypeManager3D;
-import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
 public class SplitResult {
 	
@@ -217,21 +216,7 @@ public class SplitResult {
 				ci.setExperimentType(IAPexperimentTypes.AnalysisResults + "");
 			}
 		}
-		boolean superMerge = false;
-		if (superMerge) {
-			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Get mapping path objects");
-			System.out.println(SystemAnalysis.getCurrentTime() + ">GET MAPPING PATH OBJECTS...");
-			ArrayList<MappingData3DPath> mdpl = MappingData3DPath.get(mergedExperiment, false);
-			mergedExperiment.clear();
-			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Mapping path obhjects to experiment");
-			System.out.println(SystemAnalysis.getCurrentTime() + ">MERGE " + mdpl.size() + " MAPPING PATH OBJECTS TO EXPERIMENT...");
-			mergedExperiment = MappingData3DPath.merge(mdpl, false);
-			if (optStatus != null)
-				optStatus.setCurrentStatusText1("Created unified experiment");
-			System.out.println(SystemAnalysis.getCurrentTime() + ">UNIFIED EXPERIMENT CREATED");
-		}
+		
 		long tStart = tempDataSetDescription.getSubmissionTimeL();
 		long tProcessing = tFinish - tStart;
 		int nToDo = tempDataSetDescription.getPartCntI();
@@ -252,10 +237,12 @@ public class SplitResult {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Merged Experiment: " + mergedExperiment.getName());
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Merged Measurements: " + mergedExperiment.getNumberOfMeasurementValues());
 		
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: SAVE COMBINED EXPERIMENT...");
-		ExperimentInterface resExp = m
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: SAVE COMBINED EXPERIMENT... (old id=" + mergedExperiment.getHeader().getDatabaseId()
+				+ ", which will be cleared for saving)");
+		mergedExperiment.getHeader().setDatabaseId("");
+		mergedExperiment = m
 				.saveExperiment(mergedExperiment, optStatus == null ? new BackgroundTaskConsoleLogger("", "", true) : optStatus, true, true);
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COMBINED EXPERIMENT HAS BEEN SAVED");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COMBINED EXPERIMENT HAS BEEN SAVED TO " + mergedExperiment.getHeader().getDatabaseId());
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Saved combined experiment " + mergedExperiment.getName());
 		if (optStatus != null)
@@ -282,10 +269,13 @@ public class SplitResult {
 			try {
 				if (i.getDatabaseId() != null && i.getDatabaseId().length() > 0) {
 					ExperimentHeaderInterface hhh = m.getExperimentHeader(new ObjectId(experiment2id.get(i)));
-					if (!deleteAfterMerge)
+					if (!deleteAfterMerge) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Put experiment " + i.getDatabaseId() + " into trash: " + i.getExperimentName());
 						m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
-					else
-						m.deleteExperiment(i.getDatabaseId());
+					} else {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Delete experiment " + i.getDatabaseId() + ": " + i.getExperimentName());
+						// m.deleteExperiment(i.getDatabaseId());
+					}
 				}
 				if (optStatus != null)
 					optStatus.setCurrentStatusValueFine(100d * (idx++) / maxIdx);
@@ -310,7 +300,7 @@ public class SplitResult {
 		if (optStatus != null)
 			optStatus.setCurrentStatusText2("Completed in " + SystemAnalysis.getWaitTime(System.currentTimeMillis() - tFinish) + "");
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: COMPLETED");
-		return resExp;
+		return mergedExperiment;
 	}
 	
 	public int merge(Runnable optPingCode, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
