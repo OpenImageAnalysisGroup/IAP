@@ -184,7 +184,7 @@ public class SystemOptions {
 	
 	protected static HashMap<String, SystemOptions> fileIniInstances = new HashMap<String, SystemOptions>();
 	
-	public static synchronized SystemOptions getInstance(String iniFileName, IniIoProvider iniIO) {
+	public static SystemOptions getInstance(String iniFileName, IniIoProvider iniIO) {
 		if (iniIO != null)
 			try {
 				if (iniIO.getInstance() != null)
@@ -212,7 +212,7 @@ public class SystemOptions {
 		}
 	}
 	
-	public synchronized static SystemOptions getInstance() {
+	public static SystemOptions getInstance() {
 		try {
 			return getInstance(null, null);
 		} catch (Exception e) {
