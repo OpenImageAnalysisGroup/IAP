@@ -313,4 +313,23 @@ public class ImageStack implements Iterable<ImageProcessor> {
 	public ImageProcessor getProcessor(int n) {
 		return this.stack.getProcessor(n + 1);
 	}
+	
+	public int[][][] getIntCube() {
+		int width = stack.getWidth();
+		int height = stack.getHeight();
+		int bands = stack.getSize();
+		int[][][] cube = new int[width][height][bands];
+		
+		for (int b = 0; b < bands; b++) {
+			int[][] slice = this.getImage(b).getAs2A();
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					cube[x][y][b] = slice[x][y];
+				}
+			}
+			
+		}
+		
+		return cube;
+	}
 }
