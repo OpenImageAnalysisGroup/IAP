@@ -10,7 +10,11 @@
 
 package org.bson.util.annotations;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * The class to which this annotation is applied is immutable.  This means that
@@ -27,9 +31,12 @@ import java.lang.annotation.*;
  * <p>
  * Immutable objects are inherently thread-safe; they may be passed between threads or
  * published without synchronization.
+ *
+ * @deprecated This class is NOT a part of public API and will be dropped in 3.x versions.
  */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated
 public @interface Immutable {
 }
