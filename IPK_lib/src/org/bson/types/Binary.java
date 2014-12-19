@@ -1,22 +1,17 @@
-// Binary.java
-
-/**
- *  See the NOTICE.txt file distributed with this work for
- *  information regarding copyright ownership.
+/*
+ * Copyright (c) 2008-2014 MongoDB, Inc.
  *
- *  The authors license this file to you under the
- *  Apache License, Version 2.0 (the "License"); you may not use
- *  this file except in compliance with the License.  You may
- *  obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.bson.types;
@@ -27,7 +22,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * generic binary holder
+ * Generic binary holder.
  */
 public class Binary implements Serializable {
 
@@ -43,24 +38,39 @@ public class Binary implements Serializable {
     }
 
     /**
-     * Creates a Binary object
+     * Creates a Binary with the specified type and data.
      *
-     * @param type type of the field as encoded in BSON
-     * @param data raw data
+     * @param type the binary type
+     * @param data the binary data
      */
     public Binary(byte type, byte[] data) {
         _type = type;
         _data = data;
     }
 
+    /**
+     * Get the binary sub type as a byte.
+     *
+     * @return the binary sub type as a byte.
+     */
     public byte getType() {
         return _type;
     }
 
+    /**
+     * Get a copy of the binary value.
+     *
+     * @return a copy of the binary value.
+     */
     public byte[] getData() {
         return _data;
     }
 
+    /**
+     * Get the length of the data.
+     *
+     * @return the length of the binary array.
+     */
     public int length() {
         return _data.length;
     }
