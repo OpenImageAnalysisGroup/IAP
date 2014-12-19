@@ -319,6 +319,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		NavigationAction res = new AbstractNavigationAction("Show content of trash can") {
 			
 			private NavigationButton src;
+			ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
 			
 			@Override
 			public String getDefaultImage() {
@@ -333,6 +334,16 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			@Override
 			public void performActionCalculateResults(NavigationButton src) throws Exception {
 				this.src = src;
+				actions.clear();
+				actions.add(ActionTrash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
+						src.getGUIsetting(), m));
+				actions.add(ActionTrash.getTrashEntity(trashed, DeletionCommand.UNTRASH_ALL,
+						src.getGUIsetting(), m));
+				for (ExperimentHeaderInterface ehi : trashed) {
+					ExperimentReference exp = new ExperimentReference(ehi, m);
+					actions.add(getMongoExperimentButton(exp, src.getGUIsetting()));
+				}
+				
 			}
 			
 			@Override
@@ -344,15 +355,6 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			
 			@Override
 			public ArrayList<NavigationButton> getResultNewActionSet() {
-				ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
-				actions.add(ActionTrash.getTrashEntity(trashed, DeletionCommand.EMPTY_TRASH_DELETE_ALL_TRASHED_IN_LIST,
-						src.getGUIsetting(), m));
-				actions.add(ActionTrash.getTrashEntity(trashed, DeletionCommand.UNTRASH_ALL,
-						src.getGUIsetting(), m));
-				for (ExperimentHeaderInterface ehi : trashed) {
-					ExperimentReference exp = new ExperimentReference(ehi, m);
-					actions.add(getMongoExperimentButton(exp, src.getGUIsetting()));
-				}
 				return actions;
 			}
 		};

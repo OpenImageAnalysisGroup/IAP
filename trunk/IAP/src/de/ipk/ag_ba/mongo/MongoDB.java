@@ -483,12 +483,14 @@ public class MongoDB {
 											System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not get condition list for substance "
 													+ substance.get("name") + " (id " + so + ")");
 										} else {
-											for (Object oo : cl)
+											for (Object oo : cl) {
 												if (oo != null)
-													rList.add(new ObjectId(oo.toString()));
-											if (rList.size() > 2000) {
-												collCond.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
-												rList.clear();
+													collCond.remove(new BasicDBObject("_id", oo.toString()), WriteConcern.ACKNOWLEDGED);
+												// rList.add(new ObjectId(oo.toString()));
+												// if (rList.size() > 0) {
+												// collCond.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)), WriteConcern.SAFE);
+												// rList.clear();
+												// }
 											}
 										}
 									}
@@ -499,10 +501,12 @@ public class MongoDB {
 							rList.clear();
 							if (sl != null) {
 								for (Object oo : sl)
-									if (oo != null)
-										rList.add(new ObjectId(oo.toString()));
-								if (rList.size() > 0)
-									collSubst.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
+									if (oo != null) {
+										collSubst.remove(new BasicDBObject("_id", oo.toString()), WriteConcern.ACKNOWLEDGED);
+									}
+								// rList.add(new ObjectId(oo.toString()));
+								// if (rList.size() > 0)
+								// collSubst.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
 							}
 						}
 						collExps.remove(expRef);
