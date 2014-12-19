@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2008-2014 MongoDB, Inc.
  *
@@ -14,19 +15,33 @@
  * limitations under the License.
  */
 
-// ByteStream.java
+package org.bson.types;
 
-package com.mongodb.io;
-
-import java.nio.ByteBuffer;
+import java.io.Serializable;
 
 /**
- * @deprecated This class is NOT a part of public API and will be dropped in 3.x versions.
+ * Represent the maximum key value regardless of the key's type
  */
-@Deprecated
-public interface ByteStream {
+public class MaxKey implements Serializable {
+
+    private static final long serialVersionUID = 5123414776151687185L;
+
+    public MaxKey() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+       return o instanceof MaxKey;
+    }
     
-    public boolean hasMore();
-    public int write( ByteBuffer bb );
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+    
+    @Override
+    public String toString() {
+        return "MaxKey";
+    }
 
 }
