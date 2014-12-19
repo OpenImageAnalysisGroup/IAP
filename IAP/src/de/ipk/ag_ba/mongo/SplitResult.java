@@ -274,7 +274,7 @@ public class SplitResult {
 						m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
 					} else {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Delete experiment " + i.getDatabaseId() + ": " + i.getExperimentName());
-						// m.deleteExperiment(i.getDatabaseId());
+						m.deleteExperiment(i.getDatabaseId());
 					}
 				}
 				if (optStatus != null)

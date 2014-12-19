@@ -50,14 +50,17 @@ import org.AttributeHelper;
 import org.ErrorMsg;
 import org.HomeFolder;
 import org.IniIoProvider;
+import org.MeasurementFilter;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.editor.MainFrame;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.ActionSettings;
+import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.PipelineDesc;
@@ -1325,6 +1328,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									.getFileNameMain(), targetTreeNode
 									.getExperiment().getExperiment(), viewMode == ImageViewMode.TIMELINE);
 					if (match.size() > 0) {
+						NumericMeasurementInterface iddd = match.iterator().next();
+						MeasurementFilter mf = new MySnapshotFilter(new ArrayList<ThreadSafeOptions>(), iddd.getParentSample().getParentCondition()
+								.getExperimentHeader().getGlobalOutlierInfo());
 						ArrayList<ImageData> toBeLoaded = new ArrayList<ImageData>();
 						NumericMeasurementInterface a = match.iterator().next();
 						String pre =
@@ -1339,8 +1345,22 @@ public class DataSetFileButton extends JButton implements ActionListener {
 						
 						String desiredCamera = ((ImageData) imageResult.getBinaryFileInfo().getEntity()).getParentSample().getParentCondition().getParentSubstance()
 								.getName();
+						boolean addClockToImages = SystemOptions.getInstance().getBoolean("IAP", "Image View//Add Clock Icon for Image Display", true);
+						Color cbc = SystemOptions.getInstance().getColor("IAP", "Image View//Clock Icon Border Color", Color.RED);
+						Color chc = SystemOptions.getInstance().getColor("IAP", "Image View//Clock Icon Hand Color", Color.BLACK);
+						Color ctc = SystemOptions.getInstance().getColor("IAP", "Image View//Clock Icon Text Color", Color.GRAY);
+						int clockR = SystemOptions.getInstance().getInteger("IAP", "Image View//Clock Radius", 50);
+						int clockB = SystemOptions.getInstance().getInteger("IAP", "Image View//Clock Border", 10);
 						if (main) {
 							for (NumericMeasurementInterface nmi : match) {
+								boolean isGlobalOutlier = mf.filterOut(nmi.getQualityAnnotation(), nmi.getParentSample().getTime());
+								if (isGlobalOutlier)
+									continue;
+								String f = ((NumericMeasurement3D) nmi).getAnnotationField("outlier");
+								if (f != null && f.equals("1")) {
+									continue;
+								}
+								
 								if (viewMode == ImageViewMode.TIMELINE
 										&& !desiredCamera.equals(nmi.getParentSample().getParentCondition().getParentSubstance().getName()))
 									continue;
@@ -1352,6 +1372,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										else {
 											Image fi = new Image(
 													id.getURL());
+											if (addClockToImages)
+												fi = fi.io().canvas().drawClock(clockR, clockB, id, cbc, chc, ctc).getImage();
 											if (viewMode == ImageViewMode.HISTOGRAM)
 												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
 											else
@@ -1374,6 +1396,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										else {
 											Image fi = new Image(
 													id.getLabelURL());
+											if (addClockToImages)
+												fi = fi.io().canvas().drawClock(clockR, clockB, id, cbc, chc, ctc).getImage();
 											if (viewMode == ImageViewMode.HISTOGRAM)
 												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
 											else
@@ -1395,6 +1419,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 										Image fi = new Image(
 												new IOurl(
 														id.getAnnotationField("oldreference")));
+										if (addClockToImages)
+											fi = fi.io().canvas().drawClock(clockR, clockB, id, cbc, chc, ctc).getImage();
 										if (viewMode == ImageViewMode.TIMELINE)
 											is.addImage(id.getQualityAnnotation() + " / " + id.getSubstanceName() + " / " + id.getParentSample().getTimeUnit() + " "
 													+ id.getParentSample().getTime(), fi);

@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.Vector2i;
 
@@ -16,6 +17,7 @@ import de.ipk.ag_ba.image.operations.complex_hull.Line;
 import de.ipk.ag_ba.image.operations.complex_hull.Point;
 import de.ipk.ag_ba.image.operations.skeleton.RunnableWithBooleanResult;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 public class ImageCanvas {
 	
@@ -439,6 +441,32 @@ public class ImageCanvas {
 	
 	public ImageCanvas drawLine(Vector2i v1, Vector2i v2, int rgb, double alpha, int size) {
 		return drawLine(v1.x, v1.y, v2.x, v2.y, rgb, alpha, size);
+	}
+	
+	public ImageCanvas drawClock(int r, int border, ImageData id, Color clockBorderColor, Color clockHandColor, Color clockTextColor) {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		if (w < r * 2 || h < r * 2)
+			return this;
+		else {
+			int x = w - r - 3 * border;
+			int y = h - r - 3 * border;
+			ImageCanvas canvas = drawCircle(
+					x,
+					y, r, clockBorderColor.getRGB(), 0.5, 2);
+			canvas = canvas.text(2 + w - r - 4 * border, h - 2 * r - 3 * border, "0", clockTextColor);
+			canvas = canvas.text(5 + w - r - 5 * border, h, "12", clockTextColor);
+			canvas = canvas.text(w - 2 * border, h - r - 1 * border - border / 2, "6", clockTextColor);
+			canvas = canvas.text(w - 2 * r - 6 * border - 5, h - r - 1 * border - border / 2, "18", clockTextColor);
+			Long t = id.getParentSample().getSampleFineTimeOrRowId();
+			if (t != null) {
+				Date date = new Date(t);
+				double day = date.getHours() / 24d + date.getMinutes() / 24d / 60d + date.getSeconds() / 24d / 60d / 60d;
+				day = day * 2 * Math.PI - Math.PI / 2;
+				canvas = canvas.drawLine(x, y, (int) (x + r * Math.cos(day)), (int) (y + r * Math.sin(day)), clockHandColor.getRGB(), 0.5, 1);
+			}
+			return canvas;
+		}
 	}
 	
 }

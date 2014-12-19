@@ -1946,6 +1946,14 @@ public class IAPservice {
 			public void run() {
 				int err = 0;
 				String lasturl = "";
+				
+				boolean addClockToImages = SystemOptions.getInstance().getBoolean("IAP", "Image View//Add Clock Icon for Image Display", true);
+				Color cbc = SystemOptions.getInstance().getColor("IAP", "Image View//Clock Icon Border Color", Color.RED);
+				Color chc = SystemOptions.getInstance().getColor("IAP", "Image View//Clock Icon Hand Color", Color.BLACK);
+				Color ctc = SystemOptions.getInstance().getColor("IAP", "Image View//Clock Icon Text Color", Color.GRAY);
+				int clockR = SystemOptions.getInstance().getInteger("IAP", "Image View//Clock Radius", 50);
+				int clockB = SystemOptions.getInstance().getInteger("IAP", "Image View//Clock Border", 10);
+				
 				for (int i = 0; i < toBeLoaded.size(); i++) {
 					if (status.wantsToStop())
 						break;
@@ -1973,6 +1981,8 @@ public class IAPservice {
 						if (SystemOptions.getInstance().getBoolean("IAP", "Image View//Add Snapshot Time to Timeline", true))
 							fi = fi.io().canvas().text(10, fi.getHeight() - 10, id.getParentSample().getTimeUnit() + " "
 									+ id.getParentSample().getTime() + " " + t, c, 25).getImage();
+						if (addClockToImages)
+							fi = fi.io().canvas().drawClock(clockR, clockB, id, cbc, chc, ctc).getImage();
 						is.addImage(id.getQualityAnnotation() + "|" + id.getSubstanceName() + "|" + id.getParentSample().getTimeUnit() + " "
 								+ id.getParentSample().getTime() + "|" + id.getRotation(), fi);
 					} catch (Exception e) {
