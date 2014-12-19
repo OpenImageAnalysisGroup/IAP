@@ -1,19 +1,17 @@
-// BSONTimestamp.java
-
-/**
- *      Copyright (C) 2008 10gen Inc.
+/*
+ * Copyright (c) 2008-2014 MongoDB, Inc.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.bson.types;
@@ -22,10 +20,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * this is used for internal increment values.
- * for storing normal dates in MongoDB, you should use java.util.Date
- * <b>time</b> is seconds since epoch
- * <b>inc<b> is an ordinal
+ * This is used for internal increment values. For storing normal dates in MongoDB, you should use java.util.Date {@code time} is seconds
+ * since epoch {@code inc} is an ordinal.
  */
 public class BSONTimestamp implements Comparable<BSONTimestamp>, Serializable {
 
@@ -33,18 +29,29 @@ public class BSONTimestamp implements Comparable<BSONTimestamp>, Serializable {
     
     static final boolean D = Boolean.getBoolean( "DEBUG.DBTIMESTAMP" );
 
+    /**
+     * Construct a new instance with a null time and a 0 increment.
+     */
     public BSONTimestamp(){
         _inc = 0;
         _time = null;
     }
 
-    public BSONTimestamp(int time, int inc ){
+    /**
+     * Construct a new instance for the given time and increment.
+     *
+     * @param time the number of seconds since the epoch
+     * @param inc  the increment.
+     */
+    public BSONTimestamp(final int time, final int inc) {
         _time = new Date( time * 1000L );
         _inc = inc;
     }
 
     /**
-     * @return get time in seconds since epoch
+     * Gets the time in seconds since epoch.
+     *
+     * @return an int representing time in seconds since epoch
      */
     public int getTime(){
         if ( _time == null )
@@ -52,10 +59,16 @@ public class BSONTimestamp implements Comparable<BSONTimestamp>, Serializable {
         return (int)(_time.getTime() / 1000);
     }
     
+    /**
+     * Gets the increment value.
+     *
+     * @return an incrementing ordinal for operations within a given second
+     */
     public int getInc(){
         return _inc;
     }
 
+    @Override
     public String toString(){
         return "TS time:" + _time + " inc:" + _inc;
     }
