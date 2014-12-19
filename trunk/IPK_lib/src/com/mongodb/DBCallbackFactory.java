@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2008 - 2012 10gen, Inc. <http://10gen.com>
+/*
+ * Copyright (c) 2008-2014 MongoDB, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,18 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
 package com.mongodb;
 
 /**
- * This class exists only so that on Java 5 the driver can create instances of a standard MBean,
- * therefore keeping compatibility with the JMX implementation in the Java 5 JMX class libraries.
+ * Factory for creating concrete implementations of DBCallback.
  */
-class Java5MongoConnectionPool extends DBPortPool implements Java5MongoConnectionPoolMBean {
+public interface DBCallbackFactory {
 
-    Java5MongoConnectionPool(ServerAddress addr, MongoOptions options) {
-        super(addr, options);
-    }
+    /**
+     * Creates a DBCallback for the given collection.
+     *
+     * @param collection a DBCollection for the DBCallback
+     * @return a new DBCallback that operates on the collection.
+     */
+    DBCallback create(DBCollection collection);
+
 }
+
