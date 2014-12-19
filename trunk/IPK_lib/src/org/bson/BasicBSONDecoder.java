@@ -1,32 +1,103 @@
-/**
- *      Copyright (C) 2008 10gen Inc.
+/*
+ * Copyright (c) 2008-2014 MongoDB, Inc.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.bson;
-
-import static org.bson.BSON.*;
-
-import java.io.*;
 
 import org.bson.io.PoolOutputBuffer;
 import org.bson.types.ObjectId;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import static org.bson.BSON.ARRAY;
+import static org.bson.BSON.BINARY;
+import static org.bson.BSON.BOOLEAN;
+import static org.bson.BSON.B_BINARY;
+import static org.bson.BSON.B_GENERAL;
+import static org.bson.BSON.B_UUID;
+import static org.bson.BSON.CODE;
+import static org.bson.BSON.CODE_W_SCOPE;
+import static org.bson.BSON.DATE;
+import static org.bson.BSON.EOO;
+import static org.bson.BSON.MAXKEY;
+import static org.bson.BSON.MINKEY;
+import static org.bson.BSON.NULL;
+import static org.bson.BSON.NUMBER;
+import static org.bson.BSON.NUMBER_INT;
+import static org.bson.BSON.NUMBER_LONG;
+import static org.bson.BSON.OBJECT;
+import static org.bson.BSON.OID;
+import static org.bson.BSON.REF;
+import static org.bson.BSON.REGEX;
+import static org.bson.BSON.STRING;
+import static org.bson.BSON.SYMBOL;
+import static org.bson.BSON.TIMESTAMP;
+import static org.bson.BSON.UNDEFINED;
+
 
 /**
  * Basic implementation of BSONDecoder interface that creates BasicBSONObject instances
+ *
+ * <h3>Migration instructions</h3>
+ * <p>In driver versions before <em>2.12</em> {@code BasicBSONDecoder} exposed several protected members to its subclasses:</p>
+ * 
+ * <b>Fields:</b>
+ * <ul>
+ *     <li>{@code protected BSONInput _in}</li>
+ *     <li>{@code protected BSONCallback _callback}</li>
+ *     <li>{@code protected int _len}</li>
+ *     <li>{@code protected int _pos}</li>
+ * </ul>
+ * 
+ * <b>Methods:</b>
+ * <ul>
+ *     <li>{@code protected void _binary(String)}</li>
+ * </ul>
+ * 
+ * <b>Nested Classes:</b>
+ * <ul>
+ *     <li>{@code protected class BSONInput}</li>
+ * </ul>
+ *
+ * <h4>Solution 1: Custom {@link BSONCallback} implementation</h4>
+ * <p>With callbacks you can handle the process of creating objects from bytes in BSON format.</p>
+ * 
+ * <p>For example to get away from overriging <b>{@code BasicBSONDecoder._binary(String)}</b>
+ * you can use the following piece of code:</p>
+ * <pre>{@code
+ *     public class CustomBSONCallback extends BasicBSONCallback {
+ *         public void gotBinary(String name, byte type, byte[] data) {
+ *             _put(name,toHex(data));
+ *         }
+ *         private static String toHex(byte[] bytes) {...}
+ *     }
+ * }</pre>
+ *
+ * <p>This solution covers majority of the cases.</p>
+ *
+ * <h4>Solution 2: Custom {@link BSONDecoder} implementation</h4>
+ * <p>If you need to customize byte-level decoding at the lowest layer you have to provide you own
+ * implementation of the {@link BSONDecoder} interface.</p>
+ * 
+ * <p>Please check <a href="http://bsonspec.org/">http://bsonspec.org/</a> for more information.</p>
  */
 public class BasicBSONDecoder implements BSONDecoder {
+
+    @Override
     public BSONObject readObject( byte[] b ){
         try {
             return readObject( new ByteArrayInputStream( b ) );
@@ -36,6 +107,7 @@ public class BasicBSONDecoder implements BSONDecoder {
         }
     }
 
+    @Override
     public BSONObject readObject( InputStream in )
         throws IOException {
         BasicBSONCallback c = new BasicBSONCallback();
@@ -43,6 +115,7 @@ public class BasicBSONDecoder implements BSONDecoder {
         return (BSONObject)c.get();
     }
 
+    @Override
     public int decode( byte[] b , BSONCallback callback ){
         try {
             return _decode( new BSONInput( new ByteArrayInputStream(b) ) , callback );
@@ -52,6 +125,7 @@ public class BasicBSONDecoder implements BSONDecoder {
         }
     }
 
+    @Override
     public int decode( InputStream in , BSONCallback callback )
         throws IOException {
         return _decode( new BSONInput( in ) , callback );
@@ -229,6 +303,15 @@ public class BasicBSONDecoder implements BSONDecoder {
         return true;
     }
 
+    /**
+     *
+     * @param name the field name
+     * @throws IOException
+     *
+     * @deprecated This method should not be a part of API.
+     *             Please see the class-level documentation for a migration instructions.
+     */
+    @Deprecated
     protected void _binary( final String name )
         throws IOException {
         final int totalLen = _in.readInt();
@@ -274,13 +357,18 @@ public class BasicBSONDecoder implements BSONDecoder {
         final BSONCallback _basic = _callback.createBSONCallback();
         _callback = _basic;
         _basic.reset();
-        _basic.objectStart(false);
+        _basic.objectStart();
 
         while( decodeElement() );
         _callback = save;
         return _basic.get();
     }
 
+    /**
+     * @deprecated This class should not be a part of API.
+     *             Please see the class-level documentation for a migration instructions.
+     */
+    @Deprecated
     protected class BSONInput {
 
         public BSONInput(final InputStream in){
@@ -490,7 +578,18 @@ public class BasicBSONDecoder implements BSONDecoder {
 
     }
 
+    /**
+     * @deprecated This field should not be a part of API.
+     *             Please see the class-level documentation for a migration instructions.
+     */
+    @Deprecated
     protected BSONInput _in;
+
+    /**
+     * @deprecated This field should not be a part of API.
+     *             Please see the class-level documentation for a migration instructions.
+     */
+    @Deprecated
     protected BSONCallback _callback;
 
     private byte [] _random = new byte[1024]; // has to be used within a single function
@@ -498,7 +597,18 @@ public class BasicBSONDecoder implements BSONDecoder {
 
     private PoolOutputBuffer _stringBuffer = new PoolOutputBuffer();
 
+    /**
+     * @deprecated This field should not be a part of API.
+     *             Please see the class-level documentation for a migration instructions.
+     */
+    @Deprecated
     protected int _pos; // current offset into _inputBuffer
+
+    /**
+     * @deprecated This field should not be a part of API.
+     *             Please see the class-level documentation for a migration instructions.
+     */
+    @Deprecated
     protected int _len; // length of valid data in _inputBuffer
 
     private static final int MAX_STRING = ( 32 * 1024 * 1024 );

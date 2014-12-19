@@ -1,49 +1,83 @@
-/**
- *      Copyright (C) 2008-2011 10gen Inc.
+/*
+ * Copyright (c) 2008-2014 MongoDB, Inc.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.bson;
 
 import org.bson.io.BSONByteBuffer;
-import org.bson.types.*;
+import org.bson.types.BSONTimestamp;
+import org.bson.types.Code;
+import org.bson.types.CodeWScope;
+import org.bson.types.MaxKey;
+import org.bson.types.MinKey;
+import org.bson.types.ObjectId;
+import org.bson.types.Symbol;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
- * @author antoine
- * @author brendan
- * @author scotthernandez
- * @author Kilroy Wuz Here
+ * An immutable {@code BSONObject} backed by a byte buffer that lazily provides keys and values on request. This is useful for transferring
+ * BSON documents between servers when you don't want to pay the performance penalty of encoding or decoding them fully.
  */
 public class LazyBSONObject implements BSONObject {
 
-    public LazyBSONObject( byte[] data, LazyBSONCallback callback ){
-        this( BSONByteBuffer.wrap( data ), callback );
+    /**
+     * Construct an instance.
+     *
+     * @param bytes the raw bytes
+     * @param callback the callback to use to construct nested values
+     */
+    public LazyBSONObject( byte[] bytes, LazyBSONCallback callback ){
+        this( BSONByteBuffer.wrap( bytes ), callback );
     }
 
-    public LazyBSONObject( byte[] data, int offset, LazyBSONCallback callback ){
-        this( BSONByteBuffer.wrap( data, offset, data.length - offset ), offset, callback );
+    /**
+     * Construct an instance.
+     *
+     * @param bytes the raw bytes
+     * @param offset the offset into the raw bytes representing the start of the document
+     * @param callback the callback to use to construct nested values
+     */
+    public LazyBSONObject( byte[] bytes, int offset, LazyBSONCallback callback ){
+        this( BSONByteBuffer.wrap( bytes, offset, bytes.length - offset ), offset, callback );
     }
 
+    /**
+     * @deprecated use {@link #LazyBSONObject(byte[], LazyBSONCallback)} instead
+     */
+    @Deprecated
     public LazyBSONObject( BSONByteBuffer buffer, LazyBSONCallback callback ){
         this( buffer, 0, callback );
     }
 
+    /**
+     * @deprecated use {@link #LazyBSONObject(byte[], int, LazyBSONCallback)} instead
+     */
+    @Deprecated
     public LazyBSONObject( BSONByteBuffer buffer, int offset, LazyBSONCallback callback ){
         _callback = callback;
         _input = buffer;
@@ -72,10 +106,12 @@ public class LazyBSONObject implements BSONObject {
 
     class LazyBSONKeyIterator implements Iterator<String> {
 
+        @Override
         public boolean hasNext(){
             return !isElementEmpty( offset );
         }
 
+        @Override
         public String next(){
             int fieldSize = sizeCString( offset + 1);
             int elementSize = getElementBSONSize( offset );
@@ -84,6 +120,7 @@ public class LazyBSONObject implements BSONObject {
             return key;
         }
 
+        @Override
         public void remove(){
             throw new UnsupportedOperationException( "Read only" );
         }
@@ -91,6 +128,10 @@ public class LazyBSONObject implements BSONObject {
         int offset = _doc_start_offset + FIRST_ELMT_OFFSET;
     }
 
+    /**
+     * @deprecated This class is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     public class LazyBSONKeySet extends ReadOnlySet<String> {
 
         /**
@@ -177,10 +218,12 @@ public class LazyBSONObject implements BSONObject {
 
     class LazyBSONEntryIterator implements Iterator<Map.Entry<String, Object>> {
 
+        @Override
         public boolean hasNext(){
             return !isElementEmpty( offset );
         }
 
+        @Override
         public Map.Entry<String, Object> next(){
             int fieldSize = sizeCString(offset + 1);
             int elementSize = getElementBSONSize(offset);
@@ -223,6 +266,7 @@ public class LazyBSONObject implements BSONObject {
             };
         }
 
+        @Override
         public void remove(){
             throw new UnsupportedOperationException( "Read only" );
         }
@@ -330,18 +374,42 @@ public class LazyBSONObject implements BSONObject {
         }
     }
 
+    /**
+     * Always throws {@code UnsupportedOperationException}.
+     *
+     * @param key Name to set
+     * @param v   Corresponding value
+     * @return will not return normally
+     * @throws java.lang.UnsupportedOperationException
+     */
+    @Override
     public Object put( String key, Object v ){
         throw new UnsupportedOperationException( "Object is read only" );
     }
 
+    /**
+     * Always throws {@code UnsupportedOperationException}.
+     *
+     * @param o the object
+     * @throws java.lang.UnsupportedOperationException
+     */
+    @Override
     public void putAll( BSONObject o ){
         throw new UnsupportedOperationException( "Object is read only" );
     }
 
+    /**
+     * Always throws {@code UnsupportedOperationException}.
+     *
+     * @param m the map
+     * @throws java.lang.UnsupportedOperationException
+     */
+    @Override
     public void putAll( Map m ){
         throw new UnsupportedOperationException( "Object is read only" );
     }
 
+    @Override
     public Object get( String key ){
         //get element up to the key
         ElementRecord element = getElement(key);
@@ -398,10 +466,19 @@ public class LazyBSONObject implements BSONObject {
         return elements;
     }
 
+    @Override
     public Map toMap(){
         throw new UnsupportedOperationException( "Not Supported" );
     }
 
+    /**
+     * Always throws {@code UnsupportedOperationException}.
+     *
+     * @param key The name of the field to remove
+     * @return will not return normally
+     * @throws java.lang.UnsupportedOperationException
+     */
+    @Override
     public Object removeField( String key ){
         throw new UnsupportedOperationException( "Object is read only" );
     }
@@ -411,6 +488,7 @@ public class LazyBSONObject implements BSONObject {
         return containsField( s );
     }
 
+    @Override
     public boolean containsField( String s ){
         return keySet().contains( s );
     }
@@ -419,6 +497,7 @@ public class LazyBSONObject implements BSONObject {
      *
      * @return the set of all keys in the document
      */
+    @Override
     public Set<String> keySet(){
         return new LazyBSONKeySet();
     }
@@ -431,10 +510,19 @@ public class LazyBSONObject implements BSONObject {
         return new LazyBSONEntrySet();
     }
 
+    /**
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     protected boolean isElementEmpty( int offset ){
         return getElementType( offset ) == BSON.EOO;
     }
 
+    /**
+     * Gets whether this is an empty {@code BSONObject}.
+     *
+     * @return true if this has no keys
+     */
     public boolean isEmpty(){
         return isElementEmpty( _doc_start_offset + FIRST_ELMT_OFFSET );
     }
@@ -443,10 +531,22 @@ public class LazyBSONObject implements BSONObject {
         return _input.getInt( offset );
     }
 
+    /**
+     * Gets the size in bytes of the BSON document.
+     *
+     * @return the size in bytes
+     */
     public int getBSONSize(){
         return getBSONSize( _doc_start_offset );
     }
-    
+
+    /**
+     * Pipe the raw bytes into the given output stream.
+     *
+     * @param os the output stream
+     * @return the number of bytes written
+     * @throws IOException any IOException thrown by the output stream
+     */
     public int pipe(OutputStream os) throws IOException {
         os.write(_input.array(), _doc_start_offset, getBSONSize());
         return getBSONSize();
@@ -456,10 +556,18 @@ public class LazyBSONObject implements BSONObject {
         return _input.getCString( offset );
     }
 
+    /**
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     protected byte getElementType( final int offset ){
         return _input.get( offset );
     }
 
+    /**
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     protected int getElementBSONSize( int offset ){
         int x = 0;
         byte type = getElementType( offset++ );
@@ -522,7 +630,10 @@ public class LazyBSONObject implements BSONObject {
      * Returns the size of the BSON cstring at the given offset in the buffer
      * @param offset the offset into the buffer
      * @return the size of the BSON cstring, including the null terminator
+     *
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
      */
+    @Deprecated
     protected int sizeCString( int offset ){
         int end = offset;
         while ( true ){
@@ -535,6 +646,10 @@ public class LazyBSONObject implements BSONObject {
         return end - offset + 1;
     }
 
+    /**
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     protected Object getElementValue( ElementRecord record ){
         switch ( record.type ){
             case BSON.EOO:
@@ -592,7 +707,7 @@ public class LazyBSONObject implements BSONObject {
             case BSON.REGEX:
                 int patternCStringSize = sizeCString( record.valueOffset );
                 String pattern = _input.getCString( record.valueOffset );
-                String flags = _input.getCString( record.valueOffset + patternCStringSize + 1 );
+                String flags = _input.getCString( record.valueOffset + patternCStringSize );
                 return Pattern.compile( pattern, BSON.regexFlags( flags ) );
             default:
                 throw new BSONException(
@@ -645,6 +760,14 @@ public class LazyBSONObject implements BSONObject {
         return bin;
     }
 
+    protected int getOffset(){
+        return _doc_start_offset;
+    }
+
+    protected byte[] getBytes() {
+        return _input.array();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -665,6 +788,7 @@ public class LazyBSONObject implements BSONObject {
      *
      * @return JSON serialization
      */
+    @Override
     public String toString(){
         return com.mongodb.util.JSON.serialize( this );
     }
@@ -677,10 +801,23 @@ public class LazyBSONObject implements BSONObject {
      */
     final static int FIRST_ELMT_OFFSET = 4;
 
+    /**
+     * @deprecated Please use {@link #getOffset()} instead.
+     */
+    @Deprecated
     protected final int _doc_start_offset;
 
+    /**
+     *  @deprecated Please use {@link #getBytes()} to access underlying bytes.
+     */
+    @Deprecated
     protected final BSONByteBuffer _input; // TODO - Guard this with synchronicity?
     // callback is kept to create sub-objects on the fly
+
+    /**
+     * @deprecated This field is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     protected final LazyBSONCallback _callback;
     private static final Logger log = Logger.getLogger( "org.bson.LazyBSONObject" );
 }

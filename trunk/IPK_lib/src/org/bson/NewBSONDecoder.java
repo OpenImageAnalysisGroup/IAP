@@ -1,11 +1,11 @@
-/**
- * Copyright (C) 2012 10gen Inc.
+/*
+ * Copyright (c) 2008-2014 MongoDB, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,17 +18,45 @@ package org.bson;
 
 import org.bson.io.Bits;
 import org.bson.types.ObjectId;
-import static org.bson.BSON.*;
 
-// Java
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.DataInputStream;
 import java.io.UnsupportedEncodingException;
+
+import static org.bson.BSON.ARRAY;
+import static org.bson.BSON.BINARY;
+import static org.bson.BSON.BOOLEAN;
+import static org.bson.BSON.B_BINARY;
+import static org.bson.BSON.B_GENERAL;
+import static org.bson.BSON.B_UUID;
+import static org.bson.BSON.CODE;
+import static org.bson.BSON.CODE_W_SCOPE;
+import static org.bson.BSON.DATE;
+import static org.bson.BSON.EOO;
+import static org.bson.BSON.MAXKEY;
+import static org.bson.BSON.MINKEY;
+import static org.bson.BSON.NULL;
+import static org.bson.BSON.NUMBER;
+import static org.bson.BSON.NUMBER_INT;
+import static org.bson.BSON.NUMBER_LONG;
+import static org.bson.BSON.OBJECT;
+import static org.bson.BSON.OID;
+import static org.bson.BSON.REF;
+import static org.bson.BSON.REGEX;
+import static org.bson.BSON.STRING;
+import static org.bson.BSON.SYMBOL;
+import static org.bson.BSON.TIMESTAMP;
+import static org.bson.BSON.UNDEFINED;
+
+// Java
 
 /**
  * A new implementation of the bson decoder.
+ *
+ * @deprecated This class is NOT a part of public API and will be dropped in 3.x versions.
  */
+@Deprecated
 public class NewBSONDecoder implements BSONDecoder {
 
     @Override
@@ -117,7 +145,7 @@ public class NewBSONDecoder implements BSONDecoder {
         final BSONCallback _basic = _callback.createBSONCallback();
         _callback = _basic;
         _basic.reset();
-        _basic.objectStart(false);
+        _basic.objectStart();
 
         while( decodeElement() );
         _callback = save;
