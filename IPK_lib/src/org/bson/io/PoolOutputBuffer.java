@@ -1,30 +1,33 @@
-// PoolOutputBuffer.java
-
-/**
- *      Copyright (C) 2008 10gen Inc.
+/*
+ * Copyright (c) 2008-2014 MongoDB, Inc.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+// PoolOutputBuffer.java
 
 package org.bson.io;
 
-import org.bson.*;
-import org.bson.io.*;
-import org.bson.util.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.io.*;
-import java.util.*;
-
+/**
+ * @deprecated This class is NOT a part of public API and will be dropped in 3.x versions.
+ */
+@Deprecated
 public class PoolOutputBuffer extends OutputBuffer {
 
     public static final int BUF_SIZE = 1024 * 16;
@@ -46,14 +49,26 @@ public class PoolOutputBuffer extends OutputBuffer {
         return _cur.pos();
     }
 
+    /**
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     public void setPosition( int position ){
         _cur.reset( position );
     }
 
+    /**
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     public void seekEnd(){
         _cur.reset( _end );
     }
 
+    /**
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     public void seekStart(){
         _cur.reset();
     }
@@ -83,6 +98,12 @@ public class PoolOutputBuffer extends OutputBuffer {
         byte[] bs = _cur();
         bs[_cur.getAndInc()] = (byte)(b&0xFF);
         _afterWrite();
+    }
+
+    @Override
+    public void truncateToPosition(final int newPosition) {
+        setPosition(newPosition);
+        _end.reset(_cur);
     }
 
     void _afterWrite(){
@@ -126,6 +147,9 @@ public class PoolOutputBuffer extends OutputBuffer {
         for ( int i=-1; i<_fromPool.size(); i++ ){
             final byte[] b = _get( i );
             final int amt = _end.len( i );
+            if (amt == 0) {
+                break;
+            }
             out.write( b , 0 , amt );
             total += amt;
         }
@@ -177,7 +201,10 @@ public class PoolOutputBuffer extends OutputBuffer {
         int len( int which ){
             if ( which < x )
                 return BUF_SIZE;
-            return y;
+            else if (which == x)
+                return y;
+            else
+                return 0;
         }
 
         public String toString(){
@@ -201,6 +228,10 @@ public class PoolOutputBuffer extends OutputBuffer {
         return new String( c , 0  , m );
     }
 
+    /**
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     */
+    @Deprecated
     public String asString( String encoding )
         throws UnsupportedEncodingException {
 
@@ -218,7 +249,6 @@ public class PoolOutputBuffer extends OutputBuffer {
         }
         return new String( _mine , 0 , size() , encoding );
     }
-
 
     final byte[] _mine = new byte[BUF_SIZE];
     final char[] _chars = new char[BUF_SIZE];
