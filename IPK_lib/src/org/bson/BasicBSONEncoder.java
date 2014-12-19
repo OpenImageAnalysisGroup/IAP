@@ -1,22 +1,44 @@
-// BSONEncoder.java
-
-/**
- *      Copyright (C) 2008 10gen Inc.
+/*
+ * Copyright (c) 2008-2014 MongoDB, Inc.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.bson;
+
+import com.mongodb.DBRefBase;
+import org.bson.io.BasicOutputBuffer;
+import org.bson.io.OutputBuffer;
+import org.bson.types.BSONTimestamp;
+import org.bson.types.Binary;
+import org.bson.types.Code;
+import org.bson.types.CodeWScope;
+import org.bson.types.MaxKey;
+import org.bson.types.MinKey;
+import org.bson.types.ObjectId;
+import org.bson.types.Symbol;
+
+import java.lang.reflect.Array;
+import java.nio.Buffer;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 
 import static org.bson.BSON.ARRAY;
 import static org.bson.BSON.BINARY;
@@ -43,44 +65,15 @@ import static org.bson.BSON.TIMESTAMP;
 import static org.bson.BSON.UNDEFINED;
 import static org.bson.BSON.regexFlags;
 
-import java.lang.reflect.Array;
-import java.nio.Buffer;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Pattern;
-
-import org.bson.io.BasicOutputBuffer;
-import org.bson.io.OutputBuffer;
-import org.bson.types.BSONTimestamp;
-import org.bson.types.Binary;
-import org.bson.types.Code;
-import org.bson.types.CodeWScope;
-import org.bson.types.MaxKey;
-import org.bson.types.MinKey;
-import org.bson.types.ObjectId;
-import org.bson.types.Symbol;
-
-import com.mongodb.DBRefBase;
-
 /**
- * this is meant to be pooled or cached
- * there is some per instance memory for string conversion, etc...
+ * This is meant to be pooled or cached. There is some per instance memory for string conversion, etc...
  */
 @SuppressWarnings("unchecked")
 public class BasicBSONEncoder implements BSONEncoder {
     
     static final boolean DEBUG = false;
 
-    public BasicBSONEncoder(){
-
-    }
-
+    @Override
     public byte[] encode( BSONObject o ){
         BasicOutputBuffer buf = new BasicOutputBuffer();
         set( buf );
@@ -89,41 +82,68 @@ public class BasicBSONEncoder implements BSONEncoder {
         return buf.toByteArray();
     }
 
+    @Override
     public void set( OutputBuffer out ){
         if ( _buf != null )
             throw new IllegalStateException( "in the middle of something" );
         
         _buf = out;
     }
- 
+
+    /**
+     * Gets the buffer the BSON is being encoded into.
+     *
+     * @return the OutputBuffer
+     */
+    protected OutputBuffer getOutputBuffer() {
+        return _buf;
+    }
+
+    @Override
     public void done(){
         _buf = null;
     }
    
     /**
      * @return true if object was handled
+     *
+     * @deprecated Override {@link #putSpecial(String, Object)} if you need to you need to handle custom types.
      */
+    @Deprecated
     protected boolean handleSpecialObjects( String name , BSONObject o ){
         return false;
     }
-    
+
+    /**
+     * Special values are not encoded into documents.
+     *
+     * @param name the field name
+     * @param o    the value
+     * @return true if the operation is successful. This implementation always returns false.
+     */
     protected boolean putSpecial( String name , Object o ){
         return false;
     }
 
-    /** Encodes a <code>BSONObject</code>.
-     * This is for the higher level api calls
-     * @param o the object to encode
+    /**
+     * Encodes a {@code BSONObject}. This is for the higher level api calls.
+     *
+     * @param o the document to encode
      * @return the number of characters in the encoding
      */
+    @Override
     public int putObject( BSONObject o ){
         return putObject( null , o );
     }
 
     /**
-     * this is really for embedded objects
+     * This is really for embedded objects
+     *
+     * @param name the field name
+     * @param o    the object
+     * @return the number of characters in the encoding
      */
-    protected int putObject( String name , BSONObject o ){
+    protected int putObject(String name, BSONObject o) {
 
         if ( o == null )
             throw new NullPointerException( "can't save a null object" );
@@ -195,12 +215,21 @@ public class BasicBSONEncoder implements BSONEncoder {
         return _buf.getPosition() - start;
     }
 
-	protected void _putObjectField( String name , Object val ){
+    /**
+     * Encodes any Object type
+     *
+     * @param name the field name
+     * @param val  the value to write
+     */
+    protected void _putObjectField( String name , Object val ){
 
         if ( name.equals( "_transientFields" ) )
             return;
         
         if ( DEBUG ) System.out.println( "\t put thing : " + name );
+
+        if ( name.contains( "\0" ) )
+            throw new IllegalArgumentException( "Document field names can't have a NULL character. (Bad Key: '" + name + "')" );
         
         if ( name.equals( "$where") && val instanceof String ){
             _put( CODE , name );
@@ -314,21 +343,43 @@ public class BasicBSONEncoder implements BSONEncoder {
     }
     
 
+    /**
+     * Encodes a null value
+     *
+     * @param name the field name
+     */
     protected void putNull( String name ){
         _put( NULL , name );
     }
 
+    /**
+     * Encodes an undefined value
+     *
+     * @param name the field name
+     */
     protected void putUndefined(String name){
         _put(UNDEFINED, name);
     }
 
-    protected void putTimestamp(String name, BSONTimestamp ts ){
-        _put( TIMESTAMP , name );
-        _buf.writeInt( ts.getInc() );
-        _buf.writeInt( ts.getTime() );
+    /**
+     * Encodes a BSON timestamp
+     *
+     * @param name the field name
+     * @param ts   the timestamp to encode
+     */
+    protected void putTimestamp(String name, BSONTimestamp ts) {
+        _put(TIMESTAMP, name);
+        _buf.writeInt(ts.getInc());
+        _buf.writeInt(ts.getTime());
     }
-    
-    protected void putCodeWScope( String name , CodeWScope code ){
+
+    /**
+     * Encodes a field to a JAVASCRIPT_WITH_SCOPE value.
+     *
+     * @param name the field name
+     * @param code the value
+     */
+    protected void putCodeWScope(String name, CodeWScope code) {
         _put( CODE_W_SCOPE , name );
         int temp = _buf.getPosition();
         _buf.writeInt( 0 );
@@ -337,24 +388,48 @@ public class BasicBSONEncoder implements BSONEncoder {
         _buf.writeInt( temp , _buf.getPosition() - temp );
     }
 
+    /**
+     * Encodes a field to a JAVASCRIPT value.
+     *
+     * @param name the field name
+     * @param code the value
+     */
     protected void putCode( String name , Code code ){
         _put( CODE , name );
         int temp = _buf.getPosition();
         _putValueString( code.getCode() );
     }
 
+    /**
+     * Encodes a field with a {@code Boolean} or {@code boolean} value
+     *
+     * @param name  the field name
+     * @param b the value
+     */
     protected void putBoolean( String name , Boolean b ){
         _put( BOOLEAN , name );
         _buf.write( b ? (byte)0x1 : (byte)0x0 );
     }
 
-    protected void putDate( String name , Date d ){
-        _put( DATE , name );
-        _buf.writeLong( d.getTime() );
+    /**
+     * Encodes a field with data and time value.
+     *
+     * @param name the field name
+     * @param date the value
+     */
+    protected void putDate(String name, Date date) {
+        _put(DATE, name);
+        _buf.writeLong(date.getTime());
     }
 
-    protected void putNumber( String name , Number n ){
-		if ( n instanceof Integer ||
+    /**
+     * Encodes any number field.
+     *
+     * @param name the field name
+     * @param n    the number
+     */
+    protected void putNumber(String name, Number n) {
+        if ( n instanceof Integer ||
 	             n instanceof Short ||
 	             n instanceof Byte ||
 	             n instanceof AtomicInteger ){
@@ -373,12 +448,24 @@ public class BasicBSONEncoder implements BSONEncoder {
 	        throw new IllegalArgumentException( "can't serialize " + n.getClass() );
 		}
     }
-    
-    protected void putBinary( String name , byte[] data ){
+
+    /**
+     * Encodes a byte array field
+     *
+     * @param name the field name
+     * @param data the value
+     */
+    protected void putBinary(String name, byte[] data) {
         putBinary( name, B_GENERAL, data );
     }
     
-    protected void putBinary( String name , Binary val ){
+    /**
+     * Encodes a Binary field
+     *
+     * @param name   the field name
+     * @param val the value
+     */
+    protected void putBinary(final String name, final Binary val) {
         putBinary( name, val.getType(), val.getData() );        
     }
     
@@ -396,9 +483,14 @@ public class BasicBSONEncoder implements BSONEncoder {
         int before = _buf.getPosition();
         _buf.write( data );
         int after = _buf.getPosition();
-        com.mongodb.util.MyAsserts.assertEquals( after - before , data.length );
     }
     
+    /**
+     * Encodes a field with a {@link java.util.UUID} value.  This is encoded to a binary value of subtype UUID_LEGACY
+     *
+     * @param name the field name
+     * @param val the value
+     */
     protected void putUUID( String name , UUID val ){
         _put( BINARY , name );
         _buf.writeInt( 16 );
@@ -407,12 +499,24 @@ public class BasicBSONEncoder implements BSONEncoder {
         _buf.writeLong( val.getLeastSignificantBits());
     }
 
-    protected void putSymbol( String name , Symbol s ){
-        _putString(name, s.getSymbol(), SYMBOL);
+    /**
+     * Encodes a Symbol field
+     *
+     * @param name   the field name
+     * @param symbol the value
+     */
+    protected void putSymbol(String name, Symbol symbol) {
+        _putString(name, symbol.getSymbol(), SYMBOL);
     }
 
-    protected void putString(String name, String s) {
-        _putString(name, s, STRING);
+    /**
+     * Encodes a String field
+     *
+     * @param name  the field name
+     * @param value the value
+     */
+    protected void putString(String name, String value) {
+        _putString(name, value, STRING);
     }
 
     private void _putString( String name , String s, byte type ){
@@ -420,7 +524,13 @@ public class BasicBSONEncoder implements BSONEncoder {
         _putValueString( s );
     }
 
-    protected void putObjectId( String name , ObjectId oid ){
+    /**
+     * Encodes an ObjectId field to an OBJECT_ID.
+     *
+     * @param name the field name
+     * @param oid  the value
+     */
+    protected void putObjectId(String name, ObjectId oid) {
         _put( OID , name );
         // according to spec, values should be stored big endian
         _buf.writeIntBE( oid._time() );
@@ -430,8 +540,8 @@ public class BasicBSONEncoder implements BSONEncoder {
     
     private void putPattern( String name, Pattern p ) {
         _put( REGEX , name );
-        _put( p.pattern() );
-        _put( regexFlags( p.flags() ) );
+        _buf.writeCString( p.pattern() );
+        _buf.writeCString( regexFlags( p.flags() ) );
     }
 
     private void putMinKey( String name ) {
@@ -444,82 +554,81 @@ public class BasicBSONEncoder implements BSONEncoder {
 
 
     // ----------------------------------------------
-    
+
     /**
      * Encodes the type and key.
-     * 
+     *
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     *             Access buffer directly via {@link #getOutputBuffer()} if you need to change how BSON is written.
      */
-    protected void _put( byte type , String name ){
-        _buf.write( type );
-        _put( name );
+    @Deprecated
+    protected void _put(byte type, String name) {
+        _buf.write(type);
+        _buf.writeCString(name);
     }
 
+    /**
+     * @deprecated This method is NOT a part of public API and will be dropped in 3.x versions.
+     *             Access buffer directly via {@link #getOutputBuffer()} if you need to change how BSON is written.
+     *             Otherwise override {@link #putString(String, String)}.
+     */
+    @Deprecated
     protected void _putValueString( String s ){
-        int lenPos = _buf.getPosition();
-        _buf.writeInt( 0 ); // making space for size
-        int strLen = _put( s );
-        _buf.writeInt( lenPos , strLen );
+        _buf.writeString(s);
     }
     
     void _reset( Buffer b ){
         b.position(0);
-        b.limit( b.capacity() );
+        b.limit(b.capacity());
     }
 
     /**
-     * puts as utf-8 string
+     * Puts as utf-8 string
+     *
+     * @deprecated Replaced by {@code getOutputBuffer().writeCString(String)}.
      */
+    @Deprecated
     protected int _put( String str ){
-
-        final int len = str.length();
-        int total = 0;
-
-        for ( int i=0; i<len; ){
-            int c = Character.codePointAt( str , i );
-
-            if ( c < 0x80 ){
-                _buf.write( (byte)c );
-                total += 1;
-            }
-            else if ( c < 0x800 ){
-                _buf.write( (byte)(0xc0 + (c >> 6) ) );
-                _buf.write( (byte)(0x80 + (c & 0x3f) ) );
-                total += 2;
-            }
-            else if (c < 0x10000){
-                _buf.write( (byte)(0xe0 + (c >> 12) ) );
-                _buf.write( (byte)(0x80 + ((c >> 6) & 0x3f) ) );
-                _buf.write( (byte)(0x80 + (c & 0x3f) ) );
-                total += 3;
-            }
-            else {
-                _buf.write( (byte)(0xf0 + (c >> 18)) );
-                _buf.write( (byte)(0x80 + ((c >> 12) & 0x3f)) );
-                _buf.write( (byte)(0x80 + ((c >> 6) & 0x3f)) );
-                _buf.write( (byte)(0x80 + (c & 0x3f)) );
-                total += 4;
-            }
-            
-            i += Character.charCount(c);
-        }  
-        
-        _buf.write( (byte)0 );
-        total++;
-        return total;
+        return _buf.writeCString(str);
     }
 
+    /**
+     * Writes integer to underlying buffer.
+     *
+     * @param x the integer number
+     * @deprecated Replaced by {@code getOutputBuffer().writeInt(int)}.
+     */
+    @Deprecated
     public void writeInt( int x ){
         _buf.writeInt( x );
     }
 
+    /**
+     * Writes long to underlying buffer.
+     *
+     * @param x the long number
+     * @deprecated Replaced by {@code getOutputBuffer().writeLong(long)}.
+     */
+    @Deprecated
     public void writeLong( long x ){
-        _buf.writeLong( x );
-    }
-    
-    public void writeCString( String s ){
-        _put( s );
+        _buf.writeLong(x);
     }
 
+    /**
+     * Writes C string (null-terminated string) to underlying buffer.
+     *
+     * @param s the string
+     * @deprecated Replaced by {@code getOutputBuffer().writeCString(String)}.
+     */
+    @Deprecated
+    public void writeCString( String s ){
+        _buf.writeCString(s);
+    }
+
+    /**
+     * @deprecated Replaced by {@link #getOutputBuffer()}.
+     */
+    @Deprecated
     protected OutputBuffer _buf;
 
 }
