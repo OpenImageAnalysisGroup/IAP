@@ -320,8 +320,30 @@ public class ImageStack implements Iterable<ImageProcessor> {
 		int bands = stack.getSize();
 		int[][][] cube = new int[width][height][bands];
 		
+		if (this.imageType == ImageType.GRAY16)
+			System.out.println("Warning: ImageType 16 Bit may worked not as disired within int Cube operation. May use float Cube operation.");
+		
 		for (int b = 0; b < bands; b++) {
 			int[][] slice = this.getImage(b).getAs2A();
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					cube[x][y][b] = slice[x][y];
+				}
+			}
+			
+		}
+		
+		return cube;
+	}
+	
+	public float[][][] getFloatCube() {
+		int width = stack.getWidth();
+		int height = stack.getHeight();
+		int bands = stack.getSize();
+		float[][][] cube = new float[width][height][bands];
+		
+		for (int b = 0; b < bands; b++) {
+			float[][] slice = this.getProcessor(b).getFloatArray();
 			for (int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
 					cube[x][y][b] = slice[x][y];
