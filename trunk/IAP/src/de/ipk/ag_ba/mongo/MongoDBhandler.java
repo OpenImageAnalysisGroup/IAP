@@ -126,13 +126,18 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 				}
 				// check all gridFS file collections and look for matching hash value...
 				boolean ensureIndex = MongoDB.getEnsureIndex();
-				if (ensureIndex)
-					for (String fs : MongoGridFS.getFileCollections()) {
-						DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
-						collectionChunks.ensureIndex("files_id");
-					}
 				for (String fs : MongoGridFS.getFileCollections()) {
-					GridFS gridfs = new GridFS(db, fs);
+					GridFS gridfs;
+					synchronized (cachedCollection) {
+						if (!cachedCollection.containsKey(fs)) {
+							cachedCollection.put(fs, new GridFS(db, fs));
+							if (ensureIndex) {
+								DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
+								collectionChunks.createIndex("files_id");
+							}
+						}
+						gridfs = cachedCollection.get(fs);
+					}
 					
 					GridFSDBFile fff = gridfs.findOne(url.getDetail());
 					if (fff != null) {
@@ -187,14 +192,15 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 				
 				// check all gridFS file collections and look for matching hash value...
 				for (String fs : MongoGridFS.getPreviewFileCollections()) {
-					DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
-					collectionChunks.ensureIndex("files_id");
-				}
-				for (String fs : MongoGridFS.getPreviewFileCollections()) {
 					GridFS gridfs;
 					synchronized (cachedCollection) {
-						if (!cachedCollection.containsKey(fs))
+						if (!cachedCollection.containsKey(fs)) {
 							cachedCollection.put(fs, new GridFS(db, fs));
+							if (MongoDB.getEnsureIndex()) {
+								DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
+								collectionChunks.createIndex("files_id");
+							}
+						}
 						gridfs = cachedCollection.get(fs);
 					}
 					GridFSDBFile fff = gridfs.findOne(url.getDetail());
@@ -238,7 +244,13 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 			public void run() {
 				// check all gridFS file collections and look for matching hash value...
 				for (String fs : MongoGridFS.getFileCollections()) {
-					GridFS gridfs = new GridFS(db, fs);
+					GridFS gridfs;
+					synchronized (cachedCollection) {
+						if (!cachedCollection.containsKey(fs))
+							cachedCollection.put(fs, new GridFS(db, fs));
+						gridfs = cachedCollection.get(fs);
+					}
+					
 					GridFSDBFile fff = gridfs.findOne(url.getDetail());
 					if (fff != null) {
 						try {
@@ -278,14 +290,20 @@ public class MongoDBhandler extends AbstractResourceIOHandler {
 						}
 					}
 					// check all gridFS file collections and look for matching hash value...
-					boolean ensureIndex = false;
-					if (ensureIndex)
-						for (String fs : MongoGridFS.getFileCollections()) {
-							DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
-							collectionChunks.ensureIndex("files_id");
-						}
+					boolean ensureIndex = MongoDB.getEnsureIndex();
 					for (String fs : MongoGridFS.getFileCollections()) {
-						GridFS gridfs = new GridFS(db, fs);
+						GridFS gridfs;
+						synchronized (cachedCollection) {
+							if (!cachedCollection.containsKey(fs)) {
+								cachedCollection.put(fs, new GridFS(db, fs));
+								if (ensureIndex) {
+									DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
+									collectionChunks.createIndex("files_id");
+									collectionChunks.createIndex("filename");
+								}
+							}
+							gridfs = cachedCollection.get(fs);
+						}
 						
 						GridFSDBFile fff = gridfs.findOne(hash);
 						if (fff != null) {

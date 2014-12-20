@@ -55,6 +55,7 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientOptions.Builder;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
+import com.mongodb.WriteResult;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
@@ -509,7 +510,9 @@ public class MongoDB {
 								// collSubst.remove(new BasicDBObject("_id", new BasicDBObject("$in", rList)));
 							}
 						}
-						collExps.remove(expRef);
+						WriteResult wr = collExps.remove(expRef, WriteConcern.FSYNC_SAFE);
+						if (!wr.getLastError(WriteConcern.SAFE).ok())
+							throw new RuntimeException("Remove experiment error: " + wr.getError());
 					}
 				}
 			}
@@ -1731,6 +1734,7 @@ public class MongoDB {
 		boolean rmList = true;
 		ArrayList<ObjectId> rList = new ArrayList<ObjectId>();
 		int deleted = 0;
+		long startTime = System.currentTimeMillis();
 		for (final GridFSDBFile f : toBeRemoved) {
 			free.addLong(f.getLength());
 			if (!rmList)
@@ -1746,8 +1750,10 @@ public class MongoDB {
 			}
 			deleted++;
 			status.setCurrentStatusText1("File "
-					+ deleted + "/" + toBeRemoved.size() + " (" + (int) (100d * deleted / toBeRemoved.size()) + "%)"
-					+ ", removed: " + free.getLong() / 1024 / 1024 + " MB");
+					+ deleted + "/" + toBeRemoved.size() + " (" + (int) (deleted * 1000d * 60 / (System.currentTimeMillis() - startTime + 1)) + " files/min, "
+					+ (int) (100d * deleted / toBeRemoved.size()) + "%)"
+					+ ", removed: " + free.getLong() / 1024 / 1024 + " MB, "
+					+ SystemAnalysis.getDataTransferSpeedString(free.getLong(), startTime, System.currentTimeMillis()));
 			status.setCurrentStatusValueFine(deleted * 100d / toBeRemoved.size());
 		}
 		if (rmList && rList.size() > 0) {
