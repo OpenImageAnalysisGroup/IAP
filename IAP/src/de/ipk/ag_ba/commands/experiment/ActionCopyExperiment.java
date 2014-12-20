@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.MeasurementFilter;
 import org.SettingsHelperDefaultIsFalse;
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -45,6 +46,7 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 	private boolean addUDPcopy;
 	private int outlierCountNumerics;
 	private int outlierCountBinary;
+	private long expSize = -1;
 	
 	public ActionCopyExperiment(String tooltip) {
 		super(tooltip);
@@ -58,9 +60,12 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 		this("Copy dataset");
 		this.m = m;
 		this.experimentReferences = new ArrayList<ExperimentReference>();
+		expSize = 0;
 		for (ExperimentHeaderInterface eh : experimentHeaderList) {
 			ExperimentReference er = new ExperimentReference(eh, m);
 			this.experimentReferences.add(er);
+			if (eh.getSizekb() > 0)
+				expSize += eh.getSizekb() * 1024;
 		}
 		this.guiSetting = guiSetting;
 	}
@@ -164,7 +169,7 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 		if (experimentReferences.size() == 1)
 			return "Copy";
 		else
-			return "Copy Set of Experiments (" + experimentReferences.size() + ")";
+			return "Copy Set of Experiments (" + experimentReferences.size() + " e., ~" + SystemAnalysis.getDataAmountString(expSize) + ")";
 	}
 	
 	@Override
