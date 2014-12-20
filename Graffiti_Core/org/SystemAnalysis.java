@@ -458,7 +458,11 @@ public class SystemAnalysis {
 			return StringManipulationTools.formatNumber(d / 1024d / 1024d, "#.#") + " MB";
 		if (d < 1024l * 1024l * 1024l * 1024l)
 			return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d, "#.#") + " GB";
-		return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d / 1024d, "#.#") + " TB";
+		if (d < 1024l * 1024l * 1024l * 1024l * 1024l)
+			return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d / 1024d, "#.#") + " TB";
+		if (d < 1024l * 1024l * 1024l * 1024l * 1024l * 1024l)
+			return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d / 1024d / 1024d, "#.#") + " PB";
+		return StringManipulationTools.formatNumber(d / 1024d / 1024d / 1024d / 1024d / 1024d / 1024d, "#.#") + " EB";
 	}
 	
 	public static String[] getEnvArray() {
