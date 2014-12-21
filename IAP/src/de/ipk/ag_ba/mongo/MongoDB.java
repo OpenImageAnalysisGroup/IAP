@@ -1752,7 +1752,7 @@ public class MongoDB {
 			status.setCurrentStatusText1("File "
 					+ deleted + "/" + toBeRemoved.size() + " (" + (int) (deleted * 1000d * 60 / (System.currentTimeMillis() - startTime + 1)) + " files/min, "
 					+ (int) (100d * deleted / toBeRemoved.size()) + "%)"
-					+ ", removed: " + free.getLong() / 1024 / 1024 + " MB, "
+					+ ", removed: "
 					+ SystemAnalysis.getDataTransferSpeedString(free.getLong(), startTime, System.currentTimeMillis()));
 			status.setCurrentStatusValueFine(deleted * 100d / toBeRemoved.size());
 		}
