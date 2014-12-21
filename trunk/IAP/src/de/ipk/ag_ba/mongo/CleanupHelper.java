@@ -117,21 +117,22 @@ public class CleanupHelper implements RunnableOnDB {
 		status.setCurrentStatusText1(status.getCurrentStatusMessage2());
 		// status.setCurrentStatusText2("Count condition IDs");
 		{
+			status.setCurrentStatusText2("Count condition IDs");// (" + max + ")");
 			DBCollection conditions = db.getCollection("conditions");
-			// if (MongoDB.getEnsureIndex())
-			// conditions.ensureIndex("_id");
-			long nn = 0;// , max = conditions.count();
+			if (MongoDB.getEnsureIndex())
+				conditions.createIndex("_id");
+			long nn = 0, max = conditions.count();
 			status.setCurrentStatusText2("Read list of condition IDs");// (" + max + ")");
 			DBCursor condCur = conditions
-					.find(new BasicDBObject(), new BasicDBObject("_id", 1)).batchSize(50);// .hint(new BasicDBObject("_id", 1))
+					.find(new BasicDBObject(), new BasicDBObject("_id", 1)).hint(new BasicDBObject("_id", 1)).batchSize(5).maxScan(5);
 			// .batchSize(10000);
 			while (condCur.hasNext()) {
 				ObjectId condO = (ObjectId) condCur.next().get("_id");
 				dbIdsOfConditions.add(condO.toString());
 				nn++;
-				if (nn % 50 == 0) {
-					status.setCurrentStatusText2("Read list of condition IDs (" + nn /* + "/" + max */+ ")");
-					status.setCurrentStatusValueFine(-1);// 100d * nn / max);
+				if (nn % 5 == 0) {
+					status.setCurrentStatusText2("Read list of condition IDs (" + nn + "/" + max + ")");
+					status.setCurrentStatusValueFine(100d * nn / max);
 				}
 				
 			}
