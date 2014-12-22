@@ -13,4 +13,10 @@ public class FeatureObject {
 	public enum FeatureObjectType {
 		POSITION, VECTOR, NUMERIC, OBJECT, COLOR,
 	}
+	
+	@Override
+	public String toString() {
+		return featureObjectType + "=" + feature;
+	}
+	
 }

@@ -240,13 +240,9 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 				}
 			}
 			
-			if (n > 0 && cameraPosition == CameraPosition.SIDE) {
+			if (n > 0) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.up.count"), nup, "leaftips", this, imageRef);
-				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.down.count"), ndown, "leaftips", this, imageRef);
-				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.corner.angle.mean"), 360 * StatsArea.getMean() / circleArea, null,
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.corner.angle.mean"), 360 * StatsArea.getMean() / circleArea, "degree",
 						this, imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.corner.angle.stdev"), StatsArea.getStandardDeviation(), null, this,
@@ -258,6 +254,13 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.corner.angle.mean.kurtosis"), StatsArea.getKurtosis(), null, this,
 						imageRef);
+			}
+			
+			if (n > 0 && cameraPosition == CameraPosition.SIDE) {
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.up.count"), nup, "leaftips", this, imageRef);
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.down.count"), ndown, "leaftips", this, imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip.angle.mean"), statsLeafDirection.getMean(), "degree", this, imageRef);
 				getResultSet().setNumericResult(getBlockPosition(),
@@ -360,15 +363,15 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 									.text((int) direction_fin.getX() + 10, (int) direction_fin.getY(),
 											"x: " + ((int) pos_fin.getX() + borderSize) + " y: " + ((int) pos_fin.getY() + borderSize),
 											Color.BLACK);
-							if (isSide) {
-								String s = "A: " + angle.intValue() + " | CA: " + StringManipulationTools.formatNumber(cornerAngle, 2);
-								if (calcWidth)
-									s += " | Diff: " + diff;
-								return t.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, s, Color.BLACK)
-										.getImage();
-							}
-							else
-								return t.getImage();
+							// if (isSide) {
+							String s = "A: " + angle.intValue() + " | CA: " + StringManipulationTools.formatNumber(cornerAngle, 2);
+							if (calcWidth)
+								s += " | Diff: " + diff;
+							return t.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, s, Color.BLACK)
+									.getImage();
+							// }
+							// else
+							// return t.getImage();
 						}
 						
 						@Override
