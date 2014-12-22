@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operation;
 
+import java.awt.Color;
+
 /**
  * Creates an object which stores the position and the intensity int-value of an image pixel.
  * 
@@ -34,5 +36,14 @@ public class PositionAndColor {
 	
 	public void setIntensityInt(int val) {
 		this.intensityInt = val;
+	}
+	
+	@Override
+	public String toString() {
+		Color c = new Color(intensityInt);
+		int r = c.getRed();
+		int g = c.getGreen();
+		int b = c.getBlue();
+		return x + ":" + y + "=" + intensityInt + "/" + r + "," + g + "," + b;
 	}
 }
