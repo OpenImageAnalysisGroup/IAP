@@ -360,7 +360,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 											"x: " + ((int) pos_fin.getX() + borderSize) + " y: " + ((int) pos_fin.getY() + borderSize),
 											Color.BLACK);
 							if (isSide) {
-								String s = "A: " + angle.intValue() + " | CA: " + cornerAngle;
+								String s = "A: " + angle.intValue() + " | CA: " + StringManipulationTools.formatNumber(cornerAngle, 2);
 								if (calcWidth)
 									s += " | Diff: " + diff;
 								return t.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, s, Color.BLACK)
@@ -494,7 +494,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		int geometricThresh = (int) (fillGradeInPercent * (Math.PI * searchRadius * searchRadius));
 		ba.setCheckSplit(true);
 		ba.calcSUSAN(searchRadius, geometricThresh);
-		ba.getPeaksFromBorder(1, (int) (searchRadius * 1.5), "susan");
+		ba.getPeaksFromBorder(1, (searchRadius), "susan");
 		ba.approxDirection(searchRadius * 2);
 		
 		if (debug_borderDetection)
@@ -503,27 +503,28 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		res = ba.getPeakList();
 		
 		if (calcWidth)
-			calcWidthNearTip(res, img, (int) (searchRadius * getDouble("Factor for Width Estimation", 1.5)));
+			calcWidthNearTip(res, img, searchRadius, (int) (getDouble("Factor for Width Estimation", 1.5)));
 		
 		return res;
 	}
 	
-	private void calcWidthNearTip(LinkedList<Feature> res, Image img, int searchRadius) {
+	private void calcWidthNearTip(LinkedList<Feature> res, Image img, int searchRadius, double fac) {
 		// ImageCanvas ic = new ImageCanvas(img);
 		int[][] img2d = img.getAs2A();
+		int newRadius = (int) (searchRadius * fac);
 		for (Feature lt : res) {
 			Vector2D pos = lt.getPosition();
 			// ic.drawCircle((int) pos.getX(), (int) pos.getY(), searchRadius, Color.CYAN.getRGB(), 0.5, 2);
 			
 			ArrayList<PositionAndColor> areaBig = BorderAnalysis.regionGrowing((int) pos.getX(), (int) pos.getY(), img2d.clone(),
 					ImageOperation.BACKGROUND_COLORint,
-					searchRadius, Integer.MAX_VALUE,
+					newRadius, Integer.MAX_VALUE,
 					false, false);
 			ArrayList<PositionAndColor> areaSmall = (ArrayList<PositionAndColor>) lt.getFeature("pixels");
 			
 			int diff = areaBig.size() - areaSmall.size();
 			// System.out.println("diff: " + diff);
-			lt.addFeature("widthNearTip", diff, FeatureObjectType.NUMERIC);
+			lt.addFeature("widthNearTip", diff / Math.abs(searchRadius - newRadius), FeatureObjectType.NUMERIC);
 		}
 		
 	}
