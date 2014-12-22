@@ -44,6 +44,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 	boolean debug_borderDetection;
 	double borderSize;
 	private boolean useAdaptiveRadiusEstimation;
+	boolean calcWidth = false;
 	
 	@Override
 	protected void prepare() {
@@ -51,6 +52,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		
 		debug_borderDetection = getBoolean("Debug Border Detection", false);
 		useAdaptiveRadiusEstimation = getBoolean("Use Addaptive Radius", false);
+		calcWidth = getBoolean("Calculate Width near Leaf-Tip", false);
 	}
 	
 	@Override
@@ -144,6 +146,17 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 				
 				final Double angle = (Double) bf.getFeature("angle");
 				Vector2D direction = (Vector2D) bf.getFeature("direction");
+				
+				if (calcWidth) {
+					int widthNearLT = (int) bf.getFeature("widthNearTip");
+					
+					if (widthNearLT > 0)
+						getResultSet().setNumericResult(
+								getBlockPosition(),
+								new Trait(cameraPosition, cameraType, TraitCategory.ORGAN_GEOMETRY, "leaftip."
+										+ StringManipulationTools.formatNumberAddZeroInFront(n, 2) + ".widthNearTip"), widthNearLT, null, this,
+								imageRef);
+				}
 				
 				if (angle != null) {
 					ArrayList<PositionAndColor> temp_area = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
@@ -277,12 +290,17 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 			}
 		}
 		
-		if (saveFeaturesInResultSet) {
+		boolean markResults = true;
+		if (saveFeaturesInResultSet || markResults) {
 			int index = 1;
 			for (Feature bf : peakList) {
 				Vector2D pos = bf.getPosition();
 				final Double angle = (Double) bf.getFeature("angle");
 				Vector2D direction = (Vector2D) bf.getFeature("direction");
+				ArrayList<PositionAndColor> temp_area = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
+				int size = temp_area.size();
+				int diff = (int) bf.getFeature("widthNearTip");
+				
 				final CameraType cameraType_fin = cameraType;
 				
 				if (pos == null || cameraPosition == null || cameraType == null) {
@@ -294,29 +312,34 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 				final Vector2D pos_fin = pos;
 				final Vector2D direction_fin = direction.add(sub);
 				
-				getResultSet().setNumericResult(0,
-						new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2)
-								+ ".x"), pos_fin.getX(), "px", this, imageRef);
-				getResultSet().setNumericResult(
-						0,
-						new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip." + StringManipulationTools.formatNumberAddZeroInFront(index, 2)
-								+ ".y"),
-						pos_fin.getY(), "px", this, imageRef);
-				
-				if (angle != null && cameraPosition == CameraPosition.SIDE)
-					getResultSet()
-							.setNumericResult(
-									0,
-									new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip."
-											+ StringManipulationTools.formatNumberAddZeroInFront(index, 2)
-											+ ".angle"),
-									angle, "degree", this, imageRef);
+				if (saveFeaturesInResultSet) {
+					getResultSet().setNumericResult(
+							0,
+							new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip."
+									+ StringManipulationTools.formatNumberAddZeroInFront(index, 2)
+									+ ".x"), pos_fin.getX(), "px", this, imageRef);
+					getResultSet().setNumericResult(
+							0,
+							new Trait(cameraPosition, cameraType_fin, TraitCategory.GEOMETRY, "leaftip."
+									+ StringManipulationTools.formatNumberAddZeroInFront(index, 2)
+									+ ".y"),
+							pos_fin.getY(), "px", this, imageRef);
+					
+					if (angle != null && cameraPosition == CameraPosition.SIDE)
+						getResultSet()
+								.setNumericResult(
+										0,
+										new Trait(cameraPosition, cameraType, TraitCategory.GEOMETRY, "leaftip."
+												+ StringManipulationTools.formatNumberAddZeroInFront(index, 2)
+												+ ".angle"),
+										angle, "degree", this, imageRef);
+				}
 				index++;
 				
 				if (searchRadius > 0) {
 					final int searchRadius_fin = searchRadius;
 					final boolean isSide = cameraPosition == CameraPosition.SIDE;
-					
+					final double cornerAngle = 360 * size / circleArea;
 					getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
 						
 						@Override
@@ -336,9 +359,13 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 									.text((int) direction_fin.getX() + 10, (int) direction_fin.getY(),
 											"x: " + ((int) pos_fin.getX() + borderSize) + " y: " + ((int) pos_fin.getY() + borderSize),
 											Color.BLACK);
-							if (isSide)
-								return t.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, "angle: " + angle.intValue(), Color.BLACK)
+							if (isSide) {
+								String s = "A: " + angle.intValue() + " | CA: " + cornerAngle;
+								if (calcWidth)
+									s += " | Diff: " + diff;
+								return t.text((int) direction_fin.getX() + 10, (int) direction_fin.getY() + 15, s, Color.BLACK)
 										.getImage();
+							}
 							else
 								return t.getImage();
 						}
@@ -475,7 +502,30 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		
 		res = ba.getPeakList();
 		
+		if (calcWidth)
+			calcWidthNearTip(res, img, (int) (searchRadius * getDouble("Factor for Width Estimation", 1.5)));
+		
 		return res;
+	}
+	
+	private void calcWidthNearTip(LinkedList<Feature> res, Image img, int searchRadius) {
+		// ImageCanvas ic = new ImageCanvas(img);
+		int[][] img2d = img.getAs2A();
+		for (Feature lt : res) {
+			Vector2D pos = lt.getPosition();
+			// ic.drawCircle((int) pos.getX(), (int) pos.getY(), searchRadius, Color.CYAN.getRGB(), 0.5, 2);
+			
+			ArrayList<PositionAndColor> areaBig = BorderAnalysis.regionGrowing((int) pos.getX(), (int) pos.getY(), img2d.clone(),
+					ImageOperation.BACKGROUND_COLORint,
+					searchRadius, Integer.MAX_VALUE,
+					false, false);
+			ArrayList<PositionAndColor> areaSmall = (ArrayList<PositionAndColor>) lt.getFeature("pixels");
+			
+			int diff = areaBig.size() - areaSmall.size();
+			// System.out.println("diff: " + diff);
+			lt.addFeature("widthNearTip", diff, FeatureObjectType.NUMERIC);
+		}
+		
 	}
 	
 	private Image preprocessImage(Image img, int searchRadius, int blurSize, int erode, int dilate) {
@@ -615,6 +665,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 										(tf.getReferenceLink() != null ? " Further information: <a href='" + tf.getReferenceLink() + "'>Link</a>." : "")));
 			}
 		}
+		desList.add(new CalculatedProperty("leaftip.*.widthNearTip", "Number of pixels of the area between two selected search radii for leaf tip detection."));
 		return desList.toArray(new CalculatedPropertyDescription[desList.size()]);
 	}
 }

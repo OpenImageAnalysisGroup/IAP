@@ -210,7 +210,7 @@ public class BorderAnalysis {
 					int[][] predefinedRegion = ImageOperation.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
 					
 					// do region-growing
-					ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, debug);
+					ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, true, debug);
 					
 					// check area (condition: (region.size() < geometricThresh) => get only positive results)
 					if (region != null) {
@@ -252,7 +252,7 @@ public class BorderAnalysis {
 			int h = image.getHeight();
 			
 			int[][] predefinedRegion = ImageOperation.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
-			ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, debug);
+			ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, true, debug);
 			ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
 			borderFeatureList.addFeature(peakpos, matched, "pixels", FeatureObjectType.OBJECT);
 		}
@@ -577,10 +577,11 @@ public class BorderAnalysis {
 		return res;
 	}
 	
-	public static ArrayList<PositionAndColor> regionGrowing(int x, int y, int[][] img2d, int background, int radius, int geometricThresh, boolean debug) {
+	public static ArrayList<PositionAndColor> regionGrowing(int x, int y, int[][] img2d, int background, int radius, int geometricThresh,
+			boolean speedUpButLossResults, boolean debug) {
 		ArrayList<PositionAndColor> region = null;
 		try {
-			region = regionGrowing(img2d, x, y, background, radius, geometricThresh, debug);
+			region = regionGrowing(img2d, x, y, background, radius, geometricThresh, speedUpButLossResults, debug);
 		} catch (InterruptedException e) {
 			region = new ArrayList<PositionAndColor>();
 			e.printStackTrace();
@@ -602,7 +603,8 @@ public class BorderAnalysis {
 	 * @return HashSet which includes Vector3d of all point coordinates plus color-values
 	 * @throws InterruptedException
 	 */
-	static ArrayList<PositionAndColor> regionGrowing(int[][] img2d, int x, int y, int background, double radius, int geometricThresh, boolean debug)
+	static ArrayList<PositionAndColor> regionGrowing(int[][] img2d, int x, int y, int background, double radius, int geometricThresh,
+			boolean speedUpButLossResults, boolean debug)
 			throws InterruptedException {
 		radius = radius * radius;
 		int[][] imgTemp = img2d.clone();
@@ -619,7 +621,7 @@ public class BorderAnalysis {
 		boolean inside = false;
 		double dist = 0.0;
 		Image show = null;
-		boolean speedUpButLossResults = true;
+		
 		if (debug) {
 			show = new Image(imgTemp);
 			show.show("debug");
