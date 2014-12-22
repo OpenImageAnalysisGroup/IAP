@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -148,7 +149,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 				Vector2D direction = (Vector2D) bf.getFeature("direction");
 				
 				if (calcWidth) {
-					int widthNearLT = (int) bf.getFeature("widthNearTip");
+					Double widthNearLT = (Double) bf.getFeature("widthNearTip");
 					
 					if (widthNearLT > 0)
 						getResultSet().setNumericResult(
@@ -299,11 +300,11 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 				Vector2D direction = (Vector2D) bf.getFeature("direction");
 				ArrayList<PositionAndColor> temp_area = (ArrayList<PositionAndColor>) bf.getFeature("pixels");
 				int size = temp_area.size();
-				int diff = (int) bf.getFeature("widthNearTip");
+				Double diff = (Double) bf.getFeature("widthNearTip");
 				
 				final CameraType cameraType_fin = cameraType;
 				
-				if (pos == null || cameraPosition == null || cameraType == null) {
+				if (pos == null || cameraPosition == null || cameraType == null || diff == null) {
 					continue;
 				}
 				
@@ -503,7 +504,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		res = ba.getPeakList();
 		
 		if (calcWidth)
-			calcWidthNearTip(res, img, searchRadius, (int) (getDouble("Factor for Width Estimation", 1.5)));
+			calcWidthNearTip(res, img, searchRadius, getDouble("Factor for Width Estimation", 1.5));
 		
 		return res;
 	}
@@ -524,7 +525,11 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 			
 			int diff = areaBig.size() - areaSmall.size();
 			// System.out.println("diff: " + diff);
-			lt.addFeature("widthNearTip", diff / Math.abs(searchRadius - newRadius), FeatureObjectType.NUMERIC);
+			if (searchRadius - newRadius != 0) {
+				double w = diff / Math.abs(searchRadius - newRadius);
+				lt.addFeature("widthNearTip", w, FeatureObjectType.NUMERIC);
+			} else
+				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Internal Error: SearchRadius - NewRadius == 0!");
 		}
 		
 	}
