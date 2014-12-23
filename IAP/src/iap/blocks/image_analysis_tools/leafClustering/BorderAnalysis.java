@@ -19,7 +19,7 @@ import javax.vecmath.Point3d;
 import org.GapList;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
-import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
@@ -36,7 +36,7 @@ public class BorderAnalysis {
 	private ArrayList<ArrayList<Integer>> borderLists;
 	private final FeatureList borderFeatureList;
 	private LinkedList<Feature> peakList;
-	boolean debug = false;
+	boolean debug = true;
 	boolean onlyBiggest = true;
 	boolean checkSplit = true;
 	private final Image orig;
@@ -48,7 +48,7 @@ public class BorderAnalysis {
 		this.orig = orig;
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
 		borderIO = borderIO.skeletonize().replaceColor(Color.BLACK.getRGB(), Color.BLUE.getRGB());
-		Image boImg = borderIO.getImage().show("borderImg", debug);;
+		Image boImg = borderIO.getImage().show("borderImg", debug);
 		borderLength = boImg.io().countFilledPixels();
 		borderImage = borderIO.getAs2D();
 		borderLists = getBorderLists(borderImage, borderLength, debug);
@@ -61,7 +61,7 @@ public class BorderAnalysis {
 	/**
 	 * Extract Peaks of feature list. (get middle of peaks)
 	 **/
-	public void getPeaksFromBorder(double minSizeOfPeak, int distBetweenPeaks, String filterKey) {
+	public void getPeaksFromBorder(double minSizeOfPeak, int distBetweenPeaks, String filterKey, int largeRadius) {
 		peakList = new LinkedList<Feature>();
 		int listsize = borderFeatureList.size();
 		int[] peaks = null;
@@ -104,7 +104,7 @@ public class BorderAnalysis {
 			peakList.get(idx).addFeature("borderposition", peaks[idx], FeatureObjectType.NUMERIC);
 		}
 		
-		calculateRegions();
+		calculateRegions(largeRadius);
 	}
 	
 	public void plot(int waitTime, int radius) {
@@ -201,7 +201,7 @@ public class BorderAnalysis {
 		for (ArrayList<Integer> tempArray : borderLists) {
 			int listSize = tempArray.size();
 			// for (int idx = 0; idx < listSize; idx += 2) {
-			BackgroundThreadDispatcher.stream("Susan Calculation").processInts(IntStream.range(0, listSize).filter((idx) -> idx % 2 == 0),
+			new StreamBackgroundTaskHelper<Integer>("Susan Calculation").processInts(IntStream.range(0, listSize).filter((idx) -> idx % 2 == 0),
 					(idx) -> {
 						int xtemp = tempArray.get(idx);
 						int ytemp = tempArray.get(idx + 1);
@@ -221,14 +221,6 @@ public class BorderAnalysis {
 								split = isSplit(predefinedRegion, region, radius, debug);
 							if (!split || !checkSplit) {
 								borderFeatureList.addFeature(idx / 2, (double) (geometricThresh - region.size()), key, FeatureObjectType.NUMERIC);
-								// ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
-								// if (matched.size() < 10) {
-								// System.out.println("Warning: small region!! at x: " + (xtemp) + " y: " + (ytemp) + " rx: " + (xtemp - (radius / 2)) + " ry: "
-								// + (ytemp - (radius / 2)));
-								// new Image(copyRegionto2dArray(region)).show("region");
-								// }
-								// borderFeatureList.addFeature(idx / 2, matched, "pixels",
-								// FeatureObjectType.OBJECT);
 							} else
 								borderFeatureList.addFeature(idx / 2, 0.0, key, FeatureObjectType.NUMERIC);
 						} else
@@ -241,20 +233,32 @@ public class BorderAnalysis {
 		}
 	}
 	
-	private void calculateRegions() {
+	private void calculateRegions(int radius2) {
+		int[][] img2d = image.getAs2A();
+		int w = image.getWidth();
+		int h = image.getHeight();
 		for (Feature p : peakList) {
 			int peakpos = (int) p.getFeature("borderposition");
 			Vector2D imgpos = p.getPosition();
 			int xtemp = (int) imgpos.getX();
 			int ytemp = (int) imgpos.getY();
-			int[][] img2d = image.getAs2A();
-			int w = image.getWidth();
-			int h = image.getHeight();
 			
+			image.show("FK " + xtemp + ":" + ytemp, debug);
 			int[][] predefinedRegion = ImageOperation.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
+			new Image(predefinedRegion).show("FUUUUUU", debug);
 			ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, true, debug);
 			ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
+			
+			int[][] predefinedRegion2 = ImageOperation.crop(img2d, w, h, xtemp - radius2, xtemp + radius2, ytemp - radius2, ytemp + radius2);
+			ArrayList<PositionAndColor> regionLarge = regionGrowing(radius2, radius2, predefinedRegion2, background, radius2, geometricThresh, false, debug);
+			ArrayList<PositionAndColor> matchedLarge = matchWithImage(regionLarge, orig, xtemp - (radius2 / 2), ytemp - (radius2 / 2), radius2);
+			orig.io().copy().canvas()
+					.markPoints(matched, Color.YELLOW.getRGB(), 0.5d)
+					.markPoints(matchedLarge, Color.BLUE.getRGB(), 0.5d).getImage().show("XXXXXX " + xtemp + "/" + ytemp, debug);
 			borderFeatureList.addFeature(peakpos, matched, "pixels", FeatureObjectType.OBJECT);
+			borderFeatureList.addFeature(peakpos, matchedLarge, "pixelsNearTip", FeatureObjectType.OBJECT);
+			
+			borderFeatureList.addFeature(peakpos, (matchedLarge.size() - matched.size()) / (double) (radius2 - radius), "widthNearTip", FeatureObjectType.NUMERIC);
 		}
 	}
 	
@@ -583,8 +587,7 @@ public class BorderAnalysis {
 		try {
 			region = regionGrowing(img2d, x, y, background, radius, geometricThresh, speedUpButLossResults, debug);
 		} catch (InterruptedException e) {
-			region = new ArrayList<PositionAndColor>();
-			e.printStackTrace();
+			throw new UnsupportedOperationException(e);
 		}
 		return region;
 	}
@@ -606,7 +609,7 @@ public class BorderAnalysis {
 	static ArrayList<PositionAndColor> regionGrowing(int[][] img2d, int x, int y, int background, double radius, int geometricThresh,
 			boolean speedUpButLossResults, boolean debug)
 			throws InterruptedException {
-		radius = radius * radius;
+		radius = radius * radius; // compare squared values, to avoid square-root calculations
 		int[][] imgTemp = img2d.clone();
 		int w = img2d.length;
 		int h = img2d[1].length;
@@ -711,7 +714,7 @@ public class BorderAnalysis {
 					resultRegion.add(temp);
 					// current region bigger than geometricThresh
 					if (resultRegion.size() > geometricThresh - 1 && speedUpButLossResults)
-						return resultRegion;
+						return new ArrayList<PositionAndColor>(); // CK: previously the region pixels where returned, but these would be incomplete?!
 					visited.push(temp);
 					dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
 					// no pixel found -> go back
