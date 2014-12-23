@@ -43,6 +43,7 @@ public class BorderAnalysis {
 	private int radius;
 	private int background;
 	private int geometricThresh;
+	private int geometricThresh2;
 	
 	public BorderAnalysis(Image img, Image orig) {
 		this.orig = orig;
@@ -179,11 +180,12 @@ public class BorderAnalysis {
 	}
 	
 	// TODO adapt for multiple borders if needed.
-	public void calcSUSAN(int radius, int geometricThresh) {
+	public void calcSUSAN(int radius, int geometricThresh, int geometricThresh2) {
 		background = ImageOperation.BACKGROUND_COLORint;
 		
 		this.radius = radius;
 		this.geometricThresh = geometricThresh;
+		this.geometricThresh2 = geometricThresh2;
 		
 		int[][] img2d = image.getAs2A();
 		int w = img2d.length;
@@ -210,7 +212,8 @@ public class BorderAnalysis {
 					int[][] predefinedRegion = ImageOperation.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
 					
 					// do region-growing
-					ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, true, debug);
+					ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh,
+							true, debug);
 					
 					// check area (condition: (region.size() < geometricThresh) => get only positive results)
 					if (region != null) {
@@ -250,7 +253,7 @@ public class BorderAnalysis {
 			ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
 			
 			int[][] predefinedRegion2 = ImageOperation.crop(img2d, w, h, xtemp - radius2, xtemp + radius2, ytemp - radius2, ytemp + radius2);
-			ArrayList<PositionAndColor> regionLarge = regionGrowing(radius2, radius2, predefinedRegion2, background, radius2, geometricThresh, false, debug);
+			ArrayList<PositionAndColor> regionLarge = regionGrowing(radius2, radius2, predefinedRegion2, background, radius2, geometricThresh, true, debug);
 			ArrayList<PositionAndColor> matchedLarge = matchWithImage(regionLarge, orig, xtemp - (radius2 / 2), ytemp - (radius2 / 2), radius2);
 			orig.io().copy().canvas()
 					.markPoints(matched, Color.YELLOW.getRGB(), 0.5d)
@@ -581,7 +584,8 @@ public class BorderAnalysis {
 		return res;
 	}
 	
-	public static ArrayList<PositionAndColor> regionGrowing(int x, int y, int[][] img2d, int background, int radius, int geometricThresh,
+	public static ArrayList<PositionAndColor> regionGrowing(int x, int y, int[][] img2d, int background, int radius,
+			int geometricThresh,
 			boolean speedUpButLossResults, boolean debug) {
 		ArrayList<PositionAndColor> region = null;
 		try {
@@ -606,7 +610,8 @@ public class BorderAnalysis {
 	 * @return HashSet which includes Vector3d of all point coordinates plus color-values
 	 * @throws InterruptedException
 	 */
-	static ArrayList<PositionAndColor> regionGrowing(int[][] img2d, int x, int y, int background, double radius, int geometricThresh,
+	static ArrayList<PositionAndColor> regionGrowing(int[][] img2d, int x, int y, int background, double radius,
+			int geometricThresh,
 			boolean speedUpButLossResults, boolean debug)
 			throws InterruptedException {
 		radius = radius * radius; // compare squared values, to avoid square-root calculations
@@ -714,7 +719,7 @@ public class BorderAnalysis {
 					resultRegion.add(temp);
 					// current region bigger than geometricThresh
 					if (resultRegion.size() > geometricThresh - 1 && speedUpButLossResults)
-						return new ArrayList<PositionAndColor>(); // CK: previously the region pixels where returned, but these would be incomplete?!
+						return resultRegion;
 					visited.push(temp);
 					dist = (x - rx) * (x - rx) + (y - ry) * (y - ry);
 					// no pixel found -> go back

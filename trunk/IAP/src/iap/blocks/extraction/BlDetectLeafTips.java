@@ -97,7 +97,8 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 					(ct == CameraType.FLUO) ? input().images().getFluoInfo() :
 							(ct == CameraType.NIR) ? input().images().getNirInfo() :
 									(ct == CameraType.IR) ? null : null;
-			savePeaksAndFeatures(getPeaksFromBorder(workimg, mask, searchRadius, fillGradeInPercent), ct,
+			savePeaksAndFeatures(
+					getPeaksFromBorder(workimg, mask, searchRadius, (int) (searchRadius * getDouble("Factor for Width Estimation", 1.5)), fillGradeInPercent), ct,
 					optionsAndResults.getCameraPosition(),
 					searchRadius, maxValidY, info, input().masks().vis());
 		}
@@ -520,15 +521,16 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, pk);
 	}
 	
-	private LinkedList<Feature> getPeaksFromBorder(Image img, Image orig, int searchRadius, double fillGradeInPercent) {
+	private LinkedList<Feature> getPeaksFromBorder(Image img, Image orig, int searchRadius, int searchRadius2, double fillGradeInPercent) {
 		BorderAnalysis ba = null;
 		LinkedList<Feature> res = null;
 		
 		ba = new BorderAnalysis(img, orig);
 		int geometricThresh = (int) (fillGradeInPercent * (Math.PI * searchRadius * searchRadius));
+		int geometricThresh2 = (int) (fillGradeInPercent * (Math.PI * searchRadius2 * searchRadius2));
 		ba.setCheckSplit(true);
-		ba.calcSUSAN(searchRadius, geometricThresh);
-		ba.getPeaksFromBorder(1, searchRadius, "susan", (int) (searchRadius * getDouble("Factor for Width Estimation", 1.5)));
+		ba.calcSUSAN(searchRadius, geometricThresh, geometricThresh2);
+		ba.getPeaksFromBorder(1, searchRadius, "susan", searchRadius2);
 		ba.approxDirection(searchRadius * 2);
 		
 		if (debug_borderDetection)
