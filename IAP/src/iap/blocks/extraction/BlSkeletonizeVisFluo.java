@@ -32,6 +32,7 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 
 /**
  * Calculates the skeleton to detect the leaves and the tassel.
@@ -67,7 +68,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 					.blurImageJ(getDouble("Blur-Vis", 0))
 					.getImage().show("vis preprocessed", debug);
 			
-			if (viswork != null)
+			if (viswork != null) {
+				viswork.setCameraType(vis.getCameraType());
 				if (vis != null) {
 					calcSkeleton(viswork, vis, fluo,
 							getBoolean("Leaf Width Calculation Type A (VIS)", false),
@@ -75,6 +77,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 							getBoolean("draw_skeleton", true),
 							CameraType.VIS, input().images().getVisInfo());
 				}
+			}
 		}
 		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && getResultSet() != null) {
 			Image viswork = vis.copy().io().bm()// .medianFilter32Bit()
@@ -83,7 +86,8 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 					.blurImageJ(getDouble("Blur-Vis", 3.0))
 					.getImage().show("vis", debug);
 			
-			if (viswork != null)
+			if (viswork != null) {
+				viswork.setCameraType(vis.getCameraType());
 				if (vis != null) {
 					calcSkeleton(viswork, vis, fluo,
 							getBoolean("Leaf Width Calculation Type A (VIS)", false),
@@ -91,6 +95,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 							getBoolean("draw_skeleton", true),
 							CameraType.VIS, input().images().getVisInfo());
 				}
+			}
 		}
 		return res;
 	}
@@ -103,7 +108,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		Image fluo = input().masks().fluo() != null ? input().masks().fluo().copy() : null;
 		if (fluo == null)
 			return fluo;
-		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && vis != null && fluo != null && getResultSet() != null) {
+		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && getResultSet() != null) {
 			Image fluowork = fluo.copy().io()
 					.dilateHorizontal(getInt("Dilate-Cnt-Fluo-Hor", 15)) // 10
 					.bm()// .medianFilter32Bit()
@@ -112,30 +117,30 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 					.blurImageJ(getDouble("Blur-Fluo", 0.0))
 					.getImage().show("fluo", debug);
 			
-			if (fluowork != null)
-				if (vis != null && fluo != null) {
-					calcSkeleton(fluowork, vis, fluo,
-							getBoolean("Leaf Width Calculation Type A (FLUO)", false),
-							getBoolean("Leaf Width Calculation Type B (FLUO)", false),
-							getBoolean("draw_skeleton", true),
-							CameraType.FLUO, input().images().getFluoInfo());
-				}
+			if (fluowork != null) {
+				fluowork.setCameraType(fluo.getCameraType());
+				calcSkeleton(fluowork, vis, fluo,
+						getBoolean("Leaf Width Calculation Type A (FLUO)", false),
+						getBoolean("Leaf Width Calculation Type B (FLUO)", false),
+						getBoolean("draw_skeleton", true),
+						CameraType.FLUO, input().images().getFluoInfo());
+			}
 		}
-		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && vis != null && fluo != null && getResultSet() != null) {
-			Image viswork = fluo.copy().io().bm()// .filterRGB(150, 255, 255)
+		if (optionsAndResults.getCameraPosition() == CameraPosition.TOP && getResultSet() != null) {
+			Image fluowork = fluo.copy().io().bm()// .filterRGB(150, 255, 255)
 					.erode(getInt("Erode-Cnt-Fluo", 0))
 					.dilate(getInt("Dilate-Cnt-Fluo", 0)).io()
 					.blurImageJ(getDouble("Blur-Fluo", 0.0))
 					.getImage().show("fluo", debug);
 			
-			if (viswork != null)
-				if (vis != null && fluo != null) {
-					calcSkeleton(viswork, vis, fluo,
-							getBoolean("Leaf Width Calculation Type A (FLUO)", false),
-							getBoolean("Leaf Width Calculation Type B (FLUO)", false),
-							getBoolean("draw_skeleton", true),
-							CameraType.FLUO, input().images().getFluoInfo());
-				}
+			if (fluowork != null) {
+				fluowork.setCameraType(fluo.getCameraType());
+				calcSkeleton(fluowork, vis, fluo,
+						getBoolean("Leaf Width Calculation Type A (FLUO)", false),
+						getBoolean("Leaf Width Calculation Type B (FLUO)", false),
+						getBoolean("draw_skeleton", true),
+						CameraType.FLUO, input().images().getFluoInfo());
+			}
 		}
 		return input().masks().fluo();
 	}
@@ -159,9 +164,6 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 			skel2d.createEndpointsAndBranchesLists();
 		}
 		
-		int w = vis.getWidth();
-		int height = vis.getHeight();
-		
 		skel2d.calculateEndlimbsRecursive();
 		int leafcount = skel2d.endpoints.size();
 		if (debug)
@@ -171,7 +173,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		rt.incrementCounter();
 		
 		int bloomLimbCount = 0;
-		if (getBoolean("Detect Bloom", false) && fluo != null) {
+		if (getBoolean("Detect Bloom", false) && fluo != null && vis != null) {
 			double xf = fluo.getWidth() / (double) vis.getWidth();
 			double yf = fluo.getHeight() / (double) vis.getHeight();
 			Image proc = fluo;
@@ -231,33 +233,38 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		if (specialLeafWidthCalculations) {
 			ArrayList<Point> branchPoints = skel2d.getBranches();
 			if (branchPoints.size() > 0) {
-				int[][] tempImage = new int[w][height];
+				int wid = inp.getWidth();
+				int hei = inp.getHeight();
+				int[][] tempImage = new int[wid][hei];
 				int clear = ImageOperation.BACKGROUND_COLORint;
-				for (int x = 0; x < w; x++)
-					for (int y = 0; y < height; y++)
+				for (int x = 0; x < wid; x++)
+					for (int y = 0; y < hei; y++)
 						tempImage[x][y] = clear;
 				Image clearImage = new Image(tempImage).copy();
 				int black = Color.BLACK.getRGB();
 				for (Point p : branchPoints)
-					if (p.x >= 0 && p.y >= 0 && p.x < w && p.y < height)
-						tempImage[p.x][p.y] = black;
+					if (p.x >= 0 && p.y >= 0 && p.x < wid && p.y < hei)
+						tempImage[p.x][p.y] = Color.YELLOW.getRGB();
 				Image temp = new Image(tempImage);
 				temp = temp.io().hull().setCustomBackgroundImageForDrawing(clearImage).
-						find(getResultSet(), true, false, false, false, false, false, false, black, black, black, black, black, null, 0d).getImage();
-				temp = temp.io().border().floodFillFromOutside(clear, black).getImage().show("INNER HULL", debug);
+						find(null, false, false, true, false, false, false, false, black, black, black, black, black, null, 0d).getImage();
+				temp = temp.io().border().floodFillFromOutside(clear, Color.YELLOW.getRGB()).getImage().show("INNER HULL", debug);
+				getResultSet().setImage(getBlockPosition(), "innerhull_" + inp.getCameraType(), new LoadedImage(imageRef, temp.getAsBufferedImage(true)), true);
 				tempImage = temp.getAs2A();
 				int[][] ttt = inpFLUOunchanged.getAs2A();
 				int wf = inpFLUOunchanged.getWidth();
 				int hf = inpFLUOunchanged.getHeight();
 				for (int x = 0; x < ttt.length && x < tempImage.length; x++)
 					for (int y = 0; y < ttt[0].length && y < tempImage[0].length; y++) { // [x]
-						if (tempImage[x][y] != black)
+						if (tempImage[x][y] != Color.YELLOW.getRGB())
 							ttt[x][y] = clear;
 					}
+				
 				for (Point p : branchPoints)
 					if (p.x < wf && p.y < hf && p.x > 0 && p.y > 0)
 						ttt[p.x][p.y] = clear;
 				temp = new Image(ttt).io().show("FINAL", debug).getImage();
+				
 				leafWidthInPixels = 0d;
 				int filled;
 				ImageJOperation tio = temp.io().bm();
@@ -279,9 +286,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		
 		// ***Out***
 		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
-		Image result = MapOriginalOnSkelUseingMedian(skelres, vis, Color.BLACK.getRGB());
+		Image result = MapOriginalOnSkelUseingMedian(skelres, inp, Color.BLACK.getRGB());
 		result.show("res", false);
-		Image result2 = skel2d.copyONOriginalImage(vis);
+		Image result2 = skel2d.copyONOriginalImage(inp);
 		result2.show("res2", false);
 		
 		// ***Saved***
