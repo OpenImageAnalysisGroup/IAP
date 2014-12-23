@@ -471,9 +471,10 @@ public class ImageCanvas {
 	}
 	
 	public ImageCanvas markPoints(ArrayList<PositionAndColor> pixels, int color, double alpha) {
-		for (PositionAndColor pac : pixels) {
-			drawLine(pac.x, pac.y, pac.x + 1, pac.y, color, alpha, 1);
-		}
+		if (pixels != null)
+			for (PositionAndColor pac : pixels) {
+				drawLine(pac.x, pac.y, pac.x + 1, pac.y, color, alpha, 1);
+			}
 		return this;
 	}
 	

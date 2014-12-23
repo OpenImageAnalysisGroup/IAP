@@ -229,6 +229,8 @@ public class ConvexHullCalculator {
 					};
 					if (br != null && io != null && io.getCameraType() != null)
 						br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
+					else
+						res = runnableOnMask.postProcess(res.getImage()).io();
 				}
 			}
 			java.awt.geom.Point2D.Double[] mr = null;
@@ -266,6 +268,9 @@ public class ConvexHullCalculator {
 					};
 					if (br != null && io != null && io.getCameraType() != null)
 						br.addImagePostProcessor(io.getCameraType(), null, runnableOnMask);
+					else
+						res = runnableOnMask.postProcess(res.getImage()).io();
+					
 				}
 			}
 			
@@ -299,6 +304,9 @@ public class ConvexHullCalculator {
 					};
 					if (br != null && io != null && io.getCameraType() != null)
 						br.addImagePostProcessor(io.getCameraType(), null, roi);
+					else
+						res = roi.postProcess(res.getImage()).io();
+					
 				}
 			}
 			
@@ -319,10 +327,8 @@ public class ConvexHullCalculator {
 			};
 			if (br != null && io != null && io.getCameraType() != null)
 				br.addImagePostProcessor(io.getCameraType(), null, roi);
-			if (br == null && io != null) {
-				res = drawHullAndCentroid(drawHull, drawCentroid, res, polygon,
-						hullLineColor, centroidF, centroidColor, 1).getImage().io();
-			}
+			else
+				res = roi.postProcess(res.getImage()).io();
 		}
 		
 		return res;
