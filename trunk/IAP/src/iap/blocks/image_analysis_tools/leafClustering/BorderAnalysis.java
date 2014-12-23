@@ -254,7 +254,7 @@ public class BorderAnalysis {
 			
 			int[][] predefinedRegion2 = ImageOperation.crop(img2d, w, h, xtemp - radius2, xtemp + radius2, ytemp - radius2, ytemp + radius2);
 			ArrayList<PositionAndColor> regionLarge = regionGrowing(radius2, radius2, predefinedRegion2, background, radius2, geometricThresh, true, debug);
-			ArrayList<PositionAndColor> matchedLarge = matchWithImage(regionLarge, orig, xtemp - (radius2 / 2), ytemp - (radius2 / 2), radius2);
+			ArrayList<PositionAndColor> matchedLarge = fuRe(regionLarge, xtemp - radius2 - radius / 2, ytemp - radius2 - radius / 2, orig);
 			orig.io().copy().canvas()
 					.markPoints(matched, Color.YELLOW.getRGB(), 0.5d)
 					.markPoints(matchedLarge, Color.BLUE.getRGB(), 0.5d).getImage().show("XXXXXX " + xtemp + "/" + ytemp, debug);
@@ -263,6 +263,20 @@ public class BorderAnalysis {
 			
 			borderFeatureList.addFeature(peakpos, (matchedLarge.size() - matched.size()) / (double) (radius2 - radius), "widthNearTip", FeatureObjectType.NUMERIC);
 		}
+	}
+	
+	private ArrayList<PositionAndColor> fuRe(ArrayList<PositionAndColor> regionLarge, int xtemp, int ytemp, Image orig) {
+		int[] origArray = orig.getAs1A();
+		int w = orig.getWidth();
+		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>(regionLarge.size());
+		for (PositionAndColor pac : regionLarge) {
+			pac.x = pac.x + xtemp;
+			pac.y = pac.y + ytemp;
+			int c = origArray[pac.x + pac.y * w];
+			if (c != ImageOperation.BACKGROUND_COLORint)
+				res.add(pac);
+		}
+		return res;
 	}
 	
 	private ArrayList<PositionAndColor> matchWithImage(ArrayList<PositionAndColor> region, Image orig, int xtemp, int ytemp, int radius) {
