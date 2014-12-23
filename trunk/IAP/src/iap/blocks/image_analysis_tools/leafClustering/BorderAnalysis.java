@@ -26,7 +26,7 @@ import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * @author pape
+ * @author pape, klukas
  */
 public class BorderAnalysis {
 	
@@ -36,7 +36,7 @@ public class BorderAnalysis {
 	private ArrayList<ArrayList<Integer>> borderLists;
 	private final FeatureList borderFeatureList;
 	private LinkedList<Feature> peakList;
-	boolean debug = true;
+	boolean debug = false;
 	boolean onlyBiggest = true;
 	boolean checkSplit = true;
 	private final Image orig;
