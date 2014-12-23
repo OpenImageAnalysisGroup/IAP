@@ -34,6 +34,8 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		if (true)
+			throw new UnsupportedOperationException("Not yet implemented!");
 		res.clear();
 		String currentOutliers = experiment.getHeader().getGlobalOutlierInfo();
 		
