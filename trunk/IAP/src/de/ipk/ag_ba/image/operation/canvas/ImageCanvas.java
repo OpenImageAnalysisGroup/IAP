@@ -13,6 +13,7 @@ import java.util.Date;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operations.complex_hull.Line;
 import de.ipk.ag_ba.image.operations.complex_hull.Point;
 import de.ipk.ag_ba.image.operations.skeleton.RunnableWithBooleanResult;
@@ -467,6 +468,13 @@ public class ImageCanvas {
 			}
 			return canvas;
 		}
+	}
+	
+	public ImageCanvas markPoints(ArrayList<PositionAndColor> pixels, int color, double alpha) {
+		for (PositionAndColor pac : pixels) {
+			drawLine(pac.x, pac.y, pac.x + 1, pac.y, color, alpha, 1);
+		}
+		return this;
 	}
 	
 }
