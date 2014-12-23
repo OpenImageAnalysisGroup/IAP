@@ -410,14 +410,25 @@ public class BlockResults implements BlockResultSet {
 	@Override
 	public Image getImage(int blockPosition, String id) {
 		synchronized (storedImages) {
-			if (!storedImages.containsKey(blockPosition))
+			if (blockPosition >= 0) {
+				if (!storedImages.containsKey(blockPosition))
+					return null;
+				ImageAndImageData res = storedImages.get(blockPosition).get(id);
+				if (res == null)
+					return null;
+				else {
+					storedImages.get(blockPosition).remove(id);
+					return res.getImage();
+				}
+			} else {
+				for (int bp : storedImages.keySet()) {
+					ImageAndImageData res = storedImages.get(bp).get(id);
+					if (res != null) {
+						storedImages.get(bp).remove(id);
+						return res.getImage();
+					}
+				}
 				return null;
-			ImageAndImageData res = storedImages.get(blockPosition).get(id);
-			if (res == null)
-				return null;
-			else {
-				storedImages.get(blockPosition).remove(id);
-				return res.getImage();
 			}
 		}
 	}

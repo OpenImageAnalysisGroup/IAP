@@ -43,9 +43,10 @@ public class BorderAnalysis {
 	private int radius;
 	private int background;
 	private int geometricThresh;
-	private int geometricThresh2;
+	private final int[][] innerHullPixels;
+	private final Image innerHull;
 	
-	public BorderAnalysis(Image img, Image orig) {
+	public BorderAnalysis(Image img, Image orig, Image innerHull) {
 		this.orig = orig;
 		ImageOperation borderIO = img.io().border().borderDetection(ImageOperation.BACKGROUND_COLORint, Color.BLUE.getRGB(), false);
 		borderIO = borderIO.skeletonize().replaceColor(Color.BLACK.getRGB(), Color.BLUE.getRGB());
@@ -56,6 +57,9 @@ public class BorderAnalysis {
 		borderLists = sort();
 		borderFeatureList = new FeatureList(borderLists, onlyBiggest);
 		image = img;
+		this.innerHull = innerHull;
+		this.innerHullPixels = innerHull != null ? innerHull.getAs2A() : null;
+		
 		this.setDebug(false);
 	}
 	
@@ -180,12 +184,11 @@ public class BorderAnalysis {
 	}
 	
 	// TODO adapt for multiple borders if needed.
-	public void calcSUSAN(int radius, int geometricThresh, int geometricThresh2) {
+	public void calcSUSAN(int radius, int geometricThresh) {
 		background = ImageOperation.BACKGROUND_COLORint;
 		
 		this.radius = radius;
 		this.geometricThresh = geometricThresh;
-		this.geometricThresh2 = geometricThresh2;
 		
 		int[][] img2d = image.getAs2A();
 		int w = img2d.length;
@@ -240,6 +243,7 @@ public class BorderAnalysis {
 		int[][] img2d = image.getAs2A();
 		int w = image.getWidth();
 		int h = image.getHeight();
+		
 		for (Feature p : peakList) {
 			int peakpos = (int) p.getFeature("borderposition");
 			Vector2D imgpos = p.getPosition();
@@ -259,9 +263,11 @@ public class BorderAnalysis {
 					.markPoints(matched, Color.YELLOW.getRGB(), 0.5d)
 					.markPoints(matchedLarge, Color.BLUE.getRGB(), 0.5d).getImage().show("XXXXXX " + xtemp + "/" + ytemp, debug);
 			borderFeatureList.addFeature(peakpos, matched, "pixels", FeatureObjectType.OBJECT);
-			borderFeatureList.addFeature(peakpos, matchedLarge, "pixelsNearTip", FeatureObjectType.OBJECT);
-			
-			borderFeatureList.addFeature(peakpos, (matchedLarge.size() - matched.size()) / (double) (radius2 - radius), "widthNearTip", FeatureObjectType.NUMERIC);
+			if (matchedLarge != null)
+				borderFeatureList.addFeature(peakpos, matchedLarge, "pixelsNearTip", FeatureObjectType.OBJECT);
+			if (matchedLarge != null)
+				borderFeatureList.addFeature(peakpos, (matchedLarge.size() - matched.size()) / (double) (radius2 - radius), "widthNearTip",
+						FeatureObjectType.NUMERIC);
 		}
 	}
 	
@@ -269,10 +275,32 @@ public class BorderAnalysis {
 		int[] origArray = orig.getAs1A();
 		int w = orig.getWidth();
 		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>(regionLarge.size());
+		int y = Color.YELLOW.getRGB();
+		// innerHull.show("FF");
 		for (PositionAndColor pac : regionLarge) {
 			pac.x = pac.x + xtemp;
 			pac.y = pac.y + ytemp;
 			int c = origArray[pac.x + pac.y * w];
+			
+			if (innerHullPixels != null) {
+				if (pac.x <= 0)
+					System.out.println("OFFSET TO SMALL IN X-DIR: " + pac.x);
+				else
+					if (pac.y <= 0)
+						System.out.println("OFFSET TO SMALL IN Y-DIR: " + pac.y);
+					else
+						if (pac.x > innerHullPixels.length)
+							System.out.println("OFFSET TO LARGE IN X-DIR: " + pac.x);
+						else
+							if (pac.y > innerHullPixels[0].length)
+								System.out.println("OFFSET TO LARGE IN Y-DIR: " + pac.y);
+							else {
+								int hullC = innerHullPixels[pac.x][pac.y];
+								if (hullC != y)
+									return null;
+							}
+			}
+			
 			if (c != ImageOperation.BACKGROUND_COLORint)
 				res.add(pac);
 		}
@@ -661,6 +689,7 @@ public class BorderAnalysis {
 				show.update(new Image(imgTemp));
 				Thread.sleep(100);
 			}
+			
 			imgTemp[rx][ry] = background;
 			
 			find = false;
