@@ -280,29 +280,31 @@ public class BorderAnalysis {
 		for (PositionAndColor pac : regionLarge) {
 			pac.x = pac.x + xtemp;
 			pac.y = pac.y + ytemp;
-			int c = origArray[pac.x + pac.y * w];
-			
-			if (innerHullPixels != null) {
-				if (pac.x <= 0)
-					System.out.println("OFFSET TO SMALL IN X-DIR: " + pac.x);
-				else
-					if (pac.y <= 0)
-						System.out.println("OFFSET TO SMALL IN Y-DIR: " + pac.y);
+			if (pac.x >= 0 && pac.y >= 0) {
+				int c = origArray[pac.x + pac.y * w];
+				
+				if (innerHullPixels != null) {
+					if (pac.x < 0)
+						;// System.out.println("OFFSET TO SMALL IN X-DIR: " + pac.x);
 					else
-						if (pac.x > innerHullPixels.length)
-							System.out.println("OFFSET TO LARGE IN X-DIR: " + pac.x);
+						if (pac.y < 0)
+							;// System.out.println("OFFSET TO SMALL IN Y-DIR: " + pac.y);
 						else
-							if (pac.y > innerHullPixels[0].length)
-								System.out.println("OFFSET TO LARGE IN Y-DIR: " + pac.y);
-							else {
-								int hullC = innerHullPixels[pac.x][pac.y];
-								if (hullC != y)
-									return null;
-							}
+							if (pac.x > innerHullPixels.length)
+								System.out.println("OFFSET TO LARGE IN X-DIR: " + pac.x);
+							else
+								if (pac.y > innerHullPixels[0].length)
+									System.out.println("OFFSET TO LARGE IN Y-DIR: " + pac.y);
+								else {
+									int hullC = innerHullPixels[pac.x][pac.y];
+									if (hullC != y)
+										return null;
+								}
+				}
+				
+				if (c != ImageOperation.BACKGROUND_COLORint)
+					res.add(pac);
 			}
-			
-			if (c != ImageOperation.BACKGROUND_COLORint)
-				res.add(pac);
 		}
 		return res;
 	}
