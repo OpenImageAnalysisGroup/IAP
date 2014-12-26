@@ -221,14 +221,16 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		this.imageResult = imageResult;
 		this.readOnly = readOnly;
 		if (imageResult != null && getMaxString(imageResult.getFileNameMain()).endsWith("..."))
-			setToolTipText(imageResult.getFileNameMain());
+			setToolTipText("<html>" + imageResult.getFileNameMain() + "<br><font color='gray'>" + getNameInFull(imageResult, null).split("/", 2)[1]);
 		else
 			if (imageResult == null) {
 				if (projectNode.getTargetEntity() instanceof Substance3D)
-					setToolTipText(((Substance3D) projectNode.getTargetEntity()).getName());
+					setToolTipText("<html>" + ((Substance3D) projectNode.getTargetEntity()).getName() + "<br><font color='gray'>"
+							+ getNameInFull(imageResult, null).split("/", 2)[1]);
 				else
 					if (projectNode.getTargetEntity() instanceof Condition3D)
-						setToolTipText(((Condition3D) projectNode.getTargetEntity()).getName());
+						setToolTipText("<html>" + ((Condition3D) projectNode.getTargetEntity()).getName() + "<br><font color='gray'>"
+								+ getNameInFull(imageResult, null).split("/", 2)[1]);
 			}
 	}
 	
@@ -250,6 +252,33 @@ public class DataSetFileButton extends JButton implements ActionListener {
 														.getPosition().intValue()
 														+ ")" : "0)")))))
 				+ "</b></body></html>";
+	}
+	
+	public static String getNameInFull(ImageResult imageResult, String customNonImageTitle) {
+		String s = (imageResult == null ? "" + customNonImageTitle :
+				
+				imageResult.getFileNameMain() + "/" +
+						((!(imageResult.getBinaryFileInfo().entity instanceof NumericMeasurement3D)) ?
+								"(Attachment)" :
+								"c=" +
+										((NumericMeasurement3D) imageResult
+												.getBinaryFileInfo().entity)
+												.getParentSample().getParentCondition().toString() + " s=" +
+										((NumericMeasurement3D) imageResult
+												.getBinaryFileInfo().entity)
+												.getParentSample().getSampleTime() + " i=" +
+										((NumericMeasurement3D) imageResult
+												.getBinaryFileInfo().entity)
+												.getQualityAnnotation()
+										+ " ("
+										+ (((NumericMeasurement3D) imageResult
+												.getBinaryFileInfo().entity)
+												.getPosition() != null ? ((NumericMeasurement3D) imageResult
+												.getBinaryFileInfo().entity)
+												.getPosition().intValue()
+												+ ")" : "0)")))
+				+ "";
+		return s;
 	}
 	
 	private static String strip(String fileName, String opt) {

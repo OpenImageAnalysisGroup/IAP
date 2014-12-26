@@ -86,7 +86,28 @@ public class FilterConnector {
 				matches++;
 			return true;
 		}
-		boolean match = label.contains(tf.getText());
+		boolean match = true;
+		if (tf.getText().contains("&")) {
+			for (String t : tf.getText().split("&")) {
+				if (!label.contains(t)) {
+					match = false;
+					break;
+				}
+				
+			}
+		} else {
+			match = false;
+			if (tf.getText().contains("|")) {
+				for (String t : tf.getText().split("|")) {
+					if (label.contains(t)) {
+						match = true;
+						break;
+					}
+					
+				}
+			} else
+				match = label.contains(tf.getText());
+		}
 		if (count)
 			if (match)
 				matches++;
