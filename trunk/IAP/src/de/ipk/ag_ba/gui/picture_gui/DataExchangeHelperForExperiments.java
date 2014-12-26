@@ -358,7 +358,7 @@ public class DataExchangeHelperForExperiments {
 				lastInList = binaryFileInfo;
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
 				
-				String cl = DataSetFileButton.getName(imageResult, null);
+				String cl = DataSetFileButton.getNameInFull(imageResult, null);
 				if (cl != null)
 					if (!myFilterConnector.matches(cl, false, false))
 						continue;
@@ -370,7 +370,7 @@ public class DataExchangeHelperForExperiments {
 					break;
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
 				
-				String cl = DataSetFileButton.getName(imageResult, null);
+				String cl = DataSetFileButton.getNameInFull(imageResult, null);
 				if (cl != null)
 					if (!myFilterConnector.matches(cl, binaryFileInfo == lastInList, true))
 						continue;
