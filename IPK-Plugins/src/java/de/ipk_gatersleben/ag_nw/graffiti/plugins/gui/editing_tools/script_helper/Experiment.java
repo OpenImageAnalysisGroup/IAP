@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -928,19 +927,27 @@ public class Experiment implements ExperimentInterface {
 	}
 	
 	public static String[] getTimes(ExperimentInterface experimentData) {
-		LinkedHashSet<String> times = new LinkedHashSet<String>();
+		return getTimes(experimentData, null);
+	}
+	
+	public static String[] getTimes(ExperimentInterface experimentData, String optSubstanceFilter) {
+		TreeMap<String, String> times = new TreeMap<String, String>();
 		if (experimentData != null)
 			for (SubstanceInterface md : experimentData) {
+				if (optSubstanceFilter != null && !optSubstanceFilter.equals(md.getName()))
+					continue;
 				for (ConditionInterface sd : md) {
 					for (SampleInterface s : sd) {
 						String t = s.getSampleTime();
-						if (!t.equals("-1 -1"))
-							times.add(t);
+						if (!t.equals("-1 -1")) {
+							String sortKey = StringManipulationTools.formatNumberAddZeroInFront(s.getTime(), 3) + " " + s.getTimeUnit();
+							times.put(sortKey, t);
+						}
 					}
 				}
 			}
 		if (times.size() > 0)
-			return times.toArray(new String[] {});
+			return times.values().toArray(new String[] {});
 		else
 			return new String[] { XPathHelper.noGivenTimeStringConstant };
 	}
@@ -1385,5 +1392,15 @@ public class Experiment implements ExperimentInterface {
 	
 	public ExperimentStatistics getExperimentStatistics() {
 		return new ExperimentStatistics(this);
+	}
+	
+	@Override
+	public Collection<SubstanceInterface> getSubstances() {
+		return md;
+	}
+	
+	@Override
+	public Object getAttributeField(String id) {
+		return getHeader().getAttributeField(id);
 	}
 }

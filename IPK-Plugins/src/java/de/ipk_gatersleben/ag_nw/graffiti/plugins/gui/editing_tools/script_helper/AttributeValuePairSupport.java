@@ -16,4 +16,6 @@ public interface AttributeValuePairSupport {
 	
 	public void fillAttributeMap(Map<String, Object> attributeValueMap);
 	
+	public abstract Object getAttributeField(String id);
+	
 }

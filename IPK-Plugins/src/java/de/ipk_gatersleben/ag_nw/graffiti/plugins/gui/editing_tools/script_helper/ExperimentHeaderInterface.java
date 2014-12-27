@@ -9,7 +9,7 @@ import org.ExperimentHeaderHelper;
 import unit_test_support.TestValueRequired;
 
 @TestValueRequired("experimentname")
-public interface ExperimentHeaderInterface extends Comparable<ExperimentHeaderInterface>, Cloneable, FileAttachmentSupport {
+public interface ExperimentHeaderInterface extends AttributeValuePairSupport, Comparable<ExperimentHeaderInterface>, Cloneable, FileAttachmentSupport {
 	
 	@Override
 	public boolean equals(Object obj);

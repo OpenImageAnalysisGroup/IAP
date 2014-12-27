@@ -336,6 +336,11 @@ public class SampleAverage implements SampleAverageInterface {
 	}
 	
 	@Override
+	public Object getAttributeField(String id) {
+		throw new UnsupportedOperationException("not yet implemented for this data structure!");
+	}
+	
+	@Override
 	public String getFiles() {
 		throw new UnsupportedOperationException("Not implemented for this data type");
 	}

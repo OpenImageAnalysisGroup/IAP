@@ -41,6 +41,45 @@ public class Sample implements SampleInterface {
 	
 	private static final String[] attributeNames = new String[] { "id", "measurementtool", "time", "unit", "ttest", "files" };
 	
+	private Object[] getAttributeValues() {
+		return new Object[] { getSampleFineTimeOrRowId(), getMeasurementtool(), getTime(), getTimeUnit(),
+				getTtestInfo().toString(), getFiles() };
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
+	 * .MappingDataEntity#fillAttributeMap(java.util.Map)
+	 */
+	@Override
+	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
+		Object[] values = getAttributeValues();
+		int idx = 0;
+		for (String name : attributeNames) {
+			attributeValueMap.put(name, values[idx++]);
+		}
+	}
+	
+	@Override
+	public Object getAttributeField(String id) {
+		switch (id) {
+			case "id":
+				return getSampleFineTimeOrRowId();
+			case "measurementtool":
+				return getMeasurementtool();
+			case "time":
+				return getTime();
+			case "unit":
+				return getTimeUnit();
+			case "ttest":
+				return getTtestInfo();
+			case "files":
+				return getFiles();
+		}
+		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");
+	}
+	
 	@Override
 	public void getString(StringBuilder r) {
 		r.append("<sample");
@@ -57,11 +96,6 @@ public class Sample implements SampleInterface {
 	@Override
 	public void getXMLAttributeString(StringBuilder r) {
 		Substance.getAttributeString(r, attributeNames, getAttributeValues());
-	}
-	
-	private Object[] getAttributeValues() {
-		return new Object[] { getSampleFineTimeOrRowId(), getMeasurementtool(), getTime(), getTimeUnit(),
-				getTtestInfo().toString(), getFiles() };
 	}
 	
 	@Override
@@ -387,21 +421,6 @@ public class Sample implements SampleInterface {
 	@Override
 	public Iterator<NumericMeasurementInterface> iterator() {
 		return measurements.iterator();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
-	 * .MappingDataEntity#fillAttributeMap(java.util.Map)
-	 */
-	@Override
-	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
-		Object[] values = getAttributeValues();
-		int idx = 0;
-		for (String name : attributeNames) {
-			attributeValueMap.put(name, values[idx++]);
-		}
 	}
 	
 	@Override

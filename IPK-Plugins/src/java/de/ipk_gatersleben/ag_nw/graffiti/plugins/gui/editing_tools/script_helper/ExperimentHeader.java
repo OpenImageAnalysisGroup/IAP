@@ -340,6 +340,11 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	}
 	
 	@Override
+	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
+		fillAttributeMap(attributeValueMap, -1);
+	}
+	
+	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap, int measurementcount) {
 		attributeValueMap.put("experimentname", getExperimentName());
 		if (database != null)
@@ -372,6 +377,51 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 					attributeValueMap.put(DCelement.getTermPrefix() + dc.getTermName(), dcValue);
 			}
 		}
+	}
+	
+	@Override
+	public Object getAttributeField(String id) {
+		switch (id) {
+			case "experimentname":
+				return getExperimentName();
+			case "database":
+				return database;
+			case "remark":
+				return remark;
+			case "coordinator":
+				return coordinator;
+			case "experimenttype":
+				return experimentType;
+			case "sequence":
+				return sequence;
+			case "files":
+				return files;
+			case "excelfileid":
+				return databaseId;
+			case "importusername":
+				return importUserName;
+			case "importusergroup":
+				return importUserGroup;
+			case "importdate":
+				return importDate;
+			case "startdate":
+				return startDate;
+			case "storagetime":
+				return storageTime;
+			case "measurements":
+				return null;
+			case "imagefiles":
+				return (imageFiles == null ? 0 : imageFiles);
+			case "sizekb":
+				return sizekb;
+			case "origin":
+				return originDatabaseId;
+			case "outliers":
+				return globalOutliers;
+			case "settings":
+				return settings;
+		}
+		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");
 	}
 	
 	public static HashMap<String, String> getNiceHTMLfieldNameMapping() {
