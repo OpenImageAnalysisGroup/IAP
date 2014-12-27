@@ -12,6 +12,7 @@ import de.ipk.ag_ba.commands.experiment.ActionNumericExportCommands;
 import de.ipk.ag_ba.commands.experiment.ActionShowDataWithinVANTED;
 import de.ipk.ag_ba.commands.experiment.ActionToolList;
 import de.ipk.ag_ba.commands.experiment.ActionViewData;
+import de.ipk.ag_ba.commands.experiment.charting.ActionFxCreateDataChart;
 import de.ipk.ag_ba.commands.experiment.clipboard.ActionCopyToClipboard;
 import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReport;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
@@ -38,6 +39,8 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 	public ActionDataProcessing[] getDataProcessingActions(ExperimentReference experimentReference) {
 		ArrayList<ActionDataProcessing> actions = new ArrayList<ActionDataProcessing>();
 		
+		actions.add(new ActionFxCreateDataChart());
+		
 		actions.add(new ActionViewData());
 		
 		final ArrayList<ThreadSafeOptions> toggles = new ArrayList<ThreadSafeOptions>();
@@ -57,6 +60,7 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		}
 		
 		actions.add(new ActionCopyExperiment());
+		
 		actions.add(new ActionToolList("Various tools and less-often used data manipulation commands"));
 		actions.add(new ActionCmdLineTools("Script-commands for data evaluation and filtering"));
 		actions.add(new ActionCopyToClipboard());
