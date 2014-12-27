@@ -314,6 +314,19 @@ public class NumericMeasurement3D extends NumericMeasurement {
 	}
 	
 	@Override
+	public Object getAttributeField(String id) {
+		switch (id) {
+			case "position":
+				return position;
+			case "positionUnit":
+				return positionUnit;
+			case "annotation":
+				return annotation;
+		}
+		return super.getAttributeField(id);
+	}
+	
+	@Override
 	public NumericMeasurementInterface clone(SampleInterface parent) {
 		NumericMeasurement3D m = (NumericMeasurement3D) super.clone(parent);
 		m.setPosition(getPosition());
