@@ -144,4 +144,6 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	public void mergeBiologicalReplicates(BackgroundTaskStatusProviderSupportingExternalCall status);
 	
 	public void addAndMerge(Runnable optPingCode, ExperimentInterface ei, RunnableExecutor re, MergeCompareRequirements mcr);
+	
+	public Collection<SubstanceInterface> getSubstances();
 }

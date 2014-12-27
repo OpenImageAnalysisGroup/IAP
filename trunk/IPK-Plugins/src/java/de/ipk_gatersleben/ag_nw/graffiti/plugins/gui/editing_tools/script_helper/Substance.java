@@ -1310,4 +1310,9 @@ public class Substance implements SubstanceInterface {
 		
 	}
 	
+	@Override
+	public Object getAttributeField(String id) {
+		throw new UnsupportedOperationException("not yet implemented for this data structure!");
+	}
+	
 }

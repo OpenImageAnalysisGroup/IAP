@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,17 +73,62 @@ public class Condition implements ConditionInterface {
 	private static final String[] attributeNames = new String[] {
 			"experimentname", "database",
 			"experimenttype",
-			"coordinator", "startdate", "importdate", "storagedate", "remark", "genotype",
-			"growthconditions", "id", "name", "treatment",
-			"variety", "sequence", "files", "settings" };
+			"coordinator", "startdate", "importdate", "storagedate", "remark",
+			"id", "name", "genotype", "variety", "sequence", "growthconditions", "treatment",
+			"files", "settings" };
 	
-	private static final String[] attributeNamesForDocument = new String[] { "genotype",
-			"growthconditions", "id",
-			"name", "treatment", "variety", "sequence", "files" };
+	private static final String[] attributeNamesForDocument = new String[] {
+			"id", "name", "genotype", "variety", "sequence", "growthconditions", "treatment", "files" };
+	
+	private static final String[] attributeNameWithoutDocumentFields = remove(attributeNames, attributeNamesForDocument, "sequence");
 	
 	public Condition(SubstanceInterface md) {
 		parent = md;
 		header = new ExperimentHeader();
+	}
+	
+	private Object[] getAttributeValues() {
+		return new Object[] { getExperimentName(), getDatabase(), getExperimentType(), getCoordinator(),
+				getExperimentStartDate(), getExperimentImportDate(), getExperimentStorageDate(),
+				getExperimentRemark(),
+				getRowId(), getSpecies(), getGenotype(), getVariety(),
+				getSequence(), getGrowthconditions(), getTreatment(), getFiles(), getExperimentSettings() };
+	}
+	
+	@Override
+	public Object getAttributeField(String id) {
+		switch (id) {
+			case "name":
+				return getSpecies();
+			case "genotype":
+				return getGenotype();
+			case "variety":
+				return getVariety();
+			case "sequence":
+				return getSequence();
+			case "growthconditions":
+				return getGrowthconditions();
+			case "treatment":
+				return getTreatment();
+			case "files":
+				return getFiles();
+		}
+		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");
+	}
+	
+	private static String[] remove(String[] a, String[] rem, String... rrr) {
+		HashSet<String> r = new HashSet<String>();
+		for (String rs : rem)
+			r.add(rs);
+		HashSet<String> p = new HashSet<String>();
+		for (String ps : rrr)
+			p.add(ps);
+		ArrayList<String> res = new ArrayList<String>();
+		for (String as : a) {
+			if (!r.contains(as) && !p.contains(as))
+				res.add(as);
+		}
+		return res.toArray(new String[] {});
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -124,14 +170,6 @@ public class Condition implements ConditionInterface {
 		res.append("<tr><td>Treatment</td><td>" + treatment + "</td></tr>");
 		res.append("</table></html>");
 		return res.toString();
-	}
-	
-	private Object[] getAttributeValues() {
-		return new Object[] { getExperimentName(), getDatabase(), getExperimentType(), getCoordinator(),
-				getExperimentStartDate(), getExperimentImportDate(), getExperimentStorageDate(),
-				getExperimentRemark(), getGenotype(),
-				getGrowthconditions(), getRowId(), getSpecies(), getTreatment(), getVariety(),
-				getSequence(), getFiles(), getExperimentSettings() };
 	}
 	
 	@Override
@@ -977,5 +1015,9 @@ public class Condition implements ConditionInterface {
 		Map<String, Object> attributeValueMap = new HashMap<String, Object>();
 		fillAttributeMap(attributeValueMap);
 		return attributeValueMap;
+	}
+	
+	public static String[] getExperimentFields() {
+		return attributeNameWithoutDocumentFields;
 	}
 }

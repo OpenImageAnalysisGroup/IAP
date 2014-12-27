@@ -222,6 +222,23 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	}
 	
 	@Override
+	public Object getAttributeField(String id) {
+		switch (id) {
+			case "replicates":
+				return replicateID;
+			case "unit":
+				return unit;
+			case "value":
+				return value;
+			case "quality":
+				return quality;
+			case "files":
+				return files;
+		}
+		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");
+	}
+	
+	@Override
 	public NumericMeasurementInterface clone(SampleInterface parent) {
 		NumericMeasurementInterface m = Experiment.typemanager.getNewMeasurement(parent);
 		m.setValue(value);
@@ -259,4 +276,5 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		res.value = value;
 		return res;
 	}
+	
 }
