@@ -58,8 +58,6 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 		// todo add zoom slider (default, large, extra large)
 		// todo add plant filter (all, ID 1, ID 2, ID 3, ...)
 		
-		res.add(new NavigationButton("Create Data Chart", new ActionFxCreateDataChart(experiment), src.getGUIsetting()));
-		
 		res.add(new NavigationButton("Add Marked Outliers to Global Outlier List", new ActionSetGlobalOutliers(experiment), src.getGUIsetting()));
 		
 		if (experiment.m != null)

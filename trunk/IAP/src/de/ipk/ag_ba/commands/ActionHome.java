@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
+import org.ReleaseInfo;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.about.ActionAbout;
@@ -30,7 +31,7 @@ public final class ActionHome extends AbstractNavigationAction {
 	private final BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus;
 	
 	public ActionHome(BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus, GUIsetting guiSetting) {
-		super("IAP Home");
+		super("<html>IAP Home<br><font color='gray'>V" + ReleaseInfo.IAP_VERSION_STRING);
 		this.myStatus = myStatus;
 		this.guiSetting = guiSetting;
 		assert guiSetting != null;

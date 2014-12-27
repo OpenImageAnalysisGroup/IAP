@@ -5,6 +5,7 @@ import info.clearthought.layout.TableLayout;
 import java.awt.Color;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -40,10 +41,15 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
 public class DataChartComponentWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private final ExperimentInterface experiment;
+	private JSplitPane splitPane;
 	
 	public DataChartComponentWindow(ExperimentInterface experiment) {
 		this.experiment = experiment;
 		initGui();
+	}
+	
+	public JComponent getGUI() {
+		return splitPane;
 	}
 	
 	private void initGui() {
@@ -65,7 +71,8 @@ public class DataChartComponentWindow extends JFrame {
 		setDefaultChartDisplay(graph, ge, experiment.iterator().next().getName(), ex.size() < 10);
 		
 		final XmlDataChartComponent chart = new XmlDataChartComponent(experiment, GraffitiCharts.AUTOMATIC.getName(), graph, ge);
-		chart.setBorder(BorderFactory.createRaisedBevelBorder());
+		// chart.setBorder(BorderFactory.createRaisedBevelBorder());
+		chart.setBorder(BorderFactory.createEtchedBorder());
 		EditorSession s = new EditorSession(graph);
 		s.getGraph().getListenerManager().addDelayedAttributeListener(new AbstractAttributeListener() {
 			@Override
@@ -102,10 +109,10 @@ public class DataChartComponentWindow extends JFrame {
 		}
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.addTab("Settings A", graphSettingsEditPanel);
-		tabbedPane.addTab("Settings B", nodeSettingsEditPanel);
+		tabbedPane.addTab("Settings Page 1", graphSettingsEditPanel);
+		tabbedPane.addTab("Settings Page 2", nodeSettingsEditPanel);
 		
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, chart, tabbedPane);
+		this.splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, chart, tabbedPane);
 		splitPane.setDividerLocation(getWidth() - 300);
 		splitPane.setDividerSize(10);
 		splitPane.setOneTouchExpandable(true);
