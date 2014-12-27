@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.RunnableExecutor;
@@ -71,11 +72,14 @@ public class MappingData3DPath {
 		
 		mdnew = clone ? md.clone() : md;
 		condnew = clone ? cond.clone(mdnew) : cond;
-		mdnew.add(condnew);
+		if (clone)
+			mdnew.add(condnew);
 		sampnew = clone ? sample.clone(condnew) : sample;
-		condnew.add(sampnew);
+		if (clone)
+			condnew.add(sampnew);
 		measnew = clone ? meas.clone(sampnew) : meas;
-		sampnew.add(measnew);
+		if (clone)
+			sampnew.add(measnew);
 		// } catch (NullPointerException e) {
 		// ErrorMsg.addErrorMessage(e);
 		// measnew = null;
@@ -186,6 +190,10 @@ public class MappingData3DPath {
 		for (NumericMeasurementInterface nmi : md)
 			mmd.add(new MappingData3DPath(nmi, false));
 		return merge(mmd, ignoreSnapshotFineTime, status);
+	}
+	
+	public static Stream<MappingData3DPath> getStream(ExperimentInterface experiment) {
+		return get(experiment, false).stream();
 	}
 	
 }
