@@ -33,8 +33,12 @@ import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
  * @author klukas
@@ -315,5 +319,29 @@ public class ExperimentReference {
 	
 	public MongoDB getM() {
 		return m;
+	}
+	
+	public void visitConditions(String optSubstanceFilter, ConditionVisitor cv) throws Exception {
+		for (SubstanceInterface si : getData().getSubstances())
+			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
+				for (ConditionInterface ci : si)
+					cv.visit(ci);
+	}
+	
+	public void visitSamples(String optSubstanceFilter, SampleVisitor nmi) throws Exception {
+		for (SubstanceInterface si : getData().getSubstances())
+			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
+				for (ConditionInterface ci : si)
+					for (SampleInterface sa : ci)
+						nmi.visit(sa);
+	}
+	
+	public void visitNumericMeasurements(String optSubstanceFilter, NumericMeasurementVisitor nmi) throws Exception {
+		for (SubstanceInterface si : getData().getSubstances())
+			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
+				for (ConditionInterface ci : si)
+					for (SampleInterface sa : ci)
+						for (NumericMeasurementInterface n : sa)
+							nmi.visit(n);
 	}
 }

@@ -226,11 +226,14 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			if (imageResult == null) {
 				if (projectNode.getTargetEntity() instanceof Substance3D)
 					setToolTipText("<html>" + ((Substance3D) projectNode.getTargetEntity()).getName() + "<br><font color='gray'>"
-							+ getNameInFull(imageResult, null).split("/", 2)[1]);
+							+ (getNameInFull(imageResult, null).contains("/") ? getNameInFull(imageResult, null).split("/", 2)[1] : getNameInFull(imageResult, null)));
 				else
 					if (projectNode.getTargetEntity() instanceof Condition3D)
-						setToolTipText("<html>" + ((Condition3D) projectNode.getTargetEntity()).getName() + "<br><font color='gray'>"
-								+ getNameInFull(imageResult, null).split("/", 2)[1]);
+						setToolTipText("<html>"
+								+ ((Condition3D) projectNode.getTargetEntity()).getName()
+								+ "<br><font color='gray'>"
+								+ (getNameInFull(imageResult, null).contains("/") ? getNameInFull(imageResult, null).split("/", 2)[1]
+										: getNameInFull(imageResult, null)));
 			}
 	}
 	
