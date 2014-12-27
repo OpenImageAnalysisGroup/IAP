@@ -1,5 +1,8 @@
 package org;
 
+/**
+ * @author klukas
+ */
 public interface IniIoProvider {
 	
 	public String getString();

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -1076,5 +1077,20 @@ public class StringManipulationTools implements HelperClass {
 		ArrayList<String> res = new ArrayList<String>();
 		possibleValues.forEach((e) -> res.add(e + ""));
 		return res;
+	}
+	
+	public static String getStringList(LinkedHashSet<String> values, String div, int max, String etc) {
+		if (values.size() <= max)
+			return getStringList(values, div);
+		ArrayList<String> elements = new ArrayList<String>();
+		for (String v : values) {
+			elements.add(v);
+			if (elements.size() > max) {
+				elements.remove(elements.size() - 1);
+				elements.add(etc);
+				break;
+			}
+		}
+		return getStringList(elements, div);
 	}
 }
