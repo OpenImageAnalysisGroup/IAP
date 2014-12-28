@@ -71,7 +71,7 @@ public class InstanceLoader {
 	 *            DOCUMENT ME!
 	 */
 	public static Object createInstance(Class theClass)
-						throws InstanceCreationException {
+			throws InstanceCreationException {
 		try {
 			return theClass.newInstance();
 		} catch (InstantiationException ie) {
@@ -90,8 +90,8 @@ public class InstanceLoader {
 	 * @throws InstanceCreationException
 	 *            DOCUMENT ME!
 	 */
-	public static synchronized Object createInstance(String name)
-						throws InstanceCreationException {
+	public static Object createInstance(String name)
+			throws InstanceCreationException {
 		try {
 			Class c = storedLoader.loadClass(name);
 			
@@ -124,11 +124,11 @@ public class InstanceLoader {
 	 *            DOCUMENT ME!
 	 */
 	public static Object createInstance(String name, Object param)
-						throws InstanceCreationException {
+			throws InstanceCreationException {
 		try {
 			return Class.forName(name)
-								.getConstructor(new Class[] { param.getClass() })
-								.newInstance(new Object[] { param });
+					.getConstructor(new Class[] { param.getClass() })
+					.newInstance(new Object[] { param });
 		} catch (InvocationTargetException ite) {
 			throw new InstanceCreationException(ite);
 		} catch (NoSuchMethodException nsme) {
@@ -159,13 +159,13 @@ public class InstanceLoader {
 	 *            DOCUMENT ME!
 	 */
 	public static Object createInstance(Class theClass, String paramClassname,
-						Object param)
-						throws InstanceCreationException {
+			Object param)
+			throws InstanceCreationException {
 		try {
 			return theClass.getConstructor(new Class[]
-																	{
-								Class.forName(paramClassname)
-																	}).newInstance(new Object[] { param });
+			{
+					Class.forName(paramClassname)
+			}).newInstance(new Object[] { param });
 		} catch (InvocationTargetException ite) {
 			throw new InstanceCreationException(ite);
 		} catch (NoSuchMethodException nsme) {
@@ -194,10 +194,10 @@ public class InstanceLoader {
 	 *            DOCUMENT ME!
 	 */
 	public static Object createInstance(Class theClass, Object param)
-						throws InstanceCreationException {
+			throws InstanceCreationException {
 		try {
 			return theClass.getConstructor(new Class[] { param.getClass() })
-								.newInstance(new Object[] { param });
+					.newInstance(new Object[] { param });
 		} catch (InvocationTargetException ite) {
 			throw new InstanceCreationException(ite);
 		} catch (NoSuchMethodException nsme) {
