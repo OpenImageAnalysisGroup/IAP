@@ -81,10 +81,10 @@ public class Condition implements ConditionInterface {
 			"id", "name", "genotype", "variety", "sequence", "growthconditions", "treatment", "files" };
 	
 	private static final String[] attributeNames = new String[] {
-			"experimentname", "database",
-			"experimenttype",
-			"coordinator", "startdate", "importdate", "storagedate", "remark", "genotype",
-			"growthconditions", "id", "name", "treatment",
+			"experimentname", "database", "experimenttype",
+			"coordinator", "startdate", "importdate", "storagedate", "remark",
+			"id", "name", "genotype",
+			"growthconditions", "treatment",
 			"variety", "sequence", "files", "settings" };
 	
 	private static final String[] attributeNamesForDocument = new String[] { "genotype",
@@ -103,7 +103,7 @@ public class Condition implements ConditionInterface {
 				getExperimentStartDate(), getExperimentImportDate(), getExperimentStorageDate(),
 				getExperimentRemark(),
 				getRowId(), getSpecies(), getGenotype(), getVariety(),
-				getSequence(), getGrowthconditions(), getTreatment(), getFiles(), getExperimentSettings() };
+				getGrowthconditions(), getTreatment(), getSequence(), getFiles(), getExperimentSettings() };
 	}
 	
 	@Override
