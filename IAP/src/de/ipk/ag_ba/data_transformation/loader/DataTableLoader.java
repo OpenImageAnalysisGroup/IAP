@@ -83,8 +83,8 @@ public class DataTableLoader {
 						} else {
 							int hc = StringManipulationTools.count(subval, "-");
 							if (hc > 0) {
-								for (int idx = 0; idx < hc; idx++) {
-									String subCol = prefix + "." + id + "$" + id + "$[-/" + idx + "]";
+								for (int idx = 0; idx <= hc; idx++) {
+									String subCol = prefix + "." + id + "$[-/" + idx + "]";
 									if (!columns.containsKey(subCol)) {
 										columns.put(prefix + "." + id + "$" + subCol, new ColumnDescription(subCol, WordUtils.capitalize(id) + "$[-/" + idx + "]",
 												isMetaData));

@@ -140,6 +140,8 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction {
 				experiment.visitSamples(
 						substanceFilter,
 						(sample) -> {
+							if (sample.size() == 0)
+								return;
 							String groupInstance = ColumnDescription.extractDataString(relevantColumns, sample);
 							if (groupInstance != null && !groupInstance.isEmpty())
 								ng.add(groupInstance);
@@ -148,6 +150,8 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction {
 				experiment.visitConditions(
 						substanceFilter,
 						(condition) -> {
+							if (condition.size() == 0)
+								return;
 							String groupInstance = ColumnDescription.extractDataString(relevantColumns, condition);
 							if (groupInstance != null && !groupInstance.isEmpty())
 								ng.add(groupInstance);
