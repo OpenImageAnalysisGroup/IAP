@@ -72,9 +72,9 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 			else
 				return "<html><center><b>&#8667;</b>&nbsp;Process data"
 						+ "&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
-						+ (calcGrubbsA ? (step++) + ". outlier identification and removal" : "")
+						+ (calcGrubbsA ? (step++) + ". outlier removal for technical replicates" : "")
 						+ (groupByPlantID ? (calcGrubbsA ? "<br>" : "") + (step++) + ". calculate mean value for plant ID and day"
-								+ (calcGrubbsB ? "<br>" + (step++) + ". outlier identification and removal" : "")
+								+ (calcGrubbsB ? "<br>" + (step++) + ". outlier removal for group replicates" : "")
 								: "")
 						+ (calcANOVA ? (calcGrubbsA || groupByPlantID || calcGrubbsB ? "<br>" : "") + (step++) + ". calculate ANOVA p-Values" : "");
 			// (groupsDeterminationInProgress.getBval(0, false) ? "~ one moment ~<br>determine group set" :

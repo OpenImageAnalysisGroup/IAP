@@ -229,15 +229,14 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			ra.add(new NavigationButton(groupByAction, src.getGUIsetting()));
 			ra.add(new NavigationButton(filterGroupAction, src.getGUIsetting()));
 			ra.add(new NavigationButton(new ActionTimeRangeCommand(this, "Time Range", filterGroupAction, groupFilter), src.getGUIsetting()));
-			
 			if (false) {
 				addSortCommand(ra);
 				addSummarizeCommandErrorBars(ra);
 			}
 			ra.add(new NavigationButton(new ActionFilterOutliersCommand(this, "Filter Outliers", filterGroupAction), src.getGUIsetting()));
 			ra.add(new NavigationButton(new ActionSummarizeGroupsCommand("Summarize data", this), src.getGUIsetting()));
-			addExportCommand(ra);
 			addCreatePlotCommand(ra);
+			addExportCommand(ra);
 		}
 		// res.add("<h3>*Filter*</h3>Filter Global Outliers Yes / No");
 		// res.add("<h3>*Group by*</h3>Checkboxes: condition.genotype + condition.treatment");
@@ -406,36 +405,44 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 	}
 	
 	private void addExportCommand(ArrayList<NavigationButton> ra) {
-		if (false)
-			ra.add(new NavigationButton(new AbstractNavigationAction("Export plots") {
+		ra.add(new NavigationButton(new AbstractNavigationAction("Export plots") {
+			
+			private NavigationButton src2;
+			
+			@Override
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
+				src2 = src;
 				
-				private NavigationButton src2;
-				
-				@Override
-				public void performActionCalculateResults(NavigationButton src) throws Exception {
-					src2 = src;
-				}
-				
-				@Override
-				public String getDefaultTitle() {
-					return "Export";
-				}
-				
-				@Override
-				public String getDefaultImage() {
-					return "img/ext/gpl2/Gnome-Document-Save-64.png";
-				}
-				
-				@Override
-				public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-					return currentSet;
-				}
-				
-				@Override
-				public ArrayList<NavigationButton> getResultNewActionSet() {
-					return null;
-				}
-			}, src.getGUIsetting()));
+				// traverse substances, consider only target substance
+				// traverse conditions
+				// traverse samples, check time
+				// traverse measurements, check group and global and local outlier info
+				// result:
+				// filtered NMI list, create Mapping Path with clone=true
+				// create experiment
+				// show data.
+			}
+			
+			@Override
+			public String getDefaultTitle() {
+				return "Export";
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return "img/ext/gpl2/Gnome-Document-Save-64.png";
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+				return currentSet;
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				return null;
+			}
+		}, src.getGUIsetting()));
 	}
 	
 	@Override
