@@ -68,6 +68,7 @@ public class DataTableLoader {
 				// check if value contains '//', then split and add virtual columns, if split content contains a ':'. The string before the ':' is interpreted as a
 				// sub-column name. The ':' is also interpreted, if no '//' is found.
 				Object val = attributeValueMap.get(id);
+				System.out.println();
 				if (val instanceof String) {
 					String v = (String) val;
 					for (String subval : v.split("//")) {
