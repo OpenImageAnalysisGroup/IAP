@@ -70,15 +70,26 @@ public class Condition implements ConditionInterface {
 	private SubstanceInterface parent;
 	private ExperimentHeaderInterface header;
 	
-	private static final String[] attributeNames = new String[] {
+	private static final String[] attributeNames_CORRECTED = new String[] {
 			"experimentname", "database",
 			"experimenttype",
 			"coordinator", "startdate", "importdate", "storagedate", "remark",
 			"id", "name", "genotype", "variety", "sequence", "growthconditions", "treatment",
 			"files", "settings" };
 	
-	private static final String[] attributeNamesForDocument = new String[] {
+	private static final String[] attributeNamesForDocument_CORRECTED = new String[] {
 			"id", "name", "genotype", "variety", "sequence", "growthconditions", "treatment", "files" };
+	
+	private static final String[] attributeNames = new String[] {
+			"experimentname", "database",
+			"experimenttype",
+			"coordinator", "startdate", "importdate", "storagedate", "remark", "genotype",
+			"growthconditions", "id", "name", "treatment",
+			"variety", "sequence", "files", "settings" };
+	
+	private static final String[] attributeNamesForDocument = new String[] { "genotype",
+			"growthconditions", "id",
+			"name", "treatment", "variety", "sequence", "files" };
 	
 	private static final String[] attributeNameWithoutDocumentFields = remove(attributeNames, attributeNamesForDocument, "sequence");
 	
