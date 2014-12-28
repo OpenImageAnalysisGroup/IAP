@@ -1,7 +1,6 @@
 package util;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +14,8 @@ import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
+
+import org.graffiti.util.InstanceLoader;
 
 public class FxLogoObjects {
 	
@@ -49,8 +50,8 @@ public class FxLogoObjects {
 		MeshView m = new MeshView();
 		
 		try {
-			InputStream s = new Appearance().getClass().getResource("fxml/" + fxmlFile).openStream();
-			m = new FXMLLoader().load(s);
+			FXMLLoader.setDefaultClassLoader(InstanceLoader.getCurrentLoader());
+			m = FXMLLoader.load(getClass().getResource("fxml/" + fxmlFile));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
