@@ -13,7 +13,7 @@ import org.JLabelJavaHelpLink;
 public class TemplateFileManager {
 	
 	private static TemplateFileManager instance;
-	private ArrayList<TemplateFile> templates;
+	private final ArrayList<TemplateFile> templates;
 	private FolderPanel buttonPanelExcelTemplates = null;
 	
 	private TemplateFileManager() {
@@ -34,9 +34,9 @@ public class TemplateFileManager {
 	private void refreshFolderPanel() {
 		if (buttonPanelExcelTemplates == null) {
 			buttonPanelExcelTemplates =
-								new FolderPanel(
-													"Data Input Templates", true, true, false,
-													JLabelJavaHelpLink.getHelpActionListener("inputformats"));
+					new FolderPanel(
+							"Data Input Templates", true, true, false,
+							JLabelJavaHelpLink.getHelpActionListener("inputformats"));
 			buttonPanelExcelTemplates.setFrameColor(new JTabbedPane().getBackground(), Color.BLACK, 0, 5);
 			buttonPanelExcelTemplates.setBackground(null);
 			// buttonPanelExcelTemplates.setBackground(Color.white);
@@ -45,9 +45,10 @@ public class TemplateFileManager {
 		}
 		
 		buttonPanelExcelTemplates.clearGuiComponentList();
-		
-		for (TemplateFile tf : templates)
-			buttonPanelExcelTemplates.addGuiComponentRow(null, tf.getButton(), false);
+		synchronized (templates) {
+			for (TemplateFile tf : templates)
+				buttonPanelExcelTemplates.addGuiComponentRow(null, tf.getButton(), false);
+		}
 		buttonPanelExcelTemplates.layoutRows();
 	}
 	
