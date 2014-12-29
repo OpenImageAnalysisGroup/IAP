@@ -39,4 +39,9 @@ public class DataMappingTypeManager implements DataMappingTypeManagerInterface {
 	public boolean isKnownMeasurementType(String type) {
 		return type.equals(NumericMeasurement.typeName);
 	}
+	
+	@Override
+	public ExperimentInterface getNewExperiment() {
+		return new Experiment();
+	}
 }
