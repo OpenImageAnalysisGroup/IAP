@@ -14,6 +14,7 @@ package de.ipk_gatersleben.ag_pbi.mmd.experimentdata;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.DataMappingTypeManagerInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleAverage;
@@ -81,6 +82,11 @@ public class DataMappingTypeManager3D implements DataMappingTypeManagerInterface
 				|| type.equals(ImageData.typeName)
 				|| type.equals(VolumeData.typeName)
 				|| type.equals(NetworkData.typeName);
+	}
+	
+	@Override
+	public ExperimentInterface getNewExperiment() {
+		return new Experiment();
 	}
 	
 }
