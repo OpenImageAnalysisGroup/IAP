@@ -15,4 +15,6 @@ public interface DataMappingTypeManagerInterface {
 	public NumericMeasurementInterface getNewMeasurementOfType(String type, SampleInterface sample);
 	
 	public boolean isKnownMeasurementType(String type);
+	
+	public ExperimentInterface getNewExperiment();
 }

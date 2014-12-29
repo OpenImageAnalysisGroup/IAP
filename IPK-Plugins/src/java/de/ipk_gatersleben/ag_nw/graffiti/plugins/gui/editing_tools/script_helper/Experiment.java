@@ -248,8 +248,7 @@ public class Experiment implements ExperimentInterface {
 			for (SubstanceInterface m : this)
 				for (ConditionInterface s : m)
 					return s.getExperimentHeader();
-			ErrorMsg.addErrorMessage("Internal error, isEmpty false, but no seriesData!");
-			return null;
+			throw new RuntimeException("Internal error, isEmpty false, but no seriesData!");
 		}
 	}
 	

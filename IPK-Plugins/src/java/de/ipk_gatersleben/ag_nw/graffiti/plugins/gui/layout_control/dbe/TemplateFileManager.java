@@ -60,7 +60,9 @@ public class TemplateFileManager {
 	}
 	
 	public void addTemplateFile(TemplateFile templateFile) {
-		templates.add(templateFile);
+		synchronized (templates) {
+			templates.add(templateFile);
+		}
 		refreshFolderPanel();
 	}
 	
