@@ -19,13 +19,22 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 	private NavigationButton src2;
 	private SystemOptions set;
 	private final DirtyNotificationSupport[] dirtyNotification;
+	private final ExperimentReferenceWithFilterSupport experiment;
 	
-	public ActionFilterOutliersCommand(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip, DirtyNotificationSupport... dirtyNotification) {
+	public ActionFilterOutliersCommand(ExperimentReferenceWithFilterSupport experiment, ActionFxCreateDataChart actionFxCreateDataChart, String tooltip,
+			DirtyNotificationSupport... dirtyNotification) {
 		super(tooltip);
+		this.experiment = experiment;
 		this.actionFxCreateDataChart = actionFxCreateDataChart;
 		this.dirtyNotification = dirtyNotification;
 		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
 				: this.actionFxCreateDataChart.settingsLocal.getSettings();
+		checkExperimentFiltering();
+	}
+	
+	private void checkExperimentFiltering() {
+		boolean ro = set.getBoolean("Charting", "Filter outliers//Ignore defined outliers", true);
+		experiment.setRemoveDefinedOutliers(ro);
 	}
 	
 	@Override
@@ -59,6 +68,7 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 				this.actionFxCreateDataChart.settingsLocal.setUseLocalSettings(true);
 			set = global ? this.actionFxCreateDataChart.settingsGlobal.getSettings() : this.actionFxCreateDataChart.settingsLocal.getSettings();
 			set.setBoolean("Charting", "Filter outliers//Ignore defined outliers", cbIgnoreDefinedOutliers.isSelected());
+			checkExperimentFiltering();
 			for (DirtyNotificationSupport dns : dirtyNotification)
 				dns.setDirty(true);
 		}

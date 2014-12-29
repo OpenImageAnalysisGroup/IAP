@@ -16,7 +16,6 @@ import org.SystemOptions;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.data_transformation.ColumnDescription;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 public final class ActionChartingGroupBySettings extends AbstractNavigationAction {
@@ -27,11 +26,11 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 	private NavigationButton src2;
 	private final ActionFilterGroupsCommand filterGroupAction;
 	private SystemOptions set;
-	private final ExperimentReferenceInterface experiment;
+	private final ExperimentReferenceWithFilterSupport experiment;
 	private final String substanceFilter;
 	
 	public ActionChartingGroupBySettings(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip, ActionFilterGroupsCommand filterGroupAction,
-			ExperimentReferenceInterface experiment, String substanceFilter) {
+			ExperimentReferenceWithFilterSupport experiment, String substanceFilter) {
 		super(tooltip);
 		this.actionFxCreateDataChart = actionFxCreateDataChart;
 		this.filterGroupAction = filterGroupAction;
@@ -48,7 +47,7 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		int items = 0;
 		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
 				: this.actionFxCreateDataChart.settingsLocal.getSettings();
-		for (ColumnDescription col : this.actionFxCreateDataChart.data_table.getColumns()) {
+		for (ColumnDescription col : experiment.getDataTable().getColumns()) {
 			if (col.allowGroupBy()) {
 				String group = col.getID().split("\\.")[0];
 				if (!settings.containsKey(group))
