@@ -18,7 +18,7 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -32,7 +32,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 public class ActionSetTimes extends AbstractNavigationAction implements ActionDataProcessing {
 	private static final String SECONDS_WITHIN_1 = "Seconds within 1 ";
 	private MongoDB m;
-	private ExperimentReference experiment;
+	private ExperimentReferenceInterface experiment;
 	private NavigationButton src;
 	private String summaryHTML = "";
 	private Date referenceDay1;
@@ -232,8 +232,8 @@ public class ActionSetTimes extends AbstractNavigationAction implements ActionDa
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
-		this.m = experimentReference.m;
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
+		this.m = experimentReference.getM();
 		this.experiment = experimentReference;
 	}
 }

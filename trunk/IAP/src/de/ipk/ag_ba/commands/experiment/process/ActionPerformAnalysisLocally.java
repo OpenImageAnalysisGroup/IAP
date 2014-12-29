@@ -8,7 +8,7 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.UserDefinedImageAnalysisPipelineTask;
@@ -22,7 +22,7 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 		super(tooltip);
 	}
 	
-	public ActionPerformAnalysisLocally(IniIoProvider iniIO, ExperimentReference experiment, MongoDB m) {
+	public ActionPerformAnalysisLocally(IniIoProvider iniIO, ExperimentReferenceInterface experiment, MongoDB m) {
 		this("Perform Analysis (local execution)");
 		this.iniIO = iniIO;
 		this.m = m;

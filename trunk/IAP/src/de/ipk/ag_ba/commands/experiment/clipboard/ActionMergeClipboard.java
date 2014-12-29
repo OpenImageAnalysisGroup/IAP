@@ -15,6 +15,7 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -47,7 +48,7 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 		ArrayList<String> sequences = new ArrayList<String>();
 		Date firstExperimentStart = null;
 		Date lastExperimentEnd = null;
-		for (ExperimentReference i : guiSetting.getClipboardItems()) {
+		for (ExperimentReferenceInterface i : guiSetting.getClipboardItems()) {
 			String id = i.getHeader().getDatabaseId() + "";
 			ids.add(id);
 			String seq = i.getHeader().getSequence() + "";

@@ -14,7 +14,7 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.JDOM2DOM;
@@ -23,7 +23,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.JDOM2DOM
  * @author klukas
  */
 public class ActionShowXML extends AbstractNavigationAction implements ActionDataProcessing {
-	private ExperimentReference experiment;
+	private ExperimentReferenceInterface experiment;
 	private NavigationButton src;
 	ArrayList<String> xmlOutput = new ArrayList<String>();
 	
@@ -94,7 +94,7 @@ public class ActionShowXML extends AbstractNavigationAction implements ActionDat
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.experiment = experimentReference;
 	}
 }

@@ -13,7 +13,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
@@ -24,7 +24,7 @@ public class ActionDataExportToHsmFolder extends AbstractNavigationAction {
 	private DataExportHelper dataExchangeHelper;
 	
 	public ActionDataExportToHsmFolder(MongoDB m,
-			ExperimentReference experimentReference, String hsmFolder) {
+			ExperimentReferenceInterface experimentReference, String hsmFolder) {
 		super("Save in HSM (" + hsmFolder + ")");
 		this.dataExchangeHelper = new DataExportHelper(experimentReference, m, hsmFolder, status);
 	}

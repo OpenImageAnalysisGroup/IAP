@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -26,23 +26,23 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 	private boolean active;
 	private final boolean saveAnnotation;
 	private MongoDB m;
-	private final ArrayList<ExperimentReference> experimentlist;
+	private final ArrayList<ExperimentReferenceInterface> experimentlist;
 	private String task = "";
 	private boolean ignoreOutliers;
 	
-	public ActionCopyListOfExperimentsToMongo(MongoDB m, ArrayList<ExperimentReference> experiment) {
+	public ActionCopyListOfExperimentsToMongo(MongoDB m, ArrayList<ExperimentReferenceInterface> experiment) {
 		super("Copy a list of experiments to this storage location");
 		this.m = m;
-		this.experimentlist = new ArrayList<ExperimentReference>();
+		this.experimentlist = new ArrayList<ExperimentReferenceInterface>();
 		experimentlist.addAll(experiment);
 		saveAnnotation = false;
 	}
 	
-	public ActionCopyListOfExperimentsToMongo(MongoDB m, ArrayList<ExperimentReference> experiment, boolean annotationSave, boolean ignoreOutliers) {
+	public ActionCopyListOfExperimentsToMongo(MongoDB m, ArrayList<ExperimentReferenceInterface> experiment, boolean annotationSave, boolean ignoreOutliers) {
 		super("Copy a list of experiments to this storage location");
 		this.m = m;
 		this.ignoreOutliers = ignoreOutliers;
-		this.experimentlist = new ArrayList<ExperimentReference>();
+		this.experimentlist = new ArrayList<ExperimentReferenceInterface>();
 		experimentlist.addAll(experiment);
 		this.saveAnnotation = annotationSave;
 	}
@@ -65,14 +65,14 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 		
 		this.m = (MongoDB) sel[0];
 		
-		ArrayList<ExperimentReference> expList = new ArrayList<ExperimentReference>();
+		ArrayList<ExperimentReferenceInterface> expList = new ArrayList<ExperimentReferenceInterface>();
 		boolean filter = experimentlist.size() > 1;
 		if (!filter) {
 			expList.addAll(experimentlist);
 		} else {
 			ArrayList<Object> params = new ArrayList<Object>();
 			TreeSet<String> dbNames = new TreeSet<String>();
-			for (ExperimentReference experiment : experimentlist) {
+			for (ExperimentReferenceInterface experiment : experimentlist) {
 				try {
 					String sourceDB = experiment.getHeader().getOriginDbId().split(":")[1];
 					if (sourceDB != null && !sourceDB.isEmpty())
@@ -96,7 +96,7 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 				String dbName = dbNamesArr.get(idx);
 				System.out.println("?Accept " + dbName + ": " + i);
 				if (i) {
-					for (ExperimentReference experiment : experimentlist) {
+					for (ExperimentReferenceInterface experiment : experimentlist) {
 						String sourceDB;
 						try {
 							sourceDB = experiment.getHeader().getOriginDbId().split(":")[1];
@@ -115,7 +115,7 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 		try {
 			active = true;
 			int i = 0, n = expList.size();
-			for (ExperimentReference experiment : expList) {
+			for (ExperimentReferenceInterface experiment : expList) {
 				i++;
 				status.setCurrentStatusText1("Load " + experiment.getExperimentName());
 				task = "Load " + experiment.getExperimentName() + " (" + i + "/" + n + ")";

@@ -20,11 +20,11 @@ import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 
 public class ActionAnalysis extends AbstractNavigationAction implements ActionDataProcessing {
-	ExperimentReference experimentReference;
+	ExperimentReferenceInterface experimentReference;
 	private NavigationButton src;
 	
 	public ActionAnalysis(String tooltip) {
@@ -45,7 +45,7 @@ public class ActionAnalysis extends AbstractNavigationAction implements ActionDa
 		
 		if (experimentReference.getIniIoProvider() == null)
 			experimentReference.setIniIoProvider(
-					new ExperimentAnalysisSettingsIOprovder(experimentReference.getHeader(), experimentReference.m));
+					new ExperimentAnalysisSettingsIOprovder(experimentReference.getHeader(), experimentReference.getM()));
 		
 		IniIoProvider ioStringProvider = experimentReference.getIniIoProvider();
 		
@@ -67,16 +67,16 @@ public class ActionAnalysis extends AbstractNavigationAction implements ActionDa
 			actions.add(new NavigationButton(ac, src.getGUIsetting()));
 			
 			actions.add(new NavigationButton(
-					new ActionPerformAnalysisLocally(ioStringProvider, experimentReference, experimentReference.m),
+					new ActionPerformAnalysisLocally(ioStringProvider, experimentReference, experimentReference.getM()),
 					src.getGUIsetting()));
 			
 			boolean enableRemoteTaskExecution = IAPmain.isSettingEnabled(IAPfeature.REMOTE_EXECUTION);
-			if (experimentReference.m != null)
+			if (experimentReference.getM() != null)
 				if (enableRemoteTaskExecution)
 					actions.add(new NavigationButton(
 							new ActionPerformGridAnalysis(
 									new PipelineDesc(null, ioStringProvider, null, null, "(unknown legacy IAP version)"),
-									experimentReference.m, experimentReference),
+									experimentReference.getM(), experimentReference),
 							src.getGUIsetting()));
 		}
 		
@@ -111,7 +111,7 @@ public class ActionAnalysis extends AbstractNavigationAction implements ActionDa
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.experimentReference = experimentReference;
 	}
 }

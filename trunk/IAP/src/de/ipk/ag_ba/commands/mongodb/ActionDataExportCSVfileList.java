@@ -10,6 +10,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderService;
@@ -71,7 +72,7 @@ public class ActionDataExportCSVfileList extends AbstractNavigationAction {
 				try {
 					status.setCurrentStatusText1("Process numeric data");
 					status.setCurrentStatusText2(eh.getExperimentName());
-					ExperimentReference er = new ExperimentReference(eh, m);
+					ExperimentReferenceInterface er = new ExperimentReference(eh, m);
 					action.setExperimentReference(er);
 					action.setUseIndividualReportNames(true);
 					action.setStatusProvider(getStatusProvider());

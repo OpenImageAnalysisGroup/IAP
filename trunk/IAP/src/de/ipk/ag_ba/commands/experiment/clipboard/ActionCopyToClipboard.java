@@ -6,10 +6,10 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 
 public class ActionCopyToClipboard extends AbstractNavigationAction implements ActionDataProcessing {
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	
 	public ActionCopyToClipboard(String tooltip) {
 		super(tooltip);
@@ -53,14 +53,13 @@ public class ActionCopyToClipboard extends AbstractNavigationAction implements A
 		return IAPimages.getCopyToClipboard();
 	}
 	
-
 	@Override
 	public boolean isImageAnalysisCommand() {
 		return false;
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.experimentReference = experimentReference;
 	}
 	

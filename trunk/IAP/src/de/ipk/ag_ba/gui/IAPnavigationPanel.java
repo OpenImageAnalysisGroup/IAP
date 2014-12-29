@@ -59,7 +59,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.StyleAware;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.FlowLayoutImproved;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.util.PopupListener;
@@ -276,7 +276,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 				if (accept(nb))
 					this.set.add(nb);
 			}
-			for (ExperimentReference clipboardItem : guiSettting.getClipboardItems()) {
+			for (ExperimentReferenceInterface clipboardItem : guiSettting.getClipboardItems()) {
 				NavigationAction na = new ActionMongoOrLTexperimentNavigation(clipboardItem);
 				NavigationButton nb = new NavigationButton("Clipboard item " + clipboardItem.getExperimentName() + "", na, guiSettting);
 				nb.setRightAligned(true);

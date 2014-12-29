@@ -804,18 +804,18 @@ public class DataSetFileButton extends JButton implements ActionListener {
 									VolumeData volume = (VolumeData) mde;
 									if (volume != null)
 										DataExchangeHelperForExperiments
-												.downloadFile(targetTreeNode.getExperiment().m, imageResult.getHashMain(), tfMain,
+												.downloadFile(targetTreeNode.getExperiment().getM(), imageResult.getHashMain(), tfMain,
 														DataSetFileButton.this,
 														MongoCollection.VOLUMES);
 								} catch (Exception e) {
 									DataExchangeHelperForExperiments
-											.downloadFile(targetTreeNode.getExperiment().m,
+											.downloadFile(targetTreeNode.getExperiment().getM(),
 													imageResult.getHashMain(),
 													tfMain,
 													DataSetFileButton.this,
 													MongoCollection.IMAGES);
 									DataExchangeHelperForExperiments
-											.downloadFile(targetTreeNode.getExperiment().m, imageResult
+											.downloadFile(targetTreeNode.getExperiment().getM(), imageResult
 													.getFileNameLabel(),
 													tfLabel,
 													DataSetFileButton.this,

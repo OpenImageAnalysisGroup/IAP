@@ -16,7 +16,7 @@ import org.SystemOptions;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.data_transformation.ColumnDescription;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
 public final class ActionChartingGroupBySettings extends AbstractNavigationAction {
@@ -27,11 +27,11 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 	private NavigationButton src2;
 	private final ActionFilterGroupsCommand filterGroupAction;
 	private SystemOptions set;
-	private final ExperimentReference experiment;
+	private final ExperimentReferenceInterface experiment;
 	private final String substanceFilter;
 	
 	public ActionChartingGroupBySettings(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip, ActionFilterGroupsCommand filterGroupAction,
-			ExperimentReference experiment, String substanceFilter) {
+			ExperimentReferenceInterface experiment, String substanceFilter) {
 		super(tooltip);
 		this.actionFxCreateDataChart = actionFxCreateDataChart;
 		this.filterGroupAction = filterGroupAction;
@@ -145,7 +145,7 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		String list = StringManipulationTools.getStringList(groupby, ", ");
 		if (list.isEmpty())
 			list = "no filter &gt; single group";
-		return "<html><center>&nbsp;&nbsp;&nbsp;Group by&nbsp;<b>&#8667;</b><br><font color='gray'><small>" + list + "</small></font></center>";
+		return "<html><center>&#8667;</b>&nbsp;Group by&nbsp;<b>&#8667;</b><br><font color='gray'><small>" + list + "</small></font></center>";
 	}
 	
 	@Override

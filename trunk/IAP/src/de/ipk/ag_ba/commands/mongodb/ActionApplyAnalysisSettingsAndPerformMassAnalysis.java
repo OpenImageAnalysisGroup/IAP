@@ -31,6 +31,7 @@ import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.navigation_model.RemoteExecutionWrapperAction;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.mongo.RunnableProcessingSubstance;
@@ -88,7 +89,7 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 				for (ExperimentHeaderInterface eh : experimentHeaders) {
 					if (eh.getImportdate() != null && eh.getSettings() != null && !eh.getSettings().isEmpty()) {
 						try {
-							ExperimentReference er = new ExperimentReference(eh, m);
+							ExperimentReferenceInterface er = new ExperimentReference(eh, m);
 							IniIoProvider iniIO = er.getIniIoProvider();
 							SystemOptions so = SystemOptions.getInstance(null, iniIO);
 							String vv = so.getString("DESCRIPTION", "tuned_for_IAP_version", "(unknown legacy IAP version)");
@@ -209,7 +210,7 @@ public class ActionApplyAnalysisSettingsAndPerformMassAnalysis extends AbstractN
 									} else {
 										try {
 											// submit
-											ExperimentReference er = new ExperimentReference(noS, m);
+											ExperimentReferenceInterface er = new ExperimentReference(noS, m);
 											String settings = noS.getSettings();
 											if (settings != null && !settings.trim().isEmpty()) {
 												PipelineDesc pd = new PipelineDesc(null, er.getIniIoProvider(), null, null, null);

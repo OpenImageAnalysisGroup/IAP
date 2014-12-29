@@ -13,11 +13,11 @@ import de.ipk.ag_ba.commands.experiment.scripts.ScriptHelper;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 
 public class ActionCmdLineTools extends AbstractNavigationAction implements ActionDataProcessing {
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	
 	public ActionCmdLineTools(String tooltip) {
 		super(tooltip);
@@ -90,7 +90,7 @@ public class ActionCmdLineTools extends AbstractNavigationAction implements Acti
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.experimentReference = experimentReference;
 	}
 }

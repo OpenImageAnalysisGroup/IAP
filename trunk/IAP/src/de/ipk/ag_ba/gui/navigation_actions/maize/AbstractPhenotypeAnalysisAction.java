@@ -21,6 +21,7 @@ import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.Batch;
@@ -50,7 +51,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigationAction
 		implements RemoteCapableAnalysisAction {
 	protected MongoDB m;
-	protected ExperimentReference experiment;
+	protected ExperimentReferenceInterface experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
 	protected ExperimentInterface experimentResult;
@@ -368,7 +369,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		if (experimentResult != null) {
 			ExperimentReference ref = new ExperimentReference(experimentResult);
-			ref.m = m;
+			ref.setM(m);
 			
 			for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(ref, true))
 				res.add(new NavigationButton(adp, src != null ? src.getGUIsetting() : null));
@@ -392,7 +393,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 	}
 	
 	@Override
-	public void setParams(ExperimentReference experiment, MongoDB m, String params) {
+	public void setParams(ExperimentReferenceInterface experiment, MongoDB m, String params) {
 		this.experiment = experiment;
 		this.m = m;
 	}

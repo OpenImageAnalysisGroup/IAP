@@ -12,7 +12,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -26,7 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ActionFilterConditions extends AbstractNavigationAction {
 	
 	private ArrayList<ThreadSafeOptions> metaDataColumns;
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private int ngroups = -1;
 	private String oldPattern = "", oldPattern2 = "";
 	public ArrayList<ThreadSafeOptions> experimentFactorSelection;
@@ -40,7 +40,7 @@ public class ActionFilterConditions extends AbstractNavigationAction {
 	
 	public ActionFilterConditions(ThreadSafeOptions metaDataColumnsReady, ArrayList<ThreadSafeOptions> metaDataColumns,
 			ArrayList<ThreadSafeOptions> groupSelection,
-			ExperimentReference experimentReference) {
+			ExperimentReferenceInterface experimentReference) {
 		this("Filter experiment groups");
 		this.metaDataColumnsReady = metaDataColumnsReady;
 		this.metaDataColumns = metaDataColumns;

@@ -13,20 +13,20 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 
 public class ActionAssignAnalysisTemplate extends AbstractNavigationAction implements NavigationAction {
 	
 	private String iniFileName;
 	private String title;
-	private ExperimentReference exp;
+	private ExperimentReferenceInterface exp;
 	private boolean skipped;
 	
 	public ActionAssignAnalysisTemplate(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionAssignAnalysisTemplate(ExperimentReference exp,
+	public ActionAssignAnalysisTemplate(ExperimentReferenceInterface exp,
 			String iniFileName, String tooltip, String title) {
 		this(tooltip);
 		this.exp = exp;
@@ -52,18 +52,18 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 		String ini = SystemOptions.getInstance(iniFileName, null).getIniValue();
 		ini = StringEscapeUtils.escapeXml(ini);
 		exp.getHeader().setSettings(ini);
-		if (exp.m != null) {
+		if (exp.getM() != null) {
 			try {
-				exp.m.saveExperimentHeader(exp.getHeader());
+				exp.getM().saveExperimentHeader(exp.getHeader());
 				System.out.println(SystemAnalysis.getCurrentTime()
 						+ ">Saved changed settings for "
 						+ exp.getExperimentName()
 						+ " in storage location "
-						+ exp.m.getDatabaseName() + ".");
+						+ exp.getM().getDatabaseName() + ".");
 				if (exp.getIniIoProvider() != null && exp.getIniIoProvider().getInstance() != null)
 					exp.getIniIoProvider().getInstance().reload();
 				else
-					exp.setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(exp.getHeader(), exp.m));
+					exp.setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(exp.getHeader(), exp.getM()));
 			} catch (Exception e) {
 				e.printStackTrace();
 				MainFrame.showMessageDialog("Could not save changed settings: " + e.getMessage(), "Error");

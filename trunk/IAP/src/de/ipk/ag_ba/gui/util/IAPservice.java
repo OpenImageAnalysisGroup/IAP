@@ -2007,8 +2007,8 @@ public class IAPservice {
 		BackgroundTaskHelper.issueSimpleTaskInWindow("Load Image List", "Initialize", backgroundTask1, finishSwingTask, status, false, true);
 	}
 	
-	public static boolean getIsAnnotationSavePossible(ExperimentReference experiment) {
-		if (experiment != null && experiment.m != null)
+	public static boolean getIsAnnotationSavePossible(ExperimentReferenceInterface experiment) {
+		if (experiment != null && experiment.getM() != null)
 			return true;
 		String dbId = experiment != null && experiment.getHeader() != null ? experiment.getHeader().getDatabaseId() : null;
 		if (dbId != null) {

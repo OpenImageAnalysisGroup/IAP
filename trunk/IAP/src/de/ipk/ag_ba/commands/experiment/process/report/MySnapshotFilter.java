@@ -147,8 +147,7 @@ public class MySnapshotFilter implements SnapshotFilter {
 		if (isGlobalOutlier)
 			return true;
 		else {
-			String f = nmi.getAnnotationField("outlier");
-			if (f != null && f.equals("1"))
+			if (nmi.isMarkedAsOutlier())
 				return true;
 		}
 		return false;

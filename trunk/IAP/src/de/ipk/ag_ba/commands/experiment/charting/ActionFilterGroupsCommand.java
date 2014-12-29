@@ -14,21 +14,21 @@ import de.ipk.ag_ba.data_transformation.ColumnDescription;
 import de.ipk.ag_ba.data_transformation.DataTable;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 
-public final class ActionFilterGroupsCommand extends AbstractNavigationAction {
+public final class ActionFilterGroupsCommand extends AbstractNavigationAction implements DirtyNotificationSupport {
 	private NavigationButton src2;
 	private boolean dirty = true;
 	private final ThreadSafeOptions groupsDeterminationInProgress = new ThreadSafeOptions();
 	private final LinkedHashSet<String> groups = new LinkedHashSet<String>();
 	private final LinkedHashSet<String> disabled_groups = new LinkedHashSet<String>();
 	private final DataTable data_table;
-	private final ExperimentReference experiment;
+	private final ExperimentReferenceInterface experiment;
 	private ActionChartingGroupBySettings groupByAction;
 	private final String substanceFilter;
 	
-	public ActionFilterGroupsCommand(String tooltip, DataTable data_table, ExperimentReference experiment, String substanceFilter) {
+	public ActionFilterGroupsCommand(String tooltip, DataTable data_table, ExperimentReferenceInterface experiment, String substanceFilter) {
 		super(tooltip);
 		this.data_table = data_table;
 		this.experiment = experiment;
@@ -113,7 +113,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction {
 		}
 	}
 	
-	public static LinkedHashSet<String> getInstanceValuesForColumns(ExperimentReference experiment, ColumnDescription relevantColumn, String optSubstanceFilter)
+	public static LinkedHashSet<String> getInstanceValuesForColumns(ExperimentReferenceInterface experiment, ColumnDescription relevantColumn, String optSubstanceFilter)
 			throws Exception {
 		ArrayList<ColumnDescription> relevantColumns = new ArrayList<ColumnDescription>();
 		relevantColumns.add(relevantColumn);
@@ -124,7 +124,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction {
 		return getInstanceValues(relevantColumns, experiment, substanceFilter);
 	}
 	
-	private static LinkedHashSet<String> getInstanceValues(ArrayList<ColumnDescription> relevantColumns, ExperimentReference experiment, String substanceFilter)
+	private static LinkedHashSet<String> getInstanceValues(ArrayList<ColumnDescription> relevantColumns, ExperimentReferenceInterface experiment, String substanceFilter)
 			throws Exception {
 		LinkedHashSet<String> ng = new LinkedHashSet<>();
 		if (ColumnDescription.isMeasurementRelevant(relevantColumns)) {
@@ -188,6 +188,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction {
 		return null;
 	}
 	
+	@Override
 	public void setDirty(boolean dirty) {
 		this.dirty = dirty;
 		groups.clear();

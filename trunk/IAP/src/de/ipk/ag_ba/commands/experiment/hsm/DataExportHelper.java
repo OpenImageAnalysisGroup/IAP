@@ -31,7 +31,7 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -50,7 +50,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
 
 public class DataExportHelper {
 	
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private int files, knownFiles, errorCount;
 	private String errorMessage;
 	private final String hsmFolder;
@@ -63,7 +63,7 @@ public class DataExportHelper {
 	boolean includeAnnotationImages = true;
 	private String mb;
 	
-	public DataExportHelper(ExperimentReference experimentReference, MongoDB m, String hsmFolder,
+	public DataExportHelper(ExperimentReferenceInterface experimentReference, MongoDB m, String hsmFolder,
 			BackgroundTaskStatusProviderSupportingExternalCall status) {
 		this.experimentReference = experimentReference;
 		this.m = m;

@@ -39,7 +39,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.io_handler.hsm.HsmResourceIoHandler;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -61,7 +61,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
  */
 public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 	private final MongoDB m;
-	private final ExperimentReference experimentReference;
+	private final ExperimentReferenceInterface experimentReference;
 	private NavigationButton src;
 	private String fn;
 	private String mb;
@@ -73,7 +73,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 	private boolean includeAnnotationImages = true;
 	
 	public ActionDataUdpBroadcast(MongoDB m,
-			ExperimentReference experimentReference) {
+			ExperimentReferenceInterface experimentReference) {
 		super("Broadcast dataset to other computers");
 		this.m = m;
 		this.experimentReference = experimentReference;
@@ -820,7 +820,7 @@ public class ActionDataUdpBroadcast extends AbstractNavigationAction {
 					+ " existing files have been skipped)." + errorMessage);
 	}
 	
-	public ExperimentReference getExperimentReference() {
+	public ExperimentReferenceInterface getExperimentReference() {
 		return experimentReference;
 	}
 	

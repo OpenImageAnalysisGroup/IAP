@@ -14,7 +14,7 @@ import javax.swing.tree.TreePath;
 
 import org.StringManipulationTools;
 
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 
 /**
@@ -22,13 +22,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class ExperimentTreeModel implements TreeModel {
 	
-	private final ExperimentReference experiment;
+	private final ExperimentReferenceInterface experiment;
 	private final ActionListener dataChangedListener;
 	private final boolean isReadOnly;
 	
 	public ExperimentTreeModel(
 			ActionListener dataChangedListener,
-			ExperimentReference exp,
+			ExperimentReferenceInterface exp,
 			boolean readOnly) {
 		this.experiment = exp;
 		this.dataChangedListener = dataChangedListener;

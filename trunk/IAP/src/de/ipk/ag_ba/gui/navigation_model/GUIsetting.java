@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 
 import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 
 /**
  * @author klukas
@@ -26,7 +27,7 @@ public class GUIsetting {
 	private final IAPnavigationPanel navigationPanel;
 	private final IAPnavigationPanel actionPanel;
 	private final JPanel graphPanel;
-	private final LinkedHashSet<ExperimentReference> clipboardExperiments = new LinkedHashSet<ExperimentReference>();
+	private final LinkedHashSet<ExperimentReferenceInterface> clipboardExperiments = new LinkedHashSet<ExperimentReferenceInterface>();
 	private final HashSet<String> clipboardExperimentDatabaseIds = new HashSet<String>();
 	
 	public GUIsetting(IAPnavigationPanel navigationPanel, IAPnavigationPanel actionPanel, JPanel graphPanel) {
@@ -51,10 +52,10 @@ public class GUIsetting {
 		return clipboardExperimentDatabaseIds.contains(databaseId);
 	}
 	
-	public boolean isInClipboard(ExperimentReference experimentReference) {
+	public boolean isInClipboard(ExperimentReferenceInterface experimentReference) {
 		boolean found = clipboardExperiments.contains(experimentReference);
 		if (!found && experimentReference.getExperimentPeek() != null) {
-			for (ExperimentReference er : clipboardExperiments) {
+			for (ExperimentReferenceInterface er : clipboardExperiments) {
 				if (er.getExperimentPeek() == experimentReference.getExperimentPeek())
 					return true;
 			}
@@ -62,34 +63,34 @@ public class GUIsetting {
 		return found;
 	}
 	
-	public void addClipboardItem(ExperimentReference experimentReference) {
+	public void addClipboardItem(ExperimentReferenceInterface experimentReference) {
 		// add only the header to the clipboard, as storing the whole experiment may
 		// require a lot of memory
 		if (experimentReference.getHeader().getDatabaseId() != null && !experimentReference.getHeader().getDatabaseId().isEmpty()) {
-			ExperimentReference er = new ExperimentReference(experimentReference.getHeader());
+			ExperimentReferenceInterface er = new ExperimentReference(experimentReference.getHeader());
 			clipboardExperiments.add(er);
 			clipboardExperimentDatabaseIds.add(er.getHeader().getDatabaseId());
-			er.m = experimentReference.m;
+			er.setM(experimentReference.getM());
 		} else {
 			clipboardExperiments.add(experimentReference);
 		}
 		
 	}
 	
-	public void removeClipboardItem(ExperimentReference experimentReference) {
+	public void removeClipboardItem(ExperimentReferenceInterface experimentReference) {
 		String del = experimentReference.getHeader().getDatabaseId();
 		clipboardExperimentDatabaseIds.remove(experimentReference.getHeader().getDatabaseId());
-		ArrayList<ExperimentReference> toBeRemoved = new ArrayList<ExperimentReference>();
-		for (ExperimentReference er : clipboardExperiments) {
+		ArrayList<ExperimentReferenceInterface> toBeRemoved = new ArrayList<ExperimentReferenceInterface>();
+		for (ExperimentReferenceInterface er : clipboardExperiments) {
 			if (er.getHeader().getDatabaseId().equals(del) || er == experimentReference ||
 					er.getExperiment() == experimentReference.getExperiment())
 				toBeRemoved.add(er);
 		}
-		for (ExperimentReference d : toBeRemoved)
+		for (ExperimentReferenceInterface d : toBeRemoved)
 			clipboardExperiments.remove(d);
 	}
 	
-	public Collection<ExperimentReference> getClipboardItems() {
+	public Collection<ExperimentReferenceInterface> getClipboardItems() {
 		return clipboardExperiments;
 	}
 	

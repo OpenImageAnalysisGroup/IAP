@@ -228,7 +228,7 @@ public class MyDropTarget extends DropTarget implements DropTargetListener {
 					imageButton.setToolTipText(file.getName());
 				
 				if (file.canRead()) {
-					if (targetTreeNode.getExperiment().m == null) {
+					if (targetTreeNode.getExperiment().getM() == null) {
 						MappingDataEntity target = targetTreeNode.getTargetEntity();
 						BinaryFileInfo bfi = new BinaryFileInfo(FileSystemHandler.getURL(file), null, false,
 								targetTreeNode.getTargetEntity());

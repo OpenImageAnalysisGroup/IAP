@@ -18,7 +18,7 @@ import de.ipk.ag_ba.commands.settings.ActionToggle;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ActionNumericDataReportSetupInterestingTraitsStep2 extends AbstractNavigationAction {
 	
 	private boolean clustering;
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private NavigationButton src;
 	
 	ArrayList<String> lastOutput = new ArrayList<String>();
@@ -56,7 +56,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 		this.xlsx = xlsx;
 	}
 	
-	public ActionNumericDataReportSetupInterestingTraitsStep2(ExperimentReference experimentReference,
+	public ActionNumericDataReportSetupInterestingTraitsStep2(ExperimentReferenceInterface experimentReference,
 			boolean exportIndividualAngles, ArrayList<ThreadSafeOptions> divideDatasetBy, boolean xlsx,
 			ArrayList<ThreadSafeOptions> toggles, boolean finalStep) {
 		this("Create report" +
@@ -381,7 +381,7 @@ public class ActionNumericDataReportSetupInterestingTraitsStep2 extends Abstract
 			settingInterestingProperties.add(n);
 	}
 	
-	public ExperimentReference getExperimentReference() {
+	public ExperimentReferenceInterface getExperimentReference() {
 		return experimentReference;
 	}
 	

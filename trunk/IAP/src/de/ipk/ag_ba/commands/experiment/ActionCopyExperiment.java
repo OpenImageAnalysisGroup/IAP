@@ -21,6 +21,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -38,7 +39,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 public class ActionCopyExperiment extends AbstractNavigationAction implements NavigationAction, ActionDataProcessing {
 	
 	private MongoDB m;
-	private ArrayList<ExperimentReference> experimentReferences;
+	private ArrayList<ExperimentReferenceInterface> experimentReferences;
 	private NavigationButton src;
 	private ArrayList<MongoDB> ml;
 	// private boolean addHSMcopy;
@@ -59,7 +60,7 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 	public ActionCopyExperiment(MongoDB m, ArrayList<ExperimentHeaderInterface> experimentHeaderList, GUIsetting guiSetting) {
 		this("Copy dataset");
 		this.m = m;
-		this.experimentReferences = new ArrayList<ExperimentReference>();
+		this.experimentReferences = new ArrayList<ExperimentReferenceInterface>();
 		expSize = 0;
 		for (ExperimentHeaderInterface eh : experimentHeaderList) {
 			ExperimentReference er = new ExperimentReference(eh, m);
@@ -178,9 +179,9 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
-		this.m = experimentReference.m;
-		this.experimentReferences = new ArrayList<ExperimentReference>();
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
+		this.m = experimentReference.getM();
+		this.experimentReferences = new ArrayList<ExperimentReferenceInterface>();
 		this.experimentReferences.add(experimentReference);
 	}
 }

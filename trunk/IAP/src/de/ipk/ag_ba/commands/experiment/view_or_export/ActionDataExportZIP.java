@@ -33,7 +33,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
@@ -55,7 +55,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class ActionDataExportZIP extends AbstractNavigationAction implements SpecialCommandLineSupport, ActionDataProcessing {
 	
-	private ExperimentReference er;
+	private ExperimentReferenceInterface er;
 	private String fn;
 	private String mb;
 	private int files;
@@ -68,7 +68,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 		super(tooltip);
 	}
 	
-	public ActionDataExportZIP(ExperimentReference experimentReference, ThreadSafeOptions jpg, ThreadSafeOptions tsoQuality) {
+	public ActionDataExportZIP(ExperimentReferenceInterface experimentReference, ThreadSafeOptions jpg, ThreadSafeOptions tsoQuality) {
 		this("Create ZIP file");
 		this.er = experimentReference;
 		this.jpg = jpg;
@@ -151,7 +151,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 		this.errorMessage = null;
 		try {
 			OutputStream os;
-			ExperimentReference experimentReference = er;
+			ExperimentReferenceInterface experimentReference = er;
 			status.setCurrentStatusText1("Load Experiment");
 			ExperimentInterface experiment = experimentReference.getData();
 			
@@ -466,7 +466,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.er = experimentReference;
 	}
 }

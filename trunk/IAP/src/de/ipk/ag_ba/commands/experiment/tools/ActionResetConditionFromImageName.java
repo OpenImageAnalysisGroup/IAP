@@ -11,7 +11,7 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.mongodb.ActionCopyToMongo;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -26,7 +26,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
  */
 public class ActionResetConditionFromImageName extends AbstractNavigationAction implements ActionDataProcessing {
 	private MongoDB m;
-	private ExperimentReference experiment;
+	private ExperimentReferenceInterface experiment;
 	private NavigationButton src;
 	
 	public ActionResetConditionFromImageName() {
@@ -103,8 +103,8 @@ public class ActionResetConditionFromImageName extends AbstractNavigationAction 
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
-		this.m = experimentReference.m;
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
+		this.m = experimentReference.getM();
 		this.experiment = experimentReference;
 	}
 }

@@ -17,7 +17,7 @@ import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -28,7 +28,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
 public final class ActionShowDataWithinVANTED extends AbstractNavigationAction implements ActionDataProcessing {
 	private final AbstractExperimentDataProcessor pp;
-	private ExperimentReference experimentName;
+	private ExperimentReferenceInterface experimentName;
 	MainPanelComponent mpc;
 	private NavigationButton src;
 	
@@ -88,7 +88,7 @@ public final class ActionShowDataWithinVANTED extends AbstractNavigationAction i
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.experimentName = experimentReference;
 	}
 	

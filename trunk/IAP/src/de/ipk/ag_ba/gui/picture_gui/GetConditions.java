@@ -3,7 +3,7 @@ package de.ipk.ag_ba.gui.picture_gui;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
@@ -15,11 +15,11 @@ public class GetConditions implements Runnable {
 	boolean readOnly;
 	private final SubstanceInterface substance;
 	private final MongoTreeNode substNode;
-	private final ExperimentReference experiment;
+	private final ExperimentReferenceInterface experiment;
 	private final ActionListener dataChangedListener;
 	
 	public GetConditions(ExperimentTreeModel experimentTreeModel, MongoTreeNode substNode,
-			ExperimentReference experiment,
+			ExperimentReferenceInterface experiment,
 			SubstanceInterface substance,
 			boolean readOnly, ActionListener dataChangedListener) {
 		getConditions = experimentTreeModel;

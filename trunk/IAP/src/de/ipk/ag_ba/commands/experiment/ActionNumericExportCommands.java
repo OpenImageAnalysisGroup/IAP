@@ -10,14 +10,14 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.settings.ActionToggle;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 
 /**
  * @author klukas
  */
 public final class ActionNumericExportCommands extends AbstractNavigationAction implements ActionDataProcessing {
 	private final ArrayList<ThreadSafeOptions> toggles;
-	private ExperimentReference experiment;
+	private ExperimentReferenceInterface experiment;
 	private NavigationButton src;
 	private final ThreadSafeOptions exportImages;
 	private final ThreadSafeOptions tsoQuality;
@@ -119,7 +119,7 @@ public final class ActionNumericExportCommands extends AbstractNavigationAction 
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.experiment = experimentReference;
 	}
 }
