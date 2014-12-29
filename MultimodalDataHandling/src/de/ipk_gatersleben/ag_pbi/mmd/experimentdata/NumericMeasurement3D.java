@@ -349,6 +349,22 @@ public class NumericMeasurement3D extends NumericMeasurement {
 		return null;
 	}
 	
+	public boolean isMarkedAsOutlier() {
+		String o = getAnnotationField("outlier");
+		if (o != null && o.equals("1"))
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean isMarkedAsFlagged() {
+		String o = getAnnotationField("flagged");
+		if (o != null && o.equals("1"))
+			return true;
+		else
+			return false;
+	}
+	
 	public synchronized ArrayList<String> getAnnotationKeys(String search) {
 		ArrayList<String> result = new ArrayList<String>();
 		String a = getAnnotation();
