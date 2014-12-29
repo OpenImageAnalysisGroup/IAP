@@ -24,7 +24,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.vanted.plugin.VfsFileObject;
@@ -163,7 +163,7 @@ public abstract class VirtualFileSystem {
 	
 	public abstract IOurl getIOurlFor(String fileName);
 	
-	public MainPanelComponent saveExperiment(MongoDB m, ExperimentReference experimentReference,
+	public MainPanelComponent saveExperiment(MongoDB m, ExperimentReferenceInterface experimentReference,
 			BackgroundTaskStatusProviderSupportingExternalCall statusProvider, boolean ignoreOutliers) throws Exception {
 		ActionDataExportToVfs a = new ActionDataExportToVfs(m, experimentReference,
 				(VirtualFileSystemVFS2) this, ignoreOutliers, null);

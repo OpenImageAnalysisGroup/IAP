@@ -44,7 +44,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.image.structures.Image;
@@ -69,7 +69,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
  */
 public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private final MongoDB m;
-	private final ArrayList<ExperimentReference> experimentReferences;
+	private final ArrayList<ExperimentReferenceInterface> experimentReferences;
 	private String mb;
 	private int files, knownFiles, errorCount;
 	private final ThreadSafeOptions tso = new ThreadSafeOptions();
@@ -86,23 +86,23 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	private boolean skipCreateNewDBid;
 	
 	public ActionDataExportToVfs(MongoDB m,
-			ExperimentReference experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers, VfsFileSystemSource optFileSystemSource) {
+			ExperimentReferenceInterface experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers, VfsFileSystemSource optFileSystemSource) {
 		super("Copy to " + vfs.getTargetName() + " (" + vfs.getProtocolName() + ")");
 		this.m = m;
 		this.ignoreOutliers = ignoreOutliers;
 		this.optFileSystemSource = optFileSystemSource;
-		this.experimentReferences = new ArrayList<ExperimentReference>();
+		this.experimentReferences = new ArrayList<ExperimentReferenceInterface>();
 		this.experimentReferences.add(experimentReference);
 		this.vfs = vfs;
 	}
 	
 	public ActionDataExportToVfs(MongoDB m,
-			ArrayList<ExperimentReference> experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers, VfsFileSystemSource optFileSystemSource) {
+			ArrayList<ExperimentReferenceInterface> experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers, VfsFileSystemSource optFileSystemSource) {
 		super("Copy to " + vfs.getTargetName() + " (" + vfs.getProtocolName() + ")");
 		this.m = m;
 		this.ignoreOutliers = ignoreOutliers;
 		this.optFileSystemSource = optFileSystemSource;
-		this.experimentReferences = new ArrayList<ExperimentReference>();
+		this.experimentReferences = new ArrayList<ExperimentReferenceInterface>();
 		this.experimentReferences.addAll(experimentReference);
 		this.vfs = vfs;
 	}
@@ -159,7 +159,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			throws Exception {
 		this.errorMessage = null;
 		try {
-			for (ExperimentReference experimentReference : experimentReferences) {
+			for (ExperimentReferenceInterface experimentReference : experimentReferences) {
 				ExperimentInterface experiment = experimentReference.getData();
 				
 				if (!skipClone) {

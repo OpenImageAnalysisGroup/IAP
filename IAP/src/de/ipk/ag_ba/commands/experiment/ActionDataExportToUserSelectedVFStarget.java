@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 
 public class ActionDataExportToUserSelectedVFStarget extends AbstractNavigationAction implements NavigationAction {
 	
-	private final ArrayList<ExperimentReference> experimentReference;
+	private final ArrayList<ExperimentReferenceInterface> experimentReference;
 	private final MongoDB m;
 	private boolean ignoreOutliers;
 	
@@ -22,7 +22,7 @@ public class ActionDataExportToUserSelectedVFStarget extends AbstractNavigationA
 	}
 	
 	public ActionDataExportToUserSelectedVFStarget(String tooltip, MongoDB m,
-			ArrayList<ExperimentReference> experimentReference, boolean ignoreOutliers) {
+			ArrayList<ExperimentReferenceInterface> experimentReference, boolean ignoreOutliers) {
 		super(tooltip);
 		this.m = m;
 		this.experimentReference = experimentReference;

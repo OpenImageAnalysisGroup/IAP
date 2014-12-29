@@ -9,7 +9,7 @@ package de.ipk.ag_ba.commands.mongodb;
 
 import de.ipk.ag_ba.commands.analysis.AbstractExperimentDataNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -24,13 +24,13 @@ public class ActionCopyToMongo extends AbstractExperimentDataNavigationAction {
 	private final boolean saveAnnotation;
 	private MongoDB m;
 	
-	public ActionCopyToMongo(MongoDB m, ExperimentReference experiment) {
+	public ActionCopyToMongo(MongoDB m, ExperimentReferenceInterface experiment) {
 		super(experiment);
 		this.m = m;
 		saveAnnotation = false;
 	}
 	
-	public ActionCopyToMongo(MongoDB m, ExperimentReference experiment, boolean annotationSave) {
+	public ActionCopyToMongo(MongoDB m, ExperimentReferenceInterface experiment, boolean annotationSave) {
 		super(experiment);
 		this.m = m;
 		this.saveAnnotation = annotationSave;

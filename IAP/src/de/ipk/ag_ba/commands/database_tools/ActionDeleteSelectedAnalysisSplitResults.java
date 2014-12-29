@@ -16,6 +16,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -78,9 +79,9 @@ public class ActionDeleteSelectedAnalysisSplitResults extends AbstractNavigation
 			status.setCurrentStatusValueFine(100d * idx / mmll.size());
 			if (ei.getExperimentName() == null || ei.getExperimentName().length() == 0 || ei.getExperimentName().contains("§")) {
 				status.setCurrentStatusText2("Load Dataset");
-				ExperimentReference eD = new ExperimentReference(ei.getOriginDbId());
+				ExperimentReferenceInterface eD = new ExperimentReference(ei.getOriginDbId());
 				String pe = eD.getExperimentName();
-				ExperimentReference er = new ExperimentReference(ei, m);
+				ExperimentReferenceInterface er = new ExperimentReference(ei, m);
 				Experiment ee = (Experiment) er.getData();
 				ehl.add(ei);
 				String expN = ei.getExperimentName();

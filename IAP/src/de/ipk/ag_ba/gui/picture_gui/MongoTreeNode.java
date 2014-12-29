@@ -2,7 +2,7 @@ package de.ipk.ag_ba.gui.picture_gui;
 
 import java.awt.event.ActionListener;
 
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.MappingDataEntity;
 
 /**
@@ -15,14 +15,14 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 	private boolean sizeDirty = true;
 	
 	private String size = "";
-	private final ExperimentReference experiment;
+	private final ExperimentReferenceInterface experiment;
 	private final ActionListener sizeChangedListener;
 	private String tooltip;
 	private boolean isGroupNode = false;
 	private boolean isSampleNode;
 	
 	public MongoTreeNode(MongoTreeNode projectNode, ActionListener sizeChangedListener,
-			ExperimentReference expRef,
+			ExperimentReferenceInterface expRef,
 			MappingDataEntity tableName, String title, boolean readOnly) {
 		super(readOnly);
 		this.experiment = expRef;
@@ -129,7 +129,7 @@ public class MongoTreeNode extends MongoTreeNodeBasis {
 		return super.isLeaf();
 	}
 	
-	public ExperimentReference getExperiment() {
+	public ExperimentReferenceInterface getExperiment() {
 		return experiment;
 	}
 	

@@ -33,7 +33,7 @@ import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.gui.images.IAPimages;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
@@ -112,7 +112,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	
 	private final DataSetFilePanel buttonView;
 	
-	public SupplementaryFilePanelMongoDB(final ExperimentReference doc,
+	public SupplementaryFilePanelMongoDB(final ExperimentReferenceInterface doc,
 			String experimentName) {
 		final SupplementaryFilePanelMongoDB thisPanel = this;
 		

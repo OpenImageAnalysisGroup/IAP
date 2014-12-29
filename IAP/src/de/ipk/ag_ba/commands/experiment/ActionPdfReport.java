@@ -12,14 +12,14 @@ import de.ipk.ag_ba.commands.settings.ActionToggle;
 import de.ipk.ag_ba.gui.ImageAnalysisCommandManager;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 public class ActionPdfReport extends AbstractNavigationAction implements ActionDataProcessing {
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private NavigationButton src;
 	TreeSet<String> cs = new TreeSet<String>();
 	TreeSet<String> ss = new TreeSet<String>();
@@ -169,7 +169,7 @@ public class ActionPdfReport extends AbstractNavigationAction implements ActionD
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.experimentReference = experimentReference;
 	}
 }

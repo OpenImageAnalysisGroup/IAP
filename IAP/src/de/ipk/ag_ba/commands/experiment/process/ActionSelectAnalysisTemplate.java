@@ -7,18 +7,18 @@ import org.ErrorMsg;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 
 public class ActionSelectAnalysisTemplate extends AbstractNavigationAction {
 	
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private NavigationButton src;
 	
 	public ActionSelectAnalysisTemplate(String tooltip) {
 		super(tooltip);
 	}
 	
-	public ActionSelectAnalysisTemplate(ExperimentReference experimentReference) {
+	public ActionSelectAnalysisTemplate(ExperimentReferenceInterface experimentReference) {
 		super("Assign customizable analysis pipeline to this experiment");
 		this.experimentReference = experimentReference;
 	}

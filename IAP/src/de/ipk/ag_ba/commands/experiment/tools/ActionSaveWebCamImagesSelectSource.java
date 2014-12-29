@@ -9,7 +9,7 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
@@ -17,7 +17,7 @@ import de.ipk.ag_ba.mongo.MongoDB;
  */
 public class ActionSaveWebCamImagesSelectSource extends AbstractNavigationAction implements ActionDataProcessing {
 	private MongoDB m;
-	private ExperimentReference experiment;
+	private ExperimentReferenceInterface experiment;
 	private NavigationButton src;
 	ArrayList<String> xmlOutput = new ArrayList<String>();
 	
@@ -102,8 +102,8 @@ public class ActionSaveWebCamImagesSelectSource extends AbstractNavigationAction
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
-		this.m = experimentReference.m;
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
+		this.m = experimentReference.getM();
 		this.experiment = experimentReference;
 	}
 }

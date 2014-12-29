@@ -30,7 +30,7 @@ import de.ipk.ag_ba.commands.settings.ActionSettingsEditor;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.server.gwt.SnapshotDataIAP;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 
@@ -59,7 +59,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private boolean allowGroupFiltering;
 	private boolean allowDataColumnSelection;
 	private boolean createClusteringDataset;
-	final ExperimentReference experimentReference;
+	final ExperimentReferenceInterface experimentReference;
 	private ActionFilterConditions actionGroupSelection;
 	private ActionSettingsEditor ase;
 	private ActionSelectDataColumns actionSelectDataColumns;
@@ -71,7 +71,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 	private ArrayList<String> scriptFileNames;
 	private int timeoutInMinutes;
 	
-	public AbstractRscriptExecutionAction(ActionScriptBasedDataProcessing adp, String tooltip, String scriptIniLocation, ExperimentReference experimentReference)
+	public AbstractRscriptExecutionAction(ActionScriptBasedDataProcessing adp, String tooltip, String scriptIniLocation, ExperimentReferenceInterface experimentReference)
 			throws Exception {
 		super(tooltip);
 		this.adp = adp;

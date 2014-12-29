@@ -20,8 +20,8 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
@@ -31,21 +31,22 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public abstract class AbstractExperimentDataNavigationAction extends AbstractNavigationAction {
 	
 	protected final ArrayList<NavigationButton> actions = new ArrayList<NavigationButton>();
-	protected ExperimentReference experiment;
+	protected ExperimentReferenceInterface experiment;
 	
 	private NavigationButton src;
 	
-	public AbstractExperimentDataNavigationAction(ExperimentReference experiment) {
+	public AbstractExperimentDataNavigationAction(ExperimentReferenceInterface experiment) {
 		super("Analyse Experiment Data Set");
 		this.experiment = experiment;
 	}
 	
+	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		actions.clear();
-		ExperimentReference exp = experiment;
+		ExperimentReferenceInterface exp = experiment;
 		try {
 			exp.setExperimentData(experiment.getData());
-			exp.m = experiment.m;
+			exp.setM(experiment.getM());
 			for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(exp, true))
 				actions.add(new NavigationButton(adp, src.getGUIsetting()));
 		} catch (Exception e) {
@@ -59,7 +60,7 @@ public abstract class AbstractExperimentDataNavigationAction extends AbstractNav
 		try {
 			ExperimentHeaderInfoPanel info = new ExperimentHeaderInfoPanel();
 			ExperimentInterface ex = experiment.getData();
-			info.setExperimentInfo(experiment.m, ex.getHeader(), true, ex);
+			info.setExperimentInfo(experiment.getM(), ex.getHeader(), true, ex);
 			JComponent jp = TableLayout.getSplit(info, null, TableLayout.PREFERRED, TableLayout.FILL);
 			jp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 			jp = TableLayout.getSplitVertical(jp, null, TableLayout.PREFERRED, TableLayout.FILL);
@@ -73,6 +74,7 @@ public abstract class AbstractExperimentDataNavigationAction extends AbstractNav
 		
 	}
 	
+	@Override
 	public void performActionCalculateResults(final NavigationButton src) throws Exception {
 		this.src = src;
 	}

@@ -25,6 +25,7 @@ import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
@@ -39,14 +40,14 @@ public class ActionMongoOrLTexperimentNavigation extends
 	private NavigationButton src;
 	private final String tt;
 	private String displayName;
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private boolean requestTitleUpdates = true;
 	private boolean oldAnalysis;
 	private String domainUser;
 	private String oldRelease;
 	
 	public ActionMongoOrLTexperimentNavigation(
-			ExperimentReference exp) {
+			ExperimentReferenceInterface exp) {
 		super(
 				exp.getHeader().getDatabaseId() != null
 						&& exp.getHeader().getDatabaseId().startsWith("lt:") ? "Access imaging system data set"
@@ -109,7 +110,7 @@ public class ActionMongoOrLTexperimentNavigation extends
 		if (header.getHistory() != null && !header.getHistory().isEmpty()) {
 			actions.add(new NavigationButton(
 					new ActionExperimentHistory(header.getHistory(),
-							experimentReference.m), src.getGUIsetting()));
+							experimentReference.getM()), src.getGUIsetting()));
 		}
 		
 		if (header != null && header.getDatabaseId() != null
@@ -117,12 +118,12 @@ public class ActionMongoOrLTexperimentNavigation extends
 			// if (experimentReference.m != null)
 			if (header.inTrash()) {
 				actions.add(ActionTrash.getTrashEntity(header,
-						DeletionCommand.UNTRASH, src.getGUIsetting(), experimentReference.m));
+						DeletionCommand.UNTRASH, src.getGUIsetting(), experimentReference.getM()));
 				actions.add(ActionTrash.getTrashEntity(header,
-						DeletionCommand.DELETE, src.getGUIsetting(), experimentReference.m));
+						DeletionCommand.DELETE, src.getGUIsetting(), experimentReference.getM()));
 			} else {
 				actions.add(ActionTrash.getTrashEntity(header,
-						DeletionCommand.TRASH, src.getGUIsetting(), experimentReference.m));
+						DeletionCommand.TRASH, src.getGUIsetting(), experimentReference.getM()));
 			}
 		}
 		

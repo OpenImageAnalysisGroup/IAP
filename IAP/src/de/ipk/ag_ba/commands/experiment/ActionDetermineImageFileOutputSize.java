@@ -16,7 +16,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -30,7 +30,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction implements NavigationAction {
 	
-	private ExperimentReference experiment;
+	private ExperimentReferenceInterface experiment;
 	private ThreadSafeOptions exportImages;
 	private ThreadSafeOptions tsoQuality;
 	private final ArrayList<ThreadSafeOptions> togglesQuality = new ArrayList<>();
@@ -44,7 +44,7 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 		super(tooltip);
 	}
 	
-	public ActionDetermineImageFileOutputSize(ExperimentReference experiment, ThreadSafeOptions exportImages, ThreadSafeOptions tsoQuality) {
+	public ActionDetermineImageFileOutputSize(ExperimentReferenceInterface experiment, ThreadSafeOptions exportImages, ThreadSafeOptions tsoQuality) {
 		this("Estimate JPG/PNG output size of image files");
 		this.experiment = experiment;
 		this.exportImages = exportImages;

@@ -17,7 +17,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
@@ -28,7 +28,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ActionDataExportAsFilesAction extends AbstractNavigationAction implements SpecialCommandLineSupport {
 	
 	private MongoDB m;
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private File targetDirectory;
 	private String errorMessage;
 	
@@ -36,7 +36,7 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction impl
 		super(tooltip);
 	}
 	
-	public ActionDataExportAsFilesAction(MongoDB m, ExperimentReference experimentReference) {
+	public ActionDataExportAsFilesAction(MongoDB m, ExperimentReferenceInterface experimentReference) {
 		this("Export the experiment to a directory on the file system");
 		this.m = m;
 		this.experimentReference = experimentReference;
@@ -112,7 +112,7 @@ public class ActionDataExportAsFilesAction extends AbstractNavigationAction impl
 		}
 	}
 	
-	public ExperimentReference getExperimentReference() {
+	public ExperimentReferenceInterface getExperimentReference() {
 		return experimentReference;
 	}
 	

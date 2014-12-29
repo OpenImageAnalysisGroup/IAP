@@ -15,13 +15,13 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.SupplementaryFilePanelMongoDB;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 
 /**
  * @author klukas
  */
 public class ActionViewData extends AbstractNavigationAction implements ActionDataProcessing {
-	private ExperimentReference experiment;
+	private ExperimentReferenceInterface experiment;
 	NavigationButton src = null;
 	MainPanelComponent mpc;
 	
@@ -60,8 +60,8 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 		
 		res.add(new NavigationButton("Add Marked Outliers to Global Outlier List", new ActionSetGlobalOutliers(experiment), src.getGUIsetting()));
 		
-		if (experiment.m != null)
-			res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(experiment.m, experiment, true), src.getGUIsetting()));
+		if (experiment.getM() != null)
+			res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(experiment.getM(), experiment, true), src.getGUIsetting()));
 		else {
 			String dbId = experiment != null && experiment.getHeader() != null ? experiment.getHeader().getDatabaseId() : null;
 			if (dbId != null) {
@@ -74,7 +74,7 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 							VirtualFileSystemVFS2 vv2 = (VirtualFileSystemVFS2) vv.getVFS();
 							if (vv2.isAbleToSaveData())
 								res.add(new NavigationButton(null,
-										new ActionDataExportToVfs(experiment.m, experiment, vv2, false, null) {
+										new ActionDataExportToVfs(experiment.getM(), experiment, vv2, false, null) {
 											
 											@Override
 											public void performActionCalculateResults(NavigationButton src) throws Exception {
@@ -129,7 +129,7 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 		return mpc;
 	}
 	
-	public ExperimentReference getExperimentReference() {
+	public ExperimentReferenceInterface getExperimentReference() {
 		return experiment;
 	}
 	
@@ -149,7 +149,7 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.experiment = experimentReference;
 	}
 }

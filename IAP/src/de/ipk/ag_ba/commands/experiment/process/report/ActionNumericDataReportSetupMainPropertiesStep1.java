@@ -20,7 +20,7 @@ import de.ipk.ag_ba.commands.settings.ActionToggle;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Condition.ConditionInfo;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -31,7 +31,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNavigationAction implements SpecialCommandLineSupport {
 	
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private NavigationButton src;
 	
 	private final boolean exportIndividualAngles;
@@ -52,7 +52,7 @@ public class ActionNumericDataReportSetupMainPropertiesStep1 extends AbstractNav
 	}
 	
 	public ActionNumericDataReportSetupMainPropertiesStep1(
-			ExperimentReference experimentReference, boolean exportIndividualAngles, boolean xlsx,
+			ExperimentReferenceInterface experimentReference, boolean exportIndividualAngles, boolean xlsx,
 			ArrayList<ThreadSafeOptions> toggles) {
 		this("Specify report options" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")

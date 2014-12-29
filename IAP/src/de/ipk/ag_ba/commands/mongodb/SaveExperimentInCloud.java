@@ -105,7 +105,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 				m.saveExperiment(newExperiment, status);
 			}
 			ExperimentReference exRef = new ExperimentReference(newExperiment);
-			exRef.m = m;
+			exRef.setM(m);
 			for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(exRef, true))
 				res.add(new NavigationButton(adp, src.getGUIsetting()));
 			

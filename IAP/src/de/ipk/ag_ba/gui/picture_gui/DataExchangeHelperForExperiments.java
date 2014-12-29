@@ -49,6 +49,7 @@ import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.DataStorageType;
 import de.ipk.ag_ba.mongo.DatabaseStorageResult;
 import de.ipk.ag_ba.mongo.DatabaseStorageResultWithURL;
@@ -79,7 +80,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
  */
 public class DataExchangeHelperForExperiments {
 	
-	public static int getSizeOfExperiment(ExperimentReference m) {
+	public static int getSizeOfExperiment(ExperimentReferenceInterface m) {
 		return -1;
 	}
 	
@@ -554,7 +555,7 @@ public class DataExchangeHelperForExperiments {
 					if (fn != null) {
 						boolean xlsx = true;
 						ActionPdfCreation3 action = new ActionPdfCreation3(
-								(ExperimentReference) null,
+								(ExperimentReferenceInterface) null,
 								(ArrayList<ThreadSafeOptions>) null,
 								new ThreadSafeOptions() /* false */,
 								new ThreadSafeOptions() /* false */,

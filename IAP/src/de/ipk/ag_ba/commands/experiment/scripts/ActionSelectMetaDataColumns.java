@@ -6,7 +6,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 
 /**
  * @author klukas
@@ -15,14 +15,14 @@ public class ActionSelectMetaDataColumns extends AbstractNavigationAction {
 	
 	private ArrayList<ThreadSafeOptions> metaDataColumns;
 	private NavigationButton src;
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	
 	public ActionSelectMetaDataColumns(String tooltip) {
 		super(tooltip);
 	}
 	
 	public ActionSelectMetaDataColumns(ArrayList<ThreadSafeOptions> metaDataColumns,
-			ExperimentReference experimentReference) {
+			ExperimentReferenceInterface experimentReference) {
 		this("Select metadata columns");
 		this.metaDataColumns = metaDataColumns;
 		this.experimentReference = experimentReference;

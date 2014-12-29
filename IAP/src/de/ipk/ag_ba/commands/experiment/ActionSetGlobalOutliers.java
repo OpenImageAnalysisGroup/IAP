@@ -8,7 +8,7 @@ import org.StringManipulationTools;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -23,11 +23,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class ActionSetGlobalOutliers extends AbstractNavigationAction {
 	
-	private final ExperimentReference experiment;
+	private final ExperimentReferenceInterface experiment;
 	
 	private final ArrayList<String> res = new ArrayList<String>();
 	
-	public ActionSetGlobalOutliers(ExperimentReference experiment) {
+	public ActionSetGlobalOutliers(ExperimentReferenceInterface experiment) {
 		super("Enumerates a global outlier list from marked outliers.");
 		this.experiment = experiment;
 	}

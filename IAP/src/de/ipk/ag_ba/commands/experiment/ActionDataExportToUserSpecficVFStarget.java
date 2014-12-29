@@ -13,13 +13,13 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 
 public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAction implements NavigationAction {
 	
-	private final ArrayList<ExperimentReference> experimentReference;
+	private final ArrayList<ExperimentReferenceInterface> experimentReference;
 	private final MongoDB m;
 	private VfsFileProtocol p;
 	
@@ -36,7 +36,7 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 	}
 	
 	public ActionDataExportToUserSpecficVFStarget(String tooltip, MongoDB m,
-			ArrayList<ExperimentReference> experimentReference,
+			ArrayList<ExperimentReferenceInterface> experimentReference,
 			VfsFileProtocol p,
 			boolean ignoreOutliers) {
 		super(tooltip);
@@ -114,7 +114,7 @@ public class ActionDataExportToUserSpecficVFStarget extends AbstractNavigationAc
 				false,
 				false,
 				null);
-		for (ExperimentReference er : experimentReference) {
+		for (ExperimentReferenceInterface er : experimentReference) {
 			results.add(vfs.saveExperiment(m, er, getStatusProvider(), ignoreOutliers));
 		}
 		if (saveVFS) {

@@ -10,19 +10,19 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 
 public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavigationAction implements NavigationAction {
 	
-	private final ArrayList<ExperimentReference> experimentReferences;
+	private final ArrayList<ExperimentReferenceInterface> experimentReferences;
 	private final MongoDB m;
 	private final boolean ignoreOutliers;
 	private final ArrayList<MainPanelComponent> results = new ArrayList<MainPanelComponent>();
 	
 	public ActionDataExportToUserSelectedFileSystemFolder(String tooltip, MongoDB m,
-			ArrayList<ExperimentReference> experimentReference, boolean ignoreOutliers) {
+			ArrayList<ExperimentReferenceInterface> experimentReference, boolean ignoreOutliers) {
 		super(tooltip);
 		this.m = m;
 		this.experimentReferences = experimentReference;
@@ -47,7 +47,7 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 					false,
 					false,
 					null);
-			for (ExperimentReference er : experimentReferences) {
+			for (ExperimentReferenceInterface er : experimentReferences) {
 				results.add(vfs.saveExperiment(m, er, getStatusProvider(), ignoreOutliers));
 			}
 		}

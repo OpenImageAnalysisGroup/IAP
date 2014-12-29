@@ -56,6 +56,7 @@ import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
@@ -77,7 +78,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
  * @author klukas
  */
 public class ActionPdfCreation3 extends AbstractNavigationAction implements SpecialCommandLineSupport, ConditionFilter {
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	
 	ArrayList<String> lastOutput = new ArrayList<String>();
 	
@@ -128,7 +129,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	}
 	
 	public ActionPdfCreation3(
-			ExperimentReference experimentReference,
+			ExperimentReferenceInterface experimentReference,
 			ArrayList<ThreadSafeOptions> divideDatasetBy,
 			ThreadSafeOptions exportIndividualAngles,
 			ThreadSafeOptions exportIndividualReplicates,
@@ -149,7 +150,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	}
 	
 	public ActionPdfCreation3(
-			ExperimentReference experimentReference,
+			ExperimentReferenceInterface experimentReference,
 			ArrayList<ThreadSafeOptions> divideDatasetBy,
 			ThreadSafeOptions exportIndividualAngles,
 			ThreadSafeOptions exportIndividualReplicates,
@@ -189,7 +190,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		this.tsoSplitSecond = tsoSplitSecond;
 	}
 	
-	private static String getToolTipInfo(ExperimentReference experimentReference, ArrayList<ThreadSafeOptions> divideDatasetBy,
+	private static String getToolTipInfo(ExperimentReferenceInterface experimentReference, ArrayList<ThreadSafeOptions> divideDatasetBy,
 			boolean exportIndividualAngles,
 			boolean exportIndividualReplicates,
 			boolean exportImages,
@@ -1456,7 +1457,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					+ finalResultFileLocation + "'>" + finalResultFileLocation + "</a>");
 	}
 	
-	public ExperimentReference getExperimentReference() {
+	public ExperimentReferenceInterface getExperimentReference() {
 		return experimentReference;
 	}
 	
@@ -1606,7 +1607,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			}
 	}
 	
-	public void setExperimentReference(ExperimentReference er) {
+	public void setExperimentReference(ExperimentReferenceInterface er) {
 		experimentReference = er;
 	}
 	

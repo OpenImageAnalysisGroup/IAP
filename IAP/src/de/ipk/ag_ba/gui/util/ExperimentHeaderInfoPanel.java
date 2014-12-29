@@ -89,13 +89,13 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 	
 	private RunnableWithExperimentInfo saveAction;
 	
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	
 	public ExperimentHeaderInfoPanel() {
 		// empty
 	}
 	
-	public ExperimentHeaderInfoPanel(final boolean startEnabled, final ExperimentReference experimentReference) {
+	public ExperimentHeaderInfoPanel(final boolean startEnabled, final ExperimentReferenceInterface experimentReference) {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
@@ -104,7 +104,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					public void run() {
 						if (ExperimentHeaderInfoPanel.this.isVisible())
 							setExperimentInfo(
-									experimentReference.m,
+									experimentReference.getM(),
 									experimentReference.getHeader(),
 									startEnabled,
 									experimentReference.getExperiment());
@@ -602,8 +602,8 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		setBorder(BorderFactory.createLoweredBevelBorder());
 	}
 	
-	protected ActionDataExportToVfs getCopyAction(ExperimentReference experiment, VirtualFileSystemVFS2 vv2) {
-		return new ActionDataExportToVfs(experiment.m, experiment, vv2, false, null) {
+	protected ActionDataExportToVfs getCopyAction(ExperimentReferenceInterface experiment, VirtualFileSystemVFS2 vv2) {
+		return new ActionDataExportToVfs(experiment.getM(), experiment, vv2, false, null) {
 			
 			@Override
 			public void performActionCalculateResults(NavigationButton src) throws Exception {

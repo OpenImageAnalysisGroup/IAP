@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -16,12 +16,12 @@ public class GetMeasurements implements Runnable {
 	boolean readOnly;
 	private final ArrayList<SampleInterface> samples;
 	private final MongoTreeNode sampNode;
-	private final ExperimentReference experiment;
+	private final ExperimentReferenceInterface experiment;
 	private final ActionListener dataChangedListener;
 	private final SimpleDateFormat sdf;
 	
 	public GetMeasurements(MongoTreeNode sampNode,
-			ExperimentReference experiment, ArrayList<SampleInterface> samples,
+			ExperimentReferenceInterface experiment, ArrayList<SampleInterface> samples,
 			boolean readOnly, ActionListener dataChangedListener, SimpleDateFormat sdf) {
 		this.readOnly = readOnly;
 		this.samples = samples;

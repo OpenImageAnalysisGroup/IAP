@@ -7,7 +7,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
@@ -19,7 +19,7 @@ public class ActionSelectDataColumns extends AbstractNavigationAction {
 	private Collection<String> desiredDataColumns;
 	private final ArrayList<String> confirmedColumns = new ArrayList<String>();
 	private final ArrayList<String> descriptions = new ArrayList<String>();
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private NavigationButton src;
 	private ArrayList<ThreadSafeOptions> listOfColumns = null;
 	private final ThreadSafeOptions dataEvaluated = new ThreadSafeOptions();
@@ -29,7 +29,7 @@ public class ActionSelectDataColumns extends AbstractNavigationAction {
 	}
 	
 	public ActionSelectDataColumns(String tooltip, final Collection<String> desiredDataColumns,
-			final ExperimentReference experimentReference, ArrayList<ThreadSafeOptions> listOfColumns) {
+			final ExperimentReferenceInterface experimentReference, ArrayList<ThreadSafeOptions> listOfColumns) {
 		this(tooltip);
 		dataEvaluated.setBval(0, false);
 		this.desiredDataColumns = desiredDataColumns;

@@ -23,7 +23,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.DataChartComponentWindow;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -42,7 +42,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class ActionFxCreateDataChart extends AbstractNavigationAction implements ActionDataProcessing {
 	
-	ExperimentReference experiment;
+	ExperimentReferenceWithFilterSupport experiment;
 	
 	private final ArrayList<String> res = new ArrayList<String>();
 	
@@ -67,10 +67,10 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		this.settingsGlobal = new ChartSettings(false);
 	}
 	
-	public ActionFxCreateDataChart(String groupFilter, ExperimentReference experiment, DataTable data_table, ChartSettings settingsGlobal) {
+	public ActionFxCreateDataChart(String groupFilter, ExperimentReferenceInterface experiment, DataTable data_table, ChartSettings settingsGlobal) {
 		super("Create a Data Chart");
 		this.groupFilter = groupFilter;
-		this.experiment = experiment;
+		this.experiment = new ExperimentReferenceWithFilterSupport(experiment);
 		this.data_table = data_table;
 		this.settingsGlobal = settingsGlobal;
 		try {
@@ -142,8 +142,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 					outlierSearch: for (NumericMeasurementInterface nmi : sd3) {
 						if (nmi instanceof ImageData) {
 							ImageData id = (ImageData) nmi;
-							String o = id.getAnnotationField("outlier");
-							if (o != null && o.equals("1")) {
+							if (id.isMarkedAsOutlier()) {
 								String pid = id.getQualityAnnotation().trim();
 								if (!outliers.contains(pid)) {
 									res.add("Added ID " + pid + " to global outlier list.");
@@ -185,7 +184,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		groupsDetermined = true;
 		
 		if (groupFilter != null) {
-			System.out.println("Try to find desc for: " + groupFilter);
+			// System.out.println("Try to find desc for: " + groupFilter);
 			this.traitDescription = IAPpluginManager.getInstance().getDescriptionForCalculatedProperty(groupFilter);
 		}
 		
@@ -225,15 +224,21 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		if (groupNames.size() == 0 && groupFilter != null) {
 			ActionFilterGroupsCommand filterGroupAction = new ActionFilterGroupsCommand("Filter Groups", data_table, experiment, groupFilter);
 			ActionChartingGroupBySettings groupByAction = new ActionChartingGroupBySettings(this, "Group by", filterGroupAction, experiment, groupFilter);
+			ActionTimeRangeCommand filterTimeRangeAction = new ActionTimeRangeCommand(this, "Time Range", filterGroupAction, groupFilter);
 			filterGroupAction.setGroupByAction(groupByAction);
+			
+			// STEP 1:
+			ra.add(new NavigationButton(new ActionFilterOutliersCommand(this, "Filter Outliers", filterGroupAction, filterTimeRangeAction), src.getGUIsetting()));
+			// STEP 2:
 			ra.add(new NavigationButton(groupByAction, src.getGUIsetting()));
+			// STEP 3:
 			ra.add(new NavigationButton(filterGroupAction, src.getGUIsetting()));
-			ra.add(new NavigationButton(new ActionTimeRangeCommand(this, "Time Range", filterGroupAction, groupFilter), src.getGUIsetting()));
+			// STEP 4:
+			ra.add(new NavigationButton(filterTimeRangeAction, src.getGUIsetting()));
 			if (false) {
 				addSortCommand(ra);
 				addSummarizeCommandErrorBars(ra);
 			}
-			ra.add(new NavigationButton(new ActionFilterOutliersCommand(this, "Filter Outliers", filterGroupAction), src.getGUIsetting()));
 			ra.add(new NavigationButton(new ActionSummarizeGroupsCommand("Summarize data", this), src.getGUIsetting()));
 			addCreatePlotCommand(ra);
 			addExportCommand(ra);
@@ -479,8 +484,8 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
-		this.experiment = experimentReference;
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
+		this.experiment = new ExperimentReferenceWithFilterSupport(experimentReference);
 		this.settingsGlobal.setIniIOprovider(experimentReference.getIniIoProvider());
 	}
 	

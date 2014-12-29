@@ -43,12 +43,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 /**
  * @author klukas
  */
-public class ExperimentReference {
+public class ExperimentReference implements ExperimentReferenceInterface {
 	
 	private final String experimentName;
-	private ExperimentInterface experiment;
+	protected ExperimentInterface experiment;
 	private ExperimentHeaderInterface header;
-	public MongoDB m;
+	private MongoDB m;
 	
 	private static ArrayList<ExperimentLoader> knownExperimentLoaders = new ArrayList<ExperimentLoader>();
 	
@@ -57,7 +57,7 @@ public class ExperimentReference {
 	
 	public ExperimentReference(ExperimentHeaderInterface header) {
 		this.experimentName = header.getExperimentName();
-		this.header = header;
+		this.setHeader(header);
 	}
 	
 	public ExperimentReference(String databaseID) {
@@ -68,7 +68,7 @@ public class ExperimentReference {
 						null/* SystemAnalysis.getUserName() */, db);
 				for (ExperimentHeaderInterface ehi : res) {
 					if (ehi.getDatabaseId().equals(databaseID)) {
-						header = ehi;
+						setHeader(ehi);
 						break;
 					}
 				}
@@ -93,14 +93,14 @@ public class ExperimentReference {
 									IAPmain.loadIcon(ico2), IAPmain.loadIcon(ico3), IAPmain.loadIcon(ico4));
 							try {
 								databaseID = StringManipulationTools.stringReplace(databaseID, "\\", "/");
-								for (ExperimentReference ehi : dataSource.getAllExperiments()) {
+								for (ExperimentReferenceInterface ehi : dataSource.getAllExperiments()) {
 									if (ehi != null) {
 										String dbi = ehi.getHeader().getDatabaseId();
 										if (ignorePrefix && dbi.indexOf(":") > 0)
 											dbi = dbi.substring(dbi.indexOf(":") + ":".length());
 										dbi = StringManipulationTools.stringReplace(dbi, "\\", "/");
 										if (dbi.equals(databaseID)) {
-											header = ehi.getHeader();
+											setHeader(ehi.getHeader());
 											vfsFound = true;
 											break;
 										}
@@ -117,37 +117,42 @@ public class ExperimentReference {
 					String fileName = databaseID.substring("hsm:".length());
 					try {
 						if (new File(fileName).exists())
-							header = HsmFileSystemSource.getHSMexperimentHeaderFromFullyQualifiedFileName(fileName);
+							setHeader(HsmFileSystemSource.getHSMexperimentHeaderFromFullyQualifiedFileName(fileName));
 						else
-							header = null;
+							setHeader(null);
 					} catch (IOException e) {
 						throw new UnsupportedOperationException(e);
 					}
 				} else {
 					for (MongoDB m : MongoDB.getMongos()) {
-						header = m.getExperimentHeader(new ObjectId(databaseID));
-						if (header != null) {
+						setHeader(m.getExperimentHeader(new ObjectId(databaseID)));
+						if (getHeader() != null) {
 							setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this.getHeader(), m));
 							break;
 						}
 					}
 				}
 		}
-		this.experimentName = header != null ? header.getExperimentName() : null;
+		this.experimentName = getHeader() != null ? getHeader().getExperimentName() : null;
 	}
 	
 	public ExperimentReference(ExperimentInterface experiment) {
 		this.experimentName = experiment.getName();
-		this.experiment = experiment;
-		this.header = experiment.getHeader();
+		this.setExperiment(experiment);
+		this.setHeader(experiment.getHeader());
 	}
 	
 	public ExperimentReference(ExperimentHeaderInterface ehi, MongoDB m) {
 		this(ehi);
-		this.m = m;
+		this.setM(m);
 		setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this.getHeader(), m));
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getData()
+	 */
+	@Override
 	public ExperimentInterface getData() throws Exception {
 		return getData(false, null);
 	}
@@ -157,6 +162,11 @@ public class ExperimentReference {
 			knownExperimentLoaders.add(loader);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getExperiment()
+	 */
+	@Override
 	public ExperimentInterface getExperiment() {
 		if (isLoading) {
 			try {
@@ -172,43 +182,48 @@ public class ExperimentReference {
 		return experiment;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getData(boolean, org.BackgroundTaskStatusProviderSupportingExternalCall)
+	 */
+	@Override
 	public ExperimentInterface getData(
 			boolean interactiveGetExperimentSize,
 			BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
-		if (experiment != null)
-			return experiment;
+		if (getExperimentPeek() != null)
+			return getExperimentPeek();
 		else {
 			synchronized (ExperimentReference.class) {
-				if (experiment != null)
-					return experiment;
-				String databaseId = header.getDatabaseId();
+				if (getExperimentPeek() != null)
+					return getExperimentPeek();
+				String databaseId = getHeader().getDatabaseId();
 				ExperimentInterface res = null; // weakId2exp.get(databaseId);
 				// if (res != null)
 				// return res;
 				for (ExperimentLoader loader : knownExperimentLoaders) {
 					if (loader.canHandle(databaseId)) {
-						res = loader.getExperiment(header, interactiveGetExperimentSize, status);
+						res = loader.getExperiment(getHeader(), interactiveGetExperimentSize, status);
 						if (res != null) {
-							experiment = res;
+							setExperiment(res);
 							return res;
 						}
 					}
 				}
 				if (databaseId != null)
 					if (databaseId.startsWith("lt:"))
-						res = new LTdataExchange().getExperiment(header, interactiveGetExperimentSize, status);
+						res = new LTdataExchange().getExperiment(getHeader(), interactiveGetExperimentSize, status);
 					else
 						if (databaseId.startsWith("hsm:")) {
 							res = HSMfolderTargetDataManager.getExperiment(databaseId);
 						} else
-							if (m != null)
-								res = m.getExperiment(header, interactiveGetExperimentSize, status);
+							if (getM() != null)
+								res = getM().getExperiment(getHeader(), interactiveGetExperimentSize, status);
 							else
 								res = null;
 				// weakId2exp.put(databaseId, res);
-				this.experiment = res;
+				this.setExperiment(res);
 				if (res == null)
-					System.out.println(SystemAnalysis.getCurrentTime() + ">Experiment could not be loaded. DB ID: " + header.getDatabaseId());
+					System.out.println(SystemAnalysis.getCurrentTime() + ">Experiment could not be loaded. DB ID: " + getHeader().getDatabaseId());
 				// else
 				// System.out.println(SystemAnalysis.getCurrentTime() + ">Loaded experiment with " +
 				// experiment.size() + " substances (DB ID " + res.getHeader().getDatabaseId() + ").");
@@ -217,24 +232,45 @@ public class ExperimentReference {
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getExperimentName()
+	 */
+	@Override
 	public String getExperimentName() {
 		return experimentName;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#setExperimentData(de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.
+	 * ExperimentInterface)
+	 */
+	@Override
 	public void setExperimentData(ExperimentInterface data) {
-		this.experiment = data;
+		this.setExperiment(data);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getHeader()
+	 */
+	@Override
 	public ExperimentHeaderInterface getHeader() {
 		if (header == null) {
-			if (experiment != null)
-				return experiment.getHeader();
+			if (getExperimentPeek() != null)
+				return getExperimentPeek().getHeader();
 			else
 				return null;
 		} else
 			return header;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getData(org.BackgroundTaskStatusProviderSupportingExternalCall)
+	 */
+	@Override
 	public ExperimentInterface getData(BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
 		return getData(status != null, status);
 	}
@@ -242,8 +278,13 @@ public class ExperimentReference {
 	private boolean isLoading = false;
 	private BackgroundTaskStatusProviderSupportingExternalCall loaderStatus = null;
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#loadDataInBackground(org.BackgroundTaskStatusProviderSupportingExternalCall)
+	 */
+	@Override
 	public void loadDataInBackground(final BackgroundTaskStatusProviderSupportingExternalCall status) throws Exception {
-		if (experiment != null)
+		if (getExperimentPeek() != null)
 			return;
 		synchronized (todoOnceDataIsAvailable) {
 			isLoading = true;
@@ -252,7 +293,7 @@ public class ExperimentReference {
 				@Override
 				public void run() {
 					try {
-						experiment = getData(status);
+						setExperiment(getData(status));
 					} catch (Exception e) {
 						ErrorMsg.addErrorMessage(e);
 					} finally {
@@ -270,7 +311,7 @@ public class ExperimentReference {
 						}
 					}
 				}
-			}, "Load experiment " + header.getExperimentName());
+			}, "Load experiment " + getHeader().getExperimentName());
 		}
 	}
 	
@@ -278,6 +319,11 @@ public class ExperimentReference {
 	private IniIoProvider storedIniProvider;
 	private DataSourceLevel dataSourceLevel;
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#runAsDataBecomesAvailable(java.lang.Runnable)
+	 */
+	@Override
 	public synchronized void runAsDataBecomesAvailable(Runnable r) {
 		synchronized (todoOnceDataIsAvailable) {
 			if (isLoading) {
@@ -287,10 +333,20 @@ public class ExperimentReference {
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getExperimentPeek()
+	 */
+	@Override
 	public ExperimentInterface getExperimentPeek() {
 		return experiment;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getIniIoProvider()
+	 */
+	@Override
 	public IniIoProvider getIniIoProvider() {
 		if (storedIniProvider == null) {
 			System.out.println(SystemAnalysis.getCurrentTime()
@@ -300,27 +356,58 @@ public class ExperimentReference {
 		return storedIniProvider;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#setIniIoProvider(org.IniIoProvider)
+	 */
+	@Override
 	public void setIniIoProvider(IniIoProvider iniProvider) {
 		storedIniProvider = iniProvider;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getIoHelper()
+	 */
+	@Override
 	public ExperimentIoHelper getIoHelper() {
-		return new ExperimentIoHelper(m);
+		return new ExperimentIoHelper(getM());
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#resetStoredHeader()
+	 */
+	@Override
 	public void resetStoredHeader() {
-		this.header = null;
+		this.setHeader(null);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#setHeader(de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.
+	 * ExperimentHeaderInterface)
+	 */
+	@Override
 	public void setHeader(ExperimentHeaderInterface header) {
 		this.header = header;
-		setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this.getHeader(), m));
+		setIniIoProvider(new ExperimentAnalysisSettingsIOprovder(this.getHeader(), getM()));
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#getM()
+	 */
+	@Override
 	public MongoDB getM() {
 		return m;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitConditions(java.lang.String, de.ipk.ag_ba.gui.util.ConditionVisitor)
+	 */
+	@Override
 	public void visitConditions(String optSubstanceFilter, ConditionVisitor cv) throws Exception {
 		for (SubstanceInterface si : getData().getSubstances())
 			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
@@ -328,6 +415,11 @@ public class ExperimentReference {
 					cv.visit(ci);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitSamples(java.lang.String, de.ipk.ag_ba.gui.util.SampleVisitor)
+	 */
+	@Override
 	public void visitSamples(String optSubstanceFilter, SampleVisitor nmi) throws Exception {
 		for (SubstanceInterface si : getData().getSubstances())
 			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
@@ -336,6 +428,11 @@ public class ExperimentReference {
 						nmi.visit(sa);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitNumericMeasurements(java.lang.String, de.ipk.ag_ba.gui.util.NumericMeasurementVisitor)
+	 */
+	@Override
 	public void visitNumericMeasurements(String optSubstanceFilter, NumericMeasurementVisitor nmi) throws Exception {
 		for (SubstanceInterface si : getData().getSubstances())
 			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
@@ -343,5 +440,14 @@ public class ExperimentReference {
 					for (SampleInterface sa : ci)
 						for (NumericMeasurementInterface n : sa)
 							nmi.visit(n);
+	}
+	
+	protected void setExperiment(ExperimentInterface experiment) {
+		this.experiment = experiment;
+	}
+	
+	@Override
+	public void setM(MongoDB m) {
+		this.m = m;
 	}
 }

@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeMap;
 
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 public class GetSubstances implements Runnable {
 	boolean readOnly;
-	private final ExperimentReference experiment;
+	private final ExperimentReferenceInterface experiment;
 	private final MongoTreeNode projectNode;
 	private final ActionListener dataChangedListener;
 	private final ExperimentTreeModel treeModel;
@@ -18,7 +18,7 @@ public class GetSubstances implements Runnable {
 	
 	public GetSubstances(
 			String validPrefix,
-			MongoTreeNode projectNode, ExperimentReference experiment,
+			MongoTreeNode projectNode, ExperimentReferenceInterface experiment,
 			boolean readOnly,
 			ActionListener dataChangedListener,
 			ExperimentTreeModel treeModel) {

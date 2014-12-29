@@ -42,6 +42,7 @@ import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentHeaderInfoPanel;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -726,7 +727,7 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		this.currentUser = user;
 	}
 	
-	public static String getTempdataExperimentName(ExperimentReference exp) {
+	public static String getTempdataExperimentName(ExperimentReferenceInterface exp) {
 		String n = exp.getExperimentName();
 		if (n == null || !n.contains("§"))
 			return n;

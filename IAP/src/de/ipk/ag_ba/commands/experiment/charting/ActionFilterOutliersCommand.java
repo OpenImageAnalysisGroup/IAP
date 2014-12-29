@@ -18,12 +18,12 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 	private final ActionFxCreateDataChart actionFxCreateDataChart;
 	private NavigationButton src2;
 	private SystemOptions set;
-	private final ActionFilterGroupsCommand filterGroupAction;
+	private final DirtyNotificationSupport[] dirtyNotification;
 	
-	public ActionFilterOutliersCommand(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip, ActionFilterGroupsCommand filterGroupAction) {
+	public ActionFilterOutliersCommand(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip, DirtyNotificationSupport... dirtyNotification) {
 		super(tooltip);
 		this.actionFxCreateDataChart = actionFxCreateDataChart;
-		this.filterGroupAction = filterGroupAction;
+		this.dirtyNotification = dirtyNotification;
 		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
 				: this.actionFxCreateDataChart.settingsLocal.getSettings();
 	}
@@ -59,14 +59,15 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 				this.actionFxCreateDataChart.settingsLocal.setUseLocalSettings(true);
 			set = global ? this.actionFxCreateDataChart.settingsGlobal.getSettings() : this.actionFxCreateDataChart.settingsLocal.getSettings();
 			set.setBoolean("Charting", "Filter outliers//Ignore defined outliers", cbIgnoreDefinedOutliers.isSelected());
-			filterGroupAction.setDirty(true);
+			for (DirtyNotificationSupport dns : dirtyNotification)
+				dns.setDirty(true);
 		}
 	}
 	
 	@Override
 	public String getDefaultTitle() {
 		boolean ro = set.getBoolean("Charting", "Filter outliers//Ignore defined outliers", true);
-		return "<html><center><b>&#8667;</b>&nbsp;Outlier&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
+		return "<html><center><b>&nbsp;</b>&nbsp;Outlier&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
 				+ (ro ? "removing defined outliers" : "defined outliers are not removed");
 	}
 	
