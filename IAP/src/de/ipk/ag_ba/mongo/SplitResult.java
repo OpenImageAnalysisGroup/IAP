@@ -19,6 +19,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import de.ipk.ag_ba.gui.images.IAPexperimentTypes;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.server.task_management.BatchCmd;
@@ -95,7 +96,7 @@ public class SplitResult {
 	
 	private ExperimentInterface doMerge(Runnable optPingCode, TempDataSetDescription tempDataSetDescription,
 			ArrayList<ExperimentHeaderInterface> knownResults, boolean interactive, BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-			ExperimentReference optPreviousResultsToBeMerged) throws Exception {
+			ExperimentReferenceInterface optPreviousResultsToBeMerged) throws Exception {
 		System.out.println("*****************************");
 		System.out.println("MERGE INDEX: " + tempDataSetDescription.getPartCntI() + "/" + tempDataSetDescription.getPartCnt()
 				+ ", RESULTS AVAILABLE: " + knownResults.size());
@@ -126,12 +127,12 @@ public class SplitResult {
 			experiment2id.put(ii, ii.getDatabaseId());
 			nnii.addInt(1);
 			if (sourceHeader == null) {
-				ExperimentReference eRef = new ExperimentReference(ii.getOriginDbId());
+				ExperimentReferenceInterface eRef = new ExperimentReference(ii.getOriginDbId());
 				ExperimentHeaderInterface oriH = eRef.getHeader();
 				sourceHeader = oriH;
 			}
 			if (originName == null) {
-				ExperimentReference eRef = new ExperimentReference(ii.getOriginDbId());
+				ExperimentReferenceInterface eRef = new ExperimentReference(ii.getOriginDbId());
 				ExperimentHeaderInterface oriH = eRef.getHeader();
 				
 				String[] cc = ii.getExperimentName().split("§");
@@ -349,7 +350,7 @@ public class SplitResult {
 				// check if source data is still available
 				ExperimentHeaderInterface firstExp = knownResults.iterator().next();
 				String oid = firstExp.getOriginDbId();
-				ExperimentReference eRef = new ExperimentReference(oid);
+				ExperimentReferenceInterface eRef = new ExperimentReference(oid);
 				ExperimentHeaderInterface eRefHeader = eRef.getHeader();
 				if (eRefHeader == null) {
 					// source data set has been deleted meanwhile
@@ -368,13 +369,13 @@ public class SplitResult {
 					continue;
 				}
 			}
-			ExperimentReference optPreviousResultsToBeMerged = null;
+			ExperimentReferenceInterface optPreviousResultsToBeMerged = null;
 			{
 				// check if result data needs to be merged with previous calculation results
 				String[] cc = knownResults.iterator().next().getExperimentName().split("§");
 				String mergeWithDBid = cc.length == 5 ? cc[4] : "";
 				if (!mergeWithDBid.isEmpty() && !mergeWithDBid.equals("null")) {
-					ExperimentReference eRef = new ExperimentReference(mergeWithDBid);
+					ExperimentReferenceInterface eRef = new ExperimentReference(mergeWithDBid);
 					ExperimentHeaderInterface eRefHeader = eRef.getHeader();
 					if (eRefHeader == null) {
 						// source data set has been deleted meanwhile

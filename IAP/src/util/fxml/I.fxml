@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!-- Copyright/License : unknown -->
-<!-- FXML specification : JRE/JavaFX 8.0 early access build b128 -->
-<!-- Generator : ModelImporterJFX 0.4.1 of InteractiveMesh, www.interactivemesh.org/models/jfx3dbrowser.html -->
-
 <?import javafx.scene.shape.MeshView?>
 <?import javafx.scene.shape.TriangleMesh?>
 

@@ -16,7 +16,7 @@ import de.ipk.ag_ba.commands.experiment.charting.ActionFxCreateDataChart;
 import de.ipk.ag_ba.commands.experiment.clipboard.ActionCopyToClipboard;
 import de.ipk.ag_ba.commands.experiment.process.ActionNumericDataReport;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.plugins.AbstractIAPplugin;
@@ -36,7 +36,7 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 	
 	@SuppressWarnings("unused")
 	@Override
-	public ActionDataProcessing[] getDataProcessingActions(ExperimentReference experimentReference) {
+	public ActionDataProcessing[] getDataProcessingActions(ExperimentReferenceInterface experimentReference) {
 		ArrayList<ActionDataProcessing> actions = new ArrayList<ActionDataProcessing>();
 		
 		actions.add(new ActionFxCreateDataChart());

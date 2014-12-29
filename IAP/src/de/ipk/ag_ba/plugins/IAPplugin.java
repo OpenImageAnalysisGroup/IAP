@@ -10,7 +10,7 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProcessing;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
@@ -55,7 +55,7 @@ public interface IAPplugin extends GenericPlugin {
 	 * @return A list of NavigationAction commands, which may process the particular experiment
 	 *         data set. The commands are shown once a experiment is loaded.
 	 */
-	public ActionDataProcessing[] getDataProcessingActions(ExperimentReference experimentReference);
+	public ActionDataProcessing[] getDataProcessingActions(ExperimentReferenceInterface experimentReference);
 	
 	/**
 	 * @param experimentReference
@@ -64,7 +64,7 @@ public interface IAPplugin extends GenericPlugin {
 	 * @return A list of NavigationAction commands, which may process the particular experiment
 	 *         dataset. The commands are shown after the user clicks the Tool command when a experiment is loaded.
 	 */
-	public ActionDataProcessing[] getDataProcessingTools(ExperimentReference experimentReference);
+	public ActionDataProcessing[] getDataProcessingTools(ExperimentReferenceInterface experimentReference);
 	
 	/**
 	 * @param experimentReference
@@ -75,7 +75,7 @@ public interface IAPplugin extends GenericPlugin {
 	 *         These commands normally work by extending the abstract class XYZ (TODO ADD NAME HERE), and process
 	 *         a given CSV export.
 	 */
-	public ActionScriptBasedDataProcessing[] getScriptBasedDataProcessingTools(ExperimentReference experimentReference);
+	public ActionScriptBasedDataProcessing[] getScriptBasedDataProcessingTools(ExperimentReferenceInterface experimentReference);
 	
 	/**
 	 * Override this method to provide help text(s), displayed by the settings editor for a specific
