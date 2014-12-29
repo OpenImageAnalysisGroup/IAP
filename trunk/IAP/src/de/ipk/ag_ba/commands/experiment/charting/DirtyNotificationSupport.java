@@ -5,6 +5,6 @@ package de.ipk.ag_ba.commands.experiment.charting;
  */
 public interface DirtyNotificationSupport {
 	
-	void setDirty(boolean b);
+	void setDirty(boolean b) throws Exception;
 	
 }

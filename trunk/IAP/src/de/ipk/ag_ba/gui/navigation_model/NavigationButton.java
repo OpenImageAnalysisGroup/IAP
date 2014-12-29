@@ -195,6 +195,7 @@ public class NavigationButton implements StyleAware {
 	private boolean requestingTitle = false;
 	private WeakReference<JButton> weakButtonReference;
 	private long lastGetTitleTime = Long.MAX_VALUE;
+	private ButtonDrawStyle style;
 	
 	public String getTitle() {
 		Runnable r = new Runnable() {
@@ -242,6 +243,12 @@ public class NavigationButton implements StyleAware {
 	
 	public String getTitle(boolean forceProgressText) {
 		String adt = action != null ? action.getDefaultTitle() : null;
+		
+		if (style == ButtonDrawStyle.FLAT_LARGE && adt != null && adt.contains("<small>")) {
+			adt = StringManipulationTools.stringReplace(adt, "</small>", "</font>");
+			adt = StringManipulationTools.stringReplace(adt, "<small>", "<font size=+0>");
+		}
+		
 		if (action != null && adt != null && adt.length() > 0)
 			title = adt;
 		
@@ -472,7 +479,7 @@ public class NavigationButton implements StyleAware {
 	
 	@Override
 	public void setButtonStyle(ButtonDrawStyle style) {
-		// empty, override if needed
+		this.style = style;
 	}
 	
 	public static void updateButtonTitle(
