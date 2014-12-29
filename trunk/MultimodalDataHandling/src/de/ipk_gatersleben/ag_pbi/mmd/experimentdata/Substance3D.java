@@ -233,7 +233,7 @@ public class Substance3D extends Substance {
 		return list;
 	}
 	
-	public static SubstanceInterface createnewSubstance(String substancename) {
+	public static SubstanceInterface createNewSubstance(String substancename) {
 		SubstanceInterface md = Experiment.getTypeManager().getNewSubstance();
 		md.setAttribute(new MyAttribute("name",
 				substancename != null ? substancename

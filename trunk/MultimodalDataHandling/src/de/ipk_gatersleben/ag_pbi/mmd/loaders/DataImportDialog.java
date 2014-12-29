@@ -161,7 +161,7 @@ public class DataImportDialog {
 		ExperimentInterface experiment = new Experiment();
 		long fs = 0;
 		for (ImportDialogFile idf : idflist) {
-			SubstanceInterface md = Substance3D.createnewSubstance(idf.getSubstance());
+			SubstanceInterface md = Substance3D.createNewSubstance(idf.getSubstance());
 			
 			Condition3D series = (Condition3D) Experiment.getTypeManager().getNewCondition(md);
 			series.setSpecies(idf.getSpecies());
