@@ -9,7 +9,7 @@ import org.apache.commons.math3.distribution.TDistribution;
 
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -23,7 +23,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
  */
 public class OutlierAnalysisGlobal {
 	
-	private final ExperimentReference experimentReference;
+	private final ExperimentReferenceInterface experimentReference;
 	private double threshold = 0.01;
 	private final boolean global;
 	private final HashSet<NumericMeasurement> lowerValues;
@@ -34,7 +34,7 @@ public class OutlierAnalysisGlobal {
 	private final boolean processAveragePlantData;
 	
 	public OutlierAnalysisGlobal(double threshold, boolean considerCondition,
-			ExperimentReference experimentReference,
+			ExperimentReferenceInterface experimentReference,
 			HashSet<NumericMeasurement> lower, HashSet<NumericMeasurement> upper,
 			HashSet<SampleInterface> lowerSamples, HashSet<SampleInterface> upperSamples,
 			boolean processAverageData) {

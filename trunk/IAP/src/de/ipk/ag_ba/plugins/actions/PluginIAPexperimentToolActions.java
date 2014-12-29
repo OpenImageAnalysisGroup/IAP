@@ -10,7 +10,7 @@ import de.ipk.ag_ba.commands.experiment.tools.ActionSetTimes;
 import de.ipk.ag_ba.commands.experiment.tools.ActionShowXML;
 import de.ipk.ag_ba.commands.experiment.tools.ActionSortSubstances;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.AbstractIAPplugin;
 import de.ipk.ag_ba.plugins.outlier.OutlierAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
@@ -24,7 +24,7 @@ public class PluginIAPexperimentToolActions extends AbstractIAPplugin {
 	}
 	
 	@Override
-	public ActionDataProcessing[] getDataProcessingTools(ExperimentReference experimentReference) {
+	public ActionDataProcessing[] getDataProcessingTools(ExperimentReferenceInterface experimentReference) {
 		ArrayList<ActionDataProcessing> res = new ArrayList<ActionDataProcessing>();
 		
 		res.add(new ActionSortSubstances());

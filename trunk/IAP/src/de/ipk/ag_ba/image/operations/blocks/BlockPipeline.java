@@ -40,7 +40,7 @@ import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.ImageSet;
@@ -381,7 +381,7 @@ public class BlockPipeline {
 	 *           Image set to be analyzed.
 	 */
 	public static void debugTryAnalysis(
-			final ExperimentReference er,
+			final ExperimentReferenceInterface er,
 			final Collection<NumericMeasurementInterface> input,
 			AbstractPhenotypingTask analysisTask) {
 		final ExperimentInterface e = er.getExperiment();
@@ -470,7 +470,7 @@ public class BlockPipeline {
 						
 						analysisTaskFinal.setInput(
 								AbstractPhenotypingTask.getWateringInfo(e),
-								samples, input, er.m, idxF, idxCntF);
+								samples, input, er.getM(), idxF, idxCntF);
 						
 						BackgroundTaskStatusProviderSupportingExternalCall statusInnerCall = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 								analysisTaskFinal.getName(), analysisTaskFinal.getTaskDescription());
@@ -525,7 +525,7 @@ public class BlockPipeline {
 											@Override
 											public void run() {
 												analysisTaskFinal.debugSetValidTrays(new int[] { idxF });
-												analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, er.m, 0, 1);
+												analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, er.getM(), 0, 1);
 												BackgroundTaskHelper.issueSimpleTaskInWindow(
 														analysisTaskFinal.getName(), "Repeat Snapshot Analysis...",
 														backgroundTaskInnerCall,
@@ -548,7 +548,7 @@ public class BlockPipeline {
 		finishSwingTaskRef.setObject(finishSwingTask);
 		analysisTaskFinal.setInput(
 				AbstractPhenotypingTask.getWateringInfo(e),
-				samples, input, er.m, 0, 1);
+				samples, input, er.getM(), 0, 1);
 		BackgroundTaskHelper.issueSimpleTaskInWindow(analysisTaskFinal.getName(),
 				"Analyze...", backgroundTask, finishSwingTask, status, false,
 				true);

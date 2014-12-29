@@ -15,7 +15,7 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.outlier.data.Handler;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -31,7 +31,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class OutlierAnalysis extends AbstractNavigationAction implements ActionDataProcessing {
 	
-	private ExperimentReference experimentReference;
+	private ExperimentReferenceInterface experimentReference;
 	private String selTimepoint;
 	private double threshold = 0.01;
 	protected ArrayList<String> calculationResults = new ArrayList<String>();
@@ -353,7 +353,7 @@ public class OutlierAnalysis extends AbstractNavigationAction implements ActionD
 	}
 	
 	@Override
-	public void setExperimentReference(ExperimentReference experimentReference) {
+	public void setExperimentReference(ExperimentReferenceInterface experimentReference) {
 		this.experimentReference = experimentReference;
 	}
 	

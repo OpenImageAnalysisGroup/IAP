@@ -18,7 +18,7 @@ import de.ipk.ag_ba.commands.experiment.view_or_export.ActionScriptBasedDataProc
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 
 /**
@@ -79,12 +79,12 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin
 	}
 	
 	@Override
-	public ActionDataProcessing[] getDataProcessingActions(ExperimentReference er) {
+	public ActionDataProcessing[] getDataProcessingActions(ExperimentReferenceInterface er) {
 		return new ActionDataProcessing[] {};
 	}
 	
 	@Override
-	public ActionDataProcessing[] getDataProcessingTools(ExperimentReference er) {
+	public ActionDataProcessing[] getDataProcessingTools(ExperimentReferenceInterface er) {
 		return new ActionDataProcessing[] {};
 	}
 	
@@ -99,7 +99,7 @@ public class AbstractIAPplugin extends GenericPluginAdapter implements IAPplugin
 	}
 	
 	@Override
-	public ActionScriptBasedDataProcessing[] getScriptBasedDataProcessingTools(ExperimentReference experimentReference) {
+	public ActionScriptBasedDataProcessing[] getScriptBasedDataProcessingTools(ExperimentReferenceInterface experimentReference) {
 		return new ActionScriptBasedDataProcessing[] {};
 	}
 }

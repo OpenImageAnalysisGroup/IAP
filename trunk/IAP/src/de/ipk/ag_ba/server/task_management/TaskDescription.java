@@ -15,7 +15,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.ErrorMsg;
 import org.SystemAnalysis;
 
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.Batch;
@@ -36,7 +36,7 @@ public class TaskDescription {
 	
 	private boolean finishedIncomplete = false, finishedComplete = false;
 	
-	private ExperimentReference experimentInput;
+	private ExperimentReferenceInterface experimentInput;
 	
 	private final String systemIP;
 	
@@ -46,7 +46,7 @@ public class TaskDescription {
 		return task + "$" + params + "$" + startTime;
 	}
 	
-	public TaskDescription(BatchCmd cmd, ExperimentReference experiment, String systemIP) {
+	public TaskDescription(BatchCmd cmd, ExperimentReferenceInterface experiment, String systemIP) {
 		this.cmd = cmd;
 		this.systemIP = systemIP;
 		// ip $ analysisAction.className $ params $ unique key (time stamp)

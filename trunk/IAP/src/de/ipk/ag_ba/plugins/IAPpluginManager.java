@@ -24,7 +24,7 @@ import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.TemplatePhenotypingTask;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
-import de.ipk.ag_ba.gui.util.ExperimentReference;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.pipelines.AnalysisPipelineTemplate;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 
@@ -86,7 +86,7 @@ public class IAPpluginManager {
 	}
 	
 	public Collection<ActionDataProcessing> getExperimentProcessingActions(
-			final ExperimentReference experimentReference,
+			final ExperimentReferenceInterface experimentReference,
 			final boolean imageAnalysis) {
 		final Collection<ActionDataProcessing> dataProcessingActions = new ArrayList<ActionDataProcessing>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
@@ -103,7 +103,7 @@ public class IAPpluginManager {
 	}
 	
 	public Collection<ActionDataProcessing> getExperimentToolActions(
-			final ExperimentReference experimentReference) {
+			final ExperimentReferenceInterface experimentReference) {
 		final Collection<ActionDataProcessing> dataProcessingActions = new ArrayList<ActionDataProcessing>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
 			@Override
@@ -118,7 +118,7 @@ public class IAPpluginManager {
 	}
 	
 	public Collection<ActionScriptBasedDataProcessing> getExperimentScriptActions(
-			final ExperimentReference experimentReference) {
+			final ExperimentReferenceInterface experimentReference) {
 		final Collection<ActionScriptBasedDataProcessing> scriptBasedProcessingActions = new ArrayList<ActionScriptBasedDataProcessing>();
 		RunnableOnIAPplugin r = new RunnableOnIAPplugin() {
 			@Override
