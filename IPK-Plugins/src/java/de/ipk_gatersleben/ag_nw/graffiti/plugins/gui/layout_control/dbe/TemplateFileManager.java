@@ -53,7 +53,9 @@ public class TemplateFileManager {
 	}
 	
 	public void addTemplate(String title, URL url, RunnableForFile openAfterSaving) {
-		templates.add(new TemplateFile(title, url, openAfterSaving));
+		synchronized (templates) {
+			templates.add(new TemplateFile(title, url, openAfterSaving));
+		}
 		refreshFolderPanel();
 	}
 	
