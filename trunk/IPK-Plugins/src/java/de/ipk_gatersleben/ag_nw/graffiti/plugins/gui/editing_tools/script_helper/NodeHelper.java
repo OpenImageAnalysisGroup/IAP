@@ -1196,8 +1196,6 @@ public class NodeHelper implements Node, HelperClass {
 	public static HashMap<Node, Node> inverseMap(HashMap<Node, Node> map) {
 		HashMap<Node, Node> m = new HashMap<Node, Node>();
 		for (Node n : map.keySet()) {
-			if (n == null || map.get(n) == null)
-				System.out.println("FUUUUUUUUUUUUUUUUUUUUU");
 			m.put(map.get(n), n);
 		}
 		return m;

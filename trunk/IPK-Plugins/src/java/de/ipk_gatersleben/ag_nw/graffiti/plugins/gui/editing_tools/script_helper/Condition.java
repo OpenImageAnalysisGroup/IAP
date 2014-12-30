@@ -465,15 +465,15 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public String getSpecies() {
-		if (species == null || species.equalsIgnoreCase(""))
-			species = ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING;
+		// if (species == null || species.equalsIgnoreCase(""))
+		// species = ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING;
 		return species;
 	}
 	
 	@Override
 	public String getGenotype() {
-		if (genotype == null || genotype.equalsIgnoreCase(""))
-			genotype = ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING;
+		// if (genotype == null || genotype.equalsIgnoreCase(""))
+		// genotype = ExperimentInterface.UNSPECIFIED_ATTRIBUTE_STRING;
 		return genotype;
 	}
 	
