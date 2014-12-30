@@ -197,7 +197,7 @@ public class DataImportDialog {
 		}
 		experiment.getHeader().setNumberOfFiles(idflist.size());
 		experiment.getHeader().setSizekb(fs / 1024);
-		experiment.getHeader().setImportusername(SystemAnalysis.getUserName());
+		experiment.getHeader().setImportUserName(SystemAnalysis.getUserName());
 		return experiment.split();
 	}
 	
