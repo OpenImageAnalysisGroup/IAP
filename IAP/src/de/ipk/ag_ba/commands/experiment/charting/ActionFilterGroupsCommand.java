@@ -11,24 +11,30 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.data_transformation.ColumnDescription;
+import de.ipk.ag_ba.data_transformation.loader.DataTableLoader;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
-import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
-public final class ActionFilterGroupsCommand extends AbstractNavigationAction implements DirtyNotificationSupport {
+public final class ActionFilterGroupsCommand extends AbstractNavigationAction implements DirtyNotificationSupport, ExperimentTransformation {
 	private NavigationButton src2;
 	private boolean dirty = true;
 	private final ThreadSafeOptions groupsDeterminationInProgress = new ThreadSafeOptions();
 	private final LinkedHashSet<String> groups = new LinkedHashSet<String>();
 	private final LinkedHashSet<String> disabled_groups = new LinkedHashSet<String>();
-	private final ExperimentReferenceWithFilterSupport experiment;
 	private ActionChartingGroupBySettings groupByAction;
 	private final String substanceFilter;
+	private final ExperimentTransformationPipeline pipeline;
 	
-	public ActionFilterGroupsCommand(String tooltip, ExperimentReferenceWithFilterSupport experiment, String substanceFilter) {
+	public ActionFilterGroupsCommand(String tooltip, ExperimentTransformationPipeline pipeline, String substanceFilter) {
 		super(tooltip);
-		this.experiment = experiment;
+		this.pipeline = pipeline;
 		this.substanceFilter = substanceFilter;
 	}
 	
@@ -89,7 +95,8 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 				try {
 					ArrayList<ColumnDescription> relevantColumns = new ArrayList<ColumnDescription>();
 					Set<String> groupby = groupByAction.getGroupByColumnIDs();
-					for (ColumnDescription cd : experiment.getDataTable().getColumns()) {
+					ExperimentInterface experiment = pipeline.getInput(ActionFilterGroupsCommand.this);
+					for (ColumnDescription cd : new DataTableLoader().loadFromExperiment(experiment).getColumns()) {
 						if (groupby.contains(cd.getID()))
 							relevantColumns.add(cd);
 					}
@@ -110,7 +117,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 		}
 	}
 	
-	public static LinkedHashSet<String> getInstanceValuesForColumns(ExperimentReferenceInterface experiment, ColumnDescription relevantColumn,
+	public static LinkedHashSet<String> getInstanceValuesForColumns(ExperimentInterface experiment, ColumnDescription relevantColumn,
 			String optSubstanceFilter)
 			throws Exception {
 		ArrayList<ColumnDescription> relevantColumns = new ArrayList<ColumnDescription>();
@@ -119,15 +126,15 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 	}
 	
 	private LinkedHashSet<String> getInstanceValuesForColumns(ArrayList<ColumnDescription> relevantColumns) throws Exception {
-		return getInstanceValues(relevantColumns, experiment, substanceFilter);
+		return getInstanceValues(relevantColumns, pipeline.getInput(this), substanceFilter);
 	}
 	
-	private static LinkedHashSet<String> getInstanceValues(ArrayList<ColumnDescription> relevantColumns, ExperimentReferenceInterface experiment,
+	private static LinkedHashSet<String> getInstanceValues(ArrayList<ColumnDescription> relevantColumns, ExperimentInterface experiment,
 			String substanceFilter)
 			throws Exception {
 		LinkedHashSet<String> ng = new LinkedHashSet<>();
 		if (ColumnDescription.isMeasurementRelevant(relevantColumns)) {
-			experiment.visitNumericMeasurements(
+			((Experiment) experiment).visitNumericMeasurements(
 					substanceFilter,
 					(nmi) -> {
 						String groupInstance = ColumnDescription.extractDataString(relevantColumns, nmi);
@@ -196,5 +203,53 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 	
 	public void setGroupByAction(ActionChartingGroupBySettings groupByAction) {
 		this.groupByAction = groupByAction;
+	}
+	
+	@Override
+	public ExperimentInterface transform(ExperimentInterface input) {
+		
+		ArrayList<ColumnDescription> relevantColumns = new ArrayList<ColumnDescription>();
+		Set<String> groupby = groupByAction.getGroupByColumnIDs();
+		ExperimentInterface experiment = pipeline.getInput(ActionFilterGroupsCommand.this);
+		for (ColumnDescription cd : new DataTableLoader().loadFromExperiment(experiment).getColumns()) {
+			if (groupby.contains(cd.getID()))
+				relevantColumns.add(cd);
+		}
+		
+		ArrayList<MappingData3DPath> pathObjects = new ArrayList<MappingData3DPath>();
+		for (MappingData3DPath po : MappingData3DPath.get(input, true)) {
+			if (ColumnDescription.isMeasurementRelevant(relevantColumns)) {
+				NumericMeasurementInterface nmi = po.getMeasurement();
+				String groupInstance = ColumnDescription.extractDataString(relevantColumns, nmi);
+				if (groupInstance != null && !groupInstance.isEmpty()) {
+					if (groups.contains(groupInstance))
+						pathObjects.add(po);
+				}
+			} else {
+				if (ColumnDescription.isSampleRelevant(relevantColumns)) {
+					SampleInterface sample = po.getSampleData();
+					if (sample.size() == 0)
+						continue;
+					String groupInstance = ColumnDescription.extractDataString(relevantColumns, sample);
+					if (groupInstance != null && !groupInstance.isEmpty()) {
+						if (groups.contains(groupInstance))
+							pathObjects.add(po);
+					}
+				} else {
+					ConditionInterface condition = po.getConditionData();
+					if (condition.size() == 0)
+						continue;
+					String groupInstance = ColumnDescription.extractDataString(relevantColumns, condition);
+					if (groupInstance != null && !groupInstance.isEmpty()) {
+						if (groups.contains(groupInstance))
+							pathObjects.add(po);
+					}
+				}
+			}
+		}
+		
+		ExperimentInterface result = MappingData3DPath.merge(pathObjects, false);
+		
+		return result;
 	}
 }

@@ -182,9 +182,9 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 			ExperimentHeaderInterface ehi = processData(excelFile, gc, day2avg, day2min, day2max, tm, e, addMinMax);
 			ehi.setDatabase("");
 			ehi.setDatabaseId("");
-			ehi.setExperimenttype("Climate");
+			ehi.setExperimentType("Climate");
 			ehi.setOriginDbId(excelFile.getAbsolutePath());
-			ehi.setImportusername(SystemAnalysis.getUserName());
+			ehi.setImportUserName(SystemAnalysis.getUserName());
 			ehi.setNumberOfFiles(0);
 			String fn = excelFile.getName();
 			if (fn.contains("."))
@@ -208,8 +208,8 @@ public class ActionImportClimateData extends AbstractNavigationAction {
 		ehi.setExperimentname(excelFile.getName());
 		ehi.setDatabase("");
 		ehi.setCoordinator(SystemAnalysis.getUserName());
-		ehi.setStartdate(day2avg.firstKey());
-		ehi.setImportdate(day2avg.lastKey());
+		ehi.setStartDate(day2avg.firstKey());
+		ehi.setImportDate(day2avg.lastKey());
 		ehi.setStorageTime(new Date());
 		ehi.setRemark("Import at " + SystemAnalysis.getCurrentTime() + " by " + SystemAnalysis.getUserName());
 		e.setHeader(ehi);

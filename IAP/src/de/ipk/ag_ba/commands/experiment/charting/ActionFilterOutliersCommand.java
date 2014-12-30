@@ -5,13 +5,19 @@ import java.util.ArrayList;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
+import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
-public final class ActionFilterOutliersCommand extends AbstractNavigationAction {
+public final class ActionFilterOutliersCommand extends AbstractNavigationAction implements ExperimentTransformation {
 	/**
 	 * 
 	 */
@@ -19,22 +25,14 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 	private NavigationButton src2;
 	private SystemOptions set;
 	private final DirtyNotificationSupport[] dirtyNotification;
-	private final ExperimentReferenceWithFilterSupport experiment;
 	
-	public ActionFilterOutliersCommand(ExperimentReferenceWithFilterSupport experiment, ActionFxCreateDataChart actionFxCreateDataChart, String tooltip,
+	public ActionFilterOutliersCommand(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip,
 			DirtyNotificationSupport... dirtyNotification) {
 		super(tooltip);
-		this.experiment = experiment;
 		this.actionFxCreateDataChart = actionFxCreateDataChart;
 		this.dirtyNotification = dirtyNotification;
 		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
 				: this.actionFxCreateDataChart.settingsLocal.getSettings();
-		checkExperimentFiltering();
-	}
-	
-	private void checkExperimentFiltering() {
-		boolean ro = set.getBoolean("Charting", "Filter outliers//Ignore defined outliers", true);
-		experiment.setRemoveDefinedOutliers(ro);
 	}
 	
 	@Override
@@ -68,9 +66,12 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 				this.actionFxCreateDataChart.settingsLocal.setUseLocalSettings(true);
 			set = global ? this.actionFxCreateDataChart.settingsGlobal.getSettings() : this.actionFxCreateDataChart.settingsLocal.getSettings();
 			set.setBoolean("Charting", "Filter outliers//Ignore defined outliers", cbIgnoreDefinedOutliers.isSelected());
-			checkExperimentFiltering();
-			for (DirtyNotificationSupport dns : dirtyNotification)
-				dns.setDirty(true);
+			if (dirtyNotification != null)
+				for (DirtyNotificationSupport dns : dirtyNotification)
+					if (dns == null)
+						throw new RuntimeException("internal error: dns variable is null");
+					else
+						dns.setDirty(true);
 		}
 	}
 	
@@ -94,5 +95,28 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
+	}
+	
+	public static ExperimentInterface tryGetFilteredDataset(ExperimentReferenceInterface experiment, String groupFilter2,
+			BackgroundTaskStatusProviderSupportingExternalCall sp) throws Exception {
+		if (experiment != null && groupFilter2 != null)
+			for (SubstanceInterface si : experiment.getData()) {
+				if (groupFilter2.equals(si.getName())) {
+					ExperimentInterface ne = Experiment.copyAndExtractSubtanceInclusiveData(si);
+					return ne;
+				}
+			}
+		return null;
+	}
+	
+	@Override
+	public ExperimentInterface transform(ExperimentInterface input) {
+		boolean removeOutliers = set.getBoolean("Charting", "Filter outliers//Ignore defined outliers", true);
+		if (removeOutliers) {
+			ExperimentInterface eclone = input.clone();
+			IAPservice.removeOutliers(eclone);
+			return eclone;
+		} else
+			return input;
 	}
 }

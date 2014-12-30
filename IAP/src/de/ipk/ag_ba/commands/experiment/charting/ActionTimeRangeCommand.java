@@ -15,8 +15,9 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
-public final class ActionTimeRangeCommand extends AbstractNavigationAction implements DirtyNotificationSupport {
+public final class ActionTimeRangeCommand extends AbstractNavigationAction implements DirtyNotificationSupport, ExperimentTransformation {
 	/**
 	 * 
 	 */
@@ -126,5 +127,10 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	public void setDirty(boolean b) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public ExperimentInterface transform(ExperimentInterface input) {
+		throw new RuntimeException("not yet implemented!");
 	}
 }

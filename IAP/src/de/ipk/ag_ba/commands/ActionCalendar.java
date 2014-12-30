@@ -170,11 +170,11 @@ public class ActionCalendar extends AbstractNavigationAction implements SpecialC
 			public MainPanelComponent getResultMainPanel() {
 				ExperimentHeaderInterface ei = new ExperimentHeader();
 				ei.setExperimentname("Planned Experiment");
-				ei.setExperimenttype("Phenomics");
+				ei.setExperimentType("Phenomics");
 				ei.setCoordinator(SystemAnalysis.getUserName());
-				ei.setImportusername(SystemAnalysis.getUserName());
-				ei.setStartdate(new Date());
-				ei.setImportdate(new Date());
+				ei.setImportUserName(SystemAnalysis.getUserName());
+				ei.setStartDate(new Date());
+				ei.setImportDate(new Date());
 				final ExperimentHeaderInfoPanel info = new ExperimentHeaderInfoPanel();
 				info.setExperimentInfo(m, ei, true, null);
 				

@@ -464,10 +464,10 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					experimentHeader.setExperimentname(editName.getText());
 					// experimentHeader.setImportusergroup((String)
 					// groupVisibility.getSelectedItem());
-					experimentHeader.setImportusergroup(groupVisibility.getText());
-					experimentHeader.setExperimenttype((String) experimentTypeSelection.getSelectedItem());
-					experimentHeader.setStartdate(expStart.getDate());
-					experimentHeader.setImportdate(expEnd.getDate());
+					experimentHeader.setImportUserGroup(groupVisibility.getText());
+					experimentHeader.setExperimentType((String) experimentTypeSelection.getSelectedItem());
+					experimentHeader.setStartDate(expStart.getDate());
+					experimentHeader.setImportDate(expEnd.getDate());
 					experimentHeader.setSequence(sequence.getText());
 					experimentHeader.setRemark(remark.getText());
 					experimentHeader.setGlobalOutlierInfo(outliers.getText());
