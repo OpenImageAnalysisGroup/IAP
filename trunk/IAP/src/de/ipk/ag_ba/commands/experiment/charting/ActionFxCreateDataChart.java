@@ -10,8 +10,6 @@ import org.apache.commons.lang3.text.WordUtils;
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ChartSettings;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
-import de.ipk.ag_ba.data_transformation.ColumnDescription;
-import de.ipk.ag_ba.data_transformation.loader.DataTableLoader;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
@@ -61,9 +59,6 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		super("Create a Data Chart");
 		this.groupFilter = groupFilter;
 		this.experiment = experiment;
-		this.experimentWithSingleSubstance = ActionFilterOutliersCommand.tryGetFilteredDataset(experiment, groupFilter, getStatusProvider());
-		if (experimentWithSingleSubstance != null && experimentWithSingleSubstance.size() != 1)
-			throw new RuntimeException("Exactly one substance is allowed here!");
 		
 		this.settingsGlobal = settingsGlobal;
 		
@@ -80,7 +75,16 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		this.src = src;
 		res.clear();
 		
-		determineSubstanceGroups();
+		try {
+			if (experiment != null)
+				determineSubstanceGroups();
+		} catch (Exception err) {
+			throw new RuntimeException(err);
+		}
+		
+		this.experimentWithSingleSubstance = ActionFilterOutliersCommand.tryGetFilteredDataset(experiment, groupFilter, getStatusProvider());
+		if (experimentWithSingleSubstance != null && experimentWithSingleSubstance.size() != 1)
+			throw new RuntimeException("Exactly one substance is allowed here!");
 		
 		if (traitDescription != null && !traitDescription.isEmpty())
 			res.add(traitDescription);
@@ -88,41 +92,18 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		if (groupFilter != null && substanceGroupNames.isEmpty())
 			this.settingsLocal = new ChartSettings(true);
 		
-		if (experimentWithSingleSubstance != null) {
-			
-			// data_table.debugPrintColumnNames();
-			StringBuilder sb = new StringBuilder("<h3>Dimensions  go into Navigation Tree</h3>");
-			int n = 0;
-			for (ColumnDescription cd : new DataTableLoader().loadFromExperiment(experimentWithSingleSubstance).getColumns()) {
-				sb.append(cd.getNiceName() + " ");
-				n++;
-				if (n % 5 == 0)
-					sb.append("<br>");
-			}
-			res.add(sb.toString());
-			
-			res.add("<h3>*Filter*</h3>Filter Global Outliers Yes / No");
-			res.add("<h3>*Group by*</h3>Checkboxes: condition.genotype + condition.treatment");
-			res.add("<h3>*Summarize*</h3>numbered checklist: measurement.position &gt; then: plant ID");
-			res.add("<h3>*Time*</h3>All Days, Day 1, Day 2, Day 3, ...");
-			res.add("<h3>*Plot*</h3>Mean/Min/Max/Median/Sum / t-Test p-value (2 groups) / ANOVA p-Value / ...");
-			res.add("<h3>*Error Bars*</h3>No/Std dev/Std err/Variance");
-		}
 		if (substanceGroupNames.size() == 0 && groupFilter != null) {
 			this.transformationPipeline = new ExperimentTransformationPipeline(experimentWithSingleSubstance);
 			
-			filterGroupAction = new ActionFilterGroupsCommand("Filter Groups", transformationPipeline, groupFilter);
-			groupByAction = new ActionChartingGroupBySettings(this, "Group by", filterGroupAction, groupFilter, transformationPipeline);
-			filterGroupAction.setGroupByAction(groupByAction);
-			filterTimeRangeAction = new ActionTimeRangeCommand(this, "Time Range", filterGroupAction, groupFilter);
-			createPlotAction = new ActionCreatePlotCommand(this, "Create/update plot");
-			summarizeDataAction = new ActionSummarizeGroupsCommand("Summarize data", this);
-			removeDefinedOutlierAction = new ActionFilterOutliersCommand(this, "Filter Outliers", filterGroupAction,
-					filterTimeRangeAction,
-					createPlotAction);
+			removeDefinedOutlierAction = new ActionFilterOutliersCommand("Filter Outliers", transformationPipeline, settingsLocal, settingsGlobal);
+			filterGroupAction = new ActionFilterGroupsCommand("Filter Groups", transformationPipeline);
+			groupByAction = new ActionChartingGroupBySettings("Group by", transformationPipeline, settingsLocal, settingsGlobal, filterGroupAction);
+			filterTimeRangeAction = new ActionTimeRangeCommand("Time Range", transformationPipeline, settingsLocal, settingsGlobal);
+			summarizeDataAction = new ActionSummarizeGroupsCommand("Summarize data", transformationPipeline, settingsLocal, settingsGlobal);
+			createPlotAction = new ActionCreatePlotCommand("Create/update plot", transformationPipeline, settingsLocal, settingsGlobal);
 			
 			transformationPipeline.setSteps(removeDefinedOutlierAction, groupByAction,
-					filterGroupAction, filterTimeRangeAction);
+					filterGroupAction, filterTimeRangeAction, summarizeDataAction, createPlotAction);
 		}
 		
 	}

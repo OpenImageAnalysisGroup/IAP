@@ -9,6 +9,7 @@ import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.ChartSettings;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.gui.util.IAPservice;
@@ -21,26 +22,25 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 	/**
 	 * 
 	 */
-	private final ActionFxCreateDataChart actionFxCreateDataChart;
 	private NavigationButton src2;
 	private SystemOptions set;
-	private final DirtyNotificationSupport[] dirtyNotification;
+	private final ExperimentTransformationPipeline pipeline;
+	private final ChartSettings settingsLocal;
+	private final ChartSettings settingsGlobal;
 	
-	public ActionFilterOutliersCommand(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip,
-			DirtyNotificationSupport... dirtyNotification) {
+	public ActionFilterOutliersCommand(String tooltip, ExperimentTransformationPipeline pipeline, ChartSettings settingsLocal, ChartSettings settingsGlobal) {
 		super(tooltip);
-		this.actionFxCreateDataChart = actionFxCreateDataChart;
-		this.dirtyNotification = dirtyNotification;
-		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
-				: this.actionFxCreateDataChart.settingsLocal.getSettings();
+		this.pipeline = pipeline;
+		this.settingsLocal = settingsLocal;
+		this.settingsGlobal = settingsGlobal;
+		this.set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		src2 = src;
 		
-		set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
-				: this.actionFxCreateDataChart.settingsLocal.getSettings();
+		set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 		
 		JCheckBox cbIgnoreDefinedOutliers = new JCheckBox("Ignore defined outliers");
 		cbIgnoreDefinedOutliers.setSelected(set.getBoolean("Charting", "Filter outliers//Ignore defined outliers", true));
@@ -53,7 +53,7 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 		sa[idx++] = new JLabel();
 		sa[idx++] = "Local/global";
 		JCheckBox cbPersistentChange = new JCheckBox("Apply change persistent with experiment");
-		cbPersistentChange.setSelected(!this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings());
+		cbPersistentChange.setSelected(!settingsLocal.getUseLocalSettings());
 		sa[idx++] = cbPersistentChange;
 		
 		Object[] ur = MyInputHelper.getInput("Filter input data (defined outliers):<br><br>", "Filter Data (Outliers)", sa);
@@ -61,17 +61,12 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 			// apply settings
 			boolean global = cbPersistentChange.isSelected();
 			if (global)
-				this.actionFxCreateDataChart.settingsLocal.setUseLocalSettings(false);
+				settingsLocal.setUseLocalSettings(false);
 			else
-				this.actionFxCreateDataChart.settingsLocal.setUseLocalSettings(true);
-			set = global ? this.actionFxCreateDataChart.settingsGlobal.getSettings() : this.actionFxCreateDataChart.settingsLocal.getSettings();
+				settingsLocal.setUseLocalSettings(true);
+			set = global ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 			set.setBoolean("Charting", "Filter outliers//Ignore defined outliers", cbIgnoreDefinedOutliers.isSelected());
-			if (dirtyNotification != null)
-				for (DirtyNotificationSupport dns : dirtyNotification)
-					if (dns == null)
-						throw new RuntimeException("internal error: dns variable is null");
-					else
-						dns.setDirty(true);
+			pipeline.setDirty(this);
 		}
 	}
 	
@@ -118,5 +113,10 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 			return eclone;
 		} else
 			return input;
+	}
+	
+	@Override
+	public void updateStatus() throws Exception {
+		// empty
 	}
 }

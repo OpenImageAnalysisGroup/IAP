@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.ChartSettings;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -21,20 +22,18 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	/**
 	 * 
 	 */
-	private final ActionFxCreateDataChart actionFxCreateDataChart;
 	private NavigationButton src2;
 	private SystemOptions set;
-	private final ActionFilterGroupsCommand filterGroupAction;
-	private final String substanceFilter;
+	private final ExperimentTransformationPipeline pipeline;
+	private final ChartSettings settingsLocal;
+	private final ChartSettings settingsGlobal;
 	
-	public ActionTimeRangeCommand(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip, ActionFilterGroupsCommand filterGroupAction,
-			String substanceFilter) {
+	public ActionTimeRangeCommand(String tooltip, ExperimentTransformationPipeline pipeline, ChartSettings settingsLocal, ChartSettings settingsGlobal) {
 		super(tooltip);
-		this.actionFxCreateDataChart = actionFxCreateDataChart;
-		this.filterGroupAction = filterGroupAction;
-		this.substanceFilter = substanceFilter;
-		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
-				: this.actionFxCreateDataChart.settingsLocal.getSettings();
+		this.pipeline = pipeline;
+		this.settingsLocal = settingsLocal;
+		this.settingsGlobal = settingsGlobal;
+		this.set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 		
 	}
 	
@@ -48,10 +47,9 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		src2 = src;
 		LinkedHashMap<String, JCheckBox> settings = new LinkedHashMap<String, JCheckBox>();
 		int items = 0;
-		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
-				: this.actionFxCreateDataChart.settingsLocal.getSettings();
+		this.set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 		
-		for (String time : Experiment.getTimes(this.actionFxCreateDataChart.experiment.getData(), substanceFilter)) {
+		for (String time : Experiment.getTimes(pipeline.getInput(this), null)) {
 			items++;
 			JCheckBox cb = new JCheckBox(time);
 			cb.setSelected(set.getBoolean("Charting", "Time range//" + time, true));
@@ -72,7 +70,7 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		sa[idx++] = new JLabel();
 		sa[idx++] = "Local/global";
 		JCheckBox cbPersistentChange = new JCheckBox("Apply change persistent with experiment");
-		cbPersistentChange.setSelected(!this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings());
+		cbPersistentChange.setSelected(!settingsLocal.getUseLocalSettings());
 		sa[idx++] = cbPersistentChange;
 		
 		Object[] ur = MyInputHelper.getInput("Experiment days:<br><br>", "Time Range", sa);
@@ -80,14 +78,14 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 			// apply settings
 			boolean global = cbPersistentChange.isSelected();
 			if (global)
-				this.actionFxCreateDataChart.settingsLocal.setUseLocalSettings(false);
+				settingsLocal.setUseLocalSettings(false);
 			else
-				this.actionFxCreateDataChart.settingsLocal.setUseLocalSettings(true);
+				settingsLocal.setUseLocalSettings(true);
 			for (String time : settings.keySet()) {
 				JCheckBox cb = settings.get(time);
 				set.setBoolean("Charting", "Time range//" + time, cb.isSelected());
 			}
-			filterGroupAction.setDirty(true);
+			pipeline.setDirty(this);
 		}
 	}
 	
@@ -124,13 +122,12 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	}
 	
 	@Override
-	public void setDirty(boolean b) {
-		// TODO Auto-generated method stub
-		
+	public ExperimentInterface transform(ExperimentInterface input) {
+		return input;
 	}
 	
 	@Override
-	public ExperimentInterface transform(ExperimentInterface input) {
-		throw new RuntimeException("not yet implemented!");
+	public void updateStatus() throws Exception {
+		// TODO
 	}
 }
