@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 
 import org.AttributeHelper;
 import org.ExperimentHeaderHelper;
@@ -113,7 +114,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	}
 	
 	@Override
-	public void setImportusername(String importusername) {
+	public void setImportUserName(String importusername) {
 		this.importUserName = importusername;
 	}
 	
@@ -123,7 +124,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	}
 	
 	@Override
-	public void setImportusergroup(String importusergroup) {
+	public void setImportUserGroup(String importusergroup) {
 		this.importUserGroup = importusergroup;
 	}
 	
@@ -133,7 +134,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	}
 	
 	@Override
-	public void setImportdate(Date importdate) {
+	public void setImportDate(Date importdate) {
 		this.importDate = importdate;
 	}
 	
@@ -143,7 +144,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	}
 	
 	@Override
-	public void setStartdate(Date startdate) {
+	public void setStartDate(Date startdate) {
 		this.startDate = startdate;
 	}
 	
@@ -173,7 +174,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	}
 	
 	@Override
-	public void setExperimenttype(String experimenttype) {
+	public void setExperimentType(String experimenttype) {
 		this.experimentType = experimenttype;
 	}
 	
@@ -269,23 +270,23 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			if (map.containsKey("excelfileid"))
 				setDatabaseId(map.get("excelfileid") + "");
 		setCoordinator((String) map.get("coordinator"));
-		setExperimenttype((String) map.get("experimenttype"));
+		setExperimentType((String) map.get("experimenttype"));
 		setSequence((String) map.get("sequence"));
 		setFiles((String) map.get("files"));
-		setImportusername((String) map.get("importusername"));
-		setImportusergroup((String) map.get("importusergroup"));
+		setImportUserName((String) map.get("importusername"));
+		setImportUserGroup((String) map.get("importusergroup"));
 		if (map.get("importdate") != null && map.get("importdate") instanceof String) {
 			Date aDate = getDate((String) map.get("importdate"));
 			if (aDate != null)
-				setImportdate(aDate);
+				setImportDate(aDate);
 		} else
-			setImportdate((Date) map.get("importdate"));
+			setImportDate((Date) map.get("importdate"));
 		if (map.get("startdate") != null && map.get("startdate") instanceof String) {
 			Date aDate = getDate((String) map.get("startdate"));
 			if (aDate != null)
-				setStartdate(aDate);
+				setStartDate(aDate);
 		} else
-			setStartdate((Date) map.get("startdate"));
+			setStartDate((Date) map.get("startdate"));
 		if (map.get("storagetime") != null && map.get("storagetime") instanceof String) {
 			if (!((String) map.get("storagetime")).equals("null")) {
 				Date aDate = getDate((String) map.get("storagetime"));
@@ -422,6 +423,92 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 				return settings;
 		}
 		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");
+	}
+	
+	private HashMap<String, Consumer<String>> stringSetters = null;
+	
+	private synchronized HashMap<String, Consumer<String>> getStringSetterFunctions() {
+		if (stringSetters == null) {
+			stringSetters = new HashMap<String, Consumer<String>>();
+			stringSetters.put("experimentname", this::setExperimentName);
+			stringSetters.put("database", this::setDatabase);
+			stringSetters.put("remark", this::setRemark);
+			stringSetters.put("coordinator", this::setCoordinator);
+			stringSetters.put("experimenttype", this::setExperimentType);
+			stringSetters.put("sequence", this::setSequence);
+			stringSetters.put("files", this::setFiles);
+			stringSetters.put("excelfileid", this::setDatabaseId);
+			stringSetters.put("importusername", this::setImportUserName);
+			stringSetters.put("importusergroup", this::setImportUserGroup);
+			stringSetters.put("origin", this::setOriginDbId);
+			stringSetters.put("outliers", this::setGlobalOutlierInfo);
+			stringSetters.put("settings", this::setSettings);
+		}
+		return stringSetters;
+	}
+	
+	@Override
+	public void setAttributeField(String id, Object value) {
+		HashMap<String, Consumer<String>> mm = getStringSetterFunctions();
+		if (mm.containsKey(id)) {
+			mm.get(id).accept((String) value);
+			return;
+		}
+		switch (id) {
+			case "importdate":
+				if (value == null)
+					setImportDate(null);
+				else
+					if (value instanceof String)
+						setImportDate(getDate((String) value));
+					else
+						if (value instanceof Date)
+							setImportDate((Date) value);
+						else
+							throw new RuntimeException("Can't set field importdate with given attribute type!");
+				return;
+			case "startdate":
+				if (value == null)
+					setStartDate(null);
+				else
+					if (value instanceof String)
+						setStartDate(getDate((String) value));
+					else
+						if (value instanceof Date)
+							setStartDate((Date) value);
+						else
+							throw new RuntimeException("Can't set field startdate with given attribute type!");
+				return;
+			case "storagetime":
+				if (value == null)
+					setStorageTime(null);
+				else
+					if (value instanceof String)
+						setStorageTime(getDate((String) value));
+					else
+						if (value instanceof Date)
+							setStorageTime((Date) value);
+						else
+							throw new RuntimeException("Can't set field storagetime with given attribute type!");
+				return;
+			case "measurements":
+				// empty
+				return;
+			case "imagefiles":
+				if (value == null)
+					imageFiles = null;
+				else
+					imageFiles = Integer.parseInt((String) value);
+				return;
+			case "sizekb":
+				if (value == null)
+					setSizekb(-1l);
+				else
+					setSizekb(Long.parseLong((String) value));
+				return;
+				
+		}
+		throw new UnsupportedOperationException("Can't set field value for id '" + id + "'!");
 	}
 	
 	public static HashMap<String, String> getNiceHTMLfieldNameMapping() {

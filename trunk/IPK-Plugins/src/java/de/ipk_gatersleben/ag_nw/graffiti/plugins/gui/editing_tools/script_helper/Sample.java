@@ -518,4 +518,9 @@ public class Sample implements SampleInterface {
 	public void setFiles(String files) {
 		this.files = files;
 	}
+	
+	@Override
+	public void setAttributeField(String id, Object value) {
+		throw new RuntimeException("not yet implemented!");
+	}
 }

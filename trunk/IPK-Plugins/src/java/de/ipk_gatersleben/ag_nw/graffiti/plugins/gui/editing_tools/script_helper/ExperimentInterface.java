@@ -146,4 +146,11 @@ public interface ExperimentInterface extends List<SubstanceInterface>, Cloneable
 	public void addAndMerge(Runnable optPingCode, ExperimentInterface ei, RunnableExecutor re, MergeCompareRequirements mcr);
 	
 	public Collection<SubstanceInterface> getSubstances();
+	
+	public abstract void visitConditions(String optSubstanceFilter, ConditionVisitor cv) throws Exception;
+	
+	public abstract void visitSamples(String optSubstanceFilter, SampleVisitor nmi) throws Exception;
+	
+	public abstract void visitNumericMeasurements(String optSubstanceFilter, NumericMeasurementVisitor nmi) throws Exception;
+	
 }

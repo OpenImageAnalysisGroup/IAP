@@ -305,9 +305,9 @@ public class GeneExpressionFileReader extends ExperimentDataFileReader {
 		else
 			res.setCoordinator("");
 		res.setDatabase("");
-		res.setImportusername("");
-		res.setImportdate((excelFile != null ? new Date(excelFile.lastModified()) : new Date()));
-		res.setStartdate(new Date());
+		res.setImportUserName("");
+		res.setImportDate((excelFile != null ? new Date(excelFile.lastModified()) : new Date()));
+		res.setStartDate(new Date());
 		res.setNumberOfFiles(0);
 		res.setSizekb(0);
 		return res;

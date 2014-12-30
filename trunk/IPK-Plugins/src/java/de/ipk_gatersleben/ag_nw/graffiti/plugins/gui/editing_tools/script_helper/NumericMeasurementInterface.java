@@ -56,4 +56,5 @@ public interface NumericMeasurementInterface extends Measurement {
 	public abstract String getQualityAnnotation();
 	
 	public NumericMeasurementInterface clone(SampleInterface parent);
+	
 }

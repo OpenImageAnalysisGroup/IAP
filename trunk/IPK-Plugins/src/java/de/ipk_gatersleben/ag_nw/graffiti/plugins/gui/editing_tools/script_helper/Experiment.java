@@ -800,8 +800,8 @@ public class Experiment implements ExperimentInterface {
 				clone.addAll(new Experiment(d));
 		}
 		for (ExperimentHeaderInterface eh : clone.getHeaders()) {
-			eh.setImportusergroup(getHeader().getImportusergroup());
-			eh.setImportusername(getHeader().getImportusername());
+			eh.setImportUserGroup(getHeader().getImportusergroup());
+			eh.setImportUserName(getHeader().getImportusername());
 		}
 		return clone;
 	}
@@ -1401,5 +1401,49 @@ public class Experiment implements ExperimentInterface {
 	@Override
 	public Object getAttributeField(String id) {
 		return getHeader().getAttributeField(id);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitConditions(java.lang.String, de.ipk.ag_ba.gui.util.ConditionVisitor)
+	 */
+	@Override
+	public void visitConditions(String optSubstanceFilter, ConditionVisitor cv) throws Exception {
+		for (SubstanceInterface si : getSubstances())
+			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
+				for (ConditionInterface ci : si)
+					cv.visit(ci);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitSamples(java.lang.String, de.ipk.ag_ba.gui.util.SampleVisitor)
+	 */
+	@Override
+	public void visitSamples(String optSubstanceFilter, SampleVisitor nmi) throws Exception {
+		for (SubstanceInterface si : getSubstances())
+			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
+				for (ConditionInterface ci : si)
+					for (SampleInterface sa : ci)
+						nmi.visit(sa);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitNumericMeasurements(java.lang.String, de.ipk.ag_ba.gui.util.NumericMeasurementVisitor)
+	 */
+	@Override
+	public void visitNumericMeasurements(String optSubstanceFilter, NumericMeasurementVisitor nmi) throws Exception {
+		for (SubstanceInterface si : getSubstances())
+			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
+				for (ConditionInterface ci : si)
+					for (SampleInterface sa : ci)
+						for (NumericMeasurementInterface n : sa)
+							nmi.visit(n);
+	}
+	
+	@Override
+	public void setAttributeField(String id, Object value) {
+		throw new RuntimeException("Not yet implemented!");
 	}
 }

@@ -34,6 +34,32 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 			setFiles((String) attributemap.get("files"));
 	}
 	
+	@Override
+	public void setAttributeField(String id, Object value) {
+		switch (id) {
+			case "replicates":
+				if (value == null)
+					setReplicateID(0);
+				else
+					setReplicateID(Integer.parseInt((String) value));
+				return;
+			case "unit":
+				setUnit((String) value);
+			case "value":
+				if (value == null)
+					setValue(Double.NaN);
+				else
+					setValue(Double.parseDouble((String) value));
+				return;
+			case "quality":
+				setQualityAnnotation((String) value);
+				return;
+			case "files":
+				setFiles((String) value);
+		}
+		throw new RuntimeException("Cant set field " + id + "!");
+	}
+	
 	/**
 	 * Builds up a new hierarchy for a newly created MeasurementData. Copies as
 	 * much as possible starting from the copyFrom Measurement to the top until
@@ -276,5 +302,4 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		res.value = value;
 		return res;
 	}
-	
 }

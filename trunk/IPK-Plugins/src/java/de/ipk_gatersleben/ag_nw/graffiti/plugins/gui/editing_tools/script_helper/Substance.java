@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
@@ -595,19 +596,6 @@ public class Substance implements SubstanceInterface {
 		
 	}
 	
-	// public Collection<Condition> getConditions() {
-	// return conditions;
-	// }
-	//
-	// public void addCondition(Condition condition) {
-	// conditions.add(condition);
-	// }
-	
-	// public void addConditions(Collection<Condition> conditions2) {
-	// for (Condition c : conditions2)
-	// conditions.add(c);
-	// }
-	
 	/**
 	 * @return Null or eventually empty list of synonyms.
 	 */
@@ -673,12 +661,6 @@ public class Substance implements SubstanceInterface {
 			return returnIfNoSynonymes;
 		else {
 			return synonyms.size();
-			// int max = Integer.MIN_VALUE;
-			// for (Integer i : synonyms.keySet()) {
-			// if (i>max)
-			// max = i;
-			// }
-			// return max;
 		}
 	}
 	
@@ -694,6 +676,55 @@ public class Substance implements SubstanceInterface {
 		return sum / cnt;
 	}
 	
+	private HashMap<String, Consumer<String>> stringSetters = null;
+	
+	private synchronized HashMap<String, Consumer<String>> getStringSetterFunctions() {
+		if (stringSetters == null) {
+			stringSetters = new HashMap<String, Consumer<String>>();
+			stringSetters.put("id", this::setRowId);
+			stringSetters.put("name", this::setName);
+			stringSetters.put("info", this::setInfo);
+			stringSetters.put("substancegroup", this::setSubstancegroup);
+			stringSetters.put("funcat", this::setFuncat);
+			stringSetters.put("new_blast", this::setNewBlast);
+			stringSetters.put("spot", this::setSpot);
+			stringSetters.put("cluster_id", this::setClusterId);
+			stringSetters.put("new_blast_e_val", this::setNewBlastEval);
+			stringSetters.put("new_blast_score", this::setNewBlastScore);
+			stringSetters.put("affy_hit", this::setAffyHit);
+			stringSetters.put("score", this::setScore);
+			stringSetters.put("secure", this::setSecure);
+			stringSetters.put("files", this::setFiles);
+			stringSetters.put("formula", this::setFormula);
+		}
+		return stringSetters;
+	}
+	
+	@Override
+	public Object getAttributeField(String id) {
+		throw new UnsupportedOperationException("not yet implemented for this data structure!");
+	}
+	
+	@Override
+	public void setAttributeField(String id, Object value) {
+		HashMap<String, Consumer<String>> mm = getStringSetterFunctions();
+		if (mm.containsKey(id)) {
+			mm.get(id).accept((String) value);
+		} else
+			if (id.startsWith("name")) {
+				String index = id.substring("name".length());
+				try {
+					int idx = Integer.parseInt(index);
+					if (synonyms == null)
+						synonyms = new HashMap<Integer, String>();
+					synonyms.put(idx, (String) value);
+				} catch (Exception err) {
+					ErrorMsg.addErrorMessage(err);
+				}
+			} else
+				throw new RuntimeException("Internal Error: Unknown Substance Attribute: " + id);
+	}
+	
 	@Override
 	public void setAttribute(MyAttribute attr) {
 		if (attr == null)
@@ -701,63 +732,23 @@ public class Substance implements SubstanceInterface {
 		if (attr.getValue() == null)
 			return;
 		attr.setValue(StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#")));
-		if (attr.getName().equals("id"))
-			setRowId(attr.getValue());
-		else
-			if (attr.getName().equals("name"))
-				setName(attr.getValue());
-			else
-				if (attr.getName().equals("info"))
-					setInfo(attr.getValue());
-				else
-					if (attr.getName().equals("substancegroup"))
-						setSubstancegroup(attr.getValue());
-					else
-						if (attr.getName().equals("funcat"))
-							setFuncat(attr.getValue());
-						else
-							if (attr.getName().equals("new_blast"))
-								; // setNewBlast(attr.getValue());
-							else
-								if (attr.getName().equals("spot"))
-									setSpot(attr.getValue());
-								else
-									if (attr.getName().equals("cluster_id"))
-										setClusterId(attr.getValue());
-									else
-										if (attr.getName().equals("new_blast_e_val"))
-											setNewBlastEval(attr.getValue());
-										else
-											if (attr.getName().equals("new_blast_score"))
-												setNewBlastScore(attr.getValue());
-											else
-												if (attr.getName().equals("affy_hit"))
-													setAffyHit(attr.getValue());
-												else
-													if (attr.getName().equals("score"))
-														setScore(attr.getValue());
-													else
-														if (attr.getName().equals("secure"))
-															setSecure(attr.getValue());
-														else
-															if (attr.getName().equals("files"))
-																setFiles(attr.getValue());
-															else
-																if (attr.getName().equals("formula"))
-																	setFormula(attr.getValue());
-																else
-																	if (attr.getName().startsWith("name")) {
-																		String index = attr.getName().substring("name".length());
-																		try {
-																			int idx = Integer.parseInt(index);
-																			if (synonyms == null)
-																				synonyms = new HashMap<Integer, String>();
-																			synonyms.put(idx, attr.getValue());
-																		} catch (Exception err) {
-																			ErrorMsg.addErrorMessage(err);
-																		}
-																	} else
-																		System.err.println("Internal Error: Unknown Substance Attribute: " + attr.getName());
+		
+		HashMap<String, Consumer<String>> mm = getStringSetterFunctions();
+		if (mm.containsKey(attr.getName())) {
+			mm.get(attr.getName()).accept(attr.getValue());
+		} else
+			if (attr.getName().startsWith("name")) {
+				String index = attr.getName().substring("name".length());
+				try {
+					int idx = Integer.parseInt(index);
+					if (synonyms == null)
+						synonyms = new HashMap<Integer, String>();
+					synonyms.put(idx, attr.getValue());
+				} catch (Exception err) {
+					ErrorMsg.addErrorMessage(err);
+				}
+			} else
+				System.err.println("Internal Error: Unknown Substance Attribute: " + attr.getName());
 	}
 	
 	@Override
@@ -1308,11 +1299,6 @@ public class Substance implements SubstanceInterface {
 			}
 		});
 		
-	}
-	
-	@Override
-	public Object getAttributeField(String id) {
-		throw new UnsupportedOperationException("not yet implemented for this data structure!");
 	}
 	
 }
