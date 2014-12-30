@@ -61,19 +61,19 @@ public interface ExperimentHeaderInterface extends AttributeValuePairSupport, Co
 	
 	public int getExperimentId();
 	
-	public void setImportusername(String importusername);
+	public void setImportUserName(String importusername);
 	
 	public String getImportusername();
 	
-	public void setImportusergroup(String importusergroup);
+	public void setImportUserGroup(String importusergroup);
 	
 	public String getImportusergroup();
 	
-	public void setImportdate(Date importdate);
+	public void setImportDate(Date importdate);
 	
 	public Date getImportdate();
 	
-	public void setStartdate(Date startdate);
+	public void setStartDate(Date startdate);
 	
 	public Date getStartdate();
 	
@@ -85,7 +85,7 @@ public interface ExperimentHeaderInterface extends AttributeValuePairSupport, Co
 	
 	public long getSizekb();
 	
-	public void setExperimenttype(String experimenttype);
+	public void setExperimentType(String experimenttype);
 	
 	public String getExperimentType();
 	

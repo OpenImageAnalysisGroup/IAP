@@ -18,4 +18,6 @@ public interface AttributeValuePairSupport {
 	
 	public abstract Object getAttributeField(String id);
 	
+	public abstract void setAttributeField(String id, Object value);
+	
 }

@@ -350,4 +350,9 @@ public class SampleAverage implements SampleAverageInterface {
 		throw new UnsupportedOperationException("Not implemented for this data type");
 	}
 	
+	@Override
+	public void setAttributeField(String id, Object value) {
+		throw new RuntimeException("not yet implemented!");
+	}
+	
 }

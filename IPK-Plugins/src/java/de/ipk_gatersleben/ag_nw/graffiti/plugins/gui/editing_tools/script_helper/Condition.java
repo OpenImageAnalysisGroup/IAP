@@ -127,6 +127,34 @@ public class Condition implements ConditionInterface {
 		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");
 	}
 	
+	@Override
+	public void setAttributeField(String id, Object value) {
+		switch (id) {
+			case "name":
+				setSpecies((String) value);
+				return;
+			case "genotype":
+				setGenotype((String) value);
+				return;
+			case "variety":
+				setVariety((String) value);
+				return;
+			case "sequence":
+				setSequence((String) value);
+				return;
+			case "growthconditions":
+				setGrowthconditions((String) value);
+				return;
+			case "treatment":
+				setTreatment((String) value);
+				return;
+			case "files":
+				setFiles((String) value);
+				return;
+		}
+		throw new UnsupportedOperationException("Can't set field value with id '" + id + "'!");
+	}
+	
 	private static String[] remove(String[] a, String[] rem, String... rrr) {
 		HashSet<String> r = new HashSet<String>();
 		for (String rs : rem)
@@ -649,7 +677,7 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public void setExperimentStartDate(Date experimentStartDate) {
-		header.setStartdate(experimentStartDate != null ? experimentStartDate : null);
+		header.setStartDate(experimentStartDate != null ? experimentStartDate : null);
 	}
 	
 	@Override
@@ -734,7 +762,7 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public void setExperimentType(String experimenttype) {
-		header.setExperimenttype(experimenttype != null ? experimenttype.intern() : null);
+		header.setExperimentType(experimenttype != null ? experimenttype.intern() : null);
 	}
 	
 	@Override
@@ -791,7 +819,7 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public void setExperimentImportdate(Date experimentimportdate) {
-		header.setImportdate(experimentimportdate);
+		header.setImportDate(experimentimportdate);
 	}
 	
 	@Override
