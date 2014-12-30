@@ -223,29 +223,29 @@ public class LTdataExchange implements ExperimentLoader {
 				ehi.setDatabase(database);
 				ehi.setDatabaseId("lt:" + database + ":" + ehi.getExperimentName());
 				ehi.setOriginDbId("lt:" + database + ":" + ehi.getExperimentName());
-				ehi.setImportusername(user != null ? user : SystemAnalysis.getUserName());
-				ehi.setImportusergroup("Imaging System");
+				ehi.setImportUserName(user != null ? user : SystemAnalysis.getUserName());
+				ehi.setImportUserGroup("Imaging System");
 				LTsystem system = LTsystem.getTypeFromDatabaseName(database);
 				if (system == LTsystem.Barley) {
-					ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse + "");
-					ehi.setImportusergroup("Imaging System (BGH)");
+					ehi.setExperimentType(IAPexperimentTypes.BarleyGreenhouse + "");
+					ehi.setImportUserGroup("Imaging System (BGH)");
 				} else
 					if (system == LTsystem.Maize) {
 						if (name.length() >= 6 && name.toUpperCase().endsWith("RAPS"))
-							ehi.setExperimenttype(IAPexperimentTypes.Raps + "");
+							ehi.setExperimentType(IAPexperimentTypes.Raps + "");
 						else
 							if (name.length() >= 6 && name.substring(4, 6).equals("RM"))
-								ehi.setExperimenttype(IAPexperimentTypes.BarleyGreenhouse + "");
+								ehi.setExperimentType(IAPexperimentTypes.BarleyGreenhouse + "");
 							else
-								ehi.setExperimenttype(IAPexperimentTypes.MaizeGreenhouse + "");
-						ehi.setImportusergroup("Imaging System (CGH)");
+								ehi.setExperimentType(IAPexperimentTypes.MaizeGreenhouse + "");
+						ehi.setImportUserGroup("Imaging System (CGH)");
 					} else
 						if (system == LTsystem.Phytochamber) {
-							ehi.setExperimenttype(IAPexperimentTypes.Phytochamber + "");
-							ehi.setImportusergroup("Imaging System (APH)");
+							ehi.setExperimentType(IAPexperimentTypes.Phytochamber + "");
+							ehi.setImportUserGroup("Imaging System (APH)");
 						} else {
-							ehi.setExperimenttype(IAPexperimentTypes.UnknownGreenhouse + "");
-							ehi.setImportusergroup("Imaging System (Other)");
+							ehi.setExperimentType(IAPexperimentTypes.UnknownGreenhouse + "");
+							ehi.setImportUserGroup("Imaging System (Other)");
 						}
 				// ehi.setSequence("");
 				ehi.setSizekb(-1);
@@ -276,13 +276,13 @@ public class LTdataExchange implements ExperimentLoader {
 								+ " in database " + ehi.getDatabase() + "!");
 					}
 					if (min != null)
-						ehi.setStartdate(new Date(min.getTime()));
+						ehi.setStartDate(new Date(min.getTime()));
 					else
-						ehi.setStartdate(new Date());
+						ehi.setStartDate(new Date());
 					if (max != null)
-						ehi.setImportdate(new Date(max.getTime()));
+						ehi.setImportDate(new Date(max.getTime()));
 					else
-						ehi.setImportdate(new Date());
+						ehi.setImportDate(new Date());
 					// ehi.setNumberOfFiles(rs.getInt(3));
 					break;
 				}
@@ -859,9 +859,9 @@ public class LTdataExchange implements ExperimentLoader {
 			}
 		}
 		if (experimentReq.getStartdate() == null && earliest != null)
-			experimentReq.setStartdate(new Date(earliest.getTime()));
+			experimentReq.setStartDate(new Date(earliest.getTime()));
 		if (experimentReq.getImportdate() == null && earliest != null)
-			experimentReq.setImportdate(new Date(latest.getTime()));
+			experimentReq.setImportDate(new Date(latest.getTime()));
 		
 		HashMap<String, Condition> idtag2condition = experimentReq.getDatabaseId() != null ?
 				getPlantIdAnnotation(experimentReq)

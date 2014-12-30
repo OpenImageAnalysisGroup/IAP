@@ -148,7 +148,7 @@ public class TaskDescription {
 								+ batch.getAvailableResultDatabaseId());
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Received calculation results. Job has been submitted at "
 						+ SystemAnalysis.getCurrentTime(batch.getSubmissionTime()));
-				experiment.getHeader().setImportusergroup("Temp");
+				experiment.getHeader().setImportUserGroup("Temp");
 				// System.out.println("Received result: " + experiment.getName());
 				try {
 					BatchCmd bcmd = m.batch().getCommand(batch);

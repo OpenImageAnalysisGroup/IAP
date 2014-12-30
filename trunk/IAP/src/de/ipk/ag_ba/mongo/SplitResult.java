@@ -223,8 +223,8 @@ public class SplitResult {
 		int nToDo = tempDataSetDescription.getPartCntI();
 		int nFinish = knownResults.size();
 		mergedExperiment.getHeader().setExperimentname(originName);
-		mergedExperiment.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
-		mergedExperiment.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
+		mergedExperiment.getHeader().setExperimentType(IAPexperimentTypes.AnalysisResults + "");
+		mergedExperiment.getHeader().setImportUserGroup(IAPexperimentTypes.AnalysisResults + "");
 		mergedExperiment.getHeader().setOriginDbId(sourceHeader.getDatabaseId());
 		mergedExperiment.getHeader().setRemark(
 				mergedExperiment.getHeader().getRemark() +
