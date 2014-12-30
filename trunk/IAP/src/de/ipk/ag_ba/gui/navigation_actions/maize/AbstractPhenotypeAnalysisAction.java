@@ -110,7 +110,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			sw.setDescription("Experiment cloning");
 			sw.reset();
 			experimentToBeAnalysed = experimentToBeAnalysed.clone();
-			experimentToBeAnalysed.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+			experimentToBeAnalysed.getHeader().setExperimentType(IAPexperimentTypes.AnalysisResults + "");
 			experimentToBeAnalysed.getHeader().setExperimentname(getImageAnalysisTask().getName() + " of " +
 					experiment.getExperimentName());
 			experimentToBeAnalysed.setHeader(experimentToBeAnalysed.getHeader());
@@ -196,7 +196,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					status.setCurrentStatusText1("Create result dataset");
 				statisticsResult.setHeader(experimentToBeAnalysed.getHeader().clone());
 				statisticsResult.getHeader().setExperimentname(statisticsResult.getName());
-				statisticsResult.getHeader().setImportusergroup("Analysis Job");
+				statisticsResult.getHeader().setImportUserGroup("Analysis Job");
 				for (SubstanceInterface s : statisticsResult) {
 					for (ConditionInterface c : s) {
 						c.setExperimentInfo(statisticsResult.getHeader());
@@ -221,7 +221,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				
 				// statisticsResult.getHeader().setStartdate(new Date(startTime));
 				statisticsResult.getHeader().setStorageTime(new Date());
-				statisticsResult.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+				statisticsResult.getHeader().setExperimentType(IAPexperimentTypes.AnalysisResults + "");
 				
 				boolean removeCameraInfosAndReMerge = false; // normally not needed and requires high memory and compute time
 				if (removeCameraInfosAndReMerge) {
@@ -247,7 +247,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						status.setCurrentStatusText1("Calculations finished");
 						status.setCurrentStatusText2("Save result data structure...");
 					}
-					statisticsResult.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
+					statisticsResult.getHeader().setImportUserGroup(IAPexperimentTypes.AnalysisResults + "");
 					String nn = getImageAnalysisTask().getName();
 					if (!nn.contains(experiment.getExperimentName() + ""))
 						nn = nn + " of " + experiment.getExperimentName();

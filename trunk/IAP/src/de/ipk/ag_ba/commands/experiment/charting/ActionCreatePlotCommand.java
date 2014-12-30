@@ -34,7 +34,7 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		src2 = src;
 		status.setCurrentStatusText1("Create dataset for plotting");
-		ExperimentInterface expf = actionFxCreateDataChart.experimentWithSingleSubstance.getData();
+		ExperimentInterface expf = actionFxCreateDataChart.experimentWithSingleSubstance;
 		DataChartComponentWindow dccw = new DataChartComponentWindow(expf);
 		this.chartGUI = dccw.getGUI();
 	}
@@ -79,7 +79,7 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 	}
 	
 	private void updateValueCount() throws Exception {
-		ExperimentInterface ee = actionFxCreateDataChart.experimentWithSingleSubstance.getData();
+		ExperimentInterface ee = actionFxCreateDataChart.experimentWithSingleSubstance;
 		this.valueCount = Substance3D.countMeasurementValues2(ee, MeasurementNodeType.OMICS);
 		this.conditionCount = 0;
 		for (SubstanceInterface si : ee)

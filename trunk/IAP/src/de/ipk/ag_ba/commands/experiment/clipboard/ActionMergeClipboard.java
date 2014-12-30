@@ -86,8 +86,8 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 		e.getHeader().setDatabaseId("");
 		e.getHeader().setDatabase("");
 		e.getHeader().setRemark("Clipboard merge at " + SystemAnalysis.getCurrentTime());
-		e.getHeader().setStartdate(firstExperimentStart);
-		e.getHeader().setImportdate(lastExperimentEnd);
+		e.getHeader().setStartDate(firstExperimentStart);
+		e.getHeader().setImportDate(lastExperimentEnd);
 		e.getHeader().setExperimentname("Merged " + StringManipulationTools.getStringList(names, ", "));
 		// e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
 		// e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");

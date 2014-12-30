@@ -15,10 +15,14 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.data_transformation.ColumnDescription;
+import de.ipk.ag_ba.data_transformation.DataTable;
+import de.ipk.ag_ba.data_transformation.loader.DataTableLoader;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
-public final class ActionChartingGroupBySettings extends AbstractNavigationAction {
+public final class ActionChartingGroupBySettings extends AbstractNavigationAction implements ExperimentTransformation {
 	/**
 	 * 
 	 */
@@ -26,16 +30,16 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 	private NavigationButton src2;
 	private final ActionFilterGroupsCommand filterGroupAction;
 	private SystemOptions set;
-	private final ExperimentReferenceWithFilterSupport experiment;
 	private final String substanceFilter;
+	private final ExperimentTransformationPipeline pipeline;
 	
 	public ActionChartingGroupBySettings(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip, ActionFilterGroupsCommand filterGroupAction,
-			ExperimentReferenceWithFilterSupport experiment, String substanceFilter) {
+			String substanceFilter, ExperimentTransformationPipeline pipeline) {
 		super(tooltip);
 		this.actionFxCreateDataChart = actionFxCreateDataChart;
 		this.filterGroupAction = filterGroupAction;
-		this.experiment = experiment;
 		this.substanceFilter = substanceFilter;
+		this.pipeline = pipeline;
 		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
 				: this.actionFxCreateDataChart.settingsLocal.getSettings();
 	}
@@ -47,7 +51,8 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		int items = 0;
 		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
 				: this.actionFxCreateDataChart.settingsLocal.getSettings();
-		for (ColumnDescription col : experiment.getDataTable().getColumns()) {
+		ExperimentInterface experiment = pipeline.getInput(this);
+		for (ColumnDescription col : new DataTableLoader().loadFromExperiment(experiment).getColumns()) {
 			if (col.allowGroupBy()) {
 				String group = col.getID().split("\\.")[0];
 				if (!settings.containsKey(group))
@@ -64,7 +69,7 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 								instances.add(s);
 						});
 					String nn = " (" + instances.size() + ")";
-					JCheckBox cb = new JCheckBox(col.getIitle() + nn);
+					JCheckBox cb = new JCheckBox(col.getTitle() + nn);
 					if (instances.size() > 0) {
 						cb.setToolTipText(StringManipulationTools.getStringList(instances, ", ", 5, "..."));
 					}
@@ -174,5 +179,31 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		}
 		
 		return groupby;
+	}
+	
+	@Override
+	public ExperimentInterface transform(ExperimentInterface input) {
+		ArrayList<ColumnDescription> relevantColumns = new ArrayList<ColumnDescription>();
+		ArrayList<ColumnDescription> notRelevantColumns = new ArrayList<ColumnDescription>();
+		Set<String> groupby = getGroupByColumnIDs();
+		DataTable data_table = new DataTableLoader().loadFromExperiment(input);
+		for (ColumnDescription cd : data_table.getColumns()) {
+			if (groupby.contains(cd.getID()))
+				relevantColumns.add(cd);
+			else
+				notRelevantColumns.add(cd);
+		}
+		
+		ArrayList<MappingData3DPath> pathObjects = MappingData3DPath.get(input, true);
+		for (MappingData3DPath po : pathObjects) {
+			String qa = po.getMeasurement().getQualityAnnotation(); // save plant ID
+			String merged = ColumnDescription.extractDataStringAndResetAllFields(relevantColumns, notRelevantColumns, po.getMeasurement());
+			po.getMeasurement().setQualityAnnotation(qa); // restore plant ID
+			po.getConditionData().setSpecies(merged);
+		}
+		
+		ExperimentInterface result = MappingData3DPath.merge(pathObjects, false);
+		
+		return result;
 	}
 }

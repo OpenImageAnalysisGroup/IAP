@@ -270,10 +270,10 @@ public class ActionLoadLTexportFileHierarchy extends AbstractNavigationAction {
 					eh.setCoordinator(s.getCreator());
 				if (storageTimeOfFirstInfoFile != null)
 					eh.setStorageTime(storageTimeOfFirstInfoFile);
-				eh.setImportusername(SystemAnalysis.getUserName());
+				eh.setImportUserName(SystemAnalysis.getUserName());
 				if (storageCheck)
 					eh.setSizekb(overallStorageSizeInBytes / 1024);
-				eh.setExperimenttype(IAPexperimentTypes.ImportedDataset + "");
+				eh.setExperimentType(IAPexperimentTypes.ImportedDataset + "");
 				e = LTdataExchange.getExperimentFromSnapshots(eh, sl, optIdTag2condition);
 				getStatusProvider().setCurrentStatusText1("Created " + eh.getExperimentName() + ".");
 				getStatusProvider().setCurrentStatusText2("Create Experiment Structures...");

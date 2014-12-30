@@ -120,7 +120,7 @@ public class ActionTrash extends AbstractNavigationAction {
 				if (m != null)
 					m.setExperimentType(hhh, "Trash" + ";" + hhh.getExperimentType());
 				else {
-					hhh.setExperimenttype("Trash" + ";" + hhh.getExperimentType());
+					hhh.setExperimentType("Trash" + ";" + hhh.getExperimentType());
 					hhh.getExperimentHeaderHelper().saveUpdatedProperties(null);
 				}
 				message += "has been marked as trashed!";
@@ -138,7 +138,7 @@ public class ActionTrash extends AbstractNavigationAction {
 				if (m != null)
 					m.setExperimentType(hhh, type);
 				else {
-					hhh.setExperimenttype(type);
+					hhh.setExperimentType(type);
 					hhh.getExperimentHeaderHelper().saveUpdatedProperties(null);
 				}
 				message += "Experiment " + experimentName + " has been put out of trash!";

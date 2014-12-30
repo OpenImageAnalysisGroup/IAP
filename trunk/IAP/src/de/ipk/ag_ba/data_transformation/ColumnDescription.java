@@ -54,7 +54,7 @@ public class ColumnDescription implements NiceNameSupport {
 		return id;
 	}
 	
-	public String getIitle() {
+	public String getTitle() {
 		return title;
 	}
 	
@@ -157,6 +157,81 @@ public class ColumnDescription implements NiceNameSupport {
 				if (r.length() > 0)
 					r.append("//");
 				r.append(cd.id + ":" + val);
+			}
+		}
+		return r.toString();
+	}
+	
+	public static String extractDataStringAndResetAllFields(ArrayList<ColumnDescription> relevantColumns, ArrayList<ColumnDescription> notRelevantColumns,
+			NumericMeasurementInterface nmi) {
+		StringBuilder r = new StringBuilder();
+		
+		for (ColumnDescription cd : relevantColumns) {
+			String valueHolder = cd.getIDmainPart();
+			String fieldID = cd.getIDfieldPart();
+			String val = null;
+			
+			if (cd.isSplitIndexAccess())
+				fieldID = fieldID.split("\\$", 2)[0];
+			
+			// experiment, condition, sample, measurement, see DataTableLoader
+			Object o;
+			switch (valueHolder) {
+				case "measurement":
+					o = nmi.getAttributeField(fieldID);
+					if (o != null)
+						if (o instanceof String)
+							val = (String) o;
+						else
+							val = o + "";
+					break;
+				case "sample":
+					val = (String) nmi.getParentSample().getAttributeField(fieldID);
+					break;
+				case "condition":
+					val = (String) nmi.getParentSample().getParentCondition().getAttributeField(fieldID);
+					break;
+				case "experiment":
+					o = nmi.getParentSample().getParentCondition().getExperimentHeader().getAttributeField(fieldID);
+					if (o != null)
+						if (o instanceof String)
+							val = (String) o;
+						else
+							val = o + "";
+					break;
+			}
+			if (cd.isSplitIndexAccess())
+				val = cd.getSplitContent(val);
+			if (val != null) {
+				if (r.length() > 0)
+					r.append("//");
+				r.append(cd.id + ":" + val);
+			}
+		}
+		ArrayList<ColumnDescription> allCol = new ArrayList<ColumnDescription>(relevantColumns.size() + notRelevantColumns.size());
+		allCol.addAll(relevantColumns);
+		allCol.addAll(notRelevantColumns);
+		for (ColumnDescription cd : allCol) {
+			String valueHolder = cd.getIDmainPart();
+			String fieldID = cd.getIDfieldPart();
+			
+			if (fieldID.contains("$"))
+				fieldID = fieldID.split("\\$", 2)[0];
+			
+			// experiment, condition, sample, measurement, see DataTableLoader
+			switch (valueHolder) {
+				case "measurement":
+					nmi.setAttributeField(fieldID, null);
+					break;
+				case "sample":
+					// nmi.getParentSample().setAttributeField(fieldID, null);
+					break;
+				case "condition":
+					nmi.getParentSample().getParentCondition().setAttributeField(fieldID, null);
+					break;
+				case "experiment":
+					nmi.getParentSample().getParentCondition().getExperimentHeader().setAttributeField(fieldID, null);
+					break;
 			}
 		}
 		return r.toString();

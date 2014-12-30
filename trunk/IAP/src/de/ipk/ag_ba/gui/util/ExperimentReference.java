@@ -33,12 +33,8 @@ import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
 /**
  * @author klukas
@@ -401,45 +397,6 @@ public class ExperimentReference implements ExperimentReferenceInterface {
 	@Override
 	public MongoDB getM() {
 		return m;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitConditions(java.lang.String, de.ipk.ag_ba.gui.util.ConditionVisitor)
-	 */
-	@Override
-	public void visitConditions(String optSubstanceFilter, ConditionVisitor cv) throws Exception {
-		for (SubstanceInterface si : getData().getSubstances())
-			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
-				for (ConditionInterface ci : si)
-					cv.visit(ci);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitSamples(java.lang.String, de.ipk.ag_ba.gui.util.SampleVisitor)
-	 */
-	@Override
-	public void visitSamples(String optSubstanceFilter, SampleVisitor nmi) throws Exception {
-		for (SubstanceInterface si : getData().getSubstances())
-			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
-				for (ConditionInterface ci : si)
-					for (SampleInterface sa : ci)
-						nmi.visit(sa);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitNumericMeasurements(java.lang.String, de.ipk.ag_ba.gui.util.NumericMeasurementVisitor)
-	 */
-	@Override
-	public void visitNumericMeasurements(String optSubstanceFilter, NumericMeasurementVisitor nmi) throws Exception {
-		for (SubstanceInterface si : getData().getSubstances())
-			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
-				for (ConditionInterface ci : si)
-					for (SampleInterface sa : ci)
-						for (NumericMeasurementInterface n : sa)
-							nmi.visit(n);
 	}
 	
 	protected void setExperiment(ExperimentInterface experiment) {

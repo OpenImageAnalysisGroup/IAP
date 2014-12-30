@@ -43,12 +43,6 @@ public interface ExperimentReferenceInterface {
 	
 	public abstract MongoDB getM();
 	
-	public abstract void visitConditions(String optSubstanceFilter, ConditionVisitor cv) throws Exception;
-	
-	public abstract void visitSamples(String optSubstanceFilter, SampleVisitor nmi) throws Exception;
-	
-	public abstract void visitNumericMeasurements(String optSubstanceFilter, NumericMeasurementVisitor nmi) throws Exception;
-	
 	public abstract void setM(MongoDB m);
 	
 }
