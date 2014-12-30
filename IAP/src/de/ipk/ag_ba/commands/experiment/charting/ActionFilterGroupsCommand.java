@@ -3,7 +3,6 @@ package de.ipk.ag_ba.commands.experiment.charting;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 import javax.swing.JCheckBox;
 
@@ -11,7 +10,6 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.data_transformation.ColumnDescription;
-import de.ipk.ag_ba.data_transformation.loader.DataTableLoader;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -28,14 +26,11 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 	private final ThreadSafeOptions groupsDeterminationInProgress = new ThreadSafeOptions();
 	private final LinkedHashSet<String> groups = new LinkedHashSet<String>();
 	private final LinkedHashSet<String> disabled_groups = new LinkedHashSet<String>();
-	private ActionChartingGroupBySettings groupByAction;
-	private final String substanceFilter;
 	private final ExperimentTransformationPipeline pipeline;
 	
-	public ActionFilterGroupsCommand(String tooltip, ExperimentTransformationPipeline pipeline, String substanceFilter) {
+	public ActionFilterGroupsCommand(String tooltip, ExperimentTransformationPipeline pipeline) {
 		super(tooltip);
 		this.pipeline = pipeline;
-		this.substanceFilter = substanceFilter;
 	}
 	
 	@Override
@@ -63,6 +58,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 				if (!group2setting.get(key).isSelected())
 					disabled_groups.add(key);
 			}
+			pipeline.setDirty(this);
 		}
 	}
 	
@@ -79,28 +75,22 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 	}
 	
 	private void determineGroups() {
-		if (groupByAction == null)
-			return;
 		if (!dirty)
 			return;
 		if (groupsDeterminationInProgress.getBval(0, false))
 			return;
 		dirty = false;
+		groupScanNeeded = false;
 		groupsDeterminationInProgress.setBval(0, true);
 		synchronized (groups) {
+			disabled_groups.clear();
 			groups.clear();
 		}
 		try {
 			BackgroundThreadDispatcher.addTask(() -> {
 				try {
 					ArrayList<ColumnDescription> relevantColumns = new ArrayList<ColumnDescription>();
-					Set<String> groupby = groupByAction.getGroupByColumnIDs();
-					ExperimentInterface experiment = pipeline.getInput(ActionFilterGroupsCommand.this);
-					for (ColumnDescription cd : new DataTableLoader().loadFromExperiment(experiment).getColumns()) {
-						if (groupby.contains(cd.getID()))
-							relevantColumns.add(cd);
-					}
-					
+					relevantColumns.add(new ColumnDescription("condition.name", "Species", true));
 					LinkedHashSet<String> ng = getInstanceValuesForColumns(relevantColumns);
 					synchronized (groups) {
 						groups.addAll(ng);
@@ -117,16 +107,15 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 		}
 	}
 	
-	public static LinkedHashSet<String> getInstanceValuesForColumns(ExperimentInterface experiment, ColumnDescription relevantColumn,
-			String optSubstanceFilter)
+	public static LinkedHashSet<String> getInstanceValuesForColumns(ExperimentInterface experiment, ColumnDescription relevantColumn)
 			throws Exception {
 		ArrayList<ColumnDescription> relevantColumns = new ArrayList<ColumnDescription>();
 		relevantColumns.add(relevantColumn);
-		return getInstanceValues(relevantColumns, experiment, optSubstanceFilter);
+		return getInstanceValues(relevantColumns, experiment, null);
 	}
 	
 	private LinkedHashSet<String> getInstanceValuesForColumns(ArrayList<ColumnDescription> relevantColumns) throws Exception {
-		return getInstanceValues(relevantColumns, pipeline.getInput(this), substanceFilter);
+		return getInstanceValues(relevantColumns, pipeline.getInput(this), null);
 	}
 	
 	private static LinkedHashSet<String> getInstanceValues(ArrayList<ColumnDescription> relevantColumns, ExperimentInterface experiment,
@@ -195,26 +184,10 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 	}
 	
 	@Override
-	public void setDirty(boolean dirty) {
-		this.dirty = dirty;
-		groups.clear();
-		disabled_groups.clear();
-	}
-	
-	public void setGroupByAction(ActionChartingGroupBySettings groupByAction) {
-		this.groupByAction = groupByAction;
-	}
-	
-	@Override
 	public ExperimentInterface transform(ExperimentInterface input) {
-		
 		ArrayList<ColumnDescription> relevantColumns = new ArrayList<ColumnDescription>();
-		Set<String> groupby = groupByAction.getGroupByColumnIDs();
-		ExperimentInterface experiment = pipeline.getInput(ActionFilterGroupsCommand.this);
-		for (ColumnDescription cd : new DataTableLoader().loadFromExperiment(experiment).getColumns()) {
-			if (groupby.contains(cd.getID()))
-				relevantColumns.add(cd);
-		}
+		
+		relevantColumns.add(new ColumnDescription("condition.name", "Species", true));
 		
 		ArrayList<MappingData3DPath> pathObjects = new ArrayList<MappingData3DPath>();
 		for (MappingData3DPath po : MappingData3DPath.get(input, true)) {
@@ -222,7 +195,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 				NumericMeasurementInterface nmi = po.getMeasurement();
 				String groupInstance = ColumnDescription.extractDataString(relevantColumns, nmi);
 				if (groupInstance != null && !groupInstance.isEmpty()) {
-					if (groups.contains(groupInstance))
+					if (!disabled_groups.contains(groupInstance))
 						pathObjects.add(po);
 				}
 			} else {
@@ -232,7 +205,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 						continue;
 					String groupInstance = ColumnDescription.extractDataString(relevantColumns, sample);
 					if (groupInstance != null && !groupInstance.isEmpty()) {
-						if (groups.contains(groupInstance))
+						if (!disabled_groups.contains(groupInstance))
 							pathObjects.add(po);
 					}
 				} else {
@@ -241,7 +214,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 						continue;
 					String groupInstance = ColumnDescription.extractDataString(relevantColumns, condition);
 					if (groupInstance != null && !groupInstance.isEmpty()) {
-						if (groups.contains(groupInstance))
+						if (!disabled_groups.contains(groupInstance))
 							pathObjects.add(po);
 					}
 				}
@@ -251,5 +224,27 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 		ExperimentInterface result = MappingData3DPath.merge(pathObjects, false);
 		
 		return result;
+	}
+	
+	boolean groupScanNeeded = false;
+	
+	@Override
+	public void updateStatus() throws Exception {
+		if (groupScanNeeded) {
+			groupScanNeeded = false;
+			determineGroups();
+			while (groupsDeterminationInProgress.getBval(0, false)) {
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+	}
+	
+	public void rescanGroups() {
+		dirty = true;
+		groupScanNeeded = true;
 	}
 }

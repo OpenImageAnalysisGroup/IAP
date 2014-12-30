@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.swing.JComponent;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.ChartSettings;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -14,27 +15,31 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
-public final class ActionCreatePlotCommand extends AbstractNavigationAction implements DirtyNotificationSupport {
+public final class ActionCreatePlotCommand extends AbstractNavigationAction implements ExperimentTransformation, DirtyNotificationSupport {
 	/**
 	 * 
 	 */
-	private final ActionFxCreateDataChart actionFxCreateDataChart;
 	private NavigationButton src2;
 	private JComponent chartGUI;
 	private int valueCount = -1;
 	private int substanceCount;
 	private int conditionCount;
+	private final ExperimentTransformationPipeline pipeline;
+	private final ChartSettings settingsLocal;
+	private final ChartSettings settingsGlobal;
 	
-	public ActionCreatePlotCommand(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip) {
+	public ActionCreatePlotCommand(String tooltip, ExperimentTransformationPipeline pipeline, ChartSettings settingsLocal, ChartSettings settingsGlobal) {
 		super(tooltip);
-		this.actionFxCreateDataChart = actionFxCreateDataChart;
+		this.pipeline = pipeline;
+		this.settingsLocal = settingsLocal;
+		this.settingsGlobal = settingsGlobal;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		src2 = src;
 		status.setCurrentStatusText1("Create dataset for plotting");
-		ExperimentInterface expf = actionFxCreateDataChart.experimentWithSingleSubstance;
+		ExperimentInterface expf = pipeline.getInput(this);
 		DataChartComponentWindow dccw = new DataChartComponentWindow(expf);
 		this.chartGUI = dccw.getGUI();
 	}
@@ -72,18 +77,22 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 		return null;
 	}
 	
-	@Override
-	public void setDirty(boolean b) throws Exception {
-		if (b)
-			updateValueCount();
-	}
-	
 	private void updateValueCount() throws Exception {
-		ExperimentInterface ee = actionFxCreateDataChart.experimentWithSingleSubstance;
+		ExperimentInterface ee = pipeline.getInput(this);
 		this.valueCount = Substance3D.countMeasurementValues2(ee, MeasurementNodeType.OMICS);
 		this.conditionCount = 0;
 		for (SubstanceInterface si : ee)
 			conditionCount += si.size();
 		this.substanceCount = ee.size();
+	}
+	
+	@Override
+	public ExperimentInterface transform(ExperimentInterface input) {
+		return input;
+	}
+	
+	@Override
+	public void updateStatus() throws Exception {
+		valueCount = -1;
 	}
 }

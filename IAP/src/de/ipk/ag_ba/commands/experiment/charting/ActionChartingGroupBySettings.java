@@ -14,6 +14,7 @@ import org.StringManipulationTools;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.ChartSettings;
 import de.ipk.ag_ba.data_transformation.ColumnDescription;
 import de.ipk.ag_ba.data_transformation.DataTable;
 import de.ipk.ag_ba.data_transformation.loader.DataTableLoader;
@@ -22,26 +23,25 @@ import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
+/**
+ * @author klukas
+ */
 public final class ActionChartingGroupBySettings extends AbstractNavigationAction implements ExperimentTransformation {
-	/**
-	 * 
-	 */
-	private final ActionFxCreateDataChart actionFxCreateDataChart;
 	private NavigationButton src2;
-	private final ActionFilterGroupsCommand filterGroupAction;
 	private SystemOptions set;
-	private final String substanceFilter;
 	private final ExperimentTransformationPipeline pipeline;
+	private final ChartSettings settingsLocal;
+	private final ChartSettings settingsGlobal;
+	private final ActionFilterGroupsCommand actionFilterGroup;
 	
-	public ActionChartingGroupBySettings(ActionFxCreateDataChart actionFxCreateDataChart, String tooltip, ActionFilterGroupsCommand filterGroupAction,
-			String substanceFilter, ExperimentTransformationPipeline pipeline) {
+	public ActionChartingGroupBySettings(String tooltip, ExperimentTransformationPipeline pipeline, ChartSettings settingsLocal, ChartSettings settingsGlobal,
+			ActionFilterGroupsCommand actionFilterGroup) {
 		super(tooltip);
-		this.actionFxCreateDataChart = actionFxCreateDataChart;
-		this.filterGroupAction = filterGroupAction;
-		this.substanceFilter = substanceFilter;
 		this.pipeline = pipeline;
-		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
-				: this.actionFxCreateDataChart.settingsLocal.getSettings();
+		this.settingsLocal = settingsLocal;
+		this.settingsGlobal = settingsGlobal;
+		this.actionFilterGroup = actionFilterGroup;
+		this.set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 	}
 	
 	@Override
@@ -49,8 +49,7 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		src2 = src;
 		LinkedHashMap<String, LinkedHashMap<String, JCheckBox>> settings = new LinkedHashMap<String, LinkedHashMap<String, JCheckBox>>();
 		int items = 0;
-		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
-				: this.actionFxCreateDataChart.settingsLocal.getSettings();
+		this.set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 		ExperimentInterface experiment = pipeline.getInput(this);
 		for (ColumnDescription col : new DataTableLoader().loadFromExperiment(experiment).getColumns()) {
 			if (col.allowGroupBy()) {
@@ -60,7 +59,7 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 				String key = col.getID().split("\\.", 2)[1];
 				if (!settings.get(group).containsKey(key)) {
 					items++;
-					LinkedHashSet<String> instancesPre = ActionFilterGroupsCommand.getInstanceValuesForColumns(experiment, col, substanceFilter);
+					LinkedHashSet<String> instancesPre = ActionFilterGroupsCommand.getInstanceValuesForColumns(experiment, col);
 					LinkedHashSet<String> instances = new LinkedHashSet<String>();
 					instancesPre.forEach((s) -> {
 						if (s.contains(":"))
@@ -113,7 +112,7 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		sa[idx++] = new JLabel();
 		sa[idx++] = "Local/global";
 		JCheckBox cbPersistentChange = new JCheckBox("Apply change persistent with experiment");
-		cbPersistentChange.setSelected(!this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings());
+		cbPersistentChange.setSelected(!settingsLocal.getUseLocalSettings());
 		sa[idx++] = cbPersistentChange;
 		
 		Object[] ur = MyInputHelper.getInput("Metadata columns to group the data:<br><br>", "Group data", sa);
@@ -121,10 +120,10 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 			// apply settings
 			boolean global = cbPersistentChange.isSelected();
 			if (global)
-				this.actionFxCreateDataChart.settingsLocal.setUseLocalSettings(false);
+				settingsLocal.setUseLocalSettings(false);
 			else
-				this.actionFxCreateDataChart.settingsLocal.setUseLocalSettings(true);
-			set = global ? this.actionFxCreateDataChart.settingsGlobal.getSettings() : this.actionFxCreateDataChart.settingsLocal.getSettings();
+				settingsLocal.setUseLocalSettings(true);
+			set = global ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 			for (String group : settings.keySet()) {
 				for (String id : settings.get(group).keySet()) {
 					JCheckBox cb = settings.get(group).get(id);
@@ -132,7 +131,8 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 					set.setBoolean("Charting", "Group by//" + group + "//" + key, cb.isSelected());
 				}
 			}
-			filterGroupAction.setDirty(true);
+			pipeline.setDirty(this);
+			actionFilterGroup.rescanGroups();
 		}
 	}
 	
@@ -202,8 +202,22 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 			po.getConditionData().setSpecies(merged);
 		}
 		
-		ExperimentInterface result = MappingData3DPath.merge(pathObjects, false);
+		// MappingData3DPath p0 = pathObjects.get(0);
+		// MappingData3DPath p1 = pathObjects.get(1);
+		// System.out.println(p0.getConditionData() + "");
+		// System.out.println(p1.getConditionData() + "");
+		// System.out.println(p0.getSampleData() + "");
+		// System.out.println(p1.getSampleData() + "");
+		// System.out.println(p0.getMeasurement() + "");
+		// System.out.println(p1.getMeasurement() + "");
+		
+		ExperimentInterface result = MappingData3DPath.merge(pathObjects, true);
 		
 		return result;
+	}
+	
+	@Override
+	public void updateStatus() throws Exception {
+		// empty
 	}
 }

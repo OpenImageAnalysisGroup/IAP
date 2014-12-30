@@ -8,26 +8,30 @@ import javax.swing.JCheckBox;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.experiment.ChartSettings;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
-public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction {
+public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction implements ExperimentTransformation {
 	private NavigationButton src2;
 	private final LinkedHashSet<String> groups = new LinkedHashSet<String>();
-	private final ActionFxCreateDataChart actionFxCreateDataChart;
 	private SystemOptions set;
+	private final ExperimentTransformationPipeline pipeline;
+	private final ChartSettings settingsLocal;
+	private final ChartSettings settingsGlobal;
 	
-	public ActionSummarizeGroupsCommand(String tooltip, ActionFxCreateDataChart actionFxCreateDataChart) {
+	public ActionSummarizeGroupsCommand(String tooltip, ExperimentTransformationPipeline pipeline, ChartSettings settingsLocal, ChartSettings settingsGlobal) {
 		super(tooltip);
-		this.actionFxCreateDataChart = actionFxCreateDataChart;
-		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
-				: this.actionFxCreateDataChart.settingsLocal.getSettings();
+		this.pipeline = pipeline;
+		this.settingsLocal = settingsLocal;
+		this.settingsGlobal = settingsGlobal;
+		this.set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		this.set = !this.actionFxCreateDataChart.settingsLocal.getUseLocalSettings() ? this.actionFxCreateDataChart.settingsGlobal.getSettings()
-				: this.actionFxCreateDataChart.settingsLocal.getSettings();
+		this.set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 		
 		src2 = src;
 		
@@ -95,5 +99,15 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
 		return null;
+	}
+	
+	@Override
+	public ExperimentInterface transform(ExperimentInterface input) {
+		return input;
+	}
+	
+	@Override
+	public void updateStatus() throws Exception {
+		// empty
 	}
 }
