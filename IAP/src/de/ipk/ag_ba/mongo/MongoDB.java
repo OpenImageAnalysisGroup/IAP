@@ -696,7 +696,7 @@ public class MongoDB {
 							String newName = mapableNames.get(h.getImportusername());
 							System.out.println(SystemAnalysis.getCurrentTime()
 									+ ">INFO: FIXING ACCOUNT NAME (changing " + h.getImportusername() + " to " + newName + ")");
-							h.setImportusername(newName);
+							h.setImportUserName(newName);
 							header.put("importusername", h.getImportusername());
 							col.save(header, WriteConcern.SAFE);
 						}
