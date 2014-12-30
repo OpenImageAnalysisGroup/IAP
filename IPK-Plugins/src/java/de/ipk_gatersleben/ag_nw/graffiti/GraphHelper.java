@@ -287,8 +287,6 @@ public class GraphHelper implements HelperClass {
 				int nn = sourceGraphNode2connectedGraphNode.size();
 				sourceGraphNode2connectedGraphNode.put(n, newNode);
 				mapB.put(newNode, n);
-				if (sourceGraphNode2connectedGraphNode.size() - 1 != nn)
-					System.out.println("FUUUUU");
 			}
 			for (Node n : connectedNodes) {
 				for (Edge e : n.getEdges()) {

@@ -46,10 +46,10 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 			case "unit":
 				setUnit((String) value);
 			case "value":
-				if (value == null)
-					setValue(Double.NaN);
-				else
-					setValue(Double.parseDouble((String) value));
+				// if (value == null)
+				// setValue(Double.NaN);
+				// else
+				// setValue(Double.parseDouble((String) value));
 				return;
 			case "quality":
 				setQualityAnnotation((String) value);
