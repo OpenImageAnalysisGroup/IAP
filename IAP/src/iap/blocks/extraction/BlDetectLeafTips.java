@@ -15,10 +15,12 @@ import ij.gui.Roi;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.GapList;
 import org.StringManipulationTools;
 import org.Vector2d;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
@@ -107,7 +109,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		return mask;
 	}
 	
-	private void savePeaksAndFeatures(LinkedList<Feature> peakList, CameraType cameraType, CameraPosition cameraPosition,
+	private void savePeaksAndFeatures(GapList<Feature> peakList, CameraType cameraType, CameraPosition cameraPosition,
 			int searchRadius, int maxValidY, ImageData imageRef, Image orig_image) {
 		boolean saveListObject = true;
 		boolean saveLeafCount = true;
@@ -125,7 +127,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		LinkedList<Feature> upperOutlier = new LinkedList<Feature>();
 		
 		if (removeOutliers) {
-			Outlier.doGrubbsTest((LinkedList) peakList, alpha, (LinkedList) lowerOutlier, (LinkedList) upperOutlier);
+			Outlier.doGrubbsTest((GapList) peakList, alpha, (LinkedList) lowerOutlier, (LinkedList) upperOutlier);
 		}
 		
 		if (saveListObject) {
@@ -508,9 +510,9 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		}
 	}
 	
-	private void saveAndCorrectBorderLeafTipList(LinkedList<Feature> pk, LinkedList<Feature> pl, LinkedList<Feature> pu, CameraType cameraType, int maxValidY) {
+	private void saveAndCorrectBorderLeafTipList(Collection<Feature> pk, LinkedList<Feature> pl, LinkedList<Feature> pu, CameraType cameraType, int maxValidY) {
 		// remove bordersize from all position-features
-		for (LinkedList<Feature> peakList : new LinkedList[] { pk, pl, pu }) {
+		for (Collection<Feature> peakList : new Collection[] { pk, pl, pu }) {
 			ArrayList<Feature> toRemove = new ArrayList<Feature>();
 			for (Feature bf : peakList) {
 				HashMap<String, FeatureObject> fm = bf.getFeatureMap();
@@ -531,9 +533,9 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		getResultSet().setObjectResult(getBlockPosition(), "leaftiplist_" + cameraType, pk);
 	}
 	
-	private LinkedList<Feature> getPeaksFromBorder(Image img, Image orig, int searchRadius, int searchRadius2, double fillGradeInPercent, CameraType ct) {
+	private GapList<Feature> getPeaksFromBorder(Image img, Image orig, int searchRadius, int searchRadius2, double fillGradeInPercent, CameraType ct) {
 		BorderAnalysis ba = null;
-		LinkedList<Feature> res = null;
+		GapList<Feature> res = null;
 		
 		// getResultSet().setImage(getBlockPosition(), "innerhull",
 		Image innerHull = getResultSet().getImage(-1, "innerhull_" + ct);
