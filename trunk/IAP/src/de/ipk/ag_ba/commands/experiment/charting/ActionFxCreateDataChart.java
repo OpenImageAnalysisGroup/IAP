@@ -62,6 +62,12 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		
 		this.settingsGlobal = settingsGlobal;
 		
+		if (!experiment.getIniIoProvider().isAbleToSaveData()) {
+			if (settingsLocal != null)
+				settingsLocal.setSavePossible(false);
+			settingsGlobal.setSavePossible(false);
+		}
+		
 		try {
 			if (experiment != null)
 				determineSubstanceGroups();
@@ -89,8 +95,10 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		if (traitDescription != null && !traitDescription.isEmpty())
 			res.add(traitDescription);
 		
-		if (groupFilter != null && substanceGroupNames.isEmpty())
+		if (groupFilter != null && substanceGroupNames.isEmpty()) {
 			this.settingsLocal = new ChartSettings(true);
+			settingsLocal.setSavePossible(settingsGlobal.isSavePossible());
+		}
 		
 		if (substanceGroupNames.size() == 0 && groupFilter != null) {
 			this.transformationPipeline = new ExperimentTransformationPipeline(experimentWithSingleSubstance);
@@ -341,6 +349,11 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			throw new RuntimeException(e);
 		}
 		this.settingsGlobal.setIniIOprovider(experimentReference.getIniIoProvider());
+		if (!experiment.getIniIoProvider().isAbleToSaveData()) {
+			if (settingsLocal != null)
+				settingsLocal.setSavePossible(false);
+			settingsGlobal.setSavePossible(false);
+		}
 	}
 	
 }

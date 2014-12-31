@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
+import org.StringManipulationTools;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -44,12 +45,16 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
+		String[] days = Experiment.getTimes(pipeline.getInput(this), null);
+		scanTimeValuesAndResetSettingsIfChanged(days);
 		src2 = src;
 		LinkedHashMap<String, JCheckBox> settings = new LinkedHashMap<String, JCheckBox>();
 		int items = 0;
 		this.set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
 		
-		for (String time : Experiment.getTimes(pipeline.getInput(this), null)) {
+		for (String time : days) {
+			if ("Experiment Days".equals(time))
+				continue;
 			items++;
 			JCheckBox cb = new JCheckBox(time);
 			cb.setSelected(set.getBoolean("Charting", "Time range//" + time, true));
@@ -71,6 +76,11 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		sa[idx++] = "Local/global";
 		JCheckBox cbPersistentChange = new JCheckBox("Apply change persistent with experiment");
 		cbPersistentChange.setSelected(!settingsLocal.getUseLocalSettings());
+		if (!settingsLocal.isSavePossible()) {
+			cbPersistentChange.setEnabled(false);
+			cbPersistentChange.setText("<html>" + cbPersistentChange.getText() + "<br>(experiment loaded from read-only location)");
+		}
+		
 		sa[idx++] = cbPersistentChange;
 		
 		Object[] ur = MyInputHelper.getInput("Experiment days:<br><br>", "Time Range", sa);
@@ -94,21 +104,41 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		ArrayList<String> ids = set.getSectionSettings("Charting");
 		int sel = 0;
 		int unsel = 0;
+		String range = "";
+		int min = Integer.MAX_VALUE;
+		int max = Integer.MIN_VALUE;
+		String minS = null, maxS = null;
 		for (String i : ids) {
 			if (i.startsWith("Time range//")) {
-				if (set.getBoolean("Charting", i, true))
+				if ("Time range//Experiment days".equals(i))
+					continue;
+				if (set.getBoolean("Charting", i, true)) {
 					sel++;
-				else
+					int v = Integer.parseInt(StringManipulationTools.getNumbersFromString(i.substring("Time range//".length())));
+					if (v < min) {
+						min = v;
+						minS = i.substring("Time range//".length());
+					}
+					if (v > max) {
+						max = v;
+						maxS = i.substring("Time range//".length());
+					}
+				} else
 					unsel++;
 			}
 		}
-		// cb.setSelected(set.getBoolean("Charting", "Time range//" + time, true));
-		// settings.put(time, cb);
-		// }
+		if (min < Integer.MAX_VALUE) {
+			range = minS + ".." + maxS;
+		} else {
+			range = "no data";
+		}
 		if (unsel == 0)
-			return "<html><center><b>&#8667;</b>&nbsp;Time range&nbsp;<b>&#8667;</b><br><font color='gray'><small>no time point unselected";
+			return "<html><center><b>&#8667;</b>&nbsp;Time range&nbsp;<b>&#8667;</b><br><font color='gray'><small>no time point unselected<br>"
+					+ range;
 		else
-			return "<html><center><b>&#8667;</b>&nbsp;Time range&nbsp;<b>&#8667;</b><br><font color='gray'><small>" + sel + "/" + (sel + unsel) + " days selected";
+			return "<html><center><b>&#8667;</b>&nbsp;Time range&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
+					+ sel + "/" + (sel + unsel) + " days selected<br>"
+					+ range;
 	}
 	
 	@Override
@@ -128,6 +158,16 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	
 	@Override
 	public void updateStatus() throws Exception {
-		// TODO
+		String[] days = Experiment.getTimes(pipeline.getInput(this), null);
+		scanTimeValuesAndResetSettingsIfChanged(days);
+	}
+	
+	private void scanTimeValuesAndResetSettingsIfChanged(String[] days) {
+		String storedDayList = set.getString("Charting", "Time range//Experiment days", "");
+		String currentDayList = StringManipulationTools.getStringList(days, ", ");
+		if (!(storedDayList + "").equals(currentDayList)) {
+			set.removeValuesOfSectionAndGroup("Charting", "Time range");
+			set.setString("Charting", "Time range//Experiment days", currentDayList);
+		}
 	}
 }

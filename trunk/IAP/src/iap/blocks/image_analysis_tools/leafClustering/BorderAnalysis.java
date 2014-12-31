@@ -252,7 +252,7 @@ public class BorderAnalysis {
 			
 			image.show("FK " + xtemp + ":" + ytemp, debug);
 			int[][] predefinedRegion = ImageOperation.crop(img2d, w, h, xtemp - radius, xtemp + radius, ytemp - radius, ytemp + radius);
-			new Image(predefinedRegion).show("FUUUUUU", debug);
+			new Image(predefinedRegion).show("predefined region", debug);
 			ArrayList<PositionAndColor> region = regionGrowing(radius, radius, predefinedRegion, background, radius, geometricThresh, true, debug);
 			ArrayList<PositionAndColor> matched = matchWithImage(region, orig, xtemp - (radius / 2), ytemp - (radius / 2), radius);
 			

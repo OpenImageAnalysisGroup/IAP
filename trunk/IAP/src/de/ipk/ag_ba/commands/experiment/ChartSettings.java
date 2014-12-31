@@ -13,6 +13,7 @@ public class ChartSettings {
 	private IniIoProvider iniIoProvider;
 	private final boolean localSettingObject;
 	private boolean userUseLocal = false;
+	private boolean savePossible = true;
 	
 	public ChartSettings(boolean local) {
 		this.localSettingObject = local;
@@ -30,7 +31,7 @@ public class ChartSettings {
 	}
 	
 	public boolean getUseLocalSettings() {
-		return userUseLocal;
+		return userUseLocal || !savePossible;
 	}
 	
 	public void setUseLocalSettings(boolean b) {
@@ -41,4 +42,11 @@ public class ChartSettings {
 		return SystemOptions.getInstance(null, getIniProvider());
 	}
 	
+	public void setSavePossible(boolean savePossible) {
+		this.savePossible = savePossible;
+	}
+	
+	public boolean isSavePossible() {
+		return savePossible;
+	}
 }
