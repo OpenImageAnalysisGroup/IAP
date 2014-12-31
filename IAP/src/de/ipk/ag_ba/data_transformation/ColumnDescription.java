@@ -205,7 +205,11 @@ public class ColumnDescription implements NiceNameSupport {
 			if (val != null) {
 				if (r.length() > 0)
 					r.append("//");
-				r.append(cd.id + ":" + val);
+				boolean addColName = false;
+				if (addColName)
+					r.append(cd.id + ":" + val);
+				else
+					r.append(val);
 			}
 		}
 		ArrayList<ColumnDescription> allCol = new ArrayList<ColumnDescription>(relevantColumns.size() + notRelevantColumns.size());

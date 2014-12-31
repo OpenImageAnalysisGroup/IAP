@@ -2,13 +2,19 @@ package de.ipk.ag_ba.commands.experiment.charting;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
+import org.FolderPanel;
 import org.StringManipulationTools;
 import org.SystemOptions;
 
@@ -16,8 +22,12 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ChartSettings;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
 public final class ActionTimeRangeCommand extends AbstractNavigationAction implements DirtyNotificationSupport, ExperimentTransformation {
 	/**
@@ -28,6 +38,7 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	private final ExperimentTransformationPipeline pipeline;
 	private final ChartSettings settingsLocal;
 	private final ChartSettings settingsGlobal;
+	private boolean scanned;
 	
 	public ActionTimeRangeCommand(String tooltip, ExperimentTransformationPipeline pipeline, ChartSettings settingsLocal, ChartSettings settingsGlobal) {
 		super(tooltip);
@@ -35,7 +46,6 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		this.settingsLocal = settingsLocal;
 		this.settingsGlobal = settingsGlobal;
 		this.set = !settingsLocal.getUseLocalSettings() ? settingsGlobal.getSettings() : settingsLocal.getSettings();
-		
 	}
 	
 	@Override
@@ -60,8 +70,22 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 			cb.setSelected(set.getBoolean("Charting", "Time range//" + time, true));
 			settings.put(time, cb);
 		}
-		Object[] sa = new Object[(items + settings.size()) * 2 + 4];
+		Object[] sa = new Object[(items + settings.size()) * 2 + 4 + 4];
 		int idx = 0;
+		sa[idx++] = "";
+		sa[idx++] = TableLayout.getSplit(new JButton(new AbstractAction("Invert Selection") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (JCheckBox cb : settings.values())
+					cb.setSelected(!cb.isSelected());
+				BackgroundTaskHelper.executeLaterOnSwingTask(150, () -> {
+					FolderPanel.performDialogResize(settings.values().iterator().next());
+				});
+			}
+		}), null, TableLayout.PREFERRED, TableLayout.FILL);
+		sa[idx++] = "";
+		sa[idx++] = new JLabel("<html>&nbsp;");
+		
 		Iterator<String> timeIt = settings.keySet().iterator();
 		while (timeIt.hasNext()) {
 			sa[idx++] = "";
@@ -101,6 +125,13 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	
 	@Override
 	public String getDefaultTitle() {
+		if (!scanned) {
+			try {
+				updateStatus();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 		ArrayList<String> ids = set.getSectionSettings("Charting");
 		int sel = 0;
 		int unsel = 0;
@@ -134,11 +165,13 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		}
 		if (unsel == 0)
 			return "<html><center><b>&#8667;</b>&nbsp;Time range&nbsp;<b>&#8667;</b><br><font color='gray'><small>no time point unselected<br>"
-					+ range;
+					+ range
+					+ "</small></font></center>";
 		else
 			return "<html><center><b>&#8667;</b>&nbsp;Time range&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
 					+ sel + "/" + (sel + unsel) + " days selected<br>"
-					+ range;
+					+ range
+					+ "</small></font></center>";
 	}
 	
 	@Override
@@ -153,11 +186,38 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	
 	@Override
 	public ExperimentInterface transform(ExperimentInterface input) {
+		input = input.clone();
+		ArrayList<String> ids = set.getSectionSettings("Charting");
+		HashSet<String> delDays = new HashSet<>();
+		for (String i : ids) {
+			if (i.startsWith("Time range//")) {
+				if ("Time range//Experiment days".equals(i))
+					continue;
+				if (!set.getBoolean("Charting", i, true)) {
+					delDays.add(i.substring("Time range//".length()));
+				}
+			}
+		}
+		ArrayList<SampleInterface> deleteSamples = new ArrayList<SampleInterface>();
+		input.visitSamples(null, (s) -> {
+			if (delDays.contains(s.getSampleTime()))
+				deleteSamples.add(s);
+		});
+		
+		deleteSamples.forEach((s) -> {
+			s.getParentCondition().remove(s);
+		});
+		boolean removeEmptyConditions = false;
+		if (removeEmptyConditions)
+			for (SubstanceInterface su : input)
+				su.removeIf(ConditionInterface::isEmpty);
+		
 		return input;
 	}
 	
 	@Override
 	public void updateStatus() throws Exception {
+		scanned = true;
 		String[] days = Experiment.getTimes(pipeline.getInput(this), null);
 		scanTimeValuesAndResetSettingsIfChanged(days);
 	}
@@ -165,9 +225,31 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	private void scanTimeValuesAndResetSettingsIfChanged(String[] days) {
 		String storedDayList = set.getString("Charting", "Time range//Experiment days", "");
 		String currentDayList = StringManipulationTools.getStringList(days, ", ");
-		if (!(storedDayList + "").equals(currentDayList)) {
+		LinkedHashSet<String> currentDays = new LinkedHashSet<String>();
+		for (String s : days) {
+			currentDays.add(s);
+		}
+		ArrayList<String> ids = set.getSectionSettings("Charting");
+		int matched = 0;
+		int not_matched = 0;
+		for (String i : ids) {
+			if (i.startsWith("Time range//")) {
+				if ("Time range//Experiment days".equals(i))
+					continue;
+				String d = i.substring("Time range//".length());
+				if (currentDays.contains(d))
+					matched++;
+				else
+					not_matched++;
+			}
+		}
+		
+		if (!(storedDayList + "").equals(currentDayList) || not_matched > 0 || matched != currentDays.size()) {
 			set.removeValuesOfSectionAndGroup("Charting", "Time range");
 			set.setString("Charting", "Time range//Experiment days", currentDayList);
+			for (String d : currentDays) {
+				set.setBoolean("Charting", "Time range//" + d, true);
+			}
 		}
 	}
 }

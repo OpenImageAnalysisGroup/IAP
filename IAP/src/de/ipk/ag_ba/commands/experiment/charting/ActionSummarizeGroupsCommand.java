@@ -74,13 +74,14 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 			if (!calcGrubbsA && !groupByPlantID && !calcGrubbsB && !calcANOVA)
 				return "<html><center><b>&#8667;</b>&nbsp;Pass data&nbsp;<b>&#8667;</b><br><font color='gray'><small>no calculations";
 			else
-				return "<html><center><b>&#8667;</b>&nbsp;Process data"
+				return "<html><center><b>&#8667;</b>&nbsp;Process data (TO IMPLEMENT)"
 						+ "&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
 						+ (calcGrubbsA ? (step++) + ". outlier removal for technical replicates" : "")
 						+ (groupByPlantID ? (calcGrubbsA ? "<br>" : "") + (step++) + ". calculate mean value for plant ID and day"
 								+ (calcGrubbsB ? "<br>" + (step++) + ". outlier removal for group replicates" : "")
 								: "")
-						+ (calcANOVA ? (calcGrubbsA || groupByPlantID || calcGrubbsB ? "<br>" : "") + (step++) + ". calculate ANOVA p-Values" : "");
+						+ (calcANOVA ? (calcGrubbsA || groupByPlantID || calcGrubbsB ? "<br>" : "") + (step++) + ". calculate ANOVA p-Values" : "")
+						+ "</small></font></center>";
 			// (groupsDeterminationInProgress.getBval(0, false) ? "~ one moment ~<br>determine group set" :
 			// (groups.size() == 1 ? "1 step" : groups.size() + " steps"));
 		}

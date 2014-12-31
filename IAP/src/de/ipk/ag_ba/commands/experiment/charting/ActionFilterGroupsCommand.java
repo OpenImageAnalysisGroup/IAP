@@ -1,11 +1,18 @@
 package de.ipk.ag_ba.commands.experiment.charting;
 
+import info.clearthought.layout.TableLayout;
+
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 
+import org.FolderPanel;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -18,6 +25,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
 public final class ActionFilterGroupsCommand extends AbstractNavigationAction implements DirtyNotificationSupport, ExperimentTransformation {
@@ -27,6 +35,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 	private final LinkedHashSet<String> groups = new LinkedHashSet<String>();
 	private final LinkedHashSet<String> disabled_groups = new LinkedHashSet<String>();
 	private final ExperimentTransformationPipeline pipeline;
+	private boolean updateConditionNumbers = true;
 	
 	public ActionFilterGroupsCommand(String tooltip, ExperimentTransformationPipeline pipeline) {
 		super(tooltip);
@@ -41,6 +50,21 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 			Thread.sleep(100);
 		ArrayList<Object> params = new ArrayList<Object>();
 		LinkedHashMap<String, JCheckBox> group2setting = new LinkedHashMap<>();
+		
+		params.add("");
+		params.add(TableLayout.getSplit(new JButton(new AbstractAction("Invert Selection") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (JCheckBox cb : group2setting.values())
+					cb.setSelected(!cb.isSelected());
+				BackgroundTaskHelper.executeLaterOnSwingTask(150, () -> {
+					FolderPanel.performDialogResize(group2setting.values().iterator().next());
+				});
+			}
+		}), null, TableLayout.PREFERRED, TableLayout.FILL));
+		params.add("");
+		params.add(new JLabel("<html>&nbsp;"));
+		
 		synchronized (groups) {
 			for (String g : groups) {
 				params.add("");
@@ -50,9 +74,16 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 				params.add(cb);
 			}
 		}
+		params.add("");
+		params.add(new JLabel("<html>&nbsp;"));
+		JCheckBox renumberConditions = new JCheckBox("Update Condition Numbers");
+		renumberConditions.setSelected(updateConditionNumbers);
+		params.add("");
+		params.add(renumberConditions);
 		Object[] res = MyInputHelper.getInput("Select the desired groups. For each group one line or bar is drawn in the chart.<br><br>", "Group Selection",
 				params.toArray());
 		if (res != null) {
+			this.updateConditionNumbers = renumberConditions.isSelected();
 			disabled_groups.clear();
 			for (String key : group2setting.keySet()) {
 				if (!group2setting.get(key).isSelected())
@@ -164,7 +195,8 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 					+
 					(groupsDeterminationInProgress.getBval(0, false) ? "~ one moment ~<br>determine group set" :
 							(disabled_groups.size() > 0 ? (groups.size() - disabled_groups.size()) + "/" : "")
-									+ (groups.size() == 1 ? "1 group" : groups.size() + " groups"));
+									+ (groups.size() == 1 ? "1 group" : groups.size() + " groups"))
+					+ "</small></font></center>";
 		}
 	}
 	
@@ -222,7 +254,8 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 		}
 		
 		ExperimentInterface result = MappingData3DPath.merge(pathObjects, false);
-		
+		if (updateConditionNumbers)
+			result.numberConditions();
 		return result;
 	}
 	
