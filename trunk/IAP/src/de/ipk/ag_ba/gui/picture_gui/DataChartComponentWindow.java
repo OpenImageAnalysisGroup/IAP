@@ -5,7 +5,6 @@ import info.clearthought.layout.TableLayout;
 import java.awt.Color;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -52,7 +51,7 @@ public class DataChartComponentWindow extends JFrame {
 		initGui();
 	}
 	
-	public JComponent getGUI() {
+	public JSplitPane getGUI() {
 		return splitPane;
 	}
 	

@@ -46,9 +46,11 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 		if (dccw == null)
 			dccw = new DataChartComponentWindow(expf);
 		else {
+			int splitPos = dccw.getGUI().getDividerLocation();
 			dccw.setInitGE(false);
 			dccw.setExperiment(expf);
 			dccw.initGui();
+			dccw.getGUI().setDividerLocation(splitPos);
 		}
 		this.chartGUI = dccw.getGUI();
 	}
