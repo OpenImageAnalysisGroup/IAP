@@ -1736,6 +1736,8 @@ public class MongoDB {
 		int deleted = 0;
 		long startTime = System.currentTimeMillis();
 		for (final GridFSDBFile f : toBeRemoved) {
+			if (status != null && status.wantsToStop())
+				break;
 			free.addLong(f.getLength());
 			if (!rmList)
 				gridfs.remove(f.getFilename());
@@ -1756,13 +1758,16 @@ public class MongoDB {
 					+ SystemAnalysis.getDataTransferSpeedString(free.getLong(), startTime, System.currentTimeMillis()));
 			status.setCurrentStatusValueFine(deleted * 100d / toBeRemoved.size());
 		}
-		if (rmList && rList.size() > 0) {
-			colFE.remove(
-					new BasicDBObject("_id", new BasicDBObject("$in", rList)));
-			colFC.remove(
-					new BasicDBObject("files_id", new BasicDBObject("$in", rList)));
-			rList.clear();
-		}
+		if (status != null && status.wantsToStop())
+			;
+		else
+			if (rmList && rList.size() > 0) {
+				colFE.remove(
+						new BasicDBObject("_id", new BasicDBObject("$in", rList)));
+				colFC.remove(
+						new BasicDBObject("files_id", new BasicDBObject("$in", rList)));
+				rList.clear();
+			}
 	}
 	
 	public ArrayList<String> getWebCamStorageFileSystems() throws Exception {
