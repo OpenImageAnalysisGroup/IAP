@@ -259,6 +259,8 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			
 			@Override
 			public Long saveUpdatedProperties(BackgroundTaskStatusProviderSupportingExternalCall optStatus) throws Exception {
+				if (!isAbleToSaveData())
+					return System.currentTimeMillis();
 				synchronized (VfsFileSystemSource.class) {
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Save updated header information in " + indexFile.getName());
 					DataExportHelper.writeExperimentHeaderToIndexFile(eh, indexFile.getOutputStream(), -1);

@@ -54,6 +54,11 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 		sa[idx++] = "Local/global";
 		JCheckBox cbPersistentChange = new JCheckBox("Apply change persistent with experiment");
 		cbPersistentChange.setSelected(!settingsLocal.getUseLocalSettings());
+		if (!settingsLocal.isSavePossible()) {
+			cbPersistentChange.setEnabled(false);
+			cbPersistentChange.setText("<html>" + cbPersistentChange.getText() + "<br>(experiment loaded from read-only location)");
+		}
+		
 		sa[idx++] = cbPersistentChange;
 		
 		Object[] ur = MyInputHelper.getInput("Filter input data (defined outliers):<br><br>", "Filter Data (Outliers)", sa);
@@ -74,7 +79,8 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 	public String getDefaultTitle() {
 		boolean ro = set.getBoolean("Charting", "Filter outliers//Ignore defined outliers", true);
 		return "<html><center><b>&nbsp;</b>&nbsp;Outlier&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
-				+ (ro ? "removing defined outliers" : "defined outliers are not removed");
+				+ (ro ? "removing defined outliers" : "defined outliers are not removed")
+				+ "</small></font></center>";
 	}
 	
 	@Override

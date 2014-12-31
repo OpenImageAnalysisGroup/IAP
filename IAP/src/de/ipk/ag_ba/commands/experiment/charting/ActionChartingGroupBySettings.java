@@ -113,6 +113,10 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		sa[idx++] = "Local/global";
 		JCheckBox cbPersistentChange = new JCheckBox("Apply change persistent with experiment");
 		cbPersistentChange.setSelected(!settingsLocal.getUseLocalSettings());
+		if (!settingsLocal.isSavePossible()) {
+			cbPersistentChange.setEnabled(false);
+			cbPersistentChange.setText("<html>" + cbPersistentChange.getText() + "<br>(experiment loaded from read-only location)");
+		}
 		sa[idx++] = cbPersistentChange;
 		
 		Object[] ur = MyInputHelper.getInput("Metadata columns to group the data:<br><br>", "Group data", sa);
