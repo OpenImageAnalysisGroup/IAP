@@ -200,9 +200,9 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		
 		ArrayList<MappingData3DPath> pathObjects = MappingData3DPath.get(input, true);
 		for (MappingData3DPath po : pathObjects) {
-			// String qa = po.getMeasurement().getQualityAnnotation(); // save plant ID
+			String qa = po.getMeasurement().getQualityAnnotation(); // save plant ID
 			String merged = ColumnDescription.extractDataStringAndResetAllFields(relevantColumns, notRelevantColumns, po.getMeasurement());
-			// po.getMeasurement().setQualityAnnotation(qa); // restore plant ID
+			po.getMeasurement().setQualityAnnotation(qa); // restore plant ID
 			po.getConditionData().setSpecies(merged);
 		}
 		
