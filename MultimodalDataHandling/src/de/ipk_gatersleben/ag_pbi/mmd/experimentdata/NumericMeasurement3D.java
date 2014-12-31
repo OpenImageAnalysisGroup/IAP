@@ -55,7 +55,23 @@ public class NumericMeasurement3D extends NumericMeasurement {
 			setPositionUnit((String) map.get("positionUnit"));
 		if (map.containsKey("annotation"))
 			setAnnotation((String) map.get("annotation"));
-		
+	}
+	
+	@Override
+	public void setAttributeField(String id, Object value) {
+		switch (id) {
+			case "position":
+				if (value == null)
+					setPosition(null);
+				else
+					setPosition(Double.parseDouble((String) value));
+			case "positionUnit":
+				setPositionUnit((String) value);
+			case "annotation":
+				setAnnotation((String) value);
+				return;
+		}
+		super.setAttributeField(id, value);
 	}
 	
 	public NumericMeasurement3D(Measurement copyFrom, String newSubstanceName, String optNewExperimentName) {
