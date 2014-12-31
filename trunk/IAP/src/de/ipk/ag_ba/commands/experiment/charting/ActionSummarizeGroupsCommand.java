@@ -1,10 +1,16 @@
 package de.ipk.ag_ba.commands.experiment.charting;
 
+import iap.blocks.extraction.Numeric;
+import iap.blocks.extraction.Outlier;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 
 import javax.swing.JCheckBox;
 
+import org.GapList;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -12,6 +18,10 @@ import de.ipk.ag_ba.commands.experiment.ChartSettings;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
 public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction implements ExperimentTransformation {
 	private NavigationButton src2;
@@ -39,6 +49,7 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 		boolean groupByPlantID = set.getBoolean("Summarize data", "Filter outliers//Merge into single value per day and plant ID", true);
 		boolean calcGrubbsB = set.getBoolean("Summarize data", "Filter outliers//Grubbs test for final sample data", false);
 		boolean calcANOVA = set.getBoolean("Summarize data", "Filter outliers//Calculate ANOVA p-values", false);
+		double calcGrubbsAlpha = set.getDouble("Summarize data", "Filter outliers//Grubbs alpha-values", 0.05);
 		
 		JCheckBox cbPerformGrubbsTestA = new JCheckBox("Perform Grubbs test on group samples to remove outliers");
 		cbPerformGrubbsTestA.setSelected(calcGrubbsA);
@@ -60,6 +71,7 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 			set.setBoolean("Summarize data", "Filter outliers//Merge into single value per day and plant ID", cbGroup.isSelected());
 			set.setBoolean("Summarize data", "Filter outliers//Grubbs test for final sample data", cbPerformGrubbsTestB.isSelected());
 			set.setBoolean("Summarize data", "Filter outliers//Calculate ANOVA p-values", cbANOVA.isSelected());
+			pipeline.setDirty(this);
 		}
 	}
 	
@@ -74,7 +86,7 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 			if (!calcGrubbsA && !groupByPlantID && !calcGrubbsB && !calcANOVA)
 				return "<html><center><b>&#8667;</b>&nbsp;Pass data&nbsp;<b>&#8667;</b><br><font color='gray'><small>no calculations";
 			else
-				return "<html><center><b>&#8667;</b>&nbsp;Process data (TO IMPLEMENT)"
+				return "<html><center><b>&#8667;</b>&nbsp;Process data"
 						+ "&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
 						+ (calcGrubbsA ? (step++) + ". outlier removal for technical replicates" : "")
 						+ (groupByPlantID ? (calcGrubbsA ? "<br>" : "") + (step++) + ". calculate mean value for plant ID and day"
@@ -104,7 +116,127 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 	
 	@Override
 	public ExperimentInterface transform(ExperimentInterface input) {
-		return input;
+		ExperimentInterface result = input;
+		
+		boolean calcGrubbsA = set.getBoolean("Summarize data", "Filter outliers//Grubbs test before mean calculation", false);
+		boolean groupByPlantID = set.getBoolean("Summarize data", "Filter outliers//Merge into single value per day and plant ID", true);
+		boolean calcGrubbsB = set.getBoolean("Summarize data", "Filter outliers//Grubbs test for final sample data", false);
+		boolean calcANOVA = set.getBoolean("Summarize data", "Filter outliers//Calculate ANOVA p-values", false);
+		double calcGrubbsAlpha = set.getDouble("Summarize data", "Filter outliers//Grubbs alpha-values", 0.05);
+		
+		if (!calcGrubbsA && !groupByPlantID && !calcGrubbsB && !calcANOVA)
+			return result;
+		
+		if (groupByPlantID) {
+			ArrayList<MappingData3DPath> pathObjects = MappingData3DPath.get(result, true);
+			for (MappingData3DPath po : pathObjects) {
+				po.getSampleData().setSampleFineTimeOrRowId(null);
+			}
+			result = MappingData3DPath.merge(pathObjects, true);
+			result.visitSamples(null, (s) -> {
+				s.setSampleAverage(null);
+				if (s.size() > 0) {
+					s.recalculateSampleAverage(false);
+					NumericMeasurementInterface nmiAveragePerPlant = new NumericMeasurement(s);
+					NumericMeasurementInterface template = s.iterator().next();
+					nmiAveragePerPlant.setQualityAnnotation(template.getQualityAnnotation());
+					nmiAveragePerPlant.setReplicateID(template.getReplicateID());
+					nmiAveragePerPlant.setUnit(template.getUnit());
+					nmiAveragePerPlant.setValue(s.getSampleAverage().getValue());
+					nmiAveragePerPlant.setParentSample(s);
+					s.setSampleAverage(null);
+					s.recalculateSampleAverage(false);
+				}
+			});
+			
+			pathObjects = MappingData3DPath.get(result, true);
+			for (MappingData3DPath po : pathObjects) {
+				po.getMeasurement().setQualityAnnotation(null);
+			}
+			result = MappingData3DPath.merge(pathObjects, true);
+		}
+		if (calcGrubbsA) {
+			int nA = result.getNumberOfMeasurementValues();
+			result.visitSamples(null, (s) -> {
+				s.setSampleAverage(null);
+				
+				if (calcGrubbsA) {
+					GapList<Numeric> values = new GapList<Numeric>();
+					LinkedList<Numeric> low = new LinkedList<>();
+					LinkedList<Numeric> hig = new LinkedList<>();
+					HashMap<Numeric, NumericMeasurementInterface> val2nmi = new HashMap<>();
+					for (NumericMeasurementInterface nmi : s) {
+						Numeric num = new Numeric() {
+							@Override
+							public Double getValue() {
+								return nmi.getValue();
+							}
+						};
+						val2nmi.put(num, nmi);
+						values.add(num);
+					}
+					Outlier.doGrubbsTest(values, calcGrubbsAlpha, low, hig);
+					for (Numeric l : low)
+						s.remove(val2nmi.get(l));
+					for (Numeric l : hig)
+						s.remove(val2nmi.get(l));
+				}
+				
+				s.recalculateSampleAverage(false);
+			});
+			int nB = result.getNumberOfMeasurementValues();
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed outliers A " + nA + " --> " + nB);
+		}
+		
+		if (groupByPlantID) {
+			ArrayList<MappingData3DPath> pathObjects = MappingData3DPath.get(result, false);
+			for (MappingData3DPath po : pathObjects) {
+				po.getSampleData().setSampleAverage(null);
+				po.getSampleData().setSampleFineTimeOrRowId(null);
+				po.getMeasurement().setQualityAnnotation(null);
+			}
+			
+			result = MappingData3DPath.merge(pathObjects, groupByPlantID);
+			
+			result.visitSamples(null, (s) -> {
+				s.setSampleAverage(null);
+				s.recalculateSampleAverage(false);
+			});
+		}
+		
+		if (calcGrubbsB) {
+			int nA = result.getNumberOfMeasurementValues();
+			result.visitSamples(null, (s) -> {
+				s.setSampleAverage(null);
+				
+				GapList<Numeric> values = new GapList<Numeric>();
+				LinkedList<Numeric> low = new LinkedList<>();
+				LinkedList<Numeric> hig = new LinkedList<>();
+				HashMap<Numeric, NumericMeasurementInterface> val2nmi = new HashMap<>();
+				for (NumericMeasurementInterface nmi : s) {
+					Numeric num = new Numeric() {
+						@Override
+						public Double getValue() {
+							return nmi.getValue();
+						}
+					};
+					val2nmi.put(num, nmi);
+					values.add(num);
+				}
+				Outlier.doGrubbsTest(values, calcGrubbsAlpha, low, hig);
+				for (Numeric l : low)
+					s.remove(val2nmi.get(l));
+				for (Numeric l : hig)
+					s.remove(val2nmi.get(l));
+				
+				s.recalculateSampleAverage(false);
+			});
+			result.numberConditions();
+			int nB = result.getNumberOfMeasurementValues();
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed outliers B " + nA + " --> " + nB);
+		}
+		
+		return result;
 	}
 	
 	@Override

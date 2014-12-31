@@ -10,6 +10,7 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.DataChartComponentWindow;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
@@ -24,6 +25,7 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 	private int valueCount = -1;
 	private int substanceCount;
 	private int conditionCount;
+	private int dayCount;
 	private final ExperimentTransformationPipeline pipeline;
 	private final ChartSettings settingsLocal;
 	private final ChartSettings settingsGlobal;
@@ -52,8 +54,9 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-		return "<html><center>Create plot<br><small><font color='gray'>" + valueCount + " value(s)<br>"
+		return "<html><center>Create plot<br><small><font color='gray'>" + valueCount + " value(s), "
 				+ conditionCount + " conditions<br>"
+				+ dayCount + " days, "
 				+ substanceCount + " substance(s)</font></small></center>";
 	}
 	
@@ -83,6 +86,7 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 		this.conditionCount = 0;
 		for (SubstanceInterface si : ee)
 			conditionCount += si.size();
+		this.dayCount = Experiment.getTimes(ee).length;
 		this.substanceCount = ee.size();
 	}
 	
