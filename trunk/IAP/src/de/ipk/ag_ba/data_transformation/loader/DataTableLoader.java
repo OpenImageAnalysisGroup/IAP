@@ -60,6 +60,8 @@ public class DataTableLoader {
 			attributeValueMap.remove(r);
 		
 		for (String id : attributeValueMap.keySet()) {
+			if (attributeValueMap.get(id) == null)
+				attributeValueMap.put(id, "");
 			if (attributeValueMap.get(id) != null) {
 				// add id itself
 				if (!columns.containsKey(prefix + "." + id)) {
