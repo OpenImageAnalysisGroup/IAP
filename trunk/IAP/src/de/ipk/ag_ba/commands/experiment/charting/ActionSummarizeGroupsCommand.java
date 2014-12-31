@@ -63,14 +63,16 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 		Object[] res = MyInputHelper.getInput("Group data by plant ID prior to plotting?", "Process Data", new Object[] {
 				"1.", cbPerformGrubbsTestA,
 				"2.", cbGroup,
-				"3.", cbPerformGrubbsTestB,
-				"4.", cbANOVA,
+				// "3.", cbPerformGrubbsTestB,
+				// "4.", cbANOVA,
+				"Grubbs' alpha-Value", calcGrubbsAlpha
 		});
 		if (res != null) {
 			set.setBoolean("Summarize data", "Filter outliers//Grubbs test before mean calculation", cbPerformGrubbsTestA.isSelected());
 			set.setBoolean("Summarize data", "Filter outliers//Merge into single value per day and plant ID", cbGroup.isSelected());
 			set.setBoolean("Summarize data", "Filter outliers//Grubbs test for final sample data", cbPerformGrubbsTestB.isSelected());
 			set.setBoolean("Summarize data", "Filter outliers//Calculate ANOVA p-values", cbANOVA.isSelected());
+			set.setDouble("Summarize data", "Filter outliers//Grubbs alpha-values", (Double) res[2]);
 			pipeline.setDirty(this);
 		}
 	}
