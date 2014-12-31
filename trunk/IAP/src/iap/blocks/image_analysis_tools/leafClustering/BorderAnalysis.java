@@ -35,7 +35,7 @@ public class BorderAnalysis {
 	int borderLength;
 	private ArrayList<ArrayList<Integer>> borderLists;
 	private final FeatureList borderFeatureList;
-	private LinkedList<Feature> peakList;
+	private GapList<Feature> peakList;
 	boolean debug = false;
 	boolean onlyBiggest = true;
 	boolean checkSplit = true;
@@ -67,7 +67,7 @@ public class BorderAnalysis {
 	 * Extract Peaks of feature list. (get middle of peaks)
 	 **/
 	public void getPeaksFromBorder(double minSizeOfPeak, int distBetweenPeaks, String filterKey, int largeRadius) {
-		peakList = new LinkedList<Feature>();
+		peakList = new GapList<Feature>();
 		int listsize = borderFeatureList.size();
 		int[] peaks = null;
 		
@@ -954,7 +954,7 @@ public class BorderAnalysis {
 		return borderLists;
 	}
 	
-	public LinkedList<Feature> getPeakList() {
+	public GapList<Feature> getPeakList() {
 		return peakList;
 	}
 	
