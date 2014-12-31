@@ -54,10 +54,10 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-		return "<html><center>Create plot<br><small><font color='gray'>" + valueCount + " value(s), "
-				+ conditionCount + " conditions<br>"
-				+ dayCount + " days, "
-				+ substanceCount + " substance(s)</font></small></center>";
+		return "<html><center>Create plot<br><small><font color='gray'>" + valueCount + " value" + (valueCount != 1 ? "s" : "") + ", "
+				+ conditionCount + " condition" + (conditionCount != 1 ? "s" : "") + "<br>"
+				+ dayCount + " day" + (dayCount != 1 ? "s" : "") + ", "
+				+ substanceCount + " substance" + (substanceCount != 1 ? "s" : "") + "</font></small></center>";
 	}
 	
 	@Override
