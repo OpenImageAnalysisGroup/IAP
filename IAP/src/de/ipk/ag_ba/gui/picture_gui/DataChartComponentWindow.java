@@ -40,8 +40,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
 
 public class DataChartComponentWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private final ExperimentInterface experiment;
+	private ExperimentInterface experiment;
 	private JSplitPane splitPane;
+	
+	Graph graph;
+	Node ge;
+	private boolean initGE = true;
 	
 	public DataChartComponentWindow(ExperimentInterface experiment) {
 		this.experiment = experiment;
@@ -52,22 +56,34 @@ public class DataChartComponentWindow extends JFrame {
 		return splitPane;
 	}
 	
-	private void initGui() {
+	public void setInitGE(boolean b) {
+		this.initGE = b;
+	}
+	
+	public void initGui() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Data Chart - " + experiment.iterator().next().getName());
 		setIconImage(IAPimages.getImage(IAPimages.getHistogramIcon()));
 		setSize(SystemOptions.getInstance("charts.ini", null).getInteger("Window", "Width", 800),
 				SystemOptions.getInstance("charts.ini", null).getInteger("Window", "Height", 600));
 		setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
-		final Graph graph = new AdjListGraph();
-		final Node ge = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForKeggNode(100, 100));
+		if (initGE) {
+			graph = new AdjListGraph();
+			ge = graph.addNode(AttributeHelper.getDefaultGraphicsAttributeForKeggNode(100, 100));
+		} else {
+			NodeHelper nh = new NodeHelper(ge);
+			nh.removeDataMapping();
+		}
 		NodeHelper nh = new NodeHelper(ge);
 		// nh.setLabel(experiment.iterator().next().getName());
 		SubstanceInterface ex = experiment.iterator().next();
 		nh.addDataMapping(ex);
 		nh.removeAttribute("graphics");
-		graph.removeAttribute("directed");
-		
+		try {
+			graph.removeAttribute("directed");
+		} catch (Exception e) {
+			// empty
+		}
 		setDefaultChartDisplay(graph, ge, experiment.iterator().next().getName(), ex.size() < 10);
 		
 		final XmlDataChartComponent chart = new XmlDataChartComponent(experiment, GraffitiCharts.AUTOMATIC.getName(), graph, ge);
@@ -158,5 +174,9 @@ public class DataChartComponentWindow extends JFrame {
 		Attribute newAtt = StringAttribute.getTypedStringAttribute(GraphicAttributeConstants.CHARTBACKGROUNDCOLOR
 				+ add, ColorUtil.getHexFromColor(Color.WHITE));
 		ge.addAttribute(newAtt, "charting");
+	}
+	
+	public void setExperiment(ExperimentInterface expf) {
+		this.experiment = expf;
 	}
 }

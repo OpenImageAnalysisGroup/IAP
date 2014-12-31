@@ -36,8 +36,9 @@ public class ExperimentTransformationPipeline {
 					+ (result.iterator().hasNext() ? result.iterator().next().size() : "n/a"));
 			idx++;
 		}
-		throw new RuntimeException("Invalid target!");
-		
+		result.setHeader(startDataset.getHeader().clone());
+		result.getHeader().setDatabaseId(null);
+		return result;
 	}
 	
 	public void setSteps(ExperimentTransformation... steps) {

@@ -35,7 +35,7 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 	private final LinkedHashSet<String> groups = new LinkedHashSet<String>();
 	private final LinkedHashSet<String> disabled_groups = new LinkedHashSet<String>();
 	private final ExperimentTransformationPipeline pipeline;
-	private boolean updateConditionNumbers = true;
+	private boolean updateConditionNumbers = false;
 	
 	public ActionFilterGroupsCommand(String tooltip, ExperimentTransformationPipeline pipeline) {
 		super(tooltip);
