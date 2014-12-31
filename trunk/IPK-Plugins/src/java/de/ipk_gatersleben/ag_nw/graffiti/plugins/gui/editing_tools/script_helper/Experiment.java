@@ -1408,7 +1408,7 @@ public class Experiment implements ExperimentInterface {
 	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitConditions(java.lang.String, de.ipk.ag_ba.gui.util.ConditionVisitor)
 	 */
 	@Override
-	public void visitConditions(String optSubstanceFilter, ConditionVisitor cv) throws Exception {
+	public void visitConditions(String optSubstanceFilter, ConditionVisitor cv) {
 		for (SubstanceInterface si : getSubstances())
 			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
 				for (ConditionInterface ci : si)
@@ -1420,7 +1420,7 @@ public class Experiment implements ExperimentInterface {
 	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitSamples(java.lang.String, de.ipk.ag_ba.gui.util.SampleVisitor)
 	 */
 	@Override
-	public void visitSamples(String optSubstanceFilter, SampleVisitor nmi) throws Exception {
+	public void visitSamples(String optSubstanceFilter, SampleVisitor nmi) {
 		for (SubstanceInterface si : getSubstances())
 			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
 				for (ConditionInterface ci : si)
@@ -1433,7 +1433,7 @@ public class Experiment implements ExperimentInterface {
 	 * @see de.ipk.ag_ba.gui.util.ExperimentReferenceInterface#visitNumericMeasurements(java.lang.String, de.ipk.ag_ba.gui.util.NumericMeasurementVisitor)
 	 */
 	@Override
-	public void visitNumericMeasurements(String optSubstanceFilter, NumericMeasurementVisitor nmi) throws Exception {
+	public void visitNumericMeasurements(String optSubstanceFilter, NumericMeasurementVisitor nmi) {
 		for (SubstanceInterface si : getSubstances())
 			if (optSubstanceFilter == null || optSubstanceFilter.equals(si.getName()))
 				for (ConditionInterface ci : si)

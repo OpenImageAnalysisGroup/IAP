@@ -56,6 +56,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 				return;
 			case "files":
 				setFiles((String) value);
+				return;
 		}
 		throw new RuntimeException("Cant set field " + id + "!");
 	}
