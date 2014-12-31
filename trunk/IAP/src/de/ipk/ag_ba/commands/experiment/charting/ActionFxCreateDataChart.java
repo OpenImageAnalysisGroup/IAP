@@ -46,6 +46,8 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 	ActionTimeRangeCommand filterTimeRangeAction;
 	ActionCreatePlotCommand createPlotAction;
 	ActionSummarizeGroupsCommand summarizeDataAction;
+	ActionExportPlotDataTable exportDataTableAction;
+	
 	private ExperimentTransformationPipeline transformationPipeline;
 	
 	public ActionFxCreateDataChart() {
@@ -109,6 +111,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			filterTimeRangeAction = new ActionTimeRangeCommand("Time Range", transformationPipeline, settingsLocal, settingsGlobal);
 			summarizeDataAction = new ActionSummarizeGroupsCommand("Summarize data", transformationPipeline, settingsLocal, settingsGlobal);
 			createPlotAction = new ActionCreatePlotCommand("Create/update plot", transformationPipeline, settingsLocal, settingsGlobal);
+			exportDataTableAction = new ActionExportPlotDataTable("Export data table", transformationPipeline, settingsLocal, settingsGlobal);
 			
 			transformationPipeline.setSteps(removeDefinedOutlierAction, groupByAction,
 					filterGroupAction, filterTimeRangeAction, summarizeDataAction, createPlotAction);
@@ -197,7 +200,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			}
 			ra.add(new NavigationButton(summarizeDataAction, src.getGUIsetting()));
 			ra.add(new NavigationButton(createPlotAction, src.getGUIsetting()));
-			addExportCommand(ra);
+			ra.add(new NavigationButton(exportDataTableAction, src.getGUIsetting()));
 		}
 		
 		return ra;
@@ -253,47 +256,6 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			@Override
 			public String getDefaultImage() {
 				return "img/ext/gpl2/Gnome-View-Sort-Descending-64.png";
-			}
-			
-			@Override
-			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-				return currentSet;
-			}
-			
-			@Override
-			public ArrayList<NavigationButton> getResultNewActionSet() {
-				return null;
-			}
-		}, src.getGUIsetting()));
-	}
-	
-	private void addExportCommand(ArrayList<NavigationButton> ra) {
-		ra.add(new NavigationButton(new AbstractNavigationAction("Export plots") {
-			
-			private NavigationButton src2;
-			
-			@Override
-			public void performActionCalculateResults(NavigationButton src) throws Exception {
-				src2 = src;
-				
-				// traverse substances, consider only target substance
-				// traverse conditions
-				// traverse samples, check time
-				// traverse measurements, check group and global and local outlier info
-				// result:
-				// filtered NMI list, create Mapping Path with clone=true
-				// create experiment
-				// show data.
-			}
-			
-			@Override
-			public String getDefaultTitle() {
-				return "Export";
-			}
-			
-			@Override
-			public String getDefaultImage() {
-				return "img/ext/gpl2/Gnome-Document-Save-64.png";
 			}
 			
 			@Override

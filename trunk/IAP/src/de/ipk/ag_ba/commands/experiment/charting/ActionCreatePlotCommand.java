@@ -29,6 +29,7 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 	private final ExperimentTransformationPipeline pipeline;
 	private final ChartSettings settingsLocal;
 	private final ChartSettings settingsGlobal;
+	private DataChartComponentWindow dccw;
 	
 	public ActionCreatePlotCommand(String tooltip, ExperimentTransformationPipeline pipeline, ChartSettings settingsLocal, ChartSettings settingsGlobal) {
 		super(tooltip);
@@ -42,7 +43,13 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 		src2 = src;
 		status.setCurrentStatusText1("Create dataset for plotting");
 		ExperimentInterface expf = pipeline.getInput(this);
-		DataChartComponentWindow dccw = new DataChartComponentWindow(expf);
+		if (dccw == null)
+			dccw = new DataChartComponentWindow(expf);
+		else {
+			dccw.setInitGE(false);
+			dccw.setExperiment(expf);
+			dccw.initGui();
+		}
 		this.chartGUI = dccw.getGUI();
 	}
 	
@@ -54,7 +61,8 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-		return "<html><center>Create plot<br><small><font color='gray'>" + valueCount + " value" + (valueCount != 1 ? "s" : "") + ", "
+		return "<html><center>" + (dccw == null ? "Create" : "Update") + " plot<br><small><font color='gray'>" + valueCount + " value"
+				+ (valueCount != 1 ? "s" : "") + ", "
 				+ conditionCount + " condition" + (conditionCount != 1 ? "s" : "") + "<br>"
 				+ dayCount + " day" + (dayCount != 1 ? "s" : "") + ", "
 				+ substanceCount + " substance" + (substanceCount != 1 ? "s" : "") + "</font></small></center>";
