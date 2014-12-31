@@ -3,11 +3,15 @@ package iap.blocks.extraction;
 import java.util.LinkedList;
 
 import org.ErrorMsg;
+import org.GapList;
 import org.apache.commons.math3.distribution.TDistribution;
 
+/**
+ * @author klukas
+ */
 public class Outlier {
 	
-	public static int doGrubbsTest(LinkedList<Numeric> numericValues, double alpha, LinkedList<Numeric> lowerValues, LinkedList<Numeric> upperValues) {
+	public static int doGrubbsTest(GapList<Numeric> numericValues, double alpha, LinkedList<Numeric> lowerValues, LinkedList<Numeric> upperValues) {
 		boolean outlierIdentified;
 		int removedPoints = 0;
 		do {
@@ -60,13 +64,17 @@ public class Outlier {
 					if (G > testG) {
 						if (isMaxPotentialOutlier) {
 							Numeric nm = numericValues.remove(indexOfMaxValue);
-							synchronized (upperValues) {
-								upperValues.add(nm);
+							if (upperValues != null) {
+								synchronized (upperValues) {
+									upperValues.add(nm);
+								}
 							}
 						} else {
 							Numeric nm = numericValues.remove(indexOfMinValue);
-							synchronized (lowerValues) {
-								lowerValues.add(nm);
+							if (lowerValues != null) {
+								synchronized (lowerValues) {
+									lowerValues.add(nm);
+								}
 							}
 						}
 						
