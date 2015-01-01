@@ -76,6 +76,10 @@ public class SampleAverage3D extends SampleAverage {
 			}
 			setStddev(Math.sqrt(sumDiff / (n - 1)));
 			setValue(avg);
+			if (n > 0)
+				setUnit(measurements.iterator().next().getUnit());
+			else
+				setUnit(null);
 		}
 	}
 }
