@@ -96,6 +96,9 @@ public class FolderPanel extends JComponent {
 	private boolean lockRowCount;
 	private Iconsize bigIcons = Iconsize.SMALL;
 	private boolean hideSearch;
+	private boolean searchLeftAligned;
+	private JButton condenseButton;
+	private int searchPaneWidth;
 	
 	public void setIconSize(Iconsize bigIcons) {
 		this.bigIcons = bigIcons;
@@ -380,22 +383,28 @@ public class FolderPanel extends JComponent {
 					|| searchEnabled) {
 				JComponent button1 = null, button2 = null;
 				JComponent titleComp = titleLabel;
-				if (searchEnabled) {
-					JComponent sfield = getSearchField();
-					titleComp = TableLayout.getSplit(titleLabel, sfield,
-							TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
-				}
-				if (maxRowCount > 0) {
-					JComponent lrb = getLeftRightButton();
-					titleComp = TableLayout.getSplit(titleComp, lrb,
-							TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
-				}
+				
 				if (showCondenseButton) {
 					final JComponent condenseCmdPanel = getCondenseButton();
 					condenseCmdPanel.setEnabled(hasData);
 					button1 = condenseCmdPanel;
 					addTitleMouseClickHandler(condenseCmdPanel);
 				}
+				
+				if (searchEnabled) {
+					JComponent sfield = getSearchField();
+					if (searchLeftAligned)
+						titleComp = sfield;
+					else
+						titleComp = TableLayout.getSplit(titleLabel, sfield,
+								TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
+				}
+				if (maxRowCount > 0) {
+					JComponent lrb = getLeftRightButton();
+					titleComp = TableLayout.getSplit(titleComp, lrb,
+							TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
+				}
+				
 				if (showHelpButton) {
 					JComponent helpButton = getHelpButton();
 					button2 = helpButton;
@@ -577,6 +586,8 @@ public class FolderPanel extends JComponent {
 				{ TableLayout.FILL } }));
 		
 		final JButton cmdButton = new JButton();
+		
+		this.condenseButton = cmdButton;
 		// result.setContentAreaFilled(false);
 		cmdButton.setBackground(frameColor);
 		cmdButton.setBorderPainted(false);
@@ -626,7 +637,7 @@ public class FolderPanel extends JComponent {
 		tb.setOpaque(false);
 		tb.setBackground(frameColor);
 		tb.setLayout(new TableLayout(new double[][] {
-				{ TableLayout.PREFERRED, TableLayout.PREFERRED, 40 },
+				{ TableLayout.PREFERRED, TableLayout.PREFERRED, searchLeftAligned ? searchPaneWidth : 60 },
 				{ TableLayout.FILL } }));
 		
 		final JButton cmdButtonS = new JButton();
@@ -652,6 +663,8 @@ public class FolderPanel extends JComponent {
 			
 			@Override
 			public void keyTyped(KeyEvent arg0) {
+				if (condensedState)
+					condenseButton.doClick();
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -1313,5 +1326,10 @@ public class FolderPanel extends JComponent {
 			al.actionPerformed(new ActionEvent(this, condensedState ? 0 : 1, "collapseevent"));
 		
 		// all OK!
+	}
+	
+	public void setSearchLeftAligned(boolean searchLeftAligned, int serarchPaneWidth) {
+		this.searchLeftAligned = searchLeftAligned;
+		this.searchPaneWidth = serarchPaneWidth;
 	}
 }
