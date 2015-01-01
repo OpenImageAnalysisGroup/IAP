@@ -3,7 +3,11 @@ package de.ipk.ag_ba.commands;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+
 import org.AttributeHelper;
+import org.FolderPanel;
 import org.IniIoProvider;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
@@ -12,8 +16,10 @@ import org.graffiti.plugin.io.resources.IOurl;
 
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.settings.ActionSettingsEditor;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.PipelineDesc;
+import de.ipk.ag_ba.gui.Unicode;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
@@ -21,6 +27,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 public class ActionSettings extends AbstractNavigationAction {
 	
 	ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+	ArrayList<String> allSettings = new ArrayList<String>();
 	private final String iniFileName;
 	private final String title;
 	private NavigationButton src;
@@ -71,13 +78,21 @@ public class ActionSettings extends AbstractNavigationAction {
 				}
 			}, src.getGUIsetting()));
 		
-		ArrayList<String> ss = SystemOptions.getInstance(iniFileName, iniIO).getSectionTitles();
+		SystemOptions so = SystemOptions.getInstance(iniFileName, iniIO);
+		ArrayList<String> ss = so.getSectionTitles();
 		Collections.sort(ss);
+		allSettings.clear();
 		String currentPrefix = "";
 		ArrayList<NavigationButton> toBeAdded = new ArrayList<>();
 		for (String s : ss) {
 			if (s == null)
 				s = "";
+			
+			for (String setting : so.getSectionSettings(s)) {
+				allSettings.add(s + " |||<small>" + Unicode.ARROW_RIGHT + "</small> "
+						+ StringManipulationTools.stringReplace(setting, "//", " <small>" + Unicode.ARROW_RIGHT + "</small> "));
+			}
+			
 			final ActionSettingsEditor ac = new ActionSettingsEditor(iniFileName, iniIO,
 					"Change settings of section " + s, s);
 			final NavigationButton nb = new NavigationButton(ac, src.getGUIsetting());
@@ -159,15 +174,32 @@ public class ActionSettings extends AbstractNavigationAction {
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		ArrayList<String> descs = new ArrayList<String>();
-		descs.add("<b>Click on a action button above to open a settings-group or to edit the corresponding setting.</b><br><br>" +
-				"Most settings are active immediately, but some " +
-				"options may require a restart of the progam upon setting change.");
-		descs.add("<b>The values within a specific group may be removed/reverted to their defaults:</b><br><br>" +
-				"The &quot;Defaults (delayed)&quot; command, shown for a selected settings-group, removes the shown settings and their values.<br>" +
-				"The settings will re-appear as soon as they are needed, and will be reverted to the " +
-				"programmed defaults.");
-		return new MainPanelComponent(descs);
+		ArrayList<JComponent> rr = new ArrayList<JComponent>();
+		FolderPanel fp = new FolderPanel("Setting Fields", true, true, true, null);
+		fp.setFrameColor(IAPnavigationPanel.getTabColor(), IAPnavigationPanel.getTabColor(), 5, 5);
+		for (String s : allSettings)
+			fp.addGuiComponentRow(new JLabel("<html><font color='#222222'>" + s.split("\\|\\|\\|")[0]), new JLabel("<html><font color='#222222'>"
+					+ s.split("\\|\\|\\|")[1]), false);
+		fp.setMaximumRowCount(15);
+		fp.setBackground(IAPnavigationPanel.getTabColor());
+		fp.enableSearch(true);
+		fp.setSearchLeftAligned(true, 400);
+		fp.addSearchFilter(fp.getDefaultSearchFilter(null));
+		fp.layoutRows();
+		rr.add(fp);
+		if (false)
+			rr.add(new JLabel("<html><b>Click on a action button above to open a<br>"
+					+ "settings-group or to edit the corresponding setting.</b><br><br>" +
+					"Most settings are active immediately, but some  options<br>"
+					+ "may require a restart of the progam upon setting change."));
+		if (false)
+			rr.add(new JLabel("<html><b>The values within a specific group may<br>"
+					+ "be removed/reverted to their defaults:</b><br><br>" +
+					"The &quot;Defaults (delayed)&quot; command, shown for a selected<br>"
+					+ "settings-group, removes the shown settings and their values.<br>" +
+					"The settings will re-appear as soon as they are needed, and will<br>"
+					+ "be reverted to the programmed defaults."));
+		return new MainPanelComponent(rr, 25);
 	}
 	
 	@Override

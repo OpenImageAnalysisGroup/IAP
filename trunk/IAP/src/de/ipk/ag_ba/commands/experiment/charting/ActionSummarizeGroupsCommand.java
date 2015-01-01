@@ -118,7 +118,7 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 	
 	@Override
 	public ExperimentInterface transform(ExperimentInterface input) {
-		ExperimentInterface result = input;
+		ExperimentInterface result = input.clone();
 		
 		boolean calcGrubbsA = set.getBoolean("Summarize data", "Filter outliers//Grubbs test before mean calculation", false);
 		boolean groupByPlantID = set.getBoolean("Summarize data", "Filter outliers//Merge into single value per day and plant ID", true);
@@ -148,6 +148,7 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 					nmiAveragePerPlant.setParentSample(s);
 					s.setSampleAverage(null);
 					s.recalculateSampleAverage(false);
+					s.getSampleAverage().setUnit(template.getUnit());
 				}
 			});
 			
@@ -158,7 +159,6 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 			result = MappingData3DPath.merge(pathObjects, true);
 		}
 		if (calcGrubbsA) {
-			int nA = result.getNumberOfMeasurementValues();
 			result.visitSamples(null, (s) -> {
 				s.setSampleAverage(null);
 				
@@ -186,8 +186,6 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 				
 				s.recalculateSampleAverage(false);
 			});
-			int nB = result.getNumberOfMeasurementValues();
-			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed outliers A " + nA + " --> " + nB);
 		}
 		
 		if (groupByPlantID) {
