@@ -20,7 +20,9 @@ import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
+import org.FolderPanel;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -34,7 +36,9 @@ import de.ipk.ag_ba.commands.DeletionCommand;
 import de.ipk.ag_ba.commands.Other;
 import de.ipk.ag_ba.commands.clima.ActionImportClimateData;
 import de.ipk.ag_ba.gui.ExperimentSortingMode;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.Unicode;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.interfaces.RunnableWithExperimentInfo;
@@ -67,6 +71,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	private int nVis, nAvail = 0;
 	private boolean error;
 	private String errorMsg;
+	private FolderPanel searchFP;
+	private ArrayList<NavigationButton> resSet;
 	
 	public ActionMongoExperimentsNavigation(MongoDB m, boolean limitToData, boolean limitToResults) {
 		super("Access " + m.getDisplayName());
@@ -91,8 +97,14 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 	 */
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
+		return resSet;
+	}
+	
+	private ArrayList<NavigationButton> processDataToGetAtionSet() {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+		TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> experiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 		nVis = 0;
+		this.searchFP = null;
 		
 		if (error) {
 			res.add(Other.getServerStatusEntity("<html><center>Connection Error<br>(" + errorMsg + ")</center>", src.getGUIsetting()));
@@ -137,7 +149,6 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			if (experimentList == null) {
 				res.add(Other.getServerStatusEntity("Error Status", src.getGUIsetting()));
 			} else {
-				TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> experiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 				LinkedHashSet<ExperimentHeaderInterface> trashed = new LinkedHashSet<ExperimentHeaderInterface>();
 				for (ExperimentHeaderInterface eh : experimentList) {
 					String type = mode.getFirstField(eh, "[no type]"); // eh.getExperimentType() // eh.getImportusergroup();
@@ -303,7 +314,40 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 			}
 		}
 		
+		FolderPanel fp = new FolderPanel("Experiment List", true, true, true, null);
+		fp.setFrameColor(IAPnavigationPanel.getTabColor(), IAPnavigationPanel.getTabColor(), 5, 5);
+		for (String group : experiments.keySet()) {
+			for (String group2 : experiments.get(group).keySet()) {
+				for (ExperimentHeaderInterface ehi : experiments.get(group).get(group2)) {
+					JLabel jl = new JLabel("<html><font color='#222222'>" + group + "&nbsp;<small>" + Unicode.ARROW_RIGHT + "</small>&nbsp;" + group2
+							+ "&nbsp;<small>" + Unicode.ARROW_RIGHT + "</small>&nbsp;");
+					jl.setVerticalAlignment(JLabel.TOP);
+					fp.addGuiComponentRow(jl,
+							new JLabel("<html><font color='#222222'>"
+									+ ehi.toHtmlString()), false);
+				}
+			}
+		}
+		fp.setMaximumRowCount(1);
+		fp.setBackground(IAPnavigationPanel.getTabColor());
+		fp.enableSearch(true);
+		fp.setSearchLeftAligned(true, 650);
+		fp.addSearchFilter(fp.getDefaultSearchFilter(null));
+		fp.layoutRows();
+		this.searchFP = fp;
+		
 		return res;
+	}
+	
+	@Override
+	public MainPanelComponent getResultMainPanel() {
+		if (searchFP == null)
+			return super.getResultMainPanel();
+		else {
+			ArrayList<JComponent> cl = new ArrayList<JComponent>();
+			cl.add(searchFP);
+			return new MainPanelComponent(cl, 25);
+		}
 	}
 	
 	private int count(TreeMap<String, ArrayList<ExperimentHeaderInterface>> treeMap) {
@@ -720,6 +764,9 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		} while (t.isAlive());
 		
 		nAvail = experimentList != null ? experimentList.size() : 0;
+		
+		resSet = processDataToGetAtionSet();
+		
 		status.setCurrentStatusText1("");
 	}
 	

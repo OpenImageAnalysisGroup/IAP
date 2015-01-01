@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
-import javax.swing.JComponent;
-
 import org.IniIoProvider;
 import org.SystemOptions;
 import org.apache.commons.lang3.text.WordUtils;
@@ -112,7 +110,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 		if (ht != null && !help.isEmpty())
 			return new MainPanelComponent(help);
 		else
-			return new MainPanelComponent((JComponent) null);
+			return null;// new MainPanelComponent((JComponent) null);
 	}
 	
 	@Override
