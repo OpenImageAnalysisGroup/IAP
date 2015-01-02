@@ -240,7 +240,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	}
 	
 	private boolean doLocking() {
-		return SystemOptions.getInstance().getBoolean("VFS", vfs_type.name() + " - limit concurrent use", true);
+		return SystemOptions.getInstance().getBoolean("VFS", vfs_type.name() + " - limit concurrent use", false);
 	}
 	
 	Object in = new Object();
