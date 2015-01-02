@@ -743,17 +743,30 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 				idC = field2niceName.get(idC);
 			String v = "" + am.get(id);
 			if (v != null && !v.trim().isEmpty() && !v.equalsIgnoreCase("NULL"))
-				if (id.equals("settings"))
+				if (id.equals("sizekb")) {
+					String ss = "n/a";
+					if (v != null && !v.isEmpty() && !v.equals("null")) {
+						long kb = Long.parseLong(v);
+						if (kb > 0) {
+							ss = SystemAnalysis.getDataAmountString(kb * 1024);
+						}
+					}
 					resultRows.add("<tr><td>" + idC + "</td><td>"
-							+ (v != null && !v.equals("null") && !v.isEmpty() ? "(defined)" : "(not defined)")
+							+ ss
 							+ "</td></tr>");
-				else {
-					if (v.contains("|")) {
-						for (String vv : v.split("\\|"))
-							resultRows.add("<tr><td>" + idC + "</td><td>" + StringManipulationTools.trimString(vv, 40) + "</td></tr>");
-					} else
-						resultRows.add("<tr><td>" + idC + "</td><td>" + StringManipulationTools.trimString(v, 40) + "</td></tr>");
 				}
+				else
+					if (id.equals("settings"))
+						resultRows.add("<tr><td>" + idC + "</td><td>"
+								+ (v != null && !v.equals("null") && !v.isEmpty() ? "(defined)" : "(not defined)")
+								+ "</td></tr>");
+					else {
+						if (v.contains("|")) {
+							for (String vv : v.split("\\|"))
+								resultRows.add("<tr><td>" + idC + "</td><td>" + StringManipulationTools.trimString(vv, 40) + "</td></tr>");
+						} else
+							resultRows.add("<tr><td>" + idC + "</td><td>" + StringManipulationTools.trimString(v, 40) + "</td></tr>");
+					}
 		}
 		for (String r : resultRows)
 			s.append(r);
