@@ -8,6 +8,7 @@
 package de.ipk.ag_ba.commands.mongodb;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.TreeSet;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
@@ -26,14 +27,14 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 	private boolean active;
 	private final boolean saveAnnotation;
 	private MongoDB m;
-	private final ArrayList<ExperimentReferenceInterface> experimentlist;
+	private final LinkedList<ExperimentReferenceInterface> experimentlist;
 	private String task = "";
 	private boolean ignoreOutliers;
 	
 	public ActionCopyListOfExperimentsToMongo(MongoDB m, ArrayList<ExperimentReferenceInterface> experiment) {
 		super("Copy a list of experiments to this storage location");
 		this.m = m;
-		this.experimentlist = new ArrayList<ExperimentReferenceInterface>();
+		this.experimentlist = new LinkedList<ExperimentReferenceInterface>();
 		experimentlist.addAll(experiment);
 		saveAnnotation = false;
 	}
@@ -42,7 +43,7 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 		super("Copy a list of experiments to this storage location");
 		this.m = m;
 		this.ignoreOutliers = ignoreOutliers;
-		this.experimentlist = new ArrayList<ExperimentReferenceInterface>();
+		this.experimentlist = new LinkedList<ExperimentReferenceInterface>();
 		experimentlist.addAll(experiment);
 		this.saveAnnotation = annotationSave;
 	}
@@ -65,7 +66,7 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 		
 		this.m = (MongoDB) sel[0];
 		
-		ArrayList<ExperimentReferenceInterface> expList = new ArrayList<ExperimentReferenceInterface>();
+		LinkedList<ExperimentReferenceInterface> expList = new LinkedList<ExperimentReferenceInterface>();
 		boolean filter = experimentlist.size() > 1;
 		if (!filter) {
 			expList.addAll(experimentlist);
@@ -115,7 +116,8 @@ public class ActionCopyListOfExperimentsToMongo extends AbstractNavigationAction
 		try {
 			active = true;
 			int i = 0, n = expList.size();
-			for (ExperimentReferenceInterface experiment : expList) {
+			while (!expList.isEmpty()) {
+				ExperimentReferenceInterface experiment = expList.removeFirst();
 				i++;
 				status.setCurrentStatusText1("Load " + experiment.getExperimentName());
 				task = "Load " + experiment.getExperimentName() + " (" + i + "/" + n + ")";
