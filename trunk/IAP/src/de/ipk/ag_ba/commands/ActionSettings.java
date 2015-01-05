@@ -95,9 +95,15 @@ public class ActionSettings extends AbstractNavigationAction {
 				String bln = null;
 				try {
 					ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(setting.split("//")[0], true, InstanceLoader.getCurrentLoader()).newInstance();
-					bln = inst.getName() + "//" + setting.split("//")[1];
+					String v = so.internalGetString(s, setting);
+					bln = inst.getName() + "//" + setting.split("//")[1] + (v != null ? " <b>&#9655;</b> " + v : "");
 				} catch (Exception e) {
-					// empty
+					try {
+						String v = so.internalGetString(s, setting);
+						bln = setting + (v != null ? " <b>&#9655;</b> " + v : "");
+					} catch (Exception er) {
+						// empty
+					}
 				}
 				allSettings.add(s + " |||<small>" + Unicode.ARROW_RIGHT + "</small> "
 						+ StringManipulationTools.stringReplace(
