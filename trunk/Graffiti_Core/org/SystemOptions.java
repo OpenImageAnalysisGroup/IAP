@@ -791,4 +791,28 @@ public class SystemOptions {
 			return sw.toString();
 		}
 	}
+	
+	public String internalGetString(String section, String setting) {
+		if (isBooleanSetting(section, setting))
+			return getBoolean(section, setting, false, false) ? "Yes" : "No"; // &#9745; // &#9744;
+		if (isFloatSetting(section, setting))
+			return getDouble(section, setting, Double.NaN) + "";
+		if (isIntegerSetting(section, setting))
+			return getInteger(section, setting, Integer.MAX_VALUE) + "";
+		String s = ini.get(section, setting, String.class);
+		if (s != null) {
+			if (setting.endsWith("-radio-selection")) {
+				for (String sa : s.split("//"))
+					if (sa.startsWith("[x]"))
+						return sa.substring("[x]".length());
+			}
+			if (setting.toLowerCase().contains("color") && s != null && s.startsWith("#")
+					&& s.length() == 7) {
+				Color c = StringManipulationTools.getColorFromHTMLdef(s);
+				String cn = AttributeHelper.getColorName(c);
+				return cn;
+			}
+		}
+		return s == null || s.isEmpty() ? null : s;
+	}
 }
