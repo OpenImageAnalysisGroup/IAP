@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.commands;
 
+import iap.blocks.data_structures.ImageAnalysisBlock;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -13,6 +15,7 @@ import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
+import org.graffiti.util.InstanceLoader;
 
 import de.ipk.ag_ba.commands.datasource.Book;
 import de.ipk.ag_ba.commands.settings.ActionSettingsEditor;
@@ -89,8 +92,17 @@ public class ActionSettings extends AbstractNavigationAction {
 				s = "";
 			
 			for (String setting : so.getSectionSettings(s)) {
+				String bln = null;
+				try {
+					ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(setting.split("//")[0], true, InstanceLoader.getCurrentLoader()).newInstance();
+					bln = inst.getName() + "//" + setting.split("//")[1];
+				} catch (Exception e) {
+					// empty
+				}
 				allSettings.add(s + " |||<small>" + Unicode.ARROW_RIGHT + "</small> "
-						+ StringManipulationTools.stringReplace(setting, "//", " <small>" + Unicode.ARROW_RIGHT + "</small> "));
+						+ StringManipulationTools.stringReplace(
+								bln == null || bln.isEmpty() ? setting : bln,
+								"//", " <small>" + Unicode.ARROW_RIGHT + "</small> "));
 			}
 			
 			final ActionSettingsEditor ac = new ActionSettingsEditor(iniFileName, iniIO,
