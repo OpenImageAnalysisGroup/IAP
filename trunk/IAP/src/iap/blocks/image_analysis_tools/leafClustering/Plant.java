@@ -6,6 +6,8 @@ import java.util.LinkedList;
 
 import javax.vecmath.Point2d;
 
+import org.GapList;
+
 /**
  * @author pape
  */
@@ -55,8 +57,8 @@ public class Plant {
 	/**
 	 * Returns last matched leaves (considered the ignored flag, this leaves will not be included in the returned list).
 	 */
-	public LinkedList<LeafTip> getLastTips() {
-		LinkedList<LeafTip> out = new LinkedList<LeafTip>();
+	public GapList<LeafTip> getLastTips() {
+		GapList<LeafTip> out = new GapList<LeafTip>();
 		for (Leaf l : leafList) {
 			if (l.ignore == true)
 				continue;
