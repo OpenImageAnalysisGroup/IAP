@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.GapList;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -18,25 +19,25 @@ import de.ipk.ag_ba.image.structures.ImageStack;
  */
 public class LeafMatcher {
 	
-	private final ArrayList<LinkedList<LeafTip>> leafTipList;
+	private final ArrayList<GapList<LeafTip>> leafTipList;
 	private final Plant matchedPlant;
 	private double maxDistanceBetweenLeafTips = 50.0;
 	private final int fac = 0;
 	private final int millisecondsOfOneDay = 24 * 60 * 60 * 1000;
 	private final double maxAgeForMatching = 2.0;
 	
-	public LeafMatcher(Collection<LinkedList<Feature>> tipPositionsForEachDay, Normalisation norm) {
+	public LeafMatcher(Collection<GapList<Feature>> tipPositionsForEachDay, Normalisation norm) {
 		leafTipList = convert(tipPositionsForEachDay, norm);
 		matchedPlant = new Plant();
 	}
 	
-	public LeafMatcher(Plant plant, LinkedList<Feature> tipPositionsForOneDay,
+	public LeafMatcher(Plant plant, GapList<Feature> tipPositionsForOneDay,
 			long timepoint, Normalisation norm) {
 		leafTipList = convert(tipPositionsForOneDay, timepoint, norm);
 		matchedPlant = plant;
 	}
 	
-	public LeafMatcher(LinkedList<Feature> leafTipListForOneDay, long timepoint, Normalisation norm) {
+	public LeafMatcher(GapList<Feature> leafTipListForOneDay, long timepoint, Normalisation norm) {
 		leafTipList = convert(leafTipListForOneDay, timepoint, norm);
 		matchedPlant = new Plant();
 	}
@@ -154,15 +155,15 @@ public class LeafMatcher {
 		int snapshotIndex = 0;
 		long time = 0;
 		
-		for (LinkedList<LeafTip> tempTipListIn : leafTipList) {
+		for (GapList<LeafTip> tempTipListIn : leafTipList) {
 			if (tempTipListIn.isEmpty())
 				continue;
 			
 			int tipIndex = 0;
 			if (time == 0)
-				time = tempTipListIn.getFirst().getTime();
+				time = tempTipListIn.get(0).getTime();
 			else
-				time += (tempTipListIn.getFirst().getTime() - time);
+				time += (tempTipListIn.get(0).getTime() - time);
 			
 			// first run, create new leaves
 			if (snapshotIndex == 0 && matchedPlant.getNumberOfLeaves() <= 0) {
@@ -172,8 +173,8 @@ public class LeafMatcher {
 					tipIndex++;
 				}
 			} else {
-				LinkedList<LeafTip> lastMatchedTips = matchedPlant.getLastTips();
-				LinkedList<LeafTip> toMatch = tempTipListIn;
+				GapList<LeafTip> lastMatchedTips = matchedPlant.getLastTips();
+				GapList<LeafTip> toMatch = tempTipListIn;
 				claculateBestPairs(lastMatchedTips, toMatch);
 				// old leaves remaining -> check for ignore
 				if (!lastMatchedTips.isEmpty())
@@ -200,7 +201,7 @@ public class LeafMatcher {
 	/**
 	 * Match leaf objects.
 	 */
-	private void claculateBestPairs(LinkedList<LeafTip> lastMatchedTips, LinkedList<LeafTip> toMatch) {
+	private void claculateBestPairs(GapList<LeafTip> lastMatchedTips, GapList<LeafTip> toMatch) {
 		while (!toMatch.isEmpty() && !lastMatchedTips.isEmpty()) {
 			LeafTip[] bestPair = new LeafTip[2];
 			double bestDist = Double.MAX_VALUE;
@@ -243,12 +244,12 @@ public class LeafMatcher {
 		return dist;
 	}
 	
-	private ArrayList<LinkedList<LeafTip>> convert(Collection<LinkedList<Feature>> list, Normalisation norm) {
-		ArrayList<LinkedList<LeafTip>> tiplistForEachDay = new ArrayList<LinkedList<LeafTip>>();
-		LinkedList<LeafTip> tiplist;
+	private ArrayList<GapList<LeafTip>> convert(Collection<GapList<Feature>> list, Normalisation norm) {
+		ArrayList<GapList<LeafTip>> tiplistForEachDay = new ArrayList<GapList<LeafTip>>();
+		GapList<LeafTip> tiplist;
 		long time = 0;
-		for (LinkedList<Feature> l : list) {
-			tiplist = new LinkedList<LeafTip>();
+		for (GapList<Feature> l : list) {
+			tiplist = new GapList<LeafTip>();
 			if (l != null) {
 				time += millisecondsOfOneDay;
 				for (Feature p : l) {
@@ -263,13 +264,13 @@ public class LeafMatcher {
 		return tiplistForEachDay;
 	}
 	
-	private ArrayList<LinkedList<LeafTip>> convert(LinkedList<Feature> leafTipListForOneDay,
+	private ArrayList<GapList<LeafTip>> convert(GapList<Feature> leafTipListForOneDay,
 			long timepoint, Normalisation norm) {
-		LinkedList<LeafTip> ll = new LinkedList<LeafTip>();
+		GapList<LeafTip> ll = new GapList<LeafTip>();
 		for (Feature bf : leafTipListForOneDay) {
 			ll.add(new LeafTip(timepoint, ((Integer) bf.getFeature("x")).doubleValue(), ((Integer) bf.getFeature("y")).doubleValue(), bf.getFeatureMap(), norm));
 		}
-		ArrayList<LinkedList<LeafTip>> al = new ArrayList<LinkedList<LeafTip>>();
+		ArrayList<GapList<LeafTip>> al = new ArrayList<GapList<LeafTip>>();
 		al.add(ll);
 		return al;
 	}

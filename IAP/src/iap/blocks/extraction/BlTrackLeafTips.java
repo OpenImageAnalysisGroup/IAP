@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.Colors;
+import org.GapList;
 import org.StringManipulationTools;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
@@ -57,11 +58,11 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 					optionsAndResults.getConfigAndAngle(), true);
 			BlockResultObject result1 = getResultSet().searchObjectResult(getBlockPosition(), 1, "leaftiplist_" + ct);
 			ArrayList<BlockResultValue> result2 = oldResults == null || oldResults.isEmpty() ? null : oldResults.lastEntry().getValue();
-			LinkedList<Feature> unassignedResults = null;
+			GapList<Feature> unassignedResults = null;
 			Plant previousResults = null;
 			
 			if (result1 != null) {
-				unassignedResults = (LinkedList<Feature>) result1.getObject();
+				unassignedResults = (GapList<Feature>) result1.getObject();
 			}
 			
 			if (result2 != null && !result2.isEmpty()) {
@@ -110,7 +111,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 		}
 	}
 	
-	private void createNewPlant(LinkedList<Feature> unassignedResults, CameraPosition cameraPosition,
+	private void createNewPlant(GapList<Feature> unassignedResults, CameraPosition cameraPosition,
 			CameraType cameraType, long timepoint, Normalisation norm, ImageData imageRef) {
 		LeafMatcher ltm = new LeafMatcher(unassignedResults, timepoint, norm);
 		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);
@@ -122,7 +123,7 @@ public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements Ca
 	}
 	
 	private void matchNewResults(Plant previousResults,
-			LinkedList<Feature> unassignedResults, final CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
+			GapList<Feature> unassignedResults, final CameraPosition cameraPosition, final CameraType cameraType, long timepoint,
 			final Normalisation norm, ImageData imageRef) {
 		LeafMatcher ltm = new LeafMatcher(previousResults, unassignedResults, timepoint, norm);
 		ltm.setMaxDistanceBetweenLeafTips(maxDistBetweenLeafTips);
