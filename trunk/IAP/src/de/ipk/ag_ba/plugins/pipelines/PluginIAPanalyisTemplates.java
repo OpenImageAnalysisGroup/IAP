@@ -13,6 +13,7 @@ import iap.blocks.debug.BlFilterImagesByAngle;
 import iap.blocks.debug.BlFilterImagesByCondition;
 import iap.blocks.debug.BlFilterImagesByDate;
 import iap.blocks.debug.BlFilterImagesByPlantID;
+import iap.blocks.debug.BlFilterImagesByRegularExpression;
 // import iap.blocks.debug.BlFilterImagesByRegularExpression;
 import iap.blocks.debug.BlFilterImagesByTopOrSide;
 import iap.blocks.debug.BlShowIntermediateImages;
@@ -20,11 +21,11 @@ import iap.blocks.debug.BlShowThreeDColorHistogram;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
+import iap.blocks.extraction.BlCalcColorfeatures;
 import iap.blocks.extraction.BlCalcConvexHull;
 // import iap.blocks.extraction.BlCalcIntensityFeature3DHistogram;
 import iap.blocks.extraction.BlCalcMainAxis;
 import iap.blocks.extraction.BlCalcMoments;
-import iap.blocks.extraction.BlCalcColorfeatures;
 import iap.blocks.extraction.BlCalcTextureFeatures;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
@@ -169,7 +170,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlFilterImagesByCondition(),
 				new BlShowIntermediateImages(),
 				new BlFilterImagesByPlantID(),
-				// new BlFilterImagesByRegularExpression(),
+				new BlFilterImagesByRegularExpression(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
