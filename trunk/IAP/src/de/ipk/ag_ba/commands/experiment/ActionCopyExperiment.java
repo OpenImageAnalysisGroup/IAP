@@ -170,7 +170,7 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 		if (experimentReferences.size() == 1)
 			return "Copy";
 		else
-			return "Copy Set of Experiments (" + experimentReferences.size() + " e., ~" + SystemAnalysis.getDataAmountString(expSize) + ")";
+			return "Copy Set of Experiments (" + experimentReferences.size() + " e., ~ " + SystemAnalysis.getDataAmountString(expSize) + ")";
 	}
 	
 	@Override
