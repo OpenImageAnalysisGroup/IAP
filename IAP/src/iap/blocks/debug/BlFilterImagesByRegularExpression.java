@@ -4,6 +4,8 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.StringManipulationTools;
@@ -39,8 +41,8 @@ public class BlFilterImagesByRegularExpression extends AbstractSnapshotAnalysisB
 		
 		boolean process = true;
 		
-		String[] possibleValues1 = { "contains", "does not contain" };
-		String calculationMode1 = optionsAndResults.getStringSettingRadio(this, "Calculation Mode", "contains",
+		String[] possibleValues1 = { "skip if matches", "skip if not matches" };
+		String calculationMode1 = optionsAndResults.getStringSettingRadio(this, "Calculation Mode", "skip if matches",
 				StringManipulationTools.getStringListFromArray(possibleValues1));
 		
 		Stream<ConditionInfo> possibleValues = ConditionInfo.getList().stream().filter((ConditionInfo f) -> {
@@ -52,16 +54,19 @@ public class BlFilterImagesByRegularExpression extends AbstractSnapshotAnalysisB
 		
 		ConditionInfo annotationMode = ConditionInfo.valueOfString(calculationMode);
 		
-		String regex = getString("Regex", "");
+		String regex = getString("Regex-base64", "");
 		
 		String condition = processedImages.getAnyInfo().getParentSample().getParentCondition().getField(annotationMode);
 		
-		if (condition != null && calculationMode1.equals("does not contain"))
-			if (!condition.matches(regex))
+		Pattern pat = Pattern.compile(regex);
+		Matcher match = pat.matcher(condition);
+		
+		if (condition != null && calculationMode1.equals("skip if not matches"))
+			if (!match.find())
 				process = false;
 		
-		if (condition != null && calculationMode1.equals("contains"))
-			if (condition.matches(regex))
+		if (condition != null && calculationMode1.equals("skip if matches"))
+			if (match.find())
 				process = false;
 		
 		if (!process) {
@@ -110,9 +115,7 @@ public class BlFilterImagesByRegularExpression extends AbstractSnapshotAnalysisB
 	@Override
 	public String getDescription() {
 		return "Removes images due to specific experiment condition filtered by regular expression. "
-				+ "<br>"
 				+ "Example for filtering USA and GERMANY from Varity Coondition:"
-				+ "<br>"
 				+ "Regex\'(USA|GERMANY)\' plus Calculation Mode 'contains' willl remove all plants "
 				+ "which include 'USA' or 'GERMANY' in Varity Condition.";
 	}
