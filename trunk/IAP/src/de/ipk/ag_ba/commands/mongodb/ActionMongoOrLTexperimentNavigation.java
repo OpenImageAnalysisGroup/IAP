@@ -70,12 +70,16 @@ public class ActionMongoOrLTexperimentNavigation extends
 		
 		ExperimentAnalysisSettingsIOprovder nnn = new ExperimentAnalysisSettingsIOprovder(exp.getHeader(), exp.getM());
 		if (nnn != null) {
-			SystemOptions soi = SystemOptions.getInstance(null, nnn);
-			String v = soi.getString("DESCRIPTION",
-					"tuned_for_IAP_version", null, false);
-			if (v != null && !ReleaseInfo.IAP_VERSION_STRING.equals(v))
-				oldAnalysis = true;
-			this.oldRelease = v;
+			try {
+				SystemOptions soi = SystemOptions.getInstance(null, nnn);
+				String v = soi.getString("DESCRIPTION",
+						"tuned_for_IAP_version", null, false);
+				if (v != null && !ReleaseInfo.IAP_VERSION_STRING.equals(v))
+					oldAnalysis = true;
+				this.oldRelease = v;
+			} catch (Exception e) {
+				this.oldRelease = null;
+			}
 		} else
 			this.oldRelease = null;
 		
