@@ -83,7 +83,7 @@ class DBCollectionImpl extends DBCollection {
 
         Response res = db.getConnector().call(_db, this, query, null, 2, readPref, decoder);
 
-        return new QueryResultIterator(db, this, res, batchSize, limit, options, decoder);
+        return new QueryResultIterator(this.namespace, db.getMongo(), res, batchSize, limit, decoder);
     }
 
     public Cursor aggregate(final List<DBObject> pipeline, final AggregationOptions options,
@@ -105,7 +105,7 @@ class DBCollectionImpl extends DBCollection {
             return new DBCursor(collection, new BasicDBObject(), null, ReadPreference.primary());
         } else {
             Integer batchSize = options.getBatchSize();
-            return new QueryResultIterator(res, db, this, batchSize == null ? 0 : batchSize, getDecoder(), res.getServerUsed());
+            return new QueryResultIterator(res, db.getMongo(), batchSize == null ? 0 : batchSize, getDecoder(), res.getServerUsed());
         }
     }
 
@@ -119,7 +119,7 @@ class DBCollectionImpl extends DBCollection {
 
         List<Cursor> cursors = new ArrayList<Cursor>();
         for (DBObject cursorDocument : (List<DBObject>) res.get("cursors")) {
-            cursors.add(new QueryResultIterator(cursorDocument, db, this, options.getBatchSize(), getDecoder(), res.getServerUsed()));
+            cursors.add(new QueryResultIterator(cursorDocument, db.getMongo(), options.getBatchSize(), getDecoder(), res.getServerUsed()));
         }
 
         return cursors;
@@ -343,13 +343,28 @@ class DBCollectionImpl extends DBCollection {
             List<DBObject> list = new ArrayList<DBObject>();
 
             if (db.isServerVersionAtLeast(asList(2, 7, 6))) {
-                CommandResult res = _db.command(new BasicDBObject("listIndexes", getName()), ReadPreference.primary());
+                CommandResult res = _db.command(new BasicDBObject("listIndexes", getName()).append("cursor", new BasicDBObject()),
+                                                ReadPreference.primary());
                 if (!res.ok() && res.getCode() == 26) {
                     return list;
                 }
                 res.throwOnError();
-                for (DBObject indexDocument : (List<DBObject>) res.get("indexes")) {
-                    list.add(indexDocument);
+                List<DBObject> indexes = (List<DBObject>) res.get("indexes");
+                if (indexes != null) {
+                    for (DBObject indexDocument : indexes) {
+                        list.add(indexDocument);
+                    }
+                } else {
+                    QueryResultIterator iterator = new QueryResultIterator(res, db.getMongo(), 0, DefaultDBDecoder.FACTORY.create(),
+                                                                           res.getServerUsed());
+                    try {
+                        while (iterator.hasNext()) {
+                            DBObject collectionInfo = iterator.next();
+                            list.add(collectionInfo);
+                        }
+                    } finally {
+                        iterator.close();
+                    }
                 }
             } else {
                 BasicDBObject cmd = new BasicDBObject("ns", getFullName());
