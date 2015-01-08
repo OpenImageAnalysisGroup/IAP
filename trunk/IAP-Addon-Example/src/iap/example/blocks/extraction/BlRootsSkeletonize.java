@@ -189,7 +189,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 								!getBoolean("Diameter Calculation Limit to Thick to Thin Disable Edge Traversal Veto", true)) :
 						sg.calculateDiameter(
 								getBoolean("Debug - Save Graphs to Files", false),
-								getBoolean("Don not check all endpoints but find and use most left and right ones", true),
+								getBoolean("Do not check all endpoints but find and use most left and right ones", true),
 								postProcessing, isThinnedImage);
 				HashMap<Integer, Integer> co2i = new HashMap<Integer, Integer>();
 				int idx = 1;
