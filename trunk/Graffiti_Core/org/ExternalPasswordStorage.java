@@ -36,7 +36,11 @@ public class ExternalPasswordStorage {
 		}
 	}
 	
-	public synchronized static String encryptValueIfNeeded(String group, String setting, String value) {
+	public synchronized static String encryptAndConvertValueIfNeeded(String group, String setting, String value) {
+		return encryptValueIfNeeded(group, setting, convertValueIfNeeded(group, setting, value));
+	}
+	
+	private synchronized static String encryptValueIfNeeded(String group, String setting, String value) {
 		if (!needsToBeStoredEncrypted(group, setting, value))
 			return value;
 		else {
@@ -52,7 +56,11 @@ public class ExternalPasswordStorage {
 		}
 	}
 	
-	public synchronized static String decryptValueIfNeeded(String group, String setting, String value) {
+	public synchronized static String decryptAndUnconvertValueIfNeeded(String group, String setting, String value) {
+		return unconvertValueIfNeeded(group, setting, decryptValueIfNeeded(group, setting, value));
+	}
+	
+	private synchronized static String decryptValueIfNeeded(String group, String setting, String value) {
 		if (!hasBeenStoredEncrypted(group, setting, value)) {
 			return value;
 		} else {
@@ -69,6 +77,36 @@ public class ExternalPasswordStorage {
 		}
 	}
 	
+	private synchronized static String convertValueIfNeeded(String group, String setting, String value) {
+		if (!needsToBeStoredConverted(group, setting, value))
+			return value;
+		else {
+			byte[] cleartext;
+			try {
+				cleartext = value.getBytes("UTF8");
+				return "base64:" + instance.base64encoder.encode(cleartext);
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+				return null;
+			}
+		}
+	}
+	
+	private synchronized static String unconvertValueIfNeeded(String group, String setting, String value) {
+		if (!hasBeenStoredConverted(group, setting, value)) {
+			return value;
+		} else {
+			try {
+				value = value.substring("base64:".length());
+				byte[] plainTextPwdBytes = instance.base64decoder.decodeBuffer(value);
+				return new String(plainTextPwdBytes, "UTF8");
+			} catch (Exception e) {
+				ErrorMsg.addErrorMessage(e);
+				return null;
+			}
+		}
+	}
+	
 	private static boolean needsToBeStoredEncrypted(String group, String setting, String value) {
 		if (setting != null && setting.contains("password") && value != null && !value.isEmpty() && !value.equals("?"))
 			return true;
@@ -76,8 +114,22 @@ public class ExternalPasswordStorage {
 			return false;
 	}
 	
+	private static boolean needsToBeStoredConverted(String group, String setting, String value) {
+		if (setting != null && setting.contains("base64") && value != null && !value.isEmpty() && !value.equals("?"))
+			return true;
+		else
+			return false;
+	}
+	
 	private static boolean hasBeenStoredEncrypted(String group, String setting, String value) {
 		if (setting != null && setting.contains("password") && value != null && value.startsWith("encrypted:"))
+			return true;
+		else
+			return false;
+	}
+	
+	private static boolean hasBeenStoredConverted(String group, String setting, String value) {
+		if (setting != null && setting.contains("base64") && value != null && value.startsWith("base64:"))
 			return true;
 		else
 			return false;

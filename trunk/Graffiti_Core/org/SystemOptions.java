@@ -408,7 +408,7 @@ public class SystemOptions {
 				String r = ini.get(group, setting, String.class);
 				if (r == null) {
 					if (addDefaultIfNeeded) {
-						String storeValue = ExternalPasswordStorage.encryptValueIfNeeded(group, setting, defaultValue);
+						String storeValue = ExternalPasswordStorage.encryptAndConvertValueIfNeeded(group, setting, defaultValue);
 						ini.put(group, setting, storeValue + "");
 						store(group, setting);
 					}
@@ -417,7 +417,7 @@ public class SystemOptions {
 					if (r == null || r.equals("null"))
 						return null;
 					else
-						return ExternalPasswordStorage.decryptValueIfNeeded(group, setting, r);
+						return ExternalPasswordStorage.decryptAndUnconvertValueIfNeeded(group, setting, r);
 				}
 			}
 		}
@@ -542,7 +542,7 @@ public class SystemOptions {
 			return;
 		} else {
 			synchronized (ini) {
-				value = ExternalPasswordStorage.encryptValueIfNeeded(group, setting, value);
+				value = ExternalPasswordStorage.encryptAndConvertValueIfNeeded(group, setting, value);
 				checkInvalidStatus();
 				ini.put(group, setting, value + "");
 				store(group, setting);
