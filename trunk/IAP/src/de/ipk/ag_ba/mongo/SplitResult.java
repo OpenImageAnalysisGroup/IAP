@@ -494,7 +494,8 @@ public class SplitResult {
 							BackgroundThreadDispatcher.runInSeparateThread(() -> {
 								try {
 									do {
-										optPingCode.run();
+										if (optPingCode != null)
+											optPingCode.run();
 										Thread.sleep(5000);
 									} while (!lock.tryAcquire());
 								} catch (Exception e) {
