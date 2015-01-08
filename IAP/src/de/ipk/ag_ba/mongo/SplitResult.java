@@ -129,7 +129,7 @@ public class SplitResult {
 			if (sourceHeader == null) {
 				ExperimentReferenceInterface eRef = new ExperimentReference(ii.getOriginDbId());
 				ExperimentHeaderInterface oriH = eRef.getHeader();
-				sourceHeader = oriH;
+				sourceHeader = oriH.clone();
 			}
 			if (originName == null) {
 				ExperimentReferenceInterface eRef = new ExperimentReference(ii.getOriginDbId());
@@ -152,10 +152,10 @@ public class SplitResult {
 			BackgroundTaskConsoleLogger status = new BackgroundTaskConsoleLogger("", "", false);
 			if (optPingCode != null)
 				optPingCode.run();
-			ExperimentInterface ei = m.getExperiment(ii, false, status);
+			final ExperimentInterface ei = m.getExperiment(ii.clone(), false, status);
 			// if (s1.getTime() > 30000)
 			// s1.printTime();
-			String[] cc = ii.getExperimentName().split("§");
+			String[] cc = ei.getHeader().getExperimentName().split("§");
 			tso.addInt(1);
 			if (optPingCode != null)
 				optPingCode.run();
