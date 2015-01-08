@@ -122,7 +122,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 	@Override
 	public String getDefaultTooltip() {
 		try {
-			if (experiment != null)
+			if (experiment != null && experiment.getExperimentPeek() != null)
 				determineSubstanceGroups();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
