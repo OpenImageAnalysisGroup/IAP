@@ -54,7 +54,9 @@ public class FilePanelHeader extends JPanel {
 		if (actions != null && actions.length > 0) {
 			ArrayList<JComponent> jl = new ArrayList<JComponent>();
 			JLabel il = new JLabel("");
-			jl.add(TableLayout.getSplitVertical(new JLabel("File Name >"), il, TableLayout.PREFERRED, TableLayout.PREFERRED));
+			JLabel hi = new JLabel("File Name >");
+			hi.setToolTipText("Use either & or | for logic operations");
+			jl.add(TableLayout.getSplitVertical(hi, il, TableLayout.PREFERRED, TableLayout.PREFERRED));
 			JTextField tf = new JTextField("");
 			tf.setPreferredSize(new Dimension(100, (int) tf.getPreferredSize().getHeight()));
 			myFilterConnector.textFieldDefined(tf, il);

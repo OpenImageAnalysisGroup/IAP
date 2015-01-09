@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 
 import org.AttributeHelper;
 import org.FolderPanel;
+import org.FolderPanel.Iconsize;
 import org.IniIoProvider;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
@@ -202,7 +203,12 @@ public class ActionSettings extends AbstractNavigationAction {
 		fp.setBackground(IAPnavigationPanel.getTabColor());
 		fp.enableSearch(true);
 		fp.setSearchLeftAligned(true, 400);
-		fp.addSearchFilter(fp.getDefaultSearchFilter(null));
+		fp.setIconSize(Iconsize.MIDDLE);
+		fp.setShowCondenseButton(false);
+		fp.addSearchFilter(fp.getDefaultSearchFilter(null),
+				"<html>"
+						+ "Enter text into the search field to filter the list content,<br>"
+						+ "use either & or | for logic operations to use multiple search terms.");
 		fp.layoutRows();
 		rr.add(fp);
 		if (false)
