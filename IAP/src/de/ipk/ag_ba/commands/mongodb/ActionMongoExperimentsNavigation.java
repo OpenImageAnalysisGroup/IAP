@@ -23,6 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.FolderPanel;
+import org.FolderPanel.Iconsize;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -332,6 +333,8 @@ public class ActionMongoExperimentsNavigation extends AbstractNavigationAction {
 		fp.setBackground(IAPnavigationPanel.getTabColor());
 		fp.enableSearch(true);
 		fp.setSearchLeftAligned(true, 650);
+		fp.setIconSize(Iconsize.MIDDLE);
+		fp.setShowCondenseButton(false);
 		fp.addSearchFilter(fp.getDefaultSearchFilter(null));
 		fp.layoutRows();
 		this.searchFP = fp;
