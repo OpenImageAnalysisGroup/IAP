@@ -98,7 +98,7 @@ public class FilterConnector {
 		} else {
 			match = false;
 			if (tf.getText().contains("|")) {
-				for (String t : tf.getText().split("|")) {
+				for (String t : tf.getText().split("\\|")) {
 					if (label.contains(t)) {
 						match = true;
 						break;
