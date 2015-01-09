@@ -227,18 +227,18 @@ public class MongoDB {
 				}
 			}
 			
-			if (getEnsureIndex())
-				try {
-					BackgroundThreadDispatcher.addTask(() -> {
-						try {
-							ensureBasicIndecies();
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-					}, "Ensure Indecies in Grid DB");
-				} catch (InterruptedException e) {
-					ErrorMsg.addErrorMessage(e);
-				}
+			// if (getEnsureIndex())
+			// try {
+			// BackgroundThreadDispatcher.addTask(() -> {
+			// try {
+			// ensureBasicIndecies();
+			// } catch (Exception e) {
+			// throw new RuntimeException(e);
+			// }
+			// }, "Ensure Indecies in Grid DB");
+			// } catch (InterruptedException e) {
+			// ErrorMsg.addErrorMessage(e);
+			// }
 		} else
 			mh = null;
 	}
@@ -373,7 +373,7 @@ public class MongoDB {
 					10000));
 			mob.socketTimeout(SystemOptions.getInstance().getInteger("GRID-STORAGE", "socket timeout", 5 * 60 * 1000));
 			mob.maxWaitTime(SystemOptions.getInstance().getInteger("GRID-STORAGE", "max wait time", 5 * 60 * 1000));
-			mob.autoConnectRetry(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true));
+			// depcricated//mob.autoConnectRetry(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "auto connect retry", true));
 			mob.socketKeepAlive(SystemOptions.getInstance().getBoolean("GRID-STORAGE", "socket keep alive", true));
 			mob.writeConcern(WriteConcern.ACKNOWLEDGED);
 			
