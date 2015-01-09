@@ -693,16 +693,19 @@ public class SkeletonGraph {
 									first = g;
 								last = g;
 							}
-							for (GraphElement ge : new GraphElement[] { first, last }) {
-								if (ge instanceof Node) {
-									final NodeHelper nh = new NodeHelper((Node) ge);
-									
-									Point2D p = nh.getPosition();
-									canv.drawCircle(
-											(int) p.getX() / 2,
-											(int) p.getY() / 2, 25, Color.BLUE.getRGB(), 0, 5).getImage();
+							// first and last elements are not the extreme points of the shortest longest path
+							// therefore, the drawing of these elements would currently result in incorrect results
+							if (false)
+								for (GraphElement ge : new GraphElement[] { first, last }) {
+									if (ge instanceof Node) {
+										final NodeHelper nh = new NodeHelper((Node) ge);
+										
+										Point2D p = nh.getPosition();
+										canv.drawCircle(
+												(int) p.getX() / 2,
+												(int) p.getY() / 2, 25, Color.BLUE.getRGB(), 0, 5).getImage();
+									}
 								}
-							}
 						}
 					for (GraphElement ge : elms) {
 						if (ge instanceof Node) {
