@@ -257,18 +257,21 @@ public class Batch {
 					while (cursor.hasNext()) {
 						CloudHost h = (CloudHost) cursor.next();
 						// System.out.println("age: " + (curr - h.getLastUpdateTime()) / 1000 + "s: " + h.getHostName());
-						if (curr - h.getLastUpdateTime() < maxUpdate) {
+						if (h.getLastUpdateTime() != null && curr - h.getLastUpdateTime() < maxUpdate) {
 							res.add(h);
 						} else {
-							long age = curr - h.getLastUpdateTime();
-							if (age > 1000 * 60 * 2)
+							if (h.getLastUpdateTime() != null) {
+								long age = curr - h.getLastUpdateTime();
+								if (age > 1000 * 60 * 2)
+									del.add(h);
+							} else
 								del.add(h);
 						}
 					}
 					for (CloudHost d : del)
 						dbc.remove(d);
 				} catch (Exception e) {
-					MongoDB.saveSystemErrorMessage("batchGetAvailableHosts - error " + e.getMessage(), e);
+					MongoDB.saveSystemErrorMessage("batchGetAvailableHosts - error " + e.getMessage(), null);
 				}
 			}
 			
