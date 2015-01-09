@@ -33,7 +33,7 @@ public class CloudHost extends BasicDBObject {
 		put("ping", System.currentTimeMillis());
 	}
 	
-	public long getLastUpdateTime() {
+	public Long getLastUpdateTime() {
 		return (Long) get("ping");
 	}
 	
