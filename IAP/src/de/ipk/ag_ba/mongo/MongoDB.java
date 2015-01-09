@@ -89,7 +89,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 public class MongoDB {
 	
 	public static boolean getEnsureIndex() {
-		return SystemOptions.getInstance().getBoolean("GRID-STORAGE", "ensure Index", true);
+		return false;// SystemOptions.getInstance().getBoolean("GRID-STORAGE", "ensure Index", true);
 	}
 	
 	private MongoClient m;
