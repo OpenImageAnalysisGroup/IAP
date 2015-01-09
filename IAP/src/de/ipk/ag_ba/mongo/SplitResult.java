@@ -283,10 +283,10 @@ public class SplitResult {
 				
 			} catch (Exception err) {
 				if (!deleteAfterMerge)
-					MongoDB.saveSystemErrorMessage("Could not mark experiment " + i.getExperimentName() +
+					MongoDB.saveSystemErrorMessage("Could not mark experiment as deleted: " + i.getExperimentName() +
 							" as trashed", err);
 				else
-					MongoDB.saveSystemErrorMessage("Could not delete experiment " + i.getExperimentName(), err);
+					MongoDB.saveSystemErrorMessage("Could not delete experiment: " + i.getExperimentName(), err);
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not " + (deleteAfterMerge ? "delete" : "set delete-mark on") + " experiment "
 						+ i.getExperimentName() + " (" +
 						err.getMessage() + ")");
