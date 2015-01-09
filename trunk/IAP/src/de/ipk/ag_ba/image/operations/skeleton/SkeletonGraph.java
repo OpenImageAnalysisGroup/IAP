@@ -610,12 +610,12 @@ public class SkeletonGraph {
 		if (gl.size() != 1)
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Skeleton graph with more than one component created. Number of components: "
 					+ gl.size());
-		Graph lcgg = null;
-		double largestDiameter = 0;
+		ThreadSafeOptions tsoLCGG = new ThreadSafeOptions();
 		String optGMLoutputFileName = !saveGraphFiles ? null : ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
 				+ System.currentTimeMillis() + ".gml";
 		final HashMap<Graph, Collection<GraphElement>> graphComponent2shortestPathElements =
 				new HashMap<Graph, Collection<GraphElement>>();
+		ArrayList<Runnable> todo = new ArrayList<>();
 		for (final Graph gg : gl) {
 			if (gg.getNumberOfNodes() < 2)
 				continue;
@@ -623,39 +623,46 @@ public class SkeletonGraph {
 			if (optGMLoutputFileName != null)
 				System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Determine graph diameter: ");
 			ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
-			Collection<GraphElement> elem;
-			if (findAndProcessMostLefAndRightEndPointsOnly)
-				elem = WeightedShortestPathSelectionAlgorithm.getShortestPathElements(
-						gg.getGraphElements(),
-						first(filterMostLeftAndRightEndpoints(gg.getGraphElements())),
-						last(filterMostLeftAndRightEndpoints(gg.getGraphElements())),
-						false, false, true, Double.MAX_VALUE,
-						new AttributePathNameSearchType("iap", "len", SearchType.searchDouble, "len"),
-						true, false, false, false, optLengthReturn, null);
-			else
-				elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
-						gg.getGraphElements(),
-						new AttributePathNameSearchType("iap", "len", SearchType.searchDouble, "len"),
-						optLengthReturn, false, BackgroundThreadDispatcher.getRE());
-			graphComponent2shortestPathElements.put(gg, elem);
-			if (optGMLoutputFileName != null && !thinned)
-				for (GraphElement ge : elem) {
-					if (ge instanceof Node) {
-						final NodeHelper nh = new NodeHelper((Node) ge);
-						nh.setFillColor(Color.YELLOW)
-								.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble());
+			todo.add(() -> {
+				Collection<GraphElement> elem;
+				if (findAndProcessMostLefAndRightEndPointsOnly)
+					elem = WeightedShortestPathSelectionAlgorithm.getShortestPathElements(
+							gg.getGraphElements(),
+							first(filterMostLeftAndRightEndpoints(gg.getGraphElements())),
+							last(filterMostLeftAndRightEndpoints(gg.getGraphElements())),
+							false, false, true, Double.MAX_VALUE,
+							new AttributePathNameSearchType("iap", "len", SearchType.searchDouble, "len"),
+							true, false, false, false, optLengthReturn, null);
+					else
+						elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
+								gg.getGraphElements(),
+								new AttributePathNameSearchType("iap", "len", SearchType.searchDouble, "len"),
+								optLengthReturn, false, BackgroundThreadDispatcher.getRE());
+					synchronized (gl) {
+						graphComponent2shortestPathElements.put(gg, elem);
+						if (optGMLoutputFileName != null && !thinned)
+							for (GraphElement ge : elem) {
+								if (ge instanceof Node) {
+									final NodeHelper nh = new NodeHelper((Node) ge);
+									nh.setFillColor(Color.YELLOW)
+											.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble());
+								}
+							}
+						Double dia = optLengthReturn.getDouble();
+						id2size.put(id, dia);
+						if (optGMLoutputFileName != null)
+							System.out.println(dia.intValue());
+						if (dia > tsoLCGG.getDouble()) {
+							tsoLCGG.setGraphInstance(gg);
+							tsoLCGG.setDouble(dia);
+							id2size.put(-1, dia);
+						}
 					}
-				}
-			Double dia = optLengthReturn.getDouble();
-			id2size.put(id, dia);
-			if (optGMLoutputFileName != null)
-				System.out.println(dia.intValue());
-			if (dia > largestDiameter) {
-				lcgg = gg;
-				largestDiameter = dia;
-				id2size.put(-1, dia);
-			}
+				});
 		}
+		BackgroundThreadDispatcher.getRE().execInParallel(todo, "Determine graph diameter distances", null);
+		Graph lcgg = tsoLCGG.getGraphInstance();
+		double largestDiameter = tsoLCGG.getDouble();
 		if (lcgg != null) {
 			lcgg.numberGraphElements();
 			final Graph lcggF = lcgg;
