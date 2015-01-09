@@ -670,6 +670,9 @@ public class SkeletonGraph {
 				@Override
 				public Image postProcess(Image in) {
 					ImageCanvas canv = in.io().canvas();
+					
+					Collection<GraphElement> elms = graphComponent2shortestPathElements.get(lcggF);
+					
 					if (findAndProcessMostLefAndRightEndPointsOnly) {
 						for (GraphElement ge : filterMostLeftAndRightEndpoints(lcggF.getGraphElements())) {
 							if (ge instanceof Node) {
@@ -681,8 +684,26 @@ public class SkeletonGraph {
 										(int) p.getY() / 2, 25, Color.BLUE.getRGB(), 0, 5).getImage();
 							}
 						}
-					}
-					Collection<GraphElement> elms = graphComponent2shortestPathElements.get(lcggF);
+					} else
+						if (elms.size() > 0) {
+							GraphElement first = null;
+							GraphElement last = null;
+							for (GraphElement g : elms) {
+								if (first == null)
+									first = g;
+								last = g;
+							}
+							for (GraphElement ge : new GraphElement[] { first, last }) {
+								if (ge instanceof Node) {
+									final NodeHelper nh = new NodeHelper((Node) ge);
+									
+									Point2D p = nh.getPosition();
+									canv.drawCircle(
+											(int) p.getX() / 2,
+											(int) p.getY() / 2, 25, Color.BLUE.getRGB(), 0, 5).getImage();
+								}
+							}
+						}
 					for (GraphElement ge : elms) {
 						if (ge instanceof Node) {
 							final NodeHelper nh = new NodeHelper((Node) ge);
