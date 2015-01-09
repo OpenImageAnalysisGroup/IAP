@@ -8,6 +8,7 @@ import org.ErrorMsg;
 import org.ReleaseInfo;
 
 import de.ipk.ag_ba.gui.PipelineDesc;
+import de.ipk.ag_ba.gui.navigation_actions.ParameterOptions;
 import de.ipk.ag_ba.gui.navigation_actions.maize.AbstractPhenotypeAnalysisAction;
 import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -61,6 +62,19 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+	}
+	
+	@Override
+	public ParameterOptions getParameters() {
+		return new ParameterOptions("You may modify the number of submitted jobs:", new Object[] {
+				"Job Count", numberOfJobs
+		});
+	}
+	
+	@Override
+	public void setParameters(Object[] parameters) {
+		if (parameters != null && parameters.length > 0)
+			numberOfJobs = (Integer) parameters[0];
 	}
 	
 	@Override
