@@ -35,6 +35,7 @@ import org.graffiti.graph.Node;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugins.ios.exporters.gml.GMLWriter;
 
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
@@ -635,7 +636,7 @@ public class SkeletonGraph {
 				elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
 						gg.getGraphElements(),
 						new AttributePathNameSearchType("iap", "len", SearchType.searchDouble, "len"),
-						optLengthReturn, false);
+						optLengthReturn, false, BackgroundThreadDispatcher.getRE());
 			graphComponent2shortestPathElements.put(gg, elem);
 			if (optGMLoutputFileName != null && !thinned)
 				for (GraphElement ge : elem) {
