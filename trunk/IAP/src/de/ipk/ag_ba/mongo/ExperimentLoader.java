@@ -112,7 +112,7 @@ public class ExperimentLoader implements RunnableOnDB {
 			DBObject expref = dbr.fetch();
 			if (expref != null) {
 				if (MongoDB.getEnsureIndex())
-					db.getCollection("substances").ensureIndex("_id");
+					db.getCollection("substances").createIndex("_id");
 				final BasicDBList l = (BasicDBList) expref.get("substance_ids");
 				
 				DBCursor subList;

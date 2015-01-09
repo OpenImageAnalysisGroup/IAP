@@ -427,7 +427,7 @@ public class ExperimentSaver implements RunnableOnDB {
 			DBCollection collectionA = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString());
 			
 			if (MongoDB.getEnsureIndex())
-				collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+				collectionA.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 			
 			GridFSDBFile fff = gridfs_volumes.findOne(hash);
 			if (fff != null && fff.getLength() <= 0) {
@@ -442,7 +442,7 @@ public class ExperimentSaver implements RunnableOnDB {
 				GridFS gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW_FILES.toString());
 				DBCollection collectionB = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
 				if (MongoDB.getEnsureIndex())
-					collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+					collectionB.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 				
 				saveVolumeFile(gridfs_volumes, gridfs_preview, volume, optFileSize, optStatus, hash);
 				fff = gridfs_volumes.findOne(hash);
@@ -470,11 +470,11 @@ public class ExperimentSaver implements RunnableOnDB {
 		GridFS gridfs_networks = new GridFS(db, MongoGridFS.FS_NETWORKS.toString());
 		DBCollection collectionA = db.getCollection(MongoGridFS.FS_NETWORKS_FILES.toString());
 		if (MongoDB.getEnsureIndex())
-			collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+			collectionA.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 		GridFS gridfs_preview = new GridFS(db, MongoGridFS.FS_PREVIEW.toString());
 		DBCollection collectionB = db.getCollection(MongoGridFS.FS_PREVIEW_FILES.toString());
 		if (MongoDB.getEnsureIndex())
-			collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+			collectionB.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 		
 		String hash;
 		try {
@@ -1015,7 +1015,7 @@ public class ExperimentSaver implements RunnableOnDB {
 				(image.getURL().getPrefix().equals(LTftpHandler.PREFIX)) ||
 				image.getURL().getPrefix().startsWith("hsm_")) {
 			if (MongoDB.getEnsureIndex())
-				db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
+				db.getCollection("constantSrc2hash").createIndex("srcUrl");
 			
 			if (hashMain != null) {
 				DBObject knownURL = cols.constantSrc2hash.findOne(new BasicDBObject("srcUrl", image.getURL().toString()));

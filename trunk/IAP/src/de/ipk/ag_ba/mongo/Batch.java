@@ -340,7 +340,7 @@ public class Batch {
 						
 						hostName = SystemAnalysisExt.getHostName();
 						if (MongoDB.getEnsureIndex())
-							collection.ensureIndex("release");
+							collection.createIndex("release");
 						boolean added = false;
 						int addCnt = 0;
 						for (DBObject rm : BatchCmd.getRunstatusMatchers(CloudAnalysisStatus.SCHEDULED)) {
