@@ -42,6 +42,8 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
+import org.graffiti.util.InstanceLoader;
+
 /**
  * @author Christian Klukas
  *         (c) 2004 IPK-Gatersleben
@@ -94,14 +96,17 @@ public class FolderPanel extends JComponent {
 	protected JTextField currentSearchInputField;
 	private int activeSearchResult = -1;
 	private boolean lockRowCount;
-	private Iconsize bigIcons = Iconsize.SMALL;
+	private Iconsize iconSize = Iconsize.SMALL;
 	private boolean hideSearch;
 	private boolean searchLeftAligned;
 	private JButton condenseButton;
 	private int searchPaneWidth;
+	private boolean blockFocus;
+	private boolean initialCondensedState;
+	private String searcHToolTip;
 	
 	public void setIconSize(Iconsize bigIcons) {
-		this.bigIcons = bigIcons;
+		this.iconSize = bigIcons;
 	}
 	
 	public FolderPanel(String title, boolean openCondensed,
@@ -126,6 +131,7 @@ public class FolderPanel extends JComponent {
 		this.title = title;
 		this.showCondenseButton = showCondenseButton;
 		this.condensedState = openCondensed;
+		this.initialCondensedState = openCondensed;
 		this.sortedRows = sortRows;
 		rowPanel = new JPanel();
 		setBorder(BorderFactory.createLineBorder(frameColor, frameWidth));
@@ -281,6 +287,7 @@ public class FolderPanel extends JComponent {
 			});
 		};
 		synchronized (guiComponentRows) {
+			
 			checkCondensedState();
 			removeAll();
 			
@@ -400,9 +407,16 @@ public class FolderPanel extends JComponent {
 								TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
 				}
 				if (maxRowCount > 0) {
-					JComponent lrb = getLeftRightButton();
-					titleComp = TableLayout.getSplit(titleComp, lrb,
-							TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
+					if (searchLeftAligned) {
+						JComponent lrbA = getLeftRightButtonA();
+						JComponent lrbB = getLeftRightButtonB();
+						titleComp = TableLayout.get3Split(lrbB, titleComp, lrbA,
+								TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
+					} else {
+						JComponent lrb = getLeftRightButton();
+						titleComp = TableLayout.getSplit(titleComp, lrb,
+								TableLayoutConstants.FILL, TableLayoutConstants.PREFERRED);
+					}
 				}
 				
 				if (showHelpButton) {
@@ -446,7 +460,7 @@ public class FolderPanel extends JComponent {
 			validate();
 			repaint();
 			
-			if (!hideSearch && lastSearchText.length() > 0 && currentSearchInputField != null) {
+			if (!hideSearch && (lastSearchText.length() > 0 || blockFocus) && currentSearchInputField != null) {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -585,14 +599,14 @@ public class FolderPanel extends JComponent {
 		tb.setLayout(new TableLayout(new double[][] { { TableLayout.FILL },
 				{ TableLayout.FILL } }));
 		
-		final JButton cmdButton = new JButton();
+		final JButton cmdButtonCondense = new JButton();
 		
-		this.condenseButton = cmdButton;
+		this.condenseButton = cmdButtonCondense;
 		// result.setContentAreaFilled(false);
-		cmdButton.setBackground(frameColor);
-		cmdButton.setBorderPainted(false);
-		cmdButton.setRolloverEnabled(true);
-		cmdButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		cmdButtonCondense.setBackground(frameColor);
+		cmdButtonCondense.setBorderPainted(false);
+		cmdButtonCondense.setRolloverEnabled(true);
+		cmdButtonCondense.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		// result.setOpaque(false);
 		ClassLoader cl = FolderPanel.class.getClassLoader();
 		String path = FolderPanel.class.getPackage().getName().replace('.', '/') + "/images";
@@ -604,17 +618,17 @@ public class FolderPanel extends JComponent {
 			uncondensedIcon = new ImageIcon(cl.getResource(path + "/foldL.png"));
 		}
 		if (condensedState)
-			cmdButton.setIcon(condensedIcon);
+			cmdButtonCondense.setIcon(condensedIcon);
 		else
-			cmdButton.setIcon(uncondensedIcon);
-		cmdButton.addActionListener(new ActionListener() {
+			cmdButtonCondense.setIcon(uncondensedIcon);
+		cmdButtonCondense.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				condensedState = !condensedState;
 				if (condensedState)
-					cmdButton.setIcon(condensedIcon);
+					cmdButtonCondense.setIcon(condensedIcon);
 				else
-					cmdButton.setIcon(uncondensedIcon);
+					cmdButtonCondense.setIcon(uncondensedIcon);
 				showCondensed.put(title, new Boolean(condensedState));
 				layoutRows();
 				for (ActionListener al : collapse_listeners) {
@@ -623,8 +637,8 @@ public class FolderPanel extends JComponent {
 			}
 		});
 		int s = 0;
-		cmdButton.setMargin(new Insets(s, s, s, s));
-		tb.add(cmdButton, "0,0");
+		cmdButtonCondense.setMargin(new Insets(s, s, s, s));
+		tb.add(cmdButtonCondense, "0,0");
 		tb.validate();
 		return tb;
 	}
@@ -668,7 +682,12 @@ public class FolderPanel extends JComponent {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
+						boolean isEmpty = lastSearchText == null || lastSearchText.isEmpty();
 						lastSearchText = input.getText();
+						if (!isEmpty && (lastSearchText == null || lastSearchText.isEmpty())) {
+							blockFocus = true;
+						} else
+							blockFocus = false;
 						currentPage = 0;
 						layoutRows();
 						for (ActionListener al : collapse_listeners) {
@@ -724,7 +743,7 @@ public class FolderPanel extends JComponent {
 		cmdButtonS.setMargin(new Insets(s, s, s, s));
 		tb.add(cmdButtonS, "0,0");
 		tb.add(searchResLabel, "1,0");
-		JComponent jc = FolderPanel.getBorderedComponent(input, 0, 0, 2, 2);
+		JComponent jc = iconSize == Iconsize.SMALL ? FolderPanel.getBorderedComponent(input, 0, 0, 2, 2) : input;
 		jc.setOpaque(true);
 		jc.setBackground(frameColor);
 		tb.add(jc, "2,0");
@@ -733,7 +752,10 @@ public class FolderPanel extends JComponent {
 	}
 	
 	private String getSearchHintText() {
-		return "Enter text into the search field to filter the list content";
+		if (searcHToolTip == null)
+			return "Enter text into the search field to filter the list content";
+		else
+			return searcHToolTip;
 	}
 	
 	public static ImageIcon getSearchIcon() {
@@ -744,7 +766,19 @@ public class FolderPanel extends JComponent {
 		return searchIcon;
 	}
 	
+	private JComponent getLeftRightButtonA() {
+		return getLeftRightButton(true, false);
+	}
+	
+	private JComponent getLeftRightButtonB() {
+		return getLeftRightButton(false, true);
+	}
+	
 	private JComponent getLeftRightButton() {
+		return getLeftRightButton(true, true);
+	}
+	
+	private JComponent getLeftRightButton(boolean a, boolean b) {
 		JToolBar tb = new JToolBar();
 		tb.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		tb.setBorderPainted(false);
@@ -856,7 +890,7 @@ public class FolderPanel extends JComponent {
 		cmdButton2.setToolTipText("turn page (hold Shift key to go to last page)");
 		
 		// result.setOpaque(false);
-		ClassLoader cl = FolderPanel.class.getClassLoader();
+		ClassLoader cl = InstanceLoader.getCurrentLoader();
 		String path = FolderPanel.class.getPackage().getName().replace('.', '/') + "/images";
 		ImageIcon leftIcon = null;
 		ImageIcon rightIcon = null;
@@ -865,19 +899,19 @@ public class FolderPanel extends JComponent {
 		ImageIcon moreIcon = new ImageIcon(cl.getResource(path
 				+ "/bw_unfold.png"));
 		
-		if (bigIcons == Iconsize.LARGE) {
+		if (iconSize == Iconsize.LARGE) {
 			leftIcon = new ImageIcon(cl
 					.getResource(path + "/large_left.png"));
 			rightIcon = new ImageIcon(cl.getResource(path
 					+ "/large_right.png"));
 		} else
-			if (bigIcons == Iconsize.MIDDLE) {
+			if (iconSize == Iconsize.MIDDLE) {
 				leftIcon = new ImageIcon(cl
 						.getResource(path + "/middle_left.png"));
 				rightIcon = new ImageIcon(cl.getResource(path
 						+ "/middle_right.png"));
 			} else
-				if (bigIcons == Iconsize.SMALL) {
+				if (iconSize == Iconsize.SMALL) {
 					leftIcon = new ImageIcon(cl
 							.getResource(path + "/bw_left.png"));
 					rightIcon = new ImageIcon(cl.getResource(path
@@ -893,20 +927,24 @@ public class FolderPanel extends JComponent {
 		cmdButton2.setMargin(new Insets(s, s, s, s));
 		cmdButtonReduceMaximumRowCount.setMargin(new Insets(s, s, s, s));
 		cmdButtonIncreaseMaximumRowCount.setMargin(new Insets(s, s, s, s));
-		String pt = "<html><font color='gray'><small>" + (currentPage + 1)
+		String pt = "<html>"
+				+ (iconSize == Iconsize.SMALL ? "<font color='#5A78B2'><small>" : "<font color='#5A78B2'>") // gray
+				+ (currentPage + 1)
 				+ "/" + (pages);
 		if (((currentPage + 1) + "/" + (pages)).equals("1/0"))
 			pt = "";
 		JLabel pageLabel = new JLabel(pt);
 		pageLabel.setBackground(frameColor);
 		pageLabel.setOpaque(true);
-		if (!lockRowCount) {
+		if (!lockRowCount && a) {
 			tb.add(cmdButtonReduceMaximumRowCount, "0,0");
 			tb.add(cmdButtonIncreaseMaximumRowCount, "1,0");
 		}
-		tb.add(cmdButton1, "2,0");
-		tb.add(pageLabel, "3,0");
-		tb.add(cmdButton2, "4,0");
+		if (b) {
+			tb.add(cmdButton1, "2,0");
+			tb.add(pageLabel, "3,0");
+			tb.add(cmdButton2, "4,0");
+		}
 		tb.validate();
 		return tb;
 	}
@@ -1145,6 +1183,11 @@ public class FolderPanel extends JComponent {
 		rowBackground1 = col1;
 	}
 	
+	public void addSearchFilter(SearchFilter filter, String tooltip) {
+		addSearchFilter(filter);
+		this.searcHToolTip = tooltip;
+	}
+	
 	public void addSearchFilter(SearchFilter filter) {
 		this.searchFilter = filter;
 	}
@@ -1263,7 +1306,33 @@ public class FolderPanel extends JComponent {
 						}
 				if (c1.length() <= 0 && c2.length() <= 0)
 					return true;
-				return c2.contains(searchText) || c1.contains(searchText);
+				return match(c2, searchText) || match(c1, searchText);
+			}
+			
+			private boolean match(String c1, String searchText) {
+				boolean match = true;
+				if (searchText.contains("&")) {
+					for (String t : searchText.split("&")) {
+						if (!c1.contains(t)) {
+							match = false;
+							break;
+						}
+						
+					}
+				} else {
+					match = false;
+					if (searchText.contains("|")) {
+						for (String t : searchText.split("\\|")) {
+							if (c1.contains(t)) {
+								match = true;
+								break;
+							}
+							
+						}
+					} else
+						match = c1.contains(searchText);
+				}
+				return match;
 			}
 			
 			private void getSubText(JComponent c, StringBuilder sb) {
