@@ -107,6 +107,7 @@ public class NewsHelper implements HelperClass {
 		// subscribeButton = createNewsButton("Subscribe","Subscribe to a RSS News-Feed", getSubscribeAction());
 		
 		closeButton = createNewsButton("Close", "Close this Tab", new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (tabbedPane == null) {
 					JTabbedPane jt = findTabbedPane(res);
@@ -143,6 +144,7 @@ public class NewsHelper implements HelperClass {
 		refreshFolderPanels();
 		
 		ErrorMsg.addOnAddonLoadingFinishedAction(new Runnable() {
+			@Override
 			public void run() {
 				boolean auto = new SettingsHelperDefaultIsFalse().isEnabled("download_release_infos");
 				if (auto) {
@@ -151,6 +153,7 @@ public class NewsHelper implements HelperClass {
 					autoNews.setEnabled(false);
 					refreshFolderPanels();
 					refreshNews(rfm, new Runnable() {
+						@Override
 						public void run() {
 							newsButton.setEnabled(true);
 							autoNews.setEnabled(true);
@@ -196,6 +199,7 @@ public class NewsHelper implements HelperClass {
 	
 	private ActionListener getEditFeedAction() {
 		return new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				MainFrame.showMessageDialog("<html>RSS-Feeds are saved in a text-file, which will be opened<br>" +
 						"after pressing \"OK\".<br>" +
@@ -214,6 +218,7 @@ public class NewsHelper implements HelperClass {
 	@SuppressWarnings("unused")
 	private ActionListener getSubscribeAction() {
 		return new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				Object[] res = MyInputHelper.getInput("<html>Please specify the feeds name and its URLs.<br><br><small>Separate URLs by using the \"|\" symbol.",
 						"Subscribe to a News Feed", new Object[] {
@@ -272,6 +277,7 @@ public class NewsHelper implements HelperClass {
 			}
 		}
 		ActionListener res = new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				new SettingsHelperDefaultIsFalse().setEnabled("download_release_infos", autoNews.isSelected());
 			}
@@ -283,10 +289,12 @@ public class NewsHelper implements HelperClass {
 			final JTabbedPane tabbedPane, final JButton newsButton) {
 		
 		ActionListener res = new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				refreshFolderPanels();
 				refreshNews(rfm, new Runnable() {
 					
+					@Override
 					public void run() {
 						try {
 							// tabbedPane.setSelectedComponent(res);
@@ -303,7 +311,7 @@ public class NewsHelper implements HelperClass {
 	private boolean urlError(String feeds) {
 		feeds = feeds.trim();
 		if (feeds.contains("|")) {
-			for (String url : feeds.split("|")) {
+			for (String url : feeds.split("\\|")) {
 				try {
 					URL u = new URL(url);
 					u.openConnection();
@@ -342,6 +350,7 @@ public class NewsHelper implements HelperClass {
 		final ArrayList<Date> latestDates = new ArrayList<Date>();
 		
 		Runnable workTask = new Runnable() {
+			@Override
 			public void run() {
 				URL feedUrl;
 				status.setCurrentStatusValue(-1);
@@ -420,6 +429,7 @@ public class NewsHelper implements HelperClass {
 							}
 						}
 						Collections.sort(newsItems, new Comparator<GuiRow>() {
+							@Override
 							public int compare(GuiRow o1, GuiRow o2) {
 								Date a = row2date.get(o2);
 								Date b = row2date.get(o1);
@@ -527,6 +537,7 @@ public class NewsHelper implements HelperClass {
 												urls,
 												"Manual Download",
 												null, new Runnable() {
+													@Override
 													public void run() {
 														for (String u : urls) {
 															if (u.toLowerCase().endsWith(".jar")) {
@@ -557,6 +568,7 @@ public class NewsHelper implements HelperClass {
 													"(the preferences folder will be automatically opened in a few seconds)<br><br>", urls,
 											"Manual Download", null);
 									((JButton) b).addActionListener(new ActionListener() {
+										@Override
 										public void actionPerformed(ActionEvent e) {
 											MainFrame.showMessageDialog("<html>" +
 													"After the download is finished, please restart the<br>" +
@@ -570,6 +582,7 @@ public class NewsHelper implements HelperClass {
 								case URL: {
 									b = new JMButton(title);
 									((JButton) b).addActionListener(new ActionListener() {
+										@Override
 										public void actionPerformed(ActionEvent e) {
 											for (String u : urls)
 												AttributeHelper.showInBrowser(u);
@@ -581,6 +594,7 @@ public class NewsHelper implements HelperClass {
 									b = new JMButton("Subscribe to \"" + title + "\"");
 									
 									((JButton) b).addActionListener(new ActionListener() {
+										@Override
 										public void actionPerformed(ActionEvent e) {
 											if (rfm.registerNewFeed(title, urls)) {
 												if (newsButton != null)
@@ -600,6 +614,7 @@ public class NewsHelper implements HelperClass {
 											urls,
 											"Manual Download", null);
 									((JButton) b).addActionListener(new ActionListener() {
+										@Override
 										public void actionPerformed(ActionEvent e) {
 										}
 									});
@@ -625,6 +640,7 @@ public class NewsHelper implements HelperClass {
 		
 		Runnable finishSwingTask = new Runnable() {
 			
+			@Override
 			public void run() {
 				for (int i = 0; i < urls.size(); i++) {
 					FolderPanel items = fpList.get(i);
