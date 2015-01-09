@@ -244,16 +244,19 @@ public class MongoDB {
 	}
 	
 	private void ensureBasicIndecies() throws Exception {
+		if (true)
+			return;
+		
 		processDB(new RunnableOnDB() {
 			private DB db;
 			
 			@Override
 			public void run() {
-				// DBCollection collCond = db.getCollection("conditions");
-				// collCond.ensureIndex("_id");
-				//
-				// DBCollection collSubst = db.getCollection("substances");
-				// collSubst.ensureIndex("_id");
+				DBCollection collCond = db.getCollection("conditions");
+				collCond.createIndex("_id");
+				
+				DBCollection collSubst = db.getCollection("substances");
+				collSubst.createIndex("_id");
 			}
 			
 			@Override
@@ -341,7 +344,7 @@ public class MongoDB {
 				if (ensureIndex)
 					for (String fs : MongoGridFS.getFileCollections()) {
 						DBCollection collectionChunks = db.getCollection(fs.toString() + ".chunks");
-						collectionChunks.ensureIndex("files_id");
+						collectionChunks.createIndex("files_id");
 					}
 				
 				runnableOnDB.setDB(db);
@@ -805,7 +808,7 @@ public class MongoDB {
 					}
 					boolean printed = false;
 					if (getEnsureIndex())
-						db.getCollection("substances").ensureIndex("_id");
+						db.getCollection("substances").createIndex("_id");
 					
 					BasicDBList ll = new BasicDBList();
 					BasicDBList l = (BasicDBList) expref.get("substance_ids");
@@ -1303,11 +1306,11 @@ public class MongoDB {
 					GridFS gridfs_preview_files = new GridFS(db, MongoGridFS.FS_ANNOTATION_FILES.toString());
 					DBCollection collectionC = db.getCollection(MongoGridFS.FS_ANNOTATION_FILES.toString() + ".files");
 					if (getEnsureIndex())
-						collectionC.ensureIndex("filename");
+						collectionC.createIndex("filename");
 					
 					DBCollection collectionChunks = db.getCollection(MongoGridFS.FS_ANNOTATION_FILES.toString() + ".chunks");
 					if (getEnsureIndex())
-						collectionChunks.ensureIndex("files_id");
+						collectionChunks.createIndex("files_id");
 					
 					result.setObject(gridfs_preview_files);
 				} else
@@ -1315,11 +1318,11 @@ public class MongoDB {
 						GridFS gridfs_preview_files = new GridFS(db, "fs_preview_files");
 						DBCollection collectionC = db.getCollection("fs_preview_files.files");
 						if (getEnsureIndex())
-							collectionC.ensureIndex("filename");
+							collectionC.createIndex("filename");
 						
 						DBCollection collectionChunks = db.getCollection("fs_preview_files.chunks");
 						if (getEnsureIndex())
-							collectionChunks.ensureIndex("files_id");
+							collectionChunks.createIndex("files_id");
 						
 						result.setObject(gridfs_preview_files);
 					} else
@@ -1330,11 +1333,11 @@ public class MongoDB {
 										GridFS gridfs_images = new GridFS(db, MongoGridFS.FS_IMAGES.toString());
 										DBCollection collectionA = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString());
 										if (getEnsureIndex())
-											collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+											collectionA.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 										
 										DBCollection collectionChunks = db.getCollection(MongoGridFS.FS_IMAGES_FILES.toString() + ".chunks");
 										if (getEnsureIndex())
-											collectionChunks.ensureIndex("files_id");
+											collectionChunks.createIndex("files_id");
 										
 										result.setObject(gridfs_images);
 										break;
@@ -1342,11 +1345,11 @@ public class MongoDB {
 										GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_IMAGE_LABELS.toString());
 										DBCollection collectionB = db.getCollection(MongoGridFS.FS_IMAGE_LABELS_FILES.toString());
 										if (getEnsureIndex())
-											collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+											collectionB.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 										
 										collectionChunks = db.getCollection(MongoGridFS.FS_IMAGE_LABELS.toString() + ".chunks");
 										if (getEnsureIndex())
-											collectionChunks.ensureIndex("files_id");
+											collectionChunks.createIndex("files_id");
 										
 										result.setObject(gridfs_null_files);
 										break;
@@ -1358,11 +1361,11 @@ public class MongoDB {
 										GridFS gridfs_volumes = new GridFS(db, MongoGridFS.FS_VOLUMES.toString());
 										DBCollection collectionA = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString());
 										if (getEnsureIndex())
-											collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+											collectionA.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 										
 										DBCollection collectionChunks = db.getCollection(MongoGridFS.FS_VOLUMES_FILES.toString() + ".chunks");
 										if (getEnsureIndex())
-											collectionChunks.ensureIndex("files_id");
+											collectionChunks.createIndex("files_id");
 										
 										result.setObject(gridfs_volumes);
 										break;
@@ -1370,11 +1373,11 @@ public class MongoDB {
 										GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_VOLUME_LABELS.toString());
 										DBCollection collectionB = db.getCollection("fs_volume_labels.files");
 										if (getEnsureIndex())
-											collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+											collectionB.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 										
 										collectionChunks = db.getCollection(MongoGridFS.FS_VOLUME_LABELS.toString() + ".chunks");
 										if (getEnsureIndex())
-											collectionChunks.ensureIndex("files_id");
+											collectionChunks.createIndex("files_id");
 										
 										result.setObject(gridfs_null_files);
 										break;
@@ -1386,11 +1389,11 @@ public class MongoDB {
 										GridFS gridfs_networks = new GridFS(db, MongoGridFS.FS_NETWORKS.toString());
 										DBCollection collectionA = db.getCollection(MongoGridFS.FS_NETWORKS_FILES.toString());
 										if (getEnsureIndex())
-											collectionA.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+											collectionA.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 										
 										DBCollection collectionChunks = db.getCollection(MongoGridFS.FS_NETWORKS.toString() + ".chunks");
 										if (getEnsureIndex())
-											collectionChunks.ensureIndex("files_id");
+											collectionChunks.createIndex("files_id");
 										
 										result.setObject(gridfs_networks);
 										break;
@@ -1398,11 +1401,11 @@ public class MongoDB {
 										GridFS gridfs_null_files = new GridFS(db, MongoGridFS.FS_NETWORK_LABELS.toString());
 										DBCollection collectionB = db.getCollection(MongoGridFS.fs_networks_labels_files.toString());
 										if (getEnsureIndex())
-											collectionB.ensureIndex(MongoGridFS.FIELD_FILENAME.toString());
+											collectionB.createIndex(MongoGridFS.FIELD_FILENAME.toString());
 										
 										collectionChunks = db.getCollection(MongoGridFS.FS_NETWORK_LABELS.toString() + ".chunks");
 										if (getEnsureIndex())
-											collectionChunks.ensureIndex("files_id");
+											collectionChunks.createIndex("files_id");
 										
 										result.setObject(gridfs_null_files);
 										break;
@@ -1497,7 +1500,7 @@ public class MongoDB {
 			public void run() {
 				if (url != null && url.getPrefix().equals(LTftpHandler.PREFIX)) {
 					if (getEnsureIndex())
-						db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
+						db.getCollection("constantSrc2hash").createIndex("srcUrl");
 					
 					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", url.toString()));
 					if (knownURL != null) {
@@ -1530,7 +1533,7 @@ public class MongoDB {
 			public void run() {
 				if (url != null && url.getPrefix().equals(LTftpHandler.PREFIX)) {
 					if (getEnsureIndex())
-						db.getCollection("constantSrc2hash").ensureIndex("srcUrl");
+						db.getCollection("constantSrc2hash").createIndex("srcUrl");
 					
 					DBObject knownURL = db.getCollection("constantSrc2hash").findOne(new BasicDBObject("srcUrl", url.toString()));
 					if (knownURL != null) {
