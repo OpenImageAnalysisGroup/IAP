@@ -34,9 +34,9 @@ public class BlockResultValue {
 	
 	public BlockResultValue(String fromString) {
 		this(
-				fromString.split("|", 3)[0],
-				fromString.split("|", 3)[1],
-				Double.parseDouble(fromString.split("|", 3)[2]), null);
+				fromString.split("\\|", 3)[0],
+				fromString.split("\\|", 3)[1],
+				Double.parseDouble(fromString.split("\\|", 3)[2]), null);
 	}
 	
 	public BlockResultValue(String name, String unit, Double value, Double position, NumericMeasurement3D ref) {
