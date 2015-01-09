@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -22,6 +23,7 @@ import javax.swing.KeyStroke;
 import org.AttributeHelper;
 import org.Release;
 import org.ReleaseInfo;
+import org.RunnableExecutor;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.graph.Edge;
 import org.graffiti.graph.GraphElement;
@@ -188,6 +190,12 @@ public class WeightedShortestPathSelectionAlgorithm
 	public static List<GraphElement> findLongestShortestPathElements(
 			Collection<GraphElement> possibleSourceAndEndElements, AttributePathNameSearchType wa,
 			ThreadSafeOptions optLengthReturn, boolean allowAllTargets) {
+		return findLongestShortestPathElements(possibleSourceAndEndElements, wa, optLengthReturn, allowAllTargets, null);
+	}
+	
+	public static List<GraphElement> findLongestShortestPathElements(
+			Collection<GraphElement> possibleSourceAndEndElements, AttributePathNameSearchType wa,
+			ThreadSafeOptions optLengthReturn, boolean allowAllTargets, RunnableExecutor re) {
 		WeightedShortestPathSelectionAlgorithm wsp = new WeightedShortestPathSelectionAlgorithm();
 		Selection sel = new Selection();
 		wsp.setSelection(sel);
@@ -196,29 +204,41 @@ public class WeightedShortestPathSelectionAlgorithm
 		wsp.putWeightOnEdges = true;
 		wsp.settingDirected = false;
 		wsp.weightattribute = wa;
-		List<GraphElement> res = findLongestShortestPathStartAndEndPoints(possibleSourceAndEndElements, wa, optLengthReturn, allowAllTargets);
+		LinkedHashSet<GraphElement> aAApossibleSourceAndEndElements = new LinkedHashSet<>(possibleSourceAndEndElements);
+		List<GraphElement> res = findLongestShortestPathStartAndEndPoints(aAApossibleSourceAndEndElements, wa, optLengthReturn, allowAllTargets);
 		sel.addAll(res);
 		wsp.setSelection(sel);
 		Set targetGraphElementsToBeProcessed = new HashSet();
 		for (GraphElement ge : sel.getElements()) {
 			targetGraphElementsToBeProcessed.add(ge);
 		}
-		for (GraphElement ge : new ArrayList<GraphElement>(sel.getElements())) {
-			Collection<GraphElement> shortestPathNodesAndEdges = getShortestPathElements(
-					possibleSourceAndEndElements,
-					ge,
-					targetGraphElementsToBeProcessed,
-					false,
-					false,
-					true,
-					Double.MAX_VALUE,
-					wa,
-					true,
-					false,
-					false,
-					false);
-			sel.addAll(shortestPathNodesAndEdges);
+		ArrayList<Runnable> todo = new ArrayList<>();
+		for (GraphElement ge : new LinkedHashSet<GraphElement>(sel.getElements())) {
+			Runnable r = () -> {
+				Collection<GraphElement> shortestPathNodesAndEdges = getShortestPathElements(
+						aAApossibleSourceAndEndElements,
+						ge,
+						targetGraphElementsToBeProcessed,
+						false,
+						false,
+						true,
+						Double.MAX_VALUE,
+						wa,
+						true,
+						false,
+						false,
+						false);
+				synchronized (sel) {
+					sel.addAll(shortestPathNodesAndEdges);
+				}
+			};
+			todo.add(r);
 		}
+		if (re == null)
+			for (Runnable r : todo)
+				r.run();
+		else
+			re.execInParallel(todo, "Find shortest paths", null);
 		return sel.getElements();
 	}
 	
