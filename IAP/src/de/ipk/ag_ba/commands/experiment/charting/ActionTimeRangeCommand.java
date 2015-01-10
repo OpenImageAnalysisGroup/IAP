@@ -70,7 +70,7 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 			cb.setSelected(set.getBoolean("Charting", "Time range//" + time, true));
 			settings.put(time, cb);
 		}
-		Object[] sa = new Object[(items + settings.size()) * 2 + 4 + 4];
+		Object[] sa = new Object[(items + settings.size()) * 2 + 4 + 4 + 2];
 		int idx = 0;
 		sa[idx++] = "";
 		sa[idx++] = TableLayout.getSplit(new JButton(new AbstractAction("Invert Selection") {
@@ -95,6 +95,10 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 			else
 				sa[idx++] = settings.get(time);
 		}
+		sa[idx++] = "Reset Time Values";
+		JCheckBox cbResetTime = new JCheckBox("Clear Time Information");
+		cbResetTime.setSelected(set.getBoolean("Charting", "Time range//Reset Time Values", false));
+		sa[idx++] = cbResetTime;
 		sa[idx++] = "<html>&nbsp;";
 		sa[idx++] = new JLabel();
 		sa[idx++] = "Local/global";
@@ -110,6 +114,7 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		Object[] ur = MyInputHelper.getInput("Experiment days:<br><br>", "Time Range", sa);
 		if (ur != null) {
 			// apply settings
+			boolean resetTime = cbResetTime.isSelected();
 			boolean global = cbPersistentChange.isSelected();
 			if (global)
 				settingsLocal.setUseLocalSettings(false);
@@ -119,6 +124,7 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 				JCheckBox cb = settings.get(time);
 				set.setBoolean("Charting", "Time range//" + time, cb.isSelected());
 			}
+			set.setBoolean("Charting", "Time range//Reset Time Values", resetTime);
 			pipeline.setDirty(this);
 		}
 	}
@@ -145,17 +151,19 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 					continue;
 				if (set.getBoolean("Charting", i, true)) {
 					sel++;
-					int v = Integer.parseInt(StringManipulationTools.getNumbersFromString(i.substring("Time range//".length())));
-					if (v < min) {
-						min = v;
-						minS = i.substring("Time range//".length());
-					}
-					if (v > max) {
-						max = v;
-						maxS = i.substring("Time range//".length());
-					}
-				} else
-					unsel++;
+					if (!i.contains("Reset")) {
+						int v = Integer.parseInt(StringManipulationTools.getNumbersFromString(i.substring("Time range//".length())));
+						if (v < min) {
+							min = v;
+							minS = i.substring("Time range//".length());
+						}
+						if (v > max) {
+							max = v;
+							maxS = i.substring("Time range//".length());
+						}
+					} else
+						unsel++;
+				}
 			}
 		}
 		if (min < Integer.MAX_VALUE) {
@@ -163,14 +171,17 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		} else {
 			range = "no data";
 		}
+		boolean resetTime = settingsLocal.getSettings().getBoolean("Charting", "Time range//Reset Time Values", false);
 		if (unsel == 0)
 			return "<html><center><b>&#8667;</b>&nbsp;Time range&nbsp;<b>&#8667;</b><br><font color='gray'><small>no time point unselected<br>"
 					+ range
+					+ (resetTime ? "<br>(removing time dimension)" : "")
 					+ "</small></font></center>";
 		else
 			return "<html><center><b>&#8667;</b>&nbsp;Time range&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
 					+ sel + "/" + (sel + unsel) + " days selected<br>"
 					+ range
+					+ (resetTime ? "<br>(removing time dimension)" : "")
 					+ "</small></font></center>";
 	}
 	
@@ -187,6 +198,7 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 	@Override
 	public ExperimentInterface transform(ExperimentInterface input) {
 		input = input.clone();
+		boolean resetTime = set.getBoolean("Charting", "Time range//Reset Time Values", false);
 		ArrayList<String> ids = set.getSectionSettings("Charting");
 		HashSet<String> delDays = new HashSet<>();
 		for (String i : ids) {
@@ -202,7 +214,13 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		input.visitSamples(null, (s) -> {
 			if (delDays.contains(s.getSampleTime()))
 				deleteSamples.add(s);
-		});
+				else
+					if (resetTime) {
+						s.setTime(-1);
+						s.setTimeUnit("-1");
+						s.setSampleFineTimeOrRowId(null);
+					}
+			});
 		
 		deleteSamples.forEach((s) -> {
 			s.getParentCondition().remove(s);

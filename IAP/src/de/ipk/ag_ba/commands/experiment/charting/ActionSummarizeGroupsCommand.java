@@ -12,6 +12,7 @@ import javax.swing.JCheckBox;
 
 import org.GapList;
 import org.SystemOptions;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ChartSettings;
@@ -20,6 +21,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
@@ -50,6 +52,7 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 		boolean calcGrubbsB = set.getBoolean("Summarize data", "Filter outliers//Grubbs test for final sample data", false);
 		boolean calcANOVA = set.getBoolean("Summarize data", "Filter outliers//Calculate ANOVA p-values", false);
 		double calcGrubbsAlpha = set.getDouble("Summarize data", "Filter outliers//Grubbs alpha-values", 0.05);
+		boolean sortByValue = set.getBoolean("Summarize data", "Filter outliers//Sort groups by value", true);
 		
 		JCheckBox cbPerformGrubbsTestA = new JCheckBox("Perform Grubbs test on group samples to remove outliers");
 		cbPerformGrubbsTestA.setSelected(calcGrubbsA);
@@ -59,12 +62,15 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 		cbPerformGrubbsTestB.setSelected(calcGrubbsB);
 		JCheckBox cbANOVA = new JCheckBox("Calculate ANOVA p-Values");
 		cbANOVA.setSelected(calcANOVA);
+		JCheckBox cbSort = new JCheckBox("Sort by value");
+		cbSort.setSelected(sortByValue);
 		
 		Object[] res = MyInputHelper.getInput("Group data by plant ID prior to plotting?", "Process Data", new Object[] {
 				"1.", cbPerformGrubbsTestA,
 				"2.", cbGroup,
 				// "3.", cbPerformGrubbsTestB,
 				// "4.", cbANOVA,
+				"3.", cbSort,
 				"Grubbs' alpha-Value", calcGrubbsAlpha
 		});
 		if (res != null) {
@@ -72,7 +78,8 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 			set.setBoolean("Summarize data", "Filter outliers//Merge into single value per day and plant ID", cbGroup.isSelected());
 			set.setBoolean("Summarize data", "Filter outliers//Grubbs test for final sample data", cbPerformGrubbsTestB.isSelected());
 			set.setBoolean("Summarize data", "Filter outliers//Calculate ANOVA p-values", cbANOVA.isSelected());
-			set.setDouble("Summarize data", "Filter outliers//Grubbs alpha-values", (Double) res[2]);
+			set.setBoolean("Summarize data", "Filter outliers//Sort groups by value", cbSort.isSelected());
+			set.setDouble("Summarize data", "Filter outliers//Grubbs alpha-values", (Double) res[3]);
 			pipeline.setDirty(this);
 		}
 	}
@@ -84,6 +91,8 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 			boolean groupByPlantID = set.getBoolean("Summarize data", "Filter outliers//Merge into single value per day and plant ID", true);
 			boolean calcGrubbsB = set.getBoolean("Summarize data", "Filter outliers//Grubbs test for final sample data", false);
 			boolean calcANOVA = set.getBoolean("Summarize data", "Filter outliers//Calculate ANOVA p-values", false);
+			boolean sortByValue = set.getBoolean("Summarize data", "Filter outliers//Sort groups by value", true);
+			
 			int step = 1;
 			if (!calcGrubbsA && !groupByPlantID && !calcGrubbsB && !calcANOVA)
 				return "<html><center><b>&#8667;</b>&nbsp;Pass data&nbsp;<b>&#8667;</b><br><font color='gray'><small>no calculations";
@@ -91,10 +100,11 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 				return "<html><center><b>&#8667;</b>&nbsp;Process data"
 						+ "&nbsp;<b>&#8667;</b><br><font color='gray'><small>"
 						+ (calcGrubbsA ? (step++) + ". outlier removal for technical replicates" : "")
-						+ (groupByPlantID ? (calcGrubbsA ? "<br>" : "") + (step++) + ". calculate mean value for plant ID and day"
-								+ (calcGrubbsB ? "<br>" + (step++) + ". outlier removal for group replicates" : "")
+						+ (groupByPlantID ? (step > 0 ? "<br>" : "") + (step++) + ". calculate mean value for plant ID and day"
+								+ (step > 0 ? "<br>" + (step++) + ". outlier removal for group replicates" : "")
 								: "")
-						+ (calcANOVA ? (calcGrubbsA || groupByPlantID || calcGrubbsB ? "<br>" : "") + (step++) + ". calculate ANOVA p-Values" : "")
+						+ (sortByValue ? (step > 0 ? "<br>" : "") + (step++) + ". sort groups by value" : "")
+						+ (calcANOVA ? (step > 0 ? "<br>" : "") + (step++) + ". calculate ANOVA p-Values" : "")
 						+ "</small></font></center>";
 			// (groupsDeterminationInProgress.getBval(0, false) ? "~ one moment ~<br>determine group set" :
 			// (groups.size() == 1 ? "1 step" : groups.size() + " steps"));
@@ -125,6 +135,7 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 		boolean calcGrubbsB = set.getBoolean("Summarize data", "Filter outliers//Grubbs test for final sample data", false);
 		boolean calcANOVA = set.getBoolean("Summarize data", "Filter outliers//Calculate ANOVA p-values", false);
 		double calcGrubbsAlpha = set.getDouble("Summarize data", "Filter outliers//Grubbs alpha-values", 0.05);
+		boolean sortByValue = set.getBoolean("Summarize data", "Filter outliers//Sort groups by value", true);
 		
 		if (!calcGrubbsA && !groupByPlantID && !calcGrubbsB && !calcANOVA)
 			return result;
@@ -234,6 +245,25 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 			result.numberConditions();
 			int nB = result.getNumberOfMeasurementValues();
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Removed outliers B " + nA + " --> " + nB);
+		}
+		
+		if (sortByValue) {
+			for (SubstanceInterface si : result) {
+				si.sort((a, b) -> {
+					SummaryStatistics sa = new SummaryStatistics();
+					a.visitNumericValues((nmi) -> {
+						sa.addValue(nmi.getValue());
+					});
+					SummaryStatistics sb = new SummaryStatistics();
+					b.visitNumericValues((nmi) -> {
+						sb.addValue(nmi.getValue());
+					});
+					if (sa.getN() > 0 && sb.getN() > 0) {
+						return ((Double) sa.getMax()).compareTo(sb.getMean());
+					} else
+						return 0;
+				});
+			}
 		}
 		
 		return result;
