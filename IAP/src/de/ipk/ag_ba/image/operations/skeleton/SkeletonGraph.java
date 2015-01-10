@@ -625,40 +625,43 @@ public class SkeletonGraph {
 			ThreadSafeOptions optLengthReturn = new ThreadSafeOptions();
 			todo.add(() -> {
 				Collection<GraphElement> elem;
-				if (findAndProcessMostLefAndRightEndPointsOnly)
+				if (findAndProcessMostLefAndRightEndPointsOnly) {
+					Collection<GraphElement> fll = filterMostLeftAndRightEndpoints(gg.getGraphElements());
+					if (fll.size() < 2)
+						return;
 					elem = WeightedShortestPathSelectionAlgorithm.getShortestPathElements(
 							gg.getGraphElements(),
-							first(filterMostLeftAndRightEndpoints(gg.getGraphElements())),
-							last(filterMostLeftAndRightEndpoints(gg.getGraphElements())),
+							first(fll),
+							last(fll),
 							false, false, true, Double.MAX_VALUE,
 							new AttributePathNameSearchType("iap", "len", SearchType.searchDouble, "len"),
 							true, false, false, false, optLengthReturn, null);
-					else
-						elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
-								gg.getGraphElements(),
-								new AttributePathNameSearchType("iap", "len", SearchType.searchDouble, "len"),
-								optLengthReturn, false, BackgroundThreadDispatcher.getRE());
-					synchronized (gl) {
-						graphComponent2shortestPathElements.put(gg, elem);
-						if (optGMLoutputFileName != null && !thinned)
-							for (GraphElement ge : elem) {
-								if (ge instanceof Node) {
-									final NodeHelper nh = new NodeHelper((Node) ge);
-									nh.setFillColor(Color.YELLOW)
-											.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble());
-								}
+				} else
+					elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
+							gg.getGraphElements(),
+							new AttributePathNameSearchType("iap", "len", SearchType.searchDouble, "len"),
+							optLengthReturn, false, BackgroundThreadDispatcher.getRE());
+				synchronized (gl) {
+					graphComponent2shortestPathElements.put(gg, elem);
+					if (optGMLoutputFileName != null && !thinned)
+						for (GraphElement ge : elem) {
+							if (ge instanceof Node) {
+								final NodeHelper nh = new NodeHelper((Node) ge);
+								nh.setFillColor(Color.YELLOW)
+										.setAttributeValue("shortest_path", "maxlen", optLengthReturn.getDouble());
 							}
-						Double dia = optLengthReturn.getDouble();
-						id2size.put(id, dia);
-						if (optGMLoutputFileName != null)
-							System.out.println(dia.intValue());
-						if (dia > tsoLCGG.getDouble()) {
-							tsoLCGG.setGraphInstance(gg);
-							tsoLCGG.setDouble(dia);
-							id2size.put(-1, dia);
 						}
+					Double dia = optLengthReturn.getDouble();
+					id2size.put(id, dia);
+					if (optGMLoutputFileName != null)
+						System.out.println(dia.intValue());
+					if (dia > tsoLCGG.getDouble()) {
+						tsoLCGG.setGraphInstance(gg);
+						tsoLCGG.setDouble(dia);
+						id2size.put(-1, dia);
 					}
-				});
+				}
+			});
 		}
 		BackgroundThreadDispatcher.getRE().execInParallel(todo, "Determine graph diameter distances", null);
 		Graph lcgg = tsoLCGG.getGraphInstance();
