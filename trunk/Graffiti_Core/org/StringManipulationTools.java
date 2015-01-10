@@ -957,6 +957,16 @@ public class StringManipulationTools implements HelperClass {
 			return (s.length() - StringManipulationTools.stringReplace(s, find, "").length()) / find.length();
 	}
 	
+	public static int count(String s, char find) {
+		int count = 0;
+		for (int i = 0; i < s.length(); i++) {
+			if (s.charAt(i) == find) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
 	public static String getStringList(Set<Integer> times, String div) {
 		return getStringList(times.toArray(new Integer[] {}), div);
 	}
