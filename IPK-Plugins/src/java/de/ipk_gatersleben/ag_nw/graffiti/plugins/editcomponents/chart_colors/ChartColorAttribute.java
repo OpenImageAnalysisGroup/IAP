@@ -13,6 +13,7 @@ import java.util.HashSet;
 import org.AttributeHelper;
 import org.Colors;
 import org.ErrorMsg;
+import org.StringManipulationTools;
 import org.graffiti.attributes.StringAttribute;
 import org.graffiti.event.AttributeEvent;
 import org.graffiti.graph.Graph;
@@ -57,9 +58,9 @@ public class ChartColorAttribute extends StringAttribute {
 	
 	public static ChartColorAttribute getAttribute(Graph graph) {
 		ChartColorAttribute chartColorAttribute = (ChartColorAttribute) AttributeHelper.getAttributeValue(
-							graph, ChartColorAttribute.attributeFolder,
-							ChartColorAttribute.attributeName,
-							new ChartColorAttribute(), new ChartColorAttribute(), false);
+				graph, ChartColorAttribute.attributeFolder,
+				ChartColorAttribute.attributeName,
+				new ChartColorAttribute(), new ChartColorAttribute(), false);
 		return chartColorAttribute;
 	}
 	
@@ -246,21 +247,29 @@ public class ChartColorAttribute extends StringAttribute {
 	
 	public void ensureMinimumColorSelection(int barCount) {
 		boolean set = false;
-		ArrayList<Color> colorList = Colors.getGrayColors(barCount);
+		ArrayList<Color> colorList = null;
 		int i = 0;
-		if (value.equals(notSet) && !colorList.isEmpty()) {
+		if (value.equals(notSet)) {
+			colorList = Colors.getGrayColors(barCount);
 			// value="null:null";
 			Color newColor = colorList.get(i++);
 			value = getColorCode(newColor) + ":" + getColorCode(Color.BLACK) + "";
 			set = true;
 		}
-		while (value.length() - value.replaceAll(";", "").length() < barCount - 1) {
-			// value=value+";null:null";
-			Color newColor = colorList.get(i++);
-			value = value + ";" + getColorCode(newColor) + ":" + getColorCode(Color.BLACK) + "";
-			set = true;
+		StringBuilder sb = new StringBuilder(value);
+		int nnn = StringManipulationTools.count(value, ';');
+		if (nnn < barCount - 1) {
+			colorList = Colors.getGrayColors(barCount);
+			while (nnn < barCount - 1) {
+				// value=value+";null:null";
+				Color newColor = colorList.get(i++);
+				sb.append(";" + getColorCode(newColor) + ":" + getColorCode(Color.BLACK));
+				nnn++;
+				set = true;
+			}
 		}
 		if (set) {
+			value = sb.toString();
 			try {
 				setValue(value);
 			} catch (ClassCastException cce) {
@@ -287,13 +296,13 @@ public class ChartColorAttribute extends StringAttribute {
 			return value.length() - value.replaceAll(";", "").length() + 1;
 	}
 	
-	public void setSeriesColor(int series, Color color) {
-		ensureMinimumColorSelection(series);
+	public void setSeriesColor(int series, Color color, int finalSize) {
+		ensureMinimumColorSelection(finalSize);
 		setColorString(0, series, color);
 	}
 	
-	public void setSeriesOutlineColor(int series, Color color) {
-		ensureMinimumColorSelection(series);
+	public void setSeriesOutlineColor(int series, Color color, int finalSize) {
+		ensureMinimumColorSelection(finalSize);
 		setColorString(1, series, color);
 	}
 	

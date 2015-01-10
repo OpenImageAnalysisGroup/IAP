@@ -1049,4 +1049,14 @@ public class Condition implements ConditionInterface {
 	public static String[] getExperimentFields() {
 		return attributeNameWithoutDocumentFields;
 	}
+	
+	@Override
+	public void visitNumericValues(NumericValueVisitor visitor) {
+		for (SampleInterface sa : this)
+			for (NumericMeasurementInterface nmi : sa) {
+				if (nmi instanceof NumericMeasurement) {
+					visitor.visit(nmi);
+				}
+			}
+	}
 }
