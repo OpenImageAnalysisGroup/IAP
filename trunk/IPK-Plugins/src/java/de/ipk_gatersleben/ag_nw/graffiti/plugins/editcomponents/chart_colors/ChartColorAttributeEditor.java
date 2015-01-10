@@ -42,7 +42,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.dbe.algorithms.RecolorEdges
 public class ChartColorAttributeEditor extends AbstractValueEditComponent {
 	private JPanel jpanel;
 	
-	private JButton qsButton;
+	private final JButton qsButton;
 	
 	private int barCount = -1;
 	
@@ -59,6 +59,7 @@ public class ChartColorAttributeEditor extends AbstractValueEditComponent {
 		res.setMinimumSize(new Dimension(40, 10));
 		res.setPreferredSize(new Dimension(40, 10));
 		res.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				ChartColorAttribute cca = (ChartColorAttribute) getDisplayable();
 				int numberOfColors = cca.getDefinedBarCount();
@@ -78,13 +79,13 @@ public class ChartColorAttributeEditor extends AbstractValueEditComponent {
 				knownPresets.add(presetDiffLess2);
 				knownPresets.add(presetDiffLess3);
 				Object[] inp = MyInputHelper.getInput("Select a preset:", "Color Presets (" + numberOfColors + " lines)",
-									new Object[] {
-														"Presets", knownPresets,
-														"Stripe/Start", Color.BLACK,
-														"Stripe/End", Color.LIGHT_GRAY,
-														"Set Line/Fill", true,
-														"Set Outline", false
-				});
+						new Object[] {
+								"Presets", knownPresets,
+								"Stripe/Start", Color.BLACK,
+								"Stripe/End", Color.LIGHT_GRAY,
+								"Set Line/Fill", true,
+								"Set Outline", false
+						});
 				if (inp != null) {
 					String cmd = (String) inp[0];
 					ArrayList<Color> colors = null;
@@ -212,6 +213,7 @@ public class ChartColorAttributeEditor extends AbstractValueEditComponent {
 		colorButton.setOpaque(true);
 		colorButton.setBorder(BorderFactory.createRaisedBevelBorder());
 		colorButton.addMouseListener(new MouseListener() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				JLabel src = (JLabel) e.getSource();
 				Color c;
@@ -230,26 +232,32 @@ public class ChartColorAttributeEditor extends AbstractValueEditComponent {
 				}
 			}
 			
+			@Override
 			public void mousePressed(MouseEvent arg0) {
 			}
 			
+			@Override
 			public void mouseReleased(MouseEvent arg0) {
 			}
 			
+			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				colorButton.setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
 			}
 			
+			@Override
 			public void mouseExited(MouseEvent arg0) {
 				colorButton.setBorder(BorderFactory.createRaisedBevelBorder());
 			}
 		});
 	}
 	
+	@Override
 	public JComponent getComponent() {
 		return TableLayout.getSplit(qsButton, jpanel, TableLayoutConstants.PREFERRED, TableLayoutConstants.FILL);
 	}
 	
+	@Override
 	public void setEditFieldValue() {
 		ChartColorAttribute cca = (ChartColorAttribute) getDisplayable();
 		for (int i = 0; i < jpanel.getComponentCount(); i++) {
@@ -261,14 +269,15 @@ public class ChartColorAttributeEditor extends AbstractValueEditComponent {
 				Boolean bar = (Boolean) jb.getClientProperty("isBar");
 				Integer barIndex = (Integer) jb.getClientProperty("barIndex");
 				if (bar != null && bar.booleanValue())
-					cca.setSeriesColor(barIndex.intValue(), jb.getBackground());
+					cca.setSeriesColor(barIndex.intValue(), jb.getBackground(), jpanel.getComponentCount());
 				else
 					if (barIndex != null)
-						cca.setSeriesOutlineColor(barIndex.intValue(), jb.getBackground());
+						cca.setSeriesOutlineColor(barIndex.intValue(), jb.getBackground(), jpanel.getComponentCount());
 			}
 		}
 	}
 	
+	@Override
 	public void setValue() {
 		ChartColorAttribute cca = (ChartColorAttribute) getDisplayable();
 		for (int i = 0; i < jpanel.getComponentCount(); i++) {
@@ -282,9 +291,9 @@ public class ChartColorAttributeEditor extends AbstractValueEditComponent {
 				if (bar == null || barIndex == null)
 					continue;
 				if (bar.booleanValue())
-					cca.setSeriesColor(barIndex.intValue(), jb.getBackground());
+					cca.setSeriesColor(barIndex.intValue(), jb.getBackground(), jpanel.getComponentCount());
 				else
-					cca.setSeriesOutlineColor(barIndex.intValue(), jb.getBackground());
+					cca.setSeriesOutlineColor(barIndex.intValue(), jb.getBackground(), jpanel.getComponentCount());
 			}
 		}
 	}
