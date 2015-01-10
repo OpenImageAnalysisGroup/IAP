@@ -42,6 +42,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import org.color.ColorUtil;
+import org.color.Color_CIE_Lab;
 import org.graffiti.attributes.Attributable;
 import org.graffiti.attributes.Attribute;
 import org.graffiti.attributes.AttributeNotFoundException;
@@ -2307,6 +2308,18 @@ public class AttributeHelper implements HelperClass {
 			new Color(0xFF9ACD32), // yellowgreen
 	};
 	
+	public static final Color_CIE_Lab[] knownColorsLAB = getLabFrom(knownColors);
+	
+	private static Color_CIE_Lab[] getLabFrom(Color[] ca) {
+		Color_CIE_Lab[] res = new Color_CIE_Lab[ca.length];
+		for (int i = 0; i < ca.length; i++) {
+			Color c1 = ca[i];
+			Color_CIE_Lab cCL1 = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(c1.getRed(), c1.getGreen(), c1.getBlue()));
+			res[i] = cCL1;
+		}
+		return res;
+	}
+	
 	public static Color getColorFrom3floatValues0to1(String color, Color ifUnkown) {
 		String[] col = color.split(" ");
 		if (col.length != 3)
@@ -2353,15 +2366,24 @@ public class AttributeHelper implements HelperClass {
 		return ifUnkown;
 	}
 	
-	public static String getColorName(Color attrColor) {
-		if (attrColor == null)
+	public static String getColorName(Color c1) {
+		if (c1 == null)
 			return "not set (null)";
 		
 		int nearest = -1;
 		int i = 0;
 		double diff = Double.MAX_VALUE;
-		for (Color testColor : knownColors) {
-			double tDiff = ColorUtil.deltaE2000(attrColor, testColor);
+		
+		Color_CIE_Lab cCL1 = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(c1.getRed(), c1.getGreen(), c1.getBlue()));
+		double CIE_L1 = cCL1.getL();
+		double CIE_a1 = cCL1.getA();
+		double CIE_b1 = cCL1.getB(); // Color #1 CIE-L*ab values
+		
+		for (Color_CIE_Lab cCL2 : knownColorsLAB) {
+			double CIE_L2 = cCL2.getL();
+			double CIE_a2 = cCL2.getA();
+			double CIE_b2 = cCL2.getB(); // Color #1 CIE-L*ab values
+			double tDiff = ColorUtil.deltaE2000(CIE_L1, CIE_a1, CIE_b1, CIE_L2, CIE_a2, CIE_b2);
 			if (tDiff < diff) {
 				nearest = i;
 				diff = tDiff;
