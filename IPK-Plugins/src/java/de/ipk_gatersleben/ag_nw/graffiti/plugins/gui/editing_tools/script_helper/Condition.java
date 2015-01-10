@@ -993,12 +993,14 @@ public class Condition implements ConditionInterface {
 		if (!(obj instanceof Condition))
 			return false;
 		Condition c = (Condition) obj;
-		
-		String s1 = species + ";" + genotype + ";" + growthconditions + ";" + treatment + ";" + variety + ";" + sequence + ";"
-				+ rowId;
-		String s2 = c.species + ";" + c.genotype + ";" + c.growthconditions + ";" + c.treatment + ";" + c.variety + ";" + c.sequence + ";"
-				+ c.rowId;
-		return s1.equals(s2);
+		return (species == null && c.species == null || (species != null && species.equals(c.species))) &&
+				(genotype == null && c.genotype == null || (genotype != null && genotype.equals(c.genotype))) &&
+				(growthconditions == null && c.growthconditions == null || (growthconditions != null && growthconditions.equals(c.growthconditions))) &&
+				(treatment == null && c.treatment == null || (treatment != null && treatment.equals(c.treatment))) &&
+				(variety == null && c.variety == null || (variety != null && variety.equals(c.variety))) &&
+				(sequence == null && c.sequence == null || (sequence != null && sequence.equals(c.sequence))) &&
+				(sequence == null && c.sequence == null || (sequence != null && sequence.equals(c.sequence))) &&
+				(rowId == c.rowId);
 	}
 	
 	@Override
