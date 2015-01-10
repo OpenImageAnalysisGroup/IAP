@@ -179,6 +179,11 @@ public class ColorUtil {
 		double CIE_a2 = cCL2.getA();
 		double CIE_b2 = cCL2.getB(); // Color #2 CIE-L*ab values
 		
+		return deltaE2000(CIE_L1, CIE_a1, CIE_b1, CIE_L2, CIE_a2, CIE_b2);
+		
+	}
+
+	public static double deltaE2000(double CIE_L1, double CIE_a1, double CIE_b1, double CIE_L2, double CIE_a2, double CIE_b2) {
 		double WHT_L = 1;
 		double WHT_C = 1;
 		double WHT_H = 1; // Wheight factor
@@ -240,7 +245,6 @@ public class ColorUtil {
 		xDH = xDH / (WHT_H * xSH);
 		double Delta_E00 = Math.sqrt(xDL * xDL + xDC * xDC + xDH * xDH + xRT * xDC * xDH);
 		return Delta_E00;
-		
 	}
 	
 	private static double deg2rad(double d) {
