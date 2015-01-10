@@ -9,6 +9,7 @@ import de.ipk.ag_ba.commands.experiment.ChartSettings;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.DataChartComponentWindow;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -30,6 +31,7 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 	private final ChartSettings settingsLocal;
 	private final ChartSettings settingsGlobal;
 	private DataChartComponentWindow dccw;
+	private boolean updateStarted;
 	
 	public ActionCreatePlotCommand(String tooltip, ExperimentTransformationPipeline pipeline, ChartSettings settingsLocal, ChartSettings settingsGlobal) {
 		super(tooltip);
@@ -57,12 +59,20 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 	
 	@Override
 	public String getDefaultTitle() {
-		if (valueCount < 0)
+		if (valueCount < 0 && !updateStarted) {
+			updateStarted = true;
 			try {
-				updateValueCount();
-			} catch (Exception e) {
+				BackgroundThreadDispatcher.addTask(() -> {
+					try {
+						updateValueCount();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}, "Update value count");
+			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
+		}
 		return "<html><center>" + (dccw == null ? "Create" : "Update") + " plot<br><small><font color='gray'>" + valueCount + " value"
 				+ (valueCount != 1 ? "s" : "") + ", "
 				+ conditionCount + " condition" + (conditionCount != 1 ? "s" : "") + "<br>"
