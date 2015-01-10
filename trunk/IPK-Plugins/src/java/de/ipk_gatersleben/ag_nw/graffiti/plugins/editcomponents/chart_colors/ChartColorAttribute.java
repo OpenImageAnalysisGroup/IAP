@@ -297,12 +297,12 @@ public class ChartColorAttribute extends StringAttribute {
 	}
 	
 	public void setSeriesColor(int series, Color color, int finalSize) {
-		ensureMinimumColorSelection(finalSize);
+		ensureMinimumColorSelection(series);// finalSize);
 		setColorString(0, series, color);
 	}
 	
 	public void setSeriesOutlineColor(int series, Color color, int finalSize) {
-		ensureMinimumColorSelection(finalSize);
+		ensureMinimumColorSelection(series);// finalSize);
 		setColorString(1, series, color);
 	}
 	
