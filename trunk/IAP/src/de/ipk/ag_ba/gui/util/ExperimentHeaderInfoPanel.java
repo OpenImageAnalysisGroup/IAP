@@ -341,9 +341,12 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		}
 		fp.addGuiComponentRow(new JLabel("Remark"), remark, false);
 		{
-			String to = "<html>" +
-					"Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs or " +
-					"plant IDs with time (e.g. 1107BA001/2 -> plant 1107BA001 from day 2 on).";
+			String to = "<html>"
+					+
+					"Use ' // ' to split settings. Specify time values (with >,>=,<,<=,=) or plant IDs or "
+					+
+					"plant IDs with time (e.g. 1107BA001/2 -> plant 1107BA001 from day 2 on).<br>"
+					+ "Insert '!!' to invert the filter operation from then on (use and instead of or and invert filter).";
 			fp.addGuiComponentRow(tooltip(new JLabel("Outliers"), to), tooltip(outliers, to), false);
 		}
 		{
