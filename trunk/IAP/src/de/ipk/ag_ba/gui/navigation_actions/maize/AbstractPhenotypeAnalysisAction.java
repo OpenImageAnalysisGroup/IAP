@@ -138,7 +138,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			
 			if (status != null) {
 				status.setCurrentStatusText1("Experiment: " + workload.size() + " images (vis+fluo+nir)");
-				System.out.println(SystemAnalysis.getCurrentTime() + ">To be analyzed: " + workload.size() + " images (vis+fluo+nir)");
+				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: To be analyzed: " + workload.size() + " images (vis+fluo+nir)");
 				
 			}
 			if (workload.size() == 0) {

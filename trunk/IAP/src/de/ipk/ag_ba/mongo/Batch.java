@@ -456,7 +456,7 @@ public class Batch {
 			return new ArrayList<BatchCmd>();
 		}
 		if (res.size() > 0) {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">SCHEDULED FOR START: " + res.size());
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: SCHEDULED FOR START: " + res.size());
 			java.util.Collections.sort(res, new Comparator<BatchCmd>() {
 				@Override
 				public int compare(BatchCmd o1, BatchCmd o2) {
