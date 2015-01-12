@@ -54,52 +54,70 @@ public class MySnapshotFilter implements SnapshotFilter {
 	public boolean filterOut(String plantId, Integer timePoint) {
 		if (timePoint == Integer.MAX_VALUE)
 			return false;
-		if (globalOutlierArr.length > 0) {
-			int idx = 0;
-			for (String o : globalOutlierArr) {
-				if (plantId != null && o != null && o.endsWith("*") && !o.contains("/") && o.length() >= 2) {
-					o = o.substring(0, o.length() - 1);
-					if (plantId.startsWith(o))
-						return true;
-				} else
-					if (plantId != null && plantId.equals(o))
-						return true;
-					else
-						if (plantId != null && o.startsWith(plantId + "/")) {
-							try {
-								String fromDay = o.substring((plantId + "/").length());
-								int fromD = Integer.parseInt(fromDay);
-								return timePoint >= fromD;
-							} catch (Exception e) {
-								System.out.println("Problematic outlier definition (ignored): " + o);
-							}
-						} else
-							if (timePoint != null && timePoint.equals(o))
-								return true;
-							else
-								if (timePoint != null) {
-									int day = globalOutlierDays[idx];
-									if (day < Integer.MAX_VALUE)
-										if (o.contains(">=") && timePoint >= day)
-											return true;
-										else
-											if (o.contains(">") && timePoint > day)
-												return true;
-											else
-												if (o.contains("<=") && timePoint <= day)
-													return true;
-												else
-													if (o.contains("<") && timePoint < day)
-														return true;
-													else
-														if (o.contains("=") && timePoint == day)
-															return true;
-									
-								}
-				idx++;
+		if (globalOutlierArr.length > 0)
+			return processOutlierArray(plantId, timePoint);
+		else
+			return false;
+	}
+	
+	private boolean processOutlierArray(String plantId, Integer timePoint) {
+		int idx = 0;
+		boolean inverOpAndUseAndInsteadOfOr = false;
+		boolean anyMatch = false;
+		for (String o : globalOutlierArr) {
+			if (o != null && o.equals("!!")) {
+				inverOpAndUseAndInsteadOfOr = true;
 			}
+			boolean match = false;
+			if (plantId != null && o != null && o.endsWith("*") && !o.contains("/") && o.length() >= 2) {
+				o = o.substring(0, o.length() - 1);
+				if (plantId.startsWith(o))
+					match = true;
+			} else
+				if (plantId != null && plantId.equals(o))
+					match = true;
+				else
+					if (plantId != null && o.startsWith(plantId + "/")) {
+						try {
+							String fromDay = o.substring((plantId + "/").length());
+							int fromD = Integer.parseInt(fromDay);
+							match = timePoint >= fromD;
+						} catch (Exception e) {
+							System.out.println("Problematic outlier definition (ignored): " + o);
+						}
+					} else
+						if (timePoint != null && timePoint.equals(o))
+							match = true;
+						else
+							if (timePoint != null) {
+								int day = globalOutlierDays[idx];
+								if (day < Integer.MAX_VALUE)
+									if (o.contains(">=") && timePoint >= day)
+										match = true;
+									else
+										if (o.contains(">") && timePoint > day)
+											match = true;
+										else
+											if (o.contains("<=") && timePoint <= day)
+												match = true;
+											else
+												if (o.contains("<") && timePoint < day)
+													match = true;
+												else
+													if (o.contains("=") && timePoint == day)
+														match = true;
+								
+							}
+			if (match && !inverOpAndUseAndInsteadOfOr)
+				return true;
+			if (match && inverOpAndUseAndInsteadOfOr)
+				anyMatch = true;
+			idx++;
 		}
-		return false;
+		if (inverOpAndUseAndInsteadOfOr)
+			return !anyMatch;
+		else
+			return false;
 	}
 	
 	private boolean match(ThreadSafeOptions t, SnapshotDataIAP s) {
