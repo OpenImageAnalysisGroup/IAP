@@ -35,7 +35,6 @@ public class MappingData3DPath {
 	private final SubstanceInterface mdnew;
 	private final ConditionInterface condnew;
 	private final SampleInterface sampnew;
-	private final boolean isValid = true;
 	
 	public NumericMeasurementInterface getMeasurement() {
 		return measnew;
@@ -64,7 +63,6 @@ public class MappingData3DPath {
 	}
 	
 	public MappingData3DPath(NumericMeasurementInterface meas, boolean clone) {
-		// try {
 		SampleInterface sample = meas.getParentSample();
 		
 		ConditionInterface cond = sample.getParentCondition();
@@ -80,14 +78,6 @@ public class MappingData3DPath {
 		measnew = clone ? meas.clone(sampnew) : meas;
 		if (clone)
 			sampnew.add(measnew);
-		// } catch (NullPointerException e) {
-		// ErrorMsg.addErrorMessage(e);
-		// measnew = null;
-		// mdnew = null;
-		// condnew = null;
-		// sampnew = null;
-		// isValid = false;
-		// }
 	}
 	
 	public static ExperimentInterface merge(ArrayList<MappingData3DPath> mappingpaths, boolean ignoreSnapshotFineTime) {
@@ -158,10 +148,6 @@ public class MappingData3DPath {
 			return null;
 		}
 		return experiment;
-	}
-	
-	public boolean isValid() {
-		return isValid;
 	}
 	
 	public static ArrayList<MappingData3DPath> get(ExperimentInterface e) {
