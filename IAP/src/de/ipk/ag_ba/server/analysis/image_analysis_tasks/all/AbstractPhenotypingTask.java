@@ -625,7 +625,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (!workload_imageSetsWithSpecificAngles.get(val).containsKey(time))
 					workload_imageSetsWithSpecificAngles.get(val).put(time, is);
 			}
-			System.out.println(SystemAnalysis.getCurrentTime() + ">Processing "
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Processing "
 					+ workload_imageSetsWithSpecificAngles.size() + " plants" +
 					(numberOfSubsets > 0 ?
 							" (subset " + workOnSubset + "/" + numberOfSubsets + ")"

@@ -125,21 +125,24 @@ public class CloudComputingService {
 				} else
 					if (args.length > 0 && args[0].toLowerCase().startsWith("close") ||
 							(args.length > 1 && args[1].startsWith("close"))) {
-						System.out.println(": close - auto-closing after finishing compute task - " + SystemAnalysis.getNumberOfCPUs());
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Parameter: close - auto-closing after finishing compute task - "
+								+ SystemAnalysis.getNumberOfCPUs());
 						IAPmain.setRunMode(IAPrunMode.CLOUD_HOST_BATCH_MODE);
 					} else
 						if (args.length > 0 && args[0].toLowerCase().contains("full")) {
-							System.out.println(": full - enabling full CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
+							System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Parameter: full - enabling full CPU utilization - "
+									+ SystemAnalysis.getNumberOfCPUs());
 							SystemAnalysis.setUseFullCpuPower(true);
 						} else
 							if (args.length > 0 && args[0].contains("half")) {
 								SystemAnalysis.setUseHalfCpuPower(true);
-								System.out.println(": half - enabling half CPU utilization - " + SystemAnalysis.getNumberOfCPUs());
+								System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Parameter: half - enabling half CPU utilization - "
+										+ SystemAnalysis.getNumberOfCPUs());
 							} else
 								if (args.length > 0) {
 									try {
 										Integer i = Integer.parseInt(args[0]);
-										System.out.println(": " + args[0] + " - using " + i + " CPUs");
+										System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Parameter: " + args[0] + " - using " + i + " CPUs");
 										SystemAnalysis.setUseCpu(i);
 									} catch (Exception e) {
 										if ((args[0] + "").toLowerCase().equalsIgnoreCase("clear")) {
@@ -161,7 +164,7 @@ public class CloudComputingService {
 												if ((args[0] + "").toLowerCase().startsWith("monitor")) {
 													{
 														System.out.println(SystemAnalysis.getCurrentTime()
-																+ ">'monitor' - Report system info to cloud (join, but don't perform calculations)");
+																+ ">INFO: Parameter: 'monitor' - Report system info to cloud (join, but don't perform calculations)");
 														for (MongoDB m : MongoDB.getMongos()) {
 															CloudComputingService cc = CloudComputingService.getInstance(m);
 															cc.setEnableCalculations(false);
@@ -186,11 +189,13 @@ public class CloudComputingService {
 														} else {
 															if ((args[0] + "").toLowerCase().equalsIgnoreCase("merge")) {
 																for (MongoDB m : MongoDB.getMongos()) {
-																	System.out.println(":merge - about to merge temporary data sets in database " + m.getDatabaseName());
+																	System.out.println(SystemAnalysis.getCurrentTime()
+																			+ ">INFO: Parameter: merge - about to merge temporary data sets in database " + m.getDatabaseName());
 																	try {
 																		m.processSplitResults().merge(
 																				null, true, null, new ArrayList<>());
-																		System.out.println(":merge - ^^^ merged temporary data sets in database " + m.getDatabaseName());
+																		System.out.println(SystemAnalysis.getCurrentTime()
+																				+ ">INFO: Parameter: merge - ^^^ merged temporary data sets in database " + m.getDatabaseName());
 																	} catch (Exception e1) {
 																		e1.printStackTrace();
 																	}
