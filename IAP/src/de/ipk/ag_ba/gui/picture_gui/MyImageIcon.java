@@ -284,14 +284,21 @@ public class MyImageIcon extends ImageIcon {
 		Image image = getImage();
 		int width = image.getWidth(observer);
 		int height = image.getHeight(observer);
-		final Graphics2D g2d = (Graphics2D) g.create(x, y, (int) (width * SystemAnalysis.getHiDPIScaleFactor()),
-				(int) (height * SystemAnalysis.getHiDPIScaleFactor()));
+		float hf = SystemAnalysis.getHiDPIScaleFactor();
+		final Graphics2D g2d = (Graphics2D) g.create(x, y, (int) (width * hf),
+				(int) (height * hf));
 		
-		g2d.scale(1f / SystemAnalysis.getHiDPIScaleFactor(), 1f / SystemAnalysis.getHiDPIScaleFactor());
-		g2d.drawImage(image,
-				(int) (-x / SystemAnalysis.getHiDPIScaleFactor() - x * SystemAnalysis.getHiDPIScaleFactor()),
-				(int) (-y * SystemAnalysis.getHiDPIScaleFactor()),
-				observer);
+		g2d.scale(1f / hf, 1f / hf);
+		if (hf > 1)
+			g2d.drawImage(image,
+					(int) (-x / hf - x * hf),
+					(int) (-y * hf),
+					observer);
+		else
+			g2d.drawImage(image,
+					0,
+					0,
+					observer);
 		g2d.scale(1, 1);
 		g2d.dispose();
 	}
