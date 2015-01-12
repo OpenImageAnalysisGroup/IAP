@@ -274,13 +274,14 @@ public class BorderAnalysis {
 	private ArrayList<PositionAndColor> fuRe(ArrayList<PositionAndColor> regionLarge, int xtemp, int ytemp, Image orig) {
 		int[] origArray = orig.getAs1A();
 		int w = orig.getWidth();
+		int h = orig.getHeight();
 		ArrayList<PositionAndColor> res = new ArrayList<PositionAndColor>(regionLarge.size());
 		int y = Color.YELLOW.getRGB();
 		// innerHull.show("FF");
 		for (PositionAndColor pac : regionLarge) {
 			pac.x = pac.x + xtemp;
 			pac.y = pac.y + ytemp;
-			if (pac.x >= 0 && pac.y >= 0) {
+			if (pac.x >= 0 && pac.y >= 0 && pac.x < w && pac.y < h) {
 				int c = origArray[pac.x + pac.y * w];
 				
 				if (innerHullPixels != null) {
