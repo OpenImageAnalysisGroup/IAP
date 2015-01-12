@@ -67,6 +67,7 @@ public class MySnapshotFilter implements SnapshotFilter {
 		for (String o : globalOutlierArr) {
 			if (o != null && o.equals("!!")) {
 				inverOpAndUseAndInsteadOfOr = true;
+				anyMatch = false;
 			}
 			boolean match = false;
 			if (plantId != null && o != null && o.endsWith("*") && !o.contains("/") && o.length() >= 2) {
