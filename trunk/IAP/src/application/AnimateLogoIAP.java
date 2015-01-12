@@ -1,6 +1,8 @@
 package application;
 
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -398,7 +400,11 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	public void show(boolean undecorated) {
 		this.jf = new FXsplash((int) STAGEWIDTH, (int) STAGEHEIGHT, getFX(false, undecorated), undecorated);
 		// center on display
-		Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int width = gd.getDisplayMode().getWidth();
+		int height = gd.getDisplayMode().getHeight();
+		
+		Dimension screenDim = new Dimension(width, height);// Toolkit.getDefaultToolkit().getScreenSize();
 		int w = jf.getWidth();
 		int h = jf.getHeight();
 		jf.setLocation((screenDim.width - w) / 2,
