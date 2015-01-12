@@ -217,7 +217,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			ImageResult imageResult, ImageIcon previewImage, boolean readOnly, boolean isNoImageButton, String customNonImageTitle,
 			Collection<DataSetFileButton> buttonsInThisView) {
 		this(projectNode,
-				getName(imageResult, customNonImageTitle), null, previewImage, isNoImageButton, buttonsInThisView);
+				getName(imageResult, customNonImageTitle, !projectNode.isSampleNode() && !projectNode.isLeaf()), null, previewImage, isNoImageButton,
+				buttonsInThisView);
 		this.imageResult = imageResult;
 		this.readOnly = readOnly;
 		if (imageResult != null && getMaxString(imageResult.getFileNameMain()).endsWith("..."))
@@ -237,8 +238,13 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			}
 	}
 	
-	public static String getName(ImageResult imageResult, String customNonImageTitle) {
-		return "<html><body><b>" +
+	public static String getName(ImageResult imageResult, String customNonImageTitle, boolean addTime) {
+		return "<html><body>"
+				+ (addTime && imageResult != null ?
+						(((NumericMeasurement3D) imageResult
+								.getBinaryFileInfo().entity).getParentSample().getSampleTime()) + "<br>"
+						: "")
+				+ "<b>" +
 				(imageResult == null ? "<center>" + customNonImageTitle :
 						getMaxString(strip(
 								imageResult.getFileNameMain(),
