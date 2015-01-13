@@ -160,7 +160,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 				0, 85,
 				start + 2 * step + 2 * delay, start + (3 + add) * step + 2 * delay, 1, planetColor);
 		
-		scene_planet.getChildren().addAll(Appearance.getPointLight_planet(Color.WHITE, 0, 300, planet.startsWith("sun")));
+		scene_planet.getChildren().addAll(Appearance.getPointLight_planet(Color.WHITE, 100, 500, planet.startsWith("sun")));
 		
 		CameraView.buildCamera_subscene_planet(scene_planet, camera_earth, cameraDistanceToEarth - 80, 11, 12);
 		CameraView.buildCamera_subscenes_letters(scene_I, camera_I, cameraDistanceToLetter, 0, 0);
@@ -297,7 +297,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 				0, -90, start + 3 * step + 3 * delay, start + (4 + add) * step + 3 * delay, 90, 0,
 				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE, planetColor);
 		
-		scene_planet.getChildren().addAll(Appearance.getPointLight_planet(Color.WHITE, 0, 300, planet.startsWith("sun")));
+		scene_planet.getChildren().addAll(Appearance.getPointLight_planet(Color.WHITE, 0, 1000, planet.startsWith("sun")));
 		
 		CameraView.buildCamera_subscene_planet(scene_planet, camera_earth, cameraDistanceToEarth, 11, 12);
 		CameraView.buildCamera_subscenes_letters(scene_I, camera_I, cameraDistanceToLetter, 0, 0);
