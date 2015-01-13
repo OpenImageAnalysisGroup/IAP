@@ -21,33 +21,33 @@ import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
  *         (c) 2004 IPK-Gatersleben
  */
 public class BioStatisticalCategoryDataset
-					extends DefaultStatisticalCategoryDataset
-					implements RangeInfo {
+		extends DefaultStatisticalCategoryDataset
+		implements RangeInfo {
 	
 	private static final long serialVersionUID = 1L;
-	private HashSet<String> units = new LinkedHashSet<String>(1);
-	private HashSet<String> timeUnits = new LinkedHashSet<String>(1);
-	private float ttestMarkCircleSize;
+	private final HashSet<String> units = new LinkedHashSet<String>(1);
+	private final HashSet<String> timeUnits = new LinkedHashSet<String>(1);
+	private final float ttestMarkCircleSize;
 	
-	private double lboundVal = Double.MAX_VALUE;
-	private double uboundVal = Double.NEGATIVE_INFINITY;
+	private final double lboundVal = Double.MAX_VALUE;
+	private final double uboundVal = Double.NEGATIVE_INFINITY;
 	
 	public BioStatisticalCategoryDataset(float ttestMarkCircleSize) {
 		this.ttestMarkCircleSize = ttestMarkCircleSize;
 	}
 	
-	private HashMap<Comparable, Color> rowDesc2paint1 = new HashMap<Comparable, Color>();
-	private HashMap<Comparable, Color> rowDesc2paint2 = new HashMap<Comparable, Color>();
+	private final HashMap<Comparable, Color> rowDesc2paint1 = new HashMap<Comparable, Color>();
+	private final HashMap<Comparable, Color> rowDesc2paint2 = new HashMap<Comparable, Color>();
 	
 	public void add(final double mean, final double standardDeviation,
-						final Comparable rowKey, final Comparable columnKey,
-						boolean ttestIsRef, boolean ttestIsDiff,
-						String unit, String timeunit, boolean datasetWillBeShownWithStdDev,
-						Color color1, Color color2, boolean showOnlyHalfErrorBar) {
+			final Comparable rowKey, final Comparable columnKey,
+			boolean ttestIsRef, boolean ttestIsDiff,
+			String unit, String timeunit, boolean datasetWillBeShownWithStdDev,
+			Color color1, Color color2, boolean showOnlyHalfErrorBar) {
 		add(mean, standardDeviation,
-							rowKey, columnKey,
-							ttestIsRef, ttestIsDiff,
-							unit, timeunit, datasetWillBeShownWithStdDev, showOnlyHalfErrorBar);
+				rowKey, columnKey,
+				ttestIsRef, ttestIsDiff,
+				unit, timeunit, datasetWillBeShownWithStdDev, showOnlyHalfErrorBar);
 		// System.out.println("ADD: "+rowKey+" COLOR: "+color1);
 		if (color1 != null && !rowDesc2paint1.containsKey(rowKey))
 			rowDesc2paint1.put(rowKey, color1);
@@ -77,16 +77,16 @@ public class BioStatisticalCategoryDataset
 	 *           The time unit of the measurement e.g. day
 	 */
 	public void add(final double mean, final double standardDeviation,
-							final Comparable rowKey, final Comparable columnKey,
-							boolean ttestIsRef, boolean ttestIsDiff,
-							String unit, String timeunit, boolean datasetWillBeShownWithStdDev,
-							boolean showOnlyHalfErrorBar) {
+			final Comparable rowKey, final Comparable columnKey,
+			boolean ttestIsRef, boolean ttestIsDiff,
+			String unit, String timeunit, boolean datasetWillBeShownWithStdDev,
+			boolean showOnlyHalfErrorBar) {
 		
 		final BioMeanAndStandardDeviation item =
-							new BioMeanAndStandardDeviation(
-												new Double(mean),
-												new Double(standardDeviation),
-												ttestIsRef, ttestIsDiff);
+				new BioMeanAndStandardDeviation(
+						new Double(mean),
+						new Double(standardDeviation),
+						ttestIsRef, ttestIsDiff);
 		addDataObject(item, rowKey, columnKey);
 		
 		// if the standard deviation will be shown, it must be considered
@@ -165,10 +165,12 @@ public class BioStatisticalCategoryDataset
 		return getStringList(timeUnits, ",");
 	}
 	
+	@Override
 	public Number getMaximumRangeValue() {
 		return uboundVal;
 	}
 	
+	@Override
 	public Number getMinimumRangeValue() {
 		return lboundVal;
 	}
@@ -180,7 +182,10 @@ public class BioStatisticalCategoryDataset
 			if (it.hasNext())
 				sb.append(div);
 		}
-		return sb.toString();
+		if (sb.length() == 0 || sb.toString().equals("null"))
+			return null;
+		else
+			return sb.toString();
 	}
 	
 	public Color getColor1ForRowKey(Comparable rowKey) {
