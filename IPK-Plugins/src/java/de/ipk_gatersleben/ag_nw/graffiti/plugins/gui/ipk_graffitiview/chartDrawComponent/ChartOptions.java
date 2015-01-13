@@ -80,46 +80,46 @@ public class ChartOptions {
 	public boolean enableUI;
 	
 	public ChartOptions(
-						GraphElement ge, Graph graph,
-						BioStatisticalCategoryDataset dataset,
-						String chartTitle,
-						PlotOrientation orientation,
-						boolean showLegend,
-						String domainAxis,
-						String rangeAxis,
-						boolean showRangeAxis,
-						boolean showCategoryAxis,
-						float outlineBorderWidth,
-						int axisRotation,
-						double lowerBound,
-						double upperBound,
-						boolean showGridRange,
-						boolean showGridCategory,
-						double gridWidth,
-						double axisWidth,
-						Color gridColor,
-						Color axisColor,
-						int axisFontSize,
-						boolean showStdDevAsT,
-						double stdDevTopWidth,
-						boolean showStdDevAsFillRange,
-						float shapeSize,
-						float stdDevLineWidth,
-						boolean showOnlyHalfErrorBar,
-						boolean showShapes,
-						boolean showLines,
-						boolean usePieScaling,
-						boolean connectPriorItems,
-						int plotAxisSteps,
-						boolean useLogYscale,
-						int cpIdxA,
-						int cpIdxC,
-						Color cpColA,
-						Color cpColBackground,
-						Color cpColC,
-						boolean useCustomRangeSteps,
-						double customRangeSteps,
-						boolean removeEmptyConditions) {
+			GraphElement ge, Graph graph,
+			BioStatisticalCategoryDataset dataset,
+			String chartTitle,
+			PlotOrientation orientation,
+			boolean showLegend,
+			String domainAxis,
+			String rangeAxis,
+			boolean showRangeAxis,
+			boolean showCategoryAxis,
+			float outlineBorderWidth,
+			int axisRotation,
+			double lowerBound,
+			double upperBound,
+			boolean showGridRange,
+			boolean showGridCategory,
+			double gridWidth,
+			double axisWidth,
+			Color gridColor,
+			Color axisColor,
+			int axisFontSize,
+			boolean showStdDevAsT,
+			double stdDevTopWidth,
+			boolean showStdDevAsFillRange,
+			float shapeSize,
+			float stdDevLineWidth,
+			boolean showOnlyHalfErrorBar,
+			boolean showShapes,
+			boolean showLines,
+			boolean usePieScaling,
+			boolean connectPriorItems,
+			int plotAxisSteps,
+			boolean useLogYscale,
+			int cpIdxA,
+			int cpIdxC,
+			Color cpColA,
+			Color cpColBackground,
+			Color cpColC,
+			boolean useCustomRangeSteps,
+			double customRangeSteps,
+			boolean removeEmptyConditions) {
 		this.ge = ge;
 		this.graph = graph;
 		this.dataset = dataset;
@@ -176,13 +176,13 @@ public class ChartOptions {
 		axisRotation = ((Double) AttributeHelper.getAttributeValue(graph, "", "node_plotAxisRotation", mNull, mNull)).intValue();
 		
 		boolean plotHor = ((Boolean) AttributeHelper
-							.getAttributeValue(graph, "", "node_plotOrientationHor", mTrue, mTrue)).booleanValue();
+				.getAttributeValue(graph, "", "node_plotOrientationHor", mTrue, mTrue)).booleanValue();
 		if (plotHor)
 			orientation = PlotOrientation.VERTICAL;
 		else
 			orientation = PlotOrientation.HORIZONTAL;
 		domainAxis = (String) AttributeHelper.getAttributeValue(ge, "charting", "domainAxis",
-							new String("[unit]"), new String("[unit]"));
+				new String("[unit]"), new String("[unit]"));
 		if (domainAxis.trim().length() == 0)
 			domainAxis = null;
 		rangeAxis = (String) AttributeHelper.getAttributeValue(ge, "charting", "rangeAxis", "[unit]", "[unit]");
@@ -190,19 +190,19 @@ public class ChartOptions {
 			rangeAxis = null;
 		
 		showCategoryAxis = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_showCategoryAxis",
-							mFalse, mFalse)).booleanValue();
+				mFalse, mFalse)).booleanValue();
 		showRangeAxis = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_showRangeAxis", mFalse,
-							mFalse)).booleanValue();
+				mFalse)).booleanValue();
 		
 		Boolean showRangeAxis2 = ((Boolean) AttributeHelper.getAttributeValue(ge, "charting", "showRangeAxis", null,
-							mFalse, false));
+				mFalse, false));
 		if (showRangeAxis2 != null)
 			showRangeAxis = showRangeAxis2;
 		
 		cpIdxA = ((Integer) AttributeHelper.getAttributeValue(graph, "",
-							"node_categoryBackgroundColorIndexA", mim1, mim1)).intValue();;
+				"node_categoryBackgroundColorIndexA", mim1, mim1)).intValue();;
 		cpIdxC = ((Integer) AttributeHelper.getAttributeValue(graph, "",
-							"node_categoryBackgroundColorIndexC", mim1, mim1)).intValue();
+				"node_categoryBackgroundColorIndexC", mim1, mim1)).intValue();
 		int c1 = 255;
 		int c2 = 225;
 		cpColA = NodeTools.getCategoryBackgroundColorA(graph, new Color(c2, c1, c1));
@@ -210,56 +210,56 @@ public class ChartOptions {
 		cpColC = NodeTools.getCategoryBackgroundColorC(graph, new Color(c1, c1, c2));
 		
 		gridWidth = ((Double) AttributeHelper.getAttributeValue(graph, "", "node_gridWidth", new Double(0.5d),
-							new Double(-1))).doubleValue();
+				new Double(-1))).doubleValue();
 		
 		axisWidth = ((Double) AttributeHelper.getAttributeValue(graph, "", "node_axisWidth", mOne, new Double(1)))
-							.doubleValue();
+				.doubleValue();
 		
 		gridColor = NodeTools.getGridColor(graph, (Color) CategoryPlot.DEFAULT_GRIDLINE_PAINT);
 		axisColor = NodeTools.getAxisColor(graph, (Color) CategoryPlot.DEFAULT_GRIDLINE_PAINT);
 		
 		axisFontSize = ((Integer) AttributeHelper.getAttributeValue(graph, "", "node_plotAxisFontSize", new Integer(
-							30), new Integer(30))).intValue();
+				30), new Integer(30))).intValue();
 		
 		showShapes = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_lineChartShowShapes", mTrue,
-							new Boolean(true))).booleanValue();
+				new Boolean(true))).booleanValue();
 		showGridRange = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_showGridRange", mFalse,
-							new Boolean(false))).booleanValue();
+				new Boolean(false))).booleanValue();
 		useLogYscale = false; // ((Boolean)AttributeHelper.getAttributeValue( graph, * "", "node_useLogScaleForRangeAxis", new Boolean(false),
 		// newBoolean(false))).booleanValue();
 		
 		usePieScaling = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_usePieScale", mTrue,
-							new Boolean(true))).booleanValue();
+				new Boolean(true))).booleanValue();
 		
 		showGridCategory = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_showGridCategory",
-							mTrue, mTrue)).booleanValue();
+				mTrue, mTrue)).booleanValue();
 		showLines = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_lineChartShowLines", mTrue,
-							new Boolean(true))).booleanValue();
+				new Boolean(true))).booleanValue();
 		
 		showStdDevAsT = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_lineChartShowStdDev", mFalse,
-							mFalse)).booleanValue();
+				mFalse)).booleanValue();
 		
 		showStdDevAsFillRange = ((Boolean) AttributeHelper.getAttributeValue(graph, "",
-							"node_lineChartShowStdDevRangeLine", mTrue, new Boolean(true))).booleanValue();
+				"node_lineChartShowStdDevRangeLine", mTrue, new Boolean(true))).booleanValue();
 		
 		connectPriorItems = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "connectPriorItems", mTrue,
-							mTrue)).booleanValue();
+				mTrue)).booleanValue();
 		
 		plotAxisSteps = ((Double) AttributeHelper.getAttributeValue(graph, "", "node_plotAxisSteps", mOne, mOne))
-							.intValue();
+				.intValue();
 		
 		useCustomRangeSteps = ((Boolean) AttributeHelper.getAttributeValue(ge, "charting", "useCustomRangeSteps",
-							new Boolean(false), new Boolean(false))).booleanValue();
+				new Boolean(false), new Boolean(false))).booleanValue();
 		customRangeSteps = (Double) AttributeHelper.getAttributeValue(ge, "charting", "rangeStepSize", mNull, mNull);
 		
 		boolean useCustomRange = ((Boolean) AttributeHelper.getAttributeValue(ge, "charting", "useCustomRange",
-							new Boolean(false), new Boolean(false))).booleanValue();
+				new Boolean(false), new Boolean(false))).booleanValue();
 		lowerBound = (Double) AttributeHelper.getAttributeValue(ge, "charting", "minRange", mNull, mNull);
 		
 		upperBound = (Double) AttributeHelper.getAttributeValue(ge, "charting", "maxRange", mOne, mOne);
 		
 		fillTimeGaps = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_lineChartFillTimeGaps",
-							mTrue, mTrue)).booleanValue();
+				mTrue, mTrue)).booleanValue();
 		
 		if (!useCustomRange) {
 			lowerBound = Double.NaN;
@@ -267,15 +267,15 @@ public class ChartOptions {
 		}
 		
 		Double temp = (Double) AttributeHelper.getAttributeValue(graph, "", "node_outlineBorderWidth", new Double(4d),
-							new Double(4d));
+				new Double(4d));
 		outlineBorderWidth = temp.floatValue();
 		
 		temp = (Double) AttributeHelper.getAttributeValue(graph, "", "node_chartShapeSize", new Double(6d),
-							new Double(6d));
+				new Double(6d));
 		shapeSize = temp.floatValue();
 		
 		temp = (Double) AttributeHelper.getAttributeValue(graph, "", "node_chartStdDevLineWidth", new Double(4d),
-							new Double(4d));
+				new Double(4d));
 		stdDevLineWidth = temp.floatValue();
 		
 		showOnlyHalfErrorBar = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_halfErrorBar",
@@ -283,23 +283,23 @@ public class ChartOptions {
 		removeEmptyConditions = ((Boolean) AttributeHelper.getAttributeValue(graph, "", "node_removeEmptyConditions",
 				mFalse, mFalse)).booleanValue();
 		stdDevTopWidth = (Double) AttributeHelper.getAttributeValue(graph, "", "node_chartStdDevTopWidth",
-							new Double(10d), new Double(10d));
+				new Double(10d), new Double(10d));
 		
 		showLegend = ((Boolean) AttributeHelper.getAttributeValue(ge, "charting", "show_legend", new Boolean(
-							false), new Boolean(false))).booleanValue();
+				false), new Boolean(false))).booleanValue();
 		
 	}
 	
 	public int setLayoutOfChartComponent(GraphElement ge, JComponent chartcomponent, Integer mappedDataListSize) {
 		
 		borderHor = ((Double) AttributeHelper.getAttributeValue(ge, "charting", "empty_border_width", new Double(
-							2d), new Double(2d))).doubleValue();
+				2d), new Double(2d))).doubleValue();
 		double borderVer = ((Double) AttributeHelper.getAttributeValue(ge, "charting", "empty_border_width_vert",
-							borderHor, borderHor)).doubleValue();
+				borderHor, borderHor)).doubleValue();
 		
 		try {
 			GraphElementGraphicAttribute geGraphicsAttr = (GraphElementGraphicAttribute) ge
-							.getAttribute(GraphicAttributeConstants.GRAPHICS);
+					.getAttribute(GraphicAttributeConstants.GRAPHICS);
 			borderHor += geGraphicsAttr.getFrameThickness();
 		} catch (AttributeNotFoundException anfe) {
 			// empty
@@ -316,7 +316,7 @@ public class ChartOptions {
 		int chartsInColumn = -1;
 		if (mappedDataListSize != null) // && mappedDataList.size()>1)
 			chartsInColumn = ((Integer) AttributeHelper.getAttributeValue(ge, "charting", ChartsColumnAttribute.name,
-								new ChartsColumnAttribute(-1).getValue(), new ChartsColumnAttribute(-1).getValue())).intValue();;
+					new ChartsColumnAttribute(-1).getValue(), new ChartsColumnAttribute(-1).getValue())).intValue();;
 		
 		if (chartsInColumn >= 1)
 			maxXcnt = chartsInColumn;
