@@ -170,7 +170,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		return scene;
 	}
 	
-	private static int planetIndex = SystemOptions.getInstance().getInteger("IAP", "FX//Logo Index", 3);
+	private static int planetIndex = SystemOptions.getInstance().getInteger("IAP", "FX//Logo Index", 2);
 	
 	private String getPlanet() {
 		String[] planets = new String[] {
