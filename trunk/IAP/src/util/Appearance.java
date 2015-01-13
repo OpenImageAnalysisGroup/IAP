@@ -6,6 +6,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.scene.AmbientLight;
+import javafx.scene.LightBase;
 import javafx.scene.PointLight;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -15,9 +16,8 @@ import javafx.util.Duration;
 public class Appearance {
 	
 	// get the texture for sphere as material
-	public static PhongMaterial getMaterial4() throws IOException {
-		
-		Image image = new Image(new Appearance().getClass().getResource("images/earth5.jpg").openStream(),
+	public static PhongMaterial getMaterial(String planet) throws IOException {
+		Image image = new Image(new Appearance().getClass().getResource("images/" + planet).openStream(),
 				1536, 768, false, true);
 		PhongMaterial mat = new PhongMaterial();
 		mat.setDiffuseMap(image);
@@ -42,13 +42,18 @@ public class Appearance {
 		return light_a;
 	}
 	
-	public static PointLight getPointLight_earth(Color c, double from, double to) {
+	public static LightBase getPointLight_planet(Color c, double from, double to, boolean isSun) {
 		
-		PointLight light_p = new PointLight();
-		light_p.setTranslateX(1500);
-		light_p.setTranslateY(-3200);
-		light_p.setTranslateZ(-1500);
-		
+		LightBase light_p = new PointLight();
+		if (!isSun) {
+			light_p.setTranslateX(1500);
+			light_p.setTranslateY(-3200);
+			light_p.setTranslateZ(-1500);
+		} else {
+			light_p.setTranslateX(0);
+			light_p.setTranslateY(0);
+			light_p.setTranslateZ(-2000);
+		}
 		light_p.setColor(Color.BLACK);
 		
 		Timeline rot = new Timeline();

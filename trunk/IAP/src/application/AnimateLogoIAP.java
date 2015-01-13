@@ -29,6 +29,7 @@ import javafx.stage.StageStyle;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
+import org.SystemAnalysis;
 import org.SystemOptions;
 
 import util.Appearance;
@@ -37,25 +38,25 @@ import util.FxLogoObjects;
 import de.ipk.ag_ba.gui.webstart.ProgressWindow;
 
 /***
- * @author Ulrich
+ * @author Ulrich, Klukas
  *         Output class for rotation of earth
  */
 
 public class AnimateLogoIAP extends Application implements ProgressWindow {
 	
 	private Pane root;
-	private final Group eaarthScene = new Group();
-	private final Group root_subscene2 = new Group();
-	private final Group root_subscene3 = new Group();
-	private final Group root_subscene4 = new Group();
+	private final Group scene_planet = new Group();
+	private final Group scene_I = new Group();
+	private final Group scene_A = new Group();
+	private final Group scene_P = new Group();
 	
-	private final PerspectiveCamera camera_subscene1 = new PerspectiveCamera(true);
-	private final PerspectiveCamera camera_subscene2 = new PerspectiveCamera(true);
-	private final PerspectiveCamera camera_subscene3 = new PerspectiveCamera(true);
-	private final PerspectiveCamera camera_subscene4 = new PerspectiveCamera(true);
+	private final PerspectiveCamera camera_earth = new PerspectiveCamera(true);
+	private final PerspectiveCamera camera_I = new PerspectiveCamera(true);
+	private final PerspectiveCamera camera_A = new PerspectiveCamera(true);
+	private final PerspectiveCamera camera_P = new PerspectiveCamera(true);
 	private final double cameraDistanceToEarth = -70;
 	private final double cameraDistanceToLetter = -50;// -30; // -7
-	private final FxLogoObjects object = new FxLogoObjects();
+	private final FxLogoObjects objectCreator = new FxLogoObjects();
 	
 	public AnimateLogoIAP() {
 		// empty
@@ -64,8 +65,9 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 	// build all necessary components in the scene
 	private Scene buildScene(double width, double height) {
 		
-		int STAR_COUNT = 1500;
-		boolean star = false;
+		int STAR_COUNT = 1500;// SystemOptions.getInstance().getInteger("IAP", "FX//Splash Star Count", 1500);
+		boolean star = false;// SystemOptions.getInstance().getBoolean("IAP", "FX//Splash Add Stars", false);
+		
 		Rectangle[] nodes = new Rectangle[STAR_COUNT];
 		double[] angles = new double[STAR_COUNT];
 		double[] sx = new double[STAR_COUNT];
@@ -89,29 +91,29 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		int offy = 20;
 		int offxx = -20;
 		int offyy = 00;
-		SubScene subscene1 = new SubScene(eaarthScene, offx + 81 + 200, offy + height - 5, true, SceneAntialiasing.BALANCED);
-		subscene1.setCamera(camera_subscene1);
-		subscene1.setTranslateX(0);
-		subscene1.setFill(Color.BLACK);
-		subscene1.setTranslateY(0);
+		SubScene subscene_plant = new SubScene(scene_planet, offx + 81 + 200, offy + height - 5, true, SceneAntialiasing.BALANCED);
+		subscene_plant.setCamera(camera_earth);
+		subscene_plant.setTranslateX(0);
+		subscene_plant.setFill(Color.BLACK);
+		subscene_plant.setTranslateY(0);
 		
-		SubScene subscene2 = new SubScene(root_subscene2, offx + 80 + offxx, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
-		subscene2.setCamera(camera_subscene2);
+		SubScene subscene_I = new SubScene(scene_I, offx + 80 + offxx, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
+		subscene_I.setCamera(camera_I);
 		// subscene2.setFill(Color.YELLOW);
-		subscene2.setTranslateX(205 - 20);
-		subscene2.setTranslateY(30);
+		subscene_I.setTranslateX(205 - 20);
+		subscene_I.setTranslateY(30);
 		
-		SubScene subscene3 = new SubScene(root_subscene3, offx + 150 + offxx, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
-		subscene3.setCamera(camera_subscene3);
+		SubScene subscene_A = new SubScene(scene_A, offx + 150 + offxx, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
+		subscene_A.setCamera(camera_A);
 		// subscene3.setFill(Color.RED);
-		subscene3.setTranslateX(268 + 10 - 10);
-		subscene3.setTranslateY(30);
+		subscene_A.setTranslateX(268 + 10 - 10);
+		subscene_A.setTranslateY(30);
 		
-		SubScene subscene4 = new SubScene(root_subscene4, offx + 100 + offxx, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
-		subscene4.setCamera(camera_subscene4);
+		SubScene subscene_P = new SubScene(scene_P, offx + 100 + offxx, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
+		subscene_P.setCamera(camera_P);
 		// subscene4.setFill(Color.GREEN);
-		subscene4.setTranslateX(370 + 60);// 408);
-		subscene4.setTranslateY(30);
+		subscene_P.setTranslateX(370 + 60);// 408);
+		subscene_P.setTranslateY(30);
 		root.setScaleX(sc);
 		root.setScaleY(sc);
 		root.setManaged(true);
@@ -119,10 +121,11 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		root.setMaxWidth(Double.MAX_VALUE);
 		root.getChildren().addAll(
 				// rect,
-				subscene1, subscene2, subscene3, subscene4);
-		
+				subscene_plant, subscene_I, subscene_A, subscene_P);
+		String planet = getPlanet();
+		Color planetColor = getPlanetColor(planet);
 		try {
-			object.buildEarth(eaarthScene, -3, 11, 22, 150);
+			objectCreator.buildPlanet(planet, scene_planet, -3, 11, 22, 150, camera_earth);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -139,39 +142,82 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		int id = (int) (1000 * ts);
 		// Group group, String fxmlFile, double rate, int rotFromTime, int rotToTime, double angleStart, double xpos,
 		// double angleFrom, double angleTo, double colorFadeFrom, double colorFadeTo
-		object.buildSingleLetter(root_subscene2, "I.fxml", 1,
+		objectCreator.buildSingleLetter(scene_I, "I.fxml", 1,
 				-1.8, 2,
 				-20, -90,
 				id + start + 3 * step + 3 * delay, id + start + (4 + add) * step + 3 * delay,
 				0, 90,
-				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, 1);
-		object.buildSingleLetter(root_subscene3, "A.fxml", 1,
+				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, 1, planetColor);
+		objectCreator.buildSingleLetter(scene_A, "A.fxml", 1,
 				-2.7, 2,
 				-20, -90,
 				id + start + 4 * step + 4 * delay, id + start + (5 + add) * step + 4 * delay,
 				0, 90,
-				start + 1 * step + 1 * delay, start + (2 + add) * step + 1 * delay, 1);
-		object.buildSingleLetter(root_subscene4, "P.fxml", 1,
+				start + 1 * step + 1 * delay, start + (2 + add) * step + 1 * delay, 1, planetColor);
+		objectCreator.buildSingleLetter(scene_P, "P.fxml", 1,
 				-2.7, 2,
 				-20, -90,
 				id + start + 5 * step + 5 * delay, id + start + (6 + add) * step + 4 * delay,
 				0, 85,
-				start + 2 * step + 2 * delay, start + (3 + add) * step + 2 * delay, 1);
+				start + 2 * step + 2 * delay, start + (3 + add) * step + 2 * delay, 1, planetColor);
 		
-		eaarthScene.getChildren().addAll(Appearance.getPointLight_earth(Color.WHITE, 0, 300));
+		scene_planet.getChildren().addAll(Appearance.getPointLight_planet(Color.WHITE, 0, 300, planet.startsWith("sun")));
 		
-		CameraView.buildCamera_subscene(eaarthScene, camera_subscene1, cameraDistanceToEarth - 80, 11, 12);
-		CameraView.buildCamera_subscenes(root_subscene2, camera_subscene2, cameraDistanceToLetter, 0, 0);
-		CameraView.buildCamera_subscenes(root_subscene3, camera_subscene3, cameraDistanceToLetter, 0, 0);
-		CameraView.buildCamera_subscenes(root_subscene4, camera_subscene4, cameraDistanceToLetter, 0, 0);
+		CameraView.buildCamera_subscene_planet(scene_planet, camera_earth, cameraDistanceToEarth - 80, 11, 12);
+		CameraView.buildCamera_subscenes_letters(scene_I, camera_I, cameraDistanceToLetter, 0, 0);
+		CameraView.buildCamera_subscenes_letters(scene_A, camera_A, cameraDistanceToLetter, 0, 0);
+		CameraView.buildCamera_subscenes_letters(scene_P, camera_P, cameraDistanceToLetter, 0, 0);
 		
 		return scene;
 	}
 	
+	private static int planetIndex = SystemOptions.getInstance().getInteger("IAP", "FX//Logo Index", 3);
+	
+	private String getPlanet() {
+		String[] planets = new String[] {
+				"sun", "mercury", "venus", "earth5", "moon", "mars", "jupiter",
+				"saturn", "uranus2", "neptun2", "pluto"
+		};
+		if (planetIndex < 0)
+			planetIndex = 2;
+		int idx = (planetIndex++) % 11;
+		SystemOptions.getInstance().setInteger("IAP", "FX//Logo Index", idx);
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Planet " + idx);
+		return planets[idx] + ".jpg";
+	}
+	
+	private Color getPlanetColor(String planet) {
+		switch (planet) {
+			case "earth5.jpg":
+				return Color.rgb(103, 103, 192).darker();
+			case "jupiter.jpg":
+				return Color.rgb(218, 211, 185);
+			case "mars.jpg":
+				return Color.rgb(165, 91, 56);
+			case "mercury.jpg":
+				return Color.rgb(167, 167, 167);
+			case "moon.jpg":
+				return Color.rgb(167, 167, 167);
+			case "sun.jpg":
+				return Color.rgb(255, 255, 180);
+			case "venus.jpg":
+				return Color.rgb(229, 178, 121);
+			case "neptun2.jpg":
+				return Color.rgb(94, 127, 220);
+			case "pluto.jpg":
+				return Color.rgb(130, 130, 150);
+			case "saturn.jpg":
+				return Color.rgb(220, 190, 90);
+			case "uranus2.jpg":
+				return Color.rgb(131, 185, 209);
+		}
+		return null;
+	}
+	
 	private Scene buildScene2(double width, double height) {
 		
-		int STAR_COUNT = 500;
-		boolean star = false;
+		int STAR_COUNT = 500;// SystemOptions.getInstance().getInteger("IAP", "FX//Splash Star Count", 500);
+		boolean star = false;// SystemOptions.getInstance().getBoolean("IAP", "FX//Splash Add Stars", false);
 		Rectangle[] nodes = new Rectangle[STAR_COUNT];
 		double[] angles = new double[STAR_COUNT];
 		double[] sx = new double[STAR_COUNT];
@@ -196,23 +242,23 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		int offx = 50;
 		int offy = 20;
 		int offyy = 10;
-		SubScene subscene1 = new SubScene(eaarthScene, offx + 200, offy + height - 5, true, SceneAntialiasing.BALANCED);
-		subscene1.setCamera(camera_subscene1);
+		SubScene subscene1 = new SubScene(scene_planet, offx + 200, offy + height - 5, true, SceneAntialiasing.BALANCED);
+		subscene1.setCamera(camera_earth);
 		subscene1.setTranslateX(2);
 		subscene1.setTranslateY(2);
 		
-		SubScene subscene2 = new SubScene(root_subscene2, offx + 80, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
-		subscene2.setCamera(camera_subscene2);
+		SubScene subscene2 = new SubScene(scene_I, offx + 80, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
+		subscene2.setCamera(camera_I);
 		subscene2.setTranslateX(205 + 20);
 		subscene2.setTranslateY(35);
 		
-		SubScene subscene3 = new SubScene(root_subscene3, offx + 150, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
-		subscene3.setCamera(camera_subscene3);
+		SubScene subscene3 = new SubScene(scene_A, offx + 150, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
+		subscene3.setCamera(camera_A);
 		subscene3.setTranslateX(268 + 20);
 		subscene3.setTranslateY(35);
 		
-		SubScene subscene4 = new SubScene(root_subscene4, offx + 150, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
-		subscene4.setCamera(camera_subscene4);
+		SubScene subscene4 = new SubScene(scene_P, offx + 150, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
+		subscene4.setCamera(camera_P);
 		subscene4.setTranslateX(370 + 20);// 408);
 		subscene4.setTranslateY(35);
 		root.setScaleX(sc);
@@ -224,8 +270,11 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 				// rect,
 				subscene1, subscene2, subscene3, subscene4);
 		
+		String planet = getPlanet();
+		Color planetColor = getPlanetColor(planet);
+		
 		try {
-			object.buildEarth(eaarthScene, 12, 12, 12, 50);
+			objectCreator.buildPlanet(planet, scene_planet, 12, 12, 12, 50, camera_earth);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -236,25 +285,25 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		int add = 1;
 		// Group group, String fxmlFile, double rate, int rotFromTime, int rotToTime, double angleStart, double xpos,
 		// double angleFrom, double angleTo, double colorFadeFrom, double colorFadeTo
-		object.buildSingleLetter(root_subscene2, "I.fxml", 1,
+		objectCreator.buildSingleLetter(scene_I, "I.fxml", 1,
 				-2.01, 2,
 				0, -90, start + 3 * step + 3 * delay, start + (4 + add) * step + 3 * delay, 90, 0,
-				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE);
-		object.buildSingleLetter(root_subscene3, "A.fxml", 1,
+				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE, planetColor);
+		objectCreator.buildSingleLetter(scene_A, "A.fxml", 1,
 				-2.75, 2,
 				0, -90, start + 3 * step + 3 * delay, start + (4 + add) * step + 3 * delay, 90, 0,
-				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE);
-		object.buildSingleLetter(root_subscene4, "P.fxml", 1,
+				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE, planetColor);
+		objectCreator.buildSingleLetter(scene_P, "P.fxml", 1,
 				-2.7, 2,
 				0, -90, start + 3 * step + 3 * delay, start + (4 + add) * step + 3 * delay, 90, 0,
-				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE);
+				start + 0 * step + 0 * delay, start + (1 + add) * step + 0 * delay, Timeline.INDEFINITE, planetColor);
 		
-		eaarthScene.getChildren().addAll(Appearance.getPointLight_earth(Color.WHITE, 0, 300));
+		scene_planet.getChildren().addAll(Appearance.getPointLight_planet(Color.WHITE, 0, 300, planet.startsWith("sun")));
 		
-		CameraView.buildCamera_subscene(eaarthScene, camera_subscene1, cameraDistanceToEarth, 11, 12);
-		CameraView.buildCamera_subscenes(root_subscene2, camera_subscene2, cameraDistanceToLetter, 0, 0);
-		CameraView.buildCamera_subscenes(root_subscene3, camera_subscene3, cameraDistanceToLetter, 0, 0);
-		CameraView.buildCamera_subscenes(root_subscene4, camera_subscene4, cameraDistanceToLetter, 0, 0);
+		CameraView.buildCamera_subscene_planet(scene_planet, camera_earth, cameraDistanceToEarth, 11, 12);
+		CameraView.buildCamera_subscenes_letters(scene_I, camera_I, cameraDistanceToLetter, 0, 0);
+		CameraView.buildCamera_subscenes_letters(scene_A, camera_A, cameraDistanceToLetter, 0, 0);
+		CameraView.buildCamera_subscenes_letters(scene_P, camera_P, cameraDistanceToLetter, 0, 0);
 		
 		return scene;
 	}
@@ -344,26 +393,18 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 				
 				@Override
 				public void mouseReleased(MouseEvent e) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				@Override
 				public void mousePressed(MouseEvent e) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				@Override
 				public void mouseExited(MouseEvent e) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				@Override
