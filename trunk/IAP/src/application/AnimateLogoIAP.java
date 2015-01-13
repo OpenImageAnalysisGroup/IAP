@@ -179,7 +179,8 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		};
 		if (planetIndex < 0)
 			planetIndex = 2;
-		int idx = (planetIndex++) % 11;
+		planetIndex = planetIndex + 1;
+		int idx = planetIndex % 11;
 		SystemOptions.getInstance().setInteger("IAP", "FX//Logo Index", idx);
 		return planets[idx] + ".jpg";
 	}
