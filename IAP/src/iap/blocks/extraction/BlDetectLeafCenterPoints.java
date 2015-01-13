@@ -14,8 +14,8 @@ import ij.process.FloatProcessor;
 
 import java.awt.Color;
 import java.util.HashSet;
-import java.util.LinkedList;
 
+import org.GapList;
 import org.SystemAnalysis;
 
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
@@ -34,14 +34,14 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			res = mask;
 			// only top images
 			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				LinkedList<Feature> pointList = detectCenterPoints(res);
+				GapList<Feature> pointList = detectCenterPoints(res);
 				res = saveAndMarkResults(res, pointList, input().images().getImageInfo(mask.getCameraType()));
 			}
 		}
 		return res;
 	}
 	
-	private Image saveAndMarkResults(Image img, LinkedList<Feature> pointList, ImageData imageRef) {
+	private Image saveAndMarkResults(Image img, GapList<Feature> pointList, ImageData imageRef) {
 		boolean markResults = getBoolean("Mark Center Points in Result Image", false);
 		boolean saveResults = true;
 		boolean saveResultObject = true;
@@ -83,7 +83,7 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		return img;
 	}
 	
-	private LinkedList<Feature> detectCenterPoints(Image img) {
+	private GapList<Feature> detectCenterPoints(Image img) {
 		img = img.io().bm().dilate(getInt("Mask Size for Dilate", 5)).getImage();
 		FloatProcessor edmfp = img.io().bm().edmFloat();
 		
@@ -95,7 +95,7 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		MaximumFinder mf = new MaximumFinder();
 		int maxTolerance = getInt("Maximum Tolerance", 5);
 		
-		LinkedList<Feature> centerPoints = new LinkedList<Feature>();
+		GapList<Feature> centerPoints = new GapList<Feature>();
 		try {
 			ByteProcessor bp = mf.findMaxima(edmfp, maxTolerance, 1, mf.LIST, true, true);
 			
