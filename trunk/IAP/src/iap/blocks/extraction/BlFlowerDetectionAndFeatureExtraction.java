@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.GapList;
 import org.StringManipulationTools;
 import org.Vector2i;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
@@ -54,7 +55,7 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		RegionLabeling rl = new RegionLabeling(img, false, background, -1);
 		rl.detectClusters();
 		
-		LinkedList<Feature> featureList = getFeaturesFromClusters(img, rl, minimumSizeOfRegion);
+		GapList<Feature> featureList = getFeaturesFromClusters(img, rl, minimumSizeOfRegion);
 		Image marked = null;
 		if (featureList != null)
 			marked = saveAndMarkResults(img, featureList, markResults, saveResults, trackResults, input().images().getVisInfo());
@@ -62,10 +63,10 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		return marked;
 	}
 	
-	private LinkedList<Feature> getFeaturesFromClusters(Image img, RegionLabeling rl, int minimumSizeOfRegion) {
+	private GapList<Feature> getFeaturesFromClusters(Image img, RegionLabeling rl, int minimumSizeOfRegion) {
 		
 		LinkedList<ArrayList<PositionAndColor>> regions = rl.getRegionList();
-		LinkedList<Feature> flist = new LinkedList<Feature>();
+		GapList<Feature> flist = new GapList<Feature>();
 		boolean[] deleted = new boolean[rl.getClusterCount()];
 		int[] areas = rl.getClusterSize();
 		
@@ -255,7 +256,7 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		return new Image(img);
 	}
 	
-	private Image saveAndMarkResults(Image img, LinkedList<Feature> featureList, boolean markResults, boolean saveResults, boolean trackResults,
+	private Image saveAndMarkResults(Image img, GapList<Feature> featureList, boolean markResults, boolean saveResults, boolean trackResults,
 			ImageData imageRef) {
 		
 		boolean saveResultObject = trackResults;
@@ -347,7 +348,7 @@ public class BlFlowerDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 				/ (Math.sqrt((a.getX() * a.getX() + a.getY() * a.getY())) * Math.sqrt((b.getX() * b.getX() + b.getY() * b.getY()))));
 	}
 	
-	private double getMinDist(double x, double y, LinkedList<Feature> featureList) {
+	private double getMinDist(double x, double y, GapList<Feature> featureList) {
 		double min_dist = Double.MAX_VALUE;
 		for (Feature f : featureList) {
 			double tempx = f.getPosition().getX();

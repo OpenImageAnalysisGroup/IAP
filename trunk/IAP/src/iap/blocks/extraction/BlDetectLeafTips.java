@@ -510,7 +510,7 @@ public class BlDetectLeafTips extends AbstractBlock implements CalculatesPropert
 		}
 	}
 	
-	private void saveAndCorrectBorderLeafTipList(Collection<Feature> pk, LinkedList<Feature> pl, LinkedList<Feature> pu, CameraType cameraType, int maxValidY) {
+	private void saveAndCorrectBorderLeafTipList(GapList<Feature> pk, LinkedList<Feature> pl, LinkedList<Feature> pu, CameraType cameraType, int maxValidY) {
 		// remove bordersize from all position-features
 		for (Collection<Feature> peakList : new Collection[] { pk, pl, pu }) {
 			ArrayList<Feature> toRemove = new ArrayList<Feature>();
