@@ -11,8 +11,8 @@ import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 import java.awt.Color;
 import java.util.HashSet;
-import java.util.LinkedList;
 
+import org.GapList;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -49,14 +49,14 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		cd.detectClusters();
 		
 		// get features (size, angle, center of gravity)
-		LinkedList<Feature> featureList = getFeaturesFromClusters(cd, minimumSizeOfRegion);
+		GapList<Feature> featureList = getFeaturesFromClusters(cd, minimumSizeOfRegion);
 		Image marked = saveAndMarkResults(img, featureList, markResults, saveResults, input().images().getVisInfo());
 		
 		return marked;
 	}
 	
-	private LinkedList<Feature> getFeaturesFromClusters(ClusterDetection cd, int minimumSizeOfRegion) {
-		LinkedList<Feature> flist = new LinkedList<Feature>();
+	private GapList<Feature> getFeaturesFromClusters(ClusterDetection cd, int minimumSizeOfRegion) {
+		GapList<Feature> flist = new GapList<Feature>();
 		boolean[] deleted;
 		
 		int[] areas = cd.getClusterSize();
@@ -78,7 +78,7 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 		return flist;
 	}
 	
-	private Image saveAndMarkResults(Image img, LinkedList<Feature> featureList, boolean markResults, boolean saveResults, ImageData imageRef) {
+	private Image saveAndMarkResults(Image img, GapList<Feature> featureList, boolean markResults, boolean saveResults, ImageData imageRef) {
 		
 		boolean saveResultObject = true;
 		
