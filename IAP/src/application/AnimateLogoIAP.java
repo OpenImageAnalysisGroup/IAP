@@ -29,7 +29,6 @@ import javafx.stage.StageStyle;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
-import org.SystemAnalysis;
 import org.SystemOptions;
 
 import util.Appearance;
@@ -182,7 +181,6 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 			planetIndex = 2;
 		int idx = (planetIndex++) % 11;
 		SystemOptions.getInstance().setInteger("IAP", "FX//Logo Index", idx);
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Planet " + idx);
 		return planets[idx] + ".jpg";
 	}
 	
