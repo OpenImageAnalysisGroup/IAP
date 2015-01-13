@@ -57,18 +57,27 @@ public class BlFilterImagesByRegularExpression extends AbstractSnapshotAnalysisB
 		String regex = getString("Regex-base64", "");
 		
 		String condition = processedImages.getAnyInfo().getParentSample().getParentCondition().getField(annotationMode);
-		
-		Pattern pat = Pattern.compile(regex);
-		Matcher match = pat.matcher(condition);
-		
-		if (condition != null && calculationMode1.equals("skip if not matches"))
-			if (!match.find())
+		if (condition == null || regex == null || regex.isEmpty()) {
+			if (calculationMode1.equals("skip if not matches"))
 				process = false;
-		
-		if (condition != null && calculationMode1.equals("skip if matches"))
-			if (match.find())
-				process = false;
-		
+			
+			if (calculationMode1.equals("skip if matches"))
+				process = true;
+			
+		} else {
+			Pattern pat = Pattern.compile(regex);
+			if (pat != null) {
+				Matcher match = pat.matcher(condition);
+				
+				if (condition != null && calculationMode1.equals("skip if not matches"))
+					if (!match.find())
+						process = false;
+				
+				if (condition != null && calculationMode1.equals("skip if matches"))
+					if (match.find())
+						process = false;
+			}
+		}
 		if (!process) {
 			processedImages.setVisInfo(null);
 			processedImages.setFluoInfo(null);
