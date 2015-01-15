@@ -92,8 +92,8 @@ public class ImageOperation implements MemoryHogInterface {
 	protected final ImagePlus image;
 	protected ResultsTableWithUnits rt;
 	private CameraType cameraType;
-	public static final Color BACKGROUND_COLOR = SystemOptions.getInstance().getColor("Pipeline-Debugging", "Background-Color", new Color(150, 50, 200));
-	public static final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
+	public static Color BACKGROUND_COLOR = SystemOptions.getInstance().getColor("Pipeline-Debugging", "Background-Color", new Color(150, 50, 200));
+	public static int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLOR.getRGB();
 	
 	/**
 	 * L:[0.0,254.6050567626953]<br>
