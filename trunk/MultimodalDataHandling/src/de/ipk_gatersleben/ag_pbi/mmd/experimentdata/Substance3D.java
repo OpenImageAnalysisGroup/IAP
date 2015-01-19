@@ -379,10 +379,6 @@ public class Substance3D extends Substance {
 				}
 			}
 		}
-		if (res.size() == 0)
-			System.out.println("NO MATCH !!!!! !!!!!!12345");
-		if (res.size() > 1)
-			System.out.println("MORE THAN ONE MATCH !!!!!!!!!!!12345");
 		return res.size() == 1 ? res.get(0) : null;
 	}
 	

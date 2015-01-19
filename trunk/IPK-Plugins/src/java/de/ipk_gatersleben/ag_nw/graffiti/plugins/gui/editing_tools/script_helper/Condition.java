@@ -23,6 +23,15 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.ipk_graffitiview.chartDrawC
 
 public class Condition implements ConditionInterface {
 	
+	public static final String ATTRIBUTE_KEY_FILES = "files";
+	public static final String ATTRIBUTE_KEY_SEQUENCE = "sequence";
+	public static final String ATTRIBUTE_KEY_VARIETY = "variety";
+	public static final String ATTRIBUTE_KEY_TREATMENT = "treatment";
+	public static final String ATTRIBUTE_KEY_NAME = "name";
+	public static final String ATTRIBUTE_KEY_ID = "id";
+	public static final String ATTRIBUTE_KEY_GROWTHCONDITIONS = "growthconditions";
+	public static final String ATTRIBUTE_KEY_GENOTYPE = "genotype";
+	
 	public enum ConditionInfo implements NiceNameSupport {
 		IGNORED_FIELD("---"), SPECIES("Species"), GENOTYPE("Genotype"), VARIETY("Variety"),
 		GROWTHCONDITIONS("Growth Condititions"), TREATMENT("Treatment"),
@@ -73,15 +82,15 @@ public class Condition implements ConditionInterface {
 	private static final String[] attributeNames = new String[] {
 			"experimentname", "database", "experimenttype",
 			"coordinator", "startdate", "importdate", "storagedate", "remark",
-			"id", "name", "genotype",
-			"growthconditions", "treatment",
-			"variety", "sequence", "files", "settings" };
+			ATTRIBUTE_KEY_ID, ATTRIBUTE_KEY_NAME, ATTRIBUTE_KEY_GENOTYPE,
+			ATTRIBUTE_KEY_GROWTHCONDITIONS, ATTRIBUTE_KEY_TREATMENT,
+			ATTRIBUTE_KEY_VARIETY, ATTRIBUTE_KEY_SEQUENCE, ATTRIBUTE_KEY_FILES, "settings" };
 	
-	private static final String[] attributeNamesForDocument = new String[] { "genotype",
-			"growthconditions", "id",
-			"name", "treatment", "variety", "sequence", "files" };
+	private static final String[] attributeNamesForDocument = new String[] { ATTRIBUTE_KEY_GENOTYPE,
+			ATTRIBUTE_KEY_GROWTHCONDITIONS, ATTRIBUTE_KEY_ID,
+			ATTRIBUTE_KEY_NAME, ATTRIBUTE_KEY_TREATMENT, ATTRIBUTE_KEY_VARIETY, ATTRIBUTE_KEY_SEQUENCE, ATTRIBUTE_KEY_FILES };
 	
-	private static final String[] attributeNameWithoutDocumentFields = remove(attributeNames, attributeNamesForDocument, "sequence");
+	private static final String[] attributeNameWithoutDocumentFields = remove(attributeNames, attributeNamesForDocument, ATTRIBUTE_KEY_SEQUENCE);
 	
 	public Condition(SubstanceInterface md) {
 		parent = md;
@@ -99,19 +108,19 @@ public class Condition implements ConditionInterface {
 	@Override
 	public Object getAttributeField(String id) {
 		switch (id) {
-			case "name":
+			case ATTRIBUTE_KEY_NAME:
 				return getSpecies();
-			case "genotype":
+			case ATTRIBUTE_KEY_GENOTYPE:
 				return getGenotype();
-			case "variety":
+			case ATTRIBUTE_KEY_VARIETY:
 				return getVariety();
-			case "sequence":
+			case ATTRIBUTE_KEY_SEQUENCE:
 				return getSequence();
-			case "growthconditions":
+			case ATTRIBUTE_KEY_GROWTHCONDITIONS:
 				return getGrowthconditions();
-			case "treatment":
+			case ATTRIBUTE_KEY_TREATMENT:
 				return getTreatment();
-			case "files":
+			case ATTRIBUTE_KEY_FILES:
 				return getFiles();
 		}
 		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");
@@ -120,25 +129,25 @@ public class Condition implements ConditionInterface {
 	@Override
 	public void setAttributeField(String id, Object value) {
 		switch (id) {
-			case "name":
+			case ATTRIBUTE_KEY_NAME:
 				setSpecies((String) value);
 				return;
-			case "genotype":
+			case ATTRIBUTE_KEY_GENOTYPE:
 				setGenotype((String) value);
 				return;
-			case "variety":
+			case ATTRIBUTE_KEY_VARIETY:
 				setVariety((String) value);
 				return;
-			case "sequence":
+			case ATTRIBUTE_KEY_SEQUENCE:
 				setSequence((String) value);
 				return;
-			case "growthconditions":
+			case ATTRIBUTE_KEY_GROWTHCONDITIONS:
 				setGrowthconditions((String) value);
 				return;
-			case "treatment":
+			case ATTRIBUTE_KEY_TREATMENT:
 				setTreatment((String) value);
 				return;
-			case "files":
+			case ATTRIBUTE_KEY_FILES:
 				setFiles((String) value);
 				return;
 		}
@@ -523,7 +532,7 @@ public class Condition implements ConditionInterface {
 			return;
 		if (attr.getValue().contains("~"))
 			attr.setValue(StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#")));
-		if (attr.getName().equals("id")) {
+		if (attr.getName().equals(ATTRIBUTE_KEY_ID)) {
 			try {
 				setRowId(Integer.parseInt(attr.getValue()));
 			} catch (Exception e) {
@@ -575,28 +584,28 @@ public class Condition implements ConditionInterface {
 																	if (attr.getName().equals("outlier"))
 																		setExperimentGlobalOutlierInfo(attr.getValue());
 																	else
-																		if (attr.getName().equals("name"))
+																		if (attr.getName().equals(ATTRIBUTE_KEY_NAME))
 																			setSpecies(attr.getValue());
 																		else
-																			if (attr.getName().equals("genotype"))
+																			if (attr.getName().equals(ATTRIBUTE_KEY_GENOTYPE))
 																				setGenotype(attr.getValue());
 																			else
-																				if (attr.getName().equals("growthconditions"))
+																				if (attr.getName().equals(ATTRIBUTE_KEY_GROWTHCONDITIONS))
 																					setGrowthconditions(attr.getValue());
 																				else
-																					if (attr.getName().equals("treatment"))
+																					if (attr.getName().equals(ATTRIBUTE_KEY_TREATMENT))
 																						setTreatment(attr.getValue());
 																					else
-																						if (attr.getName().equals("variety"))
+																						if (attr.getName().equals(ATTRIBUTE_KEY_VARIETY))
 																							setVariety(attr.getValue());
 																						else
 																							if (attr.getName().equals("experimenttype"))
 																								setExperimentType(attr.getValue());
 																							else
-																								if (attr.getName().equals("sequence"))
+																								if (attr.getName().equals(ATTRIBUTE_KEY_SEQUENCE))
 																									setSequence(attr.getValue());
 																								else
-																									if (attr.getName().equals("files"))
+																									if (attr.getName().equals(ATTRIBUTE_KEY_FILES))
 																										setFiles(attr.getValue());
 																									else
 																										if (attr.getName().equals("settings"))

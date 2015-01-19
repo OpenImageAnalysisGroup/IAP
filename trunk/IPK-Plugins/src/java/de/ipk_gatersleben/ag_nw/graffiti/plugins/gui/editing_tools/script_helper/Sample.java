@@ -12,6 +12,13 @@ import org.jdom.Element;
 
 public class Sample implements SampleInterface {
 	
+	public static final String ATTRIBUTE_KEY_ID = "id";
+	public static final String ATTRIBUTE_KEY_MEASUREMENTTOOL = "measurementtool";
+	public static final String ATTRIBUTE_KEY_TIME = "time";
+	public static final String ATTRIBUTE_KEY_UNIT = "unit";
+	public static final String ATTRIBUTE_KEY_TTEST = "ttest";
+	public static final String ATTRIBUTE_KEY_FILES = "files";
+	
 	public static final String UNSPECIFIED_TIME_STRING = "-1";
 	
 	/**
@@ -39,7 +46,8 @@ public class Sample implements SampleInterface {
 		return timeUnit + " " + time;
 	}
 	
-	private static final String[] attributeNames = new String[] { "id", "measurementtool", "time", "unit", "ttest", "files" };
+	private static final String[] attributeNames = new String[] { ATTRIBUTE_KEY_ID, ATTRIBUTE_KEY_MEASUREMENTTOOL,
+			ATTRIBUTE_KEY_TIME, ATTRIBUTE_KEY_UNIT, ATTRIBUTE_KEY_TTEST, ATTRIBUTE_KEY_FILES };
 	
 	private Object[] getAttributeValues() {
 		return new Object[] { getSampleFineTimeOrRowId(), getMeasurementtool(), getTime(), getTimeUnit(),
@@ -64,17 +72,17 @@ public class Sample implements SampleInterface {
 	@Override
 	public Object getAttributeField(String id) {
 		switch (id) {
-			case "id":
+			case ATTRIBUTE_KEY_ID:
 				return getSampleFineTimeOrRowId();
-			case "measurementtool":
+			case ATTRIBUTE_KEY_MEASUREMENTTOOL:
 				return getMeasurementtool();
-			case "time":
+			case ATTRIBUTE_KEY_TIME:
 				return getTime();
-			case "unit":
+			case ATTRIBUTE_KEY_UNIT:
 				return getTimeUnit();
-			case "ttest":
+			case ATTRIBUTE_KEY_TTEST:
 				return getTtestInfo();
-			case "files":
+			case ATTRIBUTE_KEY_FILES:
 				return getFiles();
 		}
 		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");
@@ -231,7 +239,7 @@ public class Sample implements SampleInterface {
 		else
 			attr.setValue(val);
 		
-		if (attr.getName().equals("id")) {
+		if (attr.getName().equals(ATTRIBUTE_KEY_ID)) {
 			// try {
 			if (attr.getValue().length() > 0 && !attr.getValue().equals("-1")) {
 				if (attr.getValue().length() > 9)
@@ -244,19 +252,19 @@ public class Sample implements SampleInterface {
 			// ErrorMsg.addErrorMessage(e);
 			// }
 		} else
-			if (attr.getName().equals("measurementtool"))
+			if (attr.getName().equals(ATTRIBUTE_KEY_MEASUREMENTTOOL))
 				setMeasurementtool(attr.getValue());
 			else
-				if (attr.getName().equals("ttest"))
+				if (attr.getName().equals(ATTRIBUTE_KEY_TTEST))
 					setTtestInfo(TtestInfo.getValueFromString(attr.getValue()));
 				else
-					if (attr.getName().equals("files"))
+					if (attr.getName().equals(ATTRIBUTE_KEY_FILES))
 						setFiles(attr.getValue());
 					else
-						if (attr.getName().equals("unit"))
+						if (attr.getName().equals(ATTRIBUTE_KEY_UNIT))
 							setTimeUnit(attr.getValue());
 						else
-							if (attr.getName().equals("time"))
+							if (attr.getName().equals(ATTRIBUTE_KEY_TIME))
 								// try {
 								setTime(Integer.parseInt(attr.getValue()));
 							// } catch (Exception e) {
