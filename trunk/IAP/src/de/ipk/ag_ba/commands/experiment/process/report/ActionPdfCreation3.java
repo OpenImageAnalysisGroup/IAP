@@ -592,7 +592,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 							Row r = infoSheet.createRow(row++);
 							String v = StringManipulationTools.removeHTMLtags(ExperimentHeader.getNiceHTMLfieldNameMapping().get(field));
 							
-							if (field.equals("sizekb")) {
+							if (field.equals(ExperimentHeader.ATTRIBUTE_KEY_SIZEKB)) {
 								try {
 									String s = "" + attributeValueMap.get(field);
 									attributeValueMap.put(field, Long.parseLong(s) / 1024 / 1024);
@@ -602,7 +602,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 									// empty
 								}
 							}
-							if (field.equals("remark")) {
+							if (field.equals(ExperimentHeader.ATTRIBUTE_KEY_REMARK)) {
 								try {
 									String s = "" + attributeValueMap.get(field);
 									s = StringManipulationTools.stringReplace(s, " // ", "\n");
@@ -612,7 +612,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 									// empty
 								}
 							}
-							if (field.equals("outliers")) {
+							if (field.equals(ExperimentHeader.ATTRIBUTE_KEY_OUTLIER)) {
 								try {
 									String s = "" + attributeValueMap.get(field);
 									s = StringManipulationTools.stringReplace(s, "//", "\n");
@@ -891,7 +891,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 						
 						if (status != null)
 							status.setCurrentStatusValueFine(100d);
-						System.out.println(SystemAnalysis.getCurrentTime() + ">File is saved (" + written.getLong() / 1024 / 1024 + " MB)");
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: File is saved (" + SystemAnalysis.getDataAmountString(written.getLong()) + ")");
 						if (status != null)
 							status.setCurrentStatusText1("Output complete");
 						if (status != null)
@@ -1343,7 +1343,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		if (status != null)
 			status.setCurrentStatusText1("Workbook is filled");
 		
-		System.out.println(SystemAnalysis.getCurrentTime() + ">Workbook is filled");
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Workbook is filled");
 	}
 	
 	private static void progressOutput(LinkedList<SnapshotDataIAP> snapshotsToBeProcessed, BackgroundTaskStatusProviderSupportingExternalCall status, Runtime r,

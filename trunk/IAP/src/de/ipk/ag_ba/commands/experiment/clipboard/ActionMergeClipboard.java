@@ -2,6 +2,7 @@ package de.ipk.ag_ba.commands.experiment.clipboard;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 
 import org.MergeCompareRequirements;
 import org.StringManipulationTools;
@@ -46,16 +47,29 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 		ArrayList<String> names = new ArrayList<String>();
 		ArrayList<String> ids = new ArrayList<String>();
 		ArrayList<String> sequences = new ArrayList<String>();
+		String experimentType = null;
+		LinkedHashSet<String> coordinators = new LinkedHashSet<>();
+		LinkedHashSet<String> outliers = new LinkedHashSet<>();
 		Date firstExperimentStart = null;
 		Date lastExperimentEnd = null;
 		for (ExperimentReferenceInterface i : guiSetting.getClipboardItems()) {
 			String id = i.getHeader().getDatabaseId() + "";
 			ids.add(id);
 			String seq = i.getHeader().getSequence() + "";
-			sequences.add(seq);
+			if (seq != null)
+				if (!seq.trim().isEmpty())
+					sequences.add(seq.trim());
 			ExperimentInterface ei = i.getData(false, status);
 			names.add(ei.getName());
 			ExperimentInterface eCopy = ei.clone();
+			if (experimentType == null)
+				experimentType = ei.getHeader().getExperimentType();
+			if (ei.getCoordinator() != null)
+				coordinators.add(ei.getCoordinator());
+			if (ei.getHeader().getGlobalOutlierInfo() != null)
+				for (String o : ei.getHeader().getGlobalOutlierInfo().split("//"))
+					if (!o.trim().isEmpty())
+						outliers.add(o.trim());
 			if (firstExperimentStart == null)
 				firstExperimentStart = ei.getStartDate();
 			else
@@ -89,7 +103,9 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 		e.getHeader().setStartDate(firstExperimentStart);
 		e.getHeader().setImportDate(lastExperimentEnd);
 		e.getHeader().setExperimentname("Merged " + StringManipulationTools.getStringList(names, ", "));
-		// e.getHeader().setExperimenttype(IAPexperimentTypes.AnalysisResults + "");
+		e.getHeader().setExperimentType(experimentType);
+		e.getHeader().setCoordinator(StringManipulationTools.getStringList(coordinators, " // "));
+		e.getHeader().setGlobalOutlierInfo(StringManipulationTools.getStringList(outliers, "//"));
 		// e.getHeader().setImportusergroup(IAPexperimentTypes.AnalysisResults + "");
 		e.getHeader().setOriginDbId(StringManipulationTools.getStringList(ids, " // "));
 		e.getHeader().setSequence(StringManipulationTools.getStringList(sequences, " // "));
