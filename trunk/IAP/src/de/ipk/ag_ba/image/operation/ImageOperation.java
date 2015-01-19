@@ -1135,18 +1135,33 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
-	 * ignores background
+	 * ignores custom background
 	 */
-	public ImageOperation invert() {
+	public ImageOperation invert(int colorInt) {
+		return invert(colorInt, true);
+	}
+	
+	/**
+	 * background could be not ignored if ignoreback == false
+	 */
+	public ImageOperation invert(int colorInt, boolean ignoreback) {
 		int[] img = getAs1D();
 		int i = 0;
 		for (int pix : img) {
-			if (pix != BACKGROUND_COLORint) {
+			if (pix != colorInt && ignoreback) {
 				img[i] = 0xFFFFFF - pix;
-			}
+			} else
+				img[i] = 0xFFFFFF - pix;
 			i++;
 		}
 		return this;
+	}
+	
+	/**
+	 * ignores background
+	 */
+	public ImageOperation invert() {
+		return invert(BACKGROUND_COLORint);
 	}
 	
 	public Image draw(Image fi, int background) {
