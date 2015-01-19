@@ -206,12 +206,14 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 						"IAP Cloud Storage, Analysis and Visualization System");
 				final JFrame jff = getIAPwindow(optCustomStartAction, tt, 800, 600, null, executeActionDelayed);
 				final Runnable rr = new Runnable() {
+					String lt = null;
+					
 					@Override
 					public void run() {
 						if (!jff.isDisplayable())
 							SystemOptions.getInstance().removeChangeListener(this);
 						else {
-							String tt = SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
+							String tt = lt != null ? lt : SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
 									"IAP Cloud Storage, Analysis and Visualization System");
 							if (optCustomStartAction != null)
 								jff.setTitle(StringManipulationTools.removeHTMLtags(
