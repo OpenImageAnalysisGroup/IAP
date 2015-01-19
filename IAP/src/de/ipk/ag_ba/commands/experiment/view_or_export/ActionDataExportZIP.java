@@ -16,11 +16,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 import java.util.WeakHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipOutputStream;
 
+import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -33,6 +31,8 @@ import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -210,7 +210,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 			final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(os));
 			
 			out.setLevel(0);
-			out.setComment("Created with IAP by user " + SystemAnalysis.getUserName() + ".");
+			out.setComment("Created with IAP V" + ReleaseInfo.IAP_VERSION_STRING + " by user " + SystemAnalysis.getUserName() + ".");
 			// out.setMethod(ZipOutputStream.STORED);
 			
 			status.setCurrentStatusText1("Create ZIP");
@@ -222,6 +222,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 			GregorianCalendar gc = new GregorianCalendar();
 			
 			final ThreadSafeOptions written = new ThreadSafeOptions();
+			final ThreadSafeOptions read = new ThreadSafeOptions();
 			
 			this.files = 0;
 			for (SubstanceInterface su : experiment)
@@ -236,118 +237,117 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 							}
 						}
 					}
-			int idx = 0;
+			ThreadSafeOptions idx = new ThreadSafeOptions();
 			
 			long startTime = System.currentTimeMillis();
-			
-			ExecutorService es = Executors.newFixedThreadPool(1);
-			
-			for (SubstanceInterface su : experiment)
-				for (ConditionInterface co : su)
-					for (SampleInterface sa : co) {
-						for (NumericMeasurementInterface nm : sa) {
-							if (nm instanceof BinaryMeasurement) {
-								BinaryMeasurement bm = (BinaryMeasurement) nm;
-								if (bm.getURL() == null)
-									continue;
-								
-								if (status.wantsToStop())
-									continue;
-								
-								status.setCurrentStatusValueFine(100d * (idx++) / files);
-								
-								final String zefnSRC;
-								final ImageData id = (ImageData) bm;
-								try {
-									if (bm instanceof ImageData) {
-										zefnSRC = getImageFileExportNameForZIPexport(gc, id);
-										
-									} else {
-										zefnSRC = bm.getURL().getFileName();
-									}
-									// bm.getURL().getFileName();
+			ArrayList<LocalComputeJob> wait = new ArrayList<>();
+			experiment.visitNumericMeasurements(
+					null,
+					(nm) -> {
+						if (nm instanceof BinaryMeasurement) {
+							BinaryMeasurement bm = (BinaryMeasurement) nm;
+							if (bm.getURL() == null)
+								return;
+							
+							if (status.wantsToStop())
+								return;
+							
+							status.setCurrentStatusValueFine(100d * (idx.addInt(1)) / files);
+							
+							final String zefnSRC;
+							final ImageData id = (ImageData) bm;
+							try {
+								if (bm instanceof ImageData) {
+									zefnSRC = getImageFileExportNameForZIPexport(gc, id);
 									
-									MyByteArrayInputStream inSRC = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
-									final SubstanceInterface suf = su;
-									if (inSRC != null) {
-										while (written.getInt() > 0)
-											Thread.sleep(5);
-										written.addInt(1);
-										es.submit(new Runnable() {
-											@Override
-											public void run() {
-												MyByteArrayInputStream in = inSRC;
-												String zefn = zefnSRC;
-												boolean closed = false;
-												synchronized (out) {
-													try {
-														if (in.getCount() > 0) {
-															
-															if (jpg.getBval(0, false)) {
-																String ext = bm.getURL().getFileNameExtension().toLowerCase();
-																if (!ext.endsWith("jpg") && !ext.endsWith("jpeg")) {
-																	Image img = new Image(in);
-																	int ss = tsoQuality.getInt();
-																	CameraType ct = CameraType.fromString(suf.getName());
-																	if (ss > 0 && ss < 100 && ct != CameraType.NIR && ct != CameraType.IR)
-																		img = img.resize(img.getWidth() * ss / 100, img.getHeight() * ss / 100);
-																	in = img.getAsJPGstream((float) tsoQuality.getDouble());
-																	closed = true;
-																	zefn = StringManipulationTools.removeFileExtension(zefn) + ".jpg";
-																}
-															} else {
-																Image img = new Image(in);
-																int ss = tsoQuality.getInt();
-																CameraType ct = CameraType.fromString(suf.getName());
-																if (ss > 0 && ss < 100 && ct != CameraType.NIR && ct != CameraType.IR)
-																	img = img.resize(img.getWidth() * ss / 100, img.getHeight() * ss / 100);
-																in = img.getAsPNGstream();
-															}
-															ZipArchiveEntry entry = new ZipArchiveEntry(zefn);
-															entry.setSize(in.getCount());
-															entry.setCrc(in.getCRC32());
-															Date t;
-															if (id.getParentSample().getSampleFineTimeOrRowId() != null)
-																t = new Date(id.getParentSample().getSampleFineTimeOrRowId());
-															else
-																t = id.getParentSample().getParentCondition().getExperimentStorageDate();
-															if (t == null)
-																t = new Date();
-															entry.setTime(t.getTime());
-															out.putNextEntry(entry);
-															out.write(in.getBuff(), 0, in.getCount());
-															out.closeEntry();
-															written.addLong(in.getCount());
-														}
-													} catch (IOException e) {
-														System.out.println("ERROR: " + e.getMessage());
-													} finally {
-														written.addInt(-1);
-														if (!closed)
-															try {
-																in.close();
-															} catch (IOException e) {
-																System.out.println("ERROR: " + e.getMessage());
-															}
-													}
-												}
-											}
-										});
-										
-									}
-								} catch (Exception e) {
-									System.out.println("ERROR: " + e.getMessage());
+								} else {
+									zefnSRC = bm.getURL().getFileName();
 								}
-								String pre = "Create ZIP...";
-								status.setCurrentStatusText1(pre);
-								long currTime = System.currentTimeMillis();
-								status.setCurrentStatusText2(SystemAnalysis.getDataTransferSpeedString(written.getLong(), startTime, currTime));
-							}
+								// bm.getURL().getFileName();
+					
+					wait.add(BackgroundThreadDispatcher.addTask(() -> {
+						MyByteArrayInputStream inSRC;
+						try {
+							inSRC = ResourceIOManager.getInputStreamMemoryCached(bm.getURL());
+						} catch (Exception e1) {
+							errorMessage = e1.getMessage();
+							inSRC = null;
 						}
-					}
-			
-			es.shutdown();
-			es.awaitTermination(31, TimeUnit.DAYS);
+						if (inSRC == null)
+							return;
+						final SubstanceInterface suf = nm.getParentSample().getParentCondition().getParentSubstance();
+						MyByteArrayInputStream in = inSRC;
+						String zefn = zefnSRC;
+						boolean closed = false;
+						try {
+							if (in.getCount() > 0) {
+								read.addLong(in.getCount());
+								if (jpg.getBval(0, false)) {
+									String ext = bm.getURL().getFileNameExtension().toLowerCase();
+									if (!ext.endsWith("jpg") && !ext.endsWith("jpeg")) {
+										Image img = new Image(in);
+										int ss = tsoQuality.getInt();
+										CameraType ct = CameraType.fromString(suf.getName());
+										if (ss > 0 && ss < 100 && ct != CameraType.NIR && ct != CameraType.IR)
+											img = img.resize(img.getWidth() * ss / 100, img.getHeight() * ss / 100);
+										in = img.getAsJPGstream((float) tsoQuality.getDouble());
+										closed = true;
+										zefn = StringManipulationTools.removeFileExtension(zefn) + ".jpg";
+									}
+								} else {
+									Image img = new Image(in);
+									int ss = tsoQuality.getInt();
+									CameraType ct = CameraType.fromString(suf.getName());
+									if (ss > 0 && ss < 100 && ct != CameraType.NIR && ct != CameraType.IR)
+										img = img.resize(img.getWidth() * ss / 100, img.getHeight() * ss / 100);
+									in = img.getAsPNGstream();
+								}
+								ZipArchiveEntry entry = new ZipArchiveEntry(zefn);
+								entry.setSize(in.getCount());
+								entry.setCrc(in.getCRC32());
+								Date t;
+								if (id.getParentSample().getSampleFineTimeOrRowId() != null)
+									t = new Date(id.getParentSample().getSampleFineTimeOrRowId());
+								else
+									t = id.getParentSample().getParentCondition().getExperimentStorageDate();
+								if (t == null)
+									t = new Date();
+								entry.setTime(t.getTime());
+								synchronized (out) {
+									out.putNextEntry(entry);
+									int n = in.getCount();
+									out.write(in.getBuff(), 0, n);
+									out.closeEntry();
+									written.addLong(n);
+								}
+							}
+						} catch (IOException e) {
+							System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
+						} finally {
+							// written.addInt(-1);
+							if (!closed)
+								try {
+									in.close();
+								} catch (IOException e) {
+									System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
+								}
+						}
+					}, "add file to ZIP"));
+					
+				} catch (Exception e) {
+					System.out.println("ERROR: " + e.getMessage());
+				}
+				String pre = "Create ZIP...";
+				status.setCurrentStatusText1(pre);
+				long currTime = System.currentTimeMillis();
+				if (read.getLong() > 0)
+					status.setCurrentStatusText1("Added " + idx.getInt() + "/" + files + " files");
+				status.setCurrentStatusText2("inp: " + SystemAnalysis.getDataTransferSpeedString(read.getLong(), startTime, currTime) + ", " +
+						"out:<br>" + SystemAnalysis.getDataTransferSpeedString(written.getLong(), startTime, currTime) + " ("
+						+ (int) (100d * written.getLong() / read.getLong()) + "% of inp)");
+			}
+		}	);
+			BackgroundThreadDispatcher.waitFor(wait);
 			out.flush();
 			out.close();
 			status.setCurrentStatusValueFine(100d);
@@ -413,7 +413,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 			return new MainPanelComponent(stop + "No output file has been generated." + errorMessage);
 		else {
 			if (errorMessage.trim().length() > 0)
-				return new MainPanelComponent(stop + "Output incomplete. Error: " + errorMessage);
+				return new MainPanelComponent(stop + "Output incomplete. Last Error: " + errorMessage);
 			else
 				return new MainPanelComponent(stop + "The file " + fn + " has been created (size " + mb + " MB, " + files + " files)." + errorMessage);
 		}

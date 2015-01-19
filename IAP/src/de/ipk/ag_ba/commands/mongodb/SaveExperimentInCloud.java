@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.TreeMap;
 
 import javax.swing.SwingUtilities;
 
@@ -157,18 +158,38 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			foundAnnoFile = true;
 		}
 		
+		TreeMap<String, TreeMap<Integer, Object>> knownFileNames2anno = new TreeMap<>();
 		HashMap<Integer, String> colNum2headerText = new HashMap<>();
 		for (int row = 1; row < tableData.getMaximumRow(); row++) {
+			TreeMap<Integer, Object> rowAnno = new TreeMap<>();
 			for (int col = 1; col < tableData.getMaximumCol(); col++) {
 				Object v = tableData.getCellData(col, row, null);
 				if (v == null)
 					continue;
 				if (row == 1) {
+					if ((!(v instanceof String) || ((String) v).isEmpty()))
+						v = "Column " + col;
 					colNum2headerText.put(col, v + "");
 				} else
 					if (col == 1) {
-						
+						if ((!(v instanceof String) || ((String) v).isEmpty())) {
+							System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: Invalid file name in first column: " + v);
+						} else {
+							knownFileNames2anno.put((String) v, rowAnno);
+						}
+					} else {
+						rowAnno.put(col, v);
 					}
+			}
+		}
+		
+		// int genotypeColumn = getColumn(Condition.ATTRIBUTE_KEY_GENOTYPE, colNum2headerText);
+		
+		TreeMap<String, TreeMap<Integer, Object>> unknownFileNames2anno = new TreeMap<>();
+		for (File f : fileList) {
+			String fn = f.getName();
+			if (!knownFileNames2anno.containsKey(fn)) {
+				unknownFileNames2anno.put(fn, new TreeMap<>());
 			}
 		}
 		
