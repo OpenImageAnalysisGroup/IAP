@@ -4127,6 +4127,10 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @return The combined image (a and b where a pixels are background).
 	 */
 	public ImageOperation or(Image b) {
+		return or(b, BACKGROUND_COLORint);
+	}
+	
+	public ImageOperation or(Image b, int back) {
 		if (b == null)
 			return this;
 		int[][] aa = getAs2D();
@@ -4136,14 +4140,14 @@ public class ImageOperation implements MemoryHogInterface {
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
 				int apixel = aa[x][y];
-				if (apixel == BACKGROUND_COLORint)
+				if (apixel == back)
 					aa[x][y] = ba[x][y];
-				else {
-					int bpixel = ba[x][y];
-					if (bpixel != BACKGROUND_COLORint) {
-						aa[x][y] = aa[x][y];// | ba[x][y];
-					}
-				}
+				// else {
+				// int bpixel = ba[x][y];
+				// if (bpixel != back) {
+				// aa[x][y] = aa[x][y];// | ba[x][y];
+				// }
+				// }
 			}
 		ba = null;
 		return new Image(aa).io();
