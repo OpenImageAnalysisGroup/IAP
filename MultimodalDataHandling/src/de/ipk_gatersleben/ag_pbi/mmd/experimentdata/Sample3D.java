@@ -31,6 +31,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
 
 public class Sample3D extends Sample {
 	
+	public static final String ATTRIBUTE_KEY_COMPONENT = "component";
 	private String component = null;
 	
 	// private final ArrayList<NumericMeasurementInterface> binaryMeasurements;
@@ -71,7 +72,7 @@ public class Sample3D extends Sample {
 	@Override
 	public void getXMLAttributeString(StringBuilder r) {
 		super.getXMLAttributeString(r);
-		Substance.getAttributeString(r, new String[] { "component" }, new String[] { getComponent() });
+		Substance.getAttributeString(r, new String[] { ATTRIBUTE_KEY_COMPONENT }, new String[] { getComponent() });
 	}
 	
 	public String getComponent() {
@@ -172,7 +173,7 @@ public class Sample3D extends Sample {
 	public void setAttribute(MyAttribute attr) {
 		if (attr == null || attr.getValue() == null || attr.getValue().length() == 0)
 			return;
-		if (attr.getName().equals("component"))
+		if (attr.getName().equals(ATTRIBUTE_KEY_COMPONENT))
 			setComponent(attr.getValue());
 		else
 			super.setAttribute(attr);
@@ -221,7 +222,7 @@ public class Sample3D extends Sample {
 	public void fillAttributeMap(Map<String, Object> attributeValueMap) {
 		super.fillAttributeMap(attributeValueMap);
 		if (component != null)
-			attributeValueMap.put("component", component);
+			attributeValueMap.put(ATTRIBUTE_KEY_COMPONENT, component);
 	}
 	
 	// @Override

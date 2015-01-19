@@ -9,6 +9,12 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 
 public class NumericMeasurement implements NumericMeasurementInterface {
+	public static final String ATTRIBUTE_KEY_FILES = "files";
+	public static final String ATTRIBUTE_KEY_QUALITY = "quality";
+	public static final String ATTRIBUTE_KEY_VALUE = "value";
+	public static final String ATTRIBUTE_KEY_UNIT = "unit";
+	public static final String ATTRIBUTE_KEY_REPLICATES = "replicates";
+	private static final String ATTRIBUTE_KEY_ID_IGNORED = "id";
 	private double value = Double.NaN;
 	private int replicateID;
 	private SampleInterface parent;
@@ -22,39 +28,39 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	public NumericMeasurement(SampleInterface parent, Map<?, ?> attributemap) {
 		this.parent = parent;
-		if (attributemap.containsKey("replicates"))
-			setReplicateID((Integer) attributemap.get("replicates"));
-		if (attributemap.containsKey("unit"))
-			setUnit((String) attributemap.get("unit"));
-		if (attributemap.containsKey("value"))
-			setValue((Double) attributemap.get("value"));
-		if (attributemap.containsKey("quality"))
-			setQualityAnnotation((String) attributemap.get("quality"));
-		if (attributemap.containsKey("files"))
-			setFiles((String) attributemap.get("files"));
+		if (attributemap.containsKey(ATTRIBUTE_KEY_REPLICATES))
+			setReplicateID((Integer) attributemap.get(ATTRIBUTE_KEY_REPLICATES));
+		if (attributemap.containsKey(ATTRIBUTE_KEY_UNIT))
+			setUnit((String) attributemap.get(ATTRIBUTE_KEY_UNIT));
+		if (attributemap.containsKey(ATTRIBUTE_KEY_VALUE))
+			setValue((Double) attributemap.get(ATTRIBUTE_KEY_VALUE));
+		if (attributemap.containsKey(ATTRIBUTE_KEY_QUALITY))
+			setQualityAnnotation((String) attributemap.get(ATTRIBUTE_KEY_QUALITY));
+		if (attributemap.containsKey(ATTRIBUTE_KEY_FILES))
+			setFiles((String) attributemap.get(ATTRIBUTE_KEY_FILES));
 	}
 	
 	@Override
 	public void setAttributeField(String id, Object value) {
 		switch (id) {
-			case "replicates":
+			case ATTRIBUTE_KEY_REPLICATES:
 				if (value == null)
 					setReplicateID(0);
 				else
 					setReplicateID(Integer.parseInt((String) value));
 				return;
-			case "unit":
+			case ATTRIBUTE_KEY_UNIT:
 				setUnit((String) value);
-			case "value":
+			case ATTRIBUTE_KEY_VALUE:
 				// if (value == null)
 				// setValue(Double.NaN);
 				// else
 				// setValue(Double.parseDouble((String) value));
 				return;
-			case "quality":
+			case ATTRIBUTE_KEY_QUALITY:
 				setQualityAnnotation((String) value);
 				return;
-			case "files":
+			case ATTRIBUTE_KEY_FILES:
 				setFiles((String) value);
 				return;
 		}
@@ -110,7 +116,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	@Override
 	public void getXMLAttributeString(StringBuilder r) {
 		Substance.getAttributeString(r, new String[] {
-				"replicates", "unit", "quality", "files"
+				ATTRIBUTE_KEY_REPLICATES, ATTRIBUTE_KEY_UNIT, ATTRIBUTE_KEY_QUALITY, ATTRIBUTE_KEY_FILES
 		}, new Object[] {
 				replicateID, unit, quality, files
 		});
@@ -170,7 +176,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		
 		String name = attr.getName();
 		
-		if (name.startsWith("i")) { // name.equals("id")) {
+		if (name.equals(ATTRIBUTE_KEY_ID_IGNORED)) {
 			// ignore ID
 			return;
 		}
@@ -179,7 +185,7 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 		if (val != null && val.contains("~"))
 			val = StringManipulationTools.htmlToUnicode(attr.getValue().replaceAll("~", "&#"));
 		
-		if (name.startsWith("r")) { // equals("replicates")) {
+		if (name.equals(ATTRIBUTE_KEY_REPLICATES)) {
 			try {
 				if (attr.getValue().length() > 0) {
 					setReplicateID(Integer.parseInt(val));
@@ -189,17 +195,17 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 				ErrorMsg.addErrorMessage(e);
 			}
 		} else
-			if (name.startsWith("u")) {// equals("unit")) {
+			if (name.equals(ATTRIBUTE_KEY_UNIT)) {
 				try {
 					setUnit(val);
 				} catch (Exception e) {
 					ErrorMsg.addErrorMessage(e);
 				}
 			} else
-				if (name.startsWith("f")) {// equals("files")) {
+				if (name.equals(ATTRIBUTE_KEY_FILES)) {
 					setFiles(val);
 				} else
-					if (name.startsWith("q")) {// equals("quality")) {
+					if (name.equals(ATTRIBUTE_KEY_QUALITY)) {
 						setQualityAnnotation(val);
 					}
 	}
@@ -241,25 +247,25 @@ public class NumericMeasurement implements NumericMeasurementInterface {
 	
 	@Override
 	public void fillAttributeMap(Map<String, Object> attributes) {
-		attributes.put("replicates", replicateID);
-		attributes.put("unit", unit);
-		attributes.put("value", value);
-		attributes.put("quality", quality);
-		attributes.put("files", files);
+		attributes.put(ATTRIBUTE_KEY_REPLICATES, replicateID);
+		attributes.put(ATTRIBUTE_KEY_UNIT, unit);
+		attributes.put(ATTRIBUTE_KEY_VALUE, value);
+		attributes.put(ATTRIBUTE_KEY_QUALITY, quality);
+		attributes.put(ATTRIBUTE_KEY_FILES, files);
 	}
 	
 	@Override
 	public Object getAttributeField(String id) {
 		switch (id) {
-			case "replicates":
+			case ATTRIBUTE_KEY_REPLICATES:
 				return replicateID;
-			case "unit":
+			case ATTRIBUTE_KEY_UNIT:
 				return unit;
-			case "value":
+			case ATTRIBUTE_KEY_VALUE:
 				return value;
-			case "quality":
+			case ATTRIBUTE_KEY_QUALITY:
 				return quality;
-			case "files":
+			case ATTRIBUTE_KEY_FILES:
 				return files;
 		}
 		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");

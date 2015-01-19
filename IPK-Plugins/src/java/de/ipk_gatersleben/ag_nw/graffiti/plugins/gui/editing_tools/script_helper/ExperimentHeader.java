@@ -23,6 +23,26 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 
 public class ExperimentHeader implements ExperimentHeaderInterface {
 	
+	public static final String ATTRIBUTE_KEY_ANNOTATION = "annotation";
+	public static final String ATTRIBUTE_KEY_SETTINGS = "settings";
+	public static final String ATTRIBUTE_KEY_FILES = "files";
+	public static final String ATTRIBUTE_KEY_OUTLIER = "outliers"; // "outliers" 's' or no 's' at the end?
+	public static final String ATTRIBUTE_KEY_ORIGIN = "origin";
+	public static final String ATTRIBUTE_KEY_SIZEKB = "sizekb";
+	public static final String ATTRIBUTE_KEY_IMAGEFILES = "imagefiles";
+	public static final String ATTRIBUTE_KEY_MEASUREMENT = "measurements";
+	public static final String ATTRIBUTE_KEY_STORAGETIME = "storagetime";
+	public static final String ATTRIBUTE_KEY_STARTDATE = "startdate";
+	public static final String ATTRIBUTE_KEY_IMPORTDATE = "importdate";
+	public static final String ATTRIBUTE_KEY_IMPORTUSERGROUP = "importusergroup";
+	public static final String ATTRIBUTE_KEY_IMPORTUSERNAME = "importusername";
+	public static final String ATTRIBUTE_KEY_EXCELFILEID = "excelfileid";
+	public static final String ATTRIBUTE_KEY_SEQUENCE = "sequence";
+	public static final String ATTRIBUTE_KEY_EXPERIMENTTYPE = "experimenttype";
+	public static final String ATTRIBUTE_KEY_COORDINATOR = "coordinator";
+	public static final String ATTRIBUTE_KEY_REMARK = "remark";
+	public static final String ATTRIBUTE_KEY_DATABASE = "database";
+	public static final String ATTRIBUTE_KEY_EXPERIMENTNAME = "experimentname";
 	/**
 	 * If list of state variables is modified/extended, check and modify equals,
 	 * hashCode and eventually compareTo method implementation.
@@ -214,9 +234,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	public void toString(StringBuilder r, int measurementcount) {
 		r.append("<experiment experimentid=\"" + experimentID + "\">");
 		Substance.getAttributeString(r, new String[] {
-				"experimentname", "database", "remark", "coordinator", "experimenttype", "sequence", "excelfileid",
-				"importusername", "importusergroup", "importdate", "startdate", "storagetime", "measurements", "imagefiles", "sizekb",
-				"origin", "outlier", "files", "settings", "annotation"
+				ATTRIBUTE_KEY_EXPERIMENTNAME, ATTRIBUTE_KEY_DATABASE, ATTRIBUTE_KEY_REMARK, ATTRIBUTE_KEY_COORDINATOR,
+				ATTRIBUTE_KEY_EXPERIMENTTYPE, ATTRIBUTE_KEY_SEQUENCE, ATTRIBUTE_KEY_EXCELFILEID,
+				ATTRIBUTE_KEY_IMPORTUSERNAME, ATTRIBUTE_KEY_IMPORTUSERGROUP, ATTRIBUTE_KEY_IMPORTDATE,
+				ATTRIBUTE_KEY_STARTDATE, ATTRIBUTE_KEY_STORAGETIME, ATTRIBUTE_KEY_MEASUREMENT, ATTRIBUTE_KEY_IMAGEFILES,
+				ATTRIBUTE_KEY_SIZEKB, ATTRIBUTE_KEY_ORIGIN, ATTRIBUTE_KEY_OUTLIER, ATTRIBUTE_KEY_FILES,
+				ATTRIBUTE_KEY_SETTINGS, ATTRIBUTE_KEY_ANNOTATION
 		}, new Object[] {
 				getExperimentName(), database, remark, coordinator, experimentType, sequence, databaseId, importUserName,
 				importUserGroup, AttributeHelper.getDateString(importDate), AttributeHelper.getDateString(startDate), AttributeHelper.getDateString(storageTime),
@@ -244,12 +267,12 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		}
 		for (Object d : del)
 			map.remove(d);
-		setExperimentname((String) map.get("experimentname"));
+		setExperimentname((String) map.get(ATTRIBUTE_KEY_EXPERIMENTNAME));
 		if (getExperimentName() == null)
 			setExperimentname(ExperimentInterface.UNSPECIFIED_EXPERIMENTNAME);
-		setDatabase((String) map.get("database"));
-		setRemark((String) map.get("remark"));
-		setSettings((String) map.get("settings"));
+		setDatabase((String) map.get(ATTRIBUTE_KEY_DATABASE));
+		setRemark((String) map.get(ATTRIBUTE_KEY_REMARK));
+		setSettings((String) map.get(ATTRIBUTE_KEY_SETTINGS));
 		{ // map individual annotation fields to single combined annotation field
 			StringAnnotationProcessor anno = new StringAnnotationProcessor("");
 			for (DCelement dc : DCelement.values()) {
@@ -267,44 +290,44 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		if (map.containsKey("_id"))
 			setDatabaseId(map.get("_id") + "");
 		else
-			if (map.containsKey("excelfileid"))
-				setDatabaseId(map.get("excelfileid") + "");
-		setCoordinator((String) map.get("coordinator"));
-		setExperimentType((String) map.get("experimenttype"));
-		setSequence((String) map.get("sequence"));
-		setFiles((String) map.get("files"));
-		setImportUserName((String) map.get("importusername"));
-		setImportUserGroup((String) map.get("importusergroup"));
-		if (map.get("importdate") != null && map.get("importdate") instanceof String) {
-			Date aDate = getDate((String) map.get("importdate"));
+			if (map.containsKey(ATTRIBUTE_KEY_EXCELFILEID))
+				setDatabaseId(map.get(ATTRIBUTE_KEY_EXCELFILEID) + "");
+		setCoordinator((String) map.get(ATTRIBUTE_KEY_COORDINATOR));
+		setExperimentType((String) map.get(ATTRIBUTE_KEY_EXPERIMENTTYPE));
+		setSequence((String) map.get(ATTRIBUTE_KEY_SEQUENCE));
+		setFiles((String) map.get(ATTRIBUTE_KEY_FILES));
+		setImportUserName((String) map.get(ATTRIBUTE_KEY_IMPORTUSERNAME));
+		setImportUserGroup((String) map.get(ATTRIBUTE_KEY_IMPORTUSERGROUP));
+		if (map.get(ATTRIBUTE_KEY_IMPORTDATE) != null && map.get(ATTRIBUTE_KEY_IMPORTDATE) instanceof String) {
+			Date aDate = getDate((String) map.get(ATTRIBUTE_KEY_IMPORTDATE));
 			if (aDate != null)
 				setImportDate(aDate);
 		} else
-			setImportDate((Date) map.get("importdate"));
-		if (map.get("startdate") != null && map.get("startdate") instanceof String) {
-			Date aDate = getDate((String) map.get("startdate"));
+			setImportDate((Date) map.get(ATTRIBUTE_KEY_IMPORTDATE));
+		if (map.get(ATTRIBUTE_KEY_STARTDATE) != null && map.get(ATTRIBUTE_KEY_STARTDATE) instanceof String) {
+			Date aDate = getDate((String) map.get(ATTRIBUTE_KEY_STARTDATE));
 			if (aDate != null)
 				setStartDate(aDate);
 		} else
-			setStartDate((Date) map.get("startdate"));
-		if (map.get("storagetime") != null && map.get("storagetime") instanceof String) {
-			if (!((String) map.get("storagetime")).equals("null")) {
-				Date aDate = getDate((String) map.get("storagetime"));
+			setStartDate((Date) map.get(ATTRIBUTE_KEY_STARTDATE));
+		if (map.get(ATTRIBUTE_KEY_STORAGETIME) != null && map.get(ATTRIBUTE_KEY_STORAGETIME) instanceof String) {
+			if (!((String) map.get(ATTRIBUTE_KEY_STORAGETIME)).equals("null")) {
+				Date aDate = getDate((String) map.get(ATTRIBUTE_KEY_STORAGETIME));
 				if (aDate != null)
 					setStorageTime(aDate);
 			}
 		} else
-			setStorageTime((Date) map.get("storagetime"));
-		if (map.get("imagefiles") != null && map.get("imagefiles") instanceof String)
-			setNumberOfFiles(Integer.parseInt(((String) map.get("imagefiles"))));
+			setStorageTime((Date) map.get(ATTRIBUTE_KEY_STORAGETIME));
+		if (map.get(ATTRIBUTE_KEY_IMAGEFILES) != null && map.get(ATTRIBUTE_KEY_IMAGEFILES) instanceof String)
+			setNumberOfFiles(Integer.parseInt(((String) map.get(ATTRIBUTE_KEY_IMAGEFILES))));
 		else
-			setNumberOfFiles(map.get("imagefiles") != null ? (Integer) map.get("imagefiles") : 0);
-		if (map.get("sizekb") != null && map.get("sizekb") instanceof String)
-			setSizekb(Integer.parseInt(((String) map.get("sizekb"))));
+			setNumberOfFiles(map.get(ATTRIBUTE_KEY_IMAGEFILES) != null ? (Integer) map.get(ATTRIBUTE_KEY_IMAGEFILES) : 0);
+		if (map.get(ATTRIBUTE_KEY_SIZEKB) != null && map.get(ATTRIBUTE_KEY_SIZEKB) instanceof String)
+			setSizekb(Integer.parseInt(((String) map.get(ATTRIBUTE_KEY_SIZEKB))));
 		else
-			setSizekb(map.get("sizekb") != null ? ((Long) map.get("sizekb")) : 0);
-		if (map.get("origin") != null && map.get("origin") instanceof String)
-			setOriginDbId((String) map.get("origin"));
+			setSizekb(map.get(ATTRIBUTE_KEY_SIZEKB) != null ? ((Long) map.get(ATTRIBUTE_KEY_SIZEKB)) : 0);
+		if (map.get(ATTRIBUTE_KEY_ORIGIN) != null && map.get(ATTRIBUTE_KEY_ORIGIN) instanceof String)
+			setOriginDbId((String) map.get(ATTRIBUTE_KEY_ORIGIN));
 		if (map.get("outliers") != null && map.get("outliers") instanceof String)
 			setGlobalOutlierInfo((String) map.get("outliers"));
 	}
@@ -347,26 +370,26 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	
 	@Override
 	public void fillAttributeMap(Map<String, Object> attributeValueMap, int measurementcount) {
-		attributeValueMap.put("experimentname", getExperimentName());
+		attributeValueMap.put(ATTRIBUTE_KEY_EXPERIMENTNAME, getExperimentName());
 		if (database != null)
-			attributeValueMap.put("database", database);
-		attributeValueMap.put("remark", remark);
-		attributeValueMap.put("coordinator", getCoordinator());
-		attributeValueMap.put("experimenttype", experimentType);
-		attributeValueMap.put("sequence", sequence);
-		attributeValueMap.put("files", files);
-		attributeValueMap.put("excelfileid", databaseId);
-		attributeValueMap.put("importusername", importUserName);
-		attributeValueMap.put("importusergroup", importUserGroup);
-		attributeValueMap.put("importdate", importDate);
-		attributeValueMap.put("startdate", startDate);
-		attributeValueMap.put("storagetime", storageTime);
-		attributeValueMap.put("measurements", measurementcount);
-		attributeValueMap.put("imagefiles", (imageFiles == null ? 0 : imageFiles));
-		attributeValueMap.put("sizekb", sizekb);
-		attributeValueMap.put("origin", originDatabaseId);
+			attributeValueMap.put(ATTRIBUTE_KEY_DATABASE, database);
+		attributeValueMap.put(ATTRIBUTE_KEY_REMARK, remark);
+		attributeValueMap.put(ATTRIBUTE_KEY_COORDINATOR, getCoordinator());
+		attributeValueMap.put(ATTRIBUTE_KEY_EXPERIMENTTYPE, experimentType);
+		attributeValueMap.put(ATTRIBUTE_KEY_SEQUENCE, sequence);
+		attributeValueMap.put(ATTRIBUTE_KEY_FILES, files);
+		attributeValueMap.put(ATTRIBUTE_KEY_EXCELFILEID, databaseId);
+		attributeValueMap.put(ATTRIBUTE_KEY_IMPORTUSERNAME, importUserName);
+		attributeValueMap.put(ATTRIBUTE_KEY_IMPORTUSERGROUP, importUserGroup);
+		attributeValueMap.put(ATTRIBUTE_KEY_IMPORTDATE, importDate);
+		attributeValueMap.put(ATTRIBUTE_KEY_STARTDATE, startDate);
+		attributeValueMap.put(ATTRIBUTE_KEY_STORAGETIME, storageTime);
+		attributeValueMap.put(ATTRIBUTE_KEY_MEASUREMENT, measurementcount);
+		attributeValueMap.put(ATTRIBUTE_KEY_IMAGEFILES, (imageFiles == null ? 0 : imageFiles));
+		attributeValueMap.put(ATTRIBUTE_KEY_SIZEKB, sizekb);
+		attributeValueMap.put(ATTRIBUTE_KEY_ORIGIN, originDatabaseId);
 		attributeValueMap.put("outliers", globalOutliers);
-		attributeValueMap.put("settings", settings);
+		attributeValueMap.put(ATTRIBUTE_KEY_SETTINGS, settings);
 		
 		{ // map single combined annotation field to individual annotation fields
 			StringAnnotationProcessor anno = new StringAnnotationProcessor(annotation);
@@ -383,43 +406,43 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Override
 	public Object getAttributeField(String id) {
 		switch (id) {
-			case "experimentname":
+			case ATTRIBUTE_KEY_EXPERIMENTNAME:
 				return getExperimentName();
-			case "database":
+			case ATTRIBUTE_KEY_DATABASE:
 				return database;
-			case "remark":
+			case ATTRIBUTE_KEY_REMARK:
 				return remark;
-			case "coordinator":
+			case ATTRIBUTE_KEY_COORDINATOR:
 				return coordinator;
-			case "experimenttype":
+			case ATTRIBUTE_KEY_EXPERIMENTTYPE:
 				return experimentType;
-			case "sequence":
+			case ATTRIBUTE_KEY_SEQUENCE:
 				return sequence;
-			case "files":
+			case ATTRIBUTE_KEY_FILES:
 				return files;
-			case "excelfileid":
+			case ATTRIBUTE_KEY_EXCELFILEID:
 				return databaseId;
-			case "importusername":
+			case ATTRIBUTE_KEY_IMPORTUSERNAME:
 				return importUserName;
-			case "importusergroup":
+			case ATTRIBUTE_KEY_IMPORTUSERGROUP:
 				return importUserGroup;
-			case "importdate":
+			case ATTRIBUTE_KEY_IMPORTDATE:
 				return importDate;
-			case "startdate":
+			case ATTRIBUTE_KEY_STARTDATE:
 				return startDate;
-			case "storagetime":
+			case ATTRIBUTE_KEY_STORAGETIME:
 				return storageTime;
-			case "measurements":
+			case ATTRIBUTE_KEY_MEASUREMENT:
 				return null;
-			case "imagefiles":
+			case ATTRIBUTE_KEY_IMAGEFILES:
 				return (imageFiles == null ? 0 : imageFiles);
-			case "sizekb":
+			case ATTRIBUTE_KEY_SIZEKB:
 				return sizekb;
-			case "origin":
+			case ATTRIBUTE_KEY_ORIGIN:
 				return originDatabaseId;
-			case "outliers":
+			case ATTRIBUTE_KEY_OUTLIER:
 				return globalOutliers;
-			case "settings":
+			case ATTRIBUTE_KEY_SETTINGS:
 				return settings;
 		}
 		throw new UnsupportedOperationException("Can't return field value from id '" + id + "'!");
@@ -430,19 +453,19 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	private synchronized HashMap<String, Consumer<String>> getStringSetterFunctions() {
 		if (stringSetters == null) {
 			stringSetters = new HashMap<String, Consumer<String>>();
-			stringSetters.put("experimentname", this::setExperimentName);
-			stringSetters.put("database", this::setDatabase);
-			stringSetters.put("remark", this::setRemark);
-			stringSetters.put("coordinator", this::setCoordinator);
-			stringSetters.put("experimenttype", this::setExperimentType);
-			stringSetters.put("sequence", this::setSequence);
-			stringSetters.put("files", this::setFiles);
-			stringSetters.put("excelfileid", this::setDatabaseId);
-			stringSetters.put("importusername", this::setImportUserName);
-			stringSetters.put("importusergroup", this::setImportUserGroup);
-			stringSetters.put("origin", this::setOriginDbId);
-			stringSetters.put("outliers", this::setGlobalOutlierInfo);
-			stringSetters.put("settings", this::setSettings);
+			stringSetters.put(ATTRIBUTE_KEY_EXPERIMENTNAME, this::setExperimentName);
+			stringSetters.put(ATTRIBUTE_KEY_DATABASE, this::setDatabase);
+			stringSetters.put(ATTRIBUTE_KEY_REMARK, this::setRemark);
+			stringSetters.put(ATTRIBUTE_KEY_COORDINATOR, this::setCoordinator);
+			stringSetters.put(ATTRIBUTE_KEY_EXPERIMENTTYPE, this::setExperimentType);
+			stringSetters.put(ATTRIBUTE_KEY_SEQUENCE, this::setSequence);
+			stringSetters.put(ATTRIBUTE_KEY_FILES, this::setFiles);
+			stringSetters.put(ATTRIBUTE_KEY_EXCELFILEID, this::setDatabaseId);
+			stringSetters.put(ATTRIBUTE_KEY_IMPORTUSERNAME, this::setImportUserName);
+			stringSetters.put(ATTRIBUTE_KEY_IMPORTUSERGROUP, this::setImportUserGroup);
+			stringSetters.put(ATTRIBUTE_KEY_ORIGIN, this::setOriginDbId);
+			stringSetters.put(ATTRIBUTE_KEY_OUTLIER, this::setGlobalOutlierInfo);
+			stringSetters.put(ATTRIBUTE_KEY_SETTINGS, this::setSettings);
 		}
 		return stringSetters;
 	}
@@ -455,7 +478,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 			return;
 		}
 		switch (id) {
-			case "importdate":
+			case ATTRIBUTE_KEY_IMPORTDATE:
 				if (value == null)
 					setImportDate(null);
 				else
@@ -467,7 +490,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 						else
 							throw new RuntimeException("Can't set field importdate with given attribute type!");
 				return;
-			case "startdate":
+			case ATTRIBUTE_KEY_STARTDATE:
 				if (value == null)
 					setStartDate(null);
 				else
@@ -479,7 +502,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 						else
 							throw new RuntimeException("Can't set field startdate with given attribute type!");
 				return;
-			case "storagetime":
+			case ATTRIBUTE_KEY_STORAGETIME:
 				if (value == null)
 					setStorageTime(null);
 				else
@@ -491,16 +514,16 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 						else
 							throw new RuntimeException("Can't set field storagetime with given attribute type!");
 				return;
-			case "measurements":
+			case ATTRIBUTE_KEY_MEASUREMENT:
 				// empty
 				return;
-			case "imagefiles":
+			case ATTRIBUTE_KEY_IMAGEFILES:
 				if (value == null)
 					imageFiles = null;
 				else
 					imageFiles = Integer.parseInt((String) value);
 				return;
-			case "sizekb":
+			case ATTRIBUTE_KEY_SIZEKB:
 				if (value == null)
 					setSizekb(-1l);
 				else
@@ -514,27 +537,27 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	public static HashMap<String, String> getNiceHTMLfieldNameMapping() {
 		HashMap<String, String> res = new HashMap<String, String>();
 		
-		res.put("experimentname", "<!-- AA -->Name of Experiment");
-		res.put("experimenttype", "<!-- AB -->Type of Experiment");
-		res.put("startdate", "<!-- C BR -->Experiment Start");
+		res.put(ATTRIBUTE_KEY_EXPERIMENTNAME, "<!-- AA -->Name of Experiment");
+		res.put(ATTRIBUTE_KEY_EXPERIMENTTYPE, "<!-- AB -->Type of Experiment");
+		res.put(ATTRIBUTE_KEY_STARTDATE, "<!-- C BR -->Experiment Start");
 		
-		res.put("database", "<!-- D-->Database");
-		res.put("origin", "<!-- D-->Origin");
-		res.put("importdate", "<!-- E -->Import Date");
-		res.put("storagetime", "<!-- F -->Storage Time");
-		res.put("excelfileid", "<!-- G BR -->Experiment ID");
+		res.put(ATTRIBUTE_KEY_DATABASE, "<!-- D-->Database");
+		res.put(ATTRIBUTE_KEY_ORIGIN, "<!-- D-->Origin");
+		res.put(ATTRIBUTE_KEY_IMPORTDATE, "<!-- E -->Import Date");
+		res.put(ATTRIBUTE_KEY_STORAGETIME, "<!-- F -->Storage Time");
+		res.put(ATTRIBUTE_KEY_EXCELFILEID, "<!-- G BR -->Experiment ID");
 		
-		res.put("importusername", "<!-- H -->Owner");
-		res.put("coordinator", "<!-- I -->Coordinator");
-		res.put("importusergroup", "<!-- J BR -->Data Visibility");
+		res.put(ATTRIBUTE_KEY_IMPORTUSERNAME, "<!-- H -->Owner");
+		res.put(ATTRIBUTE_KEY_COORDINATOR, "<!-- I -->Coordinator");
+		res.put(ATTRIBUTE_KEY_IMPORTUSERGROUP, "<!-- J BR -->Data Visibility");
 		
-		res.put("remark", "<!-- K -->Remark");
-		res.put("sequence", "<!-- L BR -->Sequence");
+		res.put(ATTRIBUTE_KEY_REMARK, "<!-- K -->Remark");
+		res.put(ATTRIBUTE_KEY_SEQUENCE, "<!-- L BR -->Sequence");
 		
-		res.put("measurements", "<!-- M -->Numeric Measurements");
-		res.put("imagefiles", "<!-- N BR -->Binary Files");
-		res.put("outliers", "<!-- O -->Outliers");
-		res.put("sizekb", "<!-- P -->Storage Requirements (KB)");
+		res.put(ATTRIBUTE_KEY_MEASUREMENT, "<!-- M -->Numeric Measurements");
+		res.put(ATTRIBUTE_KEY_IMAGEFILES, "<!-- N BR -->Binary Files");
+		res.put(ATTRIBUTE_KEY_OUTLIER, "<!-- O -->Outliers");
+		res.put(ATTRIBUTE_KEY_SIZEKB, "<!-- P -->Storage Requirements (KB)");
 		
 		{ // add nice names for individual annotation field names
 			for (DCelement dc : DCelement.values()) {
@@ -743,7 +766,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 				idC = field2niceName.get(idC);
 			String v = "" + am.get(id);
 			if (v != null && !v.trim().isEmpty() && !v.equalsIgnoreCase("NULL"))
-				if (id.equals("sizekb")) {
+				if (id.equals(ATTRIBUTE_KEY_SIZEKB)) {
 					String ss = "n/a";
 					if (v != null && !v.isEmpty() && !v.equals("null")) {
 						long kb = Long.parseLong(v);
@@ -756,7 +779,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 							+ "</td></tr>");
 				}
 				else
-					if (id.equals("settings"))
+					if (id.equals(ATTRIBUTE_KEY_SETTINGS))
 						resultRows.add("<tr><td>" + idC + "</td><td>"
 								+ (v != null && !v.equals("null") && !v.isEmpty() ? "(defined)" : "(not defined)")
 								+ "</td></tr>");
