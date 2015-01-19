@@ -341,7 +341,7 @@ public class ActionDataExportZIP extends AbstractNavigationAction implements Spe
 				status.setCurrentStatusText1(pre);
 				long currTime = System.currentTimeMillis();
 				if (read.getLong() > 0)
-					status.setCurrentStatusText1("Added " + idx.getInt() + "/" + files + " files");
+					status.setCurrentStatusText1("added " + idx.getInt() + "/" + files + " files");
 				status.setCurrentStatusText2("inp: " + SystemAnalysis.getDataTransferSpeedString(read.getLong(), startTime, currTime) + ", " +
 						"out:<br>" + SystemAnalysis.getDataTransferSpeedString(written.getLong(), startTime, currTime) + " ("
 						+ (int) (100d * written.getLong() / read.getLong()) + "% of inp)");
