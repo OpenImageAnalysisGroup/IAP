@@ -269,13 +269,13 @@ public class SystemOptions {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
 		} else {
+			if (setting.contains("|")) {
+				group = setting.split("\\|", 2)[0];
+				setting = setting.split("\\|", 2)[1];
+			}
+			
+			checkInvalidStatus();
 			synchronized (ini) {
-				if (setting.contains("|")) {
-					group = setting.split("\\|", 2)[0];
-					setting = setting.split("\\|", 2)[1];
-				}
-				
-				checkInvalidStatus();
 				Boolean r = ini.get(group, setting, Boolean.class);
 				if (r == null) {
 					if (addDefaultIfNeeded) {
