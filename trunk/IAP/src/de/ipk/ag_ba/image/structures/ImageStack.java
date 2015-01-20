@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 
 import javax.swing.JButton;
@@ -23,11 +24,14 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.FolderPanel;
+import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import util.ext.OrderedPowerSet;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.image.operation.binarymask.ImageJOperation;
 
 /**
  * @author klukas
@@ -353,5 +357,46 @@ public class ImageStack implements Iterable<ImageProcessor> {
 		}
 		
 		return cube;
+	}
+	
+	/**
+	 * @return Power set of binary mask combinations
+	 */
+	public ImageStack getBinaryPowerSet(int titleOffset) {
+		ArrayList<boolean[]> pixels = new ArrayList<>();
+		ArrayList<Integer> in = new ArrayList<>();
+		for (int i = 0; i < size(); i++) {
+			in.add(i);
+			pixels.add(getImage(i).io().bm().getAs1Aboolean());
+		}
+		ImageStack res = new ImageStack();
+		OrderedPowerSet<Integer> ps = new OrderedPowerSet<>(in);
+		for (LinkedHashSet<Integer> pl : ps.getPermutationsList(size())) {
+			boolean[] resAllTrue = new boolean[w * h];
+			for (int i = 0; i < resAllTrue.length; i++)
+				resAllTrue[i] = true;
+			for (Integer inImgIdx : pl) {
+				boolean[] pi = pixels.get(inImgIdx);
+				for (int px = 0; px < pi.length; px++) {
+					if (!pi[px])
+						resAllTrue[px] = false;
+				}
+			}
+			ArrayList<Integer> titles = new ArrayList<>();
+			for (Integer i : pl)
+				titles.add(i + titleOffset);
+			res.addImage(StringManipulationTools.getStringList(titles, "/"), new ImageJOperation(resAllTrue, w, h).getImage());
+		}
+		return res;
+	}
+	
+	public ArrayList<Image> getImages() {
+		ArrayList<Image> res = new ArrayList<>();
+		for (int i = 0; i < size(); i++) {
+			Image img = getImage(i);
+			img.setFilename(getImageLabel(i));
+			res.add(img);
+		}
+		return res;
 	}
 }
