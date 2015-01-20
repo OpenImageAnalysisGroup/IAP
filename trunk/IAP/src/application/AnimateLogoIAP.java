@@ -105,7 +105,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		SubScene subscene_A = new SubScene(scene_A, offx + 150 + offxx, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
 		subscene_A.setCamera(camera_A);
 		// subscene3.setFill(Color.RED);
-		subscene_A.setTranslateX(268 + 10 - 10);
+		subscene_A.setTranslateX(268 + 10 - 10 + 5);
 		subscene_A.setTranslateY(30);
 		
 		SubScene subscene_P = new SubScene(scene_P, offx + 100 + offxx, offy + 200 + offyy, true, SceneAntialiasing.BALANCED);
