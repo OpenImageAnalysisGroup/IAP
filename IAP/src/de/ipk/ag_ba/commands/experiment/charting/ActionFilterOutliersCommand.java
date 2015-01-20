@@ -98,11 +98,11 @@ public final class ActionFilterOutliersCommand extends AbstractNavigationAction 
 		return null;
 	}
 	
-	public static ExperimentInterface tryGetFilteredDataset(ExperimentReferenceInterface experiment, String groupFilter2,
+	public static ExperimentInterface tryGetFilteredDataset(ExperimentReferenceInterface experiment, String exactSubstanceName,
 			BackgroundTaskStatusProviderSupportingExternalCall sp) throws Exception {
-		if (experiment != null && groupFilter2 != null)
+		if (experiment != null && exactSubstanceName != null)
 			for (SubstanceInterface si : experiment.getData()) {
-				if (groupFilter2.equals(si.getName())) {
+				if (exactSubstanceName.equals(si.getName())) {
 					ExperimentInterface ne = Experiment.copyAndExtractSubtanceInclusiveData(si);
 					return ne;
 				}
