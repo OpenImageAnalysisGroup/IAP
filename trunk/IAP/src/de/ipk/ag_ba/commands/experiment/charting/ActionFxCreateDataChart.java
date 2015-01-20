@@ -70,12 +70,12 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			settingsGlobal.setSavePossible(false);
 		}
 		
-		try {
-			if (experiment != null)
-				determineSubstanceGroups();
-		} catch (Exception err) {
-			throw new RuntimeException(err);
-		}
+		// try {
+		// if (experiment != null)
+		// determineSubstanceGroups();
+		// } catch (Exception err) {
+		// throw new RuntimeException(err);
+		// }
 	}
 	
 	@Override
@@ -83,6 +83,8 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		this.src = src;
 		res.clear();
 		
+		this.experimentWithSingleSubstance = ActionFilterOutliersCommand.tryGetFilteredDataset(experiment, groupFilter, getStatusProvider());
+		
 		try {
 			if (experiment != null)
 				determineSubstanceGroups();
@@ -90,19 +92,15 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			throw new RuntimeException(err);
 		}
 		
-		this.experimentWithSingleSubstance = ActionFilterOutliersCommand.tryGetFilteredDataset(experiment, groupFilter, getStatusProvider());
 		if (experimentWithSingleSubstance != null && experimentWithSingleSubstance.size() != 1)
 			throw new RuntimeException("Exactly one substance is allowed here!");
 		
 		if (traitDescription != null && !traitDescription.isEmpty())
 			res.add(traitDescription);
 		
-		if (groupFilter != null && substanceGroupNames.isEmpty()) {
+		if (experimentWithSingleSubstance != null) {
 			this.settingsLocal = new ChartSettings(true);
 			settingsLocal.setSavePossible(settingsGlobal.isSavePossible());
-		}
-		
-		if (substanceGroupNames.size() == 0 && groupFilter != null) {
 			this.transformationPipeline = new ExperimentTransformationPipeline(experimentWithSingleSubstance);
 			
 			removeDefinedOutlierAction = new ActionFilterOutliersCommand("Filter Outliers", transformationPipeline, settingsLocal, settingsGlobal);
@@ -150,7 +148,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 		this.substanceGroupNames = new LinkedHashSet<String>();
 		for (SubstanceInterface si : experiment.getData()) {
 			if (groupFilter != null)
-				if (!si.getName().startsWith(groupFilter))
+				if (!si.getName().startsWith(groupFilter + "."))
 					continue;
 			String sn = si.getName();
 			if (groupFilter != null) {
@@ -163,7 +161,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			}
 			substanceGroupNames.add(sn);
 		}
-		if (substanceGroupNames.size() == 0)
+		if (experimentWithSingleSubstance != null)
 			if (traitDescription != null && !traitDescription.isEmpty()) {
 				String nn = new Trait(groupFilter).getNiceName();
 				if (nn != null)
@@ -183,7 +181,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 				throw new RuntimeException(e);
 			}
 		}
-		if (substanceGroupNames.size() == 0 && groupFilter != null) {
+		if (experimentWithSingleSubstance != null) {
 			
 			// STEP 1:
 			ra.add(new NavigationButton(removeDefinedOutlierAction, src
