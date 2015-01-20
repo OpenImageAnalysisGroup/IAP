@@ -653,6 +653,7 @@ public class NavigationButton implements StyleAware {
 					na.setParameters(res);
 			}
 			
+			ThreadSafeOptions mcpRef = new ThreadSafeOptions();
 			if (execute)
 				BackgroundTaskHelper.issueSimpleTask(srcNavGraphicslEntity.getTitle(), "Please wait...", new Runnable() {
 					@Override
@@ -665,13 +666,15 @@ public class NavigationButton implements StyleAware {
 								n1.setText("Error");
 							ErrorMsg.addErrorMessage(e);
 						}
+						MainPanelComponent mpc = na.getResultMainPanel();
+						mcpRef.setParam(0, mpc);
 					}
 				}, new Runnable() {
 					@Override
 					public void run() {
 						try {
 							boolean reload = false;
-							MainPanelComponent mpc = na.getResultMainPanel();
+							MainPanelComponent mpc = (MainPanelComponent) mcpRef.getParam(0, null);
 							if (mpc != null) {
 								graphPanel.removeAll();
 								JComponent gui = mpc.getGUI();
@@ -805,65 +808,6 @@ public class NavigationButton implements StyleAware {
 		
 		int imgS = getImageSize(style, target);
 		
-		ImageIcon icon = null;
-		if (n != null && n.getAction() != null && (n.getAction() instanceof ImageProvider)) {
-			ImageProvider ip = (ImageProvider) n.getAction();
-			if (ip.getImage() != null) {
-				if (SystemAnalysis.isRetina())
-					icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(ip.getImage(),
-							(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
-							(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
-				else
-					icon = new ImageIcon(GravistoService.getScaledImage(ip.getImage(), -imgS, imgS));
-			}
-		}
-		
-		if (icon == null)
-			if (target == PanelTarget.NAVIGATION && n.getIconActive() != null && n.getIconActive().getImage() != null) {
-				if (SystemAnalysis.isRetina())
-					icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(n.getIconActive().getImage(),
-							(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
-							(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
-				else
-					icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgS, imgS));
-			} else
-				if (target == PanelTarget.ACTION && n.getIconInactive() != null && n.getIconInactive().getImage() != null) {
-					if (SystemAnalysis.isRetina())
-						icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(),
-								(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
-								(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
-					else
-						icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgS, imgS));
-				} else {
-					if (target == PanelTarget.NAVIGATION) {
-						if (SystemAnalysis.isRetina() && n.getNavigationImage() != null)
-							icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(
-									GravistoService.loadIcon(IAPmain.class, n.getNavigationImage()).getImage(),
-									(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
-									(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
-						else
-							icon = GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS, false);
-						if (icon == null && n.getAction() != null) {
-							icon = GravistoService.loadIcon(n.getAction().getClass(), n.getNavigationImage(), -imgS, imgS, true);
-						}
-						
-					}
-					if (target != PanelTarget.NAVIGATION || icon == null) {
-						if (SystemAnalysis.isRetina() && n.getActionImage() != null)
-							icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(
-									GravistoService.loadIcon(IAPmain.class, n.getActionImage()).getImage(),
-									(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
-									(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
-						else
-							icon = GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS, false);
-						if (icon == null && n.getAction() != null) {
-							icon = GravistoService.loadIcon(n.getAction().getClass(), n.getActionImage(), -imgS, imgS, true);
-						}
-					}
-				}
-		if (icon != null)
-			icon.setDescription(imgS + "");
-		
 		final NavigationAction ac = n.action;
 		
 		final JButton n1 = new JButton() {
@@ -904,6 +848,8 @@ public class NavigationButton implements StyleAware {
 		if (n.getAction() != null && !n.enabled)
 			n1.setEnabled(false);
 		
+		boolean loadIcon = true;
+		
 		switch (style) {
 			case FLAT:
 			case FLAT_LARGE:
@@ -915,7 +861,7 @@ public class NavigationButton implements StyleAware {
 				}
 				if (style == ButtonDrawStyle.COMPACT_LIST) {
 					d = Integer.MAX_VALUE;
-					icon = null;
+					loadIcon = false;
 					n1.setMargin(new Insets(1, 1, 1, 1));
 					n1.setBorderPainted(false);
 					n1.setContentAreaFilled(true);
@@ -933,11 +879,44 @@ public class NavigationButton implements StyleAware {
 				}
 				break;
 			case TEXT:
-				icon = null;
+				loadIcon = false;
 				// fall through
 			case BUTTONS:
 				n1.setBorderPainted(true);
 				n1.setContentAreaFilled(true);
+		}
+		
+		if (loadIcon) {
+			
+			ImageIcon icon = getIcon(n, target, imgS, true);
+			if (icon != null)
+				loadIcon = false;
+			if (n instanceof NavigationButtonCalendar2) {
+				if (style != ButtonDrawStyle.TEXT) {
+					if (icon != null)
+						icon = new MyCalendarIcon(icon, (NavigationButtonCalendar2) n, imgS);
+					((NavigationButtonCalendar2) n).setPostUpdateRunner(new Runnable() {
+						@Override
+						public void run() {
+							n1.repaint();
+						}
+					});
+				} else
+					icon = null;
+			}
+			if (icon != null) {
+				n1.setIcon(icon);
+			} else {
+				ImageIcon ei;
+				if (SystemAnalysis.isRetina() && n.getNavigationImage() != null)
+					ei = new GravistoService.RetinaIcon(GravistoService.getScaledImage(
+							GravistoService.loadIcon(IAPmain.class, "img/ext/gpl2/Gnome-Image-Loading-64weak.png").getImage(),
+							(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+							(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+				else
+					ei = GravistoService.loadIcon(IAPmain.class, "img/ext/gpl2/Gnome-Image-Loading-64weak.png", -imgS, imgS, false);
+				n1.setIcon(ei);
+			}
 		}
 		
 		n1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -1058,31 +1037,39 @@ public class NavigationButton implements StyleAware {
 			}
 		});
 		
-		if (n instanceof NavigationButtonCalendar2) {
-			if (style != ButtonDrawStyle.TEXT) {
-				if (icon != null)
-					icon = new MyCalendarIcon(icon, (NavigationButtonCalendar2) n, imgS);
-				((NavigationButtonCalendar2) n).setPostUpdateRunner(new Runnable() {
-					@Override
-					public void run() {
-						n1.repaint();
+		if (loadIcon) {
+			try {
+				BackgroundThreadDispatcher.addTask(() -> {
+					ImageIcon icon = getIcon(n, target, imgS);
+					if (n instanceof NavigationButtonCalendar2) {
+						if (style != ButtonDrawStyle.TEXT) {
+							if (icon != null)
+								icon = new MyCalendarIcon(icon, (NavigationButtonCalendar2) n, imgS);
+							((NavigationButtonCalendar2) n).setPostUpdateRunner(new Runnable() {
+								@Override
+								public void run() {
+									n1.repaint();
+								}
+							});
+						} else
+							icon = null;
 					}
-				});
-			} else
-				icon = null;
+					ImageIcon iconf = icon;
+					if (iconf != null)
+						SwingUtilities.invokeLater(() -> {
+							n1.setIcon(iconf);
+						});
+				}, "set button icon");
+			} catch (InterruptedException e1) {
+				throw new RuntimeException(e1);
+			}
 		}
 		
-		if (icon != null)
-			n1.setIcon(icon);
-		
-		final int imgSf = imgS;
-		
-		final Runnable iconUpdateCheck;
-		
+		Runnable iconUpdateCheck;
 		if (n.isProcessing() || n.requestsTitleUpdates() != TitleUpdateMode.STATIC) {
 			iconUpdateCheck = getIconUpdateCheckRunnable(
 					new WeakReference<NavigationButton>(n), target,
-					new WeakReference<JButton>(n1), imgSf);
+					new WeakReference<JButton>(n1), imgS);
 			NavigationButton.updateButtonTitle(
 					new WeakReference<NavigationButton>(n),
 					new WeakReference<JButton>(n1),
@@ -1136,16 +1123,80 @@ public class NavigationButton implements StyleAware {
 		else
 			rr = n1;
 		
-		// if (n.isRightAligned()) {
-		// MarkComponent mc = new MarkComponent(rr, true, TableLayout.PREFERRED, false);
-		// int r = 255;
-		// int g = 180;
-		// int b = 180;
-		// mc.setMarkColor(new Color(r, g, b), null);
-		// mc.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
-		// return mc;
-		// } else
 		return rr;
+	}
+	
+	private static ImageIcon getIcon(final NavigationButton n, final PanelTarget target, int imgS) {
+		return getIcon(n, target, imgS, false);
+	}
+	
+	private static ImageIcon getIcon(final NavigationButton n, final PanelTarget target, int imgS, boolean peek) {
+		ImageIcon icon = null;
+		if (n != null && n.getAction() != null && (n.getAction() instanceof ImageProvider)) {
+			ImageProvider ip = (ImageProvider) n.getAction();
+			if (ip.getImage() != null) {
+				if (SystemAnalysis.isRetina())
+					icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(ip.getImage(),
+							(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+							(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+				else
+					icon = new ImageIcon(GravistoService.getScaledImage(ip.getImage(), -imgS, imgS));
+			}
+		}
+		
+		if (icon == null)
+			if (target == PanelTarget.NAVIGATION && n.getIconActive() != null && n.getIconActive().getImage() != null) {
+				if (SystemAnalysis.isRetina())
+					icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(n.getIconActive().getImage(),
+							(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+							(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+				else
+					icon = new ImageIcon(GravistoService.getScaledImage(n.getIconActive().getImage(), -imgS, imgS));
+			} else
+				if (target == PanelTarget.ACTION && n.getIconInactive() != null && n.getIconInactive().getImage() != null) {
+					if (SystemAnalysis.isRetina())
+						icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(),
+								(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+								(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+					else
+						icon = new ImageIcon(GravistoService.getScaledImage(n.getIconInactive().getImage(), -imgS, imgS));
+				} else {
+					if (target == PanelTarget.NAVIGATION) {
+						if (SystemAnalysis.isRetina() && n.getNavigationImage() != null)
+							icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(
+									GravistoService.loadIcon(IAPmain.class, n.getNavigationImage()).getImage(),
+									(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+									(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+						else
+							icon = peek ?
+									GravistoService.peekIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS, false) :
+									GravistoService.loadIcon(IAPmain.class, n.getNavigationImage(), -imgS, imgS, false);
+						if (icon == null && n.getAction() != null) {
+							icon = peek ?
+									GravistoService.peekIcon(n.getAction().getClass(), n.getNavigationImage(), -imgS, imgS, true) :
+									GravistoService.loadIcon(n.getAction().getClass(), n.getNavigationImage(), -imgS, imgS, true);
+						}
+						
+					}
+					if (target != PanelTarget.NAVIGATION || icon == null) {
+						if (SystemAnalysis.isRetina() && n.getActionImage() != null)
+							icon = new GravistoService.RetinaIcon(GravistoService.getScaledImage(
+									GravistoService.loadIcon(IAPmain.class, n.getActionImage()).getImage(),
+									(int) (-imgS * SystemAnalysis.getHiDPIScaleFactor()),
+									(int) (imgS * SystemAnalysis.getHiDPIScaleFactor())));
+						else
+							icon = peek ? GravistoService.peekIcon(IAPmain.class, n.getActionImage(), -imgS, imgS, false) :
+									GravistoService.loadIcon(IAPmain.class, n.getActionImage(), -imgS, imgS, false);
+						if (icon == null && n.getAction() != null) {
+							icon = peek ?
+									GravistoService.peekIcon(n.getAction().getClass(), n.getActionImage(), -imgS, imgS, true) :
+									GravistoService.loadIcon(n.getAction().getClass(), n.getActionImage(), -imgS, imgS, true);
+						}
+					}
+				}
+		if (icon != null)
+			icon.setDescription(imgS + "");
+		return icon;
 	}
 	
 	private void setButton(WeakReference<JButton> weakButtonReference) {
