@@ -34,12 +34,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-import java.util.WeakHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -98,7 +98,7 @@ import scenario.ScenarioService;
  * 
  * @author Christian Klukas
  */
-public class GravistoService implements HelperClass {
+public class GravistoService implements HelperClass, MemoryHogInterface {
 	
 	/**
 	 * The only and single instance of this object
@@ -132,6 +132,10 @@ public class GravistoService implements HelperClass {
 	 * DOCUMENT ME!
 	 */
 	private List<Session> patternSessions;
+	
+	public GravistoService() {
+		addKnownMemoryHog(this);
+	}
 	
 	/**
 	 * Returns the single instance of this class.
@@ -1042,10 +1046,28 @@ public class GravistoService implements HelperClass {
 		return loadIcon(class1, name, Integer.MAX_VALUE, Integer.MAX_VALUE);
 	}
 	
-	private static WeakHashMap<String, BufferedImage> cachedIcons = new WeakHashMap<String, BufferedImage>();
+	public static ImageIcon peekIcon(Class class1, String name) {
+		return peekIcon(class1, name, Integer.MAX_VALUE, Integer.MAX_VALUE);
+	}
+	
+	// private static WeakHashMap<String, BufferedImage> cachedIcons = new WeakHashMap<String, BufferedImage>();
+	private static HashMap<String, BufferedImage> cachedIcons = new HashMap<String, BufferedImage>();
 	
 	public static ImageIcon loadIcon(Class class1, String name, int w, int h) {
 		return loadIcon(class1, name, w, h, true);
+	}
+	
+	public static ImageIcon peekIcon(Class class1, String name, int w, int h) {
+		return peekIcon(class1, name, w, h, true);
+	}
+	
+	public static ImageIcon peekIcon(Class class1, String name, int w, int h, boolean warnIfNotFound) {
+		String id = class1.getCanonicalName() + ";" + name + ";" + w + ";" + h;
+		BufferedImage ci = cachedIcons.get(id);
+		if (ci != null)
+			return new ImageIcon(ci);
+		else
+			return null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -1513,5 +1535,10 @@ public class GravistoService implements HelperClass {
 						}
 					}
 					);
+	}
+	
+	@Override
+	public void freeMemory() {
+		cachedIcons.clear();
 	}
 }
