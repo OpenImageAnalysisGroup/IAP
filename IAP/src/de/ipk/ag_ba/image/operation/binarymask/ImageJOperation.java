@@ -35,6 +35,17 @@ public class ImageJOperation {
 		this.h = h;
 	}
 	
+	public ImageJOperation(boolean[] image, int w, int h) {
+		byte[] bi = new byte[w * h];
+		for (int i = 0; i < w * h; i++) {
+			bi[i] = image[i] ? (byte) 0 : (byte) -1;
+		}
+		
+		this.image = new ImagePlus("from 1d array", new ByteProcessor(w, h, bi));
+		this.w = w;
+		this.h = h;
+	}
+	
 	public ImageOperation io() {
 		return new ImageOperation(new ImagePlus("from binary mask", image.getProcessor().convertToRGB())).replaceColor(-1, ImageOperation.BACKGROUND_COLORint);
 	}
@@ -241,5 +252,13 @@ public class ImageJOperation {
 	public ImageJOperation invert() {
 		image.getProcessor().invert();
 		return this;
+	}
+	
+	public boolean[] getAs1Aboolean() {
+		boolean[] res = new boolean[w * h];
+		byte[] val = getAs1A();
+		for (int i = 0; i < res.length; i++)
+			res[i] = val[i] == 0; // == -1
+		return res;
 	}
 }
