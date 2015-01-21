@@ -258,7 +258,7 @@ public class ImageJOperation {
 		boolean[] res = new boolean[w * h];
 		byte[] val = getAs1A();
 		for (int i = 0; i < res.length; i++)
-			res[i] = val[i] == 0; // == -1
+			res[i] = val[i] == 0;// -1;
 		return res;
 	}
 }

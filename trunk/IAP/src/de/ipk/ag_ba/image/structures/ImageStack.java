@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.swing.JButton;
@@ -24,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.FolderPanel;
-import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -371,32 +371,62 @@ public class ImageStack implements Iterable<ImageProcessor> {
 		}
 		ImageStack res = new ImageStack();
 		OrderedPowerSet<Integer> ps = new OrderedPowerSet<>(in);
-		for (LinkedHashSet<Integer> pl : ps.getPermutationsList(size())) {
-			boolean[] resAllTrue = new boolean[w * h];
-			for (int i = 0; i < resAllTrue.length; i++)
-				resAllTrue[i] = true;
-			for (Integer inImgIdx : pl) {
-				boolean[] pi = pixels.get(inImgIdx);
-				for (int px = 0; px < pi.length; px++) {
-					if (!pi[px])
-						resAllTrue[px] = false;
+		
+		int name = 0;
+		
+		for (List<LinkedHashSet<Integer>> pll : ps.getMap().values()) {
+			for (LinkedHashSet<Integer> pl : pll) {
+				ArrayList<Integer> diffList = new ArrayList<Integer>();
+				for (int i : in) {
+					if (!pl.contains(i))
+						diffList.add(i);
 				}
+				
+				boolean[] resAllTrue = new boolean[w * h];
+				for (int i = 0; i < resAllTrue.length; i++)
+					resAllTrue[i] = true;
+				for (Integer inImgIdx : pl) {
+					boolean[] pi = pixels.get(inImgIdx);
+					for (int px = 0; px < pi.length; px++) {
+						if (!pi[px])
+							resAllTrue[px] = false;
+					}
+				}
+				
+				for (Integer inImgIdx : diffList) {
+					boolean[] pi = pixels.get(inImgIdx);
+					for (int px = 0; px < pi.length; px++) {
+						if (pi[px])
+							resAllTrue[px] = false;
+					}
+				}
+				
+				// ArrayList<Integer> titles = new ArrayList<>();
+				// for (Integer i : pl)
+				// titles.add(i + titleOffset);
+				// res.addImage(StringManipulationTools.getStringList(titles, "_"),
+				// new ImageJOperation(resAllTrue, w, h).getImage());
+				
+				res.addImage(((name++) + titleOffset) + "",
+						new ImageJOperation(resAllTrue, w, h).getImage());
 			}
-			ArrayList<Integer> titles = new ArrayList<>();
-			for (Integer i : pl)
-				titles.add(i + titleOffset);
-			res.addImage(StringManipulationTools.getStringList(titles, "/"), new ImageJOperation(resAllTrue, w, h).getImage());
 		}
 		return res;
 	}
 	
 	public ArrayList<Image> getImages() {
 		ArrayList<Image> res = new ArrayList<>();
-		for (int i = 0; i < size(); i++) {
-			Image img = getImage(i);
+		for (int i = 1; i < size() + 1; i++) {
+			Image img = getImage(i - 1);
 			img.setFilename(getImageLabel(i));
 			res.add(img);
 		}
 		return res;
+	}
+	
+	public void initLabels() {
+		for (int i = 0; i < size(); i++) {
+			stack.setSliceLabel((i + 1) + "", i + 1);
+		}
 	}
 }
