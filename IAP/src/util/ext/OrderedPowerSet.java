@@ -23,7 +23,13 @@ public class OrderedPowerSet<E> {
 		}
 	}
 	
-	public List<LinkedHashSet<E>> getPermutationsList(int elementCount) {
+	public Map<Integer, List<LinkedHashSet<E>>> getMap() {
+		for (int i = 1; i <= N; i++)
+			getPermutationsList(i);
+		return map;
+	}
+	
+	private List<LinkedHashSet<E>> getPermutationsList(int elementCount) {
 		if (elementCount < 1 || elementCount > N) {
 			throw new IndexOutOfBoundsException(
 					"Can only generate permutations for a count between 1 to " + N);

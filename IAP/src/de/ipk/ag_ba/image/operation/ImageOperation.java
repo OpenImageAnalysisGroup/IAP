@@ -988,7 +988,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation clearArea(int bx, int by, int bw, int bh,
 			int iBackgroundFill) {
-		return clearArea(bx, by, bw, bh, iBackgroundFill, true);
+		return clearArea(bx, by, bw, bh, iBackgroundFill, false);
 	}
 	
 	public ImageOperation clearArea(int bx, int by, int bw, int bh,
