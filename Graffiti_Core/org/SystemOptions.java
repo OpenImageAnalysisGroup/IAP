@@ -235,7 +235,7 @@ public class SystemOptions {
 				ini = new Ini(new StringReader(ss));
 				return ini;
 			} else {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Read INI File " + ReleaseInfo.getAppFolderWithFinalSep() + iniFileName);
+				// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Read INI File " + ReleaseInfo.getAppFolderWithFinalSep() + iniFileName);
 				fn = ReleaseInfo.getAppFolderWithFinalSep() + iniFileName;
 				return new Ini(new File(fn));
 			}
