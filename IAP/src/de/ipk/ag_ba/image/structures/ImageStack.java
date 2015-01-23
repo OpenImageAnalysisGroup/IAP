@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.TreeMap;
+import java.util.stream.IntStream;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -30,6 +32,7 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
 import util.ext.OrderedPowerSet;
 import de.ipk.ag_ba.gui.images.IAPimages;
+import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.operation.binarymask.ImageJOperation;
 
@@ -415,12 +418,15 @@ public class ImageStack implements Iterable<ImageProcessor> {
 	}
 	
 	public ArrayList<Image> getImages() {
-		ArrayList<Image> res = new ArrayList<>();
-		for (int i = 1; i < size() + 1; i++) {
-			Image img = getImage(i - 1);
-			img.setFilename(getImageLabel(i));
-			res.add(img);
-		}
+		TreeMap<Integer, Image> r = new TreeMap<>();
+		new StreamBackgroundTaskHelper<>("getImages from ImageStack").process(
+				IntStream.range(1, size() + 1), (i) -> {
+					Image img = getImage(i - 1);
+					img.setFilename(getImageLabel(i));
+					r.put(i, img);
+				}, null);
+		
+		ArrayList<Image> res = new ArrayList<>(r.values());
 		return res;
 	}
 	
