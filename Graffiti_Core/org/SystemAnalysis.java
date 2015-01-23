@@ -186,17 +186,7 @@ public class SystemAnalysis {
 	
 	public static boolean isHeadless() {
 		if (simulateHeadless) {
-			if (first) {
-				System.out
-						.println(getCurrentTime() + ">INFO: GUI availability is simulated headless, reality: "
-								+ GraphicsEnvironment.isHeadless());
-				first = false;
-			}
 			return true;
-		}
-		if (first) {
-			System.out.println(getCurrentTime() + ">INFO: Headless state: " + GraphicsEnvironment.isHeadless());
-			first = false;
 		}
 		return GraphicsEnvironment.isHeadless();
 	}
