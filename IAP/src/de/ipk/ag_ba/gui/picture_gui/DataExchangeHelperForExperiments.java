@@ -33,6 +33,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
+import org.IniIoProvider;
 import org.MeasurementFilter;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
@@ -45,8 +46,12 @@ import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 
+import de.ipk.ag_ba.commands.experiment.ChartSettings;
+import de.ipk.ag_ba.commands.experiment.charting.ActionFxCreateDataChart;
 import de.ipk.ag_ba.commands.experiment.process.report.ActionPdfCreation3;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
+import de.ipk.ag_ba.gui.IAPnavigationPanel;
+import de.ipk.ag_ba.gui.PanelTarget;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
@@ -172,19 +177,21 @@ public class DataExchangeHelperForExperiments {
 	}
 	
 	public static void fillFilePanel(final DataSetFilePanel filePanel,
-			final MongoTreeNode mtdbe, final JTree expTree, final boolean isAnnotationSavePossible, final FilterConnector myFilterConnector)
+			final MongoTreeNode mtdbe, final JTree expTree,
+			final boolean isAnnotationSavePossible, final FilterConnector myFilterConnector,
+			IniIoProvider ioProvider)
 			throws InterruptedException {
 		LocalComputeJob r = new LocalComputeJob(new Runnable() {
 			@Override
 			public void run() {
-				addFilesToPanel(filePanel, mtdbe, expTree, isAnnotationSavePossible, myFilterConnector);
+				addFilesToPanel(filePanel, mtdbe, expTree, isAnnotationSavePossible, myFilterConnector, ioProvider);
 			}
 		}, "add files to panel");
 		BackgroundThreadDispatcher.addTask(r);
 	}
 	
 	static synchronized void addFilesToPanel(final DataSetFilePanel filePanel,
-			final MongoTreeNode mt, final JTree expTree, boolean isAnnotationSavePossible, final FilterConnector myFilterConnector) {
+			final MongoTreeNode mt, final JTree expTree, boolean isAnnotationSavePossible, final FilterConnector myFilterConnector, IniIoProvider ioProvider) {
 		if (!mt.mayContainData())
 			return;
 		final StopObject stop = new StopObject(false);
@@ -346,7 +353,8 @@ public class DataExchangeHelperForExperiments {
 					cleared = true;
 					clearPanel(filePanel, mt, expTree);
 				}
-				processChartGenerator(executeLater, con != null ? con : sub, sub, mt, expTree, filePanel, bbb.isEmpty(), stop, isAnnotationSavePossible);
+				processChartGenerator(executeLater, con != null ? con : sub, sub, mt,
+						expTree, filePanel, bbb.isEmpty(), stop, isAnnotationSavePossible, ioProvider);
 			}
 			
 			BinaryFileInfo lastBBB = null;
@@ -430,8 +438,10 @@ public class DataExchangeHelperForExperiments {
 		}
 	}
 	
-	private static void processChartGenerator(ArrayList<LocalComputeJob> executeLater, final MappingDataEntity mde, final Substance3D sub,
-			MongoTreeNode mt, JTree expTree, DataSetFilePanel filePanel, boolean isLast, StopObject stop, boolean isAnnotationSavePossible) {
+	private static void processChartGenerator(ArrayList<LocalComputeJob> executeLater,
+			final MappingDataEntity mde, final Substance3D sub,
+			MongoTreeNode mt, JTree expTree, DataSetFilePanel filePanel, boolean isLast,
+			StopObject stop, boolean isAnnotationSavePossible, IniIoProvider ioProvider) {
 		if (mt != expTree.getSelectionPath().getLastPathComponent())
 			return;
 		boolean addDataChart = true;
@@ -463,150 +473,247 @@ public class DataExchangeHelperForExperiments {
 			}
 		
 		if (addDataChart) {
-			ImageIcon previewImage = IAPimages.getIcon(IAPimages.getHistogramIcon(), 32, 32);
-			
-			final DataSetFileButton chartingButton = new DataSetFileButton(
-					mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
-							"<html><center>Create Data Chart<br>"
-									+ "(specific condition)" : "<html><center>Create Data Chart<br>(selected&nbsp;property)", null);
-			chartingButton.setAdditionalActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
-							"Process data...", "");
-					Runnable r = new Runnable() {
-						@Override
-						public void run() {
-							final ExperimentInterface expf;
-							if (mde instanceof Condition3D) {
-								ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub, (ConditionInterface) mde);
-								Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
-								ArrayList<MappingData3DPath> mmd = new ArrayList<MappingData3DPath>();
-								for (NumericMeasurementInterface nmi : md) {
-									MappingData3DPath mp = new MappingData3DPath(nmi, true);
-									mp.getConditionData().setVariety(mp.getConditionData().getVariety() != null && !mp.getConditionData().getVariety().isEmpty() ?
-											mp.getConditionData().getVariety() + "/" + mp.getMeasurement().getQualityAnnotation()
-											: mp.getMeasurement().getQualityAnnotation());
-									
-									mmd.add(mp);
-								}
-								expf = MappingData3DPath.merge(mmd, true, status);
-								
-							} else {
-								status.setCurrentStatusText1("Extract subset " + sub.getName());
-								ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
-								if (status.wantsToStop())
-									return;
-								Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
-								status.setCurrentStatusText1("Create dataset for plotting");
-								expf = MappingData3DPath.merge(md, true, status);
-							}
-							if (status.wantsToStop())
-								return;
-							HashSet<String> speciesNames = new HashSet<String>();
-							for (SubstanceInterface si : expf)
-								for (ConditionInterface ci : si) {
-									speciesNames.add(ci.getSpecies());
-								}
-							int idx = 1;
-							for (SubstanceInterface si : expf)
-								for (ConditionInterface ci : si)
-									ci.setRowId(idx++);
-							if (speciesNames.size() == 1)
-								for (SubstanceInterface si : expf)
-									for (ConditionInterface ci : si)
-										ci.setSpecies(null);
-							BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
-								@Override
-								public void run() {
-									DataChartComponentWindow dccw = new DataChartComponentWindow(expf);
-									dccw.setVisible(true);
-								}
-							});
-							
-						}
-					};
-					BackgroundTaskHelper.issueSimpleTaskInWindow("Plot data", "Process data...", r, null, status, true, true);
-				}
-			});
-			chartingButton.setVerticalTextPosition(SwingConstants.BOTTOM);
-			chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
-			
-			SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
-					stop, executeLater, null, chartingButton, false, false, isAnnotationSavePossible, true));
+			addProcessDataButton(executeLater, mde, sub, mt, expTree, filePanel, stop, isAnnotationSavePossible, ioProvider);
 		}
+		// if (addDataChart) {
+		// addDataChartButton(executeLater, mde, sub, mt, expTree, filePanel, stop, isAnnotationSavePossible);
+		// }
 		if (addDataChart) {
-			ImageIcon previewImage = IAPimages.getIcon(
-					"img/ext/gpl2/Gnome-Document-Save-64.png",
-					// IAPimages.getHistogramIcon(),
-					32, 32);
-			
-			final DataSetFileButton chartingButton = new DataSetFileButton(
-					mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
-							"<html><center>Export Data (XLSX)<br>"
-									+ "(specific condition)" : "<html><center>Export Data (XLSX)<br>(selected&nbsp;property)", null);
-			chartingButton.setAdditionalActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					String defaultFileName = StringManipulationTools.getFileSystemName(
-							sub.iterator().next().getExperimentHeader().getExperimentName()
-									+ "_" + sub.getName() + ".xlsx");
-					String fn = FileHelper.getFileName(".xlsx", "Excel File", defaultFileName);
-					if (fn != null) {
-						boolean xlsx = true;
-						ActionPdfCreation3 action = new ActionPdfCreation3(
-								(ExperimentReferenceInterface) null,
-								(ArrayList<ThreadSafeOptions>) null,
-								new ThreadSafeOptions() /* false */,
-								new ThreadSafeOptions() /* false */,
-								new ThreadSafeOptions(),
-								new ThreadSafeOptions(),
-								xlsx,
-								(ArrayList<ThreadSafeOptions>) null,
-								(ArrayList<ThreadSafeOptions>) null,
-								(ThreadSafeOptions) null,
-								(ThreadSafeOptions) null,
-								(ThreadSafeOptions) null,
-								true);
-						/*
-						 * ExperimentReference experimentReference,
-						 * ArrayList<ThreadSafeOptions> divideDatasetBy,
-						 * ThreadSafeOptions exportIndividualAngles,
-						 * boolean xlsx,
-						 * ArrayList<ThreadSafeOptions> togglesFiltering,
-						 * ArrayList<ThreadSafeOptions> togglesInterestingProperties,
-						 * ThreadSafeOptions tsoBootstrapN,
-						 * ThreadSafeOptions tsoSplitFirst,
-						 * ThreadSafeOptions tsoSplitSecond,
-						 * boolean exportCommand
-						 */
-						ExperimentInterface exp;
-						if (mde instanceof Condition3D)
-							exp = Experiment.copyAndExtractSubtanceInclusiveData(sub, (ConditionInterface) mde);
-						else
-							exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
-						action.setExperimentReference(
-								new ExperimentReference(exp));
-						action.setUseIndividualReportNames(true);
-						action.setStatusProvider(null);
-						action.setSource(null, null);
-						action.setCustomTargetFileName(fn);
-						try {
-							action.performActionCalculateResults(null);
-						} catch (Exception e) {
-							e.printStackTrace();
-							MainFrame.getInstance().showMessageDialog("Could not perform operation: " + e.getMessage());
-						}
+			addExportFileButton(executeLater, mde, sub, mt, expTree, filePanel, isLast, stop, isAnnotationSavePossible);
+		}
+	}
+	
+	private static void addExportFileButton(ArrayList<LocalComputeJob> executeLater, final MappingDataEntity mde, final Substance3D sub, MongoTreeNode mt,
+			JTree expTree, DataSetFilePanel filePanel, boolean isLast, StopObject stop, boolean isAnnotationSavePossible) {
+		ImageIcon previewImage = IAPimages.getIcon(
+				"img/ext/gpl2/Gnome-Document-Save-64.png",
+				// IAPimages.getHistogramIcon(),
+				32, 32);
+		
+		final DataSetFileButton chartingButton = new DataSetFileButton(
+				mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
+						"<html><center>Export Data (XLSX)<br>"
+								+ "(specific condition)" : "<html><center>Export Data (XLSX)<br>(selected&nbsp;property)", null);
+		chartingButton.setAdditionalActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String defaultFileName = StringManipulationTools.getFileSystemName(
+						sub.iterator().next().getExperimentHeader().getExperimentName()
+								+ "_" + sub.getName() + ".xlsx");
+				String fn = FileHelper.getFileName(".xlsx", "Excel File", defaultFileName);
+				if (fn != null) {
+					boolean xlsx = true;
+					ActionPdfCreation3 action = new ActionPdfCreation3(
+							(ExperimentReferenceInterface) null,
+							(ArrayList<ThreadSafeOptions>) null,
+							new ThreadSafeOptions() /* false */,
+							new ThreadSafeOptions() /* false */,
+							new ThreadSafeOptions(),
+							new ThreadSafeOptions(),
+							xlsx,
+							(ArrayList<ThreadSafeOptions>) null,
+							(ArrayList<ThreadSafeOptions>) null,
+							(ThreadSafeOptions) null,
+							(ThreadSafeOptions) null,
+							(ThreadSafeOptions) null,
+							true);
+					/*
+					 * ExperimentReference experimentReference,
+					 * ArrayList<ThreadSafeOptions> divideDatasetBy,
+					 * ThreadSafeOptions exportIndividualAngles,
+					 * boolean xlsx,
+					 * ArrayList<ThreadSafeOptions> togglesFiltering,
+					 * ArrayList<ThreadSafeOptions> togglesInterestingProperties,
+					 * ThreadSafeOptions tsoBootstrapN,
+					 * ThreadSafeOptions tsoSplitFirst,
+					 * ThreadSafeOptions tsoSplitSecond,
+					 * boolean exportCommand
+					 */
+					ExperimentInterface exp;
+					if (mde instanceof Condition3D)
+						exp = Experiment.copyAndExtractSubtanceInclusiveData(sub, (ConditionInterface) mde);
+					else
+						exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
+					action.setExperimentReference(
+							new ExperimentReference(exp));
+					action.setUseIndividualReportNames(true);
+					action.setStatusProvider(null);
+					action.setSource(null, null);
+					action.setCustomTargetFileName(fn);
+					try {
+						action.performActionCalculateResults(null);
+					} catch (Exception e) {
+						e.printStackTrace();
+						MainFrame.getInstance().showMessageDialog("Could not perform operation: " + e.getMessage());
 					}
 				}
-				
-			});
-			chartingButton.setVerticalTextPosition(SwingConstants.BOTTOM);
-			chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
+			}
 			
-			SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
-					stop, executeLater, null, chartingButton, false, isLast, isAnnotationSavePossible, true));
-		}
+		});
+		chartingButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+		chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
+		
+		SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
+				stop, executeLater, null, chartingButton, false, isLast, isAnnotationSavePossible, true));
+	}
+	
+	private static void addDataChartButton(ArrayList<LocalComputeJob> executeLater, final MappingDataEntity mde, final Substance3D sub, MongoTreeNode mt,
+			JTree expTree, DataSetFilePanel filePanel, StopObject stop, boolean isAnnotationSavePossible) {
+		ImageIcon previewImage = IAPimages.getIcon(IAPimages.getHistogramIcon(), 32, 32);
+		
+		final DataSetFileButton chartingButton = new DataSetFileButton(
+				mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
+						"<html><center>Create Data Chart<br>"
+								+ "(specific condition)" : "<html><center>Create Data Chart<br>(selected&nbsp;property)", null);
+		chartingButton.setAdditionalActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+						"Process data...", "");
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						final ExperimentInterface expf;
+						if (mde instanceof Condition3D) {
+							ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub, (ConditionInterface) mde);
+							Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
+							ArrayList<MappingData3DPath> mmd = new ArrayList<MappingData3DPath>();
+							for (NumericMeasurementInterface nmi : md) {
+								MappingData3DPath mp = new MappingData3DPath(nmi, true);
+								mp.getConditionData().setVariety(mp.getConditionData().getVariety() != null && !mp.getConditionData().getVariety().isEmpty() ?
+										mp.getConditionData().getVariety() + "/" + mp.getMeasurement().getQualityAnnotation()
+										: mp.getMeasurement().getQualityAnnotation());
+								
+								mmd.add(mp);
+							}
+							expf = MappingData3DPath.merge(mmd, true, status);
+							
+						} else {
+							status.setCurrentStatusText1("Extract subset " + sub.getName());
+							ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
+							if (status.wantsToStop())
+								return;
+							Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
+							status.setCurrentStatusText1("Create dataset for plotting");
+							expf = MappingData3DPath.merge(md, true, status);
+						}
+						if (status.wantsToStop())
+							return;
+						HashSet<String> speciesNames = new HashSet<String>();
+						for (SubstanceInterface si : expf)
+							for (ConditionInterface ci : si) {
+								speciesNames.add(ci.getSpecies());
+							}
+						int idx = 1;
+						for (SubstanceInterface si : expf)
+							for (ConditionInterface ci : si)
+								ci.setRowId(idx++);
+						if (speciesNames.size() == 1)
+							for (SubstanceInterface si : expf)
+								for (ConditionInterface ci : si)
+									ci.setSpecies(null);
+						BackgroundTaskHelper.executeLaterOnSwingTask(0, new Runnable() {
+							@Override
+							public void run() {
+								DataChartComponentWindow dccw = new DataChartComponentWindow(expf);
+								dccw.setVisible(true);
+							}
+						});
+						
+					}
+				};
+				BackgroundTaskHelper.issueSimpleTaskInWindow("Plot data", "Process data...", r, null, status, true, true);
+			}
+		});
+		chartingButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+		chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
+		
+		SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
+				stop, executeLater, null, chartingButton, false, false, isAnnotationSavePossible, true));
+	}
+	
+	private static void addProcessDataButton(ArrayList<LocalComputeJob> executeLater, final MappingDataEntity mde, final Substance3D sub, MongoTreeNode mt,
+			JTree expTree, DataSetFilePanel filePanel, StopObject stop, boolean isAnnotationSavePossible, IniIoProvider ioProvider) {
+		ImageIcon previewImage = IAPimages.getIcon("img/ext/gpl2/Gnome-X-office-drawing-template.png", 32, 32);
+		
+		final DataSetFileButton chartingButton = new DataSetFileButton(
+				mt, null, previewImage, mt.isReadOnly(), true, (mde instanceof Condition3D) ?
+						"<html><center>Process Data<br>"
+								+ "(specific condition)" : "<html><center>Process Data<br>(selected&nbsp;property)", null);
+		chartingButton.setAdditionalActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				final BackgroundTaskStatusProviderSupportingExternalCallImpl status = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
+						"Process data...", "");
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						final ExperimentInterface expf;
+						if (mde instanceof Condition3D) {
+							ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub, (ConditionInterface) mde);
+							Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
+							ArrayList<MappingData3DPath> mmd = new ArrayList<MappingData3DPath>();
+							for (NumericMeasurementInterface nmi : md) {
+								MappingData3DPath mp = new MappingData3DPath(nmi, true);
+								mp.getConditionData().setVariety(mp.getConditionData().getVariety() != null && !mp.getConditionData().getVariety().isEmpty() ?
+										mp.getConditionData().getVariety() + "/" + mp.getMeasurement().getQualityAnnotation()
+										: mp.getMeasurement().getQualityAnnotation());
+								
+								mmd.add(mp);
+							}
+							expf = MappingData3DPath.merge(mmd, true, status);
+							expf.setHeader(exp.getHeader().clone());
+							expf.getHeader().setDatabaseId(null);
+							expf.getHeader().setOriginDbId(exp.getHeader().getDatabaseId());
+						} else {
+							status.setCurrentStatusText1("Extract subset " + sub.getName());
+							ExperimentInterface exp = Experiment.copyAndExtractSubtanceInclusiveData(sub);
+							if (status.wantsToStop())
+								return;
+							Collection<NumericMeasurementInterface> md = Substance3D.getAllMeasurements(exp);
+							status.setCurrentStatusText1("Create dataset");
+							expf = MappingData3DPath.merge(md, true, status);
+							expf.setHeader(exp.getHeader().clone());
+							expf.getHeader().setDatabaseId(null);
+							expf.getHeader().setOriginDbId(exp.getHeader().getDatabaseId());
+						}
+						if (status.wantsToStop())
+							return;
+						IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
+						try {
+							
+							ChartSettings settingsGlobal = new ChartSettings(false);
+							settingsGlobal.setIniIOprovider(ioProvider);
+							settingsGlobal.setSavePossible(ioProvider.isAbleToSaveData());
+							ChartSettings settingsLocal = new ChartSettings(true);
+							settingsLocal.setSavePossible(settingsGlobal.isSavePossible());
+							
+							ExperimentReferenceInterface expRef = new ExperimentReference(expf) {
+								
+								@Override
+								public IniIoProvider getIniIoProvider() {
+									return ioProvider;
+								}
+							};
+							ActionFxCreateDataChart ac = new ActionFxCreateDataChart(expf.iterator().next().getName(),
+									expRef, settingsGlobal);
+							ac.setShowFullSubstanceName(true);
+							ac.setDisableExportCommand(true);
+							mnp.getNewWindowListener(ac, false, "Process Data").actionPerformed(null);
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+						
+					}
+				};
+				BackgroundTaskHelper.issueSimpleTaskInWindow("Plot data", "Process data...", r, null, status, true, true);
+			}
+		});
+		chartingButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+		chartingButton.setHorizontalTextPosition(SwingConstants.CENTER);
+		
+		SwingUtilities.invokeLater(processIcon(filePanel, mt, expTree,
+				stop, executeLater, null, chartingButton, false, false, isAnnotationSavePossible, true));
 	}
 	
 	private static Runnable processIcon(final DataSetFilePanel filePanel,

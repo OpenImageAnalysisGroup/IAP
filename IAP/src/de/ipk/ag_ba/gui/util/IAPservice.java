@@ -80,7 +80,6 @@ import org.graffiti.graph.GraphElement;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
-import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.plugin.view.AttributeComponent;
 import org.graffiti.plugin.view.GraphElementComponent;
@@ -101,8 +100,6 @@ import de.ipk.ag_ba.commands.experiment.ExportSetting;
 import de.ipk.ag_ba.commands.experiment.process.report.MySnapshotFilter;
 import de.ipk.ag_ba.commands.experiment.process.report.SnapshotFilter;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataExportZIP;
-import de.ipk.ag_ba.commands.vfs.VirtualFileSystemHandler;
-import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -2005,25 +2002,6 @@ public class IAPservice {
 		};
 		
 		BackgroundTaskHelper.issueSimpleTaskInWindow("Load Image List", "Initialize", backgroundTask1, finishSwingTask, status, false, true);
-	}
-	
-	public static boolean getIsAnnotationSavePossible(ExperimentReferenceInterface experiment) {
-		if (experiment != null && experiment.getM() != null)
-			return true;
-		String dbId = experiment != null && experiment.getHeader() != null ? experiment.getHeader().getDatabaseId() : null;
-		if (dbId != null) {
-			String id = dbId.contains(":") ? dbId.substring(0, dbId.indexOf(":")) : null;
-			if (id != null && !id.isEmpty()) {
-				ResourceIOHandler vfs = ResourceIOManager.getHandlerFromPrefix(id);
-				if (vfs instanceof VirtualFileSystemHandler) {
-					VirtualFileSystemHandler vv = (VirtualFileSystemHandler) vfs;
-					if (vv.getVFS() instanceof VirtualFileSystemVFS2) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
 	}
 	
 	public static boolean isImageJvisible() {

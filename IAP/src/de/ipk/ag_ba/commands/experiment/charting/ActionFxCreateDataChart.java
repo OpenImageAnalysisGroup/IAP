@@ -49,6 +49,8 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 	ActionExportPlotDataTable exportDataTableAction;
 	
 	private ExperimentTransformationPipeline transformationPipeline;
+	private boolean disableExportCommand;
+	private boolean showFullSubstanceNameAsTitle;
 	
 	public ActionFxCreateDataChart() {
 		super("Create a Data Chart");
@@ -69,13 +71,6 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 				settingsLocal.setSavePossible(false);
 			settingsGlobal.setSavePossible(false);
 		}
-		
-		// try {
-		// if (experiment != null)
-		// determineSubstanceGroups();
-		// } catch (Exception err) {
-		// throw new RuntimeException(err);
-		// }
 	}
 	
 	@Override
@@ -132,6 +127,8 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 	}
 	
 	private void determineSubstanceGroups() throws Exception {
+		if (groupFilter != null && groupFilter.equals("combined.geometry.fluo.volume.iap"))
+			System.out.println("CHECK");
 		if (groupsDetermined)
 			return;
 		
@@ -198,7 +195,8 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			}
 			ra.add(new NavigationButton(summarizeDataAction, src.getGUIsetting()));
 			ra.add(new NavigationButton(createPlotAction, src.getGUIsetting()));
-			ra.add(new NavigationButton(exportDataTableAction, src.getGUIsetting()));
+			if (!disableExportCommand)
+				ra.add(new NavigationButton(exportDataTableAction, src.getGUIsetting()));
 		}
 		
 		return ra;
@@ -275,6 +273,8 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 	
 	@Override
 	public String getDefaultTitle() {
+		if (showFullSubstanceNameAsTitle)
+			return groupFilter;
 		if (groupFilter != null) {
 			String name = groupFilter;
 			if (groupFilter.contains("."))
@@ -314,6 +314,14 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 				settingsLocal.setSavePossible(false);
 			settingsGlobal.setSavePossible(false);
 		}
+	}
+	
+	public void setDisableExportCommand(boolean disableExportCommand) {
+		this.disableExportCommand = disableExportCommand;
+	}
+	
+	public void setShowFullSubstanceName(boolean showFullSubstanceNameAsTitle) {
+		this.showFullSubstanceNameAsTitle = showFullSubstanceNameAsTitle;
 	}
 	
 }
