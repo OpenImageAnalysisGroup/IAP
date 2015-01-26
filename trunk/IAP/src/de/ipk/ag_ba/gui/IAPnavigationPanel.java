@@ -197,6 +197,11 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 	}
 	
 	public ActionListener getNewWindowListener(final NavigationAction optCustomStartAction, final boolean executeActionDelayed) {
+		return getNewWindowListener(optCustomStartAction, executeActionDelayed, null);
+	}
+	
+	public ActionListener getNewWindowListener(final NavigationAction optCustomStartAction, final boolean executeActionDelayed,
+			String optCustomWindowTitle) {
 		
 		ActionListener res = new ActionListener() {
 			
@@ -213,18 +218,23 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 						if (!jff.isDisplayable())
 							SystemOptions.getInstance().removeChangeListener(this);
 						else {
-							String tt = lt != null ? lt : SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
-									"IAP Cloud Storage, Analysis and Visualization System");
-							if (optCustomStartAction != null)
-								jff.setTitle(StringManipulationTools.removeHTMLtags(
-										StringManipulationTools.stringReplace(
-												optCustomStartAction.getDefaultTitle(), "%gt;", " > "))
-										);
-							else
-								jff.setTitle(tt);
+							if (optCustomWindowTitle != null)
+								jff.setTitle(optCustomWindowTitle);
+							else {
+								String tt = lt != null ? lt : SystemOptions.getInstance().getString("IAP", "MDI-Window-Title",
+										"IAP Cloud Storage, Analysis and Visualization System");
+								if (optCustomStartAction != null)
+									jff.setTitle(StringManipulationTools.removeHTMLtags(
+											StringManipulationTools.stringReplace(
+													optCustomStartAction.getDefaultTitle(), "%gt;", " > "))
+											);
+								else
+									jff.setTitle(tt);
+							}
 						}
 					}
 				};
+				rr.run();
 				SystemOptions.getInstance().addChangeListener("IAP", "MDI-Window-Title", rr);
 				jff.addHierarchyListener(new HierarchyListener() {
 					@Override

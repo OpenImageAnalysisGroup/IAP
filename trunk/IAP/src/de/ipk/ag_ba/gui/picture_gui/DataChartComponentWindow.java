@@ -124,12 +124,13 @@ public class DataChartComponentWindow extends JFrame {
 		}
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.addTab("Settings Page 1", graphSettingsEditPanel);
-		tabbedPane.addTab("Settings Page 2", nodeSettingsEditPanel);
+		tabbedPane.addTab("Settings A", graphSettingsEditPanel);
+		tabbedPane.addTab("Settings B", nodeSettingsEditPanel);
 		
 		this.splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, chart, tabbedPane);
 		splitPane.setDividerLocation(getWidth() - 300);
-		splitPane.setDividerSize(10);
+		splitPane.setDividerSize(12);
+		
 		splitPane.setOneTouchExpandable(true);
 		add(TableLayout.getSplitVertical(null, // new JLabel("ToDo - some settings and filter options"),
 				splitPane, TableLayout.PREFERRED, TableLayout.FILL), "0,0");

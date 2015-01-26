@@ -65,6 +65,7 @@ public final class ActionCreatePlotCommand extends AbstractNavigationAction impl
 				BackgroundThreadDispatcher.addTask(() -> {
 					try {
 						updateValueCount();
+						updateStarted = false;
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}

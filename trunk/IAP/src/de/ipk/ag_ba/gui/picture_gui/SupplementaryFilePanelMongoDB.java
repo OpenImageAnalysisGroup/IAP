@@ -28,13 +28,13 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
+import org.IniIoProvider;
 import org.JMButton;
 import org.StringManipulationTools;
 import org.graffiti.editor.MainFrame;
 
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
-import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
@@ -112,7 +112,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 	
 	private final DataSetFilePanel buttonView;
 	
-	public SupplementaryFilePanelMongoDB(final ExperimentReferenceInterface doc,
+	public SupplementaryFilePanelMongoDB(final ExperimentReferenceInterface experimentReferemce,
 			String experimentName) {
 		final SupplementaryFilePanelMongoDB thisPanel = this;
 		
@@ -147,11 +147,13 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
-		ToolTipManager.sharedInstance().setDismissDelay(20000);
+		ToolTipManager.sharedInstance().setDismissDelay(5000);
 		
-		boolean readOnly = !IAPservice.getIsAnnotationSavePossible(doc);
+		IniIoProvider iop = experimentReferemce.getIniIoProvider();
 		
-		expTree = new JTree(new ExperimentTreeModel(this, doc, readOnly));
+		boolean readOnly = !iop.isAbleToSaveData();
+		
+		expTree = new JTree(new ExperimentTreeModel(this, experimentReferemce, readOnly));
 		
 		DBEtreeCellRenderer cir = new DBEtreeCellRenderer();
 		cir.setCameraRendererIcon(IAPimages.getIcon(IAPimages.getCamera(), 16, 16));
@@ -232,7 +234,7 @@ public class SupplementaryFilePanelMongoDB extends JPanel implements ActionListe
 							removeTempFiles();
 							try {
 								DataExchangeHelperForExperiments.fillFilePanel(filePanel, mtdbe, expTree,
-										IAPservice.getIsAnnotationSavePossible(doc), myFilterConnector);
+										!readOnly, myFilterConnector, iop);
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}

@@ -41,9 +41,10 @@ public class ExperimentTransformationPipeline {
 		return result;
 	}
 	
-	public void setSteps(ExperimentTransformation... steps) {
+	public void setSteps(ExperimentTransformation... steps) throws Exception {
 		pipelineSteps = steps;
 		this.stepResults = new ExperimentInterface[this.pipelineSteps.length];
+		setDirty(pipelineSteps[steps.length - 1]);
 	}
 	
 	public void setDirty(ExperimentTransformation step) throws Exception {
