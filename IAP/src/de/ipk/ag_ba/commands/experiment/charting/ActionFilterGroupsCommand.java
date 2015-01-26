@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -66,7 +67,10 @@ public final class ActionFilterGroupsCommand extends AbstractNavigationAction im
 		params.add(new JLabel("<html>&nbsp;"));
 		
 		synchronized (groups) {
-			for (String g : groups) {
+			TreeSet<String> instances = new TreeSet<>();
+			for (String g : groups)
+				instances.add(g);
+			for (String g : instances) {
 				params.add("");
 				JCheckBox cb = new JCheckBox("<html><code>" + extractValues(g));
 				cb.setSelected(!disabled_groups.contains(g));
