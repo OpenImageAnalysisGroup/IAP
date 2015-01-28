@@ -709,6 +709,18 @@ public class IAPservice {
 			if (type == null)
 				type = "";
 			double ggd_baseline;
+			if (type.equals("Analysis Results")) {
+				try {
+					String refID = experimentNF.getHeader().getOriginDbId();
+					ExperimentReference ehi = new ExperimentReference(refID);
+					String origType = type;
+					type = ehi.getHeader().getExperimentType();
+					System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Dataset is Analysis Result. Use source dataset for experiment type determination "
+							+ "(" + origType + " --> " + type + ").");
+				} catch (Exception e) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
+				}
+			}
 			if (type.equals("Barley")) {
 				ggd_baseline = SystemOptions.getInstance().getDouble("Growing-Degree-Days", "Barley-Baseline", 5.5);
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Growing-degree days, using baseline for Barley, "
