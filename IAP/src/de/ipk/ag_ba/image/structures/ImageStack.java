@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.structures;
 
 import ij.ImagePlus;
 import ij.gui.StackWindow;
+import ij.io.FileSaver;
 import ij.process.ImageProcessor;
 import info.clearthought.layout.TableLayout;
 
@@ -11,8 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -97,14 +96,18 @@ public class ImageStack implements Iterable<ImageProcessor> {
 	}
 	
 	public void saveAsLayeredTif(File file) throws FileNotFoundException {
-		saveAsLayeredTif(new FileOutputStream(file));
-	}
-	
-	public void saveAsLayeredTif(OutputStream os) {
 		ImagePlus image = new ImagePlus();
 		image.setStack(stack);
-		throw new UnsupportedOperationException("TODO NOT YET IMPLEMENTED");
-		// new MyFileSaver(image).saveAsTiffStack(os);
+		FileSaver fs = new FileSaver(image);
+		fs.saveAsTiffStack(file.getPath());
+	}
+	
+	public void saveAsSeparateImages(File file) {
+		for (int i = 0; i < stack.getSize(); i++) {
+			FileSaver fs = new FileSaver(this.getImage(i).getAsImagePlus());
+			String path = file.getPath() + "/stack_" + i + ".tif";
+			fs.saveAsTiff(path);
+		}
 	}
 	
 	public void show(final String title) {
