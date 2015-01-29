@@ -16,6 +16,17 @@ public class ArrayUtil {
 		return image;
 	}
 	
+	public static float[] get1d(float[][] img) {
+		int w = img.length;
+		int h = img[0].length;
+		float[] image = new float[w * h];
+		int idx = 0;
+		for (int y = 0; y < h; y++)
+			for (int x = 0; x < w; x++)
+				image[idx++] = img[x][y];
+		return image;
+	}
+	
 	public static int[][] get2d(int w, int h, int[] as1a) {
 		if (w * h != as1a.length)
 			throw new IllegalArgumentException("width * height not equal to source length");
