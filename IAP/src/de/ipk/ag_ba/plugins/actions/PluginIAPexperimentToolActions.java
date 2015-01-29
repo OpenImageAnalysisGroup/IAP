@@ -2,6 +2,7 @@ package de.ipk.ag_ba.plugins.actions;
 
 import java.util.ArrayList;
 
+import de.ipk.ag_ba.commands.experiment.tools.ActionGenerateFieldInfoFromWeight;
 import de.ipk.ag_ba.commands.experiment.tools.ActionObjectStatistics;
 import de.ipk.ag_ba.commands.experiment.tools.ActionRemerge;
 import de.ipk.ag_ba.commands.experiment.tools.ActionResetConditionFromImageName;
@@ -28,6 +29,7 @@ public class PluginIAPexperimentToolActions extends AbstractIAPplugin {
 		ArrayList<ActionDataProcessing> res = new ArrayList<ActionDataProcessing>();
 		
 		res.add(new ActionSortSubstances());
+		res.add(new ActionGenerateFieldInfoFromWeight());
 		res.add(new ActionRemerge());
 		res.add(new ActionSetTimes());
 		res.add(new ActionResetConditionFromImageName());
