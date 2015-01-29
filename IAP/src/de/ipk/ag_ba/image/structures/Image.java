@@ -11,6 +11,8 @@ import ij.ImagePlus;
 import ij.io.Opener;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
+import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -71,6 +73,10 @@ public class Image {
 	public String toString() {
 		return image != null ? image.getWidth() + " x " + image.getHeight()
 				+ " " + image.getBitDepth() + " bit" : "NULL IMAGE";
+	}
+	
+	public Image(ImageProcessor p) {
+		this(new ImagePlus("from ImageProcessor", p));
 	}
 	
 	public Image(BufferedImage bufferedImage) {
@@ -193,6 +199,10 @@ public class Image {
 	public Image(int[][] img) {
 		this(new ImagePlus("from 1d array",
 				new ColorProcessor(img.length, img[0].length, ArrayUtil.get1d(img))));
+	}
+	
+	public Image(float[][] img) {
+		this(new ImagePlus("from 1d array", new FloatProcessor(img.length, img[0].length, ArrayUtil.get1d(img))));
 	}
 	
 	public Image(java.awt.Image image) {

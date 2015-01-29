@@ -71,7 +71,12 @@ public class ImageStack implements Iterable<ImageProcessor> {
 	}
 	
 	public void addImage(String label, Image image, String optSettingsPath) {
-		image = image.copy();
+		addImage(label, image, optSettingsPath, true);
+	}
+	
+	public void addImage(String label, Image image, String optSettingsPath, boolean makeCopy) {
+		if (makeCopy)
+			image = image.copy();
 		if (!sizeKnown) {
 			sizeKnown = true;
 			this.w = image.getWidth();
@@ -313,7 +318,7 @@ public class ImageStack implements Iterable<ImageProcessor> {
 	}
 	
 	public Image getImage(int n) {
-		return new Image(this.stack.getProcessor(n + 1).getBufferedImage());
+		return new Image(this.stack.getProcessor(n + 1));
 	}
 	
 	public String[] getLabels() {
