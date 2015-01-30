@@ -136,7 +136,8 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 				}
 			}
 			pipeline.setDirty(this);
-			actionFilterGroup.rescanGroups();
+			if (actionFilterGroup != null)
+				actionFilterGroup.rescanGroups();
 		}
 	}
 	
