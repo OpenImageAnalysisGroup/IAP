@@ -57,7 +57,7 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 			res = gb.transform(res);
 			HashSet<String> plantIDs = new HashSet<>();
 			res.visitNumericMeasurements(null, (nmi) -> {
-				plantIDs.add(nmi.getQualityAnnotation());
+				plantIDs.add(fix(nmi.getQualityAnnotation()));
 			});
 			Object[] param = MyInputHelper.getInput("Field Layout:", "Field Layout", new Object[] {
 					"Number of carriers", plantIDs.size(),
@@ -86,10 +86,10 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 							Long time = sai.getSampleFineTimeOrRowId();
 							if (time != null) {
 								for (NumericMeasurementInterface nmi : sai) {
-									if (nmi.getQualityAnnotation() != null) {
+									if (fix(nmi.getQualityAnnotation()) != null) {
 										if (!day2time2plant.containsKey(sai.getTime()))
 											day2time2plant.put(sai.getTime(), new TreeMap<>());
-										day2time2plant.get(sai.getTime()).put(time, nmi.getQualityAnnotation());
+										day2time2plant.get(sai.getTime()).put(time, fix(nmi.getQualityAnnotation()));
 									}
 								}
 							}
@@ -130,10 +130,10 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 					}
 					for (SampleInterface sai : ci) {
 						for (NumericMeasurementInterface nmi : sai) {
-							if (nmi.getQualityAnnotation() != null) {
+							if (fix(nmi.getQualityAnnotation()) != null) {
 								if (Double.isNaN(nmi.getValue()))
 									continue;
-								Vector2i pos = getPos(nmi.getQualityAnnotation(), day2plant2index, sai.getTime(), carriers,
+								Vector2i pos = getPos(fix(nmi.getQualityAnnotation()), day2plant2index, sai.getTime(), carriers,
 										initoffset, carriersInLane, lanes, direction);
 								if (pos != null) {
 									if (!substance2day2x2y2diff.containsKey(s.getName()))
@@ -258,6 +258,13 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+	}
+	
+	private String fix(String id) {
+		if (id == null || !id.contains("_"))
+			return id;
+		else
+			return id.split("_")[0];
 	}
 	
 	private Vector2i getPos(String plantID, TreeMap<Integer, TreeMap<String, Integer>> day2plant2index, int time,
