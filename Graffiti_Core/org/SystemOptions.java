@@ -550,6 +550,17 @@ public class SystemOptions {
 		}
 	}
 	
+	public void setStringRadioSelection(String group, String setting, String[] possible, String selected) {
+		ArrayList<String> newValues = new ArrayList<String>();
+		for (String k : possible) {
+			if (k.equals(selected))
+				newValues.add("[x]" + k);
+			else
+				newValues.add(k);
+		}
+		setString(group, setting, StringManipulationTools.getStringList(newValues, "//"));
+	}
+	
 	public void setColor(String group, String setting, Color value) {
 		if (ini == null) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Settings file can't be used, setting value is not stored!");
