@@ -5,14 +5,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
 import org.OpenFileDialogService;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.Vector2i;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.ChartSettings;
@@ -48,13 +53,16 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 		
 		try {
 			this.src = src;
+			status.setCurrentStatusText1("Get data");
 			ExperimentInterface res = experiment.getData();
 			ExperimentTransformationPipeline pipeline = new ExperimentTransformationPipeline(res);
 			ActionChartingGroupBySettings gb = new ActionChartingGroupBySettings(null, pipeline, set, null, null);
 			pipeline.setSteps(gb);
-			
+			status.setCurrentStatusText1("Reformat groups");
+			gb.setStatusProvider(getStatusProvider());
 			gb.performActionCalculateResults(src);
 			res = gb.transform(res);
+			status.setCurrentStatusText1("Group info updated");
 			HashSet<String> plantIDs = new HashSet<>();
 			res.visitNumericMeasurements(null, (nmi) -> {
 				plantIDs.add(fix(nmi.getQualityAnnotation()));
@@ -160,6 +168,10 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 			}
 			
 			TextFile html = new TextFile();
+			TreeMap<Double, String> leftRight2subst = new TreeMap<>();
+			TreeMap<Double, String> topBottom2subst = new TreeMap<>();
+			TreeMap<Double, String> err2subst = new TreeMap<>();
+			
 			html.add("<html><head><title>Field Position Differences Map</title></head><head><body>");
 			for (String substance : substance2day2x2y2diff.keySet()) {
 				html.add("<h1>" + substance + "</h1>");
@@ -198,6 +210,8 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 							maxval = v;
 					}
 				}
+				ArrayList<Double> values = new ArrayList<>();
+				ArrayList<double[]> xy = new ArrayList<>();
 				for (int y = miny; y <= maxy; y++) {
 					StringBuilder line = new StringBuilder();
 					line.append("<tr>");
@@ -220,19 +234,63 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 							}
 							if (Double.isNaN(val))
 								line.append("<td style=\"empty-cells: hide\"></td>");
-							else
+							else {
 								line.append("<td bgcolor=\"" + StringManipulationTools.getColorHTMLdef(new Color(red, green, blue)) + "\">" +
 										(int) val
 										+ "</td>");
+								values.add(val);
+								xy.add(new double[] { x, y });
+							}
 						} else {
 							line.append("<td style=\"empty-cells: hide\"></td>");
 						}
+					}
+					OLSMultipleLinearRegression reg = new OLSMultipleLinearRegression();
+					double[] vvv = new double[values.size()];
+					for (int i = 0; i < values.size(); i++)
+						vvv[i] = values.get(i);
+					reg.newSampleData(vvv, xy.toArray(new double[][] {}));
+					try {
+						double[] ab = reg.estimateRegressionParameters();
+						double variance = reg.estimateRegressandVariance();
+						leftRight2subst.put(ab[0], substance);
+						topBottom2subst.put(ab[1], substance);
+						err2subst.put(variance, substance);
+					} catch (Exception e) {
+						System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Can't calculate regression info for substance '" + substance + "'!");
 					}
 					line.append("</tr>");
 					html.add(line.toString());
 				}
 				html.add("</table>");
 			}
+			
+			html.add("<h1>Left - Right Trait Dependency</h1>");
+			html.add("<table>");
+			html.add("<tr><th>Left-To-Right</th><th>Top-To-Bottom</th><th>Variance</td><th>Trait</th></tr>");
+			for (Double lr : leftRight2subst.keySet()) {
+				html.add("<tr>"
+						+ "<td>" + lr + "</td>"
+						+ "<td>" + getKeysByValue(topBottom2subst, leftRight2subst.get(lr)).iterator().next() + "</td>"
+						+ "<td>" + getKeysByValue(err2subst, leftRight2subst.get(lr)).iterator().next() + "</td>"
+						+ "<td>" + leftRight2subst.get(lr) + "</td></tr>");
+				
+			}
+			html.add("</table>");
+			
+			html.add("<h1>Top - Bottom Trait Dependency</h1>");
+			html.add("<table>");
+			html.add("<tr><th>Left-To-Right</th><th>Top-To-Bottom</th><th>Variance</td><th>Trait</th></tr>");
+			for (Double tb : topBottom2subst.keySet()) {
+				html.add("<tr>"
+						+ "<td>" + getKeysByValue(leftRight2subst, topBottom2subst.get(tb)).iterator().next() + "</td>"
+						+ "<td>" + tb + "</td>"
+						+ "<td>" + getKeysByValue(err2subst, topBottom2subst.get(tb)).iterator().next() + "</td>"
+						+ "<td>" + topBottom2subst.get(tb) + "</td></tr>");
+				
+			}
+			html.add("</table>");
+			
 			html.add("</body></html>");
 			status.setCurrentStatusText1("Generate output files");
 			{
@@ -258,6 +316,14 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 		} catch (Exception e) {
 			ErrorMsg.addErrorMessage(e);
 		}
+	}
+	
+	public static <T, E> Set<T> getKeysByValue(Map<T, E> map, E value) {
+		return map.entrySet()
+				.stream()
+				.filter(entry -> entry.getValue().equals(value))
+				.map(entry -> entry.getKey())
+				.collect(Collectors.toSet());
 	}
 	
 	private String fix(String id) {
