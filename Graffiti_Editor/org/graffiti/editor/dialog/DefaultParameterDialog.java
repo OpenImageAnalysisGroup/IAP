@@ -601,51 +601,56 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 				JComponentParameter sp = new JComponentParameter(val, nameTitle, nameTooltip);
 				p[i] = sp;
 			} else
-				if (param instanceof String) {
-					String val = (String) param;
-					StringParameter sp = new StringParameter(val, nameTitle, nameTooltip);
+				if (param instanceof String[]) {
+					String[] val = (String[]) param;
+					ObjectListParameter sp = new ObjectListParameter(val[0], nameTitle, nameTooltip, val);
 					p[i] = sp;
 				} else
-					if (param instanceof Double) {
-						Double val = (Double) param;
-						DoubleParameter dp = new DoubleParameter(val, nameTitle, nameTooltip);
-						p[i] = dp;
+					if (param instanceof String) {
+						String val = (String) param;
+						StringParameter sp = new StringParameter(val, nameTitle, nameTooltip);
+						p[i] = sp;
 					} else
-						if (param instanceof Node) {
-							Node val = (Node) param;
-							NodeParameter ip = new NodeParameter(val.getGraph(), val, nameTitle, nameTooltip);
-							p[i] = ip;
+						if (param instanceof Double) {
+							Double val = (Double) param;
+							DoubleParameter dp = new DoubleParameter(val, nameTitle, nameTooltip);
+							p[i] = dp;
 						} else
-							if (param instanceof Edge) {
-								Edge val = (Edge) param;
-								EdgeParameter ip = new EdgeParameter(val, nameTitle, nameTooltip);
+							if (param instanceof Node) {
+								Node val = (Node) param;
+								NodeParameter ip = new NodeParameter(val.getGraph(), val, nameTitle, nameTooltip);
 								p[i] = ip;
 							} else
-								if (param instanceof Integer) {
-									Integer val = (Integer) param;
-									IntegerParameter ip = new IntegerParameter(val, nameTitle, nameTooltip);
+								if (param instanceof Edge) {
+									Edge val = (Edge) param;
+									EdgeParameter ip = new EdgeParameter(val, nameTitle, nameTooltip);
 									p[i] = ip;
 								} else
-									if (param instanceof List) {
-										List val = (List) param;
-										ObjectListParameter ip = new ObjectListParameter(val.size() > 0 ? val.get(0) : null, nameTitle, nameTooltip, val);
+									if (param instanceof Integer) {
+										Integer val = (Integer) param;
+										IntegerParameter ip = new IntegerParameter(val, nameTitle, nameTooltip);
 										p[i] = ip;
 									} else
-										if (param instanceof Set) {
-											Set val = (Set) param;
-											ObjectListParameter ip = new ObjectListParameter(val.size() > 0 ? val.iterator().next() : null, nameTitle, nameTooltip, val);
+										if (param instanceof List) {
+											List val = (List) param;
+											ObjectListParameter ip = new ObjectListParameter(val.size() > 0 ? val.get(0) : null, nameTitle, nameTooltip, val);
 											p[i] = ip;
 										} else
-											if (param instanceof Color) {
-												Color c = (Color) param;
-												ColorParameter sp = new ColorParameter(c, nameTitle, nameTooltip);
-												p[i] = sp;
+											if (param instanceof Set) {
+												Set val = (Set) param;
+												ObjectListParameter ip = new ObjectListParameter(val.size() > 0 ? val.iterator().next() : null, nameTitle, nameTooltip, val);
+												p[i] = ip;
 											} else
-												if (param instanceof Boolean) {
-													Boolean val = (Boolean) param;
-													BooleanParameter ip = new BooleanParameter(val, nameTitle, nameTooltip);
-													p[i] = ip;
-												}
+												if (param instanceof Color) {
+													Color c = (Color) param;
+													ColorParameter sp = new ColorParameter(c, nameTitle, nameTooltip);
+													p[i] = sp;
+												} else
+													if (param instanceof Boolean) {
+														Boolean val = (Boolean) param;
+														BooleanParameter ip = new BooleanParameter(val, nameTitle, nameTooltip);
+														p[i] = ip;
+													}
 		}
 		boolean modal = true;
 		if (description != null && description != null && description instanceof String && ((String) description).startsWith("["))
