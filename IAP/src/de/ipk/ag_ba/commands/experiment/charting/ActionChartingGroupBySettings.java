@@ -216,7 +216,7 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		// System.out.println(p0.getMeasurement() + "");
 		// System.out.println(p1.getMeasurement() + "");
 		
-		ExperimentInterface result = MappingData3DPath.merge(pathObjects, true);
+		ExperimentInterface result = MappingData3DPath.merge(pathObjects, true, getStatusProvider());
 		result.numberConditions();
 		return result;
 	}
