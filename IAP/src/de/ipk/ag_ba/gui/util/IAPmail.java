@@ -25,7 +25,6 @@ import org.AttributeHelper;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 import org.HttpBasicAuth;
 import org.ReleaseInfo;
-import org.Screenshot;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -34,7 +33,9 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import util.Screenshot;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk.ag_ba.server.task_management.SystemAnalysisExt;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
@@ -237,7 +238,7 @@ public class IAPmail {
 	}
 	
 	private void createScreenshotAndAttachToMail(Multipart mp) throws AWTException, MessagingException, IOException {
-		final Screenshot screenshot = SystemAnalysis.getScreenshot();
+		final Screenshot screenshot = SystemAnalysisExt.getScreenshot();
 		
 		MimeBodyPart img = new MimeBodyPart();
 		img.setDataHandler(new DataHandler(new DataSource() {
