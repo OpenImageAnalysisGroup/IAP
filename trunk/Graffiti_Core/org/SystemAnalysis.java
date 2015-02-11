@@ -1,6 +1,5 @@
 package org;
 
-import java.awt.AWTException;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.io.BufferedReader;
@@ -429,10 +428,6 @@ public class SystemAnalysis {
 		Calendar c = new GregorianCalendar();
 		c.setTime(new Date(System.currentTimeMillis()));
 		return c.get(Calendar.MINUTE);
-	}
-	
-	public static Screenshot getScreenshot() throws IOException, AWTException {
-		return new Screenshot();
 	}
 	
 	public static String getDataAmountString(long d) {
