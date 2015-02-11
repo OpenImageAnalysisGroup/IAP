@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.server.task_management;
 
+import java.awt.AWTException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,8 +22,12 @@ import org.SystemAnalysis;
 import org.SystemInfo;
 
 import oshi.software.os.windows.WindowsHardwareAbstractionLayer;
+import util.Screenshot;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 
+/**
+ * @author klukas
+ */
 public class SystemAnalysisExt {
 	
 	public SystemInfoExt getSystemInfo() {
@@ -30,6 +35,10 @@ public class SystemAnalysisExt {
 	}
 	
 	private static int cpuSockets = -1;
+	
+	public static Screenshot getScreenshot() throws IOException, AWTException {
+		return new Screenshot();
+	}
 	
 	private static WindowsHardwareAbstractionLayer hal = AttributeHelper.windowsRunning() ? new WindowsHardwareAbstractionLayer() : null;
 	

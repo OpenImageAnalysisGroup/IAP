@@ -66,7 +66,6 @@ import org.ErrorMsg;
 import org.MeasurementFilter;
 import org.ObjectRef;
 import org.ReleaseInfo;
-import org.Screenshot;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
@@ -86,6 +85,8 @@ import org.graffiti.plugin.view.GraphElementComponent;
 import org.graffiti.plugin.view.View;
 import org.graffiti.plugins.views.defaults.GraffitiView;
 import org.graffiti.session.EditorSession;
+
+import util.Screenshot;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -1643,7 +1644,7 @@ public class IAPservice {
 				interval = 1;
 			}
 			if (!GraphicsEnvironment.isHeadless() && (t - lastScreenshotSaving >= interval * 1000 || immediately)) {
-				final Screenshot screenshot = SystemAnalysis.getScreenshot();
+				final Screenshot screenshot = SystemAnalysisExt.getScreenshot();
 				MongoDB mm = MongoDB.getDefaultCloud();
 				mm.processDB(new RunnableOnDB() {
 					private DB db;
@@ -1652,9 +1653,11 @@ public class IAPservice {
 					public void run() {
 						GridFS gridfs_webcam_files = new GridFS(db, "fs_screenshots");
 						List<GridFSDBFile> oldFiles = gridfs_webcam_files.find(screenshot.getScreenshotStaticFileName());
+						
 						GridFSInputFile inputFile = gridfs_webcam_files.createFile(screenshot.getScreenshotImage(), screenshot.getScreenshotStaticFileName());
 						inputFile.setMetaData(new BasicDBObject("time", screenshot.getTime()));
 						inputFile.setMetaData(new BasicDBObject("host", SystemAnalysisExt.getHostNameNoError()));
+						
 						inputFile.save();
 						for (GridFSDBFile oldFile : oldFiles)
 							gridfs_webcam_files.remove(oldFile);

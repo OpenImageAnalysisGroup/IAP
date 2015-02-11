@@ -1648,15 +1648,15 @@ public class MongoDB {
 				long t = 0;
 				ArrayList<GridFSDBFile> del = new ArrayList<GridFSDBFile>();
 				for (GridFSDBFile o : files) {
-					Long time = (Long) o.get("time");
+					Date time = (Date) o.get("uploadDate");
 					if (time == null)
-						time = t++;
-					if (System.currentTimeMillis() - time > 24 * 60 * 60 * 1000) {
+						time = new Date(t++);
+					if (System.currentTimeMillis() - time.getTime() > 24 * 60 * 60 * 1000) {
 						del.add(o);
 					} else {
 						String fn = "" + o.get("_id");
 						fn2newestFile.put(fn, o);
-						fn2newestStorageTime.put(fn, time);
+						fn2newestStorageTime.put(fn, time.getTime());
 					}
 				}
 				for (GridFSDBFile d : del) {
