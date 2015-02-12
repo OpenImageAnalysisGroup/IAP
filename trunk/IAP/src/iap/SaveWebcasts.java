@@ -7,6 +7,7 @@ import org.SystemAnalysis;
 
 import com.mongodb.gridfs.GridFSDBFile;
 
+import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.mongo.MongoDB;
 
 /**
@@ -26,5 +27,9 @@ public class SaveWebcasts {
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+	
+	public void saveScreenshot() {
+		IAPservice.storeDesktopImage(true);
 	}
 }

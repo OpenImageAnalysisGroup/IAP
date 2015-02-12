@@ -245,6 +245,7 @@ public class SystemAnalysisExt {
 	}
 	
 	private static String hostName = null;
+	private static String hostNameNS = null;
 	
 	private static long startupTime = System.currentTimeMillis();
 	
@@ -264,6 +265,25 @@ public class SystemAnalysisExt {
 			res = hostNameR;
 		hostName = res;
 		return res;
+	}
+	
+	public static String getHostNameWithNoStartupTimeAndNoError() {
+		if (hostNameNS != null)
+			return hostNameNS;
+		InetAddress local;
+		try {
+			local = SystemAnalysis.getLocalHost();
+			// String hostNameR = local.getHostName();
+			String ip = local.getHostAddress();
+			
+			String res = null;
+			
+			res = ip;;
+			hostNameNS = res;
+			return res;
+		} catch (UnknownHostException e) {
+			return "(unknown host)";
+		}
 	}
 	
 	public static SimpleDateFormat sdf = new SimpleDateFormat();
