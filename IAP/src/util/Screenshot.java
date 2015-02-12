@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.time.Instant;
 
 import javax.imageio.ImageIO;
 
@@ -48,15 +49,30 @@ public class Screenshot {
 		if (idleTimeMS != null) {
 			try {
 				Image i = new Image(capture);
-				i = i.io().addBorder(0, 20, 0, 0, Color.BLACK.getRGB()).getImage();
-				i = i.io().canvas().text(10, i.getHeight() - 20,
-						"Host: " + SystemAnalysisExt.getHostNameNiceNoError() + ", User: " + SystemAnalysis.getUserName() + ", "
-								+ "Boot-Time: " + SystemAnalysis.getCurrentTime(System.currentTimeMillis() - uptimeMS) + " (up "
-								+ SystemAnalysis.getWaitTime(uptimeMS.longValue()) +
-								", Last User Input: " + SystemAnalysis.getCurrentTime(lastUserInput) +
-								" (before " + SystemAnalysis.getWaitTime(idleTimeMS.longValue()) + ")"
+				int privacyMinutes = SystemOptions.getInstance().getInteger("Watch-Service", "Screenshot//Screenshot-Privacy_User_Activity_min", 15);
+				boolean active = idleTimeMS.longValue() < privacyMinutes * 60l * 1000l;
+				if (active) {
+					i = i.io().canvas().fillRect(10, 10, i.getWidth() - 10, i.getHeight() - 10, Color.RED.getRGB(), 0.9).io()
+							.blurImageJ(40).getImage();
+					i = i.io().canvas().text(100, 150, "Privacy Protection - User Active on Host", Color.BLACK, 50).getImage();
+					i = i.io().canvas().text(100, 220, "Screen capture will resume after " + privacyMinutes + " min of inactivity", Color.BLACK, 30).getImage();
+				}
+				i = i.io().addBorder(0, 40, 0, -40, Color.BLACK.getRGB()).getImage();
+				i = i.io().canvas().text(10, i.getHeight() - 42,
+						SystemAnalysis.getUserName() + "@" + SystemAnalysisExt.getHostNameWithNoStartupTimeAndNoError() + ", "
+								+ "System Boot: " + SystemAnalysis.getCurrentTime(System.currentTimeMillis() - uptimeMS) + " (up since "
+								+ SystemAnalysis.getWaitTime(0l + uptimeMS.intValue()) +
+								")\nLast User Input: " + SystemAnalysis.getCurrentTime(System.currentTimeMillis()
+										- idleTimeMS.longValue()) +
+								" (" +
+								(!active ?
+										StringManipulationTools.stringReplace(
+												SystemAnalysis.getWaitTime(idleTimeMS.longValue()),
+												"&lt;", "less than ") + " ago" : "user active on console")
+								+ "), Current Time: " + SystemAnalysis.getCurrentTime() + ":" + (Instant.now().getEpochSecond() % 60)
 						,
-						Color.WHITE, 15).getImage();
+						Color.WHITE, 30).getImage();
+				capture = i.getAsBufferedImage(false);
 			} catch (Exception e) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: Could not add user input and windows uptime information to image: "
 						+ e.getMessage());
