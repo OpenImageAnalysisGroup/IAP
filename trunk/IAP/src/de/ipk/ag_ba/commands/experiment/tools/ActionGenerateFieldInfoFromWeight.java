@@ -75,7 +75,8 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 					"Directions of lanes", new String[] {
 							DirectionMode.ALL_ONE_DIR.toString(),
 							DirectionMode.HALF_ONE_DIR.toString(),
-							DirectionMode.ALTERNATING.toString() }
+							DirectionMode.ALTERNATING.toString() },
+					"Calculate Relative Values", true,
 			});
 			if (param == null)
 				return;
@@ -84,6 +85,7 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 			int carriersInLane = (Integer) param[2];
 			int lanes = (Integer) param[3];
 			DirectionMode direction = DirectionMode.fromString((String) param[4]);
+			boolean relativeValues = (Boolean) param[4];
 			status.setCurrentStatusText1("Generate Rank Data");
 			TreeMap<Integer, TreeMap<Long, String>> day2time2plant = new TreeMap<>();
 			boolean resOK = false;
@@ -155,7 +157,10 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 										x2y2diff.put(x, new TreeMap<>());
 									if (!x2y2diff.get(x).containsKey(y))
 										if (group2day2values.get(group).get(sai.getTime()).getN() > 0) {
-											x2y2diff.get(x).put(y, nmi.getValue() - group2day2values.get(group).get(sai.getTime()).getMean());
+											if (relativeValues)
+												x2y2diff.get(x).put(y, nmi.getValue() / group2day2values.get(group).get(sai.getTime()).getMean());
+											else
+												x2y2diff.get(x).put(y, nmi.getValue() - group2day2values.get(group).get(sai.getTime()).getMean());
 											n++;
 										}
 								}
@@ -176,18 +181,25 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 			for (String substance : substance2day2x2y2diff.keySet()) {
 				html.add("<h1>" + substance + "</h1>");
 				TreeMap<Integer, TreeMap<Integer, Double>> x2y2diffSum = new TreeMap<Integer, TreeMap<Integer, Double>>();
+				TreeMap<Integer, TreeMap<Integer, Integer>> x2y2diffValueCnt = new TreeMap<Integer, TreeMap<Integer, Integer>>();
 				for (Integer day : substance2day2x2y2diff.get(substance).keySet()) {
 					TreeMap<Integer, TreeMap<Integer, Double>> x2y2diff = substance2day2x2y2diff.get(substance).get(day);
 					for (Integer x : x2y2diff.keySet()) {
 						if (!x2y2diffSum.containsKey(x))
 							x2y2diffSum.put(x, new TreeMap<Integer, Double>());
+						if (!x2y2diffValueCnt.containsKey(x))
+							x2y2diffValueCnt.put(x, new TreeMap<Integer, Integer>());
 						for (Integer y : x2y2diff.get(x).keySet()) {
 							if (!x2y2diffSum.get(x).containsKey(y))
 								x2y2diffSum.get(x).put(y, 0d);
+							if (!x2y2diffValueCnt.get(x).containsKey(y))
+								x2y2diffValueCnt.get(x).put(y, 0);
 							x2y2diffSum.get(x).put(y, x2y2diffSum.get(x).get(y) + x2y2diff.get(x).get(y));
+							x2y2diffValueCnt.get(x).put(y, x2y2diffValueCnt.get(x).get(y) + 1);
 						}
 					}
 				}
+				
 				html.add("<table border='1'>");
 				int minx = x2y2diffSum.firstKey();
 				int maxx = x2y2diffSum.lastKey();
@@ -204,6 +216,10 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 						maxy = may;
 					for (int y : x2y2diffSum.get(x).keySet()) {
 						double v = x2y2diffSum.get(x).get(y);
+						if (relativeValues) {
+							int n = x2y2diffValueCnt.get(x).get(y);
+							v = 100d * (v / n - 1);
+						}
 						if (v < minval)
 							minval = v;
 						if (v > maxval)
@@ -221,6 +237,10 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 							float green = 0;
 							float blue = 0;
 							double val = x2y2diffSum.get(x).get(y);
+							if (relativeValues) {
+								int n = x2y2diffValueCnt.get(x).get(y);
+								val = 100d * (val / n - 1);
+							}
 							if (val <= 0) {
 								blue = (float) (Math.abs(val) / Math.max(Math.abs(minval), Math.abs(maxval)));
 								red = 1f - blue;
