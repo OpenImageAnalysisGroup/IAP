@@ -85,7 +85,7 @@ public class ActionGenerateFieldInfoFromWeight extends AbstractNavigationAction 
 			int carriersInLane = (Integer) param[2];
 			int lanes = (Integer) param[3];
 			DirectionMode direction = DirectionMode.fromString((String) param[4]);
-			boolean relativeValues = (Boolean) param[4];
+			boolean relativeValues = (Boolean) param[5];
 			status.setCurrentStatusText1("Generate Rank Data");
 			TreeMap<Integer, TreeMap<Long, String>> day2time2plant = new TreeMap<>();
 			boolean resOK = false;
