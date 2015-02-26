@@ -14,12 +14,34 @@ import de.ipk.ag_ba.image.structures.Image;
 public class ChannelProcessing {
 	
 	private final int[] imageAs1dArray;
+	private final float[] floatR, floatG, floatB;
 	private final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLORint;
 	int width;
 	int height;
 	
 	public ChannelProcessing(int[] imageAs1dArray, int width, int height) {
 		this.imageAs1dArray = imageAs1dArray;
+		this.floatR = null;
+		this.floatG = null;
+		this.floatB = null;
+		this.width = width;
+		this.height = height;
+	}
+	
+	public ChannelProcessing(float[] floatR, float[] floatG, float[] floatB, int width, int height, float divistorFor8bitRangeTarget) {
+		this.imageAs1dArray = null;
+		this.floatR = new float[floatR.length];
+		this.floatG = new float[floatG.length];
+		this.floatB = new float[floatB.length];
+		
+		assert floatR.length == floatG.length;
+		assert floatG.length == floatB.length;
+		
+		for (int idx = 0; idx < floatR.length; idx++) {
+			this.floatR[idx] = floatR[idx] / divistorFor8bitRangeTarget;
+			this.floatG[idx] = floatG[idx] / divistorFor8bitRangeTarget;
+			this.floatB[idx] = floatB[idx] / divistorFor8bitRangeTarget;
+		}
 		this.width = width;
 		this.height = height;
 	}
@@ -57,72 +79,127 @@ public class ChannelProcessing {
 	}
 	
 	private ImageOperation getZ() {
-		int[] in = imageAs1dArray;
-		int[] out = new int[in.length];
-		int c, r, g, b;
+		if (imageAs1dArray != null) {
+			int[] in = imageAs1dArray;
+			int[] out = new int[in.length];
+			int c, r, g, b;
+			ColorSpaceConverter cspc = new ColorSpaceConverter();
+			for (int i = 0; i < in.length; i++) {
+				c = in[i];
+				if (c == BACKGROUND_COLORint) {
+					out[i] = BACKGROUND_COLORint;
+					continue;
+				}
+				r = (c & 0xff0000) >> 16;
+				g = (c & 0x00ff00) >> 8;
+				b = c & 0x0000ff;
+				
+				double[] xyz = cspc.RGBtoXYZ(r, g, b);
+				r = (int) (xyz[2] * 2.55);
+				
+				out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
+			}
+			return new Image(width, height, out).io();
+		} else {
+			return getXYZ(Channel.XYZ_Z);
+		}
+	}
+	
+	private ImageOperation getXYZ(Channel c) {
+		float[] out = getXYZfloatArray(c);
+		return new Image(width, height, out).io();
+	}
+	
+	private float[] getXYZfloatArray(Channel c) {
+		float[] out = new float[floatR.length];
+		float r, g, b, res;
 		ColorSpaceConverter cspc = new ColorSpaceConverter();
-		for (int i = 0; i < in.length; i++) {
-			c = in[i];
-			if (c == BACKGROUND_COLORint) {
-				out[i] = BACKGROUND_COLORint;
+		for (int i = 0; i < floatR.length; i++) {
+			r = floatR[i];
+			g = floatG[i];
+			b = floatB[i];
+			if (Float.isNaN(r) || Float.isNaN(g) || Float.isNaN(b)) {
+				out[i] = Float.NaN;
 				continue;
 			}
-			r = (c & 0xff0000) >> 16;
-			g = (c & 0x00ff00) >> 8;
-			b = c & 0x0000ff;
 			
 			double[] xyz = cspc.RGBtoXYZ(r, g, b);
-			r = (int) (xyz[2] * 2.55);
+			int idx = -1;
+			switch (c) {
+				case XYZ_X:
+					idx = 0;
+					break;
+				case XYZ_Y:
+					idx = 1;
+					break;
+				case XYZ_Z:
+					idx = 2;
+					break;
+				default:
+					idx = -1;
+					break;
+			}
 			
-			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
+			res = (float) xyz[idx];
+			
+			out[i] = res;
 		}
-		return new Image(width, height, out).io();
+		return out;
 	}
 	
 	private ImageOperation getY() {
-		int[] in = imageAs1dArray;
-		int[] out = new int[in.length];
-		int c, r, g, b;
-		ColorSpaceConverter cspc = new ColorSpaceConverter();
-		for (int i = 0; i < in.length; i++) {
-			c = in[i];
-			if (c == BACKGROUND_COLORint) {
-				out[i] = BACKGROUND_COLORint;
-				continue;
+		if (imageAs1dArray != null) {
+			int[] in = imageAs1dArray;
+			int[] out = new int[in.length];
+			int c, r, g, b;
+			ColorSpaceConverter cspc = new ColorSpaceConverter();
+			for (int i = 0; i < in.length; i++) {
+				c = in[i];
+				if (c == BACKGROUND_COLORint) {
+					out[i] = BACKGROUND_COLORint;
+					continue;
+				}
+				r = (c & 0xff0000) >> 16;
+				g = (c & 0x00ff00) >> 8;
+				b = c & 0x0000ff;
+				
+				double[] xyz = cspc.RGBtoXYZ(r, g, b);
+				r = (int) (xyz[1] * 2.55);
+				
+				out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
 			}
-			r = (c & 0xff0000) >> 16;
-			g = (c & 0x00ff00) >> 8;
-			b = c & 0x0000ff;
-			
-			double[] xyz = cspc.RGBtoXYZ(r, g, b);
-			r = (int) (xyz[1] * 2.55);
-			
-			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
+			return new Image(width, height, out).io();
+		} else {
+			return getXYZ(Channel.XYZ_Y);
 		}
-		return new Image(width, height, out).io();
+		
 	}
 	
 	private ImageOperation getX() {
-		int[] in = imageAs1dArray;
-		int[] out = new int[in.length];
-		int c, r, g, b;
-		ColorSpaceConverter cspc = new ColorSpaceConverter();
-		for (int i = 0; i < in.length; i++) {
-			c = in[i];
-			if (c == BACKGROUND_COLORint) {
-				out[i] = BACKGROUND_COLORint;
-				continue;
+		if (imageAs1dArray != null) {
+			int[] in = imageAs1dArray;
+			int[] out = new int[in.length];
+			int c, r, g, b;
+			ColorSpaceConverter cspc = new ColorSpaceConverter();
+			for (int i = 0; i < in.length; i++) {
+				c = in[i];
+				if (c == BACKGROUND_COLORint) {
+					out[i] = BACKGROUND_COLORint;
+					continue;
+				}
+				r = (c & 0xff0000) >> 16;
+				g = (c & 0x00ff00) >> 8;
+				b = c & 0x0000ff;
+				
+				double[] xyz = cspc.RGBtoXYZ(r, g, b);
+				r = (int) (xyz[0] * 2.55);
+				
+				out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
 			}
-			r = (c & 0xff0000) >> 16;
-			g = (c & 0x00ff00) >> 8;
-			b = c & 0x0000ff;
-			
-			double[] xyz = cspc.RGBtoXYZ(r, g, b);
-			r = (int) (xyz[0] * 2.55);
-			
-			out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
+			return new Image(width, height, out).io();
+		} else {
+			return getXYZ(Channel.XYZ_X);
 		}
-		return new Image(width, height, out).io();
 	}
 	
 	/**
@@ -194,78 +271,135 @@ public class ChannelProcessing {
 	}
 	
 	public ImageOperation getLabL() {
-		int[] out = new int[imageAs1dArray.length];
-		float[][][] lab = ImageOperation.getLabCubeInstance();
-		for (int px = 0; px < imageAs1dArray.length; px++) {
-			int c = imageAs1dArray[px];
-			if (c == BACKGROUND_COLORint) {
-				out[px] = BACKGROUND_COLORint;
+		if (imageAs1dArray != null) {
+			int[] out = new int[imageAs1dArray.length];
+			float[][][] lab = ImageOperation.getLabCubeInstance();
+			for (int px = 0; px < imageAs1dArray.length; px++) {
+				int c = imageAs1dArray[px];
+				if (c == BACKGROUND_COLORint) {
+					out[px] = BACKGROUND_COLORint;
+					continue;
+				}
+				
+				int r = ((c & 0xff0000) >> 16); // R 0..1
+				int g = ((c & 0x00ff00) >> 8); // G 0..1
+				int b = (c & 0x0000ff); // B 0..1
+				
+				float Li = (int) lab[r][g][b];
+				
+				r = (int) Li;
+				g = r;
+				b = r;
+				
+				out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			}
+			return new ImageOperation(out, width, height);
+		} else {
+			return getLab(Channel.LAB_L);
+		}
+	}
+	
+	private ImageOperation getLab(Channel labC) {
+		return new Image(width, height, getLabFloatArray(labC)).io();
+	}
+	
+	private float[] getLabFloatArray(Channel labC) {
+		float[] x = getXYZfloatArray(Channel.XYZ_X);
+		float[] y = getXYZfloatArray(Channel.XYZ_X);
+		float[] z = getXYZfloatArray(Channel.XYZ_X);
+		
+		float[] out = new float[x.length];
+		float xv, yv, zv, res;
+		ColorSpaceConverter cspc = new ColorSpaceConverter();
+		for (int i = 0; i < x.length; i++) {
+			xv = x[i];
+			yv = y[i];
+			zv = z[i];
+			if (Float.isNaN(xv) || Float.isNaN(yv) || Float.isNaN(zv)) {
+				out[i] = Float.NaN;
 				continue;
 			}
 			
-			int r = ((c & 0xff0000) >> 16); // R 0..1
-			int g = ((c & 0x00ff00) >> 8); // G 0..1
-			int b = (c & 0x0000ff); // B 0..1
+			double[] lab = cspc.XYZtoLAB(xv, yv, zv);
+			int idx = -1;
+			switch (labC) {
+				case LAB_L:
+					idx = 0;
+					break;
+				case LAB_A:
+					idx = 1;
+					break;
+				case LAB_B:
+					idx = 2;
+					break;
+				default:
+					idx = -1;
+					break;
+			}
 			
-			float Li = (int) lab[r][g][b];
+			res = (float) lab[idx];
 			
-			r = (int) Li;
-			g = r;
-			b = r;
-			
-			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			out[i] = res;
 		}
-		return new ImageOperation(out, width, height);
+		return out;
 	}
 	
 	public ImageOperation getLabA() {
-		int[] out = new int[imageAs1dArray.length];
-		float[][][] lab = ImageOperation.getLabCubeInstance();
-		for (int px = 0; px < imageAs1dArray.length; px++) {
-			int c = imageAs1dArray[px];
-			if (c == BACKGROUND_COLORint) {
-				out[px] = BACKGROUND_COLORint;
-				continue;
+		if (imageAs1dArray != null) {
+			int[] out = new int[imageAs1dArray.length];
+			float[][][] lab = ImageOperation.getLabCubeInstance();
+			for (int px = 0; px < imageAs1dArray.length; px++) {
+				int c = imageAs1dArray[px];
+				if (c == BACKGROUND_COLORint) {
+					out[px] = BACKGROUND_COLORint;
+					continue;
+				}
+				
+				int r = ((c & 0xff0000) >> 16); // R 0..1
+				int g = ((c & 0x00ff00) >> 8); // G 0..1
+				int b = (c & 0x0000ff); // B 0..1
+				
+				float ai = lab[r][g][b + 256];
+				
+				r = (int) ai;
+				g = r;
+				b = r;
+				
+				out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 			}
-			
-			int r = ((c & 0xff0000) >> 16); // R 0..1
-			int g = ((c & 0x00ff00) >> 8); // G 0..1
-			int b = (c & 0x0000ff); // B 0..1
-			
-			float ai = (int) lab[r][g][b + 256];
-			
-			r = (int) ai;
-			g = r;
-			b = r;
-			
-			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			return new ImageOperation(out, width, height);
+		} else {
+			return getLab(Channel.LAB_A);
 		}
-		return new ImageOperation(out, width, height);
 	}
 	
 	public ImageOperation getLabB() {
-		int[] out = new int[imageAs1dArray.length];
-		float[][][] lab = ImageOperation.getLabCubeInstance();
-		for (int px = 0; px < imageAs1dArray.length; px++) {
-			int c = imageAs1dArray[px];
-			if (c == BACKGROUND_COLORint) {
-				out[px] = BACKGROUND_COLORint;
-				continue;
+		if (imageAs1dArray != null) {
+			int[] out = new int[imageAs1dArray.length];
+			float[][][] lab = ImageOperation.getLabCubeInstance();
+			for (int px = 0; px < imageAs1dArray.length; px++) {
+				int c = imageAs1dArray[px];
+				if (c == BACKGROUND_COLORint) {
+					out[px] = BACKGROUND_COLORint;
+					continue;
+				}
+				
+				int r = ((c & 0xff0000) >> 16); // R 0..1
+				int g = ((c & 0x00ff00) >> 8); // G 0..1
+				int b = (c & 0x0000ff); // B 0..1
+				
+				float bi = (int) lab[r][g][b + 512];
+				
+				r = (int) bi;
+				g = r;
+				b = r;
+				
+				out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 			}
-			
-			int r = ((c & 0xff0000) >> 16); // R 0..1
-			int g = ((c & 0x00ff00) >> 8); // G 0..1
-			int b = (c & 0x0000ff); // B 0..1
-			
-			float bi = (int) lab[r][g][b + 512];
-			
-			r = (int) bi;
-			g = r;
-			b = r;
-			
-			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			return new ImageOperation(out, width, height);
+		} else {
+			return getLab(Channel.LAB_B);
 		}
-		return new ImageOperation(out, width, height);
 	}
 	
 	public float[][] getLAB() {
@@ -290,29 +424,70 @@ public class ChannelProcessing {
 	}
 	
 	public ImageOperation getH() {
-		int[] out = new int[imageAs1dArray.length];
+		if (imageAs1dArray != null) {
+			int[] out = new int[imageAs1dArray.length];
+			float[] hsv = new float[3];
+			for (int px = 0; px < imageAs1dArray.length; px++) {
+				int c = imageAs1dArray[px];
+				if (c == BACKGROUND_COLORint) {
+					out[px] = BACKGROUND_COLORint;
+					continue;
+				}
+				
+				int r = ((c & 0xff0000) >> 16); // R 0..1
+				int g = ((c & 0x00ff00) >> 8); // G 0..1
+				int b = (c & 0x0000ff); // B 0..1
+				
+				Color.RGBtoHSB(r, g, b, hsv);
+				
+				float h = hsv[0];
+				r = (int) (h * 255);
+				g = r;
+				b = r;
+				
+				out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			}
+			return new ImageOperation(out, width, height);
+		} else {
+			return getHSV(Channel.HSV_H);
+		}
+	}
+	
+	private ImageOperation getHSV(Channel c) {
+		return new Image(width, height, getHSVarray(c)).io();
+	}
+	
+	private float[] getHSVarray(Channel c) {
+		float[] out = new float[floatR.length];
 		float[] hsv = new float[3];
 		for (int px = 0; px < imageAs1dArray.length; px++) {
-			int c = imageAs1dArray[px];
-			if (c == BACKGROUND_COLORint) {
-				out[px] = BACKGROUND_COLORint;
+			float rv = floatR[px];
+			float gv = floatR[px];
+			float bv = floatR[px];
+			if (Float.isNaN(rv) || Float.isNaN(gv) || Float.isNaN(bv)) {
+				out[px] = Float.NaN;
 				continue;
 			}
 			
-			int r = ((c & 0xff0000) >> 16); // R 0..1
-			int g = ((c & 0x00ff00) >> 8); // G 0..1
-			int b = (c & 0x0000ff); // B 0..1
-			
-			Color.RGBtoHSB(r, g, b, hsv);
-			
-			float h = hsv[0];
-			r = (int) (h * 255);
-			g = r;
-			b = r;
-			
-			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			ColorFloatRGB.RGBtoHSB(rv, gv, bv, hsv);
+			int idx;
+			switch (c) {
+				case HSV_H:
+					idx = 0;
+					break;
+				case HSV_S:
+					idx = 1;
+					break;
+				case HSV_V:
+					idx = 2;
+					break;
+				default:
+					idx = -1;
+					break;
+			}
+			out[px] = hsv[idx];
 		}
-		return new ImageOperation(out, width, height);
+		return out;
 	}
 	
 	public ImageOperation getS() {

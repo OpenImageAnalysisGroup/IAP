@@ -241,13 +241,26 @@ public class ColorSpaceConverter {
 	 * @return XYZ in double array.
 	 */
 	public double[] RGBtoXYZ(int R, int G, int B) {
-		double[] result = new double[3];
 		
 		// convert 0..255 into 0..1
 		double r = R / 255.0;
 		double g = G / 255.0;
 		double b = B / 255.0;
 		
+		return RGBtoXYZ(r, g, b);
+	}
+	
+	/**
+	 * @param r
+	 *           0..1
+	 * @param g
+	 *           0..1
+	 * @param b
+	 *           0..1
+	 * @return XYZ in double array.
+	 */
+	public double[] RGBtoXYZ(double r, double g, double b) {
+		double[] result = new double[3];
 		// assume sRGB
 		if (r <= 0.04045) {
 			r = r / 12.92;
