@@ -197,6 +197,14 @@ public class Image {
 		this(new ImagePlus("from 1d array", new ColorProcessor(w, h, image)));
 	}
 	
+	public Image(int w, int h, float[] image) {
+		this(new ImagePlus("from 1d float array", new FloatProcessor(w, h, image)));
+	}
+	
+	public Image(int w, int h, double[] image) {
+		this(new ImagePlus("from 1d double array", new FloatProcessor(w, h, image)));
+	}
+	
 	public Image(int[][] img) {
 		this(new ImagePlus("from 1d array",
 				new ColorProcessor(img.length, img[0].length, ArrayUtil.get1d(img))));
@@ -736,5 +744,9 @@ public class Image {
 	private String getPNGstreamData() throws IOException {
 		String streamData = getAsPNGstream().toString();
 		return "image/png;charset=utf-8;base64," + streamData;
+	}
+	
+	public float[] getAs1float() {
+		return (float[]) ((FloatProcessor) image.getProcessor()).getPixels();
 	}
 }
