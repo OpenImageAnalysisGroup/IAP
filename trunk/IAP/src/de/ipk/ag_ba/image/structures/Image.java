@@ -12,6 +12,7 @@ import ij.io.Opener;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
+import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 
 import java.awt.Graphics;
@@ -590,7 +591,15 @@ public class Image {
 		if (fileName.toLowerCase().endsWith(".jpg") || fileName.toLowerCase().endsWith(".jpeg"))
 			io().saveImage(null).saveAsJpeg(fileName);
 		else
-			io().saveImage(null).saveAsPng(fileName);
+			if (fileName.toLowerCase().endsWith(".tif") || fileName.toLowerCase().endsWith(".tiff"))
+			{
+				ImagePlus ip = io().getImageAsImagePlus();
+				ImageConverter ic = new ImageConverter(ip);
+				ic.convertToGray16();
+				new ImageOperation(ip).saveImage(null).saveAsTiff(fileName);
+			}
+			else
+				io().saveImage(null).saveAsPng(fileName);
 		return this;
 	}
 	
