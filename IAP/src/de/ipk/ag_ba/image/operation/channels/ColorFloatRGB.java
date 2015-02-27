@@ -26,11 +26,11 @@ public class ColorFloatRGB {
 			cmin = b;
 		
 		brightness = (cmax) / 255.0f;
-		if (cmax != 0)
+		if (cmax >= 0.1)
 			saturation = (cmax - cmin) / (cmax);
 		else
 			saturation = 0;
-		if (saturation == 0)
+		if (saturation < 0.1)
 			hue = 0;
 		else {
 			float redc = (cmax - r) / (cmax - cmin);
@@ -48,6 +48,8 @@ public class ColorFloatRGB {
 				hue = hue + 1.0f;
 		}
 		hsbvals[0] = hue;
+		if (saturation > 2)
+			System.out.println(saturation);
 		hsbvals[1] = saturation;
 		hsbvals[2] = brightness;
 		return hsbvals;

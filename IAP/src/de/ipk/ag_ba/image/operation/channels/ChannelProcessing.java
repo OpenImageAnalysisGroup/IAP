@@ -118,12 +118,12 @@ public class ChannelProcessing {
 			r = floatR[i];
 			g = floatG[i];
 			b = floatB[i];
-			if (Float.isNaN(r) || Float.isNaN(g) || Float.isNaN(b)) {
-				out[i] = Float.NaN;
+			if (r == Float.MAX_VALUE || g == Float.MAX_VALUE || b == Float.MAX_VALUE) {
+				out[i] = Float.MAX_VALUE;
 				continue;
 			}
 			
-			double[] xyz = cspc.RGBtoXYZ(r, g, b);
+			double[] xyz = cspc.RGBtoXYZ(r / 255d, g / 255d, b / 255d);
 			int idx = -1;
 			switch (c) {
 				case XYZ_X:
@@ -305,8 +305,8 @@ public class ChannelProcessing {
 	
 	private float[] getLabFloatArray(Channel labC) {
 		float[] x = getXYZfloatArray(Channel.XYZ_X);
-		float[] y = getXYZfloatArray(Channel.XYZ_X);
-		float[] z = getXYZfloatArray(Channel.XYZ_X);
+		float[] y = getXYZfloatArray(Channel.XYZ_Y);
+		float[] z = getXYZfloatArray(Channel.XYZ_Z);
 		
 		float[] out = new float[x.length];
 		float xv, yv, zv, res;
@@ -315,8 +315,8 @@ public class ChannelProcessing {
 			xv = x[i];
 			yv = y[i];
 			zv = z[i];
-			if (Float.isNaN(xv) || Float.isNaN(yv) || Float.isNaN(zv)) {
-				out[i] = Float.NaN;
+			if (xv == Float.MAX_VALUE || yv == Float.MAX_VALUE || zv == Float.MAX_VALUE) {
+				out[i] = Float.MAX_VALUE;
 				continue;
 			}
 			
@@ -460,12 +460,12 @@ public class ChannelProcessing {
 	private float[] getHSVarray(Channel c) {
 		float[] out = new float[floatR.length];
 		float[] hsv = new float[3];
-		for (int px = 0; px < imageAs1dArray.length; px++) {
+		for (int px = 0; px < floatR.length; px++) {
 			float rv = floatR[px];
-			float gv = floatR[px];
-			float bv = floatR[px];
-			if (Float.isNaN(rv) || Float.isNaN(gv) || Float.isNaN(bv)) {
-				out[px] = Float.NaN;
+			float gv = floatG[px];
+			float bv = floatB[px];
+			if (rv == Float.MAX_VALUE || gv == Float.MAX_VALUE || bv == Float.MAX_VALUE) {
+				out[px] = Float.MAX_VALUE;
 				continue;
 			}
 			
@@ -491,55 +491,63 @@ public class ChannelProcessing {
 	}
 	
 	public ImageOperation getS() {
-		int[] out = new int[imageAs1dArray.length];
-		float[] hsv = new float[3];
-		for (int px = 0; px < imageAs1dArray.length; px++) {
-			int c = imageAs1dArray[px];
-			if (c == BACKGROUND_COLORint) {
-				out[px] = BACKGROUND_COLORint;
-				continue;
+		if (imageAs1dArray != null) {
+			int[] out = new int[imageAs1dArray.length];
+			float[] hsv = new float[3];
+			for (int px = 0; px < imageAs1dArray.length; px++) {
+				int c = imageAs1dArray[px];
+				if (c == BACKGROUND_COLORint) {
+					out[px] = BACKGROUND_COLORint;
+					continue;
+				}
+				
+				int r = ((c & 0xff0000) >> 16); // R 0..1
+				int g = ((c & 0x00ff00) >> 8); // G 0..1
+				int b = (c & 0x0000ff); // B 0..1
+				
+				Color.RGBtoHSB(r, g, b, hsv);
+				
+				float s = hsv[1];
+				r = (int) (s * 255);
+				g = r;
+				b = r;
+				
+				out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 			}
-			
-			int r = ((c & 0xff0000) >> 16); // R 0..1
-			int g = ((c & 0x00ff00) >> 8); // G 0..1
-			int b = (c & 0x0000ff); // B 0..1
-			
-			Color.RGBtoHSB(r, g, b, hsv);
-			
-			float s = hsv[1];
-			r = (int) (s * 255);
-			g = r;
-			b = r;
-			
-			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			return new ImageOperation(out, width, height);
+		} else {
+			return getHSV(Channel.HSV_S);
 		}
-		return new ImageOperation(out, width, height);
 	}
 	
 	public ImageOperation getV() {
-		int[] out = new int[imageAs1dArray.length];
-		float[] hsv = new float[3];
-		for (int px = 0; px < imageAs1dArray.length; px++) {
-			int c = imageAs1dArray[px];
-			if (c == BACKGROUND_COLORint) {
-				out[px] = BACKGROUND_COLORint;
-				continue;
+		if (imageAs1dArray != null) {
+			int[] out = new int[imageAs1dArray.length];
+			float[] hsv = new float[3];
+			for (int px = 0; px < imageAs1dArray.length; px++) {
+				int c = imageAs1dArray[px];
+				if (c == BACKGROUND_COLORint) {
+					out[px] = BACKGROUND_COLORint;
+					continue;
+				}
+				
+				int r = ((c & 0xff0000) >> 16); // R 0..1
+				int g = ((c & 0x00ff00) >> 8); // G 0..1
+				int b = (c & 0x0000ff); // B 0..1
+				
+				Color.RGBtoHSB(r, g, b, hsv);
+				
+				float v = hsv[2];
+				r = (int) (v * 255);
+				g = r;
+				b = r;
+				
+				out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 			}
-			
-			int r = ((c & 0xff0000) >> 16); // R 0..1
-			int g = ((c & 0x00ff00) >> 8); // G 0..1
-			int b = (c & 0x0000ff); // B 0..1
-			
-			Color.RGBtoHSB(r, g, b, hsv);
-			
-			float v = hsv[2];
-			r = (int) (v * 255);
-			g = r;
-			b = r;
-			
-			out[px] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+			return new ImageOperation(out, width, height);
+		} else {
+			return getHSV(Channel.HSV_V);
 		}
-		return new ImageOperation(out, width, height);
 	}
 	
 	public float[][] getHSV() {
@@ -557,6 +565,43 @@ public class ChannelProcessing {
 			res[0][px] = hsv[0];
 			res[1][px] = hsv[1];
 			res[2][px] = hsv[2];
+		}
+		return res;
+	}
+	
+	public int[] getGrayImageAs1dArray() {
+		int[] img1d = imageAs1dArray;
+		int c, r = 0;
+		int[] res = new int[width * height];
+		
+		for (int idx = 0; idx < img1d.length; idx++) {
+			c = img1d[idx];
+			r = ((c & 0xff0000) >> 16);
+			
+			// if (c == ImageOperation.BACKGROUND_COLORint)
+			// res[idx] = c;
+			// else
+			res[idx] = r;
+		}
+		return res;
+	}
+	
+	public static int[][] getGrayImageAs2dArray(Image grayImage) {
+		int[] img1d = grayImage.getAs1A();
+		int c, r, y = 0;
+		int w = grayImage.getWidth();
+		int h = grayImage.getHeight();
+		int[][] res = new int[w][h];
+		
+		for (int idx = 0; idx < img1d.length; idx++) {
+			c = img1d[idx];
+			r = ((c & 0xff0000) >> 16);
+			if (idx % w == 0 && idx > 0)
+				y++;
+			if (c == ImageOperation.BACKGROUND_COLORint)
+				res[idx % w][y] = c;
+			else
+				res[idx % w][y] = r;
 		}
 		return res;
 	}
