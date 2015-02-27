@@ -100,26 +100,29 @@ public class Image {
 			img = url2image.get(url + "");
 		}
 		if (img == null) {
-			BufferedImage inpimg;
 			InputStream is = url.getInputStream();
 			if (is == null)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
+			ImagePlus inpimg;
 			try {
 				if (".tiff".equalsIgnoreCase(url.getFileNameExtension()) || ".tif".equalsIgnoreCase(url.getFileNameExtension())) {
-					inpimg = new Opener().openTiff(is, url.getFileName()).getBufferedImage();
+					inpimg = new Opener().openTiff(is, url.getFileName());
 				} else
-					inpimg = ImageIO.read(is);
+					inpimg = new ImagePlus(url.toString(), new ColorProcessor(ImageIO.read(is)));
 			} finally {
 				is.close();
 			}
 			if (inpimg == null)
 				throw new Exception("Image could not be read: " + url);
 			try {
-				image = processTransparency(url.getFileName(), inpimg);
+				if (inpimg.getType() == ImageType.COLOR_256.depth)
+					image = processTransparency(url.getFileName(), inpimg.getBufferedImage());
+				else
+					image = inpimg;
 			} catch (Exception e) {
 				System.out
 						.println(SystemAnalysis.getCurrentTime() + ">WARNING: Quick-load didn't work correctly, revert to save-conversion. Error: " + e.getMessage());
-				image = new ImagePlus(url.getFileName(), new ColorProcessor(inpimg));
+				image = inpimg;
 			}
 			synchronized (url2image) {
 				w = image.getWidth();
@@ -606,12 +609,36 @@ public class Image {
 			if (fileName.toLowerCase().endsWith(".tif") || fileName.toLowerCase().endsWith(".tiff"))
 			{
 				ImagePlus ip = io().getImageAsImagePlus();
-				ImageConverter ic = new ImageConverter(ip);
-				ic.convertToGray16();
+				// ImageConverter ic = new ImageConverter(ip);
+				// ic.convertToGray16();
 				new ImageOperation(ip).saveImage(null).saveAsTiff(fileName);
 			}
 			else
 				io().saveImage(null).saveAsPng(fileName);
+		return this;
+	}
+	
+	public Image saveToFile(String fileName, ImageType type) {
+		
+		if (fileName.toLowerCase().endsWith(".tif") || fileName.toLowerCase().endsWith(".tiff"))
+		{
+			ImagePlus ip = io().getImageAsImagePlus();
+			ImageConverter ic = new ImageConverter(ip);
+			
+			switch (type) {
+				case GRAY16:
+					ic.convertToGray16();
+					break;
+				case GRAY32:
+					ic.convertToGray32();
+					break;
+				default:
+					throw new RuntimeException("Format not supported.");
+			}
+			new ImageOperation(ip).saveImage(null).saveAsTiff(fileName);
+		}
+		else
+			throw new RuntimeException("Format not supported.");
 		return this;
 	}
 	
@@ -751,6 +778,15 @@ public class Image {
 	}
 	
 	public float[] getAs1float() {
+		if (image.getProcessor() instanceof ColorProcessor) {
+			int[] arr = io().channels().getGrayImageAs1dArray();
+			float[] res = new float[arr.length];
+			int idx = 0;
+			for (int i : arr)
+				res[idx++] = i;
+			
+			return res;
+		}
 		return (float[]) ((FloatProcessor) image.getProcessor()).getPixels();
 	}
 }

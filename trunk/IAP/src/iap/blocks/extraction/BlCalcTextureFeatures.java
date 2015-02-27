@@ -26,6 +26,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.ImageTexture;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.channels.Channel;
+import de.ipk.ag_ba.image.operation.channels.ChannelProcessing;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
@@ -88,17 +89,17 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			for (Channel c : Channel.values()) {
 				ImageOperation ch_img = img.io().channels().get(c);
 				if (calculationMode == TextureCalculationMode.WHOLE_IMAGE) {
-					calcTextureForImage(new ImageOperation(getGrayImageAs2dArray(ch_img.getImage())), c, ct, cp, imageRef);
+					calcTextureForImage(new ImageOperation(ChannelProcessing.getGrayImageAs2dArray(ch_img.getImage())), c, ct, cp, imageRef);
 				}
 				if (calculationMode == TextureCalculationMode.SKELETON && skel != null) {
 					ImageOperation dist = ch_img.bm().edmFloatClipped().show("distance clipped", debugValues);
 					Image mapped = dist.applyMask(skel).getImage().show("mapped", debugValues);
 					ArrayList<PositionAndColor> mappedCoordinates = mapped.io().getForegroundCoordinatesAndIntensities();
-					calcTextureForSkeleton(mappedCoordinates, new ImageOperation(getGrayImageAs2dArray(ch_img.getImage())), mapped.io(), c,
+					calcTextureForSkeleton(mappedCoordinates, new ImageOperation(ChannelProcessing.getGrayImageAs2dArray(ch_img.getImage())), mapped.io(), c,
 							ct, cp, imageRef);
 				}
 				if (calculationMode == TextureCalculationMode.VISUALIZE) {
-					calcTextureForVizualization(new ImageOperation(getGrayImageAs2dArray(ch_img.crop().resize(0.1).getImage())), masksize, c, ct);
+					calcTextureForVizualization(new ImageOperation(ChannelProcessing.getGrayImageAs2dArray(ch_img.crop().resize(0.1).getImage())), masksize, c, ct);
 				}
 			}
 		}
@@ -350,26 +351,6 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			val = (255 * ((img[idx] - min) / (max - min)));
 			val = (Math.sqrt(val / 255d) * 255d);
 			res[idx] = val;
-		}
-		return res;
-	}
-	
-	private static int[][] getGrayImageAs2dArray(Image grayImage) {
-		int[] img1d = grayImage.getAs1A();
-		int c, r, y = 0;
-		int w = grayImage.getWidth();
-		int h = grayImage.getHeight();
-		int[][] res = new int[w][h];
-		
-		for (int idx = 0; idx < img1d.length; idx++) {
-			c = img1d[idx];
-			r = ((c & 0xff0000) >> 16);
-			if (idx % w == 0 && idx > 0)
-				y++;
-			if (c == ImageOperation.BACKGROUND_COLORint)
-				res[idx % w][y] = c;
-			else
-				res[idx % w][y] = r;
 		}
 		return res;
 	}
