@@ -911,7 +911,7 @@ public class SkeletonGraph {
 					ImageCanvas canv = in.io().canvas();
 					try {
 						double wi = nh.getEdges().iterator().next().getDouble("w_median");
-						double limb_len = nh.getEdges().iterator().next().getDouble("len") / 2;
+						double limb_len = nh.getEdges().iterator().next().getDouble("iap" + Attribute.SEPARATOR + "len") / 2;
 						// limb_len += wi * 2;
 						canv.text((int) (p.getX() / 2 + 18), (int) (p.getY() / 2) + 18, "w="
 								+ StringManipulationTools.formatNumber(wi, 1) + ",L=" + (int) limb_len, Color.GRAY);
