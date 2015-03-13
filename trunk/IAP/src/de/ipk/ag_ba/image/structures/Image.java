@@ -127,7 +127,8 @@ public class Image {
 			synchronized (url2image) {
 				w = image.getWidth();
 				h = image.getHeight();
-				url2image.put(url + "", this.copy());
+				if (inpimg.getType() == ImageType.COLOR_256.depth)
+					url2image.put(url + "", this.copy());
 			}
 		} else {
 			image = img.copy().getAsImagePlus();

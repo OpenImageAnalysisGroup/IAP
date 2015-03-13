@@ -107,10 +107,13 @@ public class ImageStack implements Iterable<ImageProcessor> {
 		fs.saveAsTiffStack(file.getPath());
 	}
 	
-	public void saveAsSeparateImages(File file) {
+	public void saveAsSeparateImages(File file, String prefix) {
 		for (int i = 0; i < stack.getSize(); i++) {
 			FileSaver fs = new FileSaver(this.getImage(i).getAsImagePlus());
-			String path = file.getPath() + "/stack_" + i + ".tif";
+			String is = i + "";
+			while (is.length() < 3)
+				is = "0" + is;
+			String path = file.getPath() + "/" + prefix + is + ".tif";
 			fs.saveAsTiff(path);
 		}
 	}
