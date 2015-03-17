@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="build/|javadoc/|.classpath|.project|create_javadoc.xml|jarfile.jardesc|MANIFEST.MF|graffiti_core.jar" kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="src" path="/Graffiti_lib"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/ini4j-0.5.2.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/jdom.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/soap.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-compress-1.8.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

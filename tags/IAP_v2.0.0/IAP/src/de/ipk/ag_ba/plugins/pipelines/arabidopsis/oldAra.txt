@@ -1,0 +1,73 @@
+import iap.blocks.acquisition.BlLoadImages;
+import iap.blocks.extraction.BlCalcColorHistograms;
+import iap.blocks.extraction.BlCalcConvexHull;
+import iap.blocks.extraction.BlCalcMainAxis;
+import iap.blocks.extraction.BlCalcWidthAndHeight;
+import iap.blocks.extraction.BlSkeletonizeNir;
+import iap.blocks.postprocessing.BlDrawSkeleton;
+import iap.blocks.postprocessing.BlHighlightNullResults;
+import iap.blocks.postprocessing.BlMoveMasksToImageSet;
+import iap.blocks.postprocessing.BlRunPostProcessors;
+import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
+import iap.blocks.preprocessing.BlColorBalanceVerticalNir;
+import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
+import iap.blocks.segmentation.BlAdaptiveThresholdNir;
+import iap.blocks.segmentation.BlIntensityCalculationFluo;
+import iap.blocks.segmentation.BlLabFilter;
+import iap.blocks.segmentation.BlRemoveBackground;
+import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
+import iap.blocks.unused.BlClearMasks_Arabidops;
+import iap.blocks.unused.BlColorBalanceCircularVisNir;
+import iap.blocks.unused.BlCopyImagesApplyMask;
+import iap.blocks.unused.BlCrop;
+import iap.blocks.unused.BlLoadImagesIfNeeded;
+import iap.blocks.unused.BlMedianFilter;
+import iap.blocks.unused.BlMedianFilterVisDepr;
+import iap.blocks.unused.BlSmoothShape;
+import iap.blocks.unused.BlUseFluoMaskToClearOtherImages;
+import iap.blocks.unused.BlUseVisMaskToClearFluo_fluo;
+import iap.blocks.unused.BlockClearNirPotFromNir;
+import iap.blocks.unused.BlockSkeletonize_Arabidopsis;
+
+	BlLoadImages.class.getCanonicalName(),
+				BlLoadImagesIfNeeded.class.getCanonicalName(),
+				BlColorBalanceVerticalFluo.class.getCanonicalName(),
+				BlClearMasks_Arabidops.class.getCanonicalName(),
+				BlColorBalanceVerticalVis.class.getCanonicalName(),
+				BlColorBalanceVerticalNir.class.getCanonicalName(),
+				BlColorBalanceCircularVisNir.class.getCanonicalName(),
+				BlColorBalanceVerticalNir.class.getCanonicalName(),
+				BlColorBalanceVerticalFluo.class.getCanonicalName(),
+				BlRemoveBackground.class.getCanonicalName(),
+				BlLabFilter.class.getCanonicalName(),
+				BlMedianFilterVisDepr.class.getCanonicalName(),
+				BlIntensityCalculationFluo.class.getCanonicalName(),
+				BlockClearNirPotFromNir.class.getCanonicalName(),
+				BlMedianFilter.class.getCanonicalName(),
+				BlRemoveSmallObjectsVisFluo.class.getCanonicalName(),
+				BlUseVisMaskToClearFluo_fluo.class.getCanonicalName(),
+				BlUseFluoMaskToClearOtherImages.class.getCanonicalName(),
+				
+				BlSmoothShape.class.getCanonicalName(),
+				
+				BlMedianFilterVisDepr.class.getCanonicalName(),
+				BlMedianFilterVisDepr.class.getCanonicalName(),
+				BlAdaptiveThresholdNir.class.getCanonicalName(),
+				BlSkeletonizeNir.class.getCanonicalName(),
+				BlCopyImagesApplyMask.class.getCanonicalName(),
+				
+				BlockSkeletonize_Arabidopsis.class.getCanonicalName(),
+				
+				// calculation of numeric values
+				BlCalcMainAxis.class.getCanonicalName(),
+				BlCalcWidthAndHeight.class.getCanonicalName(),
+				BlCalcColorHistograms.class.getCanonicalName(),
+				BlCalcConvexHull.class.getCanonicalName(),
+				// postprocessing
+				BlRunPostProcessors.class.getCanonicalName(),
+				
+				BlDrawSkeleton.class.getCanonicalName(),
+				
+				BlMoveMasksToImageSet.class.getCanonicalName(),
+				BlCrop.class.getCanonicalName(),
+				BlHighlightNullResults.class.getCanonicalName()
