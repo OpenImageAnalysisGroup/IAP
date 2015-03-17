@@ -136,7 +136,7 @@ public class MenuItemInfoDialog
 				boolean ext = true;
 				if (ext) {
 					// AttributeHelper.showInBrowser("http://vanted.ipk-gatersleben.de/index.php?file=doc139.html");
-					AttributeHelper.showInBrowser("http://iap.ipk-gatersleben.de/");
+					AttributeHelper.showInBrowser("http://iapg2p.sourceforge.net/");
 					return;
 				}
 				JFrame w = new JFrame("Release Information");
@@ -148,7 +148,7 @@ public class MenuItemInfoDialog
 				w.setLayout(new TableLayout(size));
 				// http://vanted/index.php?file=doc139.html
 				// http://pgrc-16.ipk-gatersleben.de/~klukas/expdat/gravisto/release.html
-				w.add(getWebPane("http://iap.ipk-gatersleben.de"),
+				w.add(getWebPane("http://iapg2p.sourceforge.net"),
 						// getWebPane("http://vanted.ipk-gatersleben.de/index.php?file=doc139.html"),
 						"1,1");
 				w.setSize(640, 480);

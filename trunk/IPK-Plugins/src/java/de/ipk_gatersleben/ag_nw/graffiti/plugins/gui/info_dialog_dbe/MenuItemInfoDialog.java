@@ -365,7 +365,7 @@ public class MenuItemInfoDialog
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String url = "http://iap.ipk-gatersleben.de";
+				String url = "http://iapg2p.sourceforge.net";
 				// "http://pgrc-16.ipk-gatersleben.de/~klukas/expdat/gravisto/demo/demos.html";
 				AttributeHelper.showInBrowser(url);
 				// JFrame w = new JFrame("Help / Tutorial");
@@ -391,7 +391,7 @@ public class MenuItemInfoDialog
 				boolean ext = true;
 				if (ext) {
 					// AttributeHelper.showInBrowser("http://vanted.ipk-gatersleben.de/index.php?file=doc139.html");
-					AttributeHelper.showInBrowser("http://iap.ipk-gatersleben.de");
+					AttributeHelper.showInBrowser("http://iapg2p.sourceforge.net");
 					return;
 				}
 				JFrame w = new JFrame("Release Information");
@@ -405,7 +405,7 @@ public class MenuItemInfoDialog
 				// http://pgrc-16.ipk-gatersleben.de/~klukas/expdat/gravisto/release.html
 				w.add(
 						// getWebPane("http://vanted.ipk-gatersleben.de/index.php?file=doc139.html"),
-						getWebPane("http://iap.ipk-gatersleben.de"),
+						getWebPane("http://iapg2p.sourceforge.net"),
 						"1,1");
 				w.setSize(640, 480);
 				w.setVisible(true);
@@ -416,7 +416,7 @@ public class MenuItemInfoDialog
 		feedback.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AttributeHelper.showInBrowser("mailto:klukas@ipk-gatersleben.de?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + "%20feedback");
+				AttributeHelper.showInBrowser("mailto:christian.klukas@gmail.de?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + "%20feedback");
 			}
 		});
 		
@@ -579,7 +579,7 @@ public class MenuItemInfoDialog
 								"If you have general suggestions for improvement, use the Send feedback command<br>" +
 								"from the Help menu!",
 								"Information");
-						AttributeHelper.showInBrowser("mailto:klukas@ipk-gatersleben.de?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT +
+						AttributeHelper.showInBrowser("mailto:christian.klukas@gmail.com?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT +
 								"%20errorlog&body=" + errorLogShort.toString());
 					}
 				} else {
