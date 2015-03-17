@@ -26,7 +26,7 @@ public class ActionFeedback extends AbstractNavigationAction {
 		ll.add("<html><h2><font face=\"Sans,Tohama,Arial\">Feedback</font></h2>" +
 				"<font face=\"Sans,Tohama,Arial\">Thank you very much for using IAP!<br><br>" +
 				"If you have any question, don't hesitate to send an E-mail to " +
-				"<a href=\"mailto:klukas@ipk-gatersleben.de\">klukas@ipk-gatersleben.de</a>.<br><br>" +
+				"<a href=\"mailto:christian.klukas@gmail.com\">christian.klukas@gmail.com</a>.<br><br>" +
 				"</font>");
 		// AttributeHelper.showInBrowser("mailto:klukas@ipk-gatersleben.de?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + "%20feedback");
 		
@@ -44,7 +44,6 @@ public class ActionFeedback extends AbstractNavigationAction {
 		return "img/ext/gpl2/Gnome-Emblem-Mail-64.png";
 	}
 	
-
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		return currentSet;

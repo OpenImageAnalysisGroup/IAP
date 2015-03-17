@@ -47,7 +47,7 @@ public class ActionAddOnManager extends AbstractNavigationAction {
 				"Add-ons may bundle additional libraries.<br>" +
 				"<br>" +
 				"If you would like to develop a custom extension, consult the developer documentation (" +
-				"<a href=\"http://iap.ipk-gatersleben.de/#development\">link</a>).</font>");
+				"<a href=\"http://iapg2p.sourceforge.net/#development\">link</a>).</font>");
 		
 		MainPanelComponent mp = new MainPanelComponent(ll);
 		return mp;
@@ -62,7 +62,6 @@ public class ActionAddOnManager extends AbstractNavigationAction {
 	public String getDefaultImage() {
 		return "img/addon-icon2.png";
 	}
-	
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {

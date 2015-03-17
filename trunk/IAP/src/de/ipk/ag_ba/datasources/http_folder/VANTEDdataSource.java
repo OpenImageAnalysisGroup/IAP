@@ -31,7 +31,7 @@ public class VANTEDdataSource extends HTTPfolderSource {
 	public VANTEDdataSource(DataSourceGroup dsg) {
 		super(dsg, getLibrary(),
 				VANTED,
-				"http://iap.ipk-gatersleben.de/examplefiles/",
+				"http://iapg2p.sourceforge.net/examplefiles/",
 				new String[] { ".gml", ".graphml" },
 				IAPmain.loadIcon("img/vanted1_0_doku.png"), // vanted1_0.png"),
 				IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()),
@@ -113,10 +113,10 @@ public class VANTEDdataSource extends HTTPfolderSource {
 	
 	private static Library getLibrary() {
 		Library liblVANTED = new Library();
-		liblVANTED.add(new Book(VANTED, "Website", new IOurl("http://iap.ipk-gatersleben.de/")));
-		liblVANTED.add(new Book(VANTED, "Source Code", new IOurl("http://iap.ipk-gatersleben.de/#development")));
+		liblVANTED.add(new Book(VANTED, "Website", new IOurl("http://iapg2p.sourceforge.net/")));
+		liblVANTED.add(new Book(VANTED, "Source Code", new IOurl("http://iapg2p.sourceforge.net/#development")));
 		// liblVANTED.add(new Book(VANTED, "Add-ons", new IOurl("http://vanted.ipk-gatersleben.de/#ui-tabs-11")));
-		liblVANTED.add(new Book(VANTED, "Lit. References", new IOurl("http://iap.ipk-gatersleben.de/#about")));
+		liblVANTED.add(new Book(VANTED, "Lit. References", new IOurl("http://iapg2p.sourceforge.net/#about")));
 		return liblVANTED;
 	}
 	
