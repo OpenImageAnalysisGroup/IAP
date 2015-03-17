@@ -79,7 +79,7 @@ public class RSSFeedManager implements HelperClass {
 		String url1 = "http://sourceforge.net/p/iapg2p/blog/feed"; // + urlSeparator + "http://kgml-ed.ipk-gatersleben.de/KGML-ED/Notes/rss.xml";
 		if (text.indexOf(url1) <= 0)
 			text = "Development News" + System.getProperty("line.separator") + url1 + System.getProperty("line.separator");
-		String url3 = "http://iap.ipk-gatersleben.de/literature.xml";
+		String url3 = "http://iapg2p.sourceforge.net/literature.xml";
 		if (text.indexOf(url3) <= 0)
 			text += "Publications" + System.getProperty("line.separator") +
 					url3 + System.getProperty("line.separator");
