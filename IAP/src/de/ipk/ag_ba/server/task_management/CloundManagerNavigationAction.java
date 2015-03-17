@@ -92,7 +92,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			}
 			
 			String clusterStatusURL = SystemOptions.getInstance().getString("IAP", "Compute Infrastructure Info URL",
-					"http://iap.ipk-gatersleben.de");
+					"http://iapg2p.sourceforge.net");
 			if (clusterAvailable) {
 				res.add(
 						new NavigationButton(

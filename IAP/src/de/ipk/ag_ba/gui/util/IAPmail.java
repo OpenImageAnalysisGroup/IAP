@@ -295,14 +295,13 @@ public class IAPmail {
 			tf.add("mail.host=mail.ipk-gatersleben.de");
 			tf.add("");
 			tf.add("# Return address to appear on emails");
-			tf.add("# (Default value : username@host)");
-			tf.add("mail.from=klukas@ipk-gatersleben.de");
+			tf.add("mail.from=user@host");
 			tf.add("");
 			tf.add("# Other possible items include:");
 			tf.add("# mail.user=");
 			tf.add("# mail.store.protocol=");
 			tf.add("# mail.transport.protocol=");
-			tf.add("mail.smtp.host=mail.ipk-gatersleben.de");
+			tf.add("mail.smtp.host=");
 			tf.add("# mail.smtp.user=");
 			tf.add("# mail.debug=");
 			try {

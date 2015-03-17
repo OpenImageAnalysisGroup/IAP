@@ -1235,9 +1235,8 @@ public class IAPservice {
 			TextFile c = new TextFile();
 			c.add("# config format: experiment measurement-label, start weighting (h:mm), end weighting (h:mm),");
 			c.add("# start weighting 2 (h:mm, or 0:00), end weighting 2 (h:mm, or 0:00), delay in minutes,email1:email2:email3:...");
-			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,klukas@ipk-gatersleben.de  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
-			c.add("# Remark: If the email-address klukas@ipk-gatersleben.de is missing, it is automatically included in the send-command.");
-			// c.add("# example config: 1116BA, auto, 10,30, klukas@ipk-gatersleben.de   -- check 1116BA every 30 minutes for watering data within the last 30 minutes, ignoring known start and stop times (with up to 10 minutes difference) from previous day");
+			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,user@host  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
+			// c.add("# example config: 1116BA, auto, 10,30, user@host   -- check 1116BA every 30 minutes for watering data within the last 30 minutes, ignoring known start and stop times (with up to 10 minutes difference) from previous day");
 			// add all experiments from today or yesterday as default entries to file
 			LTdataExchange lde = new LTdataExchange();
 			ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
@@ -1254,7 +1253,7 @@ public class IAPservice {
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Hint 1: To input multiple addresses, split them with ':', don't add spaces.");
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Hint 2: The email-address of the developer (klukas@...) is automatically included.");
 			Object[] inp = MyInputHelper.getInput("Please enter the desired mail-addresses:", "Target Mail", new Object[] {
-					"Mail 1:Mail 2", "klukas@ipk-gatersleben.de"
+					"Mail 1:Mail 2", "user@host"
 			});
 			if (inp == null)
 				return;
