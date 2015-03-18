@@ -3,7 +3,7 @@
     <!--ANT 1.7 is required -->
     <target name="create signed IAP-jar">
     	<!-- create vanted-jarfile -->
-        <jar destfile="release/iap_1_2.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="release/iap_2_0.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="../IAP Transfer/bin"/>
             <fileset dir="../IAP/bin"/>
             <fileset dir="../Graffiti_Core/build/classes"/>
