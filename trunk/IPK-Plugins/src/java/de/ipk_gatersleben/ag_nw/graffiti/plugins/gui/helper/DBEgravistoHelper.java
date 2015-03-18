@@ -18,13 +18,13 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.pattern_springembedde
  * @author Christian Klukas
  */
 public class DBEgravistoHelper implements HelperClass {
-	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 5 // 03.2014"; // "DBE-Visualisation and Analysis V1.1";
-	public static String DBE_GRAVISTO_VERSION_CODE = "1.2"; // "DBE-Visualisation and Analysis V1.1";
-	public static String DBE_GRAVISTO_VERSION = "DBE-Gravisto V2014"; // "DBE-Visualisation and Analysis V1.1";
+	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 6 // 03.2015";// "release 5 // 03.2014"; // "DBE-Visualisation and Analysis V1.1";
+	public static String DBE_GRAVISTO_VERSION_CODE = "2.0"; // "DBE-Visualisation and Analysis V1.1";
+	public static String DBE_GRAVISTO_VERSION = "DBE-Gravisto V2015"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_NAME = "DBE-Gravisto";
 	public static String DBE_INFORMATIONSYSTEM_NAME = "DBE Information System";
 	public static final String CLUSTER_ANALYSIS_NAME = "Cluster Visualisation";
-	public static final String CLUSTER_ANALYSIS_VERSION = "Cluster Visualisation V2014";
+	public static final String CLUSTER_ANALYSIS_VERSION = "Cluster Visualisation V2015";
 	public static String DBE_GRAVISTO_NAME_SHORT = "DBE-Gravisto";
 	public static String kgmlFileVersionHint = "<sub><small>v0.7.0</small></sub>";
 	
