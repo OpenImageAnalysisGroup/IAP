@@ -2,7 +2,6 @@ package iap.blocks.debug;
 
 import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.BlockType;
-import iap.blocks.postprocessing.BlSaveResultImages;
 
 import java.util.HashSet;
 
@@ -10,14 +9,14 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * @author pape, klukas
+ * @author klukas
  */
 
-public class BlShowIntermediateImages extends AbstractBlock {
+public class BlFilterImagesByCameraType extends AbstractBlock {
 	
 	@Override
 	public boolean isChangingImages() {
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -47,31 +46,43 @@ public class BlShowIntermediateImages extends AbstractBlock {
 	
 	@Override
 	public String getName() {
-		return "Display Mask-Images.";
+		return "Filter Images by Camera Type";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Displays mask-images (original resolution) for debug purposes.";
+		return "Removes images from specific camera type.";
+	}
+	
+	@Override
+	protected Image processImage(Image image) {
+		if (image != null) {
+			CameraType ct = image.getCameraType();
+			if (ct != null) {
+				boolean process = getBoolean("Process " + ct, true);
+				if (!process) {
+					return null;
+				} else {
+					return image;
+				}
+			}
+		}
+		return null;
 	}
 	
 	@Override
 	protected Image processMask(Image mask) {
-		boolean show = false;
-		
-		for (CameraType ct : CameraType.values()) {
-			if (ct != CameraType.UNKNOWN)
-				if (getBoolean("Show " + ct.getNiceName(), false) && mask.getCameraType() == ct)
-					show = true;
+		if (mask != null) {
+			CameraType ct = mask.getCameraType();
+			if (ct != null) {
+				boolean process = getBoolean("Process " + ct, true);
+				if (!process) {
+					return null;
+				} else {
+					return mask;
+				}
+			}
 		}
-		
-		if (show)
-			if (getBoolean("Include Image Information", false))
-				BlSaveResultImages.markWithImageInfos(mask.copy(), input().images().getImageInfo(mask.getCameraType()), optionsAndResults, getWellIdx()).show(
-						mask.getCameraType().getNiceName());
-			else
-				mask.show(mask.getCameraType().getNiceName());
-		
-		return mask;
+		return null;
 	}
 }

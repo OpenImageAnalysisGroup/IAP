@@ -20,12 +20,16 @@ public class BlFilterImagesByCondition extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public boolean isChangingImages() {
-		return false;
+		return true;
 	}
 	
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	

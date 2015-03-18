@@ -10,6 +10,7 @@ import iap.blocks.auto.BlAutoAdaptiveThresholdNir;
 import iap.blocks.auto.BlWarpImages;
 import iap.blocks.data_structures.ImageAnalysisBlock;
 import iap.blocks.debug.BlFilterImagesByAngle;
+import iap.blocks.debug.BlFilterImagesByCameraType;
 import iap.blocks.debug.BlFilterImagesByCondition;
 import iap.blocks.debug.BlFilterImagesByDate;
 import iap.blocks.debug.BlFilterImagesByPlantID;
@@ -171,6 +172,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlShowIntermediateImages(),
 				new BlFilterImagesByPlantID(),
 				new BlFilterImagesByRegularExpression(),
+				new BlFilterImagesByCameraType(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
