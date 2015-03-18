@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create signed IAP-jar" name="Create Runnable Jar for IAP Cloud Computing">
+    <!--ANT 1.7 is required -->
+    <target name="create signed IAP-jar">
+    	<!-- create vanted-jarfile -->
+        <jar destfile="release/iap_2_0.jar" filesetmanifest="mergewithoutmain">
+            <fileset dir="../IAP Transfer/bin"/>
+            <fileset dir="../IAP/bin"/>
+            <fileset dir="../Graffiti_Core/build/classes"/>
+            <fileset dir="../IAP CONSOLE/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/commons-codec-1.6.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-collections-3.2.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-math3-3.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/commons-logging-1.1.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/commons-net-3.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/commons-vfs2-2.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/jcifs-1.3.17.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/jsch-0.1.46.jar"/>
+            
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/flanagan.java6.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="../IAP/lib/commons-lang3-3.1.jar"/>
+            
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/ini4j-0.5.2.jar"/>
+            
+
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/bytecode-1.8.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-dbcp-1.2.2.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-pool-1.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/core-1.8.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jigsaw-2.2.6.jar"/>
+            
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/stax2-api-3.0.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/staxmate-2.0.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/woodstox-core-lgpl-4.0.9.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xpp3_min-1.1.4c.jar"/>
+
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xstream-1.3.1.jar"/>
+
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-beanutils.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-digester.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jdom.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/java-cup-v11a-runtime.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jh.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/log4j-1.2.13.jar"/>
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-logging-1.1.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/activation.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/axis.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xbean.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-awt-util.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-bridge.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-css.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-dom.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-ext.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-gvt.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-parser.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-rasterizer.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-script.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-svg-dom.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-svggen.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-transcoder.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-util.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-xml.jar"/>
+        	
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/poi-3.10-FINAL-20140208.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/poi-ooxml-3.10-FINAL-20140208.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
+        	
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/bsh-2.0b4.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-cli-1.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-discovery.jar"/>
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-math-1.0.jar"/> -->
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xercesImpl.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xmlParserAPIs.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/dom4j-1.6.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/itext-1.4.5.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jaxen-full.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jaxrpc.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jcommon-0.9.5.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jruby.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/mail.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/parser.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/optional.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/pdf-transcoder.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/rome-0.8.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/saaj.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/saxpath.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/secondstring-20030401.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/soap.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/vecmath1.2-1.14.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/wsdl4j.jar"/>
+<!--            <zipfileset excludes="META-INF/*.SF" src="/Users/klukas/Applications/eclipse/plugins/org.junit4_4.5.0.v20090824/junit.jar"/> -->
+<!--            <zipfileset excludes="META-INF/*.SF" src="/Users/klukas/Applications/eclipse/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar"/> -->
+            <fileset dir="../Graffiti_Editor/build/classes"/>
+            <fileset dir="../Graffiti_Plugins/build/classes"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jlex_java_cup.jar"/>
+            <fileset dir="../IPK-Plugins/build/classes"/>
+            <fileset dir="../IPK_lib/build"/>
+<!--            <zipfileset excludes="META-INF/*.SF" src="../IPK_lib/OfficeLnFs_2.7.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/ojdbc14.jar"/>
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/oraclexsql.jar"/> -->
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/xdb.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-net-2.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-net-ftp-2.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/plugin.jar"/>
+            <fileset dir="../MultimodalDataHandling/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="../MultimodalDataHandling/lib/pixelmed.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../MultimodalDataHandling/lib/jcommon1.0.16.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../MultimodalDataHandling/lib/jfreechart1.0.13.jar"/>
+<!--            <fileset dir="../Hive Add-on/build/classes"/> -->
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/myswing.jar"/> -->
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/AnaglyphCanvas3Dlib.jar"/> -->
+<!--            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/j3dcore.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/j3dutils.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/vecmath.jar"/> -->
+<!--            <zipfileset excludes="META-INF/*.SF" src="../Hive Add-on/lib/swingx.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/postgresql-9.0-801.jdbc4.jar"/>
+<!--            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/mongo.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jai_codec.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jai_core.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-compress-1.8.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jna.jar"/>
+                <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/platform.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="../IAP/lib/ij-1.49m.jar"/> 
+                
+            <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/jsoup-1.7.2.jar"/>
+                
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Main-Class" value="de.ipk.ag_ba.server.task_management.CloudComputingService"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+        </jar>
+    </target>
+</project>
