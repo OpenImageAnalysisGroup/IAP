@@ -115,7 +115,7 @@ public class ActionAbout extends AbstractNavigationAction {
 		Book book = new Book(null, "<html><center>" +
 				"User Documentation<br>" +
 				"<font color='gray'><small>(online PDF)</small></font></center>",
-				new IOurl("http://iap.ipk-gatersleben.de/documentation.pdf"),
+				new IOurl("http://iapg2p.sourceforge.net/documentation.pdf"),
 				"img/dataset.png");
 		rr.add(book.getNavigationButton(src));
 		
@@ -126,7 +126,7 @@ public class ActionAbout extends AbstractNavigationAction {
 		rr.add(webUrl.getNavigationButton(src));
 		
 		Book webUrl2 = new Book(null, "IAP Website",
-				new IOurl("http://iap.ipk-gatersleben.de/"),
+				new IOurl("http://iapg2p.sourceforge.net/"),
 				"img/browser.png");
 		rr.add(webUrl2.getNavigationButton(src));
 		
