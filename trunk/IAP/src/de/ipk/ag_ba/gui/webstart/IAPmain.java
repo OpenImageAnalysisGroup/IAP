@@ -678,7 +678,7 @@ public class IAPmain extends JApplet {
 		res.add(line);
 		res.add(fillLen("**", l));
 		res.add(fillLenLA("*  Design and main development:  *", " ", l, 2));
-		res.add(fillLenLA("*     Christian Klukas  *", " ", l, 2));
+		res.add(fillLenLA("*     Dr. Christian Klukas  *", " ", l, 2));
 		res.add(fillLen("**", l));
 		res.add(fillLenLA("*  Contribution to pipeline development:  *", " ", l, 2));
 		res.add(fillLenLA("*     Jean-Michel Pape  *", " ", l, 2));
