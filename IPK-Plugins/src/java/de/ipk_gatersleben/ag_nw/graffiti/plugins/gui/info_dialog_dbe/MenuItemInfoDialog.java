@@ -138,9 +138,9 @@ public class MenuItemInfoDialog
 				}
 				
 				if (ReleaseInfo.getRunningReleaseStatus() == Release.KGML_EDITOR)
-					copyR = "&copy; 2003-2014 Leibniz Institute of Plant Genetics and Crop Plant Research (IPK)";
+					copyR = "&copy; 2003-2015 Leibniz Institute of Plant Genetics and Crop Plant Research (IPK)";
 				else
-					copyR = "(c) 2003-2014 IPK-Gatersleben";
+					copyR = "(c) 2003-2015 IPK-Gatersleben";
 				
 				int num = 0;
 				num = GravistoMainHelper.getPluginManager().getPluginEntries().size();
@@ -179,21 +179,22 @@ public class MenuItemInfoDialog
 												"<br>is part of "
 												+
 												DBEgravistoHelper.DBE_INFORMATIONSYSTEM_NAME
-												+ " (c) 2010-2011 Group Image Analysis,<br>IPK-Gatersleben - " +
-												"design and implementation by Christian Klukas, head of group<br><br>"
+												+ " (c) 2010-2015 Group Image Analysis,<br>IPK-Gatersleben - " +
+												"design and implementation by Dr. Christian Klukas, head of group<br><br>"
 												: "")
 										+
 										"<b>Development</b>"
 										+ "<br><br>"
 										+ "IAP-Data-Navigator is one of the core components of the Integrated Analysis<br>" +
-										"Platform (IAP). IAP is developed since May 2010 by the research group image<br>" +
-										"analysis, lead by C. Klukas.<br><br>"
+										"Platform (IAP). IAP is from May 2010-April 2015 by the research<br>"
+										+ "group image  analysis, lead by Dr. C. Klukas." +
+										"<br><br>"
 										+
 										"VANTED has been designed and implemented mainly by Christian Klukas in the<br>"
 										+
 										"frame of his PhD thesis. The PhD work was performed under the supervision<br>"
 										+
-										"of Falk Schreiber (lead of group plant bioinformatics).<br><br>"
+										"of Prof. Falk Schreiber (lead of group plant bioinformatics).<br><br>"
 										+
 										"Parts of the application have been implementated by other members<br>"
 										+
