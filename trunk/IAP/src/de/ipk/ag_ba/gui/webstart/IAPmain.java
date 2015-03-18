@@ -673,7 +673,7 @@ public class IAPmain extends JApplet {
 		res.add(fillLen("**", l));
 		res.add(fillLen("*--  Systems Biology Cloud Computing --*", l));
 		res.add(fillLen("**", l));
-		res.add(fillLen("*(c) 2010-2014 Research Group Image Analysis, IPK *", l));
+		res.add(fillLen("*(c) 2010-2015 Research Group Image Analysis, IPK *", l));
 		res.add(fillLen("**", l));
 		res.add(line);
 		res.add(fillLen("**", l));
@@ -682,9 +682,6 @@ public class IAPmain extends JApplet {
 		res.add(fillLen("**", l));
 		res.add(fillLenLA("*  Contribution to pipeline development:  *", " ", l, 2));
 		res.add(fillLenLA("*     Jean-Michel Pape  *", " ", l, 2));
-		res.add(fillLen("**", l));
-		res.add(fillLenLA("*  External post-processing:  *", " ", l, 2));
-		res.add(fillLenLA("*     Dijun Chen, Swetlana Friedel (DI) *", " ", l, 2));
 		res.add(fillLen("**", l));
 		res.add(line);
 		return res;
