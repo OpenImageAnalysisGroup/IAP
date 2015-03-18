@@ -130,10 +130,10 @@ public class ActionAbout extends AbstractNavigationAction {
 				"img/browser.png");
 		rr.add(webUrl2.getNavigationButton(src));
 		
-		Book webUrl3 = new Book(null, "Research Group Image Analysis",
-				new IOurl("http://www.ipk-gatersleben.de/en/dept-molecular-genetics/image-analysis/"),
-				"img/browser.png");
-		rr.add(webUrl3.getNavigationButton(src));
+		// Book webUrl3 = new Book(null, "Research Group Image Analysis",
+		// new IOurl("http://www.ipk-gatersleben.de/en/dept-molecular-genetics/image-analysis/"),
+		// "img/browser.png");
+		// rr.add(webUrl3.getNavigationButton(src));
 		
 		JButton b = WorkflowHelper.getAddOnManagerButton();
 		if (b.isEnabled())
