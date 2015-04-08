@@ -354,6 +354,9 @@ public class ImageStack implements Iterable<ImageProcessor> {
 		return cube;
 	}
 	
+	/**
+	 * @return X/Y/Slice
+	 */
 	public float[][][] getFloatCube() {
 		int width = stack.getWidth();
 		int height = stack.getHeight();
@@ -446,4 +449,5 @@ public class ImageStack implements Iterable<ImageProcessor> {
 			stack.setSliceLabel((i + 1) + "", i + 1);
 		}
 	}
+
 }
