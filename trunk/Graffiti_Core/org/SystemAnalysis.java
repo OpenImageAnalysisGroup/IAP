@@ -57,8 +57,8 @@ public class SystemAnalysis {
 	}
 	
 	public static int getNumberOfCPUs() {
-		if (getEnvironmentInteger("SYSTEM.cpu_n", -1)>0)
-			return getEnvironmentInteger("SYSTEM.cpu_n",-1);
+		if (getEnvironmentInteger("SYSTEM_cpu_n", -1)>0)
+			return getEnvironmentInteger("SYSTEM_cpu_n",-1);
 		if (fixedCPUload > 0)
 			return fixedCPUload;
 		int cpus = SystemOptions.getInstance().getInteger(
