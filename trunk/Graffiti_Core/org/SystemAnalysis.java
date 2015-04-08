@@ -57,6 +57,8 @@ public class SystemAnalysis {
 	}
 	
 	public static int getNumberOfCPUs() {
+		if (getEnvironmentInteger("SYSTEM.cpu_n", -1)>0)
+			return getEnvironmentInteger("SYSTEM.cpu_n",-1);
 		if (fixedCPUload > 0)
 			return fixedCPUload;
 		int cpus = SystemOptions.getInstance().getInteger(
@@ -73,6 +75,23 @@ public class SystemAnalysis {
 			return cpus;
 	}
 	
+	public static int getEnvironmentInteger(String id, int defaultIfMissing) {
+		Map<String, String> variables = System.getenv();  
+		for (Map.Entry<String, String> entry : variables.entrySet()) {  
+		   String name = entry.getKey();
+		   if (name.equalsIgnoreCase(id)) {
+		   String value = entry.getValue();
+		   try {
+			   Integer v = Integer.parseInt(value);
+			   return v;
+		   } catch(Exception e) {
+			   throw new RuntimeException(e);
+		   }
+		   }
+		}  
+		return defaultIfMissing;
+	}
+
 	public static int getNumberOfCPUs(
 			int minimumCPUcountBeforeMultipleCPUsAreUsed) {
 		int cpus = getNumberOfCPUs();
