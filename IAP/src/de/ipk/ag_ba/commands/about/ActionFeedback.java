@@ -26,7 +26,7 @@ public class ActionFeedback extends AbstractNavigationAction {
 		ll.add("<html><h2><font face=\"Sans,Tohama,Arial\">Feedback</font></h2>" +
 				"<font face=\"Sans,Tohama,Arial\">Thank you very much for using IAP!<br><br>" +
 				"If you have any question, don't hesitate to send an E-mail to " +
-				"<a href=\"mailto:christian.klukas@gmail.com\">christian.klukas@gmail.com</a>.<br><br>" +
+				"<a href=\"mailto:klukas@users.sf.net\">klukas@users.sf.net</a>.<br><br>" +
 				"</font>");
 		// AttributeHelper.showInBrowser("mailto:klukas@ipk-gatersleben.de?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + "%20feedback");
 		
