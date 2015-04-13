@@ -207,6 +207,24 @@ public class ImageOperation implements MemoryHogInterface {
 		return new ImageOperation(target, getImage().getWidth(), getImage().getHeight());
 	}
 	
+	/**
+	 * Changes the color of the image (directly), and returns the same
+	 * imageoperation object. Replaces non matches with the other value.
+	 */
+	public ImageOperation replaceColor(int search, int replace, int replaceOther) {
+		int[] source = getAs1D();
+		int[] target = source;// new int[source.length];
+		
+		int idx = 0;
+		for (int v : source) {
+			if (v != search)
+				target[idx++] = replaceOther;
+			else
+				target[idx++] = replace;
+		}
+		return new ImageOperation(target, getImage().getWidth(), getImage().getHeight());
+	}
+	
 	public ImageOperation replaceColorsScanLine(int search, int replace) {
 		int[][] source2d = getAs2D();
 		int[][] target = getAs2D();
