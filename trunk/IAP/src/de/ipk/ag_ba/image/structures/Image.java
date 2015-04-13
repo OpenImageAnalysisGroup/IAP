@@ -115,7 +115,7 @@ public class Image {
 			if (inpimg == null)
 				throw new Exception("Image could not be read: " + url);
 			try {
-				if (inpimg.getType() == ImageType.COLOR_256.depth)
+				if (inpimg.getBitDepth() == ImageType.COLOR_RGB.depth)
 					image = processTransparency(url.getFileName(), inpimg.getBufferedImage());
 				else
 					image = inpimg;
@@ -127,7 +127,7 @@ public class Image {
 			synchronized (url2image) {
 				w = image.getWidth();
 				h = image.getHeight();
-				if (inpimg.getType() == ImageType.COLOR_256.depth)
+				if (inpimg.getBitDepth() == ImageType.COLOR_RGB.depth)
 					url2image.put(url + "", this.copy());
 			}
 		} else {
@@ -584,8 +584,9 @@ public class Image {
 		return result;
 	}
 	
-	public void setFilename(String f) {
+	public Image setFilename(String f) {
 		this.fileName = f;
+		return this;
 	}
 	
 	/**
