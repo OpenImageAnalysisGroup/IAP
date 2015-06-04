@@ -674,6 +674,7 @@ public class IAPmain extends JApplet {
 		res.add(fillLen("*--  Systems Biology Cloud Computing --*", l));
 		res.add(fillLen("**", l));
 		res.add(fillLen("*(c) 2010-2015 Research Group Image Analysis, IPK *", l));
+		res.add(fillLen("*(c) 2015 C. Klukas *", l));
 		res.add(fillLen("**", l));
 		res.add(line);
 		res.add(fillLen("**", l));
