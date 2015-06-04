@@ -1101,7 +1101,12 @@ public class ImageOperation implements MemoryHogInterface {
 		if (image.getProcessor().getPixels() instanceof int[])
 			return (int[]) image.getProcessor().getPixels();
 		else
-			return (int[]) ((ByteProcessor) image.getProcessor()).convertToRGB().getPixels();
+			try {
+				return (int[]) ((ByteProcessor) image.getProcessor()).convertToRGB().getPixels();
+			} catch (Exception e) {
+				return (int[]) (image.getProcessor().convertToByteProcessor()).convertToRGB().getPixels();
+			}
+		
 	}
 	
 	public int[][] getAs2D() {
@@ -1173,6 +1178,17 @@ public class ImageOperation implements MemoryHogInterface {
 			i++;
 		}
 		return this;
+	}
+	
+	public ImageOperation invertIgnoresBackground() {
+		int[] img = getAs1D();
+		int i = 0;
+		for (int pix : img) {
+			img[i] = 0xFFFFFF - pix;
+			i++;
+		}
+		
+		return new Image(getWidth(), getHeight(), img).io();
 	}
 	
 	/**
