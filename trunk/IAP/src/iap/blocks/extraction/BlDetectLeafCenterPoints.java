@@ -43,6 +43,7 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 	
 	private Image saveAndMarkResults(Image img, GapList<Feature> pointList, ImageData imageRef) {
 		boolean markResults = getBoolean("Mark Center Points in Result Image", false);
+		boolean saveCPCoordinates = getBoolean("Save Center Points Corrdinates", false);
 		boolean saveResults = true;
 		boolean saveResultObject = true;
 		
@@ -61,16 +62,18 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 					new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf.count"), pointList.size(), "leaves", this, imageRef);
 			
 			// save x and y position
-			int num = 0;
-			for (Feature p : pointList) {
-				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.x"), (int) p.getPosition().getX(),
-						"leaves", this, imageRef);
-				
-				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.y"), (int) p.getPosition().getY(),
-						"leaves", this, imageRef);
-				num++;
+			if (saveCPCoordinates) {
+				int num = 0;
+				for (Feature p : pointList) {
+					getResultSet().setNumericResult(getBlockPosition(),
+							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.x"), (int) p.getPosition().getX(),
+							"leaves", this, imageRef);
+					
+					getResultSet().setNumericResult(getBlockPosition(),
+							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.y"), (int) p.getPosition().getY(),
+							"leaves", this, imageRef);
+					num++;
+				}
 			}
 		}
 		
