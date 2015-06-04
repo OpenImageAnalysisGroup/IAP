@@ -17,6 +17,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MeasurementNodeType;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 
+/**
+ * @author klukas
+ */
 public final class ActionCreatePlotCommand extends AbstractNavigationAction implements ExperimentTransformation, DirtyNotificationSupport {
 	/**
 	 * 

@@ -29,6 +29,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
+/**
+ * @author klukas
+ */
 public final class ActionTimeRangeCommand extends AbstractNavigationAction implements DirtyNotificationSupport, ExperimentTransformation {
 	/**
 	 * 
@@ -106,7 +109,7 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		cbPersistentChange.setSelected(!settingsLocal.getUseLocalSettings());
 		if (!settingsLocal.isSavePossible()) {
 			cbPersistentChange.setEnabled(false);
-			cbPersistentChange.setText("<html>" + cbPersistentChange.getText() + "<br>(experiment loaded from read-only location)");
+			cbPersistentChange.setText("<html>" + cbPersistentChange.getText() + "<br>(disabled, experiment loaded from read-only location)");
 		}
 		
 		sa[idx++] = cbPersistentChange;

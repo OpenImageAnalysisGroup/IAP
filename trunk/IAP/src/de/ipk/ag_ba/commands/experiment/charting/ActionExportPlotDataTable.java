@@ -17,6 +17,10 @@ import de.ipk_gatersleben.ag_nw.graffiti.FileHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 
+/**
+ * @author klukas
+ */
+
 public final class ActionExportPlotDataTable extends AbstractNavigationAction {
 	private NavigationButton src2;
 	private final ExperimentTransformationPipeline transformationPipeline;

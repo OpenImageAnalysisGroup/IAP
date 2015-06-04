@@ -29,6 +29,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
+/**
+ * @author klukas
+ */
 public final class ActionFilterGroupsCommand extends AbstractNavigationAction implements DirtyNotificationSupport, ExperimentTransformation {
 	private NavigationButton src2;
 	private boolean dirty = true;
