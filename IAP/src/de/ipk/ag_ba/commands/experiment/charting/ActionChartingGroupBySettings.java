@@ -115,7 +115,7 @@ public final class ActionChartingGroupBySettings extends AbstractNavigationActio
 		cbPersistentChange.setSelected(!settingsLocal.getUseLocalSettings());
 		if (!settingsLocal.isSavePossible()) {
 			cbPersistentChange.setEnabled(false);
-			cbPersistentChange.setText("<html>" + cbPersistentChange.getText() + "<br>(experiment loaded from read-only location)");
+			cbPersistentChange.setText("<html>" + cbPersistentChange.getText() + "<br>(disabled, experiment loaded from read-only location)");
 		}
 		sa[idx++] = cbPersistentChange;
 		

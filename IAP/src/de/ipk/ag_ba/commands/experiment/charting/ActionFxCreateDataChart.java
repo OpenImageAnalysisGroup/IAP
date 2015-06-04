@@ -44,6 +44,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 	ActionFilterGroupsCommand filterGroupAction;
 	ActionChartingGroupBySettings groupByAction;
 	ActionTimeRangeCommand filterTimeRangeAction;
+	ActionNormalisationCommand normalisationAction;
 	ActionCreatePlotCommand createPlotAction;
 	ActionSummarizeGroupsCommand summarizeDataAction;
 	ActionExportPlotDataTable exportDataTableAction;
@@ -102,14 +103,14 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 			filterGroupAction = new ActionFilterGroupsCommand("Filter Groups", transformationPipeline);
 			groupByAction = new ActionChartingGroupBySettings("Group by", transformationPipeline, settingsLocal, settingsGlobal, filterGroupAction);
 			filterTimeRangeAction = new ActionTimeRangeCommand("Time Range", transformationPipeline, settingsLocal, settingsGlobal);
+			normalisationAction = new ActionNormalisationCommand("Normalisation", transformationPipeline, settingsLocal, settingsGlobal);
 			summarizeDataAction = new ActionSummarizeGroupsCommand("Summarize data", transformationPipeline, settingsLocal, settingsGlobal);
 			createPlotAction = new ActionCreatePlotCommand("Create/update plot", transformationPipeline, settingsLocal, settingsGlobal);
 			exportDataTableAction = new ActionExportPlotDataTable("Export data table", transformationPipeline, settingsLocal, settingsGlobal);
 			
 			transformationPipeline.setSteps(removeDefinedOutlierAction, groupByAction,
-					filterGroupAction, filterTimeRangeAction, summarizeDataAction, createPlotAction);
+					filterGroupAction, filterTimeRangeAction, normalisationAction, summarizeDataAction, createPlotAction);
 		}
-		
 	}
 	
 	@Override
@@ -193,6 +194,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 				addSortCommand(ra);
 				addSummarizeCommandErrorBars(ra);
 			}
+			ra.add(new NavigationButton(normalisationAction, src.getGUIsetting()));
 			ra.add(new NavigationButton(summarizeDataAction, src.getGUIsetting()));
 			ra.add(new NavigationButton(createPlotAction, src.getGUIsetting()));
 			if (!disableExportCommand)

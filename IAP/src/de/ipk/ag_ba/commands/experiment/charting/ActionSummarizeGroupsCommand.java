@@ -25,6 +25,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 
+/**
+ * @author klukas
+ */
 public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction implements ExperimentTransformation {
 	private NavigationButton src2;
 	private final LinkedHashSet<String> groups = new LinkedHashSet<String>();
