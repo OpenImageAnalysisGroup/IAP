@@ -166,6 +166,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		
 		skel2d.calculateEndlimbsRecursive();
 		int leafcount = skel2d.endpoints.size();
+		int branchcount = skel2d.branches.size();
 		if (debug)
 			System.out.println("A Leaf count: " + leafcount);
 		
@@ -279,6 +280,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		}
 		
 		leafcount = skel2d.endpoints.size();
+		branchcount = skel2d.branches.size();
 		// System.out.println("C Leaf count: " + leafcount);
 		Image skelres = skel2d.getAsImage();
 		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.getDefaultBackground());
@@ -358,6 +360,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 			rt.addValue("bloom.count", bloomLimbCount);
 		}
 		rt.addValue("leaf.count", leafcount);
+		rt.addValue("branchpoint.count", branchcount);
 		if (distHorizontal != null)
 			rt.addValue("leaf.length.sum.norm", leaflength * normFactor, "mm");
 		rt.addValue("leaf.length.sum", leaflength, "px");
@@ -665,7 +668,9 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 				new CalculatedProperty("bloom.count",
 						"Detect (maize) bloom skeleton endpoints."),
 				new CalculatedProperty("leaf.count",
-						"Leaf count."),
+						"Leaf count (based on skeleton)."),
+				new CalculatedProperty("branchpoint.count",
+						"Branchpoint count (based on skeleton)."),
 				new CalculatedProperty("leaf.length.sum",
 						"Skeleton length."),
 				new CalculatedProperty("leaf.length.sum.norm",
