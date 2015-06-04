@@ -737,7 +737,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		return files;
 	}
 	
-	@SuppressWarnings("resource")
 	private void copyBinaryFileContentToTarget(
 			final ExperimentInterface experiment,
 			final ThreadSafeOptions written,
