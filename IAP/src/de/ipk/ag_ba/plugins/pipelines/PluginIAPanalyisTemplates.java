@@ -30,6 +30,7 @@ import iap.blocks.extraction.BlCalcMoments;
 import iap.blocks.extraction.BlCalcTextureFeatures;
 import iap.blocks.extraction.BlCalcVolumes;
 import iap.blocks.extraction.BlCalcWidthAndHeight;
+import iap.blocks.extraction.BlCountColors;
 import iap.blocks.extraction.BlDetectLeafCenterPoints;
 import iap.blocks.extraction.BlDetectLeafTips;
 import iap.blocks.extraction.BlFlowerDetectionAndFeatureExtraction;
@@ -173,6 +174,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlFilterImagesByPlantID(),
 				new BlFilterImagesByRegularExpression(),
 				new BlFilterImagesByCameraType(),
+				new BlCountColors(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
