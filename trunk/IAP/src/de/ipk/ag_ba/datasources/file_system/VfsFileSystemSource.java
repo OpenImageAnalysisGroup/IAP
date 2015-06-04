@@ -52,6 +52,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author klukas
@@ -311,6 +312,15 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 					bm.getURL().setPrefix(prefix);
 				if (bm.getLabelURL() != null)
 					bm.getLabelURL().setPrefix(prefix);
+			}
+			if (nmi instanceof ImageData) {
+				final ImageData id = (ImageData) nmi;
+				String oldRef = id.getAnnotationField("oldreference");
+				if (oldRef != null && !oldRef.isEmpty()) {
+					IOurl oldRefUrl = new IOurl(oldRef);
+					oldRefUrl.setPrefix(prefix);
+					id.setAnnotationField("oldreference", oldRefUrl.toString());
+				}
 			}
 		}
 		md.setHeader(header);
