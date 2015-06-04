@@ -115,8 +115,11 @@ public class Image {
 			if (inpimg == null)
 				throw new Exception("Image could not be read: " + url);
 			try {
-				if (inpimg.getBitDepth() == ImageType.COLOR_RGB.depth)
+				if (inpimg.getBitDepth() == ImageType.COLOR_256.depth)
 					image = processTransparency(url.getFileName(), inpimg.getBufferedImage());
+				// else
+				// if (inpimg.getBitDepth() == ImageType.COLOR_RGB.depth)
+				// image = processTransparency(url.getFileName(), inpimg.getBufferedImage());
 				else
 					image = inpimg;
 			} catch (Exception e) {

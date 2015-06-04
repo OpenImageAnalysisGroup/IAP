@@ -261,4 +261,9 @@ public class ImageJOperation {
 			res[i] = val[i] == 0;// -1;
 		return res;
 	}
+	
+	public ImageJOperation findEdges() {
+		image.getProcessor().findEdges();
+		return this;
+	}
 }
