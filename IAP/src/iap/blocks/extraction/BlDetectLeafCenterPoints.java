@@ -59,18 +59,18 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			CameraPosition pos = optionsAndResults.getCameraPosition();
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf.count"), pointList.size(), "leaves", this, imageRef);
+					new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint.count"), pointList.size(), "leaves", this, imageRef);
 			
 			// save x and y position
 			if (saveCPCoordinates) {
 				int num = 0;
 				for (Feature p : pointList) {
 					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.x"), (int) p.getPosition().getX(),
+							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.x"), (int) p.getPosition().getX(),
 							"leaves", this, imageRef);
 					
 					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "leaf." + num + ".position.y"), (int) p.getPosition().getY(),
+							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.y"), (int) p.getPosition().getY(),
 							"leaves", this, imageRef);
 					num++;
 				}

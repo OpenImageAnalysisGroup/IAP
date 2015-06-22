@@ -116,7 +116,7 @@ public class ConvexHullCalculator {
 	}
 	
 	private double dist(Point a, Point b) {
-		return Math.sqrt((b.x - a.x) * (b.y - a.y) + (b.y - a.y) * (b.y - a.y));
+		return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
 	}
 	
 	public ConvexHullCalculator setCustomBackgroundImageForDrawing(Image customImage) {
