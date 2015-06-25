@@ -187,7 +187,6 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				final ThreadSafeOptions skipped = new ThreadSafeOptions();
 				
 				this.files = determineNumberOfFilesInDataset(experiment);
-				int idx = 0;
 				
 				knownFiles = 0;
 				
@@ -201,7 +200,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 				ExecutorService es = Executors.newFixedThreadPool(SystemOptions.getInstance().getInteger("VFS", "Copy save threads", 4));
 				HashSet<String> skippedFiles = new HashSet<String>();
 				boolean simulate = false;
-				
+				ThreadSafeOptions tsoIdx = new ThreadSafeOptions();
 				for (SubstanceInterface su : experiment) {
 					final String substanceName = su.getName();
 					for (ConditionInterface co : su)
@@ -211,10 +210,15 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 									break;
 								if (simulate) {
 									; // System.out.println("backup to hsm simu");
-								} else
-									idx = storeData(experiment, written, skipped, idx,
-											hsmManager, startTime, es,
-											substanceName, nm, skipFilesAlreadyInStorageLocation, skippedFiles);
+								} else {
+									final ExperimentInterface eif = experiment;
+									es.submit(() -> {
+										int idx = tsoIdx.addInt(1);
+										idx = storeData(eif, written, skipped, idx,
+												hsmManager, startTime, es,
+												substanceName, nm, skipFilesAlreadyInStorageLocation, skippedFiles);
+									});
+								}
 							}
 						}
 				}
@@ -234,7 +238,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 						// save XML and header
 						System.out.println("OK: VfsFile transfer of experiment "
 								+ experimentReference.getExperimentName()
-								+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " complete (saved " + idx
+								+ " to " + vfs.getTargetName() + "/" + vfs.getTargetPathName() + " complete (saved " + tsoIdx.getInt()
 								+ " files). Saving XML... // "
 								+ SystemAnalysis.getCurrentTime());
 						status.setCurrentStatusText1("Finalize storage");
@@ -746,8 +750,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 			final VfsFileObject targetFile, final boolean targetExists,
 			final Runnable optPostProcess,
 			final boolean isIconStorage) throws InterruptedException {
-		while (written.getInt() > 0)
-			Thread.sleep(5);
+		// while (written.getInt() > 0)
+		// Thread.sleep(5);
 		written.addInt(1);
 		
 		InputStream in = null;
@@ -770,26 +774,26 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							ImageIO.write(img, targetFileExtension.toUpperCase(), outNewFormat);
 							in = new MyByteArrayInputStream(outNewFormat.getBuffTrimmed());
 						}
-						synchronized (es) {
-							String fn;
-							if (isIconStorage)
-								fn = hsmManager.prepareAndGetPreviewFileNameAndPath(
-										experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
-							else
-								fn = hsmManager.prepareAndGetDataFileNameAndPath(
-										experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
-							
-							VfsFileObject f = vfs.newVfsFile(fn, true);
-							written.addLong(ResourceIOManager.copyContent(
-									new BufferedInputStream(in),
-									new BufferedOutputStream(f.getOutputStream()),
-									-1));
-							if (t != null)
-								f.setLastModified(t);
-							// f.setWritable(false);
-							// f.setExecutable(false);
-							f.renameTo(targetFile, true);
-						}
+						// synchronized (es) {
+						String fn;
+						if (isIconStorage)
+							fn = hsmManager.prepareAndGetPreviewFileNameAndPath(
+									experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
+						else
+							fn = hsmManager.prepareAndGetDataFileNameAndPath(
+									experiment.getHeader(), t, "in_progress_" + UUID.randomUUID().toString());
+						
+						VfsFileObject f = vfs.newVfsFile(fn, true);
+						written.addLong(ResourceIOManager.copyContent(
+								new BufferedInputStream(in),
+								new BufferedOutputStream(f.getOutputStream()),
+								-1));
+						if (t != null)
+							f.setLastModified(t);
+						// f.setWritable(false);
+						// f.setExecutable(false);
+						f.renameTo(targetFile, true);
+						// }
 					}
 				}
 				if (url != null) {
