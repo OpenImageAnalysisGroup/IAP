@@ -399,7 +399,11 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	public LoadedImage saveImage(String[] optFileNameMainAndLabelPrefix, LoadedImage limg,
 			boolean keepRemoteLabelURLs_safe_space, boolean ignoreLabelURL) throws Exception {
 		ExperimentHeaderInterface ehi = limg.getParentSample().getParentCondition().getExperimentHeader();
-		long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
+		Long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
+		if (snapshotTime == null) {
+			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not get exact sample time for image. Using experiment start time instead.");
+			snapshotTime = limg.getParentSample().getParentCondition().getExperimentHeader().getStartdate().getTime();
+		}
 		String pre = "";
 		String firstPre = "";
 		String finalMainName = null;
