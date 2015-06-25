@@ -377,6 +377,8 @@ public class DataExchangeHelperForExperiments {
 			for (final BinaryFileInfo binaryFileInfo : bbb) {
 				if (mt != expTree.getSelectionPath().getLastPathComponent())
 					break;
+				if (stop.shouldStop())
+					break;
 				ImageResult imageResult = new ImageResult(null, binaryFileInfo);
 				
 				String cl = DataSetFileButton.getNameInFull(imageResult, null);
