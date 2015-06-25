@@ -13,6 +13,8 @@ public class JavaFX {
 	private static boolean init = getInit();
 	
 	private static boolean getInit() {
+		if (true)
+			return true;
 		final CountDownLatch latch = new CountDownLatch(1);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
