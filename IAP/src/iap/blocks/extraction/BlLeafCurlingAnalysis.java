@@ -53,10 +53,13 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock impleme
 		ArrayList<Limb> limbs = skel2d.getEndlimbs();
 		DescriptiveStatistics statsFFTfrequency = new DescriptiveStatistics();
 		DescriptiveStatistics statsFFTamplitude = new DescriptiveStatistics();
+		DescriptiveStatistics signChangeStat = new DescriptiveStatistics();
 		for (Limb l : limbs) {
 			if (l.length() < getInt("Minimum-Limb-Length", 100))
 				continue;
 			ArrayList<Point> points = l.getPoints();
+			if (points.isEmpty())
+				continue;
 			ArrayList<Integer> distances = new ArrayList<Integer>(points.size());
 			for (Point p : points) {
 				distances.add(result.getPixel(p.x, p.y));
@@ -65,8 +68,24 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock impleme
 			double[] ydata = new double[nPoints];
 			
 			// Create wave form
+			int signChanges = 0;
+			int p, lastP = -1;
+			boolean plus = false;
+			boolean previousPlus = false;
 			for (int i = 0; i < nPoints; i++) {
-				ydata[i] = distances.get(i);
+				p = distances.get(i);
+				ydata[i] = p;
+				if (lastP > 0) {
+					if (p >= lastP) {
+						plus = true;
+					} else {
+						plus = false;
+					}
+					if (plus != previousPlus)
+						signChanges++;
+					previousPlus = plus;
+				}
+				lastP = p;
 			}
 			
 			FourierTransform ft0 = new FourierTransform(ydata);
@@ -75,8 +94,12 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock impleme
 			double averageFrequency = calculateAverageFrequency(powerSpectrum);
 			double averageAmplitude = calculateAverageIntensity(powerSpectrum);
 			
+			double signChangesPerPixel = signChanges / nPoints;
+			
 			statsFFTfrequency.addValue(averageFrequency);
 			statsFFTamplitude.addValue(averageAmplitude);
+			
+			signChangeStat.addValue(signChangesPerPixel);
 		}
 		
 		if (statsFFTfrequency.getN() > 0) {
@@ -87,6 +110,9 @@ public class BlLeafCurlingAnalysis extends AbstractSnapshotAnalysisBlock impleme
 			rt.addValue("leaf.curling.frequency.stddev", statsFFTfrequency.getStandardDeviation());
 			rt.addValue("leaf.curling.amplitude.mean", statsFFTamplitude.getMean());
 			rt.addValue("leaf.curling.amplitude.stddev", statsFFTamplitude.getStandardDeviation());
+			
+			rt.addValue("leaf.curling.signchanges.mean", statsFFTamplitude.getMean(), "changes/pixel");
+			rt.addValue("leaf.curling.signchanges.stddev", statsFFTamplitude.getStandardDeviation(), "changes/pixel");
 			
 			getResultSet().storeResults(optionsAndResults.getCameraPosition(), CameraType.VIS, TraitCategory.GEOMETRY, rt,
 					getBlockPosition(), this, input().images().getVisInfo());
