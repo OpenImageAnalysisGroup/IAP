@@ -273,7 +273,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			
 			Sample3D sample = new Sample3D(con);
 			con.add(sample);
-			
+			sample.setSampleFineTimeOrRowId(f.lastModified());
 			sample.setTime((int) ((f.lastModified() - first.getTime().getTime())
 					/ (1000 * 60 * 60 * 24)));
 			sample.setTimeUnit("day");
