@@ -93,10 +93,22 @@ public class Vector2d {
 		return new Vector2d(x * scalingFactor, y * scalingFactor);
 	}
 	
+	/**
+	 * Use rotateDirect for higher performance.
+	 */
 	public Vector2d rotate(double n) {
 		double rx = (this.x * Math.cos(n)) - (this.y * Math.sin(n));
 		double ry = (this.x * Math.sin(n)) + (this.y * Math.cos(n));
 		return new Vector2d(rx, ry);
+	}
+	
+	public void rotateDirect(double n) {
+		double cn = Math.cos(n);
+		double sn = Math.sin(n);
+		double rx = (this.x * cn) - (this.y * sn);
+		double ry = (this.x * sn) + (this.y * cn);
+		x = rx;
+		y = ry;
 	}
 	
 	public double angle(Vector2d end) {
