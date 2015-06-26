@@ -303,7 +303,7 @@ public class ChannelProcessing {
 		return new Image(width, height, getLabFloatArray(labC)).io();
 	}
 	
-	private float[] getLabFloatArray(Channel labC) {
+	public float[] getLabFloatArray(Channel labC) {
 		float[] x = getXYZfloatArray(Channel.XYZ_X);
 		float[] y = getXYZfloatArray(Channel.XYZ_Y);
 		float[] z = getXYZfloatArray(Channel.XYZ_Z);
