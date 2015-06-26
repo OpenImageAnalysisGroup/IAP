@@ -5,7 +5,7 @@ import org.NiceNameSupport;
 import de.ipk.ag_ba.image.operation.channels.Channel;
 
 public enum ColorSpace implements NiceNameSupport {
-	RGB, LAB, HSV, XYZ, CMYK, GRAYSCALE_RGB_BLUE;
+	RGB, LAB, HSV, XYZ, CMYK, GRAYSCALE_RGB_BLUE, LAB_UNSHIFTED;
 	
 	public Channel[] getChannels() {
 		switch (this) {
@@ -16,6 +16,8 @@ public enum ColorSpace implements NiceNameSupport {
 			case HSV:
 				return new Channel[] { Channel.HSV_H, Channel.HSV_S, Channel.HSV_V };
 			case LAB:
+				return new Channel[] { Channel.LAB_L, Channel.LAB_A, Channel.LAB_B };
+			case LAB_UNSHIFTED:
 				return new Channel[] { Channel.LAB_L, Channel.LAB_A, Channel.LAB_B };
 			case RGB:
 				return new Channel[] { Channel.RGB_R, Channel.RGB_G, Channel.RGB_B };
