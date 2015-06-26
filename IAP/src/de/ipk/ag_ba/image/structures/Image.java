@@ -225,7 +225,7 @@ public class Image {
 		this(new ImagePlus("Image", image));
 	}
 	
-	public Image(int w, int h, float[] channelR, float[] channelG, float[] channelB, ColorSpace mode) {
+	public Image(int w, int h, float[] channel_1, float[] channel_2, float[] channel_3, ColorSpace mode) {
 		this.w = w;
 		this.h = h;
 		int a = 255;
@@ -236,20 +236,30 @@ public class Image {
 		for (int idx = 0; idx < img.length; idx++) {
 			int r, g, b;
 			if (mode == ColorSpace.RGB) {
-				r = (int) (channelR[idx] * 255d + 0.5d);
-				g = (int) (channelG[idx] * 255d + 0.5d);
-				b = (int) (channelB[idx] * 255d + 0.5d);
+				r = (int) (channel_1[idx] * 255d + 0.5d);
+				g = (int) (channel_2[idx] * 255d + 0.5d);
+				b = (int) (channel_3[idx] * 255d + 0.5d);
 			} else
 				if (mode == ColorSpace.LAB) {
-					float labl = channelR[idx];
-					float laba = channelG[idx];
-					float labb = channelB[idx];
+					float labl = channel_1[idx];
+					float laba = channel_2[idx];
+					float labb = channel_3[idx];
 					int[] converted = csc.LABtoRGB(labl / 2.55f, laba - 128f, labb - 128f);
 					r = converted[0];
 					g = converted[1];
 					b = converted[2];
 				} else {
-					throw new UnsupportedOperationException("Unknown colormode");
+					if (mode == ColorSpace.LAB_UNSHIFTED) {
+						float labl = channel_1[idx];
+						float laba = channel_2[idx];
+						float labb = channel_3[idx];
+						int[] converted = csc.LABtoRGB(labl, laba, labb);
+						r = converted[0];
+						g = converted[1];
+						b = converted[2];
+					} else {
+						throw new UnsupportedOperationException("Unknown colormode");
+					}
 				}
 			int c = // alpha |
 			((r & 0xFF) << 16) |
