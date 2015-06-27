@@ -141,7 +141,11 @@ public class Image {
 	}
 	
 	public static ImagePlus processTransparency(String optName, BufferedImage inpimg) {
-		
+		// boolean invertRedBlue = false;
+		// SystemOptions.getInstance().getStringRadioSelection(
+		// "IAP",
+		// "Color Management//Image Loading Byte Order",
+		// false);
 		byte[] bp;
 		if (inpimg.getRaster() instanceof IntegerInterleavedRaster) {
 			int[] data = ((IntegerInterleavedRaster) inpimg.getRaster()).getDataStorage();
@@ -181,7 +185,8 @@ public class Image {
 							if ((0xFF & b1) < 0xFF)
 								pixels[out_idx] = ImageOperation.BACKGROUND_COLORint;
 							else
-								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b4) << 16) | ((0xFF & b3) << 8) | (0xFF & b2);
+								pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b2) << 16) | ((0xFF & b3) << 8) | (0xFF & b4);
+							// pixels[out_idx] = ((0xFF & b1) << 24) | ((0xFF & b4) << 16) | ((0xFF & b3) << 8) | (0xFF & b2);
 						}
 						out_idx++;
 					}
@@ -792,13 +797,17 @@ public class Image {
 		return "image/png;charset=utf-8;base64," + streamData;
 	}
 	
-	public float[] getAs1float() {
+	public float[] getAs1float(boolean scaleTo1) {
 		if (image.getProcessor() instanceof ColorProcessor) {
 			int[] arr = io().channels().getGrayImageAs1dArray();
 			float[] res = new float[arr.length];
 			int idx = 0;
-			for (int i : arr)
-				res[idx++] = i;
+			if (scaleTo1)
+				for (int i : arr)
+					res[idx++] = i / 255f;
+			else
+				for (int i : arr)
+					res[idx++] = i;
 			
 			return res;
 		}
