@@ -96,7 +96,7 @@ public class BlColorBalanceCircularLumi extends AbstractBlock {
 			
 			float[] lValues = mask.io().channels().getLabFloatArray(Channel.LAB_L);
 			
-			double base = coeff[0];
+			float base = 70;// coeff[0]*0.7;
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
 					int color = img[x][y];
@@ -111,7 +111,16 @@ public class BlColorBalanceCircularLumi extends AbstractBlock {
 			float[] aValues = mask.io().channels().getLabFloatArray(Channel.LAB_A);
 			float[] bValues = mask.io().channels().getLabFloatArray(Channel.LAB_B);
 			
-			return new Image(w, h, lValues, aValues, bValues, ColorSpace.LAB_UNSHIFTED);
+			Image res = new Image(w, h, lValues, aValues, bValues, ColorSpace.LAB_UNSHIFTED);
+			int[][] resI = res.getAs2A();
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					int color = img[x][y];
+					if (color == ImageOperation.BACKGROUND_COLORint)
+						resI[x][y] = ImageOperation.BACKGROUND_COLORint;
+				}
+			}
+			return new Image(resI);
 		} else
 			return mask;
 	}
