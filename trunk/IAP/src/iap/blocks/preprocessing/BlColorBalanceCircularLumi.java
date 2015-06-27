@@ -7,9 +7,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.Vector2d;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
-import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+import org.apache.commons.math3.fitting.PolynomialCurveFitter;
+import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -88,19 +87,22 @@ public class BlColorBalanceCircularLumi extends AbstractBlock {
 				}
 			}
 			
-			SplineInterpolator spline = new SplineInterpolator();
-			PolynomialSplineFunction func = spline.interpolate(ArrayUtils.toPrimitive(distValues.toArray(new Double[] {})),
-					ArrayUtils.toPrimitive(brightnessValues.toArray(new Double[] {})));
+			PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
+			WeightedObservedPoints obs = new WeightedObservedPoints();
+			for (int i = 0; i < distValues.size(); i++) {
+				obs.add(1, distValues.get(i), brightnessValues.get(i));
+			}
+			double[] coeff = fitter.fit(obs.toList());
 			
 			float[] lValues = mask.io().channels().getLabFloatArray(Channel.LAB_L);
 			
-			double base = func.value(0);
+			double base = coeff[0];
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
 					int color = img[x][y];
 					if (color != ImageOperation.BACKGROUND_COLORint) {
 						double currentdist = Math.sqrt((x - w / 2) * (x - w / 2) + (y - h / 2) * (y - h / 2));
-						double scale = base / func.value(currentdist);
+						double scale = base / (currentdist * currentdist * coeff[2] + currentdist * coeff[1] + coeff[0]);
 						lValues[x + y * w] *= scale;
 					}
 				}
