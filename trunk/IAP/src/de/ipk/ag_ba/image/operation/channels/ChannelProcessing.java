@@ -14,7 +14,9 @@ import de.ipk.ag_ba.image.structures.Image;
 public class ChannelProcessing {
 	
 	private final int[] imageAs1dArray;
-	private final float[] floatR, floatG, floatB;
+	private float[] floatR;
+	private float[] floatG;
+	private float[] floatB;
 	private final int BACKGROUND_COLORint = ImageOperation.BACKGROUND_COLORint;
 	int width;
 	int height;
@@ -111,6 +113,8 @@ public class ChannelProcessing {
 	}
 	
 	private float[] getXYZfloatArray(Channel c) {
+		if (floatR == null)
+			setFloatFromInt();
 		float[] out = new float[floatR.length];
 		float r, g, b, res;
 		ColorSpaceConverter cspc = new ColorSpaceConverter();
@@ -145,6 +149,12 @@ public class ChannelProcessing {
 			out[i] = res;
 		}
 		return out;
+	}
+	
+	public void setFloatFromInt() {
+		this.floatR = getR().getImage().getAs1float(false);
+		this.floatG = getG().getImage().getAs1float(false);
+		this.floatB = getB().getImage().getAs1float(false);
 	}
 	
 	private ImageOperation getY() {
