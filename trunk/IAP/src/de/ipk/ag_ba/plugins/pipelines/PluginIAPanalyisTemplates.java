@@ -45,6 +45,7 @@ import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
 import iap.blocks.preprocessing.BlClearMasks_WellProcessing;
 import iap.blocks.preprocessing.BlClearRectangle;
+import iap.blocks.preprocessing.BlColorBalanceCircularLumi;
 import iap.blocks.preprocessing.BlColorBalanceVerticalFluo;
 import iap.blocks.preprocessing.BlColorBalanceVerticalVis;
 import iap.blocks.preprocessing.BlColorCorrectionNir;
@@ -175,6 +176,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlFilterImagesByRegularExpression(),
 				new BlFilterImagesByCameraType(),
 				new BlCountColors(),
+				new BlColorBalanceCircularLumi()
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
