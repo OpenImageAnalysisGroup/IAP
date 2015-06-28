@@ -55,6 +55,7 @@ import iap.blocks.preprocessing.BlDetectScaleforNormalization;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlObjectSeparator;
 import iap.blocks.preprocessing.BlObjectSeparatorByDistance;
+import iap.blocks.preprocessing.BlSpotMatcher;
 import iap.blocks.preprocessing.BlSubtractMedianLab;
 import iap.blocks.segmentation.BlAdaptiveThresholdNir;
 import iap.blocks.segmentation.BlCopyImagesApplyMask;
@@ -178,7 +179,8 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlFilterImagesByCameraType(),
 				new BlCountColors(),
 				new BlColorBalanceCircularLumi(),
-				new BlSubtractMedianLab()
+				new BlSubtractMedianLab(),
+				new BlSpotMatcher()
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
