@@ -140,6 +140,10 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return optionsAndResults.getStringSetting(this, setting, defaultValue);
 	}
 	
+	public String getStringRadioSelection(String setting, String defaultValue, ArrayList<String> possibleValues) {
+		return optionsAndResults.getStringSettingRadio(this, setting, defaultValue, possibleValues);
+	}
+	
 	public Color getColor(String setting, Color defaultValue) {
 		return optionsAndResults.getColorSetting(this, setting, defaultValue);
 	}
