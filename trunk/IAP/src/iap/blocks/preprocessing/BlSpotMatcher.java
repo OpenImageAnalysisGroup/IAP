@@ -51,6 +51,7 @@ public class BlSpotMatcher extends AbstractBlock {
 	@Override
 	protected Image processMask(Image mask) {
 		if (mask != null && getBoolean("Process " + mask.getCameraType(), false)) {
+			mask = mask.io().resize(0.25, 0.25).getImage();
 			Image lu = mask.io().channels().getLabL().getImage();
 			int w = mask.getWidth();
 			int h = mask.getHeight();
@@ -96,8 +97,8 @@ public class BlSpotMatcher extends AbstractBlock {
 			boolean[][] okMaskI = new boolean[(int) (scanRadius * 2) + 1][(int) (scanRadius * 2) + 1];
 			for (int offX = -sr; offX <= sr; offX++) {
 				for (int offY = -sr; offY <= scanRadius; offY++) {
-					if ((offX + offY) % 10 != 0)
-						continue;
+					// if ((offX + offY) % 10 != 0)
+					// continue;
 					double dist = Math.sqrt(offX * offX + offY * offY);
 					if (dist < scanRadius)
 						okMaskO[offX + sr][offY + sr] = true;
@@ -110,10 +111,9 @@ public class BlSpotMatcher extends AbstractBlock {
 			DescriptiveStatistics statO = new DescriptiveStatistics();
 			int sr2 = sr * 2;
 			int colSkip = new Color(0, 0, 0).getRGB();
-			for (int x = sr; x < w - sr; x++) {
-				for (int y = sr; y < h - sr; y++) {
-					// if (x % 20 != 0 || y % 20 != 0) {
-					// if ((x + y) % 3 != 0) {
+			for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					// if (x % 5 != 0 || y % 5 != 0) {
 					// img[x][y] = colSkip;
 					// continue;
 					// }
@@ -130,25 +130,27 @@ public class BlSpotMatcher extends AbstractBlock {
 								if (okMaskO[offX][offY]) {
 									int xi = x + offX - sr;
 									int yi = y + offY - sr;
-									float v = values[xi + yi * w];
-									if (okMaskI[offX][offY]) {
-										// inner circle
-										// innerN++;
-										// innerSum += v;
-										statI.addValue(v);
-									} else {
-										// outer circle
-										// outerN++;
-										// outerSum += v;
-										statO.addValue(v);
+									if (xi >= 0 && yi >= 0 && xi < w && yi < h) {
+										float v = values[xi + yi * w];
+										if (okMaskI[offX][offY]) {
+											// inner circle
+											// innerN++;
+											// innerSum += v;
+											statI.addValue(v);
+										} else {
+											// outer circle
+											// outerN++;
+											// outerSum += v;
+											statO.addValue(v);
+										}
+										if (v > max)
+											max = v;
 									}
-									if (v > max)
-										max = v;
 								}
 							}
 						}
-						float averageInner = (float) statI.getPercentile(50);// innerSum / innerN;
-						float averageOuter = (float) statO.getPercentile(50);// outerSum / outerN;
+						float averageInner = (float) statI.getPercentile(darkSpots ? 50 : 50);// innerSum / innerN;
+						float averageOuter = (float) statO.getPercentile(darkSpots ? 50 : 50);// outerSum / outerN;
 						
 						float r;
 						if (darkSpots) {
