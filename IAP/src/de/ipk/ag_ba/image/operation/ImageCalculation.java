@@ -2,6 +2,7 @@ package de.ipk.ag_ba.image.operation;
 
 import java.awt.Color;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import org.Vector2d;
 
@@ -90,6 +91,19 @@ public class ImageCalculation {
 			}
 		}
 		return imageOperation;
+	}
+	
+	public int[] getColors() {
+		LinkedHashSet<Integer> colors = new LinkedHashSet<>();
+		int[] pix = imageOperation.getAs1D();
+		for (int i : pix) {
+			colors.add(i);
+		}
+		int[] cols = new int[colors.size()];
+		int idx = 0;
+		for (Integer c : colors)
+			cols[idx++] = c;
+		return cols;
 	}
 	
 }
