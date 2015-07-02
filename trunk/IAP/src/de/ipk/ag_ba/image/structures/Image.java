@@ -813,4 +813,8 @@ public class Image {
 		}
 		return (float[]) ((FloatProcessor) image.getProcessor()).getPixels();
 	}
+	
+	public float[] getAs1float() {
+		return getAs1float(false);
+	}
 }
