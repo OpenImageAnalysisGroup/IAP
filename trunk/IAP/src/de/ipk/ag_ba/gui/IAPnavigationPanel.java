@@ -366,7 +366,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 							
 							lbl.setText("<html><font size='5'>" + Unicode.STAR);
 							firstStar = false;
-							lbl.setToolTipText("Remove " + title + " bookmark");
+							lbl.setToolTipText("Remove bookmark '" + title + "'");
 							lbl.addMouseListener(getDeleteBookmarkActionListener(lbl, next, ne.getAction(), buttonStyle));
 						} else {
 							if (!disallowBookmarkCreation) {
