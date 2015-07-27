@@ -1,37 +1,82 @@
 -- See end of file for help on upgrade procedure --
 
-V1.1.0 (October 16, 2013)
+V2.0.2 (June 25, 2015)
 --------------------------------------------------------------------------------
-- Outlook -
-* More information on improvements and fixes of V1.1 will be added here, later.
-* Future versions will be even more streamlined according to received user-
-  feedback (initial feedback has been already incorporated). 
-  Further performance improvements are planned.
+* The calculation of the convex hull length was incorrect. This problem has been
+  resolved. Previous calculations of the convex hull length and of the convex
+  hull compactness are either incorrect (in about 10% of the cases) or missing
+  in the result table row (in about 90% of the cases).  Other values, such as
+  convex hull area are not affected by this bug.
+* For testing purposes a image resize block was added.
+* Datasets can be created from a list of files using the 'Load or Create Dataset'
+  > 'Create Dataset from Files' commands.
+
+V2.0.0 (March 17, 2015)
+--------------------------------------------------------------------------------
+* Culmination of a larger number of improvements, both on usability as on
+  feature completeness.
+* Uses a different settings folder path (postfix '2.0') in order to separate 
+  settings and stored pipelines from previous versions (1.x), as analysis 
+  block names and parameter names changed from version 1.1.x to 2.x.
+* The program documentation (documentation.pdf) may still reflect in part old
+  settings names and analysis block names. In case of difficulty, it is
+  recommended to download and use IAP version 1.1.x, as described in the 
+  documentation.pdf from November 2013 (see bottom of title page).
+  Once you are proficient in working with the system, you may update and use
+  version 2.x, which adds new features and is more streamlined. A revision
+  of the documentation will be created over time.
+* After a long period of working at IPK, developing VANTED, KGML-ED and IAP,
+  time has come to finish the current chapter. The overall functionality of 
+  these systems is mostly preserved within IAP.
+
+  Sincerly, Dr. Christian Klukas
+
+V1.1.3 (May 5, 2014)
+--------------------------------------------------------------------------------
+- New Features -
+* Block selection dialog lists blocks in alphabetical order
 
 - Bug Fixes -
-* Fix (change 21):
-  Bug fixes related to the separation of analysis settings, based on the
-  image unit configuration name.
+* Improved compatibility with Add-ons
+* Example Add-on (root analysis) updated
 
+V1.1.2 (April 24, 2014)
+--------------------------------------------------------------------------------
 - New Features -
-* New (change 20)
-  New commands to detect and view sets of experiments with common camera 
-  configurations (based on imported image unit configuration names).
-  The two button commands are available from the MongoDB > Database Tools
-  section. The second command allows copying analysis settings from a previous
-  experiment, to experiments which used the same image unit configurations. 
-  This way it is very quickly possible to analyze all experiments with a common
-  experiment setup, based on a selected experiment analysis pipeline.
-* New (change 19)
-  Maize default pipeline uses various blocks, which are "auto-tuning" its 
-  parameters. The standard pipeline requires thus much less initial 
-  parameterization.
-* New (change 18)
-  Block selection dialog improved (allows selecting analysis blocks using graphical
-  GUI).
-* New (change 17)
-  Add-on manager button command (from IAP > About > Add-on Manager) more easily
-  accessible.
+* The main experiment data file (XML) is stored in compressed form
+  (according VFS setting is enabled by default). Loading of compressed
+  experiment files is supported. The example result files are now compressed,
+  to speed-up the loading when using slow network connections.
+* Improved pipeline block editor window. A context menu ('...' button), can
+  be used to disable a block, to insert new blocks, or to remove a block
+* System Status, Block Execution Statistics command has been added
+
+- Bug Fixes -
+* Loading of analysis blocks, defined in Add-ons, did not work in some cases
+* Fixed layout problem of initially not visible buttons at the end of
+  an command list (if window size was too narrow)
+* Seed-Date meta data processing has been corrected
+
+V1.1.1 (November 22, 2013)
+--------------------------------------------------------------------------------
+- New Features -
+* Tested again with example data set
+* Support for example Add-on (downloadable)
+* Add-on contains working detached leaves analysis functions
+* Updated documentation files
+* Improved result data tree display
+* Leaf-tip-count block newly introduced
+
+- Bug Fixes -
+* Various updates, e.g. related several processing blocks
+* Morphological operations block correctly uses round mask of variable size
+* Calculation of relative growth rates works again
+
+V1.1.0 (November 22, 2013)
+--------------------------------------------------------------------------------
+- New Features -
+- Bug Fixes -
+* Various new features and bug fixes (see V1.1.1 for more details)
 
 V1.0.3 (August 24, 2013)
 --------------------------------------------------------------------------------
@@ -118,10 +163,12 @@ Upgrade procedure
 1. Unzip the downloaded iap.zip file and use the startup-scripts to start IAP.
    Modify the memory settings (-Xmx7g) within the windows or linux/mac start-
    script to fit your system configuration (e.g. system memory minus one or 
-   two gigabytes).
+   two gigabytes). For Mac/Linux, use the ".sh" script files for starting.
+   For Windows, use the ".cmd" script files for starting the program.
 
 2. Confirm the proper update, by clicking "About". The first text box should
-   include the text "(V1.0.3)" below the program name.
+   include the text "(V1.0.3)" or a higher number, depending of the
+   intended download version, below the program name.
    
   
 New installation
@@ -132,4 +179,4 @@ Perform step 1 of the upgrade procedure documentation.
 In case of problems/errors:
 --------------------------------------------------------------------------------
 Within IAP click "Settings > Show Config-File". Close IAP. Move one directory
-up and delete or rename the IAP settings folder ("IAP" or ".iap").
+up and delete or rename the IAP settings folder (starting with "IAP" or ".iap").
