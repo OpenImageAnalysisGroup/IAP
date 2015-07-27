@@ -46,13 +46,6 @@ public class BlSaveResultImages extends AbstractBlock {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Saved camera type " + image.getCameraType() + " to substance "
 								+ res.getParentSample().getParentCondition().getParentSubstance().getName());
 					}
-					if (image.getCameraType() != CameraType.NIR) {
-						ImageHistogram ih = image.io().histogram(false);
-						if (ih.getMostCommonValueR() == ih.getMostCommonValueG() && ih.getMostCommonValueG() == ih.getMostCommonValueB())
-							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Saved camera type " + image.getCameraType() + " to substance "
-									+ res.getParentSample().getParentCondition().getParentSubstance().getName() + ". R=G=B, so NIR image suspected! Image Size: "
-									+ image.getWidth() + "x" + image.getHeight() + ", not transparent pixels: " + image.io().countFilledPixels());
-					}
 					getResultSet().setImage(getBlockPosition(), "RESULT_" + res.getSubstanceName(),
 							new ImageAndImageData(
 									null,// new Image(res.getLoadedImage()),
