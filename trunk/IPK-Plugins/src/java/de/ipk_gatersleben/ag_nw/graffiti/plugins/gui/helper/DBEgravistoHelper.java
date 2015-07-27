@@ -18,7 +18,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.layouters.pattern_springembedde
  * @author Christian Klukas
  */
 public class DBEgravistoHelper implements HelperClass {
-	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 6 // 03.2015";// "release 5 // 03.2014"; // "DBE-Visualisation and Analysis V1.1";
+	public static String DBE_GRAVISTO_VERSION_CODE_SUBVERSION = "release 7 // 07.2015"; // "release 6 // 03.2015";// "release 5 // 03.2014"; //
+																						// "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_VERSION_CODE = "2.0"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_VERSION = "DBE-Gravisto V2015"; // "DBE-Visualisation and Analysis V1.1";
 	public static String DBE_GRAVISTO_NAME = "DBE-Gravisto";
@@ -29,19 +30,16 @@ public class DBEgravistoHelper implements HelperClass {
 	public static String kgmlFileVersionHint = "<sub><small>v0.7.0</small></sub>";
 	
 	public static String getPluginStatusText() {
-		boolean patternTabsLoaded = GravistoService.getInstance().
-				getPluginInstanceFromPluginDescription("IPK Pattern Tabs") != null;
-		boolean springEmbedderLoaded = GravistoService.getInstance().
-				getAlgorithmInstanceFromFriendlyName(PatternSpringembedder.springName) != null;
+		boolean patternTabsLoaded = GravistoService.getInstance().getPluginInstanceFromPluginDescription("IPK Pattern Tabs") != null;
+		boolean springEmbedderLoaded = GravistoService.getInstance().getAlgorithmInstanceFromFriendlyName(PatternSpringembedder.springName) != null;
 		DefaultPluginEntry te = GravistoService.getInstance().getPluginInstanceFromPluginDescription("IPK Editing Tools");
 		boolean ipkEditToolsLoaded = te != null && te.getDescription().getAuthor().toUpperCase().indexOf("IPK") >= 0;
-		boolean ipkGraffitiViewLoaded = GravistoService.getInstance().
-				getPluginInstanceFromPluginDescription("IPK Default View") != null;
+		boolean ipkGraffitiViewLoaded = GravistoService.getInstance().getPluginInstanceFromPluginDescription("IPK Default View") != null;
 		
 		return "Plugin Status:\n" +
-				"Pattern Control/Layouter: " + patternTabsLoaded + "\n" +
-				"Pattern Spring Embedder: " + springEmbedderLoaded + "\n" +
-				"Enhanced IPK Editing Tools: " + ipkEditToolsLoaded + "\n" +
-				"Enhanced IPK Gravisto View: " + ipkGraffitiViewLoaded;
+			"Pattern Control/Layouter: " + patternTabsLoaded + "\n" +
+			"Pattern Spring Embedder: " + springEmbedderLoaded + "\n" +
+			"Enhanced IPK Editing Tools: " + ipkEditToolsLoaded + "\n" +
+			"Enhanced IPK Gravisto View: " + ipkGraffitiViewLoaded;
 	}
 }
