@@ -5,7 +5,7 @@
    "http://vanted.ipk-gatersleben.de/dtd/1.0/plugin.dtd">
 
 <plugin>
-	<author>Christian Klukas, IPK</author>
+	<author>Christian Klukas</author>
 	<description>The Info Dialog for PatternGraffiti</description>
 
 	<plugindesc>
