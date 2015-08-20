@@ -51,11 +51,13 @@ public final class ActionNormalisationCommand extends AbstractNavigationAction i
 		
 		JCheckBox cbStdDevToUnit = new JCheckBox("Set StdDev to 1");
 		cbStdDevToUnit.setSelected(set.getBoolean("Charting", "Normalisation//Set StdDev to 1", false));
+		cbStdDevToUnit.setSelected(false);
+		cbStdDevToUnit.setEnabled(false);
 		
 		JCheckBox cbRangeToUnit = new JCheckBox("Set Range to 1");
 		cbRangeToUnit.setSelected(set.getBoolean("Charting", "Normalisation//Set Range to 1", false));
 		
-		Object[] sa = new Object[4 + 4];
+		Object[] sa = new Object[4 + 6];
 		int idx = 0;
 		sa[idx++] = "";
 		sa[idx++] = cbSetMeanToZero;
