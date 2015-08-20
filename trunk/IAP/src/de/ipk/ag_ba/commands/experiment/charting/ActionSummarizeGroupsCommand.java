@@ -262,7 +262,7 @@ public final class ActionSummarizeGroupsCommand extends AbstractNavigationAction
 						sb.addValue(nmi.getValue());
 					});
 					if (sa.getN() > 0 && sb.getN() > 0) {
-						return ((Double) sa.getMax()).compareTo(sb.getMean());
+						return ((Double) sa.getMean()).compareTo(sb.getMean());
 					} else
 						return 0;
 				});
