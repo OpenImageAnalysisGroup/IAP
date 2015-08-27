@@ -169,6 +169,10 @@ public class ColorUtil {
 	}
 	
 	public static double deltaE2000(Color c1, Color c2) {
+		return deltaE2000(c1, c2, 1, 1, 1);
+	}
+	
+	public static double deltaE2000(Color c1, Color c2, double wl, double wa, double wb) {
 		Color_CIE_Lab cCL1 = colorXYZ2CIELAB(colorRGB2XYZ(c1.getRed(), c1.getGreen(), c1.getBlue()));
 		Color_CIE_Lab cCL2 = colorXYZ2CIELAB(colorRGB2XYZ(c2.getRed(), c2.getGreen(), c2.getBlue()));
 		double CIE_L1 = cCL1.getL();
@@ -179,14 +183,18 @@ public class ColorUtil {
 		double CIE_a2 = cCL2.getA();
 		double CIE_b2 = cCL2.getB(); // Color #2 CIE-L*ab values
 		
-		return deltaE2000(CIE_L1, CIE_a1, CIE_b1, CIE_L2, CIE_a2, CIE_b2);
+		return deltaE2000(CIE_L1, CIE_a1, CIE_b1, CIE_L2, CIE_a2, CIE_b2, wl, wa, wb);
 		
 	}
-
+	
 	public static double deltaE2000(double CIE_L1, double CIE_a1, double CIE_b1, double CIE_L2, double CIE_a2, double CIE_b2) {
-		double WHT_L = 1;
-		double WHT_C = 1;
-		double WHT_H = 1; // Wheight factor
+		return deltaE2000(CIE_L1, CIE_a1, CIE_b1, CIE_L2, CIE_a2, CIE_b2, 1, 1, 1);
+	}
+	
+	public static double deltaE2000(double CIE_L1, double CIE_a1, double CIE_b1, double CIE_L2, double CIE_a2, double CIE_b2, double wl, double wa, double wb) {
+		double WHT_L = wl;
+		double WHT_C = wa;
+		double WHT_H = wb; // Weight factor
 		
 		double xC1 = Math.sqrt(CIE_a1 * CIE_a1 + CIE_b1 * CIE_b1);
 		double xC2 = Math.sqrt(CIE_a2 * CIE_a2 + CIE_b2 * CIE_b2);
