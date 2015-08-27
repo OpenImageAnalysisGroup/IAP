@@ -1,5 +1,9 @@
 package de.ipk.ag_ba.image.operation.channels;
 
+import java.awt.Color;
+
+import org.color.ColorUtil;
+
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.Image;
 
@@ -42,7 +46,7 @@ public class ChannelCalculation {
 				b = 255;
 			p[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		getImage().copy().show("FUUUU");
+		// getImage().copy().show("FUUUU");
 		return this;
 	}
 	
@@ -77,7 +81,7 @@ public class ChannelCalculation {
 				b = 255;
 			p[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		imageOperation.copy().show("UUU");
+		// imageOperation.copy().show("UUU");
 		return this;
 	}
 	
@@ -97,11 +101,11 @@ public class ChannelCalculation {
 			int ai = (int) lab[r][g][b + 256];
 			// int bi = (int) ImageOperation.labCube[r][g][b + 512];
 			
-			imageOperation.getR();
+			// imageOperation.getR();
 			
 			p[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
-		getImage().copy().show("FUUUU");
+		// getImage().copy().show("FUUUU");
 		return this;
 	}
 	
@@ -111,5 +115,18 @@ public class ChannelCalculation {
 	
 	public ImageOperation io() {
 		return imageOperation;
+	}
+	
+	public Image colorDifferenceDeltaE2000(Image image, double wl, double wa, double wb) {
+		int[] a = getImage().getAs1A();
+		int[] b = image.getAs1A();
+		double[] res = new double[Math.min(a.length, b.length)];
+		for (int i = 0; i < Math.min(a.length, b.length); i++) {
+			res[i] = ColorUtil.deltaE2000(new Color(a[i]), new Color(b[i]), wl, wa, wb);
+		}
+		if (a.length < b.length)
+			return new Image(getImage().getWidth(), getImage().getHeight(), res);
+		else
+			return new Image(image.getWidth(), image.getHeight(), res);
 	}
 }
