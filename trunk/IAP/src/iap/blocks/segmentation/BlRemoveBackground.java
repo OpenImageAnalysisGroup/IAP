@@ -48,10 +48,16 @@ public class BlRemoveBackground extends AbstractBlock {
 			// Nir: invert mask then add to image
 			// Fluo: diff = image - mask
 			Image diff_image;
-			if (ct == CameraType.NIR)
-				diff_image = mask.io().invert().add(image).getImage();
+			if (getBoolean("Use Lab Diff Calculation " + ct + " Image", ct == CameraType.VIS))
+				diff_image = mask.io().calc().colorDifferenceDeltaE2000(image,
+						getDouble("Use Lab Diff Calculation " + ct + " Image (L importance)", 1),
+						getDouble("Use Lab Diff Calculation " + ct + " Image (a importance)", 1),
+						getDouble("Use Lab Diff Calculation " + ct + " Image (b importance)", 1));
 			else
-				diff_image = mask.io().diff(image).getImage();
+				if (ct == CameraType.NIR)
+					diff_image = mask.io().invert().add(image).getImage();
+				else
+					diff_image = mask.io().diff(image).getImage();
 			
 			if (debug)
 				diff_image.show("diff", debug);
