@@ -2369,12 +2369,15 @@ public class AttributeHelper implements HelperClass {
 	public static String getColorName(Color c1) {
 		if (c1 == null)
 			return "not set (null)";
-		
+		return getColorName(c1.getRed(), c1.getGreen(), c1.getBlue());
+	}
+	
+	public static String getColorName(int red, int green, int blue) {
 		int nearest = -1;
 		int i = 0;
 		double diff = Double.MAX_VALUE;
 		
-		Color_CIE_Lab cCL1 = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(c1.getRed(), c1.getGreen(), c1.getBlue()));
+		Color_CIE_Lab cCL1 = ColorUtil.colorXYZ2CIELAB(ColorUtil.colorRGB2XYZ(red, green, blue));
 		double CIE_L1 = cCL1.getL();
 		double CIE_a1 = cCL1.getA();
 		double CIE_b1 = cCL1.getB(); // Color #1 CIE-L*ab values
