@@ -5,6 +5,8 @@ import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
 import iap.blocks.data_structures.CalculatedPropertyDescription;
 import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.image_analysis_tools.cvppp_2014.LeafCountCvppp;
+import iap.blocks.image_analysis_tools.cvppp_2014.LeafSegmentationCvppp;
 import iap.blocks.image_analysis_tools.imageJ.externalPlugins.MaximumFinder;
 import iap.blocks.image_analysis_tools.leafClustering.Feature;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
@@ -13,11 +15,14 @@ import ij.process.ByteProcessor;
 import ij.process.FloatProcessor;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.GapList;
 import org.SystemAnalysis;
 
+import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -27,15 +32,44 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 	
 	@Override
 	protected Image processMask(Image mask) {
-		Image res;
+		Image workimg;
+		Image res = null;
 		if (mask == null)
-			res = null;
+			workimg = null;
 		else {
-			res = mask;
+			workimg = mask.copy();
+			boolean performLabeling = getBoolean("Perform Leaf Labeling", false);
+			int maxTolerance = getInt("Maximum Tolerance", 5);
 			// only top images
 			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				GapList<Feature> pointList = detectCenterPoints(res);
-				res = saveAndMarkResults(res, pointList, input().images().getImageInfo(mask.getCameraType()));
+				if (performLabeling) {
+					// start CVPPP 2014 challenge code for leaf labeling
+					// leaf-count
+					Image[] segmentedImages = new Image[] { workimg };
+					Image[] segmentedAndNotSplitImages = new Image[] { workimg };
+					LeafCountCvppp lc = new LeafCountCvppp(segmentedImages);
+					try {
+						lc.detectLeaves(maxTolerance);
+					} catch (InterruptedException e1) {
+						throw new RuntimeException(e1);
+					}
+					segmentedImages = lc.getResultImages();
+					segmentedImages[0].show("Split Image", debugValues);
+					HashMap<String, ArrayList<Feature>> leafCenterPoints = lc.getLeafCenterPoints();
+					
+					// leaf segmentation
+					LeafSegmentationCvppp ls = new LeafSegmentationCvppp(leafCenterPoints, segmentedImages, segmentedAndNotSplitImages);
+					try {
+						ls.segmentLeaves();
+						res = ls.getResultImage();
+						res = res.io().replaceColor(-16777216, ImageOperation.BACKGROUND_COLORint).show("lebeled Leaf Image", debugValues).getImage();
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
+				} else {
+					GapList<Feature> pointList = detectCenterPoints(workimg, maxTolerance);
+					res = saveAndMarkResults(workimg, pointList, input().images().getImageInfo(mask.getCameraType()));
+				}
 			}
 		}
 		return res;
@@ -86,7 +120,7 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		return img;
 	}
 	
-	private GapList<Feature> detectCenterPoints(Image img) {
+	private GapList<Feature> detectCenterPoints(Image img, int maxTolerance) {
 		img = img.io().bm().dilate(getInt("Mask Size for Dilate", 5)).getImage();
 		FloatProcessor edmfp = img.io().bm().edmFloat();
 		
@@ -96,7 +130,6 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		}
 		
 		MaximumFinder mf = new MaximumFinder();
-		int maxTolerance = getInt("Maximum Tolerance", 5);
 		
 		GapList<Feature> centerPoints = new GapList<Feature>();
 		try {
@@ -149,7 +182,7 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 	
 	@Override
 	public String getDescription() {
-		return "Detects leaf center points from top view (for arabidopsis, tobacco)";
+		return "Detects leaf center points from top view (for arabidopsis, tobacco). Also the method for leaf labeling of rosette plants which can be found in 'Pape, J.M., Klukas, C.: 3-D histogram-based segmentation and leaf detection for rosette plants. In: Computer Vision - ECCV 2014 Workshops, vol. 8928, pp. 61–74 (2015)' is included and can be performed by enabeling the option 'Perform Leaf Labeling'.";
 	}
 	
 	@Override
