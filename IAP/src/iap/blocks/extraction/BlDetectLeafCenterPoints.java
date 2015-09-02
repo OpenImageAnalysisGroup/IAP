@@ -1,19 +1,5 @@
 package iap.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractBlock;
-import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.CalculatedProperty;
-import iap.blocks.data_structures.CalculatedPropertyDescription;
-import iap.blocks.data_structures.CalculatesProperties;
-import iap.blocks.image_analysis_tools.cvppp_2014.LeafCountCvppp;
-import iap.blocks.image_analysis_tools.cvppp_2014.LeafSegmentationCvppp;
-import iap.blocks.image_analysis_tools.imageJ.externalPlugins.MaximumFinder;
-import iap.blocks.image_analysis_tools.leafClustering.Feature;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-import ij.measure.ResultsTable;
-import ij.process.ByteProcessor;
-import ij.process.FloatProcessor;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +13,19 @@ import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.image_analysis_tools.cvppp_2014.LeafCountCvppp;
+import iap.blocks.image_analysis_tools.cvppp_2014.LeafSegmentationCvppp;
+import iap.blocks.image_analysis_tools.imageJ.externalPlugins.MaximumFinder;
+import iap.blocks.image_analysis_tools.leafClustering.Feature;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
+import ij.measure.ResultsTable;
+import ij.process.ByteProcessor;
+import ij.process.FloatProcessor;
 
 public class BlDetectLeafCenterPoints extends AbstractBlock implements CalculatesProperties {
 	
@@ -42,34 +41,34 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			int maxTolerance = getInt("Maximum Tolerance", 5);
 			// only top images
 			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-				if (performLabeling) {
-					// start CVPPP 2014 challenge code for leaf labeling
-					// leaf-count
-					Image[] segmentedImages = new Image[] { workimg };
-					Image[] segmentedAndNotSplitImages = new Image[] { workimg };
-					LeafCountCvppp lc = new LeafCountCvppp(segmentedImages);
-					try {
-						lc.detectLeaves(maxTolerance);
-					} catch (InterruptedException e1) {
-						throw new RuntimeException(e1);
-					}
-					segmentedImages = lc.getResultImages();
-					segmentedImages[0].show("Split Image", debugValues);
-					HashMap<String, ArrayList<Feature>> leafCenterPoints = lc.getLeafCenterPoints();
-					
-					// leaf segmentation
-					LeafSegmentationCvppp ls = new LeafSegmentationCvppp(leafCenterPoints, segmentedImages, segmentedAndNotSplitImages);
-					try {
-						ls.segmentLeaves();
-						res = ls.getResultImage();
-						res = res.io().replaceColor(-16777216, ImageOperation.BACKGROUND_COLORint).show("lebeled Leaf Image", debugValues).getImage();
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
-				} else {
-					GapList<Feature> pointList = detectCenterPoints(workimg, maxTolerance);
-					res = saveAndMarkResults(workimg, pointList, input().images().getImageInfo(mask.getCameraType()));
+			if (performLabeling) {
+				// start CVPPP 2014 challenge code for leaf labeling
+				// leaf-count
+				Image[] segmentedImages = new Image[] { workimg };
+				Image[] segmentedAndNotSplitImages = new Image[] { workimg };
+				LeafCountCvppp lc = new LeafCountCvppp(segmentedImages);
+				try {
+					lc.detectLeaves(maxTolerance);
+				} catch (InterruptedException e1) {
+					throw new RuntimeException(e1);
 				}
+				segmentedImages = lc.getResultImages();
+				segmentedImages[0].show("Split Image", debugValues);
+				HashMap<String, ArrayList<Feature>> leafCenterPoints = lc.getLeafCenterPoints();
+				
+				// leaf segmentation
+				LeafSegmentationCvppp ls = new LeafSegmentationCvppp(leafCenterPoints, segmentedImages, segmentedAndNotSplitImages);
+				try {
+					ls.segmentLeaves();
+					res = ls.getResultImage();
+					res = res.io().replaceColor(-16777216, ImageOperation.BACKGROUND_COLORint).show("lebeled Leaf Image", debugValues).getImage();
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				GapList<Feature> pointList = detectCenterPoints(workimg, maxTolerance);
+				res = saveAndMarkResults(workimg, pointList, input().images().getImageInfo(mask.getCameraType()));
+			}
 			}
 		}
 		return res;
@@ -84,7 +83,7 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		if (markResults) {
 			ImageCanvas ic = new ImageCanvas(img);
 			for (Feature p : pointList) {
-				ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 3);
+			ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 3);
 			}
 			img = ic.getImage();
 		}
@@ -93,21 +92,21 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			CameraPosition pos = optionsAndResults.getCameraPosition();
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint.count"), pointList.size(), "leaves", this, imageRef);
-			
+				new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint.count"), pointList.size(), "leaves", this, imageRef);
+				
 			// save x and y position
 			if (saveCPCoordinates) {
-				int num = 0;
-				for (Feature p : pointList) {
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.x"), (int) p.getPosition().getX(),
-							"leaves", this, imageRef);
-					
-					getResultSet().setNumericResult(getBlockPosition(),
-							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.y"), (int) p.getPosition().getY(),
-							"leaves", this, imageRef);
-					num++;
-				}
+			int num = 0;
+			for (Feature p : pointList) {
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.x"), (int) p.getPosition().getX(),
+						"leaves", this, imageRef);
+						
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.y"), (int) p.getPosition().getY(),
+						"leaves", this, imageRef);
+				num++;
+			}
 			}
 		}
 		
@@ -136,21 +135,21 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			ByteProcessor bp = mf.findMaxima(edmfp, maxTolerance, 1, mf.LIST, true, true);
 			
 			if (debugValues && bp != null)
-				new Image(bp.getBufferedImage()).show("Maximas");
+			new Image(bp.getBufferedImage()).show("Maximas");
 			
 			ResultsTable rt = mf.getRt();
 			
 			if (debugValues)
-				rt.show("results");
+			rt.show("results");
 			
 			for (int i = 0; i < rt.getCounter(); i++) {
-				int x = (int) rt.getValue("X", i);
-				int y = (int) rt.getValue("Y", i);
-				centerPoints.add(new Feature(x, y));
+			int x = (int) rt.getValue("X", i);
+			int y = (int) rt.getValue("Y", i);
+			centerPoints.add(new Feature(x, y));
 			}
 		} catch (Exception e) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Could not calculate leaf center points for image (forground pixels: "
-					+ img.io().countFilledPixels() + ")!");
+				+ img.io().countFilledPixels() + ")!");
 		}
 		return centerPoints;
 	}
@@ -182,15 +181,15 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 	
 	@Override
 	public String getDescription() {
-		return "Detects leaf center points from top view (for arabidopsis, tobacco). Also the method for leaf labeling of rosette plants which can be found in 'Pape, J.M., Klukas, C.: 3-D histogram-based segmentation and leaf detection for rosette plants. In: Computer Vision - ECCV 2014 Workshops, vol. 8928, pp. 61–74 (2015)' is included and can be performed by enabeling the option 'Perform Leaf Labeling'.";
+		return "Detects leaf center points from top view (for arabidopsis, tobacco). Also the method for leaf labeling of rosette plants which can be found in 'Pape, J.M., Klukas, C.: 3-D histogram-based segmentation and leaf detection for rosette plants. In: Computer Vision - ECCV 2014 Workshops, vol. 8928, pp. 61-74 (2015)' is included and can be performed by enabeling the option 'Perform Leaf Labeling'.";
 	}
 	
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("leaf.count", "Number of detected leaves."),
-				new CalculatedProperty("leaf.*.position.x", "Center position (X-axis) of a leaf."),
-				new CalculatedProperty("leaf.*.position.y", "Center position (Y-axis) of a leaf."),
+			new CalculatedProperty("leaf.count", "Number of detected leaves."),
+			new CalculatedProperty("leaf.*.position.x", "Center position (X-axis) of a leaf."),
+			new CalculatedProperty("leaf.*.position.y", "Center position (Y-axis) of a leaf."),
 		};
 	}
 	
