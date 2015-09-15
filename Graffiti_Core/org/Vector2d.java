@@ -111,6 +111,10 @@ public class Vector2d {
 		y = ry;
 	}
 	
+	public double angle() {
+		return Math.atan2(y, x);
+	}
+	
 	public double angle(Vector2d end) {
 		return Math.atan2(end.y - y, end.x - x);
 	}
@@ -135,5 +139,4 @@ public class Vector2d {
 	public double getY() {
 		return y;
 	}
-	
 }
