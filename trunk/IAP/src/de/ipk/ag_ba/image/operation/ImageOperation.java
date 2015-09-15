@@ -4794,15 +4794,38 @@ public class ImageOperation implements MemoryHogInterface {
 	}
 	
 	/**
-	 * Calculation of the distance map. MaxStep defines the precision of the algorithm (1 - correct result), by using a high Stepsize the algorithm
-	 * becomes much faster, but produces noise. While using a high Stepsize a GaussianBlur or a medianfilter is quite handy to supress noise.
-	 * 
-	 * @param maxStep
-	 *           should be > 0
-	 * @return 2d array
+	 * Check source code for details. Uses Mode INT_DISTANCE_SQUARED.
 	 */
 	public ImageOperation distanceMap() {
 		return distanceMap(DistanceCalculationMode.INT_DISTANCE_SQARED, 1);
+	}
+	
+	public float[][] distanceMapFloat(DistanceMapFloatMode dm) {
+		int background = BACKGROUND_COLORint;
+		int borderColor = Color.CYAN.getRGB();
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[][] img = getAs2D();
+		ImageOperation ioBorderPixels = new ImageOperation(getAs2D()).border().borderDetection(background,
+				Integer.MAX_VALUE,
+				false).show("BORDER PIXELS", false);
+		int borderLength = (int) ioBorderPixels.getResultsTable().getValue("border", 0);
+		int[][] borderMap = ioBorderPixels.getAs2D();
+		int[] borderList = getBorderList(borderMap, borderLength);
+		float[][] distMap = new float[w][h];
+		float dist = Float.MAX_VALUE;
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
+				if (img[x][y] != background && borderMap[x][y] == background) { // Foreground, no borderpixel
+					for (int i = 0; i < borderList.length; i += 2) { // iterate borderlist
+						dist = processBorderListPixelFloat(dm, img, borderList, dist, x, y, i);
+					}
+					distMap[x][y] = dist;
+				}
+				dist = Float.MAX_VALUE;
+			}
+		}
+		return distMap;
 	}
 	
 	/**
@@ -4810,6 +4833,7 @@ public class ImageOperation implements MemoryHogInterface {
 	 * @param scale
 	 *           Is used only for the mode INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION, in this case it is assumed, that the
 	 *           input image was enlarged accordingly, and the fractional subtraction is then multiplied by this enlargement.
+	 *           If INT_DISTANCE_TIMES10_GRAY_YIELDS_FRACTION is used, distance above 25.5 px are trimmed to int result intensity 255.
 	 * @return
 	 */
 	public ImageOperation distanceMap(DistanceCalculationMode mode, double scale) {
@@ -4871,6 +4895,34 @@ public class ImageOperation implements MemoryHogInterface {
 				
 		if (disttemp < dist)
 			dist = disttemp;
+		return dist;
+	}
+	
+	private float processBorderListPixelFloat(DistanceMapFloatMode dm, int[][] img, int[] borderList, float dist, int x, int y, int i) {
+		int xtemp = borderList[i];
+		int ytemp = borderList[i + 1];
+		
+		// distance is multiplied by 10
+		float ddist = Float.MAX_VALUE;
+		
+		switch (dm) {
+			case ANGLE_DEGREE_m180_p180:
+				ddist = (float) new Vector2d(xtemp - x, ytemp - y).angle();
+				break;
+			case DIST:
+				ddist = (float) Math.sqrt(((x - xtemp) * (x - xtemp) + (y - ytemp) * (y - ytemp))); // calc distance as double value
+				break;
+			case X:
+				ddist = x - xtemp;
+				break;
+			case Y:
+				ddist = y - ytemp;
+			default:
+				throw new UnsupportedOperationException("unknown distance map calculation mode");
+		}
+		
+		if (ddist < dist)
+			dist = ddist;
 		return dist;
 	}
 	
