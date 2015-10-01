@@ -1,14 +1,5 @@
 package iap.blocks.image_analysis_tools.cvppp_2014;
 
-import iap.blocks.image_analysis_tools.imageJ.externalPlugins.MaximumFinder;
-import iap.blocks.image_analysis_tools.leafClustering.Feature;
-import ij.ImagePlus;
-import ij.measure.ResultsTable;
-import ij.process.ByteProcessor;
-import ij.process.FloatProcessor;
-import ij.process.ImageConverter;
-import ij.process.ImageProcessor;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +11,14 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.PositionAndColor;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.image_analysis_tools.imageJ.externalPlugins.MaximumFinder;
+import iap.blocks.image_analysis_tools.leafClustering.Feature;
+import ij.ImagePlus;
+import ij.measure.ResultsTable;
+import ij.process.ByteProcessor;
+import ij.process.FloatProcessor;
+import ij.process.ImageConverter;
+import ij.process.ImageProcessor;
 
 public class LeafCountCvppp {
 	
@@ -39,21 +38,20 @@ public class LeafCountCvppp {
 		// old tuning parms
 		// final double maxTolerance = 10.0; // 0.1 * getTuningValue("maxTolerance", 1.0, 1.0, 30.0, tune); // A1 : 10, A2 : 11
 		final double scaleErode = 0.0;// getTuningValue("scaleErode", 1.0, 1.0, 30.0, tune); // A 2 : 0
-		final double remove = 0.0;// getTuningValue("remove", 1.0, 1.0, 30.0, tune);
+		
 		for (int idx = 0; idx < images.length; idx++) {
 			final int idx_fin = idx;
 			final Image segmented = images[idx];
-			resultImages[idx_fin] = runS(maxTolerance, segmented.copy(), scaleErode, (int) remove);
+			resultImages[idx_fin] = runS(maxTolerance, segmented.copy(), scaleErode);
 			resultImages[idx_fin].setFilename(segmented.getFileName());
 		}
 	}
 	
-	private Image runS(double maxTolerance, Image segmented, double scaleErode, int remove) {
+	private Image runS(double maxTolerance, Image segmented, double scaleErode) {
 		Image segmentedUnchanged = segmented.copy();
 		ArrayList<Feature> leafCenterPoints;
 		
 		leafCenterPoints = detectCenterPoints(segmented.copy(), maxTolerance);
-		maxTolerance = maxTolerance - 1.0;
 		
 		String id = "1";
 		
@@ -88,7 +86,7 @@ public class LeafCountCvppp {
 		new Image(skel.getWidth(), skel.getHeight(), mapped).show("mapped", false);
 		
 		GraphAnalysisCvppp ga = new GraphAnalysisCvppp(segmented, mapped, leafCenterPoints, segmented.getWidth(), segmented.getHeight(),
-				ImageOperation.BACKGROUND_COLORint);
+			ImageOperation.BACKGROUND_COLORint);
 		ga.doTracking(null);
 		// ga.doTracking(segmented.getFileName().contains("_030") ? "graph30" : null);
 		ArrayList<PositionAndColor> pp = ga.getSplitPoints();
@@ -99,63 +97,63 @@ public class LeafCountCvppp {
 			int[][] seg2d = segmented.getAs2A();
 			
 			for (PositionAndColor p : pp) {
-				
-				int nearX = -1, nearY = -1, r = p.intensityInt / 1000 + 20;
-				double mindist = Double.MAX_VALUE;
-				double mindistToCenter = Double.MAX_VALUE;
-				int w = segmented.getWidth();
-				int h = segmented.getHeight();
-				
-				for (int x = p.x - r; x < p.x + r; x++) {
-					for (int y = p.y - r; y < p.y + r; y++) {
-						if (x < 0 || y < 0 || x >= seg2d.length || y >= seg2d[0].length)
-							continue;
+			
+			int nearX = -1, nearY = -1, r = p.intensityInt / 1000 + 20;
+			double mindist = Double.MAX_VALUE;
+			double mindistToCenter = Double.MAX_VALUE;
+			int w = segmented.getWidth();
+			int h = segmented.getHeight();
+			
+			for (int x = p.x - r; x < p.x + r; x++) {
+				for (int y = p.y - r; y < p.y + r; y++) {
+					if (x < 0 || y < 0 || x >= seg2d.length || y >= seg2d[0].length)
+						continue;
+					if (seg2d[x][y] == ImageOperation.BACKGROUND_COLORint) {
+						double tempdist = Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
+						double tempdistToCenter = Math.sqrt((x - w / 2) * (x - w / 2) + (y - h / 2) * (y - h / 2));
+						if (tempdist < mindist || (tempdist <= mindist && tempdistToCenter < mindistToCenter)) {
+						mindist = tempdist;
+						mindistToCenter = tempdistToCenter;
+						nearX = x;
+						nearY = y;
+						}
+					}
+				}
+			}
+			if (mindistToCenter < Double.MAX_VALUE) {
+				Vector2i dir = new Vector2i(nearX - p.x, nearY - p.y);
+				dir.x = -dir.x;
+				dir.y = -dir.y;
+				int ox = p.x + dir.x;
+				int oy = p.y + dir.y;
+				int nearX2 = ox;
+				int nearY2 = oy;
+				int findX = ox;
+				int findY = oy;
+				mindist = Double.MAX_VALUE;
+				mindistToCenter = Double.MAX_VALUE;
+				for (int x = ox - r; x < ox + r; x++) {
+					for (int y = oy - r; y < oy + r; y++) {
+						if (x < 0 || y < 0 || x >= w || y >= h)
+						continue;
+						if (nearX == x && nearY == y)
+						continue;
 						if (seg2d[x][y] == ImageOperation.BACKGROUND_COLORint) {
-							double tempdist = Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
-							double tempdistToCenter = Math.sqrt((x - w / 2) * (x - w / 2) + (y - h / 2) * (y - h / 2));
-							if (tempdist < mindist || (tempdist <= mindist && tempdistToCenter < mindistToCenter)) {
-								mindist = tempdist;
-								mindistToCenter = tempdistToCenter;
-								nearX = x;
-								nearY = y;
-							}
+						double tempdist = Math.sqrt((x - findX) * (x - findX) + (y - findY) * (y - findY));
+						if (tempdist < mindist) {
+							mindist = tempdist;
+							nearX2 = x;
+							nearY2 = y;
+						}
 						}
 					}
 				}
-				if (mindistToCenter < Double.MAX_VALUE) {
-					Vector2i dir = new Vector2i(nearX - p.x, nearY - p.y);
-					dir.x = -dir.x;
-					dir.y = -dir.y;
-					int ox = p.x + dir.x;
-					int oy = p.y + dir.y;
-					int nearX2 = ox;
-					int nearY2 = oy;
-					int findX = ox;
-					int findY = oy;
-					mindist = Double.MAX_VALUE;
-					mindistToCenter = Double.MAX_VALUE;
-					for (int x = ox - r; x < ox + r; x++) {
-						for (int y = oy - r; y < oy + r; y++) {
-							if (x < 0 || y < 0 || x >= w || y >= h)
-								continue;
-							if (nearX == x && nearY == y)
-								continue;
-							if (seg2d[x][y] == ImageOperation.BACKGROUND_COLORint) {
-								double tempdist = Math.sqrt((x - findX) * (x - findX) + (y - findY) * (y - findY));
-								if (tempdist < mindist) {
-									mindist = tempdist;
-									nearX2 = x;
-									nearY2 = y;
-								}
-							}
-						}
-					}
-					if (debugDraw)
-						ic = ic.drawCircle(p.x, p.y, 5, Color.BLUE.getRGB(), 0, 1);
-					ic = ic.drawLine(nearX, nearY, nearX2, nearY2, debugDraw ? Color.PINK.getRGB() : ImageOperation.BACKGROUND_COLORint, 0, 0);
-				} else {
-					// System.out.println("WARNING:  No path!");
-				}
+				if (debugDraw)
+					ic = ic.drawCircle(p.x, p.y, 5, Color.BLUE.getRGB(), 0, 1);
+				ic = ic.drawLine(nearX, nearY, nearX2, nearY2, debugDraw ? Color.PINK.getRGB() : ImageOperation.BACKGROUND_COLORint, 0, 0);
+			} else {
+				// System.out.println("WARNING: No path!");
+			}
 			}
 			
 			resultImg = ic.getImage();
@@ -172,9 +170,9 @@ public class LeafCountCvppp {
 		for (int i = 0; i < dist.length; i++) {
 			float pix;
 			if (Math.abs(skel1d[i] - background) > 0.0001)
-				pix = dist[i] * 1000;
+			pix = dist[i] * 1000;
 			else
-				pix = background;
+			pix = background;
 			res[i] = (int) pix;
 		}
 		return res;
@@ -185,7 +183,7 @@ public class LeafCountCvppp {
 		
 		if (debug)
 			new Image(edmfp.getBufferedImage()).show("distmap");
-		
+			
 		MaximumFinder mf = new MaximumFinder();
 		ByteProcessor bp = mf.findMaxima(edmfp, maxTolerance, ImageProcessor.NO_THRESHOLD, mf.LIST, false, true);
 		
@@ -196,7 +194,7 @@ public class LeafCountCvppp {
 		
 		if (debug)
 			rt.show("results");
-		
+			
 		ArrayList<Feature> centerPoints = new ArrayList<Feature>();
 		
 		for (int i = 0; i < rt.getCounter(); i++) {
