@@ -7,9 +7,11 @@ import java.util.HashSet;
 
 import org.GapList;
 import org.SystemAnalysis;
+import org.Vector2i;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
+import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
@@ -41,34 +43,63 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			int maxTolerance = getInt("Maximum Tolerance", 5);
 			// only top images
 			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-			if (performLabeling) {
-				// start CVPPP 2014 challenge code for leaf labeling
-				// leaf-count
-				Image[] segmentedImages = new Image[] { workimg };
-				Image[] segmentedAndNotSplitImages = new Image[] { workimg };
-				LeafCountCvppp lc = new LeafCountCvppp(segmentedImages);
-				try {
-					lc.detectLeaves(maxTolerance);
-				} catch (InterruptedException e1) {
-					throw new RuntimeException(e1);
+				if (performLabeling) {
+					// start CVPPP 2014 challenge code for leaf labeling
+					res = performLeafLabeling(workimg, res, maxTolerance, input().images().getImageInfo(mask.getCameraType()));
+				} else {
+					GapList<Feature> pointList = detectCenterPoints(workimg, maxTolerance);
+					res = saveAndMarkResults(workimg, pointList, input().images().getImageInfo(mask.getCameraType()));
 				}
-				segmentedImages = lc.getResultImages();
-				segmentedImages[0].show("Split Image", debugValues);
-				HashMap<String, ArrayList<Feature>> leafCenterPoints = lc.getLeafCenterPoints();
-				
-				// leaf segmentation
-				LeafSegmentationCvppp ls = new LeafSegmentationCvppp(leafCenterPoints, segmentedImages, segmentedAndNotSplitImages);
-				try {
-					ls.segmentLeaves();
-					res = ls.getResultImage();
-					res = res.io().replaceColor(-16777216, ImageOperation.BACKGROUND_COLORint).show("lebeled Leaf Image", debugValues).getImage();
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-			} else {
-				GapList<Feature> pointList = detectCenterPoints(workimg, maxTolerance);
-				res = saveAndMarkResults(workimg, pointList, input().images().getImageInfo(mask.getCameraType()));
 			}
+		}
+		return res;
+	}
+
+	private Image performLeafLabeling(Image workimg, Image res, int maxTolerance, ImageData imageRef) {
+		boolean saveLeafFeatures = getBoolean("Save Center Points Corrdinates and Leaf Features", false);
+		// leaf-count
+		Image[] segmentedImages = new Image[] { workimg };
+		Image[] segmentedAndNotSplitImages = new Image[] { workimg };
+		LeafCountCvppp lc = new LeafCountCvppp(segmentedImages);
+		try {
+			lc.detectLeaves(maxTolerance);
+		} catch (InterruptedException e1) {
+			throw new RuntimeException(e1);
+		}
+		segmentedImages = lc.getResultImages();
+		segmentedImages[0].show("Split Image", debugValues);
+		HashMap<String, ArrayList<Feature>> leafCenterPoints = lc.getLeafCenterPoints();
+		
+		// leaf segmentation
+		LeafSegmentationCvppp ls = new LeafSegmentationCvppp(leafCenterPoints, segmentedImages, segmentedAndNotSplitImages);
+		try {
+			ls.segmentLeaves();
+			res = ls.getResultImage();
+			res = res.io().replaceColor(-16777216, ImageOperation.BACKGROUND_COLORint).show("lebeled Leaf Image", debugValues).getImage();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+		if(saveLeafFeatures) {
+			ClusterDetection cd = new ClusterDetection(res, ImageOperation.BACKGROUND_COLORint);
+			cd.detectClusters();
+			Vector2i[] centers = cd.getClusterCenterPoints();
+			int[] sizes = cd.getClusterSize();
+			
+			CameraPosition pos = optionsAndResults.getCameraPosition();
+			
+			for (int num =0; num <  cd.getClusterCount(); num++) {
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.centerpoint." + num + ".position.x"), (int) centers[num].x,
+						"leaves", this, imageRef);
+						
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.centerpoint." + num + ".position.y"), (int) centers[num].y,
+						"leaves", this, imageRef);
+				
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.area." + num), (int) sizes[num],
+						"leaves", this, imageRef);
+				num++;
 			}
 		}
 		return res;
