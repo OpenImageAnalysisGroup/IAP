@@ -24,7 +24,6 @@ import iap.blocks.image_analysis_tools.cvppp_2014.LeafCountCvppp;
 import iap.blocks.image_analysis_tools.cvppp_2014.LeafSegmentationCvppp;
 import iap.blocks.image_analysis_tools.imageJ.externalPlugins.MaximumFinder;
 import iap.blocks.image_analysis_tools.leafClustering.Feature;
-import iap.blocks.image_analysis_tools.methods.RegionLabeling;
 import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 import ij.measure.ResultsTable;
 import ij.process.ByteProcessor;
@@ -82,18 +81,19 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		}
 		if (saveLeafFeatures) {
 			// res.show("res");
-			ClusterDetection cd = new ClusterDetection(res, -1);
+			ClusterDetection cd = new ClusterDetection(res, ImageOperation.BACKGROUND_COLORint);
+			cd.enableColorMode();
 			cd.detectClusters();
 			Vector2i[] centers = cd.getClusterCenterPoints();
 			int[] sizes = cd.getClusterSize();
 			int cdcount = cd.getClusterCount();
 			
-			RegionLabeling rl = new RegionLabeling(res, false, ImageOperation.BACKGROUND_COLORint, ImageOperation.BACKGROUND_COLORint);
-			rl.detectClusters();
-			int rlcount = rl.getClusterCount();
-			
 			CameraPosition pos = optionsAndResults.getCameraPosition();
 			
+			getResultSet().setNumericResult(getBlockPosition(),
+				new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.count.distmapBased"), cdcount,
+				"centerpoint based", this, imageRef);
+				
 			for (int num = 1; num <= cd.getClusterCount(); num++) {
 			getResultSet().setNumericResult(getBlockPosition(),
 					new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.centerpoint." + num + ".position.x"), centers[num].x,
@@ -105,7 +105,7 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 					
 			getResultSet().setNumericResult(getBlockPosition(),
 					new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.area." + num), sizes[num],
-					"leaves", this, imageRef);
+					"pixel", this, imageRef);
 			}
 		}
 		return res;
