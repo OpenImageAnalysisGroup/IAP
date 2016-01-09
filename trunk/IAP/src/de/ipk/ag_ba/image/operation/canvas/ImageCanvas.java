@@ -358,6 +358,16 @@ public class ImageCanvas {
 		return this;
 	}
 	
+	public ImageCanvas text(int x, int y, String text, Color color, int size, TextJustification justification) {
+		image.io().ip().getProcessor().setJustification(justification.getValue());
+		image.io().ip().getProcessor().setColor(color);
+		image.io().ip().getProcessor().setFont(new Font("", Font.BOLD, size));
+		image.io().ip().getProcessor().drawString(text, x, y);
+		image.io().ip().getProcessor().reset();
+		image.io().ip().getProcessor().setJustification(TextJustification.LEFT.getValue());
+		return this;
+	}
+	
 	public ImageCanvas drawRectangle(int x, int y, int w, int h, Color c, int thickness) {
 		int ci = c.getRGB();
 		return drawLine(x, y, x + w, y, ci, 0, thickness)
