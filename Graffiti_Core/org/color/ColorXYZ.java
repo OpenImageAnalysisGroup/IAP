@@ -88,7 +88,7 @@ public class ColorXYZ {
 	}
 	
 	/**
-	 * Does not yet work.
+	 * May not yet work.
 	 */
 	public int getColorRGB(int errorColorValue) {
 		double var_X = x / 100d; // X from 0 to 95.047 (Observer = 2°, Illuminant = D65)
