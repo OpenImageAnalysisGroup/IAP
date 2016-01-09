@@ -30,7 +30,7 @@ public class ChannelProcessing {
 		this.height = height;
 	}
 	
-	public ChannelProcessing(float[] floatR, float[] floatG, float[] floatB, int width, int height, float divistorFor8bitRangeTarget) {
+	public ChannelProcessing(float[] floatR, float[] floatG, float[] floatB, int width, int height, float divisorFor8bitRangeTarget) {
 		this.imageAs1dArray = null;
 		this.floatR = new float[floatR.length];
 		this.floatG = new float[floatG.length];
@@ -40,9 +40,9 @@ public class ChannelProcessing {
 		assert floatG.length == floatB.length;
 		
 		for (int idx = 0; idx < floatR.length; idx++) {
-			this.floatR[idx] = floatR[idx] / divistorFor8bitRangeTarget;
-			this.floatG[idx] = floatG[idx] / divistorFor8bitRangeTarget;
-			this.floatB[idx] = floatB[idx] / divistorFor8bitRangeTarget;
+			this.floatR[idx] = floatR[idx] / divisorFor8bitRangeTarget;
+			this.floatG[idx] = floatG[idx] / divisorFor8bitRangeTarget;
+			this.floatB[idx] = floatB[idx] / divisorFor8bitRangeTarget;
 		}
 		this.width = width;
 		this.height = height;
