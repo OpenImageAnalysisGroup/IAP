@@ -116,9 +116,9 @@ public class ColorXYZ {
 	}
 	
 	private int getIntFromColor(double Red, double Green, double Blue, int errorColorValue) {
-		int R = (int) Math.round(255d * Red);
-		int G = (int) Math.round(255d * Green);
-		int B = (int) Math.round(255d * Blue);
+		int R = (int) Math.floor(256d * Red);
+		int G = (int) Math.floor(256d * Green);
+		int B = (int) Math.floor(256d * Blue);
 		
 		if (R < 0 || G < 0 || B < 0 || R > 255 || G > 255 || B > 255)
 			return errorColorValue;
