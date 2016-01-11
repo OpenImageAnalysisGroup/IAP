@@ -15,6 +15,7 @@ import iap.blocks.image_analysis_tools.imageJ.externalPlugins.MaximumFinder;
 import iap.blocks.image_analysis_tools.leafClustering.Feature;
 import ij.ImagePlus;
 import ij.measure.ResultsTable;
+import ij.plugin.filter.RankFilters;
 import ij.process.ByteProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageConverter;
@@ -33,7 +34,7 @@ public class LeafCountCvppp {
 		resultImages = new Image[images.length];
 	}
 	
-	public void detectLeaves(int maxTolerance) throws InterruptedException {
+	public void detectLeaves(int maxTolerance, int maxfilterSize) throws InterruptedException {
 		
 		// old tuning parms
 		// final double maxTolerance = 10.0; // 0.1 * getTuningValue("maxTolerance", 1.0, 1.0, 30.0, tune); // A1 : 10, A2 : 11
@@ -42,16 +43,16 @@ public class LeafCountCvppp {
 		for (int idx = 0; idx < images.length; idx++) {
 			final int idx_fin = idx;
 			final Image segmented = images[idx];
-			resultImages[idx_fin] = runS(maxTolerance, segmented.copy(), scaleErode);
+			resultImages[idx_fin] = runS(maxTolerance, maxfilterSize, segmented.copy(), scaleErode);
 			resultImages[idx_fin].setFilename(segmented.getFileName());
 		}
 	}
 	
-	private Image runS(double maxTolerance, Image segmented, double scaleErode) {
+	private Image runS(double maxTolerance, int maxfilterSize, Image segmented, double scaleErode) {
 		Image segmentedUnchanged = segmented.copy();
 		ArrayList<Feature> leafCenterPoints;
 		
-		leafCenterPoints = detectCenterPoints(segmented.copy(), maxTolerance);
+		leafCenterPoints = detectCenterPoints(segmented.copy(), maxTolerance, maxfilterSize);
 		
 		String id = "1";
 		
@@ -178,14 +179,37 @@ public class LeafCountCvppp {
 		return res;
 	}
 	
-	private synchronized ArrayList<Feature> detectCenterPoints(Image img, double maxTolerance) {
+	private synchronized ArrayList<Feature> detectCenterPoints(Image img, double maxTolerance, int maxfilterSize) {
 		FloatProcessor edmfp = img.io().bm().edmFloat();
 		
-		if (debug)
+		/*
+		 * Apply maximum filter, see
+		 * Apelt, F., Breuer, D., Nikoloski, Z., Stitt, M., and Kragler, F. (2015). Phy-
+		 * totyping 4D : a light-field imaging system for non-invasive and accurate
+		 * monitoring of spatio-temporal plant growth. Plant J. 82: 693-706.
+		 */
+		
+		FloatProcessor max = (FloatProcessor) new Image(edmfp.getBufferedImage()).io().rankFilterImageJ(maxfilterSize, RankFilters.MAX).getImage()
+			.getAsImagePlus()
+			.getProcessor()
+			.convertToFloat();
+			
+		if (false)
 			new Image(edmfp.getBufferedImage()).show("distmap");
 			
 		MaximumFinder mf = new MaximumFinder();
-		ByteProcessor bp = mf.findMaxima(edmfp, maxTolerance, ImageProcessor.NO_THRESHOLD, mf.LIST, false, true);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		try {
+			ByteProcessor bp = mf.findMaxima(max, maxTolerance, ImageProcessor.NO_THRESHOLD, mf.LIST, false, true);
+		} catch (Exception e) {
+			System.out.println("ERROR in LeafCountCvppp at Maximum Finder!");
+		}
 		
 		// if (debug)
 		// new Image(bp.getBufferedImage()).show("Maximas ");
