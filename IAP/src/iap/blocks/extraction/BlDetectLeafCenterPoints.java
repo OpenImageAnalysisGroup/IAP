@@ -41,11 +41,12 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			workimg = mask.copy();
 			boolean performLabeling = getBoolean("Perform Leaf Labeling", false);
 			int maxTolerance = getInt("Maximum Tolerance", 5);
+			int maxfilterSize = getInt("Maximum Filter Size", 3);
 			// only top images
 			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 			if (performLabeling) {
 				// start CVPPP 2014 challenge code for leaf labeling
-				res = performLeafLabeling(workimg, res, maxTolerance, input().images().getImageInfo(mask.getCameraType()));
+				res = performLeafLabeling(workimg, res, maxTolerance, maxfilterSize, input().images().getImageInfo(mask.getCameraType()));
 			} else {
 				GapList<Feature> pointList = detectCenterPoints(workimg, maxTolerance);
 				res = saveAndMarkResults(workimg, pointList, input().images().getImageInfo(mask.getCameraType()));
@@ -55,14 +56,14 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		return res;
 	}
 	
-	private Image performLeafLabeling(Image workimg, Image res, int maxTolerance, ImageData imageRef) {
+	private Image performLeafLabeling(Image workimg, Image res, int maxTolerance, int maxfilterSize, ImageData imageRef) {
 		boolean saveLeafFeatures = getBoolean("Save Center Points Corrdinates and Leaf Features", false);
 		// leaf-count
 		Image[] segmentedImages = new Image[] { workimg };
 		Image[] segmentedAndNotSplitImages = new Image[] { workimg };
 		LeafCountCvppp lc = new LeafCountCvppp(segmentedImages);
 		try {
-			lc.detectLeaves(maxTolerance);
+			lc.detectLeaves(maxTolerance, maxfilterSize);
 		} catch (InterruptedException e1) {
 			throw new RuntimeException(e1);
 		}
