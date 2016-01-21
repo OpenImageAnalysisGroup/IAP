@@ -384,6 +384,27 @@ public class BlShowThreeDColorHistogram extends AbstractBlock {
 				} catch (Exception e) {
 					return null;
 				}
+			case xyY:
+				spc = new ColorSpaceConverter();
+				double xx = (x + 1.0) / (n + 1);
+				double yy = (y + 1.0) / (n + 1);
+				double zz = (z + 1.0) / (n + 1);
+				
+				double xyzX = yy != 0 ? zz / yy * xx : 0;
+				double xyzY = yy != 0 ? zz / yy * (1 - xx - yy) : 0;
+				
+				conv = spc.XYZtoRGB(xyzX * 100d, xyzY * 100d, zz);
+				try {
+					col = new Color(conv[0] / 255d, conv[1] / 255d, conv[2] / 255d, 1.0);
+					// Diffuse Color
+					material.setDiffuseColor(col);
+					// Specular Color
+					material.setSpecularColor(col);
+					material.setSpecularPower(39.0);
+					return material;
+				} catch (Exception e) {
+					return null;
+				}
 		}
 		return material;
 	}
