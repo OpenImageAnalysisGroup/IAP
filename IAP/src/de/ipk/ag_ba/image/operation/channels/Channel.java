@@ -3,7 +3,7 @@ package de.ipk.ag_ba.image.operation.channels;
 import de.ipk.ag_ba.image.structures.ColorSpace;
 
 public enum Channel {
-	RGB_R, RGB_G, RGB_B, LAB_L, LAB_A, LAB_B, HSV_H, HSV_S, HSV_V, XYZ_X, XYZ_Y, XYZ_Z;
+	RGB_R, RGB_G, RGB_B, LAB_L, LAB_A, LAB_B, HSV_H, HSV_S, HSV_V, XYZ_X, XYZ_Y, XYZ_Z, xyY_x, xyY_y, xyY_Y;
 	
 	@Override
 	public String toString() {
@@ -39,6 +39,12 @@ public enum Channel {
 				return "Y (XYZ)";
 			case XYZ_Z:
 				return "Z (XYZ)";
+			case xyY_x:
+				return "chromaticity x (xyY)";
+			case xyY_y:
+				return "chromaticity y (xyY)";
+			case xyY_Y:
+				return "Y tristimulus (xyY)";
 		}
 		return null;
 	}
@@ -69,6 +75,12 @@ public enum Channel {
 				
 			case XYZ_Z:
 				return ColorSpace.XYZ;
+			case xyY_x:
+				
+			case xyY_y:
+				
+			case xyY_Y:
+				return ColorSpace.xyY;
 		}
 		return null;
 	}

@@ -74,6 +74,12 @@ public class ChannelProcessing {
 				return getY();
 			case XYZ_Z:
 				return getZ();
+			case xyY_x:
+				return get_xyY_x();
+			case xyY_y:
+				return get_xyY_y();
+			case xyY_Y:
+				return getY();
 			default:
 				break;
 		}
@@ -128,6 +134,13 @@ public class ChannelProcessing {
 			}
 			
 			double[] xyz = cspc.RGBtoXYZ(r / 255d, g / 255d, b / 255d);
+			double[] xyz_xyYx_xyYy = new double[xyz.length + 2];
+			xyz_xyYx_xyYy[0] = xyz[0];
+			xyz_xyYx_xyYy[1] = xyz[1];
+			xyz_xyYx_xyYy[2] = xyz[2];
+			xyz_xyYx_xyYy[3] = xyz[0] / (xyz[0] + xyz[1] + xyz[2]);
+			xyz_xyYx_xyYy[4] = xyz[1] / (xyz[0] + xyz[1] + xyz[2]);
+			
 			int idx = -1;
 			switch (c) {
 				case XYZ_X:
@@ -139,12 +152,18 @@ public class ChannelProcessing {
 				case XYZ_Z:
 					idx = 2;
 					break;
+				case xyY_x:
+					idx = 3;
+					break;
+				case xyY_y:
+					idx = 4;
+					break;
 				default:
 					idx = -1;
 					break;
 			}
 			
-			res = (float) xyz[idx];
+			res = (float) xyz_xyYx_xyYy[idx];
 			
 			out[i] = res;
 		}
@@ -209,6 +228,72 @@ public class ChannelProcessing {
 			return new Image(width, height, out).io();
 		} else {
 			return getXYZ(Channel.XYZ_X);
+		}
+	}
+	
+	private ImageOperation get_xyY_x() {
+		if (imageAs1dArray != null) {
+			int[] in = imageAs1dArray;
+			int[] out = new int[in.length];
+			int c, r, g, b;
+			ColorSpaceConverter cspc = new ColorSpaceConverter();
+			for (int i = 0; i < in.length; i++) {
+				c = in[i];
+				if (c == BACKGROUND_COLORint) {
+					out[i] = BACKGROUND_COLORint;
+					continue;
+				}
+				r = (c & 0xff0000) >> 16;
+				g = (c & 0x00ff00) >> 8;
+				b = c & 0x0000ff;
+				
+				double[] xyz = cspc.RGBtoXYZ(r, g, b);
+				double x = xyz[0];
+				double y = xyz[1];
+				double z = xyz[2];
+				double xyY_x = x / (x + y + z);
+				r = (int) (xyY_x * 256d);
+				if (r == 256)
+					r = 255;
+				
+				out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
+			}
+			return new Image(width, height, out).io();
+		} else {
+			return getXYZ(Channel.xyY_x);
+		}
+	}
+	
+	private ImageOperation get_xyY_y() {
+		if (imageAs1dArray != null) {
+			int[] in = imageAs1dArray;
+			int[] out = new int[in.length];
+			int c, r, g, b;
+			ColorSpaceConverter cspc = new ColorSpaceConverter();
+			for (int i = 0; i < in.length; i++) {
+				c = in[i];
+				if (c == BACKGROUND_COLORint) {
+					out[i] = BACKGROUND_COLORint;
+					continue;
+				}
+				r = (c & 0xff0000) >> 16;
+				g = (c & 0x00ff00) >> 8;
+				b = c & 0x0000ff;
+				
+				double[] xyz = cspc.RGBtoXYZ(r, g, b);
+				double x = xyz[0];
+				double y = xyz[1];
+				double z = xyz[2];
+				double xyY_y = y / (x + y + z);
+				r = (int) (xyY_y * 256d);
+				if (r == 256)
+					r = 255;
+				
+				out[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((r & 0xFF) << 8) | ((r & 0xFF) << 0);
+			}
+			return new Image(width, height, out).io();
+		} else {
+			return getXYZ(Channel.xyY_y);
 		}
 	}
 	
