@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
@@ -4604,17 +4605,42 @@ public class ImageOperation implements MemoryHogInterface {
 		// enumerate from bottom to top (and left to right)
 		int w = getWidth();
 		int h = getHeight();
+		int fromY = Integer.MAX_VALUE;
+		int toY = Integer.MIN_VALUE;
 		for (int y = h - 1; y >= 0; y--) {
 			for (int x = 0; x < w; x++) {
 				int c = pix[x][y];
 				if (c != BACKGROUND_COLORint) {
-					if (i < from || i >= to)
+					if (i < from || i >= to) {
+						if (y >= toY)
+							toY = y;
+						if (y <= fromY)
+							fromY = y;
 						pix[x][y] = BACKGROUND_COLORint;
+					}
 					i++;
 				}
 			}
 		}
-		return new ImageOperation(pix);
+		int stripeHeight = Math.abs(toY - fromY);
+		return new ImageOperation(pix).setProperty("stripeHeight", stripeHeight);
+	}
+	
+	/**
+	 * currently not retained when new images are derived from the ImageOperation instance.
+	 */
+	private HashMap<String, Object> storedProperties = new HashMap<>();
+	
+	public ImageOperation setProperty(String property, Object value) {
+		storedProperties.put(property, value);
+		return this;
+	}
+	
+	public Object getProperty(String property, Object defaultIfMissing) {
+		if (!storedProperties.containsKey(property))
+			return defaultIfMissing;
+		Object r = storedProperties.get(property);
+		return r;
 	}
 	
 	/**
