@@ -67,10 +67,19 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 			int regions = 5;
 			if (calculateValuesAlsoForDifferentRegions) {
 				if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE) {
-					for (int r = 0; r < regions; r++)
-						processVisibleImage(io.getBottom(r, regions).show("Side Part " + r + "/" + regions, debugRegionParts),
+					for (int r = 0; r < regions; r++) {
+						ImageOperation stripe = io.getBottom(r, regions);
+						int stripeHeight = (int) stripe.getProperty("stripeHeight", null);
+						ResultsTableWithUnits rt = new ResultsTableWithUnits();
+						rt.incrementCounter();
+						rt.addValue("stripe_height", stripeHeight);
+						getResultSet().storeResults(optionsAndResults.getCameraPosition(),
+								CameraType.VIS, TraitCategory.GEOMETRY, "section_" + (r + 1) + "_" + regions, rt, getBlockPosition(), this,
+								input().images().getVisInfo());
+						processVisibleImage(stripe.show("Side Part " + r + "/" + regions, debugRegionParts),
 								optionsAndResults.getCameraPosition(),
 								"section_" + (r + 1) + "_" + regions, true);
+					}
 				}
 				if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
 					for (int r = 0; r < regions; r++)
@@ -482,7 +491,11 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 						"Estimated relative temperature (relative to the reference area, which is by default the pot area without the plant) of the leaf pixels."),
 				new CalculatedProperty(
 						"ir.skelton.mean",
-						"Estimated relative temperature (relative to the reference area, which is by default the pot area without the plant) of the skeleton leaf pixels.")
+						"Estimated relative temperature (relative to the reference area, which is by default the pot area without the plant) of the skeleton leaf pixels."),
+				new CalculatedProperty(
+						"stripe_height",
+						"The height of a horizontal stripe, representing a certain amount (by default there are 5 stripes, thus 20 percent) "
+								+ "of the foreground pixels, when ordered from bottom to top.")
 		
 		};
 	}
