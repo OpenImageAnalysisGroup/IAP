@@ -1,13 +1,12 @@
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractBlock;
-import iap.blocks.data_structures.BlockType;
-
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
 
 /**
  * Analysis block for morphological image operations. 3 Steps are performed, first erode, then dilate, and then erode again. Each step can be performed multiple
@@ -40,14 +39,15 @@ public class BlMorphologicalOperations extends AbstractBlock {
 	
 	@Override
 	protected Image processMask(Image mask) {
+		// set default enabled for vis analysis
 		if (mask != null && getBoolean("Process " + mask.getCameraType(), mask.getCameraType() == CameraType.VIS)) {
 			ImageOperation binaryMask = mask.io();
 			int er1 = getInt(mask.getCameraType() + " Step 1 Erode Count", 1);
 			int di1 = getInt(mask.getCameraType() + " Step 2 Dilate Count", 2);
 			binaryMask = binaryMask.bm().erode(getRoundMask(er1))
-					.dilate(getRoundMask(di1))
-					.erode(getRoundMask(getInt(mask.getCameraType() + " Step 3 Erode Count", 0))).io();
-			Image orig = input().images().vis();
+				.dilate(getRoundMask(di1))
+				.erode(getRoundMask(getInt(mask.getCameraType() + " Step 3 Erode Count", 0))).io();
+			Image orig = input().images().getImage(mask.getCameraType());
 			Image img = orig.copy().io().applyMask(binaryMask.getImage(), ImageOperation.BACKGROUND_COLORint).getImage();
 			return img;
 		} else
@@ -61,12 +61,12 @@ public class BlMorphologicalOperations extends AbstractBlock {
 		double m = size / 2d;
 		for (int x = 0; x < size; x++)
 			for (int y = 0; y < size; y++) {
-				double cX = x - m + 0.5;
-				double cY = y - m + 0.5;
-				double d = Math.sqrt(cX * cX + cY * cY);
-				boolean inside = d <= m - 0.25;
-				int insideCircle = inside ? 1 : 0xffffffff;
-				kernel[x][y] = insideCircle;
+			double cX = x - m + 0.5;
+			double cY = y - m + 0.5;
+			double d = Math.sqrt(cX * cX + cY * cY);
+			boolean inside = d <= m - 0.25;
+			int insideCircle = inside ? 1 : 0xffffffff;
+			kernel[x][y] = insideCircle;
 			}
 		return kernel;
 	}
@@ -79,9 +79,9 @@ public class BlMorphologicalOperations extends AbstractBlock {
 	@Override
 	public String getDescription() {
 		return "Analysis block for morphological image operations. 3 Steps are performed, first erode, then dilate, " +
-				"and then erode again. " +
-				"Each step can be performed multiple times, according to user preference. " +
-				"This way this block can perform the Opening or Closing operation, depending on its settings, " +
-				"or only Erode or only Dilate.";
+			"and then erode again. " +
+			"Each step can be performed multiple times, according to user preference. " +
+			"This way this block can perform the Opening or Closing operation, depending on its settings, " +
+			"or only Erode or only Dilate.";
 	}
 }
