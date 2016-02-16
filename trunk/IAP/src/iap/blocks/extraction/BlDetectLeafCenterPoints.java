@@ -29,6 +29,13 @@ import ij.measure.ResultsTable;
 import ij.process.ByteProcessor;
 import ij.process.FloatProcessor;
 
+/**
+ * Leaf center point detection based on euclidean distance map for rosette plants. It is also possible to perform a leaf labeling based on
+ * 'Pape, J.M., Klukas, C.: 3-D histogram-based segmentation and leaf detection for rosette plants. In: Computer Vision - ECCV 2014 Workshops, vol. 8928, pp.
+ * 61-74 (2015)'.
+ * 
+ * @author pape
+ */
 public class BlDetectLeafCenterPoints extends AbstractBlock implements CalculatesProperties {
 	
 	@Override
@@ -44,13 +51,13 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			int maxfilterSize = getInt("Maximum Filter Size", 3);
 			// only top images
 			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
-			if (performLabeling) {
-				// start CVPPP 2014 challenge code for leaf labeling
-				res = performLeafLabeling(workimg, res, maxTolerance, maxfilterSize, input().images().getImageInfo(mask.getCameraType()));
-			} else {
-				GapList<Feature> pointList = detectCenterPoints(workimg, maxTolerance);
-				res = saveAndMarkResults(workimg, pointList, input().images().getImageInfo(mask.getCameraType()));
-			}
+				if (performLabeling) {
+					// start CVPPP 2014 challenge code for leaf labeling
+					res = performLeafLabeling(workimg, res, maxTolerance, maxfilterSize, input().images().getImageInfo(mask.getCameraType()));
+				} else {
+					GapList<Feature> pointList = detectCenterPoints(workimg, maxTolerance);
+					res = saveAndMarkResults(workimg, pointList, input().images().getImageInfo(mask.getCameraType()));
+				}
 			}
 		}
 		return res;
@@ -96,17 +103,17 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 				"centerpoint based", this, imageRef);
 				
 			for (int num = 1; num <= cd.getClusterCount(); num++) {
-			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.centerpoint." + num + ".position.x"), centers[num].x,
-					"leaves", this, imageRef);
-					
-			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.centerpoint." + num + ".position.y"), centers[num].y,
-					"leaves", this, imageRef);
-					
-			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.area." + num), sizes[num],
-					"pixel", this, imageRef);
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.centerpoint." + num + ".position.x"), centers[num].x,
+						"leaves", this, imageRef);
+						
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.centerpoint." + num + ".position.y"), centers[num].y,
+						"leaves", this, imageRef);
+						
+				getResultSet().setNumericResult(getBlockPosition(),
+						new Trait(pos, workimg.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "leaf.area." + num), sizes[num],
+						"pixel", this, imageRef);
 			}
 		}
 		return res;
@@ -121,7 +128,7 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 		if (markResults) {
 			ImageCanvas ic = new ImageCanvas(img);
 			for (Feature p : pointList) {
-			ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 3);
+				ic.drawRectangle((int) p.getPosition().getX() - 10, (int) p.getPosition().getY() - 10, 21, 21, Color.RED, 3);
 			}
 			img = ic.getImage();
 		}
@@ -134,17 +141,17 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 				
 			// save x and y position
 			if (saveCPCoordinates) {
-			int num = 0;
-			for (Feature p : pointList) {
-				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.x"), (int) p.getPosition().getX(),
-						"leaves", this, imageRef);
-						
-				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.y"), (int) p.getPosition().getY(),
-						"leaves", this, imageRef);
-				num++;
-			}
+				int num = 0;
+				for (Feature p : pointList) {
+					getResultSet().setNumericResult(getBlockPosition(),
+							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.x"), (int) p.getPosition().getX(),
+							"leaves", this, imageRef);
+							
+					getResultSet().setNumericResult(getBlockPosition(),
+							new Trait(pos, img.getCameraType(), TraitCategory.GEOMETRY, "centerpoint." + num + ".position.y"), (int) p.getPosition().getY(),
+							"leaves", this, imageRef);
+					num++;
+				}
 			}
 		}
 		
@@ -173,17 +180,17 @@ public class BlDetectLeafCenterPoints extends AbstractBlock implements Calculate
 			ByteProcessor bp = mf.findMaxima(edmfp, maxTolerance, 1, mf.LIST, true, true);
 			
 			if (debugValues && bp != null)
-			new Image(bp.getBufferedImage()).show("Maximas");
+				new Image(bp.getBufferedImage()).show("Maximas");
 			
 			ResultsTable rt = mf.getRt();
 			
 			if (debugValues)
-			rt.show("results");
+				rt.show("results");
 			
 			for (int i = 0; i < rt.getCounter(); i++) {
-			int x = (int) rt.getValue("X", i);
-			int y = (int) rt.getValue("Y", i);
-			centerPoints.add(new Feature(x, y));
+				int x = (int) rt.getValue("X", i);
+				int y = (int) rt.getValue("Y", i);
+				centerPoints.add(new Feature(x, y));
 			}
 		} catch (Exception e) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Could not calculate leaf center points for image (forground pixels: "

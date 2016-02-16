@@ -13,7 +13,7 @@ import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 
 /**
- * Uses a HSV-based pixel filter(s) for the vis/fluo/nir images.
+ * Uses a HSV-based pixel filter(s) for the vis/fluo/nir images. (Always changes the image.)
  * 
  * @author Klukas
  */
@@ -50,39 +50,48 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlock {
 			for (int filter = 1; filter <= HSVfilters; filter++) {
 				String pf = optics + " filter " + filter + " ";
 				ImageOperation blurred = processedMask.blurImageJ(getDouble(pf + " blur", 1)).show("in mask blurred", debug);
-				
-				ImageOperation filteredContent = blurred.filterRemainHSV(
-						getDouble(pf + "min H", (2 / 3d) - (1 / 2d - 1 / 3d)),
-						getDouble(pf + "max H", (2 / 3d) + (1 / 2d - 1 / 3d)),
-						getDouble(pf + "min S", 0),
-						getDouble(pf + "max S", 1),
-						getDouble(pf + "min V", 0),
-						getDouble(pf + "max V", (200d / 255d))).show(pf + " res", false);
-				int dilate = getInt(pf + "mask dilate 1", 0);
-				int erode = getInt(pf + "mask erode 2", 0);
-				int dilate2 = getInt(pf + "mask dilate 3", 0);
-				if (st != null)
-					st.addImage("mask " + filter, filteredContent.getImage());
-				if (dilate > 0)
-					filteredContent = filteredContent.bm().dilate(dilate).io();
-				if (erode > 0)
-					filteredContent = filteredContent.bm().erode(erode).io();
-				if (dilate2 > 0)
-					filteredContent = filteredContent.bm().dilate(dilate2).io();
-				if (st != null)
-					st.addImage("mask " + filter + ", modified", filteredContent.getImage());
-					
-				if (debug_1) {
-					processedMask.show(pf + " processed mask");
-					mask.show(pf + " mask");
+				boolean manip = getBoolean(pf + "manipulate mask", false);
+				if (!manip) {
+					processedMask = blurred.filterRemoveHSV(
+							getDouble(pf + "min H", (2 / 3d) - (1 / 2d - 1 / 3d)),
+							getDouble(pf + "max H", (2 / 3d) + (1 / 2d - 1 / 3d)),
+							getDouble(pf + "min S", 0),
+							getDouble(pf + "max S", 1),
+							getDouble(pf + "min V", 0),
+							getDouble(pf + "max V", (200d / 255d))).show(pf + " res", debug);
+				} else {
+					ImageOperation filteredContent = blurred.filterRemainHSV(
+							getDouble(pf + "min H", (2 / 3d) - (1 / 2d - 1 / 3d)),
+							getDouble(pf + "max H", (2 / 3d) + (1 / 2d - 1 / 3d)),
+							getDouble(pf + "min S", 0),
+							getDouble(pf + "max S", 1),
+							getDouble(pf + "min V", 0),
+							getDouble(pf + "max V", (200d / 255d))).show(pf + " res", false);
+					int dilate = getInt(pf + "mask dilate 1", 0);
+					int erode = getInt(pf + "mask erode 2", 0);
+					int dilate2 = getInt(pf + "mask dilate 3", 0);
+					if (st != null)
+						st.addImage("mask " + filter, filteredContent.getImage());
+					if (dilate > 0)
+						filteredContent = filteredContent.bm().dilate(dilate).io();
+					if (erode > 0)
+						filteredContent = filteredContent.bm().erode(erode).io();
+					if (dilate2 > 0)
+						filteredContent = filteredContent.bm().dilate(dilate2).io();
+					if (st != null)
+						st.addImage("mask " + filter + ", modified", filteredContent.getImage());
+					processedMask.show(pf + " processed mask", getBoolean("Debug Mask Manipulation", false));
+					mask.show(pf + " mask", getBoolean("Debug Mask Manipulation", false));
+					processedMask = processedMask.xor(mask).show(pf + " xor res", getBoolean("Debug Mask Manipulation", false));
+					mask = processedMask.getImage();
 				}
 	
 				processedMask = processedMask.xor(mask).show(pf + " xor res", debug_1);
 				
 				processedMask = processedMask.and(mask);
-				// image = image.io().applyMask(
-				// processedMask.closing(getInt(pf + "dilate", 2), getInt(pf + "erode", 4)).getImage(),
-				// optionsAndResults.getBackground()).getImage();
+				image = image.io().applyMask(
+						processedMask.closing(getInt(pf + "dilate", 2), getInt(pf + "erode", 4)).getImage(),
+						optionsAndResults.getBackground()).getImage();
 			}
 			if (st != null && st.size() > 0)
 				st.show("Debug mask");
@@ -110,7 +119,7 @@ public class BlFilterByHSV extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public BlockType getBlockType() {
-		return BlockType.SEGMENTATION;
+		return BlockType.DEPRECATED;
 	}
 	
 	@Override

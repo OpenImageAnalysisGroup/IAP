@@ -62,6 +62,7 @@ import iap.blocks.preprocessing.BlSubtractMedianLab;
 import iap.blocks.segmentation.BlAdaptiveThresholdNir;
 import iap.blocks.segmentation.BlCopyImagesApplyMask;
 import iap.blocks.segmentation.BlFilterByHSV;
+import iap.blocks.segmentation.BlHSVFilter;
 import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlKMeansVis;
@@ -185,6 +186,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlSpotMatcher(),
 				new BlSpotGradients(),
 				new BlResizeScale(),
+				new BlHSVFilter(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
