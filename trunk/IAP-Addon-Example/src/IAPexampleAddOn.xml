@@ -12,7 +12,7 @@
 	     <name>IAP Example Add-on</name>
              <main>iap.example.addon.PluginIAPexampleAddOn</main>
              <version>1.0</version>
-             <compatibility>1.1</compatibility>
-             <available>http://iap.ipk-gatersleben.de/addons</available>
+             <compatibility>2.0</compatibility>
+             <available>http://iapg2p.sourceforge.net/#addons</available>
 	</plugindesc>
 </plugin>
