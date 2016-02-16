@@ -1,7 +1,7 @@
 package iap.blocks.data_structures;
 
 public enum BlockType {
-	ACQUISITION, PREPROCESSING, SEGMENTATION, FEATURE_EXTRACTION, POSTPROCESSING, DEBUG, UNDEFINED;
+	ACQUISITION, PREPROCESSING, SEGMENTATION, FEATURE_EXTRACTION, POSTPROCESSING, DEBUG, UNDEFINED, DEPRECATED;
 	
 	public String getName() {
 		switch (this) {
@@ -17,6 +17,8 @@ public enum BlockType {
 				return "Segmentation";
 			case DEBUG:
 				return "Utility";
+			case DEPRECATED:
+				return "Deprecated";
 			default:
 				return "[Unknown BlockType]";
 		}
@@ -36,6 +38,8 @@ public enum BlockType {
 				return "#FFDDDD";
 			case DEBUG:
 				return "#FFDDFF";
+			case DEPRECATED:
+				return "#B2B2B2";
 			case UNDEFINED:
 				return "#FF5555";
 		}
