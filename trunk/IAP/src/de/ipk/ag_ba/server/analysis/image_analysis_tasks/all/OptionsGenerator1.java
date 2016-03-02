@@ -71,12 +71,12 @@ final class OptionsGenerator1 implements OptionsGenerator {
 			boolean processEarlyTimes = options.getBooleanSetting(null, "Early//Custom settings for early timepoints", false);
 			boolean processLateTimes = options.getBooleanSetting(null, "Late//Custom settings for late timepoints", false);
 			int earlyTimeUntilDayX = options.getIntSetting(null, "Early//Early time until time point", -1);
-			int lateTimeUntilDayX = options.getIntSetting(null, "Late//Late time until time point", -1);
+			int lateTimeFromDayX = options.getIntSetting(null, "Late//Late time from time point", -1);
 			String timeInfo = null;
 			if (processEarlyTimes && id.getAnyInfo().getParentSample().getTime() <= earlyTimeUntilDayX)
 				timeInfo = "early";
 			else
-				if (processLateTimes && id.getAnyInfo().getParentSample().getTime() >= lateTimeUntilDayX)
+				if (processLateTimes && id.getAnyInfo().getParentSample().getTime() >= lateTimeFromDayX)
 					timeInfo = "late";
 			
 			String info = id.getAnyInfo().getParentSample().getParentCondition().getParentSubstance().getInfo();
