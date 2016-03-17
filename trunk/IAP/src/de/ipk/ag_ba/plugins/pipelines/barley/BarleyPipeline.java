@@ -29,7 +29,7 @@ import iap.blocks.segmentation.BlCopyImagesApplyMask;
 import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlLabFilter;
-import iap.blocks.segmentation.BlMedianFilter;
+import iap.blocks.segmentation.BlMedianFilterFixedSize;
 import iap.blocks.segmentation.BlRemoveBackground;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
@@ -70,12 +70,12 @@ public class BarleyPipeline extends AbstractPipelineTemplate {
 				// segmentation
 				new BlRemoveBackground(),
 				new BlDetectBlueMarkers(),
-				new BlMedianFilter(),
+				new BlMedianFilterFixedSize(),
 				new BlLabFilter(),
 				new BlIRdiff(),
 				new BlIntensityCalculationFluo(),
 				new BlockClearNirPotFromNir(),
-				new BlMedianFilter(),
+				new BlMedianFilterFixedSize(),
 				new BlRemoveSmallObjectsVisFluo(),
 				new BlUseFluoMaskToClearOther(),
 				new BlCutFromSide(),

@@ -23,7 +23,7 @@ import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlRotate;
 import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlKMeansVis;
-import iap.blocks.segmentation.BlMedianFilter;
+import iap.blocks.segmentation.BlMedianFilterFixedSize;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearIr;
 import iap.blocks.segmentation.BlUseFluoMaskToClearNir;
@@ -64,7 +64,7 @@ public class ArabidopsisPipeline extends AbstractPipelineTemplate {
 				
 				new BlKMeansVis(),
 				new BlAdaptiveSegmentationFluo(),
-				new BlMedianFilter(),
+				new BlMedianFilterFixedSize(),
 				new BlUseFluoMaskToClearVis(),
 				new BlRemoveSmallObjectsVisFluo(),
 				new BlUseFluoMaskToClearVis(),

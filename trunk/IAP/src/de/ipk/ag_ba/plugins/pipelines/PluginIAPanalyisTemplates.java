@@ -67,7 +67,7 @@ import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlLabFilter;
-import iap.blocks.segmentation.BlMedianFilter;
+import iap.blocks.segmentation.BlMedianFilterFixedSize;
 import iap.blocks.segmentation.BlMorphologicalOperations;
 import iap.blocks.segmentation.BlRemoveLevitatingObjects;
 import iap.blocks.segmentation.BlRemoveMaizeBambooStick;
@@ -157,7 +157,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlCutFromSide(),
 				new BlFluoMaskIsRequired(),
 				new BlHighlightNullResults(),
-				new BlMedianFilter(),
+				new BlMedianFilterFixedSize(),
 				new BlObjectSeparator(),
 				new BlSmoothShape(),
 				new BlThreeDreconstruction(),
