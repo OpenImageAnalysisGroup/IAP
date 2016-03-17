@@ -3,19 +3,21 @@
  */
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractBlock;
-import iap.blocks.data_structures.BlockType;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
+import ij.plugin.filter.RankFilters;
 
 /**
- * Remove "peper and salt" noise from Fluo mask.
+ * Block including different rank filters with adaptive kernel sizes.
  * 
- * @author Pape, Klukas
+ * @author Pape
  */
 public class BlMedianFilter extends AbstractBlock {
 	
@@ -23,13 +25,34 @@ public class BlMedianFilter extends AbstractBlock {
 	protected Image processMask(Image mask) {
 		if (mask == null || !getBoolean("Process " + mask.getCameraType(), true))
 			return mask;
+			
+		HashMap<String, Integer> modes = new HashMap<>();
 		
-		Image medianMask = new ImageOperation(mask).copy().bm().medianFilter().io().border(2)
-				.getImage();
-		Image ref = input().images().getImage(mask.getCameraType());
-		if (ref == null)
-			return null;
-		return ref.io().applyMask_ResizeSourceIfNeeded(medianMask, optionsAndResults.getBackground()).getImage();
+		modes.put("Max", RankFilters.MAX);
+		modes.put("Mean", RankFilters.MEAN);
+		modes.put("Median", RankFilters.MEDIAN);
+		modes.put("Min", RankFilters.MIN);
+		modes.put("Variance", RankFilters.VARIANCE);
+		modes.put("Open", RankFilters.OPEN);
+		modes.put("Outliers", RankFilters.OUTLIERS);
+		// modes.put("Despeckle", RankFilters.DESPECKLE);
+		modes.put("Dark Outliers", RankFilters.DARK_OUTLIERS);
+		modes.put("Bright Outliers", RankFilters.BRIGHT_OUTLIERS);
+		
+		ArrayList<String> mode_names = new ArrayList<>();
+		for (String key : modes.keySet())
+			mode_names.add(key);
+			
+		String methodName = optionsAndResults.getStringSettingRadio(this, "Thresholding Method", "Median", mode_names);
+		int mode = modes.get("Median");
+		
+		for (String m : mode_names)
+			if (methodName.equalsIgnoreCase(m))
+			mode = modes.get(m);
+			
+		Image medianMask = new ImageOperation(mask).copy().rankFilterImageJ(getInt("Kernel size", 3), mode).getImage();
+		
+		return medianMask;
 	}
 	
 	@Override
@@ -59,12 +82,12 @@ public class BlMedianFilter extends AbstractBlock {
 	
 	@Override
 	public String getName() {
-		return "Median Filter";
+		return "Rank Filter (Adaptive Kernelsize)";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Remove 'peper and salt' noise from selected mask images.";
+		return "Apply a rank filter to an image such as 'Median', 'Max' ... (includes adaptive Kernel size). Waring: Some modes does not perfom correctly on already processed images (including defined background color, this color will not be ignored).";
 	}
 	
 }
