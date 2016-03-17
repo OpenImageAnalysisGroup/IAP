@@ -1,5 +1,10 @@
 package de.ipk.ag_ba.plugins.pipelines;
 
+import de.ipk.ag_ba.plugins.AbstractIAPplugin;
+import de.ipk.ag_ba.plugins.pipelines.arabidopsis.ArabidopsisPipeline;
+import de.ipk.ag_ba.plugins.pipelines.barley.BarleyPipeline;
+import de.ipk.ag_ba.plugins.pipelines.maize.MaizePipeline;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import iap.blocks.acquisition.BlCreateDummyReferenceIfNeeded;
 import iap.blocks.acquisition.BlLoadImages;
 import iap.blocks.auto.BlAdaptiveRemoveSmallObjectsVisFluo;
@@ -67,6 +72,7 @@ import iap.blocks.segmentation.BlIRdiff;
 import iap.blocks.segmentation.BlIntensityCalculationFluo;
 import iap.blocks.segmentation.BlKMeansVis;
 import iap.blocks.segmentation.BlLabFilter;
+import iap.blocks.segmentation.BlMedianFilter;
 import iap.blocks.segmentation.BlMedianFilterFixedSize;
 import iap.blocks.segmentation.BlMorphologicalOperations;
 import iap.blocks.segmentation.BlRemoveLevitatingObjects;
@@ -78,11 +84,6 @@ import iap.blocks.segmentation.BlUseFluoMaskToClearOther;
 import iap.blocks.threeD.BlThreeDreconstruction;
 import iap.blocks.unused.BlFluoMaskIsRequired;
 import iap.blocks.unused.BlSmoothShape;
-import de.ipk.ag_ba.plugins.AbstractIAPplugin;
-import de.ipk.ag_ba.plugins.pipelines.arabidopsis.ArabidopsisPipeline;
-import de.ipk.ag_ba.plugins.pipelines.barley.BarleyPipeline;
-import de.ipk.ag_ba.plugins.pipelines.maize.MaizePipeline;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 
 /**
  * @author Christian Klukas
@@ -96,9 +97,9 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 	@Override
 	public AnalysisPipelineTemplate[] getAnalysisTemplates() {
 		return new AnalysisPipelineTemplate[] {
-				new MaizePipeline(),
-				new BarleyPipeline(),
-				new ArabidopsisPipeline()
+			new MaizePipeline(),
+			new BarleyPipeline(),
+			new ArabidopsisPipeline()
 		};
 	}
 	
@@ -107,86 +108,87 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 		ImageAnalysisBlock[] fromPipelines = super.getImageAnalysisBlocks();
 		
 		ImageAnalysisBlock[] additionalBlocks = new ImageAnalysisBlock[] {
-				new BlMoveImagesToMasks(),
-				new BlMoveMasksToImageSet(),
-				new BlOverlayMasksOnImages(),
-				new BlAdaptiveRemoveSmallObjectsVisFluo(),
-				new BlAdaptiveSegmentationFluo(),
-				new BlAdaptiveSegmentationVis(),
-				new BlAdaptiveThresholdNir(),
-				new BlAdaptiveUseFluoMaskToClearOther(),
-				new BlAutoAdaptiveThresholdNir(),
-				new BlCalcAreas(),
-				new BlCalcColorHistograms(),
-				new BlCalcMainAxis(),
-				new BlCalcMoments(),
-				new BlCalcVolumes(),
-				new BlCalcWidthAndHeight(),
-				new BlClearMasks_WellProcessing(),
-				// new BlClosing(),
-				// new BlColorBalanceCircularVisNir(),
-				new BlColorBalanceVerticalFluo(),
-				// new BlColorBalanceVerticalNir(),
-				new BlColorBalanceVerticalVis(),
-				new BlColorCorrectionNir(),
-				new BlCopyImagesApplyMask(),
-				new BlCreateDummyReferenceIfNeeded(),
-				new BlCrop(),
-				new BlDetectBlueMarkers(),
-				new BlMorphologicalOperations(),
-				new BlFilterByHSV(),
-				new BlIntensityCalculationFluo(),
-				new BlIRdiff(),
-				// new BlKMeans2(),
-				new BlKMeansVis(),
-				new BlLabFilter(),
-				new BlLeafCurlingAnalysis(),
-				new BlLoadImages(),
-				new BlRemoveMaizeBambooStick(),
-				new BlRemoveSmallObjectsVisFluo(),
-				new BlRunPostProcessors(),
-				new BlSkeletonizeVisFluo(),
-				new BlSkeletonizeNir(),
-				new BlUseFluoMaskToClearIr(),
-				new BlUseFluoMaskToClearNir(),
-				new BlUseFluoMaskToClearOther(),
-				new BlAlign(),
-				new BlCalcCOG(),
-				new BlCalcConvexHull(),
-				new BlClearRectangle(),
-				new BlCutFromSide(),
-				new BlFluoMaskIsRequired(),
-				new BlHighlightNullResults(),
-				new BlMedianFilterFixedSize(),
-				new BlObjectSeparator(),
-				new BlSmoothShape(),
-				new BlThreeDreconstruction(),
-				new BlDetectLeafTips(),
-				new BlRemoveLevitatingObjects(),
-				new BlFilterImagesByAngle(),
-				new BlFilterImagesByTopOrSide(),
-				new BlWarpImages(),
-				new BlDetectLeafCenterPoints(),
-				// new BlCalcIntensityFeature3DHistogram(),
-				new BlDetectScaleforNormalization(),
-				new BlObjectSeparatorByDistance(),
-				new BlFlowerDetectionAndFeatureExtraction(),
-				new BlCalcTextureFeatures(),
-				new BlCalcColorfeatures(),
-				new BlShowThreeDColorHistogram(),
-				new BlFilterImagesByDate(),
-				new BlFilterImagesByCondition(),
-				new BlShowIntermediateImages(),
-				new BlFilterImagesByPlantID(),
-				new BlFilterImagesByRegularExpression(),
-				new BlFilterImagesByCameraType(),
-				new BlCountColors(),
-				new BlColorBalanceCircularLumi(),
-				new BlSubtractMedianLab(),
-				new BlSpotMatcher(),
-				new BlSpotGradients(),
-				new BlResizeScale(),
-				new BlHSVFilter(),
+			new BlMoveImagesToMasks(),
+			new BlMoveMasksToImageSet(),
+			new BlOverlayMasksOnImages(),
+			new BlAdaptiveRemoveSmallObjectsVisFluo(),
+			new BlAdaptiveSegmentationFluo(),
+			new BlAdaptiveSegmentationVis(),
+			new BlAdaptiveThresholdNir(),
+			new BlAdaptiveUseFluoMaskToClearOther(),
+			new BlAutoAdaptiveThresholdNir(),
+			new BlCalcAreas(),
+			new BlCalcColorHistograms(),
+			new BlCalcMainAxis(),
+			new BlCalcMoments(),
+			new BlCalcVolumes(),
+			new BlCalcWidthAndHeight(),
+			new BlClearMasks_WellProcessing(),
+			// new BlClosing(),
+			// new BlColorBalanceCircularVisNir(),
+			new BlColorBalanceVerticalFluo(),
+			// new BlColorBalanceVerticalNir(),
+			new BlColorBalanceVerticalVis(),
+			new BlColorCorrectionNir(),
+			new BlCopyImagesApplyMask(),
+			new BlCreateDummyReferenceIfNeeded(),
+			new BlCrop(),
+			new BlDetectBlueMarkers(),
+			new BlMorphologicalOperations(),
+			new BlFilterByHSV(),
+			new BlIntensityCalculationFluo(),
+			new BlIRdiff(),
+			// new BlKMeans2(),
+			new BlKMeansVis(),
+			new BlLabFilter(),
+			new BlLeafCurlingAnalysis(),
+			new BlLoadImages(),
+			new BlRemoveMaizeBambooStick(),
+			new BlRemoveSmallObjectsVisFluo(),
+			new BlRunPostProcessors(),
+			new BlSkeletonizeVisFluo(),
+			new BlSkeletonizeNir(),
+			new BlUseFluoMaskToClearIr(),
+			new BlUseFluoMaskToClearNir(),
+			new BlUseFluoMaskToClearOther(),
+			new BlAlign(),
+			new BlCalcCOG(),
+			new BlCalcConvexHull(),
+			new BlClearRectangle(),
+			new BlCutFromSide(),
+			new BlFluoMaskIsRequired(),
+			new BlHighlightNullResults(),
+			new BlMedianFilterFixedSize(),
+			new BlObjectSeparator(),
+			new BlSmoothShape(),
+			new BlThreeDreconstruction(),
+			new BlDetectLeafTips(),
+			new BlRemoveLevitatingObjects(),
+			new BlFilterImagesByAngle(),
+			new BlFilterImagesByTopOrSide(),
+			new BlWarpImages(),
+			new BlDetectLeafCenterPoints(),
+			// new BlCalcIntensityFeature3DHistogram(),
+			new BlDetectScaleforNormalization(),
+			new BlObjectSeparatorByDistance(),
+			new BlFlowerDetectionAndFeatureExtraction(),
+			new BlCalcTextureFeatures(),
+			new BlCalcColorfeatures(),
+			new BlShowThreeDColorHistogram(),
+			new BlFilterImagesByDate(),
+			new BlFilterImagesByCondition(),
+			new BlShowIntermediateImages(),
+			new BlFilterImagesByPlantID(),
+			new BlFilterImagesByRegularExpression(),
+			new BlFilterImagesByCameraType(),
+			new BlCountColors(),
+			new BlColorBalanceCircularLumi(),
+			new BlSubtractMedianLab(),
+			new BlSpotMatcher(),
+			new BlSpotGradients(),
+			new BlResizeScale(),
+			new BlHSVFilter(),
+			new BlMedianFilter(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
@@ -195,7 +197,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 			res[idx++] = b;
 		for (ImageAnalysisBlock b : additionalBlocks)
 			res[idx++] = b;
-		
+			
 		return res;
 	}
 }
