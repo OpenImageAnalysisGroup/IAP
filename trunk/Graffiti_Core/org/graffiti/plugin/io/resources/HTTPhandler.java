@@ -19,13 +19,25 @@ public class HTTPhandler extends AbstractResourceIOHandler {
 	@Override
 	public InputStream getInputStream(IOurl url) throws Exception {
 		if (url.isEqualPrefix(getPrefix())) {
+			// old
 			if (url.getPrefix().contains("@")) {
-				String ur = url.getPrefix();
-				String userPass = ur.split("@")[0];
-				String user = userPass.split(":")[0];
-				String pass = userPass.split(":")[1];
-				String uuu = url.toString().split("@", 2)[1];
-				return HttpBasicAuth.downloadFileWithAuth(uuu, user, pass);
+			String ur = url.getPrefix();
+			String userPass = ur.split("@")[0];
+			String user = userPass.split(":")[0];
+			String pass = userPass.split(":")[1];
+			String uuu = url.toString().split("@", 2)[1];
+			return HttpBasicAuth.downloadFileWithAuth(uuu, user, pass);
+			} else
+			// change for barley cam
+			if (url.toString().contains("@")) {
+				String url_s = url.toString();
+				String[] pree = url_s.split("@");
+				String[] pre = pree[0].split("//");
+				String[] user_pass = pre[1].split(":");
+				String user = user_pass[0];
+				String pass = user_pass[1];
+				String uuu = pree[1];
+				return HttpBasicAuth.downloadFileWithAuth("http://" + uuu, user, pass);
 			} else {
 				URLConnection con = new URL(url.toString()).openConnection();
 				con.setConnectTimeout(SystemOptions.getInstance().getInteger("VFS", "http-connect-timeout", 10000));
