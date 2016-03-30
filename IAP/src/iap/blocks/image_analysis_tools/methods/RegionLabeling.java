@@ -30,6 +30,7 @@ public class RegionLabeling implements Segmentation {
 	int[] clusterSize;
 	private TopBottomLeftRight[] boundingBox;
 	boolean eightNeighbourhood = true;
+	int foregroundpixelCount = 0;
 	
 	public LinkedList<ArrayList<PositionAndColor>> getRegionList() {
 		return regionList;
@@ -204,6 +205,7 @@ public class RegionLabeling implements Segmentation {
 				
 				// Found new pixel?
 				if (find) {
+					foregroundpixelCount++;
 					PositionAndColor temp = new PositionAndColor(rx, ry, visitedImage[rx][ry]);
 					resultRegion.add(temp);
 					// current region bigger than geometricThresh
@@ -246,6 +248,7 @@ public class RegionLabeling implements Segmentation {
 	public void detectClusters() {
 		int w = image.getWidth();
 		int h = image.getHeight();
+		foregroundpixelCount = 0;
 		regionList = new LinkedList<>();
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
@@ -332,8 +335,7 @@ public class RegionLabeling implements Segmentation {
 	
 	@Override
 	public int getForegroundPixelCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return foregroundpixelCount;
 	}
 	
 	@Override
