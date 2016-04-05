@@ -1496,6 +1496,10 @@ public class GravistoService implements HelperClass, MemoryHogInterface {
 		boolean useProxy = SystemOptions.getInstance().getBoolean("Network", "http-proxy-enabled", false);
 		String proxyUrl = SystemOptions.getInstance().getString("Network", "http-proxy-host", "");
 		Integer proxyPort = SystemOptions.getInstance().getInteger("Network", "http-proxy-port", 3128);
+		/* http.nonProxyHosts:a list of hosts that should be reached directly, bypassing the proxy. 
+		This is a list of patterns separated by '|'. The patterns may start or end with a '*' for wildcards. 
+		Any host matching one of these patterns will be reached through a direct connection instead of through a proxy. */
+		String proxyBypass = SystemOptions.getInstance().getString("Network", "host(s)-for-proxybypass", "");
 		
 		boolean useSocksProxy = SystemOptions.getInstance().getBoolean("Network", "socks-proxy-enabled", false);
 		String socksProxyUrl = SystemOptions.getInstance().getString("Network", "socks-proxy-host", "");
@@ -1511,6 +1515,7 @@ public class GravistoService implements HelperClass, MemoryHogInterface {
 			System.setProperty("http.proxyPort", proxyPort + "");
 			System.setProperty("https.proxyHost", proxyUrl);
 			System.setProperty("https.proxyPort", proxyPort + "");
+			System.setProperty("http.nonProxyHosts", proxyBypass);
 			if (useProxyAuth) {
 				System.setProperty("http.proxyUser", proxyUser);
 				System.setProperty("http.proxyPassword", proxyPass);
