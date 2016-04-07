@@ -36,6 +36,10 @@ public class SystemOptions {
 	
 	private static Thread updateCheckThread;
 	
+	public boolean isIniNull() {
+		return ini == null;
+	}
+	
 	private SystemOptions(final String iniFileName, final IniIoProvider iniIO) throws Exception {
 		if (updateCheckThread == null) {
 			Thread t = new Thread(new Runnable() {
@@ -473,6 +477,8 @@ public class SystemOptions {
 	}
 	
 	protected void store(String srcSection, String srcSetting) {
+		if (preventSave)
+			return;
 		try {
 			synchronized (ini) {
 				if (iniIO != null) {
@@ -825,5 +831,15 @@ public class SystemOptions {
 			}
 		}
 		return s == null || s.isEmpty() ? null : s;
+	}
+	
+	private boolean preventSave = false;
+	
+	public void disableSave() {
+		preventSave = true;
+	}
+	
+	public void enableSave() {
+		preventSave = false;
 	}
 }

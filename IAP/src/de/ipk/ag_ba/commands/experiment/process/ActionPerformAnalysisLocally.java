@@ -37,6 +37,8 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 	
 	@Override
 	public String getDefaultTitle() {
+		if (so.isIniNull())
+			return "Analysis pipeline not available";
 		String vv = so.getString("DESCRIPTION", "tuned_for_IAP_version", "(unknown legacy IAP version)");
 		String warning = ReleaseInfo.IAP_VERSION_STRING.equals(vv) ? "" :
 				"<br><small><font color='red'>Settings not tested with IAP V" + ReleaseInfo.IAP_VERSION_STRING + "!</font>";

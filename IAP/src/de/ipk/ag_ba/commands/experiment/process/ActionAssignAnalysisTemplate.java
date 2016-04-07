@@ -49,8 +49,8 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 			}
 		}
 		skipped = false;
-		String ini = SystemOptions.getInstance(iniFileName, null).getIniValue();
-		ini = StringEscapeUtils.escapeXml(ini);
+		String ini = iniFileName == null ? null : SystemOptions.getInstance(iniFileName, null).getIniValue();
+		ini = ini == null ? null : StringEscapeUtils.escapeXml(ini);
 		exp.getHeader().setSettings(ini);
 		if (exp.getM() != null) {
 			try {
@@ -77,16 +77,23 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return null;// new ArrayList<NavigationButton>();
+		return null;
 	}
 	
 	@Override
 	public MainPanelComponent getResultMainPanel() {
-		if (skipped)
-			return new MainPanelComponent("Template data has not been assigned. Existing analysis settings have not been modified.");
-		else
-			return new MainPanelComponent("Data from '" + iniFileName + "' has been assigned to experiment '"
-					+ exp.getExperimentName() + "'.");
+		if (iniFileName == null) {
+			if (skipped)
+				return new MainPanelComponent("Existing analysis settings could not be changed.");
+			else
+				return new MainPanelComponent("Previously attached analysis settings have been removed.");
+		} else {
+			if (skipped)
+				return new MainPanelComponent("Template data has not been assigned. Existing analysis settings have not been modified.");
+			else
+				return new MainPanelComponent("Data from '" + iniFileName + "' has been assigned to experiment '"
+						+ exp.getExperimentName() + "'.");
+		}
 	}
 	
 	@Override
@@ -101,7 +108,10 @@ public class ActionAssignAnalysisTemplate extends AbstractNavigationAction imple
 	
 	@Override
 	public String getDefaultImage() {
-		return "img/ext/gpl2/Gnome-Insert-Object-64.png";
+		if (iniFileName != null)
+			return "img/ext/gpl2/Gnome-Insert-Object-64.png";
+		else
+			return "img/ext/gpl2/Gnome-Emblem-Unreadable-64.png";
 	}
 	
 }

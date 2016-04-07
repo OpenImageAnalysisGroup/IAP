@@ -25,7 +25,10 @@ public class ActionSelectAnalysisTemplate extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Select Analysis Template";
+		if (experimentReference.getHeader().getSettings() != null && experimentReference.getHeader().getSettings().length() > 0)
+			return "Select Template / Remove Settings";
+		else
+			return "Select Template";
 	}
 	
 	@Override
@@ -47,6 +50,12 @@ public class ActionSelectAnalysisTemplate extends AbstractNavigationAction {
 						new ActionAssignAnalysisTemplate(experimentReference, pd.getIniFileName(),
 								"Assign " + pd.getName() + " analysis pipeline to experiment",
 								"<html><center>Use " + pd.getName() + ""),
+						src.getGUIsetting()));
+			if (experimentReference.getHeader().getSettings() != null && experimentReference.getHeader().getSettings().length() > 0)
+				actions.add(new NavigationButton(
+						new ActionAssignAnalysisTemplate(experimentReference, null,
+								"Remove attached analysis pipeline from experiment",
+								"<html><center>Remove attached pipeline"),
 						src.getGUIsetting()));
 		} catch (Exception e) {
 			e.printStackTrace();
