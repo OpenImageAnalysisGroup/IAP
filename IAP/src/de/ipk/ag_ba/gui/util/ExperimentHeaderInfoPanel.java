@@ -374,16 +374,18 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		fp.addGuiComponentRow(new JLabel("History"), disable(new JTextField(getVersionString(experimentHeader))), false);
 		try {
 			ExperimentAnalysisSettingsIOprovder nnn = new ExperimentAnalysisSettingsIOprovder(experimentHeader, m);
-			String so = null;
+			String so = "";
 			if (nnn != null) {
 				SystemOptions soi = SystemOptions.getInstance(null, nnn);
-				so = soi.getString("DESCRIPTION",
-						"pipeline_name", "[pipeline name unknown]", false);
-				String v = soi.getString("DESCRIPTION",
-						"tuned_for_IAP_version", "[unknown legacy, &lt;V1.2.0]", false);
-				if (!ReleaseInfo.IAP_VERSION_STRING.equals(v))
-					v = v + " - <b><font color='red'>version mismatch</font></b>";
-				so = so + ", tuned for IAP " + v;
+				if (soi.getString("DESCRIPTION", "pipeline_name", "", false, true).length() > 0) {
+					so = soi.getString("DESCRIPTION",
+							"pipeline_name", "[pipeline name unknown]", false);
+					String v = soi.getString("DESCRIPTION",
+							"tuned_for_IAP_version", "[unknown legacy, &lt;V1.2.0]", false);
+					if (!ReleaseInfo.IAP_VERSION_STRING.equals(v))
+						v = v + " - <b><font color='red'>version mismatch</font></b>";
+					so = so + ", tuned for IAP " + v;
+				}
 			}
 			JTextPane jtp = new JTextPane();
 			jtp.setContentType("text/html");
@@ -391,9 +393,9 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					|| experimentHeader.getSettings().isEmpty() ?
 					"<html><font size='2' face='Arial'>(not assigned)" :
 					"<html><font size='2' face='Arial'>"
-							+ so + ", "
+							+ so + (so.length() > 0 ? ", " : "no pipeline assigned, ")
 							+ (StringManipulationTools.count(experimentHeader.getSettings(), "\n") + (experimentHeader.getSettings().isEmpty() ? 0 : 1))
-							+ " setting-definition lines");
+							+ " setting lines stored");
 			fp.addGuiComponentRow(
 					new JLabel("Analysis Settings"),
 					disable(jtp), false);

@@ -32,12 +32,12 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 	
 	@Override
 	public String getDefaultTooltip() {
-		return so.getString("DESCRIPTION", "pipeline_description", "(no description specified)", true);
+		return so.getString("DESCRIPTION", "pipeline_description", "No description specified or pipeline not assigned.", true);
 	}
 	
 	@Override
 	public String getDefaultTitle() {
-		if (so.isIniNull())
+		if (so.isIniNull() || so.getString("DESCRIPTION", "pipeline_name", "", false, true).length() == 0)
 			return "Analysis pipeline not available";
 		String vv = so.getString("DESCRIPTION", "tuned_for_IAP_version", "(unknown legacy IAP version)");
 		String warning = ReleaseInfo.IAP_VERSION_STRING.equals(vv) ? "" :
@@ -64,6 +64,9 @@ public class ActionPerformAnalysisLocally extends AbstractPhenotypeAnalysisActio
 	
 	@Override
 	protected ImageAnalysisTask getImageAnalysisTask() {
+		if (so.isIniNull() || so.getString("DESCRIPTION", "pipeline_name", "", false, true).length() == 0)
+			return null;
+		
 		PipelineDesc pd = new PipelineDesc(
 				null, iniIO,
 				so.getString("DESCRIPTION", "pipeline_name", "(unnamed)", true),

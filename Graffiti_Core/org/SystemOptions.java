@@ -403,6 +403,10 @@ public class SystemOptions {
 	}
 	
 	public String getString(String group, String setting, String defaultValue, boolean addDefaultIfNeeded) {
+		return getString(group, setting, defaultValue, addDefaultIfNeeded, false);
+	}
+	
+	public String getString(String group, String setting, String defaultValue, boolean addDefaultIfNeeded, boolean preventNullReturn) {
 		if (ini == null) {
 			System.out.println("WARNING: Settings file can't be used, returning default setting value!");
 			return defaultValue;
@@ -419,7 +423,7 @@ public class SystemOptions {
 					return defaultValue;
 				} else {
 					if (r == null || r.equals("null"))
-						return null;
+						return preventNullReturn ? defaultValue : null;
 					else
 						return ExternalPasswordStorage.decryptAndUnconvertValueIfNeeded(group, setting, r);
 				}

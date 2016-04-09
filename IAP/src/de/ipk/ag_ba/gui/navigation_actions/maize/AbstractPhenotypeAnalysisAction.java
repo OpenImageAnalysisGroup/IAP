@@ -95,6 +95,14 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 		if (experimentResult != null)
 			return;
 		
+		ImageAnalysisTask iat = getImageAnalysisTask();
+		
+		if (iat == null) {
+			mpc = new MainPanelComponent(
+					"<html><h3>Could not perform analysis</h3>There is no image analysis task assigned. Use the 'Select Template' function to add an initial analysis script.");
+			return;
+		}
+		
 		try {
 			StopWatch sw = new StopWatch(SystemAnalysis.getCurrentTime() + ">LOAD EXPERIMENT " + experiment.getExperimentName());
 			
@@ -111,7 +119,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			sw.reset();
 			experimentToBeAnalysed = experimentToBeAnalysed.clone();
 			experimentToBeAnalysed.getHeader().setExperimentType(IAPexperimentTypes.AnalysisResults + "");
-			experimentToBeAnalysed.getHeader().setExperimentname(getImageAnalysisTask().getName() + " of " +
+			experimentToBeAnalysed.getHeader().setExperimentname(iat.getName() + " of " +
 					experiment.getExperimentName());
 			experimentToBeAnalysed.setHeader(experimentToBeAnalysed.getHeader());
 			sw.printTime();
@@ -153,7 +161,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 			final ThreadSafeOptions tso = new ThreadSafeOptions();
 			tso.setInt(1);
 			
-			ImageAnalysisTask task = getImageAnalysisTask();
+			ImageAnalysisTask task = iat;
 			if (filterAngle) {
 				task.setValidSideAngle(DEBUG_SINGLE_ANGLE1, DEBUG_SINGLE_ANGLE2, DEBUG_SINGLE_ANGLE3);
 			}
@@ -248,36 +256,38 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 						status.setCurrentStatusText2("Save result data structure...");
 					}
 					statisticsResult.getHeader().setImportUserGroup(IAPexperimentTypes.AnalysisResults + "");
-					String nn = getImageAnalysisTask().getName();
-					if (!nn.contains(experiment.getExperimentName() + ""))
-						nn = nn + " of " + experiment.getExperimentName();
-					nn = StringManipulationTools.stringReplace(nn, ":", "_");
-					statisticsResult.getHeader().setExperimentname(nn);
-					
-					statisticsResult.getHeader().setRemark(
-							(statisticsResult.getHeader().getRemark() != null && !statisticsResult.getHeader().getRemark().isEmpty() ? statisticsResult.getHeader()
-									.getRemark() + " // " : "")
-									+
-									"analysis started: " + SystemAnalysis.getCurrentTime(startTime) +
-									" // processing time: " +
-									SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime) +
-									" // finished: " + SystemAnalysis.getCurrentTime());
-					// System.out.println("Stat: " + ((Experiment) statisticsResult).getExperimentStatistics());
-					statisticsResult.getHeader().setOriginDbId(dbID);
-					statisticsResult.setHeader(statisticsResult.getHeader());
-					
-					VirtualFileSystemVFS2 vfs = VirtualFileSystemVFS2.getKnownFromDatabaseId(experiment.getHeader().getDatabaseId());
-					if (!statisticsResult.getHeader().getDatabaseId().startsWith("mongo_") && vfs != null) {
-						ActionDataExportToVfs ac = new ActionDataExportToVfs(m,
-								new ExperimentReference(statisticsResult), vfs, false, null);
-						ac.setSkipClone(true);
-						ac.setSource(src != null ? src.getAction() : null, src != null ? src.getGUIsetting() : null);
-						if (status != null)
-							ac.setStatusProvider(status);
-						ac.performActionCalculateResults(src);
-					} else {
-						if (m != null) {
-							m.saveExperiment(statisticsResult, getStatusProvider());
+					String nn = iat.getName();
+					if (nn != null) {
+						if (!nn.contains(experiment.getExperimentName() + ""))
+							nn = nn + " of " + experiment.getExperimentName();
+						nn = StringManipulationTools.stringReplace(nn, ":", "_");
+						statisticsResult.getHeader().setExperimentname(nn);
+						
+						statisticsResult.getHeader().setRemark(
+								(statisticsResult.getHeader().getRemark() != null && !statisticsResult.getHeader().getRemark().isEmpty() ? statisticsResult.getHeader()
+										.getRemark() + " // " : "")
+										+
+										"analysis started: " + SystemAnalysis.getCurrentTime(startTime) +
+										" // processing time: " +
+										SystemAnalysis.getWaitTime(System.currentTimeMillis() - startTime) +
+										" // finished: " + SystemAnalysis.getCurrentTime());
+						// System.out.println("Stat: " + ((Experiment) statisticsResult).getExperimentStatistics());
+						statisticsResult.getHeader().setOriginDbId(dbID);
+						statisticsResult.setHeader(statisticsResult.getHeader());
+						
+						VirtualFileSystemVFS2 vfs = VirtualFileSystemVFS2.getKnownFromDatabaseId(experiment.getHeader().getDatabaseId());
+						if (!statisticsResult.getHeader().getDatabaseId().startsWith("mongo_") && vfs != null) {
+							ActionDataExportToVfs ac = new ActionDataExportToVfs(m,
+									new ExperimentReference(statisticsResult), vfs, false, null);
+							ac.setSkipClone(true);
+							ac.setSource(src != null ? src.getAction() : null, src != null ? src.getGUIsetting() : null);
+							if (status != null)
+								ac.setStatusProvider(status);
+							ac.performActionCalculateResults(src);
+						} else {
+							if (m != null) {
+								m.saveExperiment(statisticsResult, getStatusProvider());
+							}
 						}
 					}
 					
