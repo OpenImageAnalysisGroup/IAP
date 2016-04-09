@@ -77,12 +77,12 @@ public class BlMedianFilter extends AbstractBlock {
 	
 	@Override
 	public BlockType getBlockType() {
-		return BlockType.SEGMENTATION;
+		return BlockType.PREPROCESSING;
 	}
 	
 	@Override
 	public String getName() {
-		return "Rank Filter (Adaptive Kernelsize)";
+		return "Rank Filter (adaptive kernel size)";
 	}
 	
 	@Override
