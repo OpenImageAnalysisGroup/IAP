@@ -115,18 +115,18 @@ public class ActionAbout extends AbstractNavigationAction {
 		Book book = new Book(null, "<html><center>" +
 				"User Documentation<br>" +
 				"<font color='gray'><small>(online PDF)</small></font></center>",
-				new IOurl("http://iapg2p.sourceforge.net/documentation.pdf"),
+				new IOurl("http://openimageanalysisgroup.github.io/IAP/documentation.pdf"),
 				"img/dataset.png");
 		rr.add(book.getNavigationButton(src));
 		
 		Book webUrl = new Book(null, "Source Code<br>" +
-				"<font color='gray'><small>(SourceForge)</small></font></center>",
-				new IOurl("http://sourceforge.net/projects/iapg2p"),
+				"<font color='gray'><small>(GitHub)</small></font></center>",
+				new IOurl("https://github.com/OpenImageAnalysisGroup/IAP"),
 				"img/ext/gpl2/Gtk-Dnd-Multiple-64.png");
 		rr.add(webUrl.getNavigationButton(src));
 		
 		Book webUrl2 = new Book(null, "IAP Website",
-				new IOurl("http://iapg2p.sourceforge.net/"),
+				new IOurl("http://openimageanalysisgroup.github.io/IAP/"),
 				"img/browser.png");
 		rr.add(webUrl2.getNavigationButton(src));
 		

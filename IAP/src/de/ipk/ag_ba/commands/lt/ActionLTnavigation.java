@@ -68,7 +68,7 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			Book book = new Book(null, "<html><center>" +
 					"User Documentation<br>" +
 					"<font color='gray'><small>(online PDF)</small></font></center>",
-					new IOurl("http://iapg2p.sourceforge.net/documentation.pdf"),
+					new IOurl("http://openimageanalysisgroup.github.io/IAP/documentation.pdf"),
 					"img/dataset.png");
 			ArrayList<NavigationButton> rr = new ArrayList<NavigationButton>();
 			rr.add(book.getNavigationButton(src));

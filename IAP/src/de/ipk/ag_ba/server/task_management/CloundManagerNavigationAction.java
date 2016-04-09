@@ -92,7 +92,7 @@ public class CloundManagerNavigationAction extends AbstractNavigationAction {
 			}
 			
 			String clusterStatusURL = SystemOptions.getInstance().getString("IAP", "Compute Infrastructure Info URL",
-					"http://iapg2p.sourceforge.net");
+					"http://openimageanalysisgroup.github.io/IAP/");
 			if (clusterAvailable) {
 				res.add(
 						new NavigationButton(

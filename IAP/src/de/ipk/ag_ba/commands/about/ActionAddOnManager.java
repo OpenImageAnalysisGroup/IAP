@@ -47,7 +47,7 @@ public class ActionAddOnManager extends AbstractNavigationAction {
 				"Add-ons may bundle additional libraries.<br>" +
 				"<br>" +
 				"If you would like to develop a custom extension, consult the developer documentation (" +
-				"<a href=\"http://iapg2p.sourceforge.net/#development\">link</a>).</font>");
+				"<a href=\"https://github.com/OpenImageAnalysisGroup/IAP/blob/master/README.md\">link</a>).</font>");
 		
 		MainPanelComponent mp = new MainPanelComponent(ll);
 		return mp;
