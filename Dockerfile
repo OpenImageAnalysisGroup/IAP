@@ -8,7 +8,17 @@ RUN cd IAP
 RUN git pull || true
 RUN cd ..
 RUN ant -f IAP/IAP/build.xml cleanall
-RUN ant -f IAP/IAP/build.xml build
+RUN ant -f IAP/Graffiti_Core/build.xml
+RUN ant -f IAP/Graffiti_lib/build.xml
+RUN ant -f IAP/Graffiti_Editor/build.xml
+RUN ant -f IAP/Graffiti_Plugins/build.xml
+RUN ant -f IAP/MultimodalDataHandling/build.xml
+RUN ant -f IAP/IPK_lib/build.xml
+RUN ant -f IAP/IPK-Plugins/build.xml
+RUN ant -f IAP/IAP-Addon-Example/build.xml
+RUN ant -f IAP/IAP\ Transfer/build.xml
+RUN ant -f IAP/IAP\ CONSOLE/build.xml
+RUN ant -f IAP/IAP/build.xml
 RUN IAP/make/createfilelist.sh
 RUN ant -f IAP/IAP/createReleaseQuick.xml
 RUN ant -f IAP/IAP/build.xml cleanall
