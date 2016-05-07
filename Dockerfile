@@ -16,7 +16,7 @@ RUN ant -f IAP/IAP\ CONSOLE/build.xml
 RUN ant -f IAP/IAP/build.xml
 RUN IAP/make/createfilelist.sh
 RUN ant -f IAP/IAP/createReleaseQuick.xml
-RUN mv IAP/IAP/release/iap_2_0.jar .
+RUN mv IAP/IAP/release/iap_2_0.jar /root/iap_2_0.jar
 RUN echo '#!/bin/bash' > IAPconsole.sh
 RUN echo 'java -cp /root/iap_2_0.jar iap.Console'  >> IAPconsole.sh
 RUN chmod +x IAPconsole.sh
