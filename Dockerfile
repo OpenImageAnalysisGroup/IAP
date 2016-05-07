@@ -4,13 +4,13 @@ LABEL Description="This image is used to start IAP in command line mode (not yet
 RUN apt-get update -y && apt-get upgrade -y && apt-get install -y ant openjfx
 RUN git clone --depth=1 https://github.com/OpenImageAnalysisGroup/IAP.git
 RUN ant -f IAP/IAP\ CONSOLE/build.xml
-RUN ant -f IAP/IAP/build.xml
 RUN IAP/make/createfilelist.sh
 RUN ant -f IAP/IAP/createReleaseQuick.xml
-RUN mv IAP/IAP/release/iap_2_0.jar /root/iap_2_0.jar
+RUN mv IAP/IAP/release/iap_2_0.jar .
+RUN ant -f IAP/IAP\ CONSOLE/build.xml cleanall
 RUN echo '#!/bin/bash' > IAPconsole.sh
-RUN echo 'java -cp /root/iap_2_0.jar iap.Console'  >> IAPconsole.sh
+RUN echo 'java -cp iap_2_0.jar iap.Console'  >> IAPconsole.sh
 RUN chmod +x IAPconsole.sh
 RUN echo '#!/bin/bash' > IAPgui.sh
-RUN echo 'java -cp /root/iap_2_0.jar de.ipk.ag_ba.gui.webstart.IAPmain'  >> IAPgui.sh
+RUN echo 'java -cp iap_2_0.jar de.ipk.ag_ba.gui.webstart.IAPmain'  >> IAPgui.sh
 RUN chmod +x IAPgui.sh
