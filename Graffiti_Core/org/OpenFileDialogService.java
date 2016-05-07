@@ -1,174 +1,129 @@
+/*******************************************************************************
+ * Copyright (c) 2003-2007 Network Analysis Group, IPK Gatersleben
+ *******************************************************************************/
+/*
+ * Created on 17.11.2004 by Christian Klukas
+ */
 package org;
 
 import java.io.File;
-import java.util.List;
-import java.util.concurrent.Semaphore;
-
-import javafx.application.Platform;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
+import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import org.apache.commons.collections.ListUtils;
-
 /**
  * @author Christian Klukas
- *         (c) 2014 IPK-Gatersleben
+ *         (c) 2006 IPK-Gatersleben
  */
 public class OpenFileDialogService implements HelperClass {
 	
-	private static final boolean USE_FX_BY_DEFAULT = true;
 	private static JFileChooser openDialog = null;
 	
 	public static File getFile(final String[] valid_extensions, final String description) {
-		if (!SystemOptions.getInstance().getBoolean("IAP", "FX//Use FX File Choosers", USE_FX_BY_DEFAULT))
-			return OpenFileDialogServiceSwing.getFile(valid_extensions, description);
-		
 		if (openDialog == null) {
 			openDialog = new JFileChooser();
 		}
-		JavaFX.init();
-		FileChooser fc = new FileChooser();
-		if (openDialog.getCurrentDirectory() != null)
-			fc.setInitialDirectory(openDialog.getCurrentDirectory());
-		fc.setTitle(description);
-		
-		for (String ext : valid_extensions) {
-			fc.getExtensionFilters().add(
-					new FileChooser.ExtensionFilter(StringManipulationTools.stringReplace(ext, "*.", "").toUpperCase(), ext));
-		}
-		if (Platform.isFxApplicationThread()) {
-			File f = fc.showOpenDialog(null);
-			if (f != null)
-				openDialog.setCurrentDirectory(f);
-			return f;
-		} else {
-			ObjectRef res = new ObjectRef();
-			Semaphore s = new Semaphore(1);
-			s.acquireUninterruptibly();
-			Platform.runLater(() -> {
-				try {
-					File f = fc.showOpenDialog(null);
-					res.setObject(f);
-				} finally {
-					s.release();
-				}
-			});
-			s.acquireUninterruptibly();
-			File f = (File) res.getObject();
-			if (f != null) {
-				if (!f.isDirectory())
-					f = f.getParentFile();
-				openDialog.setCurrentDirectory(f);
+		openDialog.setMultiSelectionEnabled(false);
+		openDialog.resetChoosableFileFilters();
+		openDialog.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				return (f.isDirectory()) ||
+						((f.canRead() && extensionOK(f.getName(), valid_extensions)));
 			}
-			return f;
-		}
+			
+			private boolean extensionOK(String fileName, String[] valid_extensions) {
+				for (String ext : valid_extensions) {
+					if (fileName.toUpperCase().endsWith(ext.toUpperCase()))
+						return true;
+				}
+				return false;
+			}
+			
+			@Override
+			public String getDescription() {
+				return description;
+			}
+		});
+		int option = openDialog.showOpenDialog(null);
+		if (option == JFileChooser.APPROVE_OPTION) {
+			return openDialog.getSelectedFile();
+		} else
+			return null;
 	}
 	
 	public static File getFile(final String[] valid_extensions, final String description, String selectButtonText) {
-		if (!SystemOptions.getInstance().getBoolean("IAP", "FX//Use FX File Choosers", USE_FX_BY_DEFAULT))
-			return OpenFileDialogServiceSwing.getFile(valid_extensions, description, selectButtonText);
-		
 		if (openDialog == null) {
 			openDialog = new JFileChooser();
 		}
-		JavaFX.init();
-		FileChooser fc = new FileChooser();
-		if (openDialog.getCurrentDirectory() != null)
-			fc.setInitialDirectory(openDialog.getCurrentDirectory());
-		fc.setTitle(description + " - " + selectButtonText);
-		
-		for (String ext : valid_extensions) {
-			fc.getExtensionFilters().add(
-					new FileChooser.ExtensionFilter(description + " - " + StringManipulationTools.stringReplace(ext, "*.", "").toUpperCase(), ext));
-		}
-		if (Platform.isFxApplicationThread()) {
-			File f = fc.showOpenDialog(null);
-			if (f != null)
-				openDialog.setCurrentDirectory(f);
-			return f;
-		} else {
-			ObjectRef res = new ObjectRef();
-			Semaphore s = new Semaphore(1);
-			s.acquireUninterruptibly();
-			Platform.runLater(() -> {
-				try {
-					File f = fc.showOpenDialog(null);
-					res.setObject(f);
-				} finally {
-					s.release();
-				}
-			});
-			s.acquireUninterruptibly();
-			File f = (File) res.getObject();
-			if (f != null) {
-				if (!f.isDirectory())
-					f = f.getParentFile();
-				openDialog.setCurrentDirectory(f);
+		openDialog.setMultiSelectionEnabled(false);
+		openDialog.resetChoosableFileFilters();
+		openDialog.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				return (f.isDirectory()) ||
+						((f.canRead() && extensionOK(f.getName(), valid_extensions)));
 			}
-			return f;
-		}
+			
+			private boolean extensionOK(String fileName, String[] valid_extensions) {
+				for (String ext : valid_extensions) {
+					if (fileName.toUpperCase().endsWith(ext.toUpperCase()))
+						return true;
+				}
+				return false;
+			}
+			
+			@Override
+			public String getDescription() {
+				return description;
+			}
+		});
+		int option = openDialog.showDialog(null, selectButtonText);
+		if (option == JFileChooser.APPROVE_OPTION) {
+			return openDialog.getSelectedFile();
+		} else
+			return null;
 	}
 	
-	public static List<File> getFiles(final String[] valid_extensions, final String description) {
-		if (!SystemOptions.getInstance().getBoolean("IAP", "FX//Use FX File Choosers", USE_FX_BY_DEFAULT))
-			return OpenFileDialogServiceSwing.getFiles(valid_extensions, description);
-		
+	public static ArrayList<File> getFiles(final String[] valid_extensions, final String description) {
+		ArrayList<File> result = new ArrayList<File>();
 		if (openDialog == null) {
 			openDialog = new JFileChooser();
 		}
-		JavaFX.init();
-		FileChooser fc = new FileChooser();
-		if (openDialog.getCurrentDirectory() != null)
-			fc.setInitialDirectory(openDialog.getCurrentDirectory());
-		fc.setTitle(description);
-		
-		fc.getExtensionFilters().add(
-				new FileChooser.ExtensionFilter("Images", ListUtils.union(
-						StringManipulationTools.getStringListFromStream(StringManipulationTools.getStringListFromArray(valid_extensions).stream()
-								.map(s -> "*." + s.toLowerCase()))
-						, (StringManipulationTools.getStringListFromStream(StringManipulationTools.getStringListFromArray(valid_extensions).stream()
-								.map(s -> "*." + s.toUpperCase()))))));
-		
-		for (String ext : valid_extensions) {
-			fc.getExtensionFilters().add(
-					new FileChooser.ExtensionFilter(StringManipulationTools.stringReplace(ext, "*.", "").toUpperCase() + " (*." + ext + ")", "*."
-							+ ext.toUpperCase(), "*."
-							+ ext.toLowerCase()));
-		}
-		if (Platform.isFxApplicationThread()) {
-			List<File> f = fc.showOpenMultipleDialog(null);
-			if (f != null && !f.isEmpty()) {
-				File ff = f.iterator().next();
-				if (!ff.isDirectory())
-					ff = ff.getParentFile();
-				openDialog.setCurrentDirectory(ff);
+		openDialog.setMultiSelectionEnabled(true);
+		openDialog.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		openDialog.resetChoosableFileFilters();
+		openDialog.setMultiSelectionEnabled(false);
+		openDialog.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				return (f.isDirectory()) ||
+						((f.canRead() && extensionOK(f.getName(), valid_extensions)));
 			}
-			return f;
-		} else {
-			ObjectRef res = new ObjectRef();
-			Semaphore s = new Semaphore(1);
-			s.acquireUninterruptibly();
-			Platform.runLater(() -> {
-				try {
-					List<File> f = fc.showOpenMultipleDialog(null);
-					res.setObject(f);
-				} finally {
-					s.release();
+			
+			private boolean extensionOK(String fileName, String[] valid_extensions) {
+				for (String ext : valid_extensions) {
+					if (fileName.toUpperCase().endsWith(ext.toUpperCase()))
+						return true;
 				}
-			});
-			s.acquireUninterruptibly();
-			List<File> f = (List<File>) res.getObject();
-			if (f != null && !f.isEmpty()) {
-				File ff = f.iterator().next();
-				if (!ff.isDirectory())
-					ff = ff.getParentFile();
-				openDialog.setCurrentDirectory(ff);
+				return false;
 			}
-			return f;
-		}
+			
+			@Override
+			public String getDescription() {
+				return description;
+			}
+		});
+		openDialog.setMultiSelectionEnabled(true);
+		int option = openDialog.showOpenDialog(null);
+		if (option == JFileChooser.APPROVE_OPTION) {
+			for (File f : openDialog.getSelectedFiles()) {
+				result.add(f);
+			}
+			return result;
+		} else
+			return null;
 	}
 	
 	public static File getSaveFile(final String[] valid_extensions, final String description) {
@@ -227,11 +182,11 @@ public class OpenFileDialogService implements HelperClass {
 	}
 	
 	public static File getDirectoryFromUser(String okButtonText, String startDir) {
-		if (!SystemOptions.getInstance().getBoolean("IAP", "FX//Use FX File Choosers", USE_FX_BY_DEFAULT))
-			return OpenFileDialogServiceSwing.getDirectoryFromUser(okButtonText, startDir);
 		if (openDialog == null) {
 			openDialog = new JFileChooser();
 		}
+		openDialog.setMultiSelectionEnabled(false);
+		openDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		try {
 			if (startDir != null && !startDir.trim().isEmpty()) {
 				File f = new File(startDir);
@@ -241,33 +196,20 @@ public class OpenFileDialogService implements HelperClass {
 		} catch (Exception e) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 		}
-		JavaFX.init();
-		DirectoryChooser dc = new DirectoryChooser();
-		if (openDialog.getCurrentDirectory() != null && openDialog.getCurrentDirectory().exists())
-			dc.setInitialDirectory(openDialog.getCurrentDirectory());
-		dc.setTitle(okButtonText);
-		if (Platform.isFxApplicationThread()) {
-			File f = dc.showDialog(null);
-			if (f != null)
-				openDialog.setCurrentDirectory(f);
-			return f;
-		} else {
-			ObjectRef res = new ObjectRef();
-			Semaphore s = new Semaphore(1);
-			s.acquireUninterruptibly();
-			Platform.runLater(() -> {
-				try {
-					File f = dc.showDialog(null);
-					res.setObject(f);
-				} finally {
-					s.release();
-				}
-			});
-			s.acquireUninterruptibly();
-			File f = (File) res.getObject();
-			if (f != null)
-				openDialog.setCurrentDirectory(f);
-			return f;
-		}
+		// openDialog.resetChoosableFileFilters();
+		// openDialog.setFileFilter(new FileFilter() {
+		// public boolean accept(File f) {
+		// return f.isDirectory();
+		// }
+		//
+		// public String getDescription() {
+		// return "Directory";
+		// }
+		// });
+		int option = openDialog.showDialog(null, okButtonText);
+		if (option == JFileChooser.APPROVE_OPTION) {
+			return openDialog.getSelectedFile();
+		} else
+			return null;
 	}
 }

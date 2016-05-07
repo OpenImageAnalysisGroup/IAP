@@ -447,21 +447,31 @@ public class IAPmain extends JApplet {
 			for (Iterator<String> it = locations_exclude.iterator(); it.hasNext();) {
 				String remove = it.next();
 				if (!locations.remove(remove)) {
-					// windows compatibility remove also not exact matches
-					for (Iterator<String> itl = locations.iterator(); itl.hasNext();) {
-						String loc = itl.next();
-						remove = remove.toUpperCase();
-						remove = StringManipulationTools.stringReplace(remove, "./", "");
-						remove = StringManipulationTools.stringReplace(remove, "\"", "");
-						remove = StringManipulationTools.stringReplace(remove, "/", "\\");
-						remove = StringManipulationTools.stringReplace(remove, "\\", "");
-						remove = StringManipulationTools.stringReplace(remove, " ", "");
-						String loc2 = loc.toUpperCase();
-						loc2 = StringManipulationTools.stringReplace(loc2, "\\", "");
-						loc2 = StringManipulationTools.stringReplace(loc2, " ", "");
-						if (loc2.indexOf(remove) >= 0) {
-							locations.remove(loc);
-							break;
+					if (remove.startsWith("**")) {
+						remove = remove.substring("**".length());
+						ArrayList<String> toRemove = new ArrayList<>();
+						for (String loc : locations) {
+							if (loc.endsWith(remove))
+								toRemove.add(loc);
+						}
+						locations.removeAll(toRemove);
+					} else {
+						// windows compatibility remove also not exact matches
+						for (Iterator<String> itl = locations.iterator(); itl.hasNext();) {
+							String loc = itl.next();
+							remove = remove.toUpperCase();
+							remove = StringManipulationTools.stringReplace(remove, "./", "");
+							remove = StringManipulationTools.stringReplace(remove, "\"", "");
+							remove = StringManipulationTools.stringReplace(remove, "/", "\\");
+							remove = StringManipulationTools.stringReplace(remove, "\\", "");
+							remove = StringManipulationTools.stringReplace(remove, " ", "");
+							String loc2 = loc.toUpperCase();
+							loc2 = StringManipulationTools.stringReplace(loc2, "\\", "");
+							loc2 = StringManipulationTools.stringReplace(loc2, " ", "");
+							if (loc2.indexOf(remove) >= 0) {
+								locations.remove(loc);
+								break;
+							}
 						}
 					}
 				}

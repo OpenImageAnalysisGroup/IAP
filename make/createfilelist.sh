@@ -135,6 +135,7 @@ echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/importers/genophen/plugin.
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/importers/flatfile/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/exporters/matrix/plugin.xml" >> plugins_exclude.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/algorithms/collapsed_graph_producer/plugin.xml" >> plugins_exclude.txt
+echo "**build.xml" >> plugins_exclude.txt
 
 cd ../..
 cd make

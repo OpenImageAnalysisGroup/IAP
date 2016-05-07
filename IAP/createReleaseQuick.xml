@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="Create IAP JAR" name="Create Runnable Jar for IAP">
+<project default="build" name="Create Runnable Jar for IAP">
     <!--ANT 1.7 is required -->
-    <target name="Create IAP JAR">
+    <target name="build">
     	<ant antfile="ant-scripts/createIAPquick.xml"/>
     </target>
 </project>
