@@ -26,8 +26,6 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.junit.Test;
-
 public class SystemAnalysis {
 	
 	private static boolean fullPower = false;
@@ -57,8 +55,8 @@ public class SystemAnalysis {
 	}
 	
 	public static int getNumberOfCPUs() {
-		if (getEnvironmentInteger("SYSTEM_cpu_n", -1)>0)
-			return getEnvironmentInteger("SYSTEM_cpu_n",-1);
+		if (getEnvironmentInteger("SYSTEM_cpu_n", -1) > 0)
+			return getEnvironmentInteger("SYSTEM_cpu_n", -1);
 		if (fixedCPUload > 0)
 			return fixedCPUload;
 		int cpus = SystemOptions.getInstance().getInteger(
@@ -76,22 +74,22 @@ public class SystemAnalysis {
 	}
 	
 	public static int getEnvironmentInteger(String id, int defaultIfMissing) {
-		Map<String, String> variables = System.getenv();  
-		for (Map.Entry<String, String> entry : variables.entrySet()) {  
-		   String name = entry.getKey();
-		   if (name.equalsIgnoreCase(id)) {
-		   String value = entry.getValue();
-		   try {
-			   Integer v = Integer.parseInt(value);
-			   return v;
-		   } catch(Exception e) {
-			   throw new RuntimeException(e);
-		   }
-		   }
-		}  
+		Map<String, String> variables = System.getenv();
+		for (Map.Entry<String, String> entry : variables.entrySet()) {
+			String name = entry.getKey();
+			if (name.equalsIgnoreCase(id)) {
+				String value = entry.getValue();
+				try {
+					Integer v = Integer.parseInt(value);
+					return v;
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 		return defaultIfMissing;
 	}
-
+	
 	public static int getNumberOfCPUs(
 			int minimumCPUcountBeforeMultipleCPUsAreUsed) {
 		int cpus = getNumberOfCPUs();
@@ -122,25 +120,25 @@ public class SystemAnalysis {
 		return AttributeHelper.windowsRunning();
 	}
 	
-	@Test
-	public static void analyzeSystem() {
-		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory
-				.getOperatingSystemMXBean();
-		for (Method method : operatingSystemMXBean.getClass()
-				.getDeclaredMethods()) {
-			method.setAccessible(true);
-			if (method.getName().startsWith("get")
-					&& Modifier.isPublic(method.getModifiers())) {
-				Object value;
-				try {
-					value = method.invoke(operatingSystemMXBean);
-				} catch (Exception e) {
-					value = e;
-				} // try
-				System.out.println(method.getName() + " = " + value);
-			} // if
-		} // for
-	}
+	// @Test
+	// public static void analyzeSystem() {
+	// OperatingSystemMXBean operatingSystemMXBean = ManagementFactory
+	// .getOperatingSystemMXBean();
+	// for (Method method : operatingSystemMXBean.getClass()
+	// .getDeclaredMethods()) {
+	// method.setAccessible(true);
+	// if (method.getName().startsWith("get")
+	// && Modifier.isPublic(method.getModifiers())) {
+	// Object value;
+	// try {
+	// value = method.invoke(operatingSystemMXBean);
+	// } catch (Exception e) {
+	// value = e;
+	// } // try
+	// System.out.println(method.getName() + " = " + value);
+	// } // if
+	// } // for
+	// }
 	
 	public static long getRealSystemMemoryInMB() {
 		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory
