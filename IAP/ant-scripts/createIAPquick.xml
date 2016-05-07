@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create signed IAP-jar" name="Create Runnable Jar for IAP Cloud Computing">
+<project default="build" name="Create Runnable Jar for IAP Cloud Computing">
     <!--ANT 1.7 is required -->
-    <target name="create signed IAP-jar">
+    <target name="build">
     	<!-- create vanted-jarfile -->
         <jar destfile="release/iap_2_0.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="../IAP Transfer/bin"/>
