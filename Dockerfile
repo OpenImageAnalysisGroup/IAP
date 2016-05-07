@@ -4,6 +4,9 @@ LABEL Description="This image is used to start IAP in command line mode (not yet
 RUN apt-get update -y && apt-get install -y ant openjfx
 RUN cd root
 RUN git clone --depth=1 https://github.com/OpenImageAnalysisGroup/IAP.git
+RUN cd IAP
+RUN git pull || true
+RUN cd ..
 RUN ant -f IAP/IAP/build.xml cleanall
 RUN ant -f IAP/IAP/build.xml build
 RUN IAP/make/createfilelist.sh
