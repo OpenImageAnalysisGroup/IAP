@@ -26,6 +26,8 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.junit.Test;
+
 public class SystemAnalysis {
 	
 	private static boolean fullPower = false;
@@ -120,25 +122,25 @@ public class SystemAnalysis {
 		return AttributeHelper.windowsRunning();
 	}
 	
-	// @Test
-	// public static void analyzeSystem() {
-	// OperatingSystemMXBean operatingSystemMXBean = ManagementFactory
-	// .getOperatingSystemMXBean();
-	// for (Method method : operatingSystemMXBean.getClass()
-	// .getDeclaredMethods()) {
-	// method.setAccessible(true);
-	// if (method.getName().startsWith("get")
-	// && Modifier.isPublic(method.getModifiers())) {
-	// Object value;
-	// try {
-	// value = method.invoke(operatingSystemMXBean);
-	// } catch (Exception e) {
-	// value = e;
-	// } // try
-	// System.out.println(method.getName() + " = " + value);
-	// } // if
-	// } // for
-	// }
+	@Test
+	public static void analyzeSystem() {
+		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory
+				.getOperatingSystemMXBean();
+		for (Method method : operatingSystemMXBean.getClass()
+				.getDeclaredMethods()) {
+			method.setAccessible(true);
+			if (method.getName().startsWith("get")
+					&& Modifier.isPublic(method.getModifiers())) {
+				Object value;
+				try {
+					value = method.invoke(operatingSystemMXBean);
+				} catch (Exception e) {
+					value = e;
+				} // try
+				System.out.println(method.getName() + " = " + value);
+			} // if
+		} // for
+	}
 	
 	public static long getRealSystemMemoryInMB() {
 		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory
