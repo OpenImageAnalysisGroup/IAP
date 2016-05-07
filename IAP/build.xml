@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="IAP">
+    <property environment="env"/>
+    <property name="Graffiti_lib.location" value="../Graffiti_lib"/>
+    <property name="IAP Transfer.location" value="../IAP Transfer"/>
+    <property name="ECLIPSE_HOME" value="../../../Applications/eclipse/"/>
+    <property name="IAP.location" value="../IAP"/>
+    <property name="IAP CONSOLE.location" value="../IAP CONSOLE"/>
+    <property name="IAP-Addon-Example.location" value="../IAP-Addon-Example"/>
+    <property name="MCCCS.location" value="../../MCCCS/MCCCS"/>
+    <property name="Graffiti_Core.location" value="../Graffiti_Core"/>
+    <property name="Graffiti_Editor.location" value="../Graffiti_Editor"/>
+    <property name="Graffiti_Plugins.location" value="../Graffiti_Plugins"/>
+    <property name="IPK_lib.location" value="../IPK_lib"/>
+    <property name="IPK-Plugins.location" value="../IPK-Plugins"/>
+    <property name="MultimodalDataHandling.location" value="../MultimodalDataHandling"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="Graffiti_lib.classpath">
+        <pathelement location="${Graffiti_lib.location}/commons-beanutils.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-digester.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jdom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/java-cup-v11a-runtime.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jh.jar"/>
+        <pathelement location="${Graffiti_lib.location}/activation.jar"/>
+        <pathelement location="${Graffiti_lib.location}/axis.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-awt-util.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-bridge.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-css.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-dom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-ext.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-gvt.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-parser.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-rasterizer.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-script.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-svg-dom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-svggen.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-transcoder.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-util.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-xml.jar"/>
+        <pathelement location="${Graffiti_lib.location}/bsh-2.0b4.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-cli-1.0.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-discovery.jar"/>
+        <pathelement location="${Graffiti_lib.location}/itext-1.4.5.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jaxen-full.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jaxrpc.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jcommon-0.9.5.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jruby.jar"/>
+        <pathelement location="${Graffiti_lib.location}/optional.jar"/>
+        <pathelement location="${Graffiti_lib.location}/parser.jar"/>
+        <pathelement location="${Graffiti_lib.location}/pdf-transcoder.jar"/>
+        <pathelement location="${Graffiti_lib.location}/rome-0.8.jar"/>
+        <pathelement location="${Graffiti_lib.location}/saaj.jar"/>
+        <pathelement location="${Graffiti_lib.location}/saxpath.jar"/>
+        <pathelement location="${Graffiti_lib.location}/secondstring-20030401.jar"/>
+        <pathelement location="${Graffiti_lib.location}/soap.jar"/>
+        <pathelement location="${Graffiti_lib.location}/vecmath1.2-1.14.jar"/>
+        <pathelement location="${Graffiti_lib.location}/wsdl4j.jar"/>
+        <pathelement location="${Graffiti_lib.location}/xmlParserAPIs.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-logging-1.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/dom4j-1.6.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/junit-3.8.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/log4j-1.2.13.jar"/>
+        <pathelement location="${Graffiti_lib.location}/xbean.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-collections-3.2.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/poi-3.10-FINAL-20140208.jar"/>
+        <pathelement location="${Graffiti_lib.location}/poi-ooxml-3.10-FINAL-20140208.jar"/>
+        <pathelement location="${Graffiti_lib.location}/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
+        <pathelement location="${Graffiti_lib.location}/poi-scratchpad-3.10-FINAL-20140208.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-math3-3.3.jar"/>
+    </path>
+    <path id="JUnit 4.libraryclasspath">
+        <pathelement location="${ECLIPSE_HOME}plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
+    </path>
+    <path id="Graffiti_Core.classpath">
+        <pathelement location="${Graffiti_Core.location}/build/classes"/>
+        <path refid="Graffiti_lib.classpath"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+        <pathelement location="${Graffiti_lib.location}/ini4j-0.5.2.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-collections-3.2.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jdom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/soap.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-compress-1.8.jar"/>
+    </path>
+    <path id="Graffiti_Editor.classpath">
+        <pathelement location="${Graffiti_Editor.location}/build/classes"/>
+        <path refid="Graffiti_Core.classpath"/>
+        <path refid="Graffiti_lib.classpath"/>
+    </path>
+    <path id="Graffiti_Plugins.classpath">
+        <path refid="Graffiti_Core.classpath"/>
+        <path refid="Graffiti_Editor.classpath"/>
+        <pathelement location="${Graffiti_Plugins.location}/build/classes"/>
+        <path refid="Graffiti_lib.classpath"/>
+        <pathelement location="${Graffiti_lib.location}/jlex_java_cup.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jdom.jar"/>
+    </path>
+    <path id="IPK_lib.classpath">
+        <pathelement location="${IPK_lib.location}/build"/>
+        <pathelement location="${Graffiti_lib.location}/commons-discovery.jar"/>
+        <pathelement location="${Graffiti_lib.location}/activation.jar"/>
+        <pathelement location="${Graffiti_lib.location}/axis.jar"/>
+        <pathelement location="${Graffiti_lib.location}/bsh-2.0b4.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-beanutils.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-cli-1.0.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-digester.jar"/>
+        <pathelement location="${Graffiti_lib.location}/itext-1.4.5.jar"/>
+        <pathelement location="${Graffiti_lib.location}/java-cup-v11a-runtime.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jaxen-full.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jaxrpc.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jcommon-0.9.5.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jdom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jh.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jruby.jar"/>
+        <pathelement location="${Graffiti_lib.location}/optional.jar"/>
+        <pathelement location="${Graffiti_lib.location}/parser.jar"/>
+        <pathelement location="${Graffiti_lib.location}/pdf-transcoder.jar"/>
+        <pathelement location="${Graffiti_lib.location}/rome-0.8.jar"/>
+        <pathelement location="${Graffiti_lib.location}/saaj.jar"/>
+        <pathelement location="${Graffiti_lib.location}/saxpath.jar"/>
+        <pathelement location="${Graffiti_lib.location}/secondstring-20030401.jar"/>
+        <pathelement location="${Graffiti_lib.location}/soap.jar"/>
+        <pathelement location="${Graffiti_lib.location}/vecmath1.2-1.14.jar"/>
+        <pathelement location="${Graffiti_lib.location}/wsdl4j.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-anim.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-svggen.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-awt-util.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-bridge.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-css.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-dom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-ext.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-gvt.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-parser.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-rasterizer.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-script.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-svg-dom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-transcoder.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-util.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-xml.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-logging-1.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/dom4j-1.6.1.jar"/>
+        <path refid="Graffiti_Core.classpath"/>
+        <pathelement location="${Graffiti_lib.location}/commons-collections-3.2.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/log4j-1.2.13.jar"/>
+        <pathelement location="${Graffiti_lib.location}/core-1.8.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/staxmate-2.0.0.jar"/>
+        <pathelement location="${Graffiti_lib.location}/woodstox-core-lgpl-4.0.9.jar"/>
+        <pathelement location="${Graffiti_lib.location}/stax2-api-3.0.3.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jigsaw-2.2.6.jar"/>
+        <pathelement location="${Graffiti_lib.location}/xstream-1.3.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/bytecode-1.8.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-dbcp-1.2.2.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-pool-1.3.jar"/>
+        <pathelement location="${Graffiti_lib.location}/xpp3_min-1.1.4c.jar"/>
+        <pathelement location="${Graffiti_lib.location}/paxtools-4.1.1-no-jena.jar"/>
+        <pathelement location="${IAP.location}/lib/platform.jar"/>
+        <pathelement location="${IAP.location}/lib/jna.jar"/>
+        <pathelement location="${IAP.location}/lib/ij-1.49m.jar"/>
+    </path>
+    <path id="IPK-Plugins.classpath">
+        <pathelement location="${IPK-Plugins.location}/build/classes"/>
+        <path refid="Graffiti_lib.classpath"/>
+        <path refid="Graffiti_Core.classpath"/>
+        <path refid="Graffiti_Editor.classpath"/>
+        <path refid="Graffiti_Plugins.classpath"/>
+        <path refid="IPK_lib.classpath"/>
+        <pathelement location="${Graffiti_lib.location}/jdom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-awt-util.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-bridge.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-css.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-dom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-ext.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-gvt.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-parser.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-rasterizer.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-script.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-svg-dom.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-svggen.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-transcoder.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-util.jar"/>
+        <pathelement location="${Graffiti_lib.location}/batik-xml.jar"/>
+        <pathelement location="${Graffiti_lib.location}/bsh-2.0b4.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-beanutils.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-cli-1.0.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-digester.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-discovery.jar"/>
+        <pathelement location="${Graffiti_lib.location}/itext-1.4.5.jar"/>
+        <pathelement location="${Graffiti_lib.location}/java-cup-v11a-runtime.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jaxen-full.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jaxrpc.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jcommon-0.9.5.jar"/>
+        <pathelement location="${Graffiti_lib.location}/jruby.jar"/>
+        <pathelement location="${Graffiti_lib.location}/optional.jar"/>
+        <pathelement location="${Graffiti_lib.location}/parser.jar"/>
+        <pathelement location="${Graffiti_lib.location}/pdf-transcoder.jar"/>
+        <pathelement location="${Graffiti_lib.location}/rome-0.8.jar"/>
+        <pathelement location="${Graffiti_lib.location}/saaj.jar"/>
+        <pathelement location="${Graffiti_lib.location}/saxpath.jar"/>
+        <pathelement location="${Graffiti_lib.location}/secondstring-20030401.jar"/>
+        <pathelement location="${Graffiti_lib.location}/soap.jar"/>
+        <pathelement location="${Graffiti_lib.location}/vecmath1.2-1.14.jar"/>
+        <pathelement location="${Graffiti_lib.location}/wsdl4j.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-net-2.0.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-net-ftp-2.0.jar"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+        <pathelement location="${Graffiti_lib.location}/commons-logging-1.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/dom4j-1.6.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/log4j-1.2.13.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-collections-3.2.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/paxtools-4.1.1-no-jena.jar"/>
+        <pathelement location="${Graffiti_lib.location}/poi-3.10-FINAL-20140208.jar"/>
+        <pathelement location="${Graffiti_lib.location}/poi-ooxml-3.10-FINAL-20140208.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-math3-3.3.jar"/>
+    </path>
+    <path id="MultimodalDataHandling.classpath">
+        <pathelement location="${MultimodalDataHandling.location}/bin"/>
+        <pathelement location="${Graffiti_lib.location}/jdom.jar"/>
+        <path refid="Graffiti_Core.classpath"/>
+        <path refid="IPK-Plugins.classpath"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+        <pathelement location="${MultimodalDataHandling.location}/lib/pixelmed.jar"/>
+        <pathelement location="${MultimodalDataHandling.location}/lib/jcommon1.0.16.jar"/>
+        <pathelement location="${MultimodalDataHandling.location}/lib/jfreechart1.0.13.jar"/>
+    </path>
+    <path id="IAP Transfer.classpath">
+        <pathelement location="${IAP Transfer.location}/bin"/>
+        <pathelement location="${IAP Transfer.location}/lib/commons-vfs2-2.0.jar"/>
+        <pathelement location="${IAP Transfer.location}/lib/commons-logging-1.1.1.jar"/>
+        <pathelement location="${IAP Transfer.location}/lib/commons-net-3.1.jar"/>
+        <pathelement location="${IAP Transfer.location}/lib/jsch-0.1.46.jar"/>
+        <pathelement location="${IAP Transfer.location}/lib/jcifs-1.3.17.jar"/>
+        <pathelement location="${IAP Transfer.location}/lib/commons-codec-1.6.jar"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+        <pathelement location="${IAP.location}/lib/commons-lang3-3.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-collections-3.2.1.jar"/>
+        <path refid="Graffiti_Core.classpath"/>
+        <pathelement location="${IAP Transfer.location}/lib/jsoup-1.7.2.jar"/>
+    </path>
+    <path id="IAP.classpath">
+        <pathelement location="bin"/>
+        <path refid="Graffiti_Core.classpath"/>
+        <path refid="Graffiti_Editor.classpath"/>
+        <path refid="Graffiti_lib.classpath"/>
+        <path refid="Graffiti_Plugins.classpath"/>
+        <path refid="IPK-Plugins.classpath"/>
+        <pathelement location="lib/plugin.jar"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+        <pathelement location="lib/postgresql-9.0-801.jdbc4.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-net-2.0.jar"/>
+        <pathelement location="lib/ojdbc14.jar"/>
+        <pathelement location="${Graffiti_lib.location}/log4j-1.2.13.jar"/>
+        <path refid="MultimodalDataHandling.classpath"/>
+        <pathelement location="lib/jai_codec.jar"/>
+        <pathelement location="lib/jai_core.jar"/>
+        <pathelement location="lib/jna.jar"/>
+        <pathelement location="lib/platform.jar"/>
+        <pathelement location="lib/jsr166y.jar"/>
+        <pathelement location="lib/bcprov-jdk16-146.jar"/>
+        <path refid="IAP Transfer.classpath"/>
+        <pathelement location="lib/flanagan.java6.jar"/>
+        <pathelement location="lib/commons-lang3-3.1.jar"/>
+        <pathelement location="${Graffiti_lib.location}/mail.jar"/>
+        <pathelement location="${IAP Transfer.location}/lib/commons-vfs2-2.0.jar"/>
+        <path refid="IPK_lib.classpath"/>
+        <pathelement location="${Graffiti_lib.location}/commons-compress-1.8.jar"/>
+        <pathelement location="${Graffiti_lib.location}/poi-3.10-FINAL-20140208.jar"/>
+        <pathelement location="${Graffiti_lib.location}/poi-ooxml-3.10-FINAL-20140208.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-math3-3.3.jar"/>
+        <pathelement location="lib/ij-1.49m.jar"/>
+        <pathelement location="${Graffiti_lib.location}/commons-collections-3.2.1.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="build.xml" dir="${Graffiti_lib.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Graffiti_Core.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Graffiti_Editor.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Graffiti_Plugins.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IAP Transfer.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IPK_lib.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IPK-Plugins.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${MultimodalDataHandling.location}" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${Graffiti_lib.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Graffiti_Core.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Graffiti_Editor.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Graffiti_Plugins.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${IAP Transfer.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${IPK_lib.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${IPK-Plugins.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${MultimodalDataHandling.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="IAP.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="build.xml" dir="${IAP CONSOLE.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IAP CONSOLE.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${IAP-Addon-Example.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IAP-Addon-Example.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${MCCCS.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${MCCCS.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="IAP">
+        <java classname="de.ipk.ag_ba.gui.webstart.IAPmain" failonerror="true" fork="yes">
+            <jvmarg line="-Xmx2g"/>
+            <classpath refid="IAP.classpath"/>
+        </java>
+    </target>
+</project>

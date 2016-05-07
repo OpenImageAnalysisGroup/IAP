@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="Graffiti_lib">
+    <property environment="env"/>
+    <property name="Graffiti_Core.location" value="../Graffiti_Core"/>
+    <property name="Graffiti_Editor.location" value="../Graffiti_Editor"/>
+    <property name="Graffiti_Plugins.location" value="../Graffiti_Plugins"/>
+    <property name="IAP.location" value="../IAP"/>
+    <property name="IPK-Plugins.location" value="../IPK-Plugins"/>
+    <property name="MCCCS.location" value="../../MCCCS/MCCCS"/>
+    <property name="ECLIPSE_HOME" value="../../../Applications/eclipse/"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="Graffiti_lib.classpath">
+        <pathelement location="commons-beanutils.jar"/>
+        <pathelement location="commons-digester.jar"/>
+        <pathelement location="jdom.jar"/>
+        <pathelement location="java-cup-v11a-runtime.jar"/>
+        <pathelement location="jh.jar"/>
+        <pathelement location="activation.jar"/>
+        <pathelement location="axis.jar"/>
+        <pathelement location="batik-awt-util.jar"/>
+        <pathelement location="batik-bridge.jar"/>
+        <pathelement location="batik-css.jar"/>
+        <pathelement location="batik-dom.jar"/>
+        <pathelement location="batik-ext.jar"/>
+        <pathelement location="batik-gvt.jar"/>
+        <pathelement location="batik-parser.jar"/>
+        <pathelement location="batik-rasterizer.jar"/>
+        <pathelement location="batik-script.jar"/>
+        <pathelement location="batik-svg-dom.jar"/>
+        <pathelement location="batik-svggen.jar"/>
+        <pathelement location="batik-transcoder.jar"/>
+        <pathelement location="batik-util.jar"/>
+        <pathelement location="batik-xml.jar"/>
+        <pathelement location="bsh-2.0b4.jar"/>
+        <pathelement location="commons-cli-1.0.jar"/>
+        <pathelement location="commons-discovery.jar"/>
+        <pathelement location="itext-1.4.5.jar"/>
+        <pathelement location="jaxen-full.jar"/>
+        <pathelement location="jaxrpc.jar"/>
+        <pathelement location="jcommon-0.9.5.jar"/>
+        <pathelement location="jruby.jar"/>
+        <pathelement location="optional.jar"/>
+        <pathelement location="parser.jar"/>
+        <pathelement location="pdf-transcoder.jar"/>
+        <pathelement location="rome-0.8.jar"/>
+        <pathelement location="saaj.jar"/>
+        <pathelement location="saxpath.jar"/>
+        <pathelement location="secondstring-20030401.jar"/>
+        <pathelement location="soap.jar"/>
+        <pathelement location="vecmath1.2-1.14.jar"/>
+        <pathelement location="wsdl4j.jar"/>
+        <pathelement location="xmlParserAPIs.jar"/>
+        <pathelement location="commons-logging-1.1.jar"/>
+        <pathelement location="dom4j-1.6.1.jar"/>
+        <pathelement location="junit-3.8.1.jar"/>
+        <pathelement location="log4j-1.2.13.jar"/>
+        <pathelement location="xbean.jar"/>
+        <pathelement location="commons-collections-3.2.1.jar"/>
+        <pathelement location="poi-3.10-FINAL-20140208.jar"/>
+        <pathelement location="poi-ooxml-3.10-FINAL-20140208.jar"/>
+        <pathelement location="poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
+        <pathelement location="poi-scratchpad-3.10-FINAL-20140208.jar"/>
+        <pathelement location="commons-math3-3.3.jar"/>
+    </path>
+    <target name="init"/>
+    <target name="clean"/>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="build.xml" dir="${Graffiti_Core.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Graffiti_Core.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Graffiti_Editor.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Graffiti_Editor.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Graffiti_Plugins.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Graffiti_Plugins.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${IAP.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IAP.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${IPK-Plugins.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${IPK-Plugins.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${MCCCS.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${MCCCS.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+</project>
