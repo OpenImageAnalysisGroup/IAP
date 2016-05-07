@@ -7,7 +7,7 @@
     <property environment="env"/>
     <property name="IAP.location" value="../IAP"/>
     <property name="Graffiti_lib.location" value="../Graffiti_lib"/>
-    <property name="ECLIPSE_HOME" value="../../../Applications/eclipse/"/>
+    <property name="ECLIPSE_HOME" value="/usr/share/eclipse/"/>
     <property name="IAP CONSOLE.location" value="../IAP CONSOLE"/>
     <property name="Graffiti_Core.location" value="../Graffiti_Core"/>
     <property name="debuglevel" value="source,lines,vars"/>

@@ -7,7 +7,7 @@
     <property environment="env"/>
     <property name="Graffiti_lib.location" value="../Graffiti_lib"/>
     <property name="IAP Transfer.location" value="../IAP Transfer"/>
-    <property name="ECLIPSE_HOME" value="../../../Applications/eclipse/"/>
+    <property name="ECLIPSE_HOME" value="/usr/share/eclipse/"/>
     <property name="IAP.location" value="../IAP"/>
     <property name="Graffiti_Core.location" value="../Graffiti_Core"/>
     <property name="Graffiti_Editor.location" value="../Graffiti_Editor"/>

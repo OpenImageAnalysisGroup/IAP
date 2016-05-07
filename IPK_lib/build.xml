@@ -7,7 +7,7 @@
     <property environment="env"/>
     <property name="Graffiti_lib.location" value="../Graffiti_lib"/>
     <property name="IAP.location" value="../IAP"/>
-    <property name="ECLIPSE_HOME" value="../../../Applications/eclipse/"/>
+    <property name="ECLIPSE_HOME" value="/usr/share/eclipse/"/>
     <property name="IAP-Addon-Example.location" value="../IAP-Addon-Example"/>
     <property name="IPK-Plugins.location" value="../IPK-Plugins"/>
     <property name="MCCCS.location" value="../../MCCCS/MCCCS"/>

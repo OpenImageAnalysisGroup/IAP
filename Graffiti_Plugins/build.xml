@@ -6,7 +6,7 @@
               as the first entry and export the buildfile again. --><project basedir="." default="build" name="Graffiti_Plugins">
     <property environment="env"/>
     <property name="Graffiti_lib.location" value="../Graffiti_lib"/>
-    <property name="ECLIPSE_HOME" value="../../../Applications/eclipse/"/>
+    <property name="ECLIPSE_HOME" value="/usr/share/eclipse/"/>
     <property name="IAP.location" value="../IAP"/>
     <property name="IAP-Addon-Example.location" value="../IAP-Addon-Example"/>
     <property name="IPK-Plugins.location" value="../IPK-Plugins"/>

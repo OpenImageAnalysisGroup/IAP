@@ -11,7 +11,7 @@
     <property name="IAP.location" value="../IAP"/>
     <property name="IPK-Plugins.location" value="../IPK-Plugins"/>
     <property name="MCCCS.location" value="../../MCCCS/MCCCS"/>
-    <property name="ECLIPSE_HOME" value="../../../Applications/eclipse/"/>
+    <property name="ECLIPSE_HOME" value="/usr/share/eclipse/"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
