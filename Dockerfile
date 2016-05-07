@@ -2,11 +2,8 @@ FROM java:latest
 MAINTAINER Dr. Christian Klukas <christian.klukas@gmail.com>
 LABEL Description="This image is used to start IAP in command line mode (not yet working)." Version="2.0.3"
 RUN apt-get update -y && apt-get install -y ant openjfx
-RUN cd root
 RUN git clone --depth=1 https://github.com/OpenImageAnalysisGroup/IAP.git
-RUN cd IAP
-RUN git pull || true
-RUN cd ..
+RUN cd IAP && git pull || true
 RUN ant -f IAP/IAP/build.xml cleanall
 RUN ant -f IAP/Graffiti_Core/build.xml
 RUN ant -f IAP/Graffiti_lib/build.xml
