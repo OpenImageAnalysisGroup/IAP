@@ -1,9 +1,5 @@
 FROM java:latest
-RUN git clone --depth=1 https://github.com/OpenImageAnalysisGroup/IAP.git
-RUN apt-get update
-RUN apt-get install -y ant
-RUN apt-get install -y openjfx
-RUN apt-get install -y eclipse
+RUN apt-get update -y && apt-get install -y ant openjfx
 RUN cd
 RUN git clone --depth=1 https://github.com/OpenImageAnalysisGroup/IAP.git
 RUN cd IAP
