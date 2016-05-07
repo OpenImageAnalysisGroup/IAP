@@ -40,7 +40,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.MenuItemInf
  * 
  * @version $Revision: 1.9 $
  */
-public class Main {
+public class MainM {
 	// ~ Static fields/initializers =============================================
 	private static final long serialVersionUID = -8853617468707668012L;
 	
@@ -54,7 +54,7 @@ public class Main {
 	
 	// ~ Constructors ===========================================================
 	
-	public Main(final boolean showMainFrame, String applicationName, String[] args, String addon, String addPluginFile) {
+	public MainM(final boolean showMainFrame, String applicationName, String[] args, String addon, String addPluginFile) {
 		this(showMainFrame, applicationName, args, new String[] { addon }, addPluginFile);
 	}
 	
@@ -70,8 +70,8 @@ public class Main {
 		}
 	}
 	
-	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon, String addPluginFile) {
-		this(showMainFrame, applicationName, args, addon, new DBEsplashScreen(applicationName,
+	public MainM(final boolean showMainFrame, String applicationName, String[] args, String[] addon, String addPluginFile) {
+		this(applicationName, args, addon, new DBEsplashScreen(applicationName,
 				"", new RunnableWithSplashScreenReference() {
 					private SplashScreenInterface ss;
 					
@@ -121,15 +121,14 @@ public class Main {
 					public void setSplashscreenInfo(SplashScreenInterface ss) {
 						this.ss = ss;
 					}
-				}) {}, addPluginFile);
+				}) {}, addPluginFile, showMainFrame);
 	}
 	
 	/**
 	 * Constructs a new instance of the editor.
-	 * 
 	 * @param addPluginFile
 	 */
-	public Main(final boolean showMainFrame, String applicationName, String[] args, String[] addon, SplashScreenInterface splashScreen, String addPluginFile) {
+	public MainM(String applicationName, String[] args, String[] addon, SplashScreenInterface splashScreen, String addPluginFile, final boolean showMainFrame) {
 		
 		setupLogger();
 		
@@ -302,7 +301,7 @@ public class Main {
 		
 		AttributeHelper.setMacOSsettings(DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT);
 		
-		new Main(true,
+		new MainM(true,
 				DBEgravistoHelper.DBE_GRAVISTO_VERSION, args, developerAddon, addPluginFile);
 	}
 	

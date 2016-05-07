@@ -11,13 +11,13 @@
  ************************************************************************************/
 package de.ipk_gatersleben.ag_pbi.mmd;
 
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.Main;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.MainM;
 
 public class StartVantedWithAddon {
 	
 	public static void main(String[] args) {
 		System.out.println("Starting VANTED with Add-on " + getAddonName() + " for development...");
-		Main.startVanted(args, getAddonName());
+		MainM.startVanted(args, getAddonName());
 	}
 	
 	public static String getAddonName() {

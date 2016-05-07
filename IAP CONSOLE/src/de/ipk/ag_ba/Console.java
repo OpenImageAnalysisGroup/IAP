@@ -37,7 +37,7 @@ import de.ipk.ag_ba.server.task_management.CloudComputingService;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.Main;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.MainM;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.DataMappingTypeManager3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
@@ -293,7 +293,8 @@ public class Console {
 				
 				String[] args = new String[] { "IAP Console" };
 				SplashScreenInterface emptySplashScreen = new SplashScreenDontPrintProgress();
-				new Main(false, (args.length > 0 ? args[0] : DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT), args, new String[] {}, emptySplashScreen, "pluginsIAP.txt");
+				new MainM((args.length > 0 ? args[0] : DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT), args,
+						new String[] {}, emptySplashScreen, "pluginsIAP.txt", false);
 			}
 			first = false;
 		}

@@ -76,7 +76,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.addons.AddonManagerPlugin;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.plugin_info.PluginInfoHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper;
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.Main;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.MainM;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 
@@ -263,7 +263,7 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 			public void actionPerformed(ActionEvent evt) {
 				if (keggEnabler.isSelected()) {
 					keggEnabler.setSelected(false);
-					if (Main.doEnableKEGGaskUser()) {
+					if (MainM.doEnableKEGGaskUser()) {
 						try {
 							new File(ReleaseInfo.getAppFolderWithFinalSep() + "license_kegg_accepted").createNewFile();
 						} catch (IOException e) {

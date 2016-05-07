@@ -1,7 +1,7 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.sbml;
 import java.io.File;
 
-import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.Main;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.MainM;
 
 public class StartSBMLImportExportPlugin {
 	
@@ -27,7 +27,7 @@ public class StartSBMLImportExportPlugin {
 		System.out.println(f.getAbsolutePath());
 		System.out.println("Starting VANTED with SBML Add-on " + getAddonName()
 				+ " for development...");
-		Main.startVanted(args, getAddonName());
+		MainM.startVanted(args, getAddonName());
 		
 		// alternatively you may also start several Addons at the same time:
 		// Main.startVantedExt(args, new String[]{"","",...});

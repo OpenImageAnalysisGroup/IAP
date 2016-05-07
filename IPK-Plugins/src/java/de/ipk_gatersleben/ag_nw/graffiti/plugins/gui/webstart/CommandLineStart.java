@@ -33,7 +33,7 @@ public class CommandLineStart {
 				System.exit(0); // all OK
 			}
 		});
-		new Main(false, (args.length > 0 ? args[0] : DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT), args, new String[] {}, null);
+		new MainM(false, (args.length > 0 ? args[0] : DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT), args, new String[] {}, null);
 	}
 	
 }

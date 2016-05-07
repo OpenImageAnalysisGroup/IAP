@@ -110,7 +110,7 @@ public class GravistoMainHelper implements HelperClass {
 		
 		int nnc = pluginLocations.size();
 		progressViewer.setText("Read Plugin-Description Files... (" + nnc + ")");
-		final ClassLoader cl = Main.class.getClassLoader();
+		final ClassLoader cl = MainM.class.getClassLoader();
 		
 		ExecutorService run = Executors.newFixedThreadPool(SystemAnalysis.getNumberOfCPUs());
 		
