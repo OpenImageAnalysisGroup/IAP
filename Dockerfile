@@ -15,7 +15,7 @@ RUN ant -f IAP/Graffiti_Plugins/build.xml
 RUN ant -f IAP/MultimodalDataHandling/build.xml
 RUN ant -f IAP/IPK_lib/build.xml
 RUN ant -f IAP/IPK-Plugins/build.xml
-RUN ant -f IAP/IAP-Addon-Example/build.xml
+#RUN ant -f IAP/IAP-Addon-Example/build.xml
 RUN ant -f IAP/IAP\ Transfer/build.xml
 RUN ant -f IAP/IAP\ CONSOLE/build.xml
 RUN ant -f IAP/IAP/build.xml
