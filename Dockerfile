@@ -8,7 +8,6 @@ RUN ant -f IAP/IAP\ CONSOLE/build.xml
 RUN IAP/make/createfilelist.sh
 RUN ant -f IAP/IAP/createReleaseQuick.xml
 RUN mv IAP/IAP/release/iap_2_0.jar .
-RUN rm -rf /IAP/*
 RUN echo '#!/bin/bash' > IAPconsole.sh
 RUN echo 'java -cp iap_2_0.jar iap.Console "$@"'  >> IAPconsole.sh
 RUN chmod +x IAPconsole.sh
@@ -16,4 +15,6 @@ RUN echo '#!/bin/bash' > IAPgui.sh
 RUN echo 'java -cp iap_2_0.jar de.ipk.ag_ba.gui.webstart.IAPmain'  >> IAPgui.sh
 RUN chmod +x IAPgui.sh
 RUN ["/IAPconsole.sh", "E1F1,_Quit"]
+RUN find /IAP/* -type f -exec rm -f {} \; || true
+RUN rm -rf /IAP || true
 CMD [ "/IAPconsole.sh" ]
