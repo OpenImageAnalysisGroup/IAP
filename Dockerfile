@@ -14,4 +14,4 @@ RUN chmod +x IAPconsole.sh
 RUN echo '#!/bin/bash' > IAPgui.sh
 RUN echo 'java -cp iap_2_0.jar de.ipk.ag_ba.gui.webstart.IAPmain'  >> IAPgui.sh
 RUN chmod +x IAPgui.sh
-CMD ./IAPconsole.sh
+CMD [ "/IAPconsole.sh" ]
