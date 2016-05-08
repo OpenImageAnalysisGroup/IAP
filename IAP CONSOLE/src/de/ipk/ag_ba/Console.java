@@ -63,6 +63,9 @@ public class Console {
 			System.out.println("*                   then 'B'. Use underscore and   *");
 			System.out.println("*                   comma to specify title lookup  *");
 			System.out.println("*                   and to separate commands       *");
+			System.out.println("* - the environment variable 'exec' is also        *");
+			System.out.println("*   evaluated and may be used as an alternative    *");
+			System.out.println("*   way to specify the commands to be executed     *");
 			System.out.println("****************************************************");
 			System.exit(0);
 		}
@@ -85,6 +88,19 @@ public class Console {
 					));
 		}
 		ArrayList<String> commandsFromArg = new ArrayList<>();
+		
+		for (String id : new String[] { "exec", "EXEC" }) {
+			String ev = System.getenv(id);
+			if (ev != null)
+				for (String s : ev.split(",")) {
+					if (!s.startsWith("_"))
+						for (char sl : s.toCharArray())
+							commandsFromArg.add(sl + "");
+					else
+						commandsFromArg.add(s);
+				}
+		}
+		
 		if (args.length > 0) {
 			for (String a : args)
 				for (String s : a.split(",")) {
