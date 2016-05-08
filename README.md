@@ -36,10 +36,6 @@ Now, you have to configure the Run configuration (click on the arrow beside the 
 Finally, switch to the Arguments tab and free up some additional main memory by adding -Xmx20g (in this example 20 GB, size of the allocated memory depends on your system, you should left some reserves for your operating system) to the VM arguments, then click Run. Congrats, the IAP should start!
 Normally, there should be no errors in the Problems view, warnings can be ignored. If you have further questions, please write a mail.
 
-*Happy coding!*
-
-*Dr. Christian Klukas*
-
 ### Short introduction into IAP extension development
 
 IAP can be customized by the end-user with new data storage locations, accessible via FTP, SFTP, direct file system access (e.g. a local folder or mounted network drive), HTTP and SMB file share protocol. Pipeline blocks may be arranged in templates, blocks can be removed, added and the block settings, which modify the behavior of a analysis block, may easily be changed. Resulting custom templates can be exported, applied to other experiments and shared to other users. The end-user documentation (link) contains detailed infos on how to achieve these tasks. To add new segmentation, analysis functions or custom user commands, e.g. for export of data in a certain file format or for custom post-processing, new source code can be developed and easily integrated into IAP using the supplied extension API. The extension API is defined in the interface IAPplugin. This file defines all possible extension points for a user-defined IAP-Plugin.
@@ -79,3 +75,7 @@ Once a new Plugin has been defined, IAP will only load it, if is known to the sy
 ### Development of Add-ons
 
 As IAP uses VANTED as one of its core libraries, custom plugins may be packaged into a single Jar file, which can easily be distributed and loaded by the end-users. Such Add-ons may customize the behavior of the included VANTED functionality and also of the new image analysis processing commands. The list of Add-ons (tab "Add-ons" on this page) gives an impression on the possibilities. Please refer to the Eclipse Project "IAP-Addon-Example" and use this as an template for your own developments. Check the content of the file IAPexamplAddOn.xml and modify the meta data (description of the Add-on) as needed. The createAdd-on.xml file is an Ant-Script (right-click it within Eclipse), which is used to pacakge the project content into a single JAR file, which can be loaded as an IAP Add-on. The Add-on is essentially a packages Plug-in, developed as described before on this page. The Plugin-description-XML file needs to be placed in the root of the source code folder. And the final JAR file name needs to be the same as the XML description file (ignoring the file extension). If you have developed your Block/Pipeline or Plugin and have problems in packaging it in a working Add-on, dont hesitate to contact the authors of the sytem
+
+*Happy coding!*
+
+*C. Klukas*
