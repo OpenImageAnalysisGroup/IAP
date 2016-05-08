@@ -22,13 +22,9 @@ The following procedure is suggested for setting up the development environment.
 
 [Source Code Link](http://cklukas.github.io/IAP/)
 
-#### GitHub Setup in Eclipse
-
-To check out the project in Eclipse a GitHub interface is needed. If you have not yet installed an interface follow the next steps, otherwise go to the next section.
-
 #### Project import into Eclipse
 
-After finishing the installation make sure that you create a separate and clean Eclipse workspace. Then follow the next steps to import the project and configure the workspace:
+Its advised to create a separate and clean Eclipse workspace. Then follow the next steps to import the project and configure the workspace:
 First change the Text file encoding to UTF-8 (select Window > Preferences > General > Workspace, choose other and select UTF-8, then click OK)
 Next, switch to the GIT Repository Exploring view and add the Git repository URL.
 After connecting to the Git repository, all projects should be pulled and initialized correctly within Eclipse.
