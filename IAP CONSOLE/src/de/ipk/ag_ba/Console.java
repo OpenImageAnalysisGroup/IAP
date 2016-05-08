@@ -92,29 +92,29 @@ public class Console {
 		for (String id : new String[] { "exec", "EXEC" }) {
 			String ev = System.getenv(id);
 			if (ev != null)
-				for (String s : ev.split(",")) {
-					if (!s.startsWith("_"))
-						for (char sl : s.toCharArray())
-							commandsFromArg.add(sl + "");
-					else
-						commandsFromArg.add(s);
-				}
+				parseInput(commandsFromArg, ev);
 		}
 		
 		if (args.length > 0) {
 			for (String a : args)
-				for (String s : a.split(",")) {
-					if (!s.startsWith("_"))
-						for (char sl : s.toCharArray())
-							commandsFromArg.add(sl + "");
-					else
-						commandsFromArg.add(s);
-				}
+				parseInput(commandsFromArg, a);
 		}
 		Console c = new Console();
 		while (true) {
 			c.printGUI(commandsFromArg);
 			c.waitForStatusChange();
+		}
+	}
+	
+	private static void parseInput(ArrayList<String> commandsFromArg, String ev) {
+		if (ev == null)
+			return;
+		for (String s : ev.split(",")) {
+			if (!s.startsWith("_"))
+				for (char sl : s.toCharArray())
+					commandsFromArg.add(sl + "");
+			else
+				commandsFromArg.add(s);
 		}
 	}
 	
@@ -176,12 +176,18 @@ public class Console {
 		System.out.println(SystemAnalysis.getCurrentTime()
 				+ ">INFO: READY, enter number or character to navigate or execute a command, just press ENTER to update display");
 		System.out.print(SystemAnalysis.getCurrentTime() + ">");
-		String input = commandsFromArg.isEmpty() ? SystemAnalysis.getCommandLineInput() : commandsFromArg.remove(0);
+		String input;
+		if (commandsFromArg.isEmpty()) {
+			String inp = SystemAnalysis.getCommandLineInput();
+			parseInput(commandsFromArg, inp);
+		}
+		input = commandsFromArg.remove(0);
+		
 		if (input != null)
 			input = input.trim();
 		if (input != null && cmd2b.containsKey(input.toUpperCase())) {
 			NavigationButton n = cmd2b.get(input.toUpperCase());
-			System.out.print(SystemAnalysis.getCurrentTime() + ">EXECUTE: \"" + StringManipulationTools.removeHTMLtags(n.getTitle() + "\""));
+			System.out.println(SystemAnalysis.getCurrentTime() + ">EXECUTE: \"" + StringManipulationTools.removeHTMLtags(n.getTitle() + "\""));
 			executeCommand(n);
 			try {
 				int navigation = Integer.parseInt(input);
