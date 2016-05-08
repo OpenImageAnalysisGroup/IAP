@@ -51,15 +51,19 @@ public class Console {
 		for (String i : IAPmain.getMainInfoLines())
 			System.out.println(i);
 		if (paramContains(new String[] { "help", "h", "?" }, args)) {
-			System.out.println("***************************************************");
-			System.out.println("* Usage                                           *");
-			System.out.println("* - no parameters: interactive console interface  *");
-			System.out.println("* - /help, /h, /?: this help                      *");
-			System.out.println("* - /exec:XYZ    : execute commands X, Y, Z       *");
-			System.out.println("*                  these commands correspond to   *");
-			System.out.println("*                  the keys you use inside the    *");
-			System.out.println("*                  console interface              *");
-			System.out.println("***************************************************");
+			System.out.println("****************************************************");
+			System.out.println("* Usage                                            *");
+			System.out.println("* - no parameters: interactive console interface   *");
+			System.out.println("* - /help, /h, /?: this help                       *");
+			System.out.println("* - /exec:XYZ    : execute commands X, Y, Z        *");
+			System.out.println("*                  these commands correspond to    *");
+			System.out.println("*                  the keys you use inside the     *");
+			System.out.println("*                  console interface               *");
+			System.out.println("* - /exec:_A,_B  : execute command named 'A' and   *");
+			System.out.println("*                  then 'B'. Use underscore and    *");
+			System.out.println("*                  comma to specify title lookup   *");
+			System.out.println("*                  and to separate commands        *");
+			System.out.println("****************************************************");
 			System.exit(0);
 		}
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Welcome! About to initalize the application...");
@@ -80,10 +84,20 @@ public class Console {
 					null
 					));
 		}
-		
+		ArrayList<String> commandsFromArg = new ArrayList<>();
+		if (args.length > 0) {
+			for (String a : args)
+				for (String s : a.split(",")) {
+					if (!s.startsWith("_"))
+						for (char sl : s.toCharArray())
+							commandsFromArg.add(sl + "");
+					else
+						commandsFromArg.add(s);
+				}
+		}
 		Console c = new Console();
 		while (true) {
-			c.printGUI();
+			c.printGUI(commandsFromArg);
 			c.waitForStatusChange();
 		}
 	}
@@ -106,7 +120,7 @@ public class Console {
 		
 	}
 	
-	private void printGUI() {
+	private void printGUI(ArrayList<String> commandsFromArg) {
 		int idx = 1;
 		HashMap<String, NavigationButton> cmd2b = new HashMap<String, NavigationButton>();
 		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>");
@@ -137,6 +151,7 @@ public class Console {
 						cmd += secondIndex + "";
 					System.out.print("  [" + cmd + "] " + title);
 					cmd2b.put(cmd, n);
+					cmd2b.put("_" + title.toUpperCase(), n);
 				}
 			}
 			System.out.println();
@@ -145,7 +160,7 @@ public class Console {
 		System.out.println(SystemAnalysis.getCurrentTime()
 				+ ">INFO: READY, enter number or character to navigate or execute a command, just press ENTER to update display");
 		System.out.print(SystemAnalysis.getCurrentTime() + ">");
-		String input = SystemAnalysis.getCommandLineInput();
+		String input = commandsFromArg.isEmpty() ? SystemAnalysis.getCommandLineInput() : commandsFromArg.remove(0);
 		if (input != null)
 			input = input.trim();
 		if (input != null && cmd2b.containsKey(input.toUpperCase())) {
@@ -239,7 +254,10 @@ public class Console {
 								if (!first)
 									System.out.println(SystemAnalysis.getCurrentTime() + ">----------------------");
 								System.out.println(SystemAnalysis.getCurrentTime() + ">"
-										+ StringManipulationTools.removeHTMLtags(o.replace("<br>", "\r\n> ").replace("<li>", "\r\n> - ")));
+										+ StringManipulationTools.removeHTMLtags(
+												o.replace("<br>", "\r\n> ").replace("<li>", "\r\n> - ")
+												)
+												.replace("&gt;", ">"));
 								first = false;
 							}
 					}

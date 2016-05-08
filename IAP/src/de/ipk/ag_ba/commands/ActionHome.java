@@ -9,6 +9,7 @@ import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.about.ActionAbout;
 import de.ipk.ag_ba.commands.bookmarks.BookmarkAction;
+import de.ipk.ag_ba.commands.exit.ActionExit;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystem;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.datasources.DataSourceGroup;
@@ -38,7 +39,6 @@ public final class ActionHome extends AbstractNavigationAction {
 	}
 	
 	private void initializeHomeActions(GUIsetting guiSetting) {
-		assert guiSetting != null;
 		homePrimaryActions = new ArrayList<NavigationButton>();
 		
 		for (NavigationAction na : IAPpluginManager.getInstance().getHomeActions()) {
@@ -68,6 +68,10 @@ public final class ActionHome extends AbstractNavigationAction {
 		}
 		
 		homePrimaryActions.add(new NavigationButton(new ActionAbout("Version and Copyright information"), guiSetting));
+		if (guiSetting == null || guiSetting.getInstance() == 1)
+			homePrimaryActions.add(new NavigationButton(new ActionExit("Close the application", true), guiSetting));
+		else
+			homePrimaryActions.add(new NavigationButton(new ActionExit("Close this window", false), guiSetting));
 	}
 	
 	private void addDataSourceAndDataSourceGroups(GUIsetting guiSetting) {

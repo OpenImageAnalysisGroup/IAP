@@ -29,11 +29,15 @@ public class GUIsetting {
 	private final JPanel graphPanel;
 	private final LinkedHashSet<ExperimentReferenceInterface> clipboardExperiments = new LinkedHashSet<ExperimentReferenceInterface>();
 	private final HashSet<String> clipboardExperimentDatabaseIds = new HashSet<String>();
+	private static int instanceId = 0;
+	private int instance;
+	private Runnable closeRunnable;
 	
 	public GUIsetting(IAPnavigationPanel navigationPanel, IAPnavigationPanel actionPanel, JPanel graphPanel) {
 		this.navigationPanel = navigationPanel;
 		this.actionPanel = actionPanel;
 		this.graphPanel = graphPanel;
+		this.setInstance(++instanceId);
 	}
 	
 	public IAPnavigationPanel getNavigationPanel() {
@@ -97,5 +101,25 @@ public class GUIsetting {
 	public void clearClipboard() {
 		clipboardExperiments.clear();
 		clipboardExperimentDatabaseIds.clear();
+	}
+	
+	public int getInstance() {
+		return instance;
+	}
+	
+	private void setInstance(int instance) {
+		this.instance = instance;
+	}
+	
+	public void closeWindow() {
+		getCloseRunnable().run();
+	}
+	
+	private Runnable getCloseRunnable() {
+		return closeRunnable;
+	}
+	
+	public void setCloseRunnable(Runnable closeRunnable) {
+		this.closeRunnable = closeRunnable;
 	}
 }

@@ -762,7 +762,7 @@ public class IAPnavigationPanel extends JPanel implements ActionListener {
 		jff.setLayout(TableLayout.getLayout(TableLayout.FILL, TableLayout.FILL));
 		BackgroundTaskStatusProviderSupportingExternalCallImpl myStatus = new BackgroundTaskStatusProviderSupportingExternalCallImpl(
 				"", "");
-		jff.add(IAPgui.getMainGUIcontent(myStatus, true, optCustomStartAction, optNavigationButtonFilter, executeActionDelayed), "0,0");
+		jff.add(IAPgui.getMainGUIcontent(myStatus, true, optCustomStartAction, optNavigationButtonFilter, executeActionDelayed, jff), "0,0");
 		jff.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		jff.setLocationByPlatform(true);
 		jff.setSize(width, height);
