@@ -181,6 +181,8 @@ public class Console {
 			String inp = SystemAnalysis.getCommandLineInput();
 			parseInput(commandsFromArg, inp);
 		}
+		if (commandsFromArg.isEmpty())
+			commandsFromArg.add("");
 		input = commandsFromArg.remove(0);
 		
 		if (input != null)
