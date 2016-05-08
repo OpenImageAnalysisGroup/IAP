@@ -54,15 +54,15 @@ public class Console {
 			System.out.println("****************************************************");
 			System.out.println("* Usage                                            *");
 			System.out.println("* - no parameters: interactive console interface   *");
-			System.out.println("* - /help, /h, /?: this help                       *");
-			System.out.println("* - /exec:XYZ    : execute commands X, Y, Z        *");
-			System.out.println("*                  these commands correspond to    *");
-			System.out.println("*                  the keys you use inside the     *");
-			System.out.println("*                  console interface               *");
-			System.out.println("* - /exec:_A,_B  : execute command named 'A' and   *");
-			System.out.println("*                  then 'B'. Use underscore and    *");
-			System.out.println("*                  comma to specify title lookup   *");
-			System.out.println("*                  and to separate commands        *");
+			System.out.println("* - /help, /h, /? - this help                      *");
+			System.out.println("* - XYZ           - execute commands X, Y, Z       *");
+			System.out.println("*                   these commands correspond to   *");
+			System.out.println("*                   the keys you use inside the    *");
+			System.out.println("*                   console interface              *");
+			System.out.println("* - _A,_B         - execute command named 'A' and  *");
+			System.out.println("*                   then 'B'. Use underscore and   *");
+			System.out.println("*                   comma to specify title lookup  *");
+			System.out.println("*                   and to separate commands       *");
 			System.out.println("****************************************************");
 			System.exit(0);
 		}
