@@ -30,7 +30,7 @@ public class RegionLabeling implements Segmentation {
 	int[] clusterSize;
 	private TopBottomLeftRight[] boundingBox;
 	boolean eightNeighbourhood = true;
-	int foregroundpixelCount = 0;
+	long foregroundpixelCount = 0;
 	
 	public LinkedList<ArrayList<PositionAndColor>> getRegionList() {
 		return regionList;
@@ -333,8 +333,16 @@ public class RegionLabeling implements Segmentation {
 		return regionList.size();
 	}
 	
+	/**
+	 * Use getForegroundPixelCountl() instead!
+	 */
 	@Override
+	@Deprecated
 	public int getForegroundPixelCount() {
+		return (Integer) null;
+	}
+	
+	public long getForegroundPixelCountl() {
 		return foregroundpixelCount;
 	}
 	
