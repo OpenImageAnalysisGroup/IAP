@@ -1592,6 +1592,8 @@ public class DataSetFileButton extends JButton implements ActionListener {
 		cm.add(getDaySelectionMenu(cs, DaySelection.ALL_DAYS));
 		cm.add(getDaySelectionMenu(cs, DaySelection.FROM_THIS_DAY));
 		cm.add(getDaySelectionMenu(cs, DaySelection.UNTIL_THIS_DAY));
+		cm.add(getDaySelectionMenu(cs, DaySelection.FROM_THIS_DAY_FLOAT));
+		cm.add(getDaySelectionMenu(cs, DaySelection.UNTIL_THIS_DAY_FLOAT));
 		
 		return cm;
 	}

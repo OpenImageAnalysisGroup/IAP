@@ -65,7 +65,7 @@ public class Match {
 			case ALL_DAYS:
 				return true;
 			case FROM_THIS_DAY:
-				return day >= refS.getTime();
+				return day >= refS.getSampleFineTimeOrRowId();
 			case THIS_DAY:
 				return day == refS.getTime();
 			case THIS_SNAPSHOT:
@@ -77,7 +77,11 @@ public class Match {
 					refFT = -1l;
 				return fineTime == refFT;
 			case UNTIL_THIS_DAY:
-				return day <= refS.getTime();
+				return day <= refS.getSampleFineTimeOrRowId();
+			case UNTIL_THIS_DAY_FLOAT:
+				return fineTime <= refS.getSampleFineTimeOrRowId();
+			case FROM_THIS_DAY_FLOAT:
+				return fineTime >= refS.getSampleFineTimeOrRowId();
 		}
 		return false;
 	}
