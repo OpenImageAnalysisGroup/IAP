@@ -28,6 +28,7 @@ import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.util.WebCamInfo;
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.server.task_management.BackupSupport;
 import de.ipk.ag_ba.server.task_management.CloundManagerNavigationAction;
 import de.ipk.ag_ba.server.task_management.MassCopySupport;
@@ -127,7 +128,7 @@ final class ActionSystemStatus extends AbstractNavigationAction {
 		boolean showLTstorageTimeCheckIcon = SystemOptions.getInstance().getBoolean(
 				"LT-DB", "Debug//system_status_show_storage_time_check_icon", false);
 		if (showLTstorageTimeCheckIcon)
-			resultNavigationButtons.add(new NavigationButton(new ActionValidateLtStorageTimes(null), src.getGUIsetting()));
+			resultNavigationButtons.add(new NavigationButton(new ActionValidateLtStorageTimes(null, new LTdataExchange()), src.getGUIsetting()));
 		
 		boolean showLT = SystemOptions.getInstance().getBoolean("LT-DB", "show_icon", false);
 		boolean hsmEn = SystemOptions.getInstance().getBoolean("ARCHIVE", "enabled", false);

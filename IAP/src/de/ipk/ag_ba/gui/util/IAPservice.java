@@ -1207,8 +1207,11 @@ public class IAPservice {
 			RunnableWithMappingData resultReceiver) throws Exception {
 		ExperimentInterface experiment = null;
 		if (header.getDatabaseId() != null
-				&& header.getDatabaseId().startsWith("lt:"))
-			experiment = new de.ipk.ag_ba.postgresql.LTdataExchange().getExperiment(header,
+				&& (
+				header.getDatabaseId().startsWith("lt:") ||
+				header.getDatabaseId().startsWith("lt_")
+				))
+			experiment = de.ipk.ag_ba.postgresql.LTdataExchange.getInstanceFromDatabaseId(header.getDatabaseId()).getExperiment(header,
 					false,
 					status);
 		else
@@ -1238,15 +1241,16 @@ public class IAPservice {
 			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,user@host  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
 			// c.add("# example config: 1116BA, auto, 10,30, user@host   -- check 1116BA every 30 minutes for watering data within the last 30 minutes, ignoring known start and stop times (with up to 10 minutes difference) from previous day");
 			// add all experiments from today or yesterday as default entries to file
-			LTdataExchange lde = new LTdataExchange();
 			ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB CONTENT...");
-			for (String database : new LTdataExchange().getDatabases()) {
-				try {
-					el.addAll(lde.getExperimentsInDatabase(null, database));
-				} catch (Exception e) {
-					if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
-						System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Can't process DB " + database + ": " + e.getMessage());
+			for (LTdataExchange lde : LTdataExchange.getKnownInstances()) {
+				for (String database : lde.getDatabases()) {
+					try {
+						el.addAll(lde.getExperimentsInDatabase(null, database));
+					} catch (Exception e) {
+						if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
+							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Can't process DB " + database + ": " + e.getMessage());
+					}
 				}
 			}
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK PROGRESS...");
@@ -1317,7 +1321,7 @@ public class IAPservice {
 					e.printStackTrace();
 				}
 			} else {
-				LTdataExchange lde = new LTdataExchange();
+				// LTdataExchange lde = new LTdataExchange();
 				ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
 				TreeSet<String> validDatabases = new TreeSet<String>();
 				boolean checkAll = false;
@@ -1328,15 +1332,17 @@ public class IAPservice {
 						checkAll = true;
 				}
 				ArrayList<String> dbs_toBeChecked = new ArrayList<String>();
-				if (checkAll)
-					dbs_toBeChecked.addAll(lde.getDatabases());
-				else
+				if (checkAll) {
+					for (LTdataExchange lde : LTdataExchange.getKnownInstances())
+						dbs_toBeChecked.addAll(lde.getDatabases());
+				} else {
 					dbs_toBeChecked.addAll(validDatabases);
+				}
 				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB CONTENT...");
 				for (String database : dbs_toBeChecked) {
 					try {
 						System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB " + database + "...");
-						el.addAll(lde.getExperimentsInDatabase(null, database));
+						el.addAll(LTdataExchange.getInstanceFromDatabaseName(database).getExperimentsInDatabase(null, database));
 					} catch (Exception e) {
 						if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
 							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Cant process DB " + database + ": " + e.getMessage());

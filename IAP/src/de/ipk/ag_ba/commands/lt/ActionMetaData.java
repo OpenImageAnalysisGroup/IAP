@@ -12,15 +12,17 @@ import de.ipk.ag_ba.postgresql.LTdataExchange;
 public class ActionMetaData extends AbstractNavigationAction {
 	
 	private final ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
+	private LTdataExchange ltde;
 	
-	public ActionMetaData(String tooltip) {
+	public ActionMetaData(String tooltip, LTdataExchange ltde) {
 		super(tooltip);
+		this.ltde = ltde;
 	}
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
 		res.clear();
-		LTdataExchange lt = new LTdataExchange();
+		LTdataExchange lt = ltde;
 		status.setCurrentStatusText1("Enumerate Meta-Data Information...");
 		final TreeMap<String, ArrayList<NavigationButton>> db2el = new TreeMap<String, ArrayList<NavigationButton>>();
 		for (String db : lt.getDatabases()) {
@@ -28,7 +30,7 @@ public class ActionMetaData extends AbstractNavigationAction {
 				for (String ml : lt.getMetaDataMeasurementLabels(db)) {
 					if (!db2el.containsKey(db))
 						db2el.put(db, new ArrayList<NavigationButton>());
-					db2el.get(db).add(new NavigationButton(new ActionMetaDataInfo(db, ml), src.getGUIsetting()));
+					db2el.get(db).add(new NavigationButton(new ActionMetaDataInfo(db, ml, ltde), src.getGUIsetting()));
 				}
 			} catch (Exception e) {
 				// empty

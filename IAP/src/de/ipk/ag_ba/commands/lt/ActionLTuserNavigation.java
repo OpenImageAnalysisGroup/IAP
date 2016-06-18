@@ -28,10 +28,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ActionLTuserNavigation extends AbstractNavigationAction implements NavigationAction {
 	
 	private final String user;
+	private LTdataExchange ltde;
 	
-	public ActionLTuserNavigation(String user) {
+	public ActionLTuserNavigation(LTdataExchange ltde) {
 		super("Show user list and their experiments");
-		this.user = user;
+		this.ltde = ltde;
+		this.user = ltde.user_login_name;
 	}
 	
 	private NavigationButton src;
@@ -64,7 +66,7 @@ public class ActionLTuserNavigation extends AbstractNavigationAction implements 
 			return;
 		status.setCurrentStatusValueFine(-1);
 		status.setCurrentStatusText1("Query Databases");
-		Collection<String> dbs = new LTdataExchange().getDatabases();
+		Collection<String> dbs = ltde.getDatabases();
 		status.setCurrentStatusValueFine(0);
 		long snapshots = 0;
 		int users = 0;
@@ -82,7 +84,7 @@ public class ActionLTuserNavigation extends AbstractNavigationAction implements 
 			status.setCurrentStatusValueFine(idx / (double) max * 100d);
 			try {
 				status.setCurrentStatusText1(n + " experiments");
-				Collection<ExperimentHeaderInterface> res = new LTdataExchange().getExperimentsInDatabase(user, db, null);
+				Collection<ExperimentHeaderInterface> res = ltde.getExperimentsInDatabase(user, db, null);
 				n += res.size();
 				for (ExperimentHeaderInterface experiment : res) {
 					String id = experiment.getDatabase() + ":" + experiment.getExperimentName();
@@ -106,7 +108,7 @@ public class ActionLTuserNavigation extends AbstractNavigationAction implements 
 							experimentNames.add(id);
 						}
 					} else
-						for (Snapshot s : new LTdataExchange().getSnapshotsOfExperiment(experiment.getDatabase(),
+						for (Snapshot s : ltde.getSnapshotsOfExperiment(experiment.getDatabase(),
 								experiment.getExperimentName())) {
 							String c = s.getCreator();
 							if (c.length() == 0)

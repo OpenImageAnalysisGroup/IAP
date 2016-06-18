@@ -17,15 +17,18 @@ public class ActionMetaDataInfo extends AbstractNavigationAction {
 	private String ml;
 	
 	private final ArrayList<String> metaInfo = new ArrayList<String>();
+	private LTdataExchange ltde;
 	
-	public ActionMetaDataInfo(String tooltip) {
+	public ActionMetaDataInfo(String tooltip, LTdataExchange ltde) {
 		super(tooltip);
+		this.ltde = ltde;
 	}
 	
-	public ActionMetaDataInfo(String db, String ml) {
-		this("Show overview of meta-data for experiment " + ml + ", stored in DB " + db);
+	public ActionMetaDataInfo(String db, String ml, LTdataExchange ltde) {
+		this("Show overview of meta-data for experiment " + ml + ", stored in DB " + db, ltde);
 		this.db = db;
 		this.ml = ml;
+		this.ltde = ltde;
 	}
 	
 	@Override
@@ -35,7 +38,7 @@ public class ActionMetaDataInfo extends AbstractNavigationAction {
 		res.append("<b>Meta-Data for Experiment " + ml + ", stored in " + db + ":</b><br><br>");
 		res.append("<table border='1'>");
 		res.append("<tr><th>ID</th><th>Type</th><th>Values (Number of Plant-IDs)</th></tr>");
-		LTdataExchange lt = new LTdataExchange();
+		LTdataExchange lt = ltde;
 		for (MetaDataType metaInfoId : lt.getMetaDataIdsForMeasureLabel(db, ml)) {
 			ArrayList<String> ids = lt.getMetaDataValues(db, ml, metaInfoId.getMeta_data_name(), true);
 			res.append("<tr><th>" + metaInfoId.getMeta_data_name() + " (" + ids.size() + ")</th><td>" + metaInfoId.getMeta_data_type() + "</td><td>"

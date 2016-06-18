@@ -50,7 +50,10 @@ public class ActionMongoOrLTexperimentNavigation extends
 			ExperimentReferenceInterface exp) {
 		super(
 				exp.getHeader().getDatabaseId() != null
-						&& exp.getHeader().getDatabaseId().startsWith("lt:") ? "Access imaging system data set"
+						&&
+						(exp.getHeader().getDatabaseId().startsWith("lt:") ||
+						exp.getHeader().getDatabaseId().startsWith("lt_")
+						) ? "Access imaging system data set"
 						: "Access Systems Biology Cloud Data Set");
 		
 		this.tt = "<html><table>" + "<tr><td>Experiment</td><td>"
@@ -118,7 +121,10 @@ public class ActionMongoOrLTexperimentNavigation extends
 		}
 		
 		if (header != null && header.getDatabaseId() != null
-				&& !header.getDatabaseId().startsWith("lt:")) {
+				&& !(
+				header.getDatabaseId().startsWith("lt:") ||
+				header.getDatabaseId().startsWith("lt_")
+				)) {
 			// if (experimentReference.m != null)
 			if (header.inTrash()) {
 				actions.add(ActionTrash.getTrashEntity(header,

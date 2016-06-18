@@ -211,7 +211,7 @@ public class MassCopySupport {
 	private void copyMissingOrNewData(boolean analyzeEachCopiedExperiment) throws SQLException, ClassNotFoundException, Exception, InterruptedException {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">START MASS COPY SYNC");
 		status.setCurrentStatusText1("Start sync...");
-		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LT Imaging System to MongoDBs (MASS COPY)", false);
+		StopWatch s = new StopWatch(SystemAnalysis.getCurrentTime() + ">INFO: LT Imaging Systems to MongoDBs (MASS COPY)", false);
 		
 		LTdataExchange lt = new LTdataExchange();
 		ArrayList<IdTime> ltIdArr = new ArrayList<IdTime>();

@@ -30,9 +30,11 @@ public class ActionValidateLtStorageTimes extends AbstractNavigationAction {
 	private final ArrayList<String> res = new ArrayList<String>();
 	private final ArrayList<ExperimentHeaderInterface> errorExp = new ArrayList<ExperimentHeaderInterface>();
 	private NavigationButton src;
+	private LTdataExchange ltde;
 	
-	public ActionValidateLtStorageTimes(String tooltip) {
+	public ActionValidateLtStorageTimes(String tooltip, LTdataExchange ltde) {
 		super(tooltip);
+		this.ltde = ltde;
 	}
 	
 	@Override
@@ -62,10 +64,10 @@ public class ActionValidateLtStorageTimes extends AbstractNavigationAction {
 		filePathCal.set(Calendar.SECOND, 0);
 		
 		int n = 0;
-		for (String database : new LTdataExchange().getDatabases()) {
+		for (String database : ltde.getDatabases()) {
 			ArrayList<ExperimentHeaderInterface> ell = new ArrayList<ExperimentHeaderInterface>();
 			try {
-				ell = new LTdataExchange().getExperimentsInDatabase(null, database, getStatusProvider());
+				ell = ltde.getExperimentsInDatabase(null, database, getStatusProvider());
 			} catch (Exception e) {
 				String s = "Could not analyze DB " + database + ": " + e.getMessage();
 				System.out.println(s);
@@ -74,7 +76,7 @@ public class ActionValidateLtStorageTimes extends AbstractNavigationAction {
 			for (ExperimentHeaderInterface ehi : ell) {
 				n++;
 				boolean foundError = false;
-				ExperimentInterface exp = new LTdataExchange().getExperiment(ehi, false, getStatusProvider());
+				ExperimentInterface exp = ltde.getExperiment(ehi, false, getStatusProvider());
 				for (NumericMeasurementInterface nmi : Substance3D.getAllFiles(exp, MeasurementNodeType.IMAGE)) {
 					ImageData id = (ImageData) nmi;
 					Date snapshotTime = new Date(id.getParentSample().getSampleFineTimeOrRowId());
