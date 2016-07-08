@@ -34,6 +34,7 @@ public class BlMedianFilter extends AbstractBlock {
 		modes.put("Min", RankFilters.MIN);
 		modes.put("Variance", RankFilters.VARIANCE);
 		modes.put("Open", RankFilters.OPEN);
+		modes.put("Close", RankFilters.CLOSE);
 		modes.put("Outliers", RankFilters.OUTLIERS);
 		// modes.put("Despeckle", RankFilters.DESPECKLE);
 		modes.put("Dark Outliers", RankFilters.DARK_OUTLIERS);
@@ -87,7 +88,7 @@ public class BlMedianFilter extends AbstractBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Apply a rank filter to an image such as 'Median', 'Max' ... (includes adaptive Kernel size). Waring: Some modes does not perfom correctly on already processed images (including defined background color, this color will not be ignored).";
+		return "Apply a rank filter to an image such as 'Median', 'Max' ... (includes adaptive Kernel size). Waring: Some modes does not perfom correctly on already processed images (including defined background color, this color will not be ignored). Please use this block before performing the foreground-/background-segmentation";
 	}
 	
 }
