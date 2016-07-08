@@ -57,10 +57,10 @@ public class ExperimentReference implements ExperimentReferenceInterface {
 	}
 	
 	public ExperimentReference(String databaseID) {
-		if (databaseID.startsWith("lt:")) {
+		if (databaseID.startsWith("lt:") || databaseID.startsWith("lt_")) {
 			String db = databaseID.split(":")[1];
 			try {
-				Collection<ExperimentHeaderInterface> res = new LTdataExchange().getExperimentsInDatabase(
+				Collection<ExperimentHeaderInterface> res = LTdataExchange.getInstanceFromDatabaseId(databaseID).getExperimentsInDatabase(
 						null/* SystemAnalysis.getUserName() */, db);
 				for (ExperimentHeaderInterface ehi : res) {
 					if (ehi.getDatabaseId().equals(databaseID)) {
@@ -206,8 +206,8 @@ public class ExperimentReference implements ExperimentReferenceInterface {
 					}
 				}
 				if (databaseId != null)
-					if (databaseId.startsWith("lt:"))
-						res = new LTdataExchange().getExperiment(getHeader(), interactiveGetExperimentSize, status);
+					if (databaseId.startsWith("lt:") || databaseId.startsWith("lt_"))
+						res = LTdataExchange.getInstanceFromDatabaseId(getHeader().getDatabaseId()).getExperiment(getHeader(), interactiveGetExperimentSize, status);
 					else
 						if (databaseId.startsWith("hsm:")) {
 							res = HSMfolderTargetDataManager.getExperiment(databaseId);

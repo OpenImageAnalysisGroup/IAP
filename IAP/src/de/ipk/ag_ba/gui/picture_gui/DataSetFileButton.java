@@ -68,6 +68,7 @@ import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
+import de.ipk.ag_ba.image.operation.demosaicing.BayerPattern;
 import de.ipk.ag_ba.image.operations.blocks.BlockPipeline;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
@@ -509,6 +510,45 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				jp.add(debugShowReferenceImage);
 			
 			jp.add(debugShowAnnotationImage);
+			
+			{
+				JMenuItem debugShowMosaicing = new JMenuItem(
+						"Mosaicing test");
+				debugShowMosaicing
+						.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								try {
+									IOurl s = imageResult
+											.getBinaryFileInfo()
+											.getFileNameMain();
+									Image fi = new Image(s);
+									ImageStack is = new ImageStack();
+									is.addImage("Source", fi);
+									for (BayerPattern p : BayerPattern.values()) {
+										Image mosa = fi.io().mosaic(p).getImage();
+										is.addImage("Mosaicing (" + p.toString() + ")", mosa);
+										Image demosa = mosa.io().demosaic(p).getImage();
+										is.addImage("Demosaiced (" + p.toString() + ")", demosa);
+									}
+									
+									is.show("Mosaicing/demosaicing test");
+								} catch (Exception err) {
+									JOptionPane
+											.showMessageDialog(
+													null,
+													"Error: "
+															+ err.getLocalizedMessage()
+															+ ". Command execution error.",
+													"Error",
+													JOptionPane.INFORMATION_MESSAGE);
+									ErrorMsg.addErrorMessage(err);
+									return;
+								}
+							}
+						});
+				jp.add(debugShowMosaicing);
+			}
 			
 			JMenu snt = new JMenu("Timeline");
 			snt.setIcon(IAPimages.getIcon("img/ext/gpl2/Gnome-Appointment-Soon-64.png", 16, 16));

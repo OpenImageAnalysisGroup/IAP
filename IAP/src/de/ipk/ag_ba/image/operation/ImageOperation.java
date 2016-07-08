@@ -66,6 +66,9 @@ import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operation.channels.Channel;
 import de.ipk.ag_ba.image.operation.channels.ChannelCalculation;
 import de.ipk.ag_ba.image.operation.channels.ChannelProcessing;
+import de.ipk.ag_ba.image.operation.demosaicing.BayerPattern;
+import de.ipk.ag_ba.image.operation.demosaicing.Demosaicing;
+import de.ipk.ag_ba.image.operation.demosaicing.Mosaicing;
 import de.ipk.ag_ba.image.operation.fluoop.FluoAnalysis;
 import de.ipk.ag_ba.image.operation.segmentation.LargeCluster;
 import de.ipk.ag_ba.image.operation.skeleton.SkeletonizeProcessor;
@@ -5467,5 +5470,13 @@ public class ImageOperation implements MemoryHogInterface {
 		}
 		
 		return new ImageOperation(res, w, getHeight());
+	}
+	
+	public ImageOperation mosaic(BayerPattern p) {
+		return new ImageOperation(Mosaicing.mosaicImage(p, getAs1D(), getWidth(), getHeight()));
+	}
+	
+	public ImageOperation demosaic(BayerPattern p) {
+		return new ImageOperation(Demosaicing.demosaic(getImage(), getWidth(), getHeight(), p));
 	}
 }

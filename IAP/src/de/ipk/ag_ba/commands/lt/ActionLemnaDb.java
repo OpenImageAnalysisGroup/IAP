@@ -31,13 +31,13 @@ public class ActionLemnaDb extends AbstractNavigationAction implements Navigatio
 	private NavigationButton src;
 	private final String db;
 	private ArrayList<ExperimentHeaderInterface> experiments;
-	private final String login;
+	private LTdataExchange ltde;
 	
-	public ActionLemnaDb(String db, ArrayList<ExperimentHeaderInterface> experiments, String login) {
+	public ActionLemnaDb(String db, ArrayList<ExperimentHeaderInterface> experiments, LTdataExchange ltde) {
 		super("Open LT-DB " + db);
 		this.db = db;
 		this.experiments = experiments;
-		this.login = login;
+		this.ltde = ltde;
 	}
 	
 	@Override
@@ -84,7 +84,7 @@ public class ActionLemnaDb extends AbstractNavigationAction implements Navigatio
 	
 	private void listDBs() {
 		try {
-			this.experiments = new LTdataExchange().getExperimentsInDatabase(login, db, status);
+			this.experiments = ltde.getExperimentsInDatabase(ltde.user_login_name, db, status);
 		} catch (Exception e) {
 			if (e.getMessage() == null || !e.getMessage().equals("ERROR: relation \"snapshot\" does not exist"))
 				System.out.println("Database " + db + " could not be processed. (" + e.getMessage() + ")");

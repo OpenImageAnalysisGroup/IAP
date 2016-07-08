@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.WeakHashMap;
 
@@ -59,6 +60,7 @@ import de.ipk.ag_ba.image.operation.ArrayUtil;
 import de.ipk.ag_ba.image.operation.ColorSpaceConverter;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.channels.Channel;
+import de.ipk.ag_ba.image.operation.demosaicing.FloatMode;
 
 /**
  * @author klukas
@@ -104,8 +106,15 @@ public class Image {
 			if (is == null)
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
 			ImagePlus inpimg;
+			// ZIP header = 50 4B 03 04 // https://en.wikipedia.org/wiki/List_of_file_signatures
+			// printf("   -p <pattern>  CFA pattern, choices for <pattern> are\n");
+			// printf("                 RGGB        upperleftmost red pixel is at (0,0)\n");
+			// printf("                 GRBG        upperleftmost red pixel is at (1,0)\n");
+			// printf("                 GBRG        upperleftmost red pixel is at (0,1)\n");
+			// printf("                 BGGR        upperleftmost red pixel is at (1,1)\n\n");
+			// printf("   -f            Flatten result to a grayscale image\n");
 			try {
-				if (".tiff".equalsIgnoreCase(url.getFileNameExtension()) || ".tif".equalsIgnoreCase(url.getFileNameExtension())) {
+				if (".tiff".equalsIgnoreCase(url.getFileNameExtension().toLowerCase()) || ".tif".equalsIgnoreCase(url.getFileNameExtension().toLowerCase())) {
 					inpimg = new Opener().openTiff(is, url.getFileName());
 				} else
 					inpimg = new ImagePlus(url.toString(), new ColorProcessor(ImageIO.read(is)));
@@ -211,6 +220,18 @@ public class Image {
 	
 	public Image(int w, int h, float[] image) {
 		this(new ImagePlus("from 1d float array", new FloatProcessor(w, h, image)));
+	}
+	
+	public Image(int w, int h, float[] image, FloatMode mode) {
+		// RGB ==> BGR
+		this(w, h, getChannel(image, w * h, w * h), getChannel(image, 2 * w * h, w * h), getChannel(image, 0, w * h), ColorSpace.RGB);
+		if (mode != FloatMode.AllRedThenAllGreenThenAllBlue) {
+			throw new RuntimeException("Internal error: unknown float mode '" + mode.toString() + "'!");
+		}
+	}
+	
+	private static float[] getChannel(float[] image, int from, int length) {
+		return Arrays.copyOfRange(image, from, from + length);
 	}
 	
 	public Image(int w, int h, double[] image) {
@@ -798,8 +819,16 @@ public class Image {
 	}
 	
 	public float[] getAs1float(boolean scaleTo1) {
+		return getAs1float(scaleTo1, false);
+	}
+	
+	public ImagePlus getStoredImage() {
+		return image;
+	}
+	
+	public float[] getAs1float(boolean scaleTo1, boolean useMaxOfRGBforGrayLevel) {
 		if (image.getProcessor() instanceof ColorProcessor) {
-			int[] arr = io().channels().getGrayImageAs1dArray();
+			int[] arr = io().channels().getGrayImageAs1dArray(useMaxOfRGBforGrayLevel);
 			float[] res = new float[arr.length];
 			int idx = 0;
 			if (scaleTo1)

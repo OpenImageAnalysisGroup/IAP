@@ -34,24 +34,32 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 public class ActionLTnavigation extends AbstractNavigationAction implements NavigationAction {
 	
 	private NavigationButton src;
-	private String login;
-	private String pass;
 	ArrayList<NavigationButton> result = new ArrayList<NavigationButton>();
 	private ArrayList<String> listOfDatabases = new ArrayList<String>();
 	private final TreeMap<String, ArrayList<ExperimentHeaderInterface>> experimentMap = new TreeMap<String, ArrayList<ExperimentHeaderInterface>>();
 	private String errorMessage;
 	private final boolean enumerateAllDBsForDetails;
+	private boolean isHwiImagingSystem = false;
+	private LTdataExchange ltde;
+	private String hwiFile;
 	
 	public ActionLTnavigation() {
 		super("Access LT-DB");
-		@SuppressWarnings("unused")
-		LTdataExchange ltInitVariablesAndSettings = new LTdataExchange();
+		this.ltde = new LTdataExchange();
 		this.enumerateAllDBsForDetails = SystemOptions.getInstance().getBoolean("LT-DB", "Load Complete Experiment-List for Overview", false);
-		
+		isHwiImagingSystem = false;
+	}
+	
+	public ActionLTnavigation(String user, String password, String host, String port, String hwiFile) {
+		super("Access LT-DB");
+		this.ltde = new LTdataExchange(user, password, host, port, hwiFile);
+		this.enumerateAllDBsForDetails = SystemOptions.getInstance().getBoolean("LT-DB", "Load Complete Experiment-List for Overview", false);
+		isHwiImagingSystem = true;
+		this.hwiFile = hwiFile;
 	}
 	
 	public void setLogin(String user) {
-		this.login = user;
+		this.ltde.user_login_name = user;
 	}
 	
 	/*
@@ -120,10 +128,10 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			if (IAPmain.getRunMode() == IAPrunMode.WEB)
 				result.add(new NavigationButton(new ActionLTlogout(), src.getGUIsetting()));
 			
-			listOfDatabases = listOfDatabases != null && !listOfDatabases.isEmpty() ? listOfDatabases : new ArrayList<String>(new LTdataExchange().getDatabases());
+			listOfDatabases = listOfDatabases != null && !listOfDatabases.isEmpty() ? listOfDatabases : new ArrayList<String>(ltde.getDatabases());
 			
 			if (!listOfDatabases.isEmpty())
-				result.add(new NavigationButton(new ActionLTuserNavigation(login), src.getGUIsetting()));
+				result.add(new NavigationButton(new ActionLTuserNavigation(ltde), src.getGUIsetting()));
 			
 			TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>> allExperiments = new TreeMap<String, TreeMap<String, ArrayList<ExperimentHeaderInterface>>>();
 			allExperiments.put("", new TreeMap<String, ArrayList<ExperimentHeaderInterface>>());
@@ -131,9 +139,9 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			Collections.sort(listOfDatabases, new Comparator<String>() {
 				@Override
 				public int compare(String arg0, String arg1) {
-					if (LTdataExchange.known(arg0) && !LTdataExchange.known(arg1))
+					if (ltde.known(arg0) && !ltde.known(arg1))
 						return -1;
-					if (!LTdataExchange.known(arg0) && LTdataExchange.known(arg1))
+					if (!ltde.known(arg0) && ltde.known(arg1))
 						return 1;
 					return arg0.compareTo(arg1);
 				}
@@ -147,23 +155,22 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 			for (String db : listOfDatabases) {
 				idx++;
 				status.setCurrentStatusValueFine(idx / (double) max * 100d);
-				if (!LTdataExchange.known(db))
+				if (!ltde.known(db))
 					continue;
 				if (enumerateAllDBsForDetails) {
 					status.setCurrentStatusText1(n + " experiments");
 					try {
 						if (!experimentMap.containsKey(db)) {
-							ArrayList<ExperimentHeaderInterface> res = new LTdataExchange().
-									getExperimentsInDatabase(login, db, status);
+							ArrayList<ExperimentHeaderInterface> res = ltde.getExperimentsInDatabase(ltde.user_login_name, db, status);
 							n += res.size();
 							experimentMap.put(db, res);
 						}
 						ArrayList<ExperimentHeaderInterface> experiments = experimentMap.get(db);
 						if (experiments.size() > 0) {
-							if (!LTdataExchange.known(db))
-								unsorted.add(new NavigationButton(new ActionLemnaDb(db, experiments, login), src.getGUIsetting()));
+							if (!ltde.known(db))
+								unsorted.add(new NavigationButton(new ActionLemnaDb(db, experiments, ltde), src.getGUIsetting()));
 							else
-								result.add(new NavigationButton(new ActionLemnaDb(db, experiments, login), src.getGUIsetting()));
+								result.add(new NavigationButton(new ActionLemnaDb(db, experiments, ltde), src.getGUIsetting()));
 						}
 						// else System.out.println("Database " + db + " is empty.");
 						for (ExperimentHeaderInterface ehi : experiments) {
@@ -175,7 +182,7 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 							System.out.println("Database " + db + " could not be processed. (" + e.getMessage() + ")");
 					}
 				} else {
-					result.add(new NavigationButton(new ActionLemnaDb(db, null, login), src.getGUIsetting()));
+					result.add(new NavigationButton(new ActionLemnaDb(db, null, ltde), src.getGUIsetting()));
 				}
 			}
 			if (unsorted.size() > 0)
@@ -185,7 +192,7 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 				result.add(1, Other.getCalendarEntity(allExperiments, null, src.getGUIsetting()));
 			
 			if (result.size() > 0)
-				result.add(enumerateAllDBsForDetails ? 2 : 1, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments"), src.getGUIsetting()));
+				result.add(enumerateAllDBsForDetails ? 2 : 1, new NavigationButton(new ActionMetaData("View Meta-Data for Experiments", ltde), src.getGUIsetting()));
 			
 			if (SystemOptions.getInstance().getBoolean("Imaging-System-Documentation", "show_icon", false)) {
 				HTTPfolderSource doku = new LTdocuSource();
@@ -219,8 +226,18 @@ public class ActionLTnavigation extends AbstractNavigationAction implements Navi
 	}
 	
 	@Override
-	public String getDefaultTitle() {
-		return "Imaging System";
+	public String getDefaultTooltip() {
+		if (isHwiImagingSystem)
+			return hwiFile;
+		else
+			return super.getDefaultTooltip();
 	}
 	
+	@Override
+	public String getDefaultTitle() {
+		if (isHwiImagingSystem)
+			return (ltde.user.equalsIgnoreCase("postgres") ? "" : ltde.user + "@") + ltde.host + ":" + ltde.port;
+		else
+			return "Imaging System";
+	}
 }

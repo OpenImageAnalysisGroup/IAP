@@ -665,18 +665,30 @@ public class ChannelProcessing {
 	}
 	
 	public int[] getGrayImageAs1dArray() {
+		return getGrayImageAs1dArray(false);
+	}
+	
+	public int[] getGrayImageAs1dArray(boolean useMaxOfRgbForIntensity) {
 		int[] img1d = imageAs1dArray;
 		int c, r = 0;
 		int[] res = new int[width * height];
 		
-		for (int idx = 0; idx < img1d.length; idx++) {
-			c = img1d[idx];
-			r = ((c & 0xff0000) >> 16);
+		if (!useMaxOfRgbForIntensity) {
+			for (int idx = 0; idx < img1d.length; idx++) {
+				c = img1d[idx];
+				r = ((c & 0xff0000) >> 16);
+				res[idx] = r;
+			}
+		} else {
+			int g, b;
+			for (int idx = 0; idx < img1d.length; idx++) {
+				c = img1d[idx];
+				r = ((c & 0xff0000) >> 16);
+				g = ((c & 0x00ff00) >> 8);
+				b = ((c & 0x0000ff) >> 0);
+				res[idx] = Math.max(Math.max(r, g), b);
+			}
 			
-			// if (c == ImageOperation.BACKGROUND_COLORint)
-			// res[idx] = c;
-			// else
-			res[idx] = r;
 		}
 		return res;
 	}

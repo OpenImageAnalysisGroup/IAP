@@ -1,5 +1,9 @@
 ## IAP - The Integrated Analysis Platform for high-throughput plant image analysis
 
+### Documentations and further Information
+
+Documentations and releases (up to version 2.0.2) are available here: [http://iapg2p.sourceforge.net/](http://iapg2p.sourceforge.net/)
+
 ### Docker-Integration
 
 For testing purposes automated builds, based on the current GitHub conntent are automatically performed. The basis for this is the available docker/github integration. The provided 'Dockerfile' shows how to download and compile the current source code, and how to create a new 'fat' iap-jar file. An example IAP commandline image is available here: [https://hub.docker.com/r/klukas/iap/](https://hub.docker.com/r/klukas/iap/). Use the command 'docker pull klukas/iap' to download the container. Enter 'docker run --rm --name IAPconsole -it klukas/iap' to start IAP in commandline mode. At the moment only limited functionality is available using this execution mode and due to the container isolation. Call options for functional use are in work and will be available in the future. Also, for now these commands work best under the Linux environment, but the Docker beta developments will very soon make it possible to execute docker container apps on Windows and Mac in the same way.

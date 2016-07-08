@@ -64,10 +64,15 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  * @author klukas, entzian
  */
 public class LTdataExchange implements ExperimentLoader {
-	private final String user;
+	public final String user;
 	private final String password;
-	private final String port;
-	private final String host;
+	public final String port;
+	public final String host;
+	
+	// current user at client PC
+	public String user_login_name;
+	private String fileName;
+	private String fName;
 	
 	private static final String driver = "org.postgresql.Driver";
 	
@@ -82,14 +87,23 @@ public class LTdataExchange implements ExperimentLoader {
 		password = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//password", "");
 		port = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//port", "5432");
 		host = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//host", "lemna-db.ipk-gatersleben.de");
+		this.fileName = "";
+		this.fName = "";
+		fileName2LTDE.put(fileName, this);
 	}
 	
-	public LTdataExchange(String user, String password, String host, String port) {
+	public LTdataExchange(String user, String password, String host, String port, String fileName) {
 		this.user = user;
 		this.password = password;
 		this.host = host;
 		this.port = port;
+		this.fileName = fileName;
+		this.fName = new File(fileName).getName();
+		this.fName = fName.substring(0, fName.length() - ".xml".length());
+		fileName2LTDE.put(fName, this);
 	}
+	
+	private static HashMap<String, LTdataExchange> fileName2LTDE = new HashMap<>();
 	
 	public Collection<String> getDatabases() throws SQLException, ClassNotFoundException {
 		HashSet<String> invalidDBs = new HashSet<String>();
@@ -134,7 +148,6 @@ public class LTdataExchange implements ExperimentLoader {
 				
 				if (!invalidDBs.contains(dbName))
 					result.add(dbName);
-				
 			}
 			rs.close();
 			ps.close();
@@ -221,8 +234,8 @@ public class LTdataExchange implements ExperimentLoader {
 				ehi.setExperimentname(name);
 				
 				ehi.setDatabase(database);
-				ehi.setDatabaseId("lt:" + database + ":" + ehi.getExperimentName());
-				ehi.setOriginDbId("lt:" + database + ":" + ehi.getExperimentName());
+				ehi.setDatabaseId(prefix() + ":" + database + ":" + ehi.getExperimentName());
+				ehi.setOriginDbId(prefix() + ":" + database + ":" + ehi.getExperimentName());
 				ehi.setImportUserName(user != null ? user : SystemAnalysis.getUserName());
 				ehi.setImportUserGroup("Imaging System");
 				LTsystem system = LTsystem.getTypeFromDatabaseName(database);
@@ -397,6 +410,13 @@ public class LTdataExchange implements ExperimentLoader {
 			optStatus.setCurrentStatusText2("Found " + result.size() + " experiments in db " + database);
 		
 		return result;
+	}
+	
+	private String prefix() {
+		if (fName.isEmpty())
+			return "lt";
+		else
+			return "lt_" + fName;
 	}
 	
 	private String getNiceNameFromLoginName(String name) {
@@ -1184,8 +1204,8 @@ public class LTdataExchange implements ExperimentLoader {
 		experiment.getHeader().setSequence(seq);
 		
 		if (experimentReq != null) {
-			experiment.getHeader().setDatabaseId("lt:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
-			experiment.getHeader().setOriginDbId("lt:" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
+			experiment.getHeader().setDatabaseId(prefix() + ":" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
+			experiment.getHeader().setOriginDbId(prefix() + ":" + experimentReq.getDatabase() + ":" + experimentReq.getExperimentName());
 		}
 		setDateValuesAccordingToSeedDate(experiment, seq);
 		if (optStatus != null)
@@ -1433,7 +1453,7 @@ public class LTdataExchange implements ExperimentLoader {
 					String dbP = args[3];
 					String dbH = args[4];
 					String dbPort = args[5];
-					res = new LTdataExchange(dbU, dbP, dbH, dbPort).isUserKnown(u, p);
+					res = new LTdataExchange(dbU, dbP, dbH, dbPort, "").isUserKnown(u, p);
 				} else {
 					System.out.println("INVALID PARAMETER SET (USER PASSWORD or USER PASSWORD DBUSER DBPASSWORD DBHOST DBPORT");
 				}
@@ -1615,7 +1635,7 @@ public class LTdataExchange implements ExperimentLoader {
 	
 	public static ExperimentInterface getExperimentFromSnapshots(ExperimentHeader eh,
 			ArrayList<Snapshot> snapshots, HashMap<String, Condition> optIdTag2condition) throws ClassNotFoundException, SQLException {
-		return new LTdataExchange().getExperiment(eh, false, null, snapshots, optIdTag2condition);
+		return getInstanceFromDatabaseId(eh.getDatabaseId()).getExperiment(eh, false, null, snapshots, optIdTag2condition);
 	}
 	
 	public static String getDefaultSelection(Integer optCol, String heading, ArrayList<String> possibleValues) {
@@ -1629,5 +1649,19 @@ public class LTdataExchange implements ExperimentLoader {
 	
 	private static boolean isDebug() {
 		return SystemOptions.getInstance().getBoolean("LT-DB", "PostgreSQL//Print Debug Messages", false);
+	}
+	
+	public static LTdataExchange getInstanceFromDatabaseId(String databaseID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public static LTdataExchange getInstanceFromDatabaseName(String database) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public static Collection<LTdataExchange> getKnownInstances() {
+		return fileName2LTDE.values();
 	}
 }
