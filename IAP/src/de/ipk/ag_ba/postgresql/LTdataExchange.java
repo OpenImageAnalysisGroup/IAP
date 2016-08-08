@@ -76,6 +76,8 @@ public class LTdataExchange implements ExperimentLoader {
 	
 	private static final String driver = "org.postgresql.Driver";
 	
+	static LTdataExchange instance = null;
+	
 	private static boolean debug;
 	/**
 	 * specifies if the camera images are stored as "top.vis", ... instead of the old style "vis.top", ...
@@ -1652,8 +1654,11 @@ public class LTdataExchange implements ExperimentLoader {
 	}
 	
 	public static LTdataExchange getInstanceFromDatabaseId(String databaseID) {
-		// TODO Auto-generated method stub
-		return null;
+		//TODO Fix final.
+		if (instance == null)
+			instance = new LTdataExchange();
+		
+		return instance;
 	}
 	
 	public static LTdataExchange getInstanceFromDatabaseName(String database) {
