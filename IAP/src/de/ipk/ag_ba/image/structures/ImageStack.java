@@ -126,6 +126,7 @@ public class ImageStack implements Iterable<ImageProcessor> {
 		}
 		final ImagePlus image = new ImagePlus();
 		image.setStack(stack);
+		image.setTitle(title);
 		if (!SwingUtilities.isEventDispatchThread()) {
 			Runnable r = new Runnable() {
 				@Override

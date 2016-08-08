@@ -199,7 +199,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			return null;
 		return "Create report" +
 				(exportIndividualAngles ? (xlsx ? " XLSX" : " CSV")
-						: " PDF ("
+						: " table  (" + (xlsx ? " .xlsx" : " .csv") + ") "
 								+ StringManipulationTools.getStringList(
 										getArrayFrom(divideDatasetBy, tsoBootstrapN != null ? tsoBootstrapN.getInt() : -1, experimentReference.getHeader().getSequence(),
 												tsoSplitFirst != null ? tsoSplitFirst.getBval(0, false) : false,
