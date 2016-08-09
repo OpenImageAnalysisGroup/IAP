@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.MeasurementFilter;
 import org.SettingsHelperDefaultIsFalse;
+import org.SettingsHelperDefaultIsTrue;
 import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -137,12 +138,17 @@ public class ActionCopyExperiment extends AbstractNavigationAction implements Na
 				res.add(new NavigationButton(new ActionDataUdpBroadcast(m, experimentReferences.iterator().next()), guiSetting));
 			}
 		
-		// if (experimentReferences.size() == 1)
-		// if (addHSMcopy) {
-		// String hsmf = IAPmain.getHSMfolder();
-		// if (hsmf != null)
-		// res.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReferences.iterator().next(), hsmf), guiSetting));
-		// }
+//		 if (experimentReferences.size() == 1)
+//		 if (addHSMcopy) {
+//		 String hsmf = IAPmain.getHSMfolder();
+//		 if (hsmf != null)
+//		 res.add(new NavigationButton(new ActionDataExportToHsmFolder(m, experimentReferences.iterator().next(), hsmf), guiSetting));
+//		 }
+		 
+		 if (new SettingsHelperDefaultIsTrue().isEnabled("ARCHIVE|enabled"))
+				res.add(new NavigationButton(new ActionDataExportToDefinedFileSystemFolder(
+					"Copy dataset to a user-selected target folder",
+					m, experimentReferences, !includeOutliers.getBval(0, false)), guiSetting));
 		
 		res.add(new NavigationButton(new ActionDataExportToUserSelectedFileSystemFolder(
 				"Copy dataset to a user-selected target folder",

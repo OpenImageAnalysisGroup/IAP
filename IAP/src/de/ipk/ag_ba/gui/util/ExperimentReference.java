@@ -407,4 +407,9 @@ public class ExperimentReference implements ExperimentReferenceInterface {
 	public void setM(MongoDB m) {
 		this.m = m;
 	}
+
+	@Override
+	public String getDatabaseName() {
+		return header.getDatabase();
+	}
 }

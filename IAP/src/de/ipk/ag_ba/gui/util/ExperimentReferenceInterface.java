@@ -44,5 +44,7 @@ public interface ExperimentReferenceInterface {
 	public abstract MongoDB getM();
 	
 	public abstract void setM(MongoDB m);
+
+	public abstract String getDatabaseName();
 	
 }
