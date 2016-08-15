@@ -65,6 +65,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	ArrayList<NavigationAction> folderActions = new ArrayList<NavigationAction>();
 	LinkedHashSet<ExperimentHeaderInterface> trashed = new LinkedHashSet<ExperimentHeaderInterface>();
 	private final NavigationImage folderIconOpened;
+	private boolean forceReadOnly;
 	
 	public VfsFileSystemSource(Library lib, String dataSourceName, VirtualFileSystem folder,
 			String[] validExtensions,
@@ -372,5 +373,9 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 	@Override
 	public ArrayList<Book> getReferenceInfos() {
 		return lib.getBooksInFolder("");
+	}
+	
+	public void setReadOnly(boolean forceReadOnly) {
+		this.forceReadOnly = forceReadOnly;
 	}
 }

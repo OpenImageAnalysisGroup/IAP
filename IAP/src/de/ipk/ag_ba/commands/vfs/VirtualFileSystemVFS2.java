@@ -57,6 +57,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 	private boolean useOnlyForMongoFileStorage;
 	private String useForMongoFileStorageCloudName;
 	
+	private boolean createIfMissing = false; // if enabled, the 'index' folder will be created initially even when just browsing the target
+	
 	public VirtualFileSystemVFS2(
 			String prefix,
 			VfsFileProtocol vfs_type,
@@ -84,6 +86,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		// if (this.vfs_type == VfsFileProtocol.LOCAL) {
 		// ResourceIOManager.registerIOHandler(new FileSystemHandler(this.prefix, this.folder));
 		// } else
+		
 		ResourceIOManager.registerIOHandler(new VirtualFileSystemHandler(this));
 	}
 	
@@ -116,14 +119,20 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		try {
 			VfsFileObject file = VfsFileObjectUtil.createVfsFileObject(vfs_type,
 					host, path, user, getPass());
-			if (!file.exists()) {
-				if (doPrintStatus())
-					System.out.println(">>>>>> create directory " + path);
-				file.mkdir();
-			}
 			ArrayList<String> res = new ArrayList<String>();
-			for (String s : file.list()) {
-				res.add(s);
+			if (!file.exists()) {
+				if (createIfMissing) {
+					if (doPrintStatus())
+						System.out.println(">>>>>> create directory " + path);
+					file.mkdir();
+					for (String s : file.list()) {
+						res.add(s);
+					}
+				}
+			} else {
+				for (String s : file.list()) {
+					res.add(s);
+				}
 			}
 			return res;
 		} catch (Exception e) {
@@ -732,8 +741,13 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		this.description = description;
 	}
 	
+	public boolean forceReadOnly = false;
+	
 	@Override
 	public boolean isAbleToSaveData() {
+		if (forceReadOnly)
+			return false;
+		
 		switch (vfs_type) {
 			case FTP:
 				return true;

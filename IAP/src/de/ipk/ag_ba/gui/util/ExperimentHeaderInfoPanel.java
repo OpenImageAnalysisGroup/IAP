@@ -544,7 +544,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 										}
 									}
 									if (!ok)
-										saveB.setText("Updated (saved)");
+										saveB.setText("Updated (in memory)");
 									// MyExperimentInfoPanel.this.setExperimentInfo(m, experimentHeader,
 									// true, null);
 								} else {

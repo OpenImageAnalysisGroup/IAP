@@ -58,11 +58,12 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 		// todo add zoom slider (default, large, extra large)
 		// todo add plant filter (all, ID 1, ID 2, ID 3, ...)
 		
-		res.add(new NavigationButton("Add Marked Outliers to Global Outlier List", new ActionSetGlobalOutliers(experiment), src.getGUIsetting()));
+		boolean saveOk = false;
 		
-		if (experiment.getM() != null)
+		if (experiment.getM() != null) {
+			saveOk = true;
 			res.add(new NavigationButton("Save Annotation Changes", new ActionCopyToMongo(experiment.getM(), experiment, true), src.getGUIsetting()));
-		else {
+		} else {
 			String dbId = experiment != null && experiment.getHeader() != null ? experiment.getHeader().getDatabaseId() : null;
 			if (dbId != null) {
 				String id = dbId.contains(":") ? dbId.substring(0, dbId.indexOf(":")) : null;
@@ -72,7 +73,8 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 						VirtualFileSystemHandler vv = (VirtualFileSystemHandler) vfs;
 						if (vv.getVFS() instanceof VirtualFileSystemVFS2) {
 							VirtualFileSystemVFS2 vv2 = (VirtualFileSystemVFS2) vv.getVFS();
-							if (vv2.isAbleToSaveData())
+							if (vv2.isAbleToSaveData()) {
+								saveOk = true;
 								res.add(new NavigationButton(null,
 										new ActionDataExportToVfs(experiment.getM(), experiment, vv2, false, null) {
 											
@@ -115,10 +117,15 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 											}
 										},
 										src.getGUIsetting()));
+							}
 						}
 					}
 				}
 			}
+		}
+		
+		if (saveOk) {
+			res.add(0, new NavigationButton("Add Marked Outliers to Global Outlier List", new ActionSetGlobalOutliers(experiment), src.getGUIsetting()));
 		}
 		
 		return res;

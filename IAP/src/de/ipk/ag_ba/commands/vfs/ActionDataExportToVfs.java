@@ -87,7 +87,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	public ActionDataExportToVfs(MongoDB m,
 			ExperimentReferenceInterface experimentReference, VirtualFileSystemVFS2 vfs, boolean ignoreOutliers, VfsFileSystemSource optFileSystemSource) {
-		super("Copy to " + vfs.getTargetName() + " (" + vfs.getProtocolName() + ")");
+		super("To " + vfs.getTargetName() + " (" + vfs.getProtocolName() + ")");
 		this.m = m;
 		this.ignoreOutliers = ignoreOutliers;
 		this.optFileSystemSource = optFileSystemSource;
@@ -146,7 +146,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	@Override
 	public String getDefaultTitle() {
-		return "Copy to " + (vfs != null ? vfs.getTargetName() : "(undefined)");
+		return "To " + (vfs != null ? vfs.getTargetName() : "(undefined)");
 	}
 	
 	@Override

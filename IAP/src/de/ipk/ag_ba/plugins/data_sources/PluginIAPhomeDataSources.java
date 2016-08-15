@@ -1,11 +1,13 @@
 package de.ipk.ag_ba.plugins.data_sources;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.SystemOptions;
 import org.graffiti.plugin.io.resources.IOurl;
 
+import de.ipk.ag_ba.commands.experiment.ActionDataExportToDefinedFileSystemFolder;
 import de.ipk.ag_ba.datasources.DataSource;
 import de.ipk.ag_ba.datasources.DataSourceGroup;
 import de.ipk.ag_ba.datasources.http_folder.IAPnewsLinksSource;
@@ -13,6 +15,7 @@ import de.ipk.ag_ba.datasources.http_folder.MetaCropDataSource;
 import de.ipk.ag_ba.datasources.http_folder.RimasDataSource;
 import de.ipk.ag_ba.datasources.http_folder.SBGNdataSource;
 import de.ipk.ag_ba.datasources.http_folder.VANTEDdataSource;
+import de.ipk.ag_ba.datasources.sub_folder_datasource.SubFolderDatasource;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.util.WebFolder;
 import de.ipk.ag_ba.plugins.AbstractIAPplugin;
@@ -69,6 +72,25 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 	@Override
 	public DataSource[] getDataSources() {
 		ArrayList<DataSource> result = new ArrayList<DataSource>();
+		
+		boolean hsm = SystemOptions.getInstance().getBoolean("ARCHIVE", "enabled", true);
+		
+		boolean readonly = SystemOptions.getInstance().getBoolean("ARCHIVE", "list_experiments_readonly", true);
+		
+		if (hsm)
+		{
+			String hsmFolder = ActionDataExportToDefinedFileSystemFolder.getHsmPath(File.separator);
+			ArrayList<File> dataSetFolders = new ArrayList<>();
+			File dd = new File(hsmFolder);
+			if (dd.exists() && dd.isDirectory()) {
+				for (File f : dd.listFiles()) {
+					if (f.isDirectory() && new File(f.getAbsoluteFile() + File.separator + "index").exists()) {
+						dataSetFolders.add(f);
+					}
+				}
+			}
+			result.add(new SubFolderDatasource("Archive", hsmFolder, readonly));
+		}
 		
 		boolean toolLinks = SystemOptions.getInstance().getBoolean("IAP", "Show Bioinformatics Tools", true);
 		if (toolLinks) {

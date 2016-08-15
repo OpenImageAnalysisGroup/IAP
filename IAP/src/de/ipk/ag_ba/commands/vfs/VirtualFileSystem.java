@@ -248,6 +248,9 @@ public abstract class VirtualFileSystem {
 				IAPmain.loadIcon(ico2),
 				IAPmain.loadIcon(ico3),
 				IAPmain.loadIcon(ico4));
+		
+		dataSourceHsm.setReadOnly(true);
+		
 		ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
 		for (NavigationAction na : vfsEntry.getAdditionalNavigationActions()) {
 			action.addAdditionalEntity(new NavigationButton(na, guiSetting));

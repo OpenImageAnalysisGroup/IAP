@@ -72,3 +72,5 @@ hs_err_pid*
 *.class
 
 *.class
+
+*.class
