@@ -89,7 +89,7 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 					}
 				}
 			}
-			result.add(new SubFolderDatasource("Archive", hsmFolder, readonly));
+			result.add(new SubFolderDatasource("Archive", hsmFolder, readonly, false));
 		}
 		
 		boolean toolLinks = SystemOptions.getInstance().getBoolean("IAP", "Show Bioinformatics Tools", true);

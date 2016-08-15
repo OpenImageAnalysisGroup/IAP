@@ -62,8 +62,10 @@ public class HsmDataSourceLevelForExperimentType implements DataSourceLevel {
 					if (group.toUpperCase().startsWith("ROOT_") || group.toUpperCase().contains("(ROOT)")
 							|| group.startsWith(IAPexperimentTypes.RootWaterScan + ""))
 						return IAPmain.loadIcon(IAPimages.getRoots());
-					else
-						return IAPmain.loadIcon(IAPimages.getFolderRemoteClosed());
+					else {
+						// return IAPmain.loadIcon(IAPimages.getFolderRemoteClosed());
+						return IAPmain.loadIcon(IAPimages.getFolderClosed());
+					}
 	}
 	
 	@Override

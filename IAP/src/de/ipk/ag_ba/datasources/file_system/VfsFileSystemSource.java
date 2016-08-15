@@ -137,19 +137,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 					return accept;
 				}
 			})) {
-				String folder = subfolder == null ? "" : subfolder + "/";
-				IOurl u = url.getIOurlFor(folder + fn);
-				if (fn.endsWith(".gml") || fn.endsWith(".graphml"))
-					folderActions.add(IAPservice.getPathwayViewAction(new PathwayWebLinkItem(fn, u, false)));
-				else {
-					String icon = null;
-					if (fn != null && fn.contains("."))
-						icon = IAPimages.getImageFromFileExtension(fn.substring(fn.lastIndexOf(".")));
-					if (icon != null)
-						lib.add(new Book("", fn.substring(0, fn.lastIndexOf(".")), u, icon));
-					else
-						lib.add(new Book("", fn.substring(0, fn.lastIndexOf(".")), u));
-				}
+				createActionOrLibEntryForGivenFilename(url, fn, subfolder, folderActions, lib);
 			}
 		}
 		if (subfolder == null) {
@@ -181,6 +169,23 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 					}
 				}
 			}
+		}
+	}
+	
+	public static void createActionOrLibEntryForGivenFilename(VirtualFileSystem url, String fn, String subfolder,
+			ArrayList<NavigationAction> folderActions, Library lib) {
+		String folder = subfolder == null ? "" : subfolder + "/";
+		IOurl u = url.getIOurlFor(folder + fn);
+		if (fn.endsWith(".gml") || fn.endsWith(".graphml"))
+			folderActions.add(IAPservice.getPathwayViewAction(new PathwayWebLinkItem(fn, u, false)));
+		else {
+			String icon = null;
+			if (fn != null && fn.contains("."))
+				icon = IAPimages.getImageFromFileExtension(fn.substring(fn.lastIndexOf(".")));
+			if (icon != null)
+				lib.add(new Book("", fn.substring(0, fn.lastIndexOf(".")), u, icon));
+			else
+				lib.add(new Book("", fn.substring(0, fn.lastIndexOf(".")), u));
 		}
 	}
 	

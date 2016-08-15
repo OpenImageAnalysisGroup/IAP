@@ -242,6 +242,7 @@ public abstract class VirtualFileSystem {
 			ico3 = vfsEntry.getDesiredIcon();
 			ico4 = vfsEntry.getDesiredIcon();
 		}
+		
 		VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
 				new String[] { ".txt", ".url", ".webloc", ".gml", ".graphml", ".pdf", ".html", ".htm" },
 				IAPmain.loadIcon(ico),

@@ -7,14 +7,17 @@ import org.OpenFileDialogService;
 import org.SystemOptions;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.commands.ActionNavigateDataSource;
 import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
+import de.ipk.ag_ba.datasources.sub_folder_datasource.SubFolderDatasource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.vanted.plugin.VfsFileProtocol;
 
@@ -41,49 +44,56 @@ public class ActionDataLoadingFromUserSelectedFileSystemFolder extends AbstractN
 		if (currentDirectory == null)
 			currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
 		if (currentDirectory != null) {
-			VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
-					"user.dir." + System.currentTimeMillis(),
-					VfsFileProtocol.LOCAL,
-					currentDirectory.getName(),
-					"File I/O", "",
-					null,
-					null,
-					currentDirectory.getCanonicalPath(),
-					false,
-					false,
-					null);
-			this.vfsEntry = vfs;
-			Library lib = new Library();
-			String ico = IAPimages.getFolderRemoteClosed();
-			String ico2 = IAPimages.getFolderRemoteOpen();
-			String ico3 = IAPimages.getFolderRemoteClosed();
-			String ico4 = IAPimages.getFolderRemoteOpen();
-			if (vfsEntry.getProtocolName().toUpperCase().contains("UDP")) {
-				ico = "img/ext/network-workgroup.png";
-				ico2 = "img/ext/network-workgroup-power.png";
-				ico3 = IAPimages.getFolderRemoteClosed();
-			} else
-				if (vfsEntry.getDesiredIcon() != null) {
-					ico = vfsEntry.getDesiredIcon();
-					ico2 = vfsEntry.getDesiredIcon();
-					ico3 = vfsEntry.getDesiredIcon();
-					ico4 = vfsEntry.getDesiredIcon();
+			if (!new File(currentDirectory + File.separator + HSMfolderTargetDataManager.DIRECTORY_FOLDER_NAME).exists()) {
+				SubFolderDatasource ds = new SubFolderDatasource(currentDirectory.getName(), currentDirectory.getAbsolutePath(), false, true);
+				ActionNavigateDataSource action = new ActionNavigateDataSource(ds);
+				action.performActionCalculateResults(src);
+				resultActions.addAll(action.getResultNewActionSet());
+			} else {
+				VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
+						"user.dir." + System.currentTimeMillis(),
+						VfsFileProtocol.LOCAL,
+						currentDirectory.getName(),
+						"File I/O", "",
+						null,
+						null,
+						currentDirectory.getCanonicalPath(),
+						false,
+						false,
+						null);
+				this.vfsEntry = vfs;
+				Library lib = new Library();
+				String ico = IAPimages.getFolderRemoteClosed();
+				String ico2 = IAPimages.getFolderRemoteOpen();
+				String ico3 = IAPimages.getFolderRemoteClosed();
+				String ico4 = IAPimages.getFolderRemoteOpen();
+				if (vfsEntry.getProtocolName().toUpperCase().contains("UDP")) {
+					ico = "img/ext/network-workgroup.png";
+					ico2 = "img/ext/network-workgroup-power.png";
+					ico3 = IAPimages.getFolderRemoteClosed();
+				} else
+					if (vfsEntry.getDesiredIcon() != null) {
+						ico = vfsEntry.getDesiredIcon();
+						ico2 = vfsEntry.getDesiredIcon();
+						ico3 = vfsEntry.getDesiredIcon();
+						ico4 = vfsEntry.getDesiredIcon();
+					}
+				VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
+						new String[] { ".txt", ".url", ".webloc", ".gml", ".graphml", ".pdf", ".html", ".htm" },
+						IAPmain.loadIcon(ico),
+						IAPmain.loadIcon(ico2),
+						IAPmain.loadIcon(ico3),
+						IAPmain.loadIcon(ico4));
+				dataSourceHsm.readDataSource();
+				ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
+				this.vfsAction = action;
+				
+				for (NavigationAction na : vfsEntry.getAdditionalNavigationActions()) {
+					action.addAdditionalEntity(new NavigationButton(na, guiSetting));
 				}
-			VfsFileSystemSource dataSourceHsm = new VfsFileSystemSource(lib, vfsEntry.getTargetName(), vfsEntry,
-					new String[] { ".txt", ".url", ".webloc", ".gml", ".graphml", ".pdf", ".html", ".htm" },
-					IAPmain.loadIcon(ico),
-					IAPmain.loadIcon(ico2),
-					IAPmain.loadIcon(ico3),
-					IAPmain.loadIcon(ico4));
-			dataSourceHsm.readDataSource();
-			ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
-			this.vfsAction = action;
-			
-			for (NavigationAction na : vfsEntry.getAdditionalNavigationActions()) {
-				action.addAdditionalEntity(new NavigationButton(na, guiSetting));
+				vfsAction.performActionCalculateResults(src);
+				resultActions.addAll(vfsAction.getResultNewActionSet());
 			}
-			vfsAction.performActionCalculateResults(src);
-			resultActions.addAll(vfsAction.getResultNewActionSet());
 		}
 	}
 	

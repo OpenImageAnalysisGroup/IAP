@@ -167,8 +167,8 @@ public class ActionMongoOrLTexperimentNavigation extends
 	
 	@Override
 	public String getDefaultImage() {
-		if (oldAnalysis)
-			return "img/ext/gpl2/Gnome-Window-Close-48.png";
+		// if (oldAnalysis)
+		// return "img/ext/gpl2/Gnome-Window-Close-48.png";
 		ExperimentHeaderInterface header = experimentReference.getHeader();
 		if (header.getDatabaseId() != null
 				&& header.getDatabaseId().contains("APH_"))

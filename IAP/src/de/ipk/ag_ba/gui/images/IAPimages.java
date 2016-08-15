@@ -98,6 +98,10 @@ public class IAPimages {
 		return "img/ext/folder-remote_t.png";
 	}
 	
+	public static String getFolderClosed() {
+		return "img/ext/folder.png";
+	}
+	
 	public static String getCloudResult() {
 		return "img/ext/applications-office.png";
 	}
