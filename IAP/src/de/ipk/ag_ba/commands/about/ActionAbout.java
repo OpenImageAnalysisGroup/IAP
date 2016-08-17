@@ -143,6 +143,7 @@ public class ActionAbout extends AbstractNavigationAction {
 		
 		rr.add(new NavigationButton(new ActionFeedback("Send feedback mail"), guiSetting));
 		rr.add(new NavigationButton(new ActionJavaFX("JavaFX Test"), guiSetting));
+		rr.add(new NavigationButton(new ActionPLYVIS("PLY Visualization Tool"), guiSetting));
 		
 		return rr;
 	}
