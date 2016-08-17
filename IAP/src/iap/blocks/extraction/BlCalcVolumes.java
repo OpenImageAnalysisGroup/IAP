@@ -25,7 +25,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 
 /**
  * Calculates volume estimation values from the side and top areas.
- * Processes by default vis and fluo data. Optionally also nir and ir data.
+ * Processes by default vis data. Optionally also nir and ir data.
  * 
  * @author klukas
  */
@@ -357,6 +357,8 @@ public class BlCalcVolumes extends AbstractSnapshotAnalysisBlock implements Calc
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
 		res.add(CameraType.FLUO);
+		res.add(CameraType.IR);
+		res.add(CameraType.NIR);
 		return res;
 	}
 	
