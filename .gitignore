@@ -73,3 +73,5 @@ hs_err_pid*
 *.class
 
 *.class
+
+IAP CONSOLE/bin/de/ipk/ag_ba/Console.class
