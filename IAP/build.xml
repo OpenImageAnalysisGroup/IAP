@@ -265,6 +265,7 @@
         <pathelement location="lib/jai_core.jar"/>
         <pathelement location="lib/jna.jar"/>
         <pathelement location="lib/platform.jar"/>
+    	<pathelement location="lib/plyvis.jar"/>
         <pathelement location="lib/jsr166y.jar"/>
         <pathelement location="lib/bcprov-jdk16-146.jar"/>
         <path refid="IAP Transfer.classpath"/>
