@@ -37,14 +37,14 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 	private static boolean useMongoDB = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use MongoDB data if available", true);
 	
 	private static boolean useSCP = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use SCP instead of FTP", false);
-	private static String ftpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP host", "lemna-db.ipk-gatersleben.de");
+	private static String ftpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP host", "lemnadb.ipk-gatersleben.de");
 	private static String ftpLocalFolder = SystemOptions.getInstance()
-			.getString("LT-DB", "Image File Transfer//FTP directory prefix", "/../../data0/pgftp/");
+			.getString("LT-DB", "Image File Transfer//FTP directory prefix", "/");
 	private static String ftpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP user", "");
 	private static String ftpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP password", "");
 	
-	private static String scpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP host", "lemna-db.ipk-gatersleben.de");
-	private static String scpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP local storage folder", "/data0/pgftp/");
+	private static String scpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP host", "lemnadb.ipk-gatersleben.de");
+	private static String scpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP local storage folder", "/");
 	private static String scpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP user", "root");
 	private static String scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "");
 	
@@ -58,12 +58,12 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 		useMongoDB = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use MongoDB data if available", true);
 		
 		useSCP = SystemOptions.getInstance().getBoolean("LT-DB", "Image File Transfer//Use SCP instead of FTP", false);
-		ftpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP directory prefix", "/../../data0/pgftp/");
+		ftpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP directory prefix", "/");
 		ftpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP user", "");
 		ftpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//FTP password", "");
 		
-		scpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP host", "lemna-db.ipk-gatersleben.de");
-		scpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP local storage folder", "/data0/pgftp/");
+		scpHost = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP host", "lemnadb.ipk-gatersleben.de");
+		scpLocalFolder = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP local storage folder", "/");
 		scpUser = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP user", "root");
 		scpPassword = SystemOptions.getInstance().getString("LT-DB", "Image File Transfer//SCP password", "");
 		
@@ -172,7 +172,7 @@ public class LTftpHandler extends AbstractResourceIOHandler {
 	
 	public static IOurl getImagingSystemFTPurl(String filename, String displayFileName) {
 		String host = SystemOptions.getInstance().getString(
-				"LT-DB", "Image File Transfer//FTP host", "lemna-db.ipk-gatersleben.de");
+				"LT-DB", "Image File Transfer//FTP host", "lemnadb.ipk-gatersleben.de");
 		if (filename.contains("/")) {
 			host += "/" + filename.substring(0, filename.lastIndexOf("/"));
 			filename = filename.substring(filename.lastIndexOf("/") + "/".length());
