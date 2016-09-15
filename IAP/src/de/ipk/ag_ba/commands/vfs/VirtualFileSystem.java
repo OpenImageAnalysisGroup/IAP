@@ -14,10 +14,12 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
+import de.ipk.ag_ba.commands.ActionNavigateDataSource;
 import de.ipk.ag_ba.commands.datasource.Library;
 import de.ipk.ag_ba.commands.experiment.hsm.ActionHsmDataSourceNavigation;
 import de.ipk.ag_ba.commands.settings.ActionToggleSettingDefaultIsFalse;
 import de.ipk.ag_ba.datasources.file_system.VfsFileSystemSource;
+import de.ipk.ag_ba.datasources.sub_folder_datasource.SubFolderDatasource;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
@@ -252,7 +254,16 @@ public abstract class VirtualFileSystem {
 		
 		dataSourceHsm.setReadOnly(true);
 		
-		ActionHsmDataSourceNavigation action = new ActionHsmDataSourceNavigation(dataSourceHsm);
+		ActionHsmDataSourceNavigation action;
+		
+		// Check if local entry then use subfolderdatasource to detect IAP datasets 
+		String s1 = vfsEntry.getProtocolName();
+		String s2 = VfsFileProtocol.LOCAL.name();
+		if (s1.startsWith(s2.toLowerCase())) {
+			action = new ActionHsmDataSourceNavigation(new SubFolderDatasource(vfsEntry.getTargetName(), vfsEntry.getTargetPathName(), false, true));
+		} else
+			action = new ActionHsmDataSourceNavigation(dataSourceHsm);
+		
 		for (NavigationAction na : vfsEntry.getAdditionalNavigationActions()) {
 			action.addAdditionalEntity(new NavigationButton(na, guiSetting));
 		}
