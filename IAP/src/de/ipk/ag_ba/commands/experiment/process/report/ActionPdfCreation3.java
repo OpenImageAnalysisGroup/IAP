@@ -42,6 +42,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
+import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
@@ -1154,39 +1155,89 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		for (Integer dateCol : dateColumns)
 			sheet.setColumnWidth(dateCol, 5000);
 		
+		boolean includePaths = true;
+				
 		HashMap<String, org.apache.poi.ss.usermodel.Hyperlink> links = new HashMap<String, org.apache.poi.ss.usermodel.Hyperlink>();
-		for (SnapshotDataIAP s : snapshotsToBeProcessed) {
-			for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, !addRowTypeAndImages)) {
-				for (DateDoubleString o : valueRow) {
-					if (o != null && o.getString() != null && !o.getString().isEmpty()) {
-						if (outpath != null)
-							if (o.getLink() != null) {
-								ArrayList<BinaryMeasurement> bin = o.getBinaryData();
-								if (bin != null && !bin.isEmpty() && bin.size() == 1) {
-									for (BinaryMeasurement bm : bin) {
-										if (bm.getURL() != null) {
-											String of = null;
-											if (o.getString().endsWith("jpg")) {
-												of = outpath + "/" + o.getString();
-											} else
-												if (o.getString().endsWith("png") || o.getString().endsWith("tiff") || o.getString().endsWith("tif")) {
-													of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
+		HashMap<String, String> paths = new HashMap<>();
+		
+		if (outpath != null) {
+			for (SnapshotDataIAP s : snapshotsToBeProcessed) {
+				for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, !addRowTypeAndImages)) {
+					for (DateDoubleString o : valueRow) {
+						if (o != null && o.getString() != null && !o.getString().isEmpty()) {
+							if (outpath != null)
+								if (o.getLink() != null) {
+									ArrayList<BinaryMeasurement> bin = o.getBinaryData();
+									if (bin != null && !bin.isEmpty() && bin.size() == 1) {
+										for (BinaryMeasurement bm : bin) {
+											if (bm.getURL() != null) {
+												String of = null;
+												if (o.getString().endsWith("jpg")) {
+													of = outpath + "/" + o.getString();
+												} else
+													if (o.getString().endsWith("png") || o.getString().endsWith("tiff") || o.getString().endsWith("tif")) {
+														of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
+													}
+												if (of != null) {
+													org.apache.poi.ss.usermodel.Hyperlink l = createHelper.createHyperlink(Hyperlink.LINK_FILE);
+													String ss = o.getString();
+													File f = new File(StringManipulationTools.removeFileExtension(ss) + ".jpg");
+													String fn = StringManipulationTools.stringReplace(
+															f.toURI().toString(),
+															" ", "%20");
+													fn = fn.substring(fn.lastIndexOf("/") + 1);
+													l.setAddress("images/" + fn);
+													links.put(of, l);
+													// link to exported images
+													String adr = l.getAddress();
+													String nice = adr.replace("%20", " ");
+													// link to orig images
+													IOurl orig_path = bm.getURL();
+													String ddd = orig_path.getDetail() + "/" + orig_path.getFileName().split("#")[0];
+													paths.put(of, ddd);
 												}
-											if (of != null) {
-												org.apache.poi.ss.usermodel.Hyperlink l = createHelper.createHyperlink(Hyperlink.LINK_FILE);
-												
-												String fn = StringManipulationTools.stringReplace(
-														new File(StringManipulationTools.removeFileExtension(o.getString()) + ".jpg").toURI().toString(),
-														" ", "%20");
-												fn = fn.substring(fn.lastIndexOf("/") + 1);
-												l.setAddress("images/" + fn);
-												
-												links.put(of, l);
 											}
 										}
 									}
 								}
-							}
+						}
+					}
+				}
+			}
+		} else if (includePaths) {
+			for (SnapshotDataIAP s : snapshotsToBeProcessed) {
+				for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, !addRowTypeAndImages)) {
+					for (DateDoubleString o : valueRow) {
+						if (o != null && o.getString() != null && !o.getString().isEmpty()) {
+								if (o.getLink() != null) {
+									ArrayList<BinaryMeasurement> bin = o.getBinaryData();
+									if (bin != null && !bin.isEmpty() && bin.size() == 1) {
+										for (BinaryMeasurement bm : bin) {
+											if (bm.getURL() != null) {
+												String of = null;
+												if (o.getString().endsWith("jpg")) {
+													of = outpath + "/" + o.getString();
+												} else
+													if (o.getString().endsWith("png") || o.getString().endsWith("tiff") || o.getString().endsWith("tif")) {
+														of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
+													}
+												if (of != null) {
+													String ss = o.getString();
+													File f = new File(StringManipulationTools.removeFileExtension(ss) + ".jpg");
+													String fn = StringManipulationTools.stringReplace(
+															f.toURI().toString(),
+															" ", "%20");
+													fn = fn.substring(fn.lastIndexOf("/") + 1);
+													// link to orig images
+													IOurl orig_path = bm.getURL();
+													String ddd = orig_path.getDetail() + "/" + orig_path.getFileName().split("#")[0];
+													paths.put(of, ddd);
+												}
+											}
+										}
+									}
+								}
+						}
 					}
 				}
 			}
@@ -1278,11 +1329,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 										if (ok) {
 											// add link to image
 											if (of != null) {
-												org.apache.poi.ss.usermodel.Hyperlink file_link = links.get(of);
-												if (file_link != null) {
-													c.setHyperlink(file_link);
-													c.setCellStyle(hlink_style);
-												}
+													org.apache.poi.ss.usermodel.Hyperlink file_link = links.get(of);
+													if (file_link != null) {
+														c.setHyperlink(file_link);
+														c.setCellStyle(hlink_style);
+													}
 											}
 										}
 									}
@@ -1290,6 +1341,17 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 								
 							}
 						}
+						
+						if (o.getString().toLowerCase().endsWith("jpg") || o.getString().toLowerCase().endsWith("png") || o.getString().toLowerCase().endsWith("tiff")
+								|| o.getString().endsWith("tif")) {
+							String of = outpath + "/" + StringManipulationTools.removeFileExtension(o.getString()) + ".jpg";
+							
+							if (includePaths) {
+								String path = paths.get(of);
+								c.setCellValue(path);
+							}
+						}
+						
 						// } else {
 						// org.apache.poi.ss.usermodel.Hyperlink file_link = createHelper.createHyperlink(Hyperlink.LINK_FILE);
 						// String fn =

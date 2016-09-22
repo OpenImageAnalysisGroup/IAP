@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.OpenFileDialogService;
+import org.SystemAnalysis;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
@@ -34,7 +35,16 @@ public class ActionDataExportToUserSelectedFileSystemFolder extends AbstractNavi
 		results.clear();
 		if (experimentReferences == null)
 			return;
-		File currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
+		File currentDirectory = null;
+		if (!SystemAnalysis.simulateHeadless)
+			currentDirectory = OpenFileDialogService.getDirectoryFromUser("Select Target Folder");
+		else {
+			System.out.println("Enter path ...");
+			String inp = SystemAnalysis.getCommandLineInput();
+			currentDirectory = new File(inp);
+			System.out.println("Copy to " + currentDirectory.getAbsolutePath());
+		}	
+		
 		if (currentDirectory != null) {
 			VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2(
 					"user.dir." + System.currentTimeMillis(),

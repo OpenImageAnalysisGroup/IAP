@@ -49,10 +49,16 @@ public class BlFilterImagesByPlantID extends AbstractSnapshotAnalysisBlock {
 			
 			String containMode = calculationMode1;
 			
-			String value = getString("Plant ID " + filterIdx, "");
+			String[] values = getString("Plant ID " + filterIdx, "").split(";");
 			String id = processedImages.getAnyInfo().getQualityAnnotation() + "";
 			
-			if (value.equals(id)) {
+			boolean includes = false;
+			
+			for (String val : values)
+				if (val.equals(id))
+					includes = true;
+			
+			if (includes) {
 				if (containMode.equals("include only defined plant"))
 					process = true;
 				else
@@ -110,6 +116,6 @@ public class BlFilterImagesByPlantID extends AbstractSnapshotAnalysisBlock {
 	
 	@Override
 	public String getDescription() {
-		return "Removes images due to specific plant ID.";
+		return "Removes images due to specific plant ID. Also lists of IDs are possible (separated by ;).";
 	}
 }

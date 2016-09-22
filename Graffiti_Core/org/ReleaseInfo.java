@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
  * @author klukas
  */
 public class ReleaseInfo implements HelperClass {
-	public static String IAP_VERSION_STRING = "2.0.5";
+	public static String IAP_VERSION_STRING = "2.0.6";
 	private static Release currentRelease = Release.DEBUG;
 	
 	public static Release getRunningReleaseStatus() {
