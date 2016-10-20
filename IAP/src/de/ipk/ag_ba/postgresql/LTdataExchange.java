@@ -88,7 +88,7 @@ public class LTdataExchange implements ExperimentLoader {
 		user = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//user", "postgres");
 		password = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//password", "");
 		port = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//port", "5432");
-		host = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//host", "lemna-db.ipk-gatersleben.de");
+		host = SystemOptions.getInstance().getString("LT-DB", "PostgreSQL//host", "lemnadb.ipk-gatersleben.de");
 		this.fileName = "";
 		this.fName = "";
 		fileName2LTDE.put(fileName, this);

@@ -165,8 +165,8 @@ public class DataExportHelper {
 													.getURL());
 									if (is.available() <= 0) {
 										System.out
-												.println("ERROR: Input stream contains no content for image with URL "
-														+ bm.getURL());
+												.println("ERROR: Input stream contains no content for image with URL: "
+														+ bm.getURL() + " -> " + bm.getLabelURL());
 									}
 								}
 								BufferedImage bimage = ImageIO.read(is);
