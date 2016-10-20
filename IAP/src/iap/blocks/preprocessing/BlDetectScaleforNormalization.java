@@ -275,12 +275,12 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 	
 	private String execute(File dir, String cmd) {
 		Runtime shell = Runtime.getRuntime();
-		Process prozess = null;
+		Process process = null;
 		InputStream inp = null;
 		
 		try {
-			prozess = shell.exec(cmd, null, dir);
-			inp = prozess.getInputStream();
+			process = shell.exec(cmd, null, dir);
+			inp = process.getInputStream();
 		} catch (IOException ioe) {
 			throw new RuntimeErrorException(new Error(ioe), "Cmd command brocken: " + cmd);
 		}

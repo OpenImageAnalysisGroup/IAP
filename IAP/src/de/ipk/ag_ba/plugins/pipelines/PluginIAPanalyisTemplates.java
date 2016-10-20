@@ -22,6 +22,7 @@ import iap.blocks.debug.BlFilterImagesByPlantID;
 import iap.blocks.debug.BlFilterImagesByRegularExpression;
 // import iap.blocks.debug.BlFilterImagesByRegularExpression;
 import iap.blocks.debug.BlFilterImagesByTopOrSide;
+import iap.blocks.debug.BlRunExternalShellCommand;
 import iap.blocks.debug.BlShowIntermediateImages;
 import iap.blocks.debug.BlShowThreeDColorHistogram;
 import iap.blocks.extraction.BlCalcAreas;
@@ -189,6 +190,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 			new BlResizeScale(),
 			new BlHSVFilter(),
 			new BlMedianFilter(),
+			new BlRunExternalShellCommand(),
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];
