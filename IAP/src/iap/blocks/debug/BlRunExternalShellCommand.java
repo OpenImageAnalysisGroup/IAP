@@ -89,11 +89,13 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 			String inputNameForExternal = filename + "." + format;
 			String outputNameForExternal = filename + "_processed." + format;
 			
-			if (debug)
-				System.out.println("Command: " + cmd  + " " + inputNameForExternal + " " + outputNameForExternal);
-			
-			if (!cmd.contains("") || cmd.length() > 0)
+			// command inserted?
+			if (!cmd.contains("") || cmd.length() > 0) {
+				if (debug)
+					System.out.println("Run external Command " + ct.getNiceName() + " " + i + ": " + cmd  + " " + inputNameForExternal + " " + outputNameForExternal);
+				
 				manipulated_image = execute(dir, cmd, inputNameForExternal, outputNameForExternal);
+			}
 			
 			if (manipulated_image != null)
 				isFirst = false;
@@ -117,7 +119,7 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 			process = shell.exec(cmd + " " + inputfile + " " + outputfile, null, dir);
 			inpSt = process.getInputStream();
 		} catch (IOException ioe) {
-			throw new RuntimeErrorException(new Error(ioe), "Cmd command brocken: " + cmd);
+			throw new RuntimeErrorException(new Error(ioe), "Cmd command brocken: " + cmd + " " + inputfile + " " + outputfile);
 		}
 		
 		String readFromShell = "";
@@ -132,7 +134,7 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 			throw new RuntimeErrorException(new Error("No input stream from external program."));
 		
 		if (debug)
-			System.out.println("Shell output: " + readFromShell);
+			System.out.println("Shell output for " + cmd + " : " + readFromShell);
 		
 		Image output = null;
 		
