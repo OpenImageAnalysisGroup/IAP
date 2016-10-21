@@ -46,7 +46,9 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * Executes a customized command in shell. IAP block n => image (vis, fluo, nir) -> external command => IAP block m 
+ * Executes a customized command in shell. IAP block n => image (vis, fluo, nir) -> external command => IAP block m.
+ * The pattern for execution "command options [input] [output]".
+ * In- and output images will attached automatically, it is not necessary to specify these.
  * 
  * @author Pape
  */
@@ -66,21 +68,39 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 			return image;
 		
 		CameraType ct = image.getCameraType();
-		String filename = UUID.randomUUID().toString();
-		String tempDir = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch");
-		String format = "png";
-		saveImage(tempDir, filename, format , image);
-		File dir = new File(tempDir);
-		String cmd = getString("Cmd " + ct.getNiceName(), "");
-		
 		Image manipulated_image = null;
+		boolean isFirst = true;
 		
-		// System.out.println("Command: " + cmd  + " " + filename + "." + format + " " + filename + "_processed." + format);
-		
-		if (!cmd.contains("") || cmd.length() > 0)
-			manipulated_image = execute(dir, cmd, filename + "." + format, filename + "_processed." + format);
-		
-		new File(tempDir + "/" + filename + "." + format).delete();
+		for (int i = 1; i <= getInt("Number of individual Commands for " + ct.getNiceName(), 1); i++) {
+			// generate random name
+			String filename = UUID.randomUUID().toString();
+			String tempDirPath = ReleaseInfo.getAppSubdirFolderWithFinalSep("scratch");
+			String format = "png";
+			
+			// check actual run
+			if (isFirst)
+				saveImage(tempDirPath, filename, format , image);
+			else
+				saveImage(tempDirPath, filename, format , manipulated_image);
+			
+			File dir = new File(tempDirPath);
+			String cmd = getString("Cmd " + ct.getNiceName() + " " + i, "");
+			
+			String inputNameForExternal = filename + "." + format;
+			String outputNameForExternal = filename + "_processed." + format;
+			
+			if (debug)
+				System.out.println("Command: " + cmd  + " " + inputNameForExternal + " " + outputNameForExternal);
+			
+			if (!cmd.contains("") || cmd.length() > 0)
+				manipulated_image = execute(dir, cmd, inputNameForExternal, outputNameForExternal);
+			
+			if (manipulated_image != null)
+				isFirst = false;
+			
+			// delete temp input
+			new File(tempDirPath + "/" + filename + "." + format).delete();
+		}
 		
 		if (manipulated_image != null)
 			return manipulated_image;
@@ -111,12 +131,12 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 		} else
 			throw new RuntimeErrorException(new Error("No input stream from external program."));
 		
-		// System.out.println("Shell output: " + readFromShell);
+		if (debug)
+			System.out.println("Shell output: " + readFromShell);
 		
 		Image output = null;
 		
-		// System.out.println("load: " + dir + outputfile);
-		
+		// run external command, load and delete temp output image 
 		try {
 			File f = new File(dir + "/" + outputfile);
 			output = new Image(ImageIO.read(f));
@@ -196,12 +216,14 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 	
 	@Override
 	public String getName() {
-		return "Run External Shell Command";
+		return "Run External Shell Command(s)";
 	}
 	
 	@Override
 	public String getDescription() {
-		return "Executes a custom command in local shell.";
+		return "Executes a custom command in local shell. The command can be specified in a string option for each image modality, nothing will be executed in case of an empty String."
+				+ " ('custom_command options ...' [inputpath] [outputpath] -- In- and output is handled by IAP, it has not to be specified."
+				+ "Example: 'convert -negate' runs the invert script of ImageMagick®.)";
 	}
 	
 	@Override
