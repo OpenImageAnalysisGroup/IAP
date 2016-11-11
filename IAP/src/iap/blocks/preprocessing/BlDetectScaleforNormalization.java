@@ -363,7 +363,10 @@ public class BlDetectScaleforNormalization extends AbstractSnapshotAnalysisBlock
 	
 	@Override
 	public String getDescription() {
-		return "Detects Legend in an image (for example \"2mm\")";
+		return "Detects Scale (like a map key) for example '2mm' in an image (only works for this style of naming). The scale should be orientated in a horizontal direction."
+			+ "The legend should be added by digital image editing tool and is recommended to use a sans-serif font like 'Arial'. The block is tested for linux system and"
+			+ "also requires the package GOCR for text detection (available for linux and windows, project webpage: http://jocr.sourceforge.net/) which is executed from the"
+			+ "Command line.";
 	}
 	
 	@Override

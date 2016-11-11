@@ -59,6 +59,11 @@ public class BlCreateDummyReferenceIfNeeded extends AbstractBlock {
 	}
 	
 	@Override
+	public String getDescriptionForParameters() {
+		return "<ul><li>Blur radius percent - specifies the radius for the appleid gaussian blur operation which is applied to the input image.</ul>";
+	}
+	
+	@Override
 	public String getDescription() {
 		return "Create a simulated, dummy reference image (in case the reference image is NULL).";
 	}

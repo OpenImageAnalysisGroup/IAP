@@ -88,7 +88,7 @@ public class BorderAnalysis {
 			double[] data2 = new double[data.length * 2];
 			for (int i = 0; i < data2.length; i++)
 				data2[i] = data[i % data.length];
-			peaks = CurveAnalysis.findMaximaIJ(data2, 1, true);
+			peaks = CurveAnalysis1D.findMaximaIJ(data2, 1, true);
 			TreeSet<Integer> val = new TreeSet<Integer>();
 			for (int p : peaks) {
 				val.add(p % data.length);
@@ -98,10 +98,10 @@ public class BorderAnalysis {
 			for (int p : val)
 				peaks[i++] = p;
 		} else {
-			peaks = CurveAnalysis.findMaximaIJ(data, 1, false);
+			peaks = CurveAnalysis1D.findMaximaIJ(data, 1, false);
 		}
 		
-		peaks = CurveAnalysis.summarizeMaxima(peaks, listsize, distBetweenPeaks, CurveAnalysis.SummarizeMode.SUM);
+		peaks = CurveAnalysis1D.summarizeMaxima(peaks, listsize, distBetweenPeaks, CurveAnalysis1D.SummarizeMode.SUM);
 		
 		// save results
 		for (int idx = 0; idx < peaks.length; idx++) {

@@ -26,6 +26,7 @@ import de.ipk.ag_ba.image.operations.blocks.DoubleAndImageData;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
+import de.ipk.ag_ba.image.operations.skeleton.Limb;
 import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
@@ -165,6 +166,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		}
 		
 		skel2d.calculateEndlimbsRecursive();
+		ArrayList<Limb> endlimbs_saved = (ArrayList<Limb>)skel2d.endlimbs.clone();
 		int leafcount = skel2d.endpoints.size();
 		int branchcount = skel2d.branches.size();
 		if (debug)
@@ -286,6 +288,15 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 		int leaflength = skelres.io().countFilledPixels(SkeletonProcessor2d.getDefaultBackground());
 		leafcount -= bloomLimbCount;
 		
+		// claculate limb curvature
+		if (getBoolean("Calculate leaf curvature", true)) {
+//			skel2d.calculateEndlimbsRecursive();
+			double[] endlimbCurvatureSUMAVG = skel2d.calculateEndLimbCurvature(endlimbs_saved);
+		
+			rt.addValue("leaf.curvature.sum", endlimbCurvatureSUMAVG[0]);
+			rt.addValue("leaf.curvature.avg", endlimbCurvatureSUMAVG[1]);
+		}
+		
 		// ***Out***
 		// System.out.println("leafcount: " + leafcount + " leaflength: " + leaflength + " numofendpoints: " + skel2d.endpoints.size());
 		Image result = MapOriginalOnSkelUseingMedian(skelres, inp, Color.BLACK.getRGB());
@@ -346,7 +357,7 @@ public class BlSkeletonizeVisFluo extends AbstractSnapshotAnalysisBlock implemen
 			}
 			// System.out.print("Leaf width: " + leafWidthInPixels + " // " + leafWidthInPixels2);
 		}
-		
+
 		if (skelres != null) {
 			skelres.show("Result Skeleton", false);
 			getResultSet().setImage(getBlockPosition(), "skeleton_" + cameraType,

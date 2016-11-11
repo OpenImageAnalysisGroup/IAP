@@ -304,6 +304,10 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
+		res.add(CameraType.VIS);
+		res.add(CameraType.NIR);
+		res.add(CameraType.IR);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
@@ -325,6 +329,11 @@ public class BlLoadImages extends AbstractSnapshotAnalysisBlock {
 	@Override
 	public String getName() {
 		return "Load Images";
+	}
+	
+	@Override
+	public String getDescriptionForParameters() {
+		return "<ul><li>Load 'VIS | FLUO | NIR | IR' - specifies which image modality is loaded and will be processed within a pipeline.</ul>";
 	}
 	
 	@Override

@@ -126,7 +126,7 @@ public class BlCutFromSide extends AbstractBlock {
 			}
 		return result.getImage();
 	}
-	
+
 	@Override
 	protected Image processImage(Image image) {
 		boolean dontCut = getBoolean("Cut Only Mask Images", false);

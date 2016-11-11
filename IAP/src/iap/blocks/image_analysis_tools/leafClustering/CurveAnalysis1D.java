@@ -17,13 +17,17 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * @author pape
  */
-public class CurveAnalysis {
+public class CurveAnalysis1D {
 	static double[] data;
 	
-	public CurveAnalysis(double[] data) {
+	public CurveAnalysis1D(double[] data) {
 		this.data = data;
 	}
 	
+	public CurveAnalysis1D() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public static PolynomialFunction fitPolynom(int degree) {
 		PolynomialFitter pf = new PolynomialFitter(degree, new LevenbergMarquardtOptimizer());
 		for (int idx = 0; idx < data.length; idx++) {
@@ -60,8 +64,8 @@ public class CurveAnalysis {
 	@Deprecated
 	public LinkedList<Integer> getLocalMinMax(int scansize) {
 		
-		double[] firstDerivative = derivate(data, scansize);
-		double[] secondDerivative = derivate(firstDerivative, scansize);
+		double[] firstDerivative = derivate(data, scansize, true);
+		double[] secondDerivative = derivate(firstDerivative, scansize, true);
 		
 		LinkedList<Integer> maxMin = new LinkedList<Integer>();
 		
@@ -76,15 +80,25 @@ public class CurveAnalysis {
 	}
 	
 	// derivation using central differences
-	private static double[] derivate(double[] data, int smoothFactor) {
+	public static double[] derivate(double[] data, int step, boolean closedCurve) {
 		int dataLength = data.length;
 		double[] derivations = new double[dataLength];
 		double frac = Math.pow(10.0, 2);
-		for (int idx = 0; idx < dataLength; idx++) {
-			int back = (((idx - smoothFactor * 2) % dataLength) + dataLength) % dataLength;
-			int ahead = (idx + smoothFactor * 2) % dataLength;
-			double derivative = (data[ahead] - data[back]) / smoothFactor;
-			derivations[idx] = Math.round(frac * derivative) / frac;
+		
+		if (closedCurve) {
+			for (int idx = 0; idx < dataLength; idx++) {
+				int back = (((idx - step * 2) % dataLength) + dataLength) % dataLength;
+				int ahead = (idx + step * 2) % dataLength;
+				double derivative = (data[ahead] - data[back]) / step;
+				derivations[idx] = Math.round(frac * derivative) / frac;
+			}
+		} else {
+			for (int idx = step; idx < dataLength - step; idx++) {
+				int back = idx - step;
+				int ahead = idx + step;
+				double derivative = (data[ahead] - data[back]) / step;
+				derivations[idx] = derivative;
+			}
 		}
 		return derivations;
 	}

@@ -190,7 +190,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 			new BlResizeScale(),
 			new BlHSVFilter(),
 			new BlMedianFilter(),
-			new BlRunExternalShellCommand(),
+			new BlRunExternalShellCommand()
 		};
 		
 		ImageAnalysisBlock[] res = new ImageAnalysisBlock[fromPipelines.length + additionalBlocks.length];

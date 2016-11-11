@@ -1,15 +1,19 @@
 package de.ipk.ag_ba.image.operations.skeleton;
 
 import iap.blocks.data_structures.RunnableOnImage;
+import iap.blocks.image_analysis_tools.leafClustering.CurveAnalysis1D;
 
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.StringManipulationTools;
 import org.Vector2i;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
+import de.ipk.ag_ba.image.operation.PositionAndColor;
+import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.Image;
 
 public class SkeletonProcessor2d {
@@ -937,5 +941,60 @@ public class SkeletonProcessor2d {
 			// else
 			// System.out.println("Prevented problematic point creation!");
 		}
+	}
+	
+	/*
+	 * Approximate Curvature for detected endlimbs.
+	 */
+	public double[] calculateEndLimbCurvature(ArrayList<Limb> endlimbs_saved) {
+		double curv_sum = 0.0;
+		for (int limb_idx = 0; limb_idx < endlimbs_saved.size(); limb_idx++) {
+			Limb elimb = endlimbs_saved.get(limb_idx);
+			ArrayList<Point> limbpoints = elimb.getPoints();
+			
+			// Collect data.
+			double[] dat_x = new double[limbpoints.size()];
+			double[] dat_y = new double[limbpoints.size()];
+			
+			int ii = 0;
+			for (Point ob : limbpoints) {
+				dat_x[ii] = ob.x;
+				dat_y[ii++] = ob.y;
+			}
+			
+			double[] curv_vals = new double[limbpoints.size()];
+			
+			int step = 10;
+			
+			CurveAnalysis1D ca = new CurveAnalysis1D();
+			
+			double[] firstDerivative_x = ca.derivate(dat_x, step, false);
+			double[] secondDerivative_x = ca.derivate(firstDerivative_x, step, false);
+			
+			double[] firstDerivative_y = ca.derivate(dat_y, step, false);
+			double[] secondDerivative_y = ca.derivate(firstDerivative_y, step, false);
+			
+			for (int idx = 0; idx < limbpoints.size(); idx++) {
+				
+				double x_1 = firstDerivative_x[idx];
+				double x_2 = secondDerivative_x[idx];
+				
+				double y_1 = firstDerivative_y[idx];
+				double y_2 = secondDerivative_y[idx];
+				
+				double cur;
+				if (x_1 == 0.0 || y_1 == 0.0)
+					cur = 0.0;
+				else
+					cur = Math.abs(x_1 * y_2 - y_1 * x_2) / Math.pow((x_1 * x_1 + y_1 * y_1), 1.5);
+				
+				curv_vals[idx++] = cur;
+			}
+
+			for (int i = 0; i < limbpoints.size(); i++) {
+				curv_sum += Math.abs(curv_vals[i]);
+			}
+		}
+		return new double[]{curv_sum, curv_sum / endlimbs_saved.size()};
 	}
 }
