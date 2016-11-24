@@ -70,6 +70,7 @@ public class Util {
 							+ "! (block is not added to pipeline!)");
 			}
 		}
+		OutputType numericResultOutputTarget = new OutputType(params.remove(0));
 		SystemOptions settings = null;
 		TreeMap<String, HashMap<String, BlockResultSet>> previousResultsForThisTimePoint = null;
 		TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> plantResults = null;
@@ -81,7 +82,7 @@ public class Util {
 			// load and assign input images
 			String inputTarget = params.remove(0);
 			String inputFileName = params.remove(0);
-			OutputType outputTarget = new OutputType(params.remove(0));
+			OutputType imageOutputTarget = new OutputType(params.remove(0));
 			
 			CameraType cameraType = null;
 			boolean mask = false;
@@ -134,6 +135,7 @@ public class Util {
 			}
 		};
 		p.execute(og, blockResults, new CommandLineBackgroundTaskStatusProvider(true));
+		numericResultOutputTarget.process(blockResults);
 	}
 	
 	private static void convertStatisticsFilesToImages(String[] args) throws IOException {

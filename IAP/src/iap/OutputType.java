@@ -1,5 +1,9 @@
 package iap;
 
+import java.util.HashMap;
+
+import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
+
 /**
  * @author klukas
  */
@@ -20,6 +24,15 @@ public class OutputType {
 				fileOutput = true;
 				fileName = definition;
 			}
+	}
+	
+	public void process(HashMap<String, BlockResultSet> blockResults) {
+		if (stdOutput) {
+			for (String key : blockResults.keySet()) {
+				System.out.println("#" + key);
+				blockResults.get(key).printAnalysisResults();
+			}
+		}
 	}
 	
 }
