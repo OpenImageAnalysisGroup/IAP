@@ -44,13 +44,19 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * Executes a customized command in shell. IAP block n => image (vis, fluo, nir) -> external command => IAP block m.
  * The pattern for execution "command options [input] [output]".
  * In- and output images will attached automatically, it is not necessary to specify these.
+ * The result string from external cmd must have a specified structure,
+ * following the common IAP standard:
  * 
- * @author Pape
+ * camera_position.trait_category.camera_type.traitname xyz [unit]
+ * top.geometry.vis.area xyz [px]
+ * 
+ * @author Jean-Michel Pape
  */
 public class BlRunExternalShellCommand extends AbstractBlock implements CalculatesProperties {
 	
@@ -69,6 +75,7 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 		
 		CameraType ct = image.getCameraType();
 		Image manipulated_image = null;
+		String string_output = "";
 		boolean isFirst = true;
 		
 		for (int i = 1; i <= getInt("Number of individual Commands for " + ct.getNiceName(), 1); i++) {
@@ -89,12 +96,16 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 			String inputNameForExternal = filename + "." + format;
 			String outputNameForExternal = filename + "_processed." + format;
 			
+			boolean saveNumericResults = getBoolean("Save numeric results for cmd " + i, false);
+			
 			// command inserted?
 			if (!cmd.contains("") || cmd.length() > 0) {
 				if (debug)
 					System.out.println("Run external Command " + ct.getNiceName() + " " + i + ": " + cmd  + " " + inputNameForExternal + " " + outputNameForExternal);
 				
-				manipulated_image = execute(dir, cmd, inputNameForExternal, outputNameForExternal);
+				Object[] exec_output = execute(dir, cmd, inputNameForExternal, outputNameForExternal, saveNumericResults );
+				manipulated_image = (Image) exec_output[0];
+				string_output = (String) exec_output[1];
 			}
 			
 			if (manipulated_image != null)
@@ -102,6 +113,9 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 			
 			// delete temp input
 			new File(tempDirPath + "/" + filename + "." + format).delete();
+			
+			if (saveNumericResults)
+				saveNumericOutputforCmd(string_output, getCameraPosition(), ct);
 		}
 		
 		if (manipulated_image != null)
@@ -110,7 +124,78 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 			return image;
 	}
 	
-	private Image execute(File dir, String cmd, String inputfile, String outputfile) {
+	/**
+	 * Parse result string and save to iap results. The result string from external cmd must have a specified structure,
+	 * following the common IAP standard:
+	 * 
+	 * camera_position.trait_category.camera_type.traitname xyz [unit]
+	 * top.geometry.vis.area xyz [px]
+	 * 
+	 * Enter null if not specified.
+	 * 
+	 * null.intensity.null...
+	 * 
+	 * In this case camera position and camera type will be replaced by the current information of the pipeline.
+	 * 
+	 * @param string_output - includes external results
+	 * @param camera_type 
+	 * @param cameraPosition 
+	 */
+	private void saveNumericOutputforCmd(String string_output, CameraPosition camera_position_iap, CameraType camera_type_iap) {
+		// 
+		String[] output_split = string_output.split("\n");
+		for (String s : output_split) {
+			String[] trait_entry = s.split("\\.");
+			String camera_position_ex = trait_entry[0];
+			String trait_category_ex = trait_entry[1];
+			String camera_type_ex = trait_entry[2];
+			String trait_name_ex = "";
+			
+			// add remaining to trait name ...
+			for (int idx = 3; idx < trait_entry.length - 1; idx++)
+				trait_name_ex += trait_entry[idx] + ".";
+
+			// split last
+			String[] last_vals = trait_entry[trait_entry.length - 1].split("\\s+");
+			
+			trait_name_ex += last_vals[0].replace(":", "");
+			double value = new Double(last_vals[1]);
+			String unit = last_vals[2];
+			
+			String camera_position = "";
+			String camera_type = "";
+			
+			// compare and check values
+			if (camera_position_ex.contains("null"))
+				camera_position = camera_position_iap.toString();
+			else
+				camera_position = camera_position_ex;
+			
+			if (camera_type_ex.contains("null"))
+				camera_type = camera_type_iap.toString();
+			else
+				camera_type = camera_type_ex;
+				
+			CameraPosition cp = CameraPosition.fromString(camera_position);
+			CameraType ct = CameraType.fromString(camera_type);
+			String u = (String) unit.subSequence(1, unit.length() - 1);
+			
+			ImageData info = (ct == CameraType.VIS) ? input().images().getVisInfo() :
+				(ct == CameraType.FLUO) ? input().images().getFluoInfo() :
+						(ct == CameraType.NIR) ? input().images().getNirInfo() :
+								(ct == CameraType.IR) ? null : null;
+						
+			getResultSet().setNumericResult(getBlockPosition(),
+				new Trait(cp, ct,
+						TraitCategory.fromString(trait_category_ex), trait_name_ex), 
+				value, 
+				u,
+				this,
+				info);
+		}
+	}
+
+	private Object[] execute(File dir, String cmd, String inputfile, String outputfile, boolean saveShellOutput) {
 		Runtime shell = Runtime.getRuntime();
 		Process process = null;
 		InputStream inpSt = null;
@@ -136,19 +221,26 @@ public class BlRunExternalShellCommand extends AbstractBlock implements Calculat
 		if (debug)
 			System.out.println("Shell output for " + cmd + " : " + readFromShell);
 		
-		Image output = null;
+		Image output_image = null;
 		
-		// run external command, load and delete temp output image 
+		// run external command, load and delete temp output image
+		File f = new File(dir + "/" + outputfile);
 		try {
-			File f = new File(dir + "/" + outputfile);
-			output = new Image(ImageIO.read(f));
+			output_image = new Image(ImageIO.read(new File(dir + "/" + outputfile)));
 			f.delete();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				output_image = new Image(ImageIO.read(new File(dir + "/" + inputfile)));
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			f.delete();
 		}
 		
-		return output;
+		Object[] obj = new Object[]{output_image, readFromShell};
+		
+		return obj;
 	}
 	
 	private static synchronized void saveImage(String outputPath, String name, String format, Image img) {
