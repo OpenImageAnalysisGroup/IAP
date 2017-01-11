@@ -34,7 +34,14 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * @author pape, klukas
+ * Block for tracking detected objects, works in interaction with:
+ * 
+ * BlDetectLeafCenterPoints
+ * BlDetectLeafTips
+ * BlRegionDetectionAndFeatureExtraction
+ * BlFlowerDetectionAndFeatureExtraction
+ * 
+ * @author Jean-Michel Pape, Christian Klukas
  */
 public class BlTrackLeafTips extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	

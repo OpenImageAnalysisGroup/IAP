@@ -826,6 +826,10 @@ public class Image {
 		return image;
 	}
 	
+	public float[] getAs1float() {
+		return getAs1float(false);
+	}
+	
 	public float[] getAs1float(boolean scaleTo1, boolean useMaxOfRGBforGrayLevel) {
 		if (image.getProcessor() instanceof ColorProcessor) {
 			int[] arr = io().channels().getGrayImageAs1dArray(useMaxOfRGBforGrayLevel);
@@ -840,10 +844,6 @@ public class Image {
 			
 			return res;
 		}
-		return (float[]) ((FloatProcessor) image.getProcessor()).getPixels();
-	}
-	
-	public float[] getAs1float() {
-		return getAs1float(false);
+		return (float[]) image.getProcessor().convertToFloatProcessor().getPixels();
 	}
 }

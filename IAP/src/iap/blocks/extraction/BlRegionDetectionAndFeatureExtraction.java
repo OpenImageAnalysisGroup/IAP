@@ -23,9 +23,10 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
- * @author pape
+ * Generic block for object identification (region growing based detection, ignores background) and feature calculation.
+ * 
+ * @author Jean-Michel Pape
  */
-@Deprecated
 public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnalysisBlock implements CalculatesProperties {
 	
 	@Override
@@ -94,18 +95,18 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 			CameraPosition pos = optionsAndResults.getCameraPosition();
 			// save leaf count
 			getResultSet().setNumericResult(getBlockPosition(),
-					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower.count"), featureList.size(), "flower", this, imageRef);
+					new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "object.count"), featureList.size(), "object", this, imageRef);
 			
 			// save x and y position
 			int num = 1;
 			for (Feature p : featureList) {
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".position.x"),
-						(int) p.getPosition().getX(), "flower", this, imageRef);
+						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "object." + num + ".position.x"),
+						(int) p.getPosition().getX(), "object", this, imageRef);
 				
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "flower." + num + ".position.y"),
-						(int) p.getPosition().getY(), "flower", this, imageRef);
+						new Trait(pos, img.getCameraType(), TraitCategory.ORGAN_GEOMETRY, "object." + num + ".position.y"),
+						(int) p.getPosition().getY(), "object", this, imageRef);
 				num++;
 			}
 		}
@@ -149,9 +150,9 @@ public class BlRegionDetectionAndFeatureExtraction extends AbstractSnapshotAnaly
 	@Override
 	public CalculatedPropertyDescription[] getCalculatedProperties() {
 		return new CalculatedPropertyDescription[] {
-				new CalculatedProperty("flower.count", "Number of detected flowers."),
-				new CalculatedProperty("flower.*.position.x", "Position (X-axis) of a detected flower."),
-				new CalculatedProperty("flower.*.position.y", "Position (Y-axis) of a detected flower."),
+				new CalculatedProperty("object.count", "Number of detected flowers."),
+				new CalculatedProperty("object.*.position.x", "Position (X-axis) of a detected flower."),
+				new CalculatedProperty("object.*.position.y", "Position (Y-axis) of a detected flower."),
 		};
 	}
 }
