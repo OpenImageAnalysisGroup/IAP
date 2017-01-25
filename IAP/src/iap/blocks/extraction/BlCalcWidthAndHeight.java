@@ -1,5 +1,6 @@
 package iap.blocks.extraction;
 
+import iap.blocks.data_structures.AbstractBlock;
 import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
 import iap.blocks.data_structures.BlockType;
 import iap.blocks.data_structures.CalculatedProperty;
@@ -23,9 +24,9 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * Calculates the plant width and height properties from the visible light image mask.
+ * Calculates the plant width and height properties from the visible/fluorescence light image mask.
  * 
- * @author klukas
+ * @author klukas, pape
  */
 public class BlCalcWidthAndHeight extends
 		AbstractSnapshotAnalysisBlock implements CalculatesProperties {
@@ -34,12 +35,25 @@ public class BlCalcWidthAndHeight extends
 	private static final String WIDTH = "width";
 	private static final String HEIGHT_NORM = "height.norm";
 	private static final String WIDTH_NORM = "width.norm";
+	
+	Double realMarkerDistHorizontal;
+	Double distHorizontal;
+	
+	boolean process_vis;
+	boolean process_fluo;
+	
 	boolean debug = false;
 	
 	@Override
 	protected void prepare() {
 		super.prepare();
 		debug = getBoolean("debug", false);
+		
+		realMarkerDistHorizontal = optionsAndResults.getREAL_MARKER_DISTANCE();
+		distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
+		
+		process_vis = getBoolean("Process Vis mask", true);
+		process_fluo = getBoolean("Process Fluo mask", true);
 	}
 	
 	@Override
@@ -49,34 +63,45 @@ public class BlCalcWidthAndHeight extends
 	
 	@Override
 	protected Image processVISmask() {
+		Image res = input().masks().vis();
 		
-		int background = optionsAndResults.getBackground();
+		if (res != null)
+			if (process_vis)
+				res = processWandH(input().masks().vis(), CameraType.VIS);
+
+		return res;
+	}
+	
+	@Override
+	protected Image processFLUOmask() {
+		Image res = input().masks().fluo();
 		
-		Double realMarkerDistHorizontal = optionsAndResults.getREAL_MARKER_DISTANCE();
-		Double distHorizontal = optionsAndResults.getCalculatedBlueMarkerDistance();
-		
-		boolean useFluo = false;
-		
-		Image visRes = input().masks().vis();
-		if (visRes == null)
-			return null;
-		
+		if (res != null)
+			if (process_vis)
+				res = processWandH(input().masks().fluo(), CameraType.FLUO);
+
+		return res;
+	}
+	
+	public Image processWandH(Image img, CameraType ct) {
 		final int vertYsoilLevelF = -1;
-		
-		Image img = useFluo ? input().masks().fluo()
-				: input().masks().vis();
+		int background = optionsAndResults.getBackground();
+				
 		if (optionsAndResults.getCameraPosition() == CameraPosition.SIDE && img != null) {
 			final TopBottomLeftRight temp = getWidthAndHeightSide(img,
 					background, vertYsoilLevelF);
 			
-			double resf = useFluo ? (double) input().masks().vis()
-					.getWidth()
-					/ (double) img.getWidth()
-					* (input().images().fluo().getWidth() / (double) input()
-							.images().fluo().getHeight())
-					/ (input().images().vis().getWidth() / (double) input()
-							.images().vis().getHeight())
-					: 1.0;
+//			double resf = img.getCameraType() == CameraType.FLUO ? (double) input().masks().vis()
+//					.getWidth()
+//					/ (double) img.getWidth()
+//					* (input().images().fluo().getWidth() / (double) input()
+//							.images().fluo().getHeight())
+//					/ (input().images().vis().getWidth() / (double) input()
+//							.images().vis().getHeight())
+//					: 1.0;
+			
+			double resfw = img.getCameraType() == CameraType.FLUO ? (double) input().masks().vis().getWidth() / (double) input().masks().fluo().getWidth() : 1.0;
+			double resfh = img.getCameraType() == CameraType.FLUO ? (double) input().masks().vis().getHeight() / (double) input().masks().fluo().getHeight() : 1.0;
 			
 			final Point values = temp != null ? new Point(Math.abs(temp
 					.getRightX() - temp.getLeftX()), Math.abs(temp.getBottomY()
@@ -85,92 +110,90 @@ public class BlCalcWidthAndHeight extends
 			if (values != null) {
 				boolean drawVerticalHeightBar = getBoolean("Draw Height Line", true);
 				if (drawVerticalHeightBar)
-					if (!useFluo) {
-						getResultSet().addImagePostProcessor(
-								new RunnableOnImageSet() {
-									@Override
-									public Image postProcessMask(
-											Image visRes) {
-										if (vertYsoilLevelF > 0)
-											visRes = visRes
-													.io()
-													.canvas()
-													.fillRect(
-															values.x
-																	/ 2
-																	+ temp.getLeftX(),
-															vertYsoilLevelF - values.y,
-															10,
-															values.y,
-															Color.MAGENTA.getRGB(),
-															255)
-													.drawLine(values.x / 2 + temp.getLeftX() - 50, vertYsoilLevelF - values.y, values.x / 2 + temp.getLeftX() + 50,
-															vertYsoilLevelF - values.y, Color.MAGENTA.getRGB(), 0.5, 5)
-													.drawLine(values.x / 2 + temp.getLeftX() - 50, vertYsoilLevelF, values.x / 2 + temp.getLeftX() + 50,
-															vertYsoilLevelF, Color.MAGENTA.getRGB(), 0.5, 5)
-													.getImage()
-													.show("DEBUG", debug);
-										else {
-											visRes = visRes
-													.io()
-													.canvas()
-													.fillRect(
-															temp.getLeftX() + (temp.getRightX() - temp.getLeftX()) / 2,
-															temp.getTopY() - temp.getBottomY()
-																	+ temp.getTopY() + temp.getBottomY()
-																	- temp.getTopY(),
-															(temp.getRightX() - temp.getLeftX()) / 2,
-															10,
-															Color.BLUE.getRGB(), 0.8)
-													.fillRect(
-															values.x
-																	/ 2
-																	+ temp.getLeftX(),
-															temp.getTopY() - temp.getBottomY()
-																	+ temp.getTopY() + temp.getBottomY()
-																	- temp.getTopY(),
-															10,
-															temp.getBottomY()
-																	- temp.getTopY(),
-															Color.BLUE.getRGB(), 0.8)
-													.getImage()
-													.show("DEBUG", debug);
-										}
-										return visRes;
+					getResultSet().addImagePostProcessor(
+							new RunnableOnImageSet() {
+								@Override
+								public Image postProcessMask(
+										Image visRes) {
+									if (vertYsoilLevelF > 0)
+										visRes = visRes
+												.io()
+												.canvas()
+												.fillRect(
+														values.x
+																/ 2
+																+ temp.getLeftX(),
+														vertYsoilLevelF - values.y,
+														10,
+														values.y,
+														Color.MAGENTA.getRGB(),
+														255)
+												.drawLine(values.x / 2 + temp.getLeftX() - 50, vertYsoilLevelF - values.y, values.x / 2 + temp.getLeftX() + 50,
+														vertYsoilLevelF - values.y, Color.MAGENTA.getRGB(), 0.5, 5)
+												.drawLine(values.x / 2 + temp.getLeftX() - 50, vertYsoilLevelF, values.x / 2 + temp.getLeftX() + 50,
+														vertYsoilLevelF, Color.MAGENTA.getRGB(), 0.5, 5)
+												.getImage()
+												.show("DEBUG", debug);
+									else {
+										visRes = visRes
+												.io()
+												.canvas()
+												.fillRect(
+														temp.getLeftX() + (temp.getRightX() - temp.getLeftX()) / 2,
+														temp.getTopY() - temp.getBottomY()
+																+ temp.getTopY() + temp.getBottomY()
+																- temp.getTopY(),
+														(temp.getRightX() - temp.getLeftX()) / 2,
+														10,
+														Color.BLUE.getRGB(), 0.8)
+												.fillRect(
+														values.x
+																/ 2
+																+ temp.getLeftX(),
+														temp.getTopY() - temp.getBottomY()
+																+ temp.getTopY() + temp.getBottomY()
+																- temp.getTopY(),
+														10,
+														temp.getBottomY()
+																- temp.getTopY(),
+														Color.BLUE.getRGB(), 0.8)
+												.getImage()
+												.show("DEBUG", debug);
 									}
-									
-									@Override
-									public CameraType getConfig() {
-										return CameraType.VIS;
-									}
-									
-									@Override
-									public Image postProcessImage(Image image) {
-										return image;
-									}
-								});
-					}
-				
+									return visRes;
+								}
+								
+								@Override
+								public CameraType getConfig() {
+									return ct;
+								}
+								
+								@Override
+								public Image postProcessImage(Image image) {
+									return image;
+								}
+							});
+
 				if (distHorizontal != null && realMarkerDistHorizontal != null) {
 					getResultSet()
 							.setNumericResult(
 									getBlockPosition(),
-									new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, WIDTH_NORM),
-									values.x * (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this, input().images().getVisInfo());
+									new Trait(cp(), ct, TraitCategory.GEOMETRY, WIDTH_NORM),
+									values.x * (realMarkerDistHorizontal / distHorizontal) * resfw, "mm", this, input().images().getAnyInfo());
 					getResultSet()
 							.setNumericResult(
 									getBlockPosition(),
-									new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, HEIGHT_NORM),
-									values.y * (realMarkerDistHorizontal / distHorizontal) * resf, "mm", this, input().images().getVisInfo());
+									new Trait(cp(), ct, TraitCategory.GEOMETRY, HEIGHT_NORM),
+									values.y * (realMarkerDistHorizontal / distHorizontal) * resfh, "mm", this, input().images().getAnyInfo());
 				}
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, WIDTH), values.x, "px", this, input().images().getVisInfo());
+						new Trait(cp(), ct, TraitCategory.GEOMETRY, WIDTH), values.x, "px", this, input().images().getAnyInfo());
 				getResultSet().setNumericResult(getBlockPosition(),
-						new Trait(cp(), CameraType.VIS, TraitCategory.GEOMETRY, HEIGHT), values.y, "px", this, input().images().getVisInfo());
+						new Trait(cp(), ct, TraitCategory.GEOMETRY, HEIGHT), values.y, "px", this, input().images().getAnyInfo());
 				
 			}
 		}
-		return visRes;
+		return img;
 	}
 	
 	private TopBottomLeftRight getWidthAndHeightSide(Image vis,
@@ -210,6 +233,7 @@ public class BlCalcWidthAndHeight extends
 	public HashSet<CameraType> getCameraInputTypes() {
 		HashSet<CameraType> res = new HashSet<CameraType>();
 		res.add(CameraType.VIS);
+		res.add(CameraType.FLUO);
 		return res;
 	}
 	
@@ -230,7 +254,7 @@ public class BlCalcWidthAndHeight extends
 	
 	@Override
 	public String getDescription() {
-		return "Calculates the plant width and height properties from the visible light image mask.";
+		return "Calculates the plant width and height properties from the visible light / fluorescence image mask.";
 	}
 	
 	@Override
