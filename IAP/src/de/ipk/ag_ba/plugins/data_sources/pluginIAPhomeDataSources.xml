@@ -9,9 +9,9 @@
 	<description>Adds home data source items to IAP</description>
 
 	<plugindesc>
-	     <name>IAP data source items</name>
-             <main>de.ipk.ag_ba.plugins.data_sources.PluginIAPhomeDataSources</main>
-             <version>1.0</version>
-             <available>http://iap.ipk-gatersleben.de</available>
+		<name>IAP data source items</name>
+		<main>de.ipk.ag_ba.plugins.data_sources.PluginIAPhomeDataSources</main>
+		<version>1.0</version>
+		<available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>
 </plugin>

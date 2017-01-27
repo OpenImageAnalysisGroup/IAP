@@ -9,9 +9,9 @@
 	<description>Adds commands to the experiment tool command set</description>
 
 	<plugindesc>
-	     <name>IAP experiment tool commands</name>
-             <main>de.ipk.ag_ba.plugins.actions.PluginIAPexperimentToolActions</main>
-             <version>1.0</version>
-             <available>http://iap.ipk-gatersleben.de</available>
+		<name>IAP experiment tool commands</name>
+		<main>de.ipk.ag_ba.plugins.actions.PluginIAPexperimentToolActions</main>
+		<version>1.0</version>
+		<available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>
 </plugin>

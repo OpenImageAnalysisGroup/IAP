@@ -9,9 +9,9 @@
 	<description>Provides help text for some of the settings of IAP</description>
 
 	<plugindesc>
-	     <name>IAP settings help</name>
-             <main>de.ipk.ag_ba.plugins.setting_help.PluginIAPsettingHelp</main>
-             <version>1.0</version>
-             <available>http://iap.ipk-gatersleben.de</available>
+		<name>IAP settings help</name>
+		<main>de.ipk.ag_ba.plugins.setting_help.PluginIAPsettingHelp</main>
+		<version>1.0</version>
+		<available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>
 </plugin>

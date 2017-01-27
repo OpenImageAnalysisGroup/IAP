@@ -6,12 +6,13 @@
 
 <plugin>
 	<author>Christian Klukas</author>
-	<description>Adds maize, barley and Arabidopsis analysis templates to IAP</description>
+	<description>Adds maize, barley and Arabidopsis analysis templates to
+		IAP</description>
 
 	<plugindesc>
-	     <name>IAP analysis templates</name>
-             <main>de.ipk.ag_ba.plugins.pipelines.PluginIAPanalyisTemplates</main>
-             <version>1.0</version>
-             <available>http://iap.ipk-gatersleben.de</available>
+		<name>IAP analysis templates</name>
+		<main>de.ipk.ag_ba.plugins.pipelines.PluginIAPanalyisTemplates</main>
+		<version>1.0</version>
+		<available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>
 </plugin>

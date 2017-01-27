@@ -9,9 +9,9 @@
 	<description>Adds VFS features to IAP-Data-Navigation</description>
 
 	<plugindesc>
-	     <name>IAP-Data-Navigation VFS features</name>
-             <main>de.ipk.ag_ba.plugins.vanted_vfs.PluginIAPvantedVFSconnection</main>
-             <version>1.0</version>
-             <available>http://iap.ipk-gatersleben.de</available>
+		<name>IAP-Data-Navigation VFS features</name>
+		<main>de.ipk.ag_ba.plugins.vanted_vfs.PluginIAPvantedVFSconnection</main>
+		<version>1.0</version>
+		<available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>
 </plugin>

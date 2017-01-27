@@ -9,9 +9,9 @@
 	<description>Adds data access home actions to IAP</description>
 
 	<plugindesc>
-	     <name>IAP data access home actions</name>
-             <main>de.ipk.ag_ba.plugins.actions.PluginIAPhomeActions</main>
-             <version>1.0</version>
-             <available>http://iap.ipk-gatersleben.de</available>
+		<name>IAP data access home actions</name>
+		<main>de.ipk.ag_ba.plugins.actions.PluginIAPhomeActions</main>
+		<version>1.0</version>
+		<available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>
 </plugin>

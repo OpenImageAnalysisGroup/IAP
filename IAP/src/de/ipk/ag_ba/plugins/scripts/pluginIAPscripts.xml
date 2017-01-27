@@ -9,9 +9,9 @@
 	<description>Adds data R-based data analysis scripts to IAP</description>
 
 	<plugindesc>
-	     <name>IAP default analysis scripts (mostly R-based)</name>
-             <main>de.ipk.ag_ba.plugins.scripts.PluginIAPscripts</main>
-             <version>1.0</version>
-             <available>http://iap.ipk-gatersleben.de</available>
+		<name>IAP default analysis scripts (mostly R-based)</name>
+		<main>de.ipk.ag_ba.plugins.scripts.PluginIAPscripts</main>
+		<version>1.0</version>
+		<available>http://iap.ipk-gatersleben.de</available>
 	</plugindesc>
 </plugin>
