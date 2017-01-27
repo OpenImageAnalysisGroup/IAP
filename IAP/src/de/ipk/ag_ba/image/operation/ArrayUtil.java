@@ -52,6 +52,20 @@ public class ArrayUtil {
 		return image;
 	}
 	
+	public static float[][] get2d(int w, int h, float[] as1a) {
+		if (w * h != as1a.length)
+			throw new IllegalArgumentException("width * height not equal to source length");
+		
+		float[][] image = new float[w][h];
+		int idx = 0;
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				image[x][y] = as1a[idx++];
+			}
+		}
+		return image;
+	}
+	
 	public static double[][][] half(double[][][] in) {
 		int len = in[0][0].length;
 		int newlen = len / 2;
@@ -61,13 +75,13 @@ public class ArrayUtil {
 				for (int z = 0; z < len; z++) {
 					res[x / 2][y / 2][z / 2] = res[x / 2][y / 2][z / 2] + in[x][y][z];
 				}
-		
+			
 		for (int x = 0; x < newlen; x++)
 			for (int y = 0; y < newlen; y++)
 				for (int z = 0; z < newlen; z++) {
 					res[x][y][z] = res[x][y][z] / 4;
 				}
-		
+			
 		return res;
 	}
 }

@@ -17,6 +17,7 @@ import org.ErrorMsg;
 import org.OpenFileDialogService;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
+import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
@@ -263,7 +264,13 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		e.setHeader(eh);
 		
 		Substance3D sub = new Substance3D();
-		sub.setName("vis.top");
+		
+		String fileImportSubstanceName = SystemOptions.getInstance().getString(
+				"File Import",
+				"File import substance name",
+				"vis.top");
+		
+		sub.setName(fileImportSubstanceName);
 		e.add(sub);
 		
 		for (File f : fileList) {

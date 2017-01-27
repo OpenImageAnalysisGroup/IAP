@@ -7,14 +7,6 @@
 
 package de.ipk.ag_ba.image.structures;
 
-import ij.ImagePlus;
-import ij.io.Opener;
-import ij.process.ByteProcessor;
-import ij.process.ColorProcessor;
-import ij.process.FloatProcessor;
-import ij.process.ImageConverter;
-import ij.process.ImageProcessor;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -52,8 +44,6 @@ import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
 import org.graffiti.plugin.io.resources.MyByteArrayOutputStream;
 
-import sun.awt.image.ByteInterleavedRaster;
-import sun.awt.image.IntegerInterleavedRaster;
 import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.operation.ArrayUtil;
@@ -61,6 +51,15 @@ import de.ipk.ag_ba.image.operation.ColorSpaceConverter;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.channels.Channel;
 import de.ipk.ag_ba.image.operation.demosaicing.FloatMode;
+import ij.ImagePlus;
+import ij.io.Opener;
+import ij.process.ByteProcessor;
+import ij.process.ColorProcessor;
+import ij.process.FloatProcessor;
+import ij.process.ImageConverter;
+import ij.process.ImageProcessor;
+import sun.awt.image.ByteInterleavedRaster;
+import sun.awt.image.IntegerInterleavedRaster;
 
 /**
  * @author klukas
@@ -107,12 +106,12 @@ public class Image {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
 			ImagePlus inpimg;
 			// ZIP header = 50 4B 03 04 // https://en.wikipedia.org/wiki/List_of_file_signatures
-			// printf("   -p <pattern>  CFA pattern, choices for <pattern> are\n");
-			// printf("                 RGGB        upperleftmost red pixel is at (0,0)\n");
-			// printf("                 GRBG        upperleftmost red pixel is at (1,0)\n");
-			// printf("                 GBRG        upperleftmost red pixel is at (0,1)\n");
-			// printf("                 BGGR        upperleftmost red pixel is at (1,1)\n\n");
-			// printf("   -f            Flatten result to a grayscale image\n");
+			// printf(" -p <pattern> CFA pattern, choices for <pattern> are\n");
+			// printf(" RGGB upperleftmost red pixel is at (0,0)\n");
+			// printf(" GRBG upperleftmost red pixel is at (1,0)\n");
+			// printf(" GBRG upperleftmost red pixel is at (0,1)\n");
+			// printf(" BGGR upperleftmost red pixel is at (1,1)\n\n");
+			// printf(" -f Flatten result to a grayscale image\n");
 			try {
 				if (".tiff".equalsIgnoreCase(url.getFileNameExtension().toLowerCase()) || ".tif".equalsIgnoreCase(url.getFileNameExtension().toLowerCase())) {
 					inpimg = new Opener().openTiff(is, url.getFileName());
@@ -288,9 +287,9 @@ public class Image {
 					}
 				}
 			int c = // alpha |
-			((r & 0xFF) << 16) |
-					((g & 0xFF) << 8) |
-					((b & 0xFF) << 0);
+					((r & 0xFF) << 16) |
+							((g & 0xFF) << 8) |
+							((b & 0xFF) << 0);
 			img[idx] = c;
 		}
 		image = new ImagePlus("from 1d array", new ColorProcessor(w, h, img));
@@ -308,9 +307,9 @@ public class Image {
 			int g = (int) (channelG[idx] * 255d + 0.5d);
 			int b = (int) (channelB[idx] * 255d + 0.5d);
 			int c = // alpha |
-			((r & 0xFF) << 16) |
-					((g & 0xFF) << 8) |
-					((b & 0xFF) << 0);
+					((r & 0xFF) << 16) |
+							((g & 0xFF) << 8) |
+							((b & 0xFF) << 0);
 			img[idx] = c;
 		}
 		image = new ImagePlus("from 1d array", new ColorProcessor(w, h, img));
@@ -436,10 +435,8 @@ public class Image {
 			return io().copy().replaceColor(ImageOperation.BACKGROUND_COLORint, java.awt.Color.WHITE.getRGB()).getAsBufferedImage();
 	}
 	
-	public static BufferedImage toBufferedImage(java.awt.Image img)
-	{
-		if (img instanceof BufferedImage)
-		{
+	public static BufferedImage toBufferedImage(java.awt.Image img) {
+		if (img instanceof BufferedImage) {
 			return (BufferedImage) img;
 		}
 		
@@ -555,6 +552,10 @@ public class Image {
 		return ArrayUtil.get2d(getWidth(), getHeight(), getAs1A());
 	}
 	
+	public float[][] getAs2Afloat() {
+		return ArrayUtil.get2d(getWidth(), getHeight(), getAs1float());
+	}
+	
 	public CameraType getCameraType() {
 		return cameraType;
 	}
@@ -647,22 +648,19 @@ public class Image {
 		if (fileName.toLowerCase().endsWith(".jpg") || fileName.toLowerCase().endsWith(".jpeg"))
 			io().saveImage(null).saveAsJpeg(fileName);
 		else
-			if (fileName.toLowerCase().endsWith(".tif") || fileName.toLowerCase().endsWith(".tiff"))
-			{
+			if (fileName.toLowerCase().endsWith(".tif") || fileName.toLowerCase().endsWith(".tiff")) {
 				ImagePlus ip = io().getImageAsImagePlus();
 				// ImageConverter ic = new ImageConverter(ip);
 				// ic.convertToGray16();
 				new ImageOperation(ip).saveImage(null).saveAsTiff(fileName);
-			}
-			else
+			} else
 				io().saveImage(null).saveAsPng(fileName);
 		return this;
 	}
 	
 	public Image saveToFile(String fileName, ImageType type) {
 		
-		if (fileName.toLowerCase().endsWith(".tif") || fileName.toLowerCase().endsWith(".tiff"))
-		{
+		if (fileName.toLowerCase().endsWith(".tif") || fileName.toLowerCase().endsWith(".tiff")) {
 			ImagePlus ip = io().getImageAsImagePlus();
 			ImageConverter ic = new ImageConverter(ip);
 			
@@ -677,8 +675,7 @@ public class Image {
 					throw new RuntimeException("Format not supported.");
 			}
 			new ImageOperation(ip).saveImage(null).saveAsTiff(fileName);
-		}
-		else
+		} else
 			throw new RuntimeException("Format not supported.");
 		return this;
 	}
@@ -841,7 +838,7 @@ public class Image {
 			else
 				for (int i : arr)
 					res[idx++] = i;
-			
+				
 			return res;
 		}
 		return (float[]) image.getProcessor().convertToFloatProcessor().getPixels();
