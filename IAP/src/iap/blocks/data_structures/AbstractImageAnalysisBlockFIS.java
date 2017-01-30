@@ -654,9 +654,18 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 		return getCameraPosition();
 	}
 	
+	/**
+	 * Function checks if current side view fits to calculated main axis. 
+	 * (main_axis.rotation only available for fluorescence images = overwrite)
+	 * (check_opposite = checks if opposite rotation is fits better)
+	 * 
+	 * @param cameratype
+	 * @return true or false
+	 */
 	protected boolean isBestAngle(CameraType ct) {
+		boolean check_opposite = true;
 		HashMap<String, ArrayList<BlockResultValue>> previousResults = optionsAndResults
-				.searchResultsOfCurrentSnapshot(new Trait(CameraPosition.TOP, ct, TraitCategory.GEOMETRY, "main_axis.rotation").toString(), true, getWellIdx(),
+				.searchResultsOfCurrentSnapshot(new Trait(CameraPosition.TOP, CameraType.FLUO, TraitCategory.GEOMETRY, "main_axis.rotation").toString(), true, getWellIdx(),
 						null, false, null);
 		
 		double sum = 0;
@@ -687,6 +696,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				double dist = Math.abs(mainRotationFromTopView - r);
 				if (dist < mindist) {
 					mindist = dist;
+					if (check_opposite) {
+						double dist_2 = dist - 180.0;
+						if (dist_2 < mindist)
+							mindist = dist_2;
+					}
 					if ((((ImageData) nmi).getPosition() + "").equals((currentImage.getPosition() + "")))
 						currentImageIsBest = true;
 					else
