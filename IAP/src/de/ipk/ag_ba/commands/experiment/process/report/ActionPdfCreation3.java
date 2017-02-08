@@ -1429,7 +1429,14 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				continue;
 			if (status != null)
 				status.setCurrentStatusText1("Adjust width of column " + (i + 1) + "/" + excelColumnHeaders.size() + "...");
-			sheet.autoSizeColumn(i);
+			
+//			System.out.println(excelColumnHeaders.size() + "|" + i);
+//			System.out.println("w=" + sheet.getColumnWidth(i));
+			try {
+				sheet.autoSizeColumn(i);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 			// System.out.println("w=" + sheet.getColumnWidth(i));
 			if (sheet.getColumnWidth(i) > 10000)
 				sheet.setColumnWidth(i, 10000);
