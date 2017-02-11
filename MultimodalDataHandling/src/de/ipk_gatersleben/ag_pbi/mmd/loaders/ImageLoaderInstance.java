@@ -11,8 +11,6 @@
  ************************************************************************************/
 package de.ipk_gatersleben.ag_pbi.mmd.loaders;
 
-import info.clearthought.layout.TableLayout;
-
 import java.io.File;
 import java.util.List;
 
@@ -31,6 +29,7 @@ import de.ipk_gatersleben.ag_pbi.datahandling.JComboBoxAutoCompleteAndSelectOnTa
 import de.ipk_gatersleben.ag_pbi.datahandling.TemplateLoaderInstance;
 import de.ipk_gatersleben.ag_pbi.mmd.JSpinnerSelectOnTab;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import info.clearthought.layout.TableLayout;
 
 public class ImageLoaderInstance extends TemplateLoaderInstance {
 	
@@ -84,6 +83,7 @@ public class ImageLoaderInstance extends TemplateLoaderInstance {
 		return toList(id);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public JPanel getAttributeDialog(int filenumber) throws Exception {
 		JPanel pan = new JPanel();

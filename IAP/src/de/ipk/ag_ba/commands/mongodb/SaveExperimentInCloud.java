@@ -17,7 +17,6 @@ import org.ErrorMsg;
 import org.OpenFileDialogService;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
-import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
@@ -265,10 +264,17 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		
 		Substance3D sub = new Substance3D();
 		
-		String fileImportSubstanceName = SystemOptions.getInstance().getString(
-				"File Import",
-				"File import substance name",
-				"vis.top");
+		Object[] inp = MyInputHelper.getInput("Select the desired camera config",
+				"Camera selection", new Object[] {
+						"Camera", new String[] { "vis.top", "vis.side", "fluo.top", "flip.side", "nir.top", "nir.side", "ir.top", "ir.side" },
+						"Rotation angle (for side images)", 0.0
+				});
+		
+		if (inp == null)
+			return;
+		
+		String fileImportSubstanceName = (String) inp[0];
+		double rotationAngle = (Double) inp[1];
 		
 		sub.setName(fileImportSubstanceName);
 		e.add(sub);
@@ -288,6 +294,7 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			ImageData img = new ImageData(sample);
 			img.setURL(FileSystemHandler.getURL(f));
 			img.setQualityAnnotation(f.getName());
+			img.setPosition(rotationAngle);
 			
 			sample.add(img);
 		}

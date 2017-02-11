@@ -57,7 +57,8 @@ public class ActionCopyToMongo extends AbstractExperimentDataNavigationAction {
 						"Select the database-target:",
 						"Target Selection", new Object[] { "Target", MongoDB.getMongos() });
 			} else
-				sel = new Object[] { MongoDB.getMongos().iterator().next() };
+				if (!MongoDB.getMongos().isEmpty())
+					sel = new Object[] { MongoDB.getMongos().iterator().next() };
 		}
 		if (sel == null)
 			return;
