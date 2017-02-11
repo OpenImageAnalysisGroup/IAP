@@ -7,6 +7,9 @@
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -26,6 +29,13 @@ import org.StringManipulationTools;
 import org.apache.poi.hssf.record.SSTRecord;
 import org.apache.poi.hssf.record.common.UnicodeString;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.util.StringSplitter;
 
@@ -356,7 +366,6 @@ public class TableData {
 			worksheetData.put(col + 1, new Hashtable<Integer, Object>());
 		if (data instanceof String) {
 			String str = ((String) data).trim();
-			// //////// str=ErrorMsg.UnicodeToHtml(str);
 			worksheetData.get(col + 1).put(row + 1, str);
 		} else
 			if (data instanceof UnicodeString) {
@@ -364,6 +373,42 @@ public class TableData {
 				worksheetData.get(col + 1).put(row + 1, str);
 			} else {
 				worksheetData.get(col + 1).put(row + 1, data);
+			}
+		if (row > maxRow)
+			maxRow = row;
+		if (col > maxCol)
+			maxCol = col;
+		if (maxRowForColumn.containsKey(col)) {
+			int currMaxRowForCol = maxRowForColumn.get(col);
+			if (row > currMaxRowForCol) {
+				maxRowForColumn.remove(col);
+				maxRowForColumn.put(col, row);
+			}
+		} else
+			maxRowForColumn.put(col, row);
+	}
+	
+	/**
+	 * @param col
+	 *           Column 1..n
+	 * @param row
+	 *           Row 1..n
+	 * @param data
+	 */
+	public synchronized void addCellDataNG(int col, int row, Object data) {
+		// Trimming of Strings, because Excel Reader was not very strict and
+		// added some space after the cell values
+		if (!worksheetData.containsKey(col))
+			worksheetData.put(col, new Hashtable<Integer, Object>());
+		if (data instanceof String) {
+			String str = ((String) data).trim();
+			worksheetData.get(col).put(row, str);
+		} else
+			if (data instanceof UnicodeString) {
+				String str = ((UnicodeString) data).getString().trim();
+				worksheetData.get(col).put(row, str);
+			} else {
+				worksheetData.get(col).put(row, data);
 			}
 		if (row > maxRow)
 			maxRow = row;
@@ -501,8 +546,7 @@ public class TableData {
 										plant_time_timeunit2timeunit,
 										plant_time_timeunit2mesunit, column, row, val, plantID.longValue());
 							}
-						}
-						else {
+						} else {
 							Long plantID = (Long) plantObj;
 							if (plantID == plantOrGenotypeColumnRefID) {
 								processData(plant_time_timeunit, plant_time_timeunit2time,
@@ -570,7 +614,7 @@ public class TableData {
 					optFineTime = Long.parseLong(timeString.split(";", 2)[1]);
 				}
 			}
-		
+			
 		// plant_time_timeunit2optFineTime
 		//
 		String optQualityAnnotation = null;
@@ -1005,5 +1049,78 @@ public class TableData {
 			res.add(r);
 		}
 		return res;
+	}
+	
+	public void saveToExcelFile(String worksheetName, File annotationFile, BackgroundTaskStatusProviderSupportingExternalCall status) throws FileNotFoundException, IOException {
+		if (status != null)
+			status.setCurrentStatusValue(-1);
+		if (status != null)
+			status.setCurrentStatusText1("Set table data");
+		SXSSFWorkbook wb = new SXSSFWorkbook();
+		wb.setCompressTempFiles(true);
+		CellStyle style = null;
+		CellStyle styleTL = null;
+		
+		CellStyle cellStyleDate = null;
+		
+		Sheet infoSheet = wb.createSheet(worksheetName);
+		Row header = infoSheet.createRow(0);
+		style = wb.createCellStyle();
+		styleTL = wb.createCellStyle();
+		styleTL.setAlignment(CellStyle.ALIGN_LEFT);
+		styleTL.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+		styleTL.setWrapText(false);
+		
+		wb.createCellStyle();
+		
+		CreationHelper createHelper = wb.getCreationHelper();
+		cellStyleDate = wb.createCellStyle();
+		cellStyleDate.setDataFormat(createHelper.createDataFormat().getFormat("m/d/yy h:mm"));
+		
+		Font font = wb.createFont();
+		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+		style.setFont(font);
+		
+		for (int col = 0; col < getMaximumCol(); col++) {
+			Cell c = header.createCell(col);
+			c.setCellValue(getUnicodeStringCellData(col, 0));
+			c.setCellStyle(styleTL);
+		}
+		
+		for (int row = 1; row <= getMaximumRow(); row++) {
+			Row r = infoSheet.createRow(row - 1);
+			for (int col = 1; col <= getMaximumCol(); col++) {
+				Object val = getCellData(col, row, null);
+				if (val == null)
+					continue;
+				
+				if (val instanceof Date) {
+					Cell cc = r.createCell(col - 1);
+					cc.setCellStyle(cellStyleDate);
+					cc.setCellValue((Date) val);
+				} else
+					if (val instanceof Double)
+						r.createCell(col - 1).setCellValue((Double) val);
+					else
+						if (val instanceof Integer)
+							r.createCell(col - 1).setCellValue((Integer) val);
+						else
+							if (val instanceof Long)
+								r.createCell(col - 1).setCellValue((Long) val);
+							else
+								if (!("" + val).isEmpty()) {
+									Cell c = r.createCell(col - 1);
+									c.setCellValue("" + val);
+									c.setCellStyle(styleTL);
+								}
+			}
+		}
+		
+		if (status != null)
+			status.setCurrentStatusText1("Generate XSLX");
+		wb.write(new FileOutputStream(annotationFile));
+		wb.dispose();
+		if (status != null)
+			status.setCurrentStatusValueFine(100d);
 	}
 }

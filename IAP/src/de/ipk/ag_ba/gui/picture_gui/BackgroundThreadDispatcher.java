@@ -265,7 +265,7 @@ public class BackgroundThreadDispatcher {
 		return new StreamBackgroundTaskHelper(desc);
 	}
 	
-	public static RunnableExecutor getRE() {
+	public static RunnableExecutor getRunnableExecutor() {
 		return new RunnableExecutor() {
 			
 			@Override

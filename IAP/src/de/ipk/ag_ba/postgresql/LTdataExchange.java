@@ -1194,7 +1194,7 @@ public class LTdataExchange implements ExperimentLoader {
 			optStatus.setCurrentStatusText1("Create experiment (" + measurements.size() + " measurements)");
 		
 		ExperimentInterface experiment = NumericMeasurement3D.getExperiment(
-				measurements, true, false, true, optStatus, BackgroundThreadDispatcher.getRE());
+				measurements, true, false, true, optStatus, BackgroundThreadDispatcher.getRunnableExecutor());
 		
 		int numberOfImages = countMeasurementValues(experiment, new MeasurementNodeType[] { MeasurementNodeType.IMAGE });
 		if (optStatus != null)

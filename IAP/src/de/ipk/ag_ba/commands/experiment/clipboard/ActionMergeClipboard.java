@@ -80,17 +80,20 @@ public class ActionMergeClipboard extends AbstractNavigationAction {
 			else
 				if (ei.getImportDate() != null && ei.getImportDate().compareTo(lastExperimentEnd) > 0)
 					lastExperimentEnd = ei.getImportDate();
-			
+				
 			ei = null;
+			boolean changeGrowthConditionValue = false;
 			for (SubstanceInterface si : eCopy)
 				for (ConditionInterface ci : si) {
+					if (!changeGrowthConditionValue)
+						continue;
 					String oldGC = ci.getGrowthconditions();
 					if (oldGC != null && oldGC.length() > 0 && !oldGC.equals("not specified"))
 						ci.setGrowthconditions(eCopy.getName() + ":" + oldGC);
 					else
 						ci.setGrowthconditions(eCopy.getName());
 				}
-			e.addAndMerge(null, eCopy, BackgroundThreadDispatcher.getRE(), new MergeCompareRequirements());
+			e.addAndMerge(null, eCopy, BackgroundThreadDispatcher.getRunnableExecutor(), new MergeCompareRequirements());
 			iii++;
 			if (status != null) {
 				status.setCurrentStatusText1("Merged dataset " + iii + "/" + nTodo);

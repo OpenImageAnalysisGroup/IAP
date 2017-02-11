@@ -38,7 +38,7 @@ public class PluginIAPhomeActions extends AbstractIAPplugin {
 		
 		String hwiFolder = "C:\\LemnaTec\\Hardware";
 		if (!new File(hwiFolder).exists()) {
-			hwiFolder = System.getProperty("user.home") + File.separator + "Hardware";
+			hwiFolder = System.getProperty("user.home") + File.separator + "LemnaTec" + File.separator + "Hardware";
 		}
 		
 		boolean added = false;

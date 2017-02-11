@@ -6,14 +6,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.TreeMap;
 
 import javax.swing.SwingUtilities;
 
 import org.ErrorMsg;
+import org.MergeCompareRequirements;
 import org.OpenFileDialogService;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -24,6 +23,7 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
@@ -31,6 +31,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataAnnotation;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableData;
@@ -157,64 +158,11 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		
 		boolean foundAnnoFile;
 		
-		File annotationFile = new File(parentFolder.getAbsoluteFile() + File.pathSeparator + "annotation.xlsx");
-		if (!annotationFile.exists()) {
-			tableData = new TableData();
-			foundAnnoFile = false;
-		} else {
-			tableData = TableData.getTableData(annotationFile, true);
-			foundAnnoFile = true;
-		}
-		
-		TreeMap<String, TreeMap<Integer, Object>> knownFileNames2anno = new TreeMap<>();
-		HashMap<Integer, String> colNum2headerText = new HashMap<>();
-		for (int row = 1; row < tableData.getMaximumRow(); row++) {
-			TreeMap<Integer, Object> rowAnno = new TreeMap<>();
-			for (int col = 1; col < tableData.getMaximumCol(); col++) {
-				Object v = tableData.getCellData(col, row, null);
-				if (v == null)
-					continue;
-				if (row == 1) {
-					if ((!(v instanceof String) || ((String) v).isEmpty()))
-						v = "Column " + col;
-					colNum2headerText.put(col, v + "");
-				} else
-					if (col == 1) {
-						if ((!(v instanceof String) || ((String) v).isEmpty())) {
-							System.err.println(SystemAnalysis.getCurrentTime() + ">ERROR: Invalid file name in first column: " + v);
-						} else {
-							knownFileNames2anno.put((String) v, rowAnno);
-						}
-					} else {
-						rowAnno.put(col, v);
-					}
-			}
-		}
-		
-		// int genotypeColumn = getColumn(Condition.ATTRIBUTE_KEY_GENOTYPE, colNum2headerText);
-		
-		TreeMap<String, TreeMap<Integer, Object>> unknownFileNames2anno = new TreeMap<>();
-		for (File f : fileList) {
-			String fn = f.getName();
-			if (!knownFileNames2anno.containsKey(fn)) {
-				unknownFileNames2anno.put(fn, new TreeMap<>());
-			}
-		}
-		
-		HashMap<ExperimentDataAnnotation, GregorianCalendar> eda2day = new HashMap<ExperimentDataAnnotation, GregorianCalendar>();
 		GregorianCalendar first = null;
 		GregorianCalendar last = null;
 		int fileIDX = 0;
 		for (File f : fileList) {
 			ExperimentDataAnnotation eda = new ExperimentDataAnnotation();
-			
-			// anno.put(f, eda);
-			// eda.setExpname(hs(parentFolder.getName()));
-			// eda.setCondspecies(hs(c.getSpecies()));
-			// eda.setCondgenotype(hs(c.getGenotype()));
-			// eda.setCondtreatment(hs(c.getTreatment()));
-			// eda.setCondvariety(hs(c.getVariety()));
-			// eda.setReplicateIDs(hi(c.getConditionId()));
 			String fn = f.getName();
 			if (fn.contains("."))
 				fn = fn.substring(0, fn.lastIndexOf("."));
@@ -224,10 +172,8 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			replIDs.add(fileIDX);
 			eda.setReplicateIDs(replIDs);
 			long creationTime = f.lastModified();
-			// eda.setSampleFineTimepoint(creationTime);
 			GregorianCalendar gc = new GregorianCalendar();
 			gc.setTimeInMillis(creationTime);
-			eda2day.put(eda, gc);
 			if (first == null)
 				first = gc;
 			if (last == null)
@@ -237,13 +183,54 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			if (gc.before(first))
 				first = gc;
 		}
-		final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
-		int fD = first.get(GregorianCalendar.DAY_OF_MONTH);
-		int fM = first.get(GregorianCalendar.MONTH);
-		int fY = first.get(GregorianCalendar.YEAR);
-		int lD = last.get(GregorianCalendar.DAY_OF_MONTH);
-		int lM = last.get(GregorianCalendar.MONTH);
-		int lY = last.get(GregorianCalendar.YEAR);
+		
+		File annotationFile = new File(parentFolder.getAbsoluteFile() + File.separator + "fileimport.xlsx");
+		if (!annotationFile.exists()) {
+			tableData = new TableData();
+			foundAnnoFile = false;
+			int col = 1;
+			int row = 1;
+			tableData.addCellDataNG(col++, row, "import file");
+			tableData.addCellDataNG(col++, row, "plant ID");
+			tableData.addCellDataNG(col++, row, "replicate");
+			tableData.addCellDataNG(col++, row, "time");
+			tableData.addCellDataNG(col++, row, "time unit");
+			tableData.addCellDataNG(col++, row, "imaging time");
+			tableData.addCellDataNG(col++, row, "measurement tool");
+			tableData.addCellDataNG(col++, row, "camera.position");
+			tableData.addCellDataNG(col++, row, "rotation degree");
+			tableData.addCellDataNG(col++, row, "species");
+			tableData.addCellDataNG(col++, row, "genotype");
+			tableData.addCellDataNG(col++, row, "variety");
+			tableData.addCellDataNG(col++, row, "growth conditions");
+			tableData.addCellDataNG(col++, row, "treatment");
+			row++;
+			int repl = 0;
+			for (File f : fileList) {
+				col = 1;
+				tableData.addCellDataNG(col++, row, f.getName());
+				tableData.addCellDataNG(col++, row, f.getName().split("@", 2)[0]);
+				tableData.addCellDataNG(col++, row, repl++);
+				tableData.addCellDataNG(col++, row, (int) ((f.lastModified() - first.getTime().getTime()) / (1000 * 60 * 60 * 24)));
+				tableData.addCellDataNG(col++, row, "day");
+				tableData.addCellDataNG(col++, row, new Date(f.lastModified()));
+				tableData.addCellDataNG(col++, row, "tool");
+				tableData.addCellDataNG(col++, row, "vis.top");
+				tableData.addCellDataNG(col++, row, 0.0);
+				tableData.addCellDataNG(col++, row, "Barley");
+				tableData.addCellDataNG(col++, row, "geno");
+				tableData.addCellDataNG(col++, row, "var");
+				tableData.addCellDataNG(col++, row, "gcon");
+				tableData.addCellDataNG(col++, row, "treat");
+				row++;
+			}
+			
+			tableData.saveToExcelFile("meta-data", annotationFile, status);
+			return;
+		} else {
+			tableData = TableData.getTableData(annotationFile, true);
+			foundAnnoFile = true;
+		}
 		
 		Experiment e = new Experiment();
 		ExperimentHeader eh = new ExperimentHeader();
@@ -262,111 +249,79 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		eh.setSizekb(sizekb / 1024);
 		e.setHeader(eh);
 		
-		Substance3D sub = new Substance3D();
+		String path = fileList.iterator().next().getParent();
 		
-		Object[] inp = MyInputHelper.getInput("Select the desired camera config",
-				"Camera selection", new Object[] {
-						"Camera", new String[] { "vis.top", "vis.side", "fluo.top", "flip.side", "nir.top", "nir.side", "ir.top", "ir.side" },
-						"Rotation angle (for side images)", 0.0
-				});
-		
-		if (inp == null)
-			return;
-		
-		String fileImportSubstanceName = (String) inp[0];
-		double rotationAngle = (Double) inp[1];
-		
-		sub.setName(fileImportSubstanceName);
-		e.add(sub);
-		
-		for (File f : fileList) {
+		for (int row = 2; row <= tableData.getMaximumRow(); row++) {
+			int metaColumn = 1;
+			String importFile = tableData.getUnicodeStringCellData(metaColumn++, row);
+			String plantId = tableData.getUnicodeStringCellData(metaColumn++, row);
+			Integer replicate = ((Double) tableData.getCellData(metaColumn++, row, -1)).intValue();
+			Integer time = ((Double) tableData.getCellData(metaColumn++, row, -1)).intValue();
+			String timeUnit = tableData.getUnicodeStringCellData(metaColumn++, row);
+			Date imagingTime = tableData.getCellDataDateObject(metaColumn++, row, null);
+			String measurementTool = tableData.getUnicodeStringCellData(metaColumn++, row);
+			String camera = tableData.getUnicodeStringCellData(metaColumn++, row);
+			Double rotation = (Double) tableData.getCellData(metaColumn++, row, 0.0);
+			String species = tableData.getUnicodeStringCellData(metaColumn++, row);
+			String genotype = tableData.getUnicodeStringCellData(metaColumn++, row);
+			String varity = tableData.getUnicodeStringCellData(metaColumn++, row);
+			String growthConditions = tableData.getUnicodeStringCellData(metaColumn++, row);
+			String treatment = tableData.getUnicodeStringCellData(metaColumn++, row);
+			
+			if (importFile == null || importFile.isEmpty())
+				messages.add("No file name specified in column A, row " + (row + 1) + ".");
+			File f = new File(path + File.separator + importFile);
+			if (!f.exists())
+				messages.add("The file '" + importFile + "' specified in column A, row " + (row + 1) + " could not be found.");
+			
+			Substance3D sub = new Substance3D();
+			sub.setName(camera);
+			e.add(sub);
+			
 			Condition3D con = new Condition3D(sub);
-			con.setSpecies(f.getName());
+			con.setExperimentInfo(eh);
+			con.setSpecies(species);
+			con.setGenotype(genotype);
+			con.setVariety(varity);
+			con.setGrowthconditions(growthConditions);
+			con.setTreatment(treatment);
+			// con.setSequence("");
 			sub.add(con);
 			
 			Sample3D sample = new Sample3D(con);
 			con.add(sample);
-			sample.setSampleFineTimeOrRowId(f.lastModified());
-			sample.setTime((int) ((f.lastModified() - first.getTime().getTime())
-					/ (1000 * 60 * 60 * 24)));
-			sample.setTimeUnit("day");
+			sample.setSampleFineTimeOrRowId(imagingTime.getTime());
+			sample.setTime(time);
+			sample.setTimeUnit(timeUnit);
+			sample.setMeasurementtool(measurementTool);
 			
 			ImageData img = new ImageData(sample);
 			img.setURL(FileSystemHandler.getURL(f));
-			img.setQualityAnnotation(f.getName());
-			img.setPosition(rotationAngle);
+			img.setQualityAnnotation(plantId);
+			img.setPosition(rotation);
+			img.setReplicateID(replicate);
 			
 			sample.add(img);
 		}
-		resultProcessor.setExperimenData(e);
-		resultProcessor.run();
 		
-		HashMap<Integer, ExperimentDataAnnotation> anno = null;
-		if (anno != null)
-			for (ExperimentDataAnnotation eda : anno.values()) {
-				if (last == null || first == null || !eda2day.containsKey(eda))
-					continue;
-				LinkedHashSet<String> substances = new LinkedHashSet<String>();
-				substances.add("vis.top");
-				substances.add("vis.side");
-				substances.add("fluo.top");
-				substances.add("fluo.side");
-				substances.add("nir.top");
-				substances.add("nir.side");
-				substances.add("ir.top");
-				substances.add("ir.side");
-				
-				eda.setSubstances(substances);
-				eda.setExpname(hs(parentFolder.getName()));
-				eda.setExpcoord(hs(SystemAnalysis.getUserName()));
-				try {
-					eda.setExpsrc(hs(SystemAnalysis.getUserName() + "@" + SystemAnalysis.getLocalHost().getCanonicalHostName() +
-							":" + parentFolder.getName()));
-				} catch (Exception er) {
-					eda.setExpsrc(hs(SystemAnalysis.getUserName() + "@localhost:" + parentFolder.getName()));
-					
-				}
-				
-				eda.setExpstartdate(hs(nn(fD) + "/" + nn(fM) + "/" + nn(fY)));
-				eda.setExpimportdate(hs(nn(lD) + "/" + nn(lM) + "/" + nn(lY)));
-				GregorianCalendar g = eda2day.get(eda);
-				long tS = first.getTime().getTime();
-				long tM = g.getTime().getTime();
-				long diff = 1 + (tM - tS) / MILLISECONDS_IN_DAY;
-				eda.setSamptimepoint(hs(diff + ""));
-				eda.setSamptimeunit(hs("day"));
-			}
-		/*
-		 * String fn = "";
-		 * TableData td = TableData.getTableData(new File(fn));
-		 * /*
-		 * for (ExperimentInterface mdl : il.process(fileList, null)) {
-		 * if (mdl != null && resultProcessor != null) {
-		 * resultProcessor.setExperimenData(mdl);
-		 * resultProcessor.run();
-		 * }
-		 * }
-		 */
+		Experiment res = new Experiment();
+		res.setHeader(e.getHeader().clone());
+		MergeCompareRequirements mcr = new MergeCompareRequirements();
+		for (SubstanceInterface s : new ArrayList<SubstanceInterface>(e)) {
+			Substance3D.addAndMergeA(res, s, true, BackgroundThreadDispatcher.getRunnableExecutor(), mcr);
+		}
+		e.clear();
+		res.sortSubstances();
+		res.sortConditions();
+		
+		resultProcessor.setExperimenData(res);
+		resultProcessor.run();
 	}
 	
 	private LinkedHashSet<String> hs(String string) {
 		LinkedHashSet<String> res = new LinkedHashSet<String>();
 		res.add(string);
 		return res;
-	}
-	
-	private LinkedHashSet<Integer> hi(Integer i) {
-		LinkedHashSet<Integer> res = new LinkedHashSet<Integer>();
-		res.add(i);
-		return res;
-	}
-	
-	private String nn(int n) {
-		String res = n + "";
-		if (res.length() < 2)
-			return "0" + res;
-		else
-			return res;
 	}
 	
 	@Override

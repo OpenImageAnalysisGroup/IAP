@@ -640,7 +640,7 @@ public class SkeletonGraph {
 					elem = WeightedShortestPathSelectionAlgorithm.findLongestShortestPathElements(
 							gg.getGraphElements(),
 							new AttributePathNameSearchType("iap", "len", SearchType.searchDouble, "len"),
-							optLengthReturn, false, BackgroundThreadDispatcher.getRE());
+							optLengthReturn, false, BackgroundThreadDispatcher.getRunnableExecutor());
 				synchronized (gl) {
 					graphComponent2shortestPathElements.put(gg, elem);
 					if (optGMLoutputFileName != null && !thinned)
@@ -663,7 +663,7 @@ public class SkeletonGraph {
 				}
 			});
 		}
-		BackgroundThreadDispatcher.getRE().execInParallel(todo, "Determine graph diameter distances", null);
+		BackgroundThreadDispatcher.getRunnableExecutor().execInParallel(todo, "Determine graph diameter distances", null);
 		Graph lcgg = tsoLCGG.getGraphInstance();
 		double largestDiameter = tsoLCGG.getDouble();
 		if (lcgg != null) {

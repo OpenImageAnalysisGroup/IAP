@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
  * @author klukas
  */
 public class ReleaseInfo implements HelperClass {
-	public static String IAP_VERSION_STRING = "2.0.7";
+	public static String IAP_VERSION_STRING = "2.0.8";
 	private static Release currentRelease = Release.DEBUG;
 	
 	public static Release getRunningReleaseStatus() {
@@ -84,11 +84,11 @@ public class ReleaseInfo implements HelperClass {
 					return false;
 			case TRANSPATH_ACCESS:
 				return false;
-				// if (currentRelease == Release.DEBUG
-				// || currentRelease == Release.RELEASE_IPK)
-				// return true;
-				// else
-				// return false;
+			// if (currentRelease == Release.DEBUG
+			// || currentRelease == Release.RELEASE_IPK)
+			// return true;
+			// else
+			// return false;
 			case URL_HELPTEXT:
 				if (currentRelease == Release.DEBUG
 						|| currentRelease == Release.RELEASE_IPK)
@@ -109,19 +109,19 @@ public class ReleaseInfo implements HelperClass {
 				return false;
 			case DATA_CARD_ACCESS:
 				return false;
-				// if (currentRelease==Release.DEBUG ||
-				// currentRelease==Release.RELEASE_IPK)
-				// return true;
-				// break;
+			// if (currentRelease==Release.DEBUG ||
+			// currentRelease==Release.RELEASE_IPK)
+			// return true;
+			// break;
 			case METHOUSE_ACCESS:
 				return false;
 			case FLAREX_ACCESS:
 				return false;
 			case SCRIPT_ACCESS:
 				return true; /*
-								 * if (currentRelease==Release.DEBUG) return true;
-								 * break;
-								 */
+									 * if (currentRelease==Release.DEBUG) return true;
+									 * break;
+									 */
 			case GravistoJavaHelp:
 				if (currentRelease != Release.RELEASE_CLUSTERVIS
 						&& currentRelease != Release.KGML_EDITOR) {
@@ -134,11 +134,11 @@ public class ReleaseInfo implements HelperClass {
 				return false;
 			case TAB_LAYOUT:
 				return true; /*
-								 * if (currentRelease==Release.RELEASE_CLUSTERVIS ||
-								 * currentRelease==Release.KGML_EDITOR ||
-								 * currentRelease==Release.DEBUG) return true;
-								 */
-				// break;
+									 * if (currentRelease==Release.RELEASE_CLUSTERVIS ||
+									 * currentRelease==Release.KGML_EDITOR ||
+									 * currentRelease==Release.DEBUG) return true;
+									 */
+			// break;
 			case STATISTIC_FUNCTIONS:
 				// if (currentRelease==Release.RELEASE_IPK ||
 				// currentRelease==Release.RELEASE_PUBLIC ||
@@ -150,9 +150,9 @@ public class ReleaseInfo implements HelperClass {
 				return false;
 			case DATAMAPPING:
 				return false;
-				// if (currentRelease!=Release.RELEASE_CLUSTERVIS &&
-				// currentRelease!=Release.KGML_EDITOR)
-				// return true;
+			// if (currentRelease!=Release.RELEASE_CLUSTERVIS &&
+			// currentRelease!=Release.KGML_EDITOR)
+			// return true;
 			case AGLET_NETWORK:
 				if (currentRelease != Release.RELEASE_CLUSTERVIS
 						&& currentRelease != Release.KGML_EDITOR)

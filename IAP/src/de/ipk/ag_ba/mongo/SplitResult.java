@@ -183,7 +183,7 @@ public class SplitResult {
 					MergeCompareRequirements mcr = new MergeCompareRequirements();
 					mcr.setCompareSamples(false);
 					mcr.setCompareValues(false);
-					mef.addAndMerge(optPingCode, ei, BackgroundThreadDispatcher.getRE(), mcr);
+					mef.addAndMerge(optPingCode, ei, BackgroundThreadDispatcher.getRunnableExecutor(), mcr);
 					if (optPingCode != null)
 						optPingCode.run();
 					BlockPipeline.ping();
