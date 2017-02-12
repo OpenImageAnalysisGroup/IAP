@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import org.AttributeHelper;
 import org.ErrorMsg;
 import org.MergeCompareRequirements;
 import org.OpenFileDialogService;
@@ -20,13 +21,11 @@ import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.commands.experiment.view_or_export.ActionDataProcessing;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.util.ExperimentReference;
 import de.ipk.ag_ba.mongo.MongoDB;
-import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
@@ -45,8 +44,6 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class SaveExperimentInCloud extends AbstractNavigationAction {
 	private NavigationButton src;
-	
-	ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 	
 	private final boolean storeInMongo;
 	
@@ -83,7 +80,6 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		
 		this.src = src;
 		this.newExperiment = null;
-		res.clear();
 		
 		final ThreadSafeOptions tso = new ThreadSafeOptions();
 		SwingUtilities.invokeAndWait(new Runnable() {
@@ -113,11 +109,6 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			if (storeInMongo) {
 				m.saveExperiment(newExperiment, status);
 			}
-			ExperimentReference exRef = new ExperimentReference(newExperiment);
-			exRef.setM(m);
-			for (ActionDataProcessing adp : IAPpluginManager.getInstance().getExperimentProcessingActions(exRef, true))
-				res.add(new NavigationButton(adp, src.getGUIsetting()));
-			
 		}
 	}
 	
@@ -125,26 +116,45 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 	public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
 		ArrayList<NavigationButton> res = new ArrayList<NavigationButton>();
 		res.addAll(currentSet);
-		if (newExperiment != null) {
-			res.add(src);
-			res.add(ActionMongoExperimentsNavigation.getMongoExperimentButton(
-					new ExperimentReference(newExperiment),
-					src.getGUIsetting()));
-		}
+		res.add(src);
 		return res;
 	}
 	
 	@Override
 	public ArrayList<NavigationButton> getResultNewActionSet() {
-		return res;
+		ArrayList<NavigationButton> res2 = new ArrayList<NavigationButton>();
+		
+		if (newExperiment != null) {
+			ExperimentReference exRef = new ExperimentReference(newExperiment);
+			exRef.setM(m);
+			res2.add(ActionMongoExperimentsNavigation.getMongoExperimentButton(exRef, src.getGUIsetting()));
+		}
+		return res2;
 	}
 	
 	private void prepareDataSetFromFileList(RunnableWithMappingData resultProcessor) throws Exception {
 		List<File> fileList = OpenFileDialogService.getFiles(new String[] { "jpg", "jpeg", "png", "tif", "tiff" }, "JPEG, PNG or TIFF Images");
-		if (fileList == null)
+		
+		if (fileList != null) {
+			boolean allFiles = true;
+			for (File f : fileList)
+				if (f.isDirectory())
+					allFiles = false;
+			if (!allFiles) {
+				messages.add("Only file lists can be processed, no directories.");
+				return;
+			}
+		}
+		
+		if (fileList == null) {
+			messages.add("Operation cancelled.");
 			return;
-		if (fileList.isEmpty())
+		}
+		if (fileList.isEmpty()) {
+			messages.add("No files selected.");
 			return;
+		}
+		
 		fileList = new ArrayList<File>(fileList);
 		Collections.sort(fileList, new Comparator<File>() {
 			@Override
@@ -155,8 +165,6 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		final File parentFolder = fileList.iterator().next().getParentFile();
 		
 		TableData tableData;
-		
-		boolean foundAnnoFile;
 		
 		GregorianCalendar first = null;
 		GregorianCalendar last = null;
@@ -187,7 +195,6 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 		File annotationFile = new File(parentFolder.getAbsoluteFile() + File.separator + "fileimport.xlsx");
 		if (!annotationFile.exists()) {
 			tableData = new TableData();
-			foundAnnoFile = false;
 			int col = 1;
 			int row = 1;
 			tableData.addCellDataNG(col++, row, "import file");
@@ -209,27 +216,35 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			for (File f : fileList) {
 				col = 1;
 				tableData.addCellDataNG(col++, row, f.getName());
-				tableData.addCellDataNG(col++, row, f.getName().split("@", 2)[0]);
+				tableData.addCellDataNG(col++, row, StringManipulationTools.removeFileExtension(f.getName()).split("@", 2)[0]);
 				tableData.addCellDataNG(col++, row, repl++);
 				tableData.addCellDataNG(col++, row, (int) ((f.lastModified() - first.getTime().getTime()) / (1000 * 60 * 60 * 24)));
 				tableData.addCellDataNG(col++, row, "day");
 				tableData.addCellDataNG(col++, row, new Date(f.lastModified()));
-				tableData.addCellDataNG(col++, row, "tool");
+				tableData.addCellDataNG(col++, row, "");
 				tableData.addCellDataNG(col++, row, "vis.top");
 				tableData.addCellDataNG(col++, row, 0.0);
 				tableData.addCellDataNG(col++, row, "Barley");
-				tableData.addCellDataNG(col++, row, "geno");
-				tableData.addCellDataNG(col++, row, "var");
-				tableData.addCellDataNG(col++, row, "gcon");
-				tableData.addCellDataNG(col++, row, "treat");
+				tableData.addCellDataNG(col++, row, "");
+				tableData.addCellDataNG(col++, row, "");
+				tableData.addCellDataNG(col++, row, "");
+				tableData.addCellDataNG(col++, row, "");
 				row++;
 			}
 			
 			tableData.saveToExcelFile("meta-data", annotationFile, status);
+			
+			messages.add("The file '" + annotationFile.getAbsolutePath() + "' has been created. Please enter or modify the image annotations like camera type and position, plant ID, experiment day, species, and so on.");
+			
+			messages.add("Then repeat this operation, the annotation file will be found and processed. "
+					+ "All image files that are specified in the XLSX table will be read, independent "
+					+ "from the actual file selection in the second run of this command.");
+			AttributeHelper.showInFileBrowser(annotationFile.getParent(), annotationFile.getName());
 			return;
 		} else {
+			messages.add("The meta-data and annotation file '" + annotationFile.getAbsolutePath() + "' has been found. "
+					+ "Independent from the actual selection of images, all image files within this table are loaded and processed according to the specified meta-data fields.");
 			tableData = TableData.getTableData(annotationFile, true);
-			foundAnnoFile = true;
 		}
 		
 		Experiment e = new Experiment();
@@ -268,11 +283,16 @@ public class SaveExperimentInCloud extends AbstractNavigationAction {
 			String growthConditions = tableData.getUnicodeStringCellData(metaColumn++, row);
 			String treatment = tableData.getUnicodeStringCellData(metaColumn++, row);
 			
-			if (importFile == null || importFile.isEmpty())
+			if (importFile == null || importFile.isEmpty()) {
 				messages.add("No file name specified in column A, row " + (row + 1) + ".");
+				continue;
+			}
+			
 			File f = new File(path + File.separator + importFile);
-			if (!f.exists())
+			if (!f.exists()) {
 				messages.add("The file '" + importFile + "' specified in column A, row " + (row + 1) + " could not be found.");
+				continue;
+			}
 			
 			Substance3D sub = new Substance3D();
 			sub.setName(camera);
