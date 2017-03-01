@@ -233,6 +233,13 @@ public class LTdataExchange implements ExperimentLoader {
 				ExperimentHeaderInterface ehi = new ExperimentHeader();
 				String name = rs.getString(1);
 				
+				// no valid measurement_label ... skip
+				if (name == null)
+					if (rs.next() == false)
+						break;
+					else
+						continue;
+				
 				ehi.setExperimentname(name);
 				
 				ehi.setDatabase(database);
