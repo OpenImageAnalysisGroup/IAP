@@ -89,6 +89,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 					if (cs >= minimumPixelCount)
 						nValidClusters++;
 				}
+			
 			if (nValidClusters > maxN)
 				nValidClusters = maxN;
 			
@@ -145,7 +146,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 					result[i] = back;
 			}
 			if (filled == 0)
-				return null;
+				return mask;
 			else
 				return new Image(mask.getWidth(), mask.getHeight(), result);
 		}
