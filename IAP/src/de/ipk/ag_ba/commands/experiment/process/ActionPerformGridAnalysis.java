@@ -66,7 +66,7 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 	
 	@Override
 	public ParameterOptions getParameters() {
-		return new ParameterOptions("You may modify the number of submitted jobs:", new Object[] {
+		return new ParameterOptions("Number of jobs to be submitted:", new Object[] {
 				"Job Count", numberOfJobs
 		});
 	}
@@ -99,8 +99,7 @@ public class ActionPerformGridAnalysis extends AbstractPhenotypeAnalysisAction {
 		if (m == null)
 			return "Analysis Job";
 		else {
-			String warning = ReleaseInfo.IAP_VERSION_STRING.equals("" + pd.getTestedIAPversion()) ? "" :
-					"<br><small><font color='red'>Settings not tested with IAP V" + ReleaseInfo.IAP_VERSION_STRING + "!";
+			String warning = ReleaseInfo.IAP_VERSION_STRING.equals("" + pd.getTestedIAPversion()) ? "" : "<br><small><font color='red'>Settings not tested with IAP V" + ReleaseInfo.IAP_VERSION_STRING + "!";
 			return "<html><center>Submit " + numberOfJobs + " analysis jobs to " + (m != null ? m.getDatabaseName() : "(database instance is null)") + warning;
 		}
 	}

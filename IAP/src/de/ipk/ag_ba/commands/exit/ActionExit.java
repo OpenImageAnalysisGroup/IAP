@@ -2,6 +2,8 @@ package de.ipk.ag_ba.commands.exit;
 
 import java.util.ArrayList;
 
+import org.SystemAnalysis;
+
 import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
@@ -20,9 +22,9 @@ public class ActionExit extends AbstractNavigationAction {
 	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		if (systemExit)
-			System.exit(0);
-		else
+		if (systemExit) {
+			SystemAnalysis.exit(0);
+		} else
 			guiSetting.closeWindow();
 	}
 	

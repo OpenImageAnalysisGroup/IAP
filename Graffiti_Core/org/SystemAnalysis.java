@@ -348,16 +348,13 @@ public class SystemAnalysis {
 	 *            - if there is a
 	 *            problem determing the address
 	 */
-	public static InetAddress getLocalHost() throws
-			UnknownHostException {
+	public static InetAddress getLocalHost() throws UnknownHostException {
 		InetAddress localHost = InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 });
 		try {
-			localHost =
-					InetAddress.getLocalHost();
+			localHost = InetAddress.getLocalHost();
 			if (!localHost.isLoopbackAddress())
 				return localHost;
-			InetAddress[] addrs =
-					getAllLocalUsingNetworkInterface();
+			InetAddress[] addrs = getAllLocalUsingNetworkInterface();
 			for (int i = 0; i < addrs.length; i++) {
 				if (!addrs[i].isLoopbackAddress())
 					return addrs[i];
@@ -365,8 +362,7 @@ public class SystemAnalysis {
 		} catch (Exception e) {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: " + e.getMessage());
 		}
-		InetAddress[] addrs =
-				getAllLocalUsingNetworkInterface();
+		InetAddress[] addrs = getAllLocalUsingNetworkInterface();
 		for (int i = 0; i < addrs.length; i++) {
 			if (!addrs[i].isLoopbackAddress())
 				return addrs[i];
@@ -389,10 +385,8 @@ public class SystemAnalysis {
 	 *            - if there is a
 	 *            problem determining addresses
 	 */
-	public static InetAddress[] getAllLocal() throws
-			UnknownHostException {
-		InetAddress[] iAddresses =
-				InetAddress.getAllByName("127.0.0.1");
+	public static InetAddress[] getAllLocal() throws UnknownHostException {
+		InetAddress[] iAddresses = InetAddress.getAllByName("127.0.0.1");
 		if (iAddresses.length != 1)
 			return iAddresses;
 		if (!iAddresses[0].isLoopbackAddress())
@@ -412,20 +406,16 @@ public class SystemAnalysis {
 	 *            - if there is a
 	 *            problem determining addresses
 	 */
-	private static InetAddress[]
-			getAllLocalUsingNetworkInterface() throws
-					UnknownHostException {
+	private static InetAddress[] getAllLocalUsingNetworkInterface() throws UnknownHostException {
 		ArrayList<InetAddress> addresses = new ArrayList<InetAddress>();
 		Enumeration<NetworkInterface> e = null;
 		try {
-			e =
-					NetworkInterface.getNetworkInterfaces();
+			e = NetworkInterface.getNetworkInterfaces();
 		} catch (SocketException ex) {
 			throw new UnknownHostException("127.0.0.1");
 		}
 		while (e.hasMoreElements()) {
-			NetworkInterface ni =
-					e.nextElement();
+			NetworkInterface ni = e.nextElement();
 			for (Enumeration<InetAddress> e2 = ni.getInetAddresses(); e2.hasMoreElements();) {
 				addresses.add(e2.nextElement());
 			}
@@ -558,5 +548,15 @@ public class SystemAnalysis {
 		} catch (Exception ignore) {
 		}
 		return 1f;
+	}
+	
+	private static void waitIfImportantProcessIsRunning() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public static void exit(int returnCode) {
+		waitIfImportantProcessIsRunning();
+		System.exit(returnCode);
 	}
 }

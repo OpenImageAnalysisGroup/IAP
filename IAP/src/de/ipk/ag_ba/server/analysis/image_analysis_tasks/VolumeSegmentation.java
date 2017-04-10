@@ -24,6 +24,7 @@ import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
@@ -45,6 +46,7 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	private final DatabaseTarget storeResultInDatabase;
 	private int workLoadIndex;
 	private int workLoadSize;
+	private ExperimentHeaderInterface header;
 	
 	public VolumeSegmentation(DatabaseTarget storeResultInDatabase) {
 		this.storeResultInDatabase = storeResultInDatabase;
@@ -133,10 +135,12 @@ public class VolumeSegmentation implements ImageAnalysisTask {
 	
 	@Override
 	public void setInput(
+			ExperimentHeaderInterface header,
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			Collection<Sample3D> input,
 			Collection<NumericMeasurementInterface> optValidMeasurements,
 			MongoDB m, int workLoadIndex, int workLoadSize) {
+		this.header = header;
 		this.input = input;
 		this.m = m;
 		this.workLoadIndex = workLoadIndex;

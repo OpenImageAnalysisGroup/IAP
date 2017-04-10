@@ -47,7 +47,7 @@ public class SubFolderDatasource extends FileSystemSource {
 			readDataSource();
 			for (String f : expFolders) {
 				VirtualFileSystemVFS2 vfs = new VirtualFileSystemVFS2("hsm_" + f, VfsFileProtocol.LOCAL, f,
-						"file", "localhost", SystemAnalysis.getUserName(), null, url + File.separator + f, true, false, f);
+						"file", "localhost", SystemAnalysis.getUserName(), null, urlFSS + File.separator + f, true, false, f);
 				
 				if (readOnly)
 					vfs.forceReadOnly = true;
@@ -58,14 +58,14 @@ public class SubFolderDatasource extends FileSystemSource {
 				res.add(vfs.getNavigationButton(src.getGUIsetting()));
 			}
 			for (String fn : filesOrDirectories) {
-				if (new File(url + File.separator + fn).isDirectory()) {
-					DataSource ds = new SubFolderDatasource(fn, url + File.separator + fn, readOnly, true);
+				if (new File(urlFSS + File.separator + fn).isDirectory()) {
+					DataSource ds = new SubFolderDatasource(fn, urlFSS + File.separator + fn, readOnly, true);
 					res.add(new NavigationButton(new ActionNavigateDataSource(ds), src.getGUIsetting()));
 				}
 			}
 			for (String fn : filesOrDirectories) {
-				if (!new File(url + File.separator + fn).isDirectory()) {
-					VirtualFileSystem vfs = new VirtualFileSystemFolderStorage("temp-fs", "local.io", fn, url + File.separator + fn);
+				if (!new File(urlFSS + File.separator + fn).isDirectory()) {
+					VirtualFileSystem vfs = new VirtualFileSystemFolderStorage("temp-fs", "local.io", fn, urlFSS + File.separator + fn);
 					ArrayList<NavigationAction> nal = new ArrayList<>();
 					Library ll = new Library();
 					VfsFileSystemSource.createActionOrLibEntryForGivenFilename(vfs, fn, null, nal, ll);
@@ -95,7 +95,7 @@ public class SubFolderDatasource extends FileSystemSource {
 		this.read = true;
 		expFolders.clear();
 		filesOrDirectories.clear();
-		File dir = new File(url);
+		File dir = new File(urlFSS);
 		if (dir.exists()) {
 			String[] entries = dir.list(new FilenameFilter() {
 				@Override

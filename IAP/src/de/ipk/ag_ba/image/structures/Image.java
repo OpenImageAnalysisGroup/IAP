@@ -93,12 +93,18 @@ public class Image {
 	private static WeakHashMap<String, Image> url2image = new WeakHashMap<String, Image>();
 	
 	public Image(IOurl url) throws IOException, Exception {
+		this(url, true);
+	}
+	
+	public Image(IOurl url, boolean useCache) throws IOException, Exception {
 		if (url != null && url.getFileName() != null)
 			this.fileName = url.getFileName();
 		
 		Image img = null;
-		synchronized (url2image) {
-			img = url2image.get(url + "");
+		if (useCache) {
+			synchronized (url2image) {
+				img = url2image.get(url + "");
+			}
 		}
 		if (img == null) {
 			InputStream is = url.getInputStream();
@@ -135,11 +141,13 @@ public class Image {
 						.println(SystemAnalysis.getCurrentTime() + ">WARNING: Quick-load didn't work correctly, revert to save-conversion. Error: " + e.getMessage());
 				image = inpimg;
 			}
-			synchronized (url2image) {
-				w = image.getWidth();
-				h = image.getHeight();
-				if (inpimg.getBitDepth() == ImageType.COLOR_RGB.depth)
-					url2image.put(url + "", this.copy());
+			w = image.getWidth();
+			h = image.getHeight();
+			if (useCache) {
+				synchronized (url2image) {
+					if (inpimg.getBitDepth() == ImageType.COLOR_RGB.depth)
+						url2image.put(url + "", this.copy());
+				}
 			}
 		} else {
 			image = img.copy().getAsImagePlus();

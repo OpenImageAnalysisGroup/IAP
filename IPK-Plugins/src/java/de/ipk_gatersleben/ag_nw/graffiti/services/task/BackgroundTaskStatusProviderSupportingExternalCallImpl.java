@@ -22,6 +22,14 @@ public class BackgroundTaskStatusProviderSupportingExternalCallImpl implements
 	}
 	
 	@Override
+	public void reset() {
+		status1 = null;
+		status2 = null;
+		currentProgress = -1d;
+		stopRequested = false;
+	}
+	
+	@Override
 	public synchronized void setCurrentStatusValueFine(double value) {
 		currentProgress = value;
 	}

@@ -1,12 +1,5 @@
 package iap.blocks.data_structures;
 
-import iap.blocks.extraction.Trait;
-import iap.blocks.extraction.TraitCategory;
-import iap.pipelines.ImageProcessorOptionsAndResults;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-import info.StopWatch;
-import info.clearthought.layout.TableLayout;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,6 +44,12 @@ import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
+import iap.pipelines.ImageProcessorOptionsAndResults;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
+import info.StopWatch;
+import info.clearthought.layout.TableLayout;
 
 /**
  * @author klukas
@@ -220,7 +219,8 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				if (getBoolean("enabled", true))
 					debugStack.addImage("Result of " + task,
 							res.getOverviewImage(SystemOptions.getInstance().getInteger("IAP", "Debug-Overview-Image-Width", 1680),
-									debugStack), null);
+									debugStack),
+							null);
 	}
 	
 	public MaskAndImageSet input() {
@@ -289,7 +289,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			error.printStackTrace();
 		if (SystemOptions.getInstance().getBoolean("IAP", "Debug - System.Exit in case of pipeline error",
 				IAPmain.getRunMode() == IAPrunMode.CLOUD_HOST_BATCH_MODE))
-			System.exit(SystemOptions.getInstance().getInteger(
+			SystemAnalysis.exit(SystemOptions.getInstance().getInteger(
 					"IAP", "Debug: System.Exit return value in case of pipeline error", 1));
 	}
 	
@@ -594,8 +594,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 			for (String id : images.get(key).keySet()) {
 				res.get(key).put(id, new ImageAndImageData(
 						images.get(key).get(id).getImage(),
-						images.get(key).get(id).getImageData()
-						));
+						images.get(key).get(id).getImageData()));
 			}
 		}
 		return res;
@@ -626,7 +625,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 						nv.setInt(v.getInt());
 					else
 						nv.setInt(v.getInt() / 2);
-				
+					
 				res.put(key, nv);
 			}
 		}
@@ -655,7 +654,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	}
 	
 	/**
-	 * Function checks if current side view fits to calculated main axis. 
+	 * Function checks if current side view fits to calculated main axis.
 	 * (main_axis.rotation only available for fluorescence images = overwrite)
 	 * (check_opposite = checks if opposite rotation is fits better)
 	 * 
@@ -665,7 +664,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	protected boolean isBestAngle(CameraType ct) {
 		boolean check_opposite = true;
 		HashMap<String, ArrayList<BlockResultValue>> previousResults = optionsAndResults
-				.searchResultsOfCurrentSnapshot(new Trait(CameraPosition.TOP, CameraType.FLUO, TraitCategory.GEOMETRY, "main_axis.rotation").toString(), true, getWellIdx(),
+				.searchResultsOfCurrentSnapshot(new Trait(CameraPosition.TOP, ct, TraitCategory.GEOMETRY, "main_axis.rotation").toString(), true, getWellIdx(),
 						null, false, null);
 		
 		double sum = 0;

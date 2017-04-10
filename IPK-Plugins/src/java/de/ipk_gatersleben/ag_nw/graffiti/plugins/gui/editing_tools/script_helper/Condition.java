@@ -33,9 +33,7 @@ public class Condition implements ConditionInterface {
 	public static final String ATTRIBUTE_KEY_GENOTYPE = "genotype";
 	
 	public enum ConditionInfo implements NiceNameSupport {
-		IGNORED_FIELD("---"), SPECIES("Species"), GENOTYPE("Genotype"), VARIETY("Variety"),
-		GROWTHCONDITIONS("Growth Condititions"), TREATMENT("Treatment"),
-		SEQUENCE("Sequence"), FILES("Files");
+		IGNORED_FIELD("---"), SPECIES("Species"), GENOTYPE("Genotype"), VARIETY("Variety"), GROWTHCONDITIONS("Growth Condititions"), TREATMENT("Treatment"), SEQUENCE("Sequence"), FILES("Files");
 		
 		private String desc;
 		
@@ -197,15 +195,42 @@ public class Condition implements ConditionInterface {
 	
 	@Override
 	public String getHTMLdescription() {
+		return getHTMLdescription(false, false);
+	}
+	
+	@Override
+	public String getHTMLdescription(boolean ommitNullValues, boolean simpleFormat) {
 		StringBuilder res = new StringBuilder();
-		res.append("<html><table border='1'>");
-		res.append("<tr><th>Property</th><th>Value</th></tr>");
-		res.append("<tr><td>Species</td><td>" + species + "</td></tr>");
-		res.append("<tr><td>Genotype</td><td>" + genotype + "</td></tr>");
-		res.append("<tr><td>Variety</td><td>" + variety + "</td></tr>");
-		res.append("<tr><td>Sequence</td><td>" + sequence + "</td></tr>");
-		res.append("<tr><td>Growth conditions</td><td>" + growthconditions + "</td></tr>");
-		res.append("<tr><td>Treatment</td><td>" + treatment + "</td></tr>");
+		if (simpleFormat) {
+			res.append("<html><table cellspacing='0' cellpadding='0' border='" + (simpleFormat ? "0" : "1") + "'>");
+			if (species != null)
+				res.append("<tr><td>Species:&nbsp;</td><td>" + species + "</td></tr>");
+			if (genotype != null)
+				res.append("<tr><td>Genotype:&nbsp;</td><td>" + genotype + "</td></tr>");
+			if (variety != null)
+				res.append("<tr><td>Variety:&nbsp;</td><td>" + variety + "</td></tr>");
+			if (sequence != null)
+				res.append("<tr><td>Sequence:&nbsp;</td><td>" + sequence + "</td></tr>");
+			if (growthconditions != null)
+				res.append("<tr><td>Growth conditions:&nbsp;</td><td>" + growthconditions + "</td></tr>");
+			if (treatment != null)
+				res.append("<tr><td>Treatment:&nbsp;</td><td>" + treatment + "</td></tr>");
+		} else {
+			res.append("<html><table border='0'>");
+			res.append("<tr><th>Property</th><th>Value</th></tr>");
+			if (species != null)
+				res.append("<tr><td>Species</td><td>" + species + "</td></tr>");
+			if (genotype != null)
+				res.append("<tr><td>Genotype</td><td>" + genotype + "</td></tr>");
+			if (variety != null)
+				res.append("<tr><td>Variety</td><td>" + variety + "</td></tr>");
+			if (sequence != null)
+				res.append("<tr><td>Sequence</td><td>" + sequence + "</td></tr>");
+			if (growthconditions != null)
+				res.append("<tr><td>Growth conditions</td><td>" + growthconditions + "</td></tr>");
+			if (treatment != null)
+				res.append("<tr><td>Treatment</td><td>" + treatment + "</td></tr>");
+		}
 		res.append("</table></html>");
 		return res.toString();
 	}
@@ -367,7 +392,7 @@ public class Condition implements ConditionInterface {
 				String measurementUnit = m.getUnit();
 				long timeValueForComparison = m.getParentSample().getSampleFineTimeOrRowId() != null && m.getParentSample().getSampleFineTimeOrRowId() > 0 ? m
 						.getParentSample().getSampleFineTimeOrRowId() : m
-						.getParentSample().getTime();
+								.getParentSample().getTime();
 				TtestInfo ttestInfo = m.getParentSample().getTtestInfo();
 				String timeUnit = m.getParentSample().getTimeUnit();
 				int seriesID = m.getParentSample().getParentCondition().getSeriesId();
@@ -504,7 +529,7 @@ public class Condition implements ConditionInterface {
 					if (exp.getName() != null && exp.getText() != null)
 						attributeList.add(new Attribute(exp.getName(), exp.getText()));
 				}
-		
+			
 		for (Object o : attributeList) {
 			if (o instanceof Attribute) {
 				Attribute a = (Attribute) o;

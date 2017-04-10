@@ -9,9 +9,6 @@
 
 package org.graffiti.editor.dialog;
 
-import info.clearthought.layout.TableLayout;
-import info.clearthought.layout.TableLayoutConstants;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -62,6 +59,9 @@ import org.graffiti.plugin.parameter.Parameter;
 import org.graffiti.plugin.parameter.StringParameter;
 import org.graffiti.selection.Selection;
 import org.graffiti.session.Session;
+
+import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
 
 /**
  * The default implementation of a parameter dialog.
@@ -205,7 +205,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 		
 		if (okOnlyButtonText != null && okOnlyButtonText.length() > 0)
 			ok.setText(okOnlyButtonText);
-		
+			
 		// JPanel buttonsPanel = new JPanel();
 		//
 		// buttonsPanel.add(ok);
@@ -432,10 +432,10 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 							TableLayout.getSplitVertical(null,
 									TableLayout.get3Split(ok, null, okOnly ? null : cancel, TableLayoutConstants.PREFERRED, border,
 											TableLayoutConstants.PREFERRED),
-									TableLayout.FILL, TableLayoutConstants.PREFERRED), null,
+									TableLayout.FILL, TableLayoutConstants.PREFERRED),
+							null,
 							TableLayout.FILL, TableLayoutConstants.PREFERRED, TableLayout.FILL, border, 0),
-					"1,3"
-					);
+					"1,3");
 		getContentPane().validate();
 	}
 	
@@ -572,14 +572,14 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 		
 		if (title != null && title.endsWith("..."))
 			title = title.substring(0, title.length() - "...".length());
-		
+			
 		// Buttons: OK => close and return input values
 		// Cancel => close and return null
 		// Reset => set to initial values
 		Parameter[] p = new Parameter[parameters.length / 2];
 		for (int i = 0; i < p.length; i++) {
 			Object desc = parameters[i * 2];
-			String nameTitle, nameTooltip;
+			String nameTitle, nameTooltip, defaultValue;
 			String nameDesc;
 			if (desc instanceof String)
 				nameDesc = (String) desc;
@@ -588,6 +588,11 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 					nameDesc = ((JLabel) desc).getText();
 				else
 					nameDesc = null;
+			defaultValue = null;
+			if (nameDesc != null && nameDesc.indexOf("@@@") > 0) {
+				nameTitle = nameDesc.substring(0, nameDesc.indexOf("@@@"));
+				defaultValue = nameDesc.substring(nameDesc.indexOf("@@@") + "@@@".length());
+			}
 			if (nameDesc != null && nameDesc.indexOf("@@") > 0) {
 				nameTitle = nameDesc.substring(0, nameDesc.indexOf("@@"));
 				nameTooltip = nameDesc.substring(nameDesc.indexOf("@@") + "@@".length());
@@ -603,7 +608,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 			} else
 				if (param instanceof String[]) {
 					String[] val = (String[]) param;
-					ObjectListParameter sp = new ObjectListParameter(val[0], nameTitle, nameTooltip, val);
+					ObjectListParameter sp = new ObjectListParameter(defaultValue != null ? defaultValue : val[0], nameTitle, nameTooltip, val);
 					p[i] = sp;
 				} else
 					if (param instanceof String) {
@@ -662,7 +667,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 					modal = false;
 					description = StringManipulationTools.stringReplace((String) description, "nonmodal", "");
 				}
-		
+			
 		boolean noButton = (description != null && description instanceof String && ((String) description).startsWith("[]"));
 		if (noButton) {
 			description = ((String) description).substring("[]".length());
@@ -696,10 +701,7 @@ public class DefaultParameterDialog extends AbstractParameterDialog implements
 				MainFrame.getInstance() != null ? MainFrame.getInstance().getEditComponentManager() : null,
 				ref,
 				p,
-				(MainFrame.getInstance() != null && MainFrame.getInstance().getActiveEditorSession() != null ?
-						MainFrame.getInstance().getActiveEditorSession().
-								getSelectionModel().getActiveSelection() : null
-				),
+				(MainFrame.getInstance() != null && MainFrame.getInstance().getActiveEditorSession() != null ? MainFrame.getInstance().getActiveEditorSession().getSelectionModel().getActiveSelection() : null),
 				title, description, null, showOnlyOneButton, noButton, false, buttonDesc, modal);
 		if (paramDialog.isOkSelected()) {
 			Parameter[] pe = paramDialog.getEditedParameters();

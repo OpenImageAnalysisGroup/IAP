@@ -14,6 +14,7 @@ public class Unicode {
 	
 	public static final String STAR = "&#10049;";
 	public static final String ARROW_RIGHT = "&#9658;";// "&#9654;";
+	public static final String ARROW_RIGHT_SMALL = "&#9655;";
 	public static final String ARROW_LEFT = "&#9668;";// "&#9668;";
 	public static final String ARROW_LEFT_EMPTY = "&#8592;"; // "&#9669;";
 	public static final String PEN = "&#9998;";

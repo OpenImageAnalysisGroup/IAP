@@ -529,7 +529,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 				else
 					setSizekb(Long.parseLong((String) value));
 				return;
-				
+			
 		}
 		throw new UnsupportedOperationException("Can't set field value for id '" + id + "'!");
 	}
@@ -756,7 +756,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 	@Override
 	public String toHtmlString() {
 		StringBuilder s = new StringBuilder();
-		s.append("<html><table border='1'><th>Property</th><th>Value</th></tr>");
+		s.append("<html><table border='0'><th>Property</th><th>Value</th></tr>");
 		HashMap<String, String> field2niceName = ExperimentHeader.getNiceHTMLfieldNameMapping();
 		TreeSet<String> resultRows = new TreeSet<String>();
 		Map<String, Object> am = getAttributeMap();
@@ -777,8 +777,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 					resultRows.add("<tr><td>" + idC + "</td><td>"
 							+ ss
 							+ "</td></tr>");
-				}
-				else
+				} else
 					if (id.equals(ATTRIBUTE_KEY_SETTINGS))
 						resultRows.add("<tr><td>" + idC + "</td><td>"
 								+ (v != null && !v.equals("null") && !v.isEmpty() ? "(defined)" : "(not defined)")

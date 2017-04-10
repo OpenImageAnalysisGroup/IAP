@@ -6,8 +6,6 @@
  */
 package de.ipk.ag_ba.server.task_management;
 
-import info.StopWatch;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -23,6 +21,7 @@ import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.RunnableWithMappingData;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import info.StopWatch;
 
 /**
  * @author klukas
@@ -193,17 +192,17 @@ public class TaskDescription {
 							System.out.println(">SYSTEM.EXIT(1) (batch queue not empty)");
 							Batch.pingHost(m, SystemAnalysisExt.getHostName(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN, "system.exit");
 							MongoDB.saveSystemMessage("Finished compute task, job queue is not empty - SYSTEM.EXIT(1)");
-							System.exit(1);
+							SystemAnalysis.exit(1);
 						} else {
 							System.out.println(">SYSTEM.EXIT(0) (batch queue is empty)");
 							Batch.pingHost(m, SystemAnalysisExt.getHostName(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Double.NaN, "system.exit");
 							MongoDB.saveSystemMessage("Finished compute task, job queue is empty - SYSTEM.EXIT(0)");
-							System.exit(0);
+							SystemAnalysis.exit(0);
 						}
 					} catch (Exception e) {
 						MongoDB.saveSystemErrorMessage("Error post-processing cloud batch execution.", e);
 					}
-					System.exit(0);
+					SystemAnalysis.exit(0);
 				}
 			}
 			

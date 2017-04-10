@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import org.BackgroundTaskStatusProviderSupportingExternalCall;
 
 import de.ipk.ag_ba.mongo.MongoDB;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
@@ -23,6 +24,7 @@ public interface ImageAnalysisTask {
 	public String getName();
 	
 	public void setInput(
+			ExperimentHeaderInterface header,
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			Collection<Sample3D> input, Collection<NumericMeasurementInterface> optValidMeasurements,
 			MongoDB m, int workOnSubset,

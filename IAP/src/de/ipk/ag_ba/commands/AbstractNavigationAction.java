@@ -143,4 +143,9 @@ public abstract class AbstractNavigationAction implements NavigationAction {
 	public SideGuiComponent getButtonGuiAddition() {
 		return null;
 	}
+	
+	@Override
+	public boolean mayRun() {
+		return true;
+	}
 }

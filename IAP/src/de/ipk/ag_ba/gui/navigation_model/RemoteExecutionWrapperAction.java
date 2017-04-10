@@ -197,4 +197,9 @@ public class RemoteExecutionWrapperAction implements NavigationAction {
 	public SideGuiComponent getButtonGuiAddition() {
 		return remoteAction != null ? remoteAction.getButtonGuiAddition() : null;
 	}
+	
+	@Override
+	public boolean mayRun() {
+		return remoteAction != null && remoteAction.mayRun();
+	}
 }

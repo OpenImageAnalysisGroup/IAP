@@ -15,6 +15,7 @@ import de.ipk.ag_ba.server.analysis.IOmodule;
 import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.vanted.LoadedVolumeExtension;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
@@ -35,6 +36,7 @@ public class VolumeStatistics implements ImageAnalysisTask {
 	private MongoDB m;
 	private int workLoadIndex;
 	private int workLoadSize;
+	private ExperimentHeaderInterface header;
 	
 	/*
 	 * (non-Javadoc)
@@ -61,7 +63,7 @@ public class VolumeStatistics implements ImageAnalysisTask {
 		
 		int background = new Color(ImageOperation.BACKGROUND_COLOR.getRed(),
 				ImageOperation.BACKGROUND_COLOR.getBlue(), ImageOperation.BACKGROUND_COLOR.getRed(), 0)
-				.getRGB();
+						.getRGB();
 		long filled = 0, voxels = 0;
 		for (Sample3D ins : input) {
 			for (Measurement md : ins) {
@@ -121,10 +123,12 @@ public class VolumeStatistics implements ImageAnalysisTask {
 	
 	@Override
 	public void setInput(
+			ExperimentHeaderInterface header,
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			Collection<Sample3D> input,
 			Collection<NumericMeasurementInterface> optValidMeasurements,
 			MongoDB m, int workLoadIndex, int workLoadSize) {
+		this.header = header;
 		this.input = input;
 		this.m = m;
 		this.workLoadIndex = workLoadIndex;

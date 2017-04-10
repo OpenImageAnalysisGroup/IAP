@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.commands.experiment.charting;
 
-import info.clearthought.layout.TableLayout;
-
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,6 +26,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import info.clearthought.layout.TableLayout;
 
 /**
  * @author klukas
@@ -152,6 +151,8 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 			if (i.startsWith("Time range//")) {
 				if ("Time range//Experiment days".equals(i))
 					continue;
+				if (StringManipulationTools.getNumbersFromString(i.substring("Time range//".length())).length() == 0)
+					continue;
 				if (set.getBoolean("Charting", i, true)) {
 					sel++;
 					if (!i.contains("Reset")) {
@@ -217,13 +218,13 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		input.visitSamples(null, (s) -> {
 			if (delDays.contains(s.getSampleTime()))
 				deleteSamples.add(s);
-				else
-					if (resetTime) {
-						s.setTime(-1);
-						s.setTimeUnit("-1");
-						s.setSampleFineTimeOrRowId(null);
-					}
-			});
+			else
+				if (resetTime) {
+					s.setTime(-1);
+					s.setTimeUnit("-1");
+					s.setSampleFineTimeOrRowId(null);
+				}
+		});
 		
 		deleteSamples.forEach((s) -> {
 			s.getParentCondition().remove(s);
@@ -232,7 +233,7 @@ public final class ActionTimeRangeCommand extends AbstractNavigationAction imple
 		if (removeEmptyConditions)
 			for (SubstanceInterface su : input)
 				su.removeIf(ConditionInterface::isEmpty);
-		
+			
 		return input;
 	}
 	

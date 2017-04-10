@@ -76,46 +76,7 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 							if (vv2.isAbleToSaveData()) {
 								saveOk = true;
 								res.add(new NavigationButton(null,
-										new ActionDataExportToVfs(experiment.getM(), experiment, vv2, false, null) {
-											
-											@Override
-											public void performActionCalculateResults(NavigationButton src) throws Exception {
-												setSkipClone(true);
-												setSkipUpdateDBid(true);
-												super.performActionCalculateResults(src);
-											}
-											
-											@Override
-											public boolean requestTitleUpdates() {
-												return false;
-											}
-											
-											@Override
-											public String getDefaultTitle() {
-												String res = "Save Annotation Changes" + (postResult != null ? "<br>" + postResult : "");
-												return res;
-											}
-											
-											@Override
-											public ArrayList<NavigationButton> getResultNewActionSet() {
-												return null;
-											}
-											
-											@Override
-											public MainPanelComponent getResultMainPanel() {
-												return null;
-											}
-											
-											@Override
-											public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
-												return currentSet;
-											}
-											
-											@Override
-											public String getDefaultImage() {
-												return "img/ext/gpl2/Gnome-Emblem-Downloads-64.png";
-											}
-										},
+										getSaveAnnotationsInVfsCommand(experiment, vv2),
 										src.getGUIsetting()));
 							}
 						}
@@ -129,6 +90,49 @@ public class ActionViewData extends AbstractNavigationAction implements ActionDa
 		}
 		
 		return res;
+	}
+	
+	public static ActionDataExportToVfs getSaveAnnotationsInVfsCommand(ExperimentReferenceInterface experiment, VirtualFileSystemVFS2 vv2) {
+		return new ActionDataExportToVfs(experiment.getM(), experiment, vv2, false, null) {
+			
+			@Override
+			public void performActionCalculateResults(NavigationButton src) throws Exception {
+				setSkipClone(true);
+				setSkipUpdateDBid(true);
+				super.performActionCalculateResults(src);
+			}
+			
+			@Override
+			public boolean requestTitleUpdates() {
+				return false;
+			}
+			
+			@Override
+			public String getDefaultTitle() {
+				String res = "Save Annotation Changes" + (postResult != null ? "<br>" + postResult : "");
+				return res;
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewActionSet() {
+				return null;
+			}
+			
+			@Override
+			public MainPanelComponent getResultMainPanel() {
+				return null;
+			}
+			
+			@Override
+			public ArrayList<NavigationButton> getResultNewNavigationSet(ArrayList<NavigationButton> currentSet) {
+				return currentSet;
+			}
+			
+			@Override
+			public String getDefaultImage() {
+				return "img/ext/gpl2/Gnome-Emblem-Downloads-64.png";
+			}
+		};
 	}
 	
 	@Override

@@ -6,8 +6,6 @@
  */
 package de.ipk.ag_ba.gui.util;
 
-import info.clearthought.layout.TableLayout;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,6 +63,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.dc.DCexperimentHeader;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.ExperimentDataInfoPane;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import info.clearthought.layout.TableLayout;
 
 /**
  * @author klukas
@@ -359,11 +358,13 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 							TableLayout.getSplitVertical(
 									annotationB,
 									null, TableLayout.PREFERRED, TableLayout.FILL),
-							TableLayout.FILL, TableLayout.PREFERRED), false);
+							TableLayout.FILL, TableLayout.PREFERRED),
+					false);
 		}
 		fp.addGuiComponentRow(new JLabel("Connected Files"), disable(new JTextField(
 				niceValue(experimentHeader.getNumberOfFiles(), null)
-						+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")")), false);
+						+ " (" + niceValue(experimentHeader.getSizekb(), "KB") + ")")),
+				false);
 		if (optExperiment != null)
 			fp.addGuiComponentRow(new JLabel("Numeric Values"), disable(new JTextField(
 					niceValue(optExperiment.getNumberOfMeasurementValues(), null))), false);
@@ -390,9 +391,7 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 			JTextPane jtp = new JTextPane();
 			jtp.setContentType("text/html");
 			jtp.setText(experimentHeader == null || experimentHeader.getSettings() == null
-					|| experimentHeader.getSettings().isEmpty() ?
-					"<html><font size='2' face='Arial'>(not assigned)" :
-					"<html><font size='2' face='Arial'>"
+					|| experimentHeader.getSettings().isEmpty() ? "<html><font size='2' face='Arial'>(not assigned)" : "<html><font size='2' face='Arial'>"
 							+ so + (so.length() > 0 ? ", " : "no pipeline assigned, ")
 							+ (StringManipulationTools.count(experimentHeader.getSettings(), "\n") + (experimentHeader.getSettings().isEmpty() ? 0 : 1))
 							+ " setting lines stored");
@@ -480,11 +479,14 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 					experimentHeader.setCoordinator(coordinator.getText());
 					if (saveMode.isSelected()) {
 						// in memory save requested
-						saveB.setText("Updated (in memory)");
+						if (saveAction != null) {
+							saveAction.run(experimentHeader);
+							saveB.setText("Updated (with action)");
+						} else
+							saveB.setText("Updated (in memory)");
 					} else {
 						if (saveAction != null) {
-							if (saveAction != null)
-								saveAction.run(experimentHeader);
+							saveAction.run(experimentHeader);
 						} else {
 							if (editPossibleBBB) {
 								if (experimentHeader.getExperimentHeaderHelper() != null) {
@@ -589,7 +591,8 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 				TableLayout.get3Split(
 						editB, null,
 						fff,
-						TableLayout.PREFERRED, 10, TableLayout.PREFERRED), null, TableLayout.FILL,
+						TableLayout.PREFERRED, 10, TableLayout.PREFERRED),
+				null, TableLayout.FILL,
 				TableLayout.PREFERRED, TableLayout.FILL), 5, TableLayout.PREFERRED), null);
 		gr.span = true;
 		
@@ -762,10 +765,8 @@ public class ExperimentHeaderInfoPanel extends JPanel {
 		ArrayList<MatchInfo> res = new ArrayList<MatchInfo>();
 		for (SubstanceInterface si : optExperiment) {
 			if (si.getName() != null && si.getName().startsWith(match[0]) &&
-					(
-					(!inverseSecond && si.getName().endsWith(match[1])) ||
-					(inverseSecond && !si.getName().endsWith(match[1]))
-					)) {
+					((!inverseSecond && si.getName().endsWith(match[1])) ||
+							(inverseSecond && !si.getName().endsWith(match[1])))) {
 				MatchInfo mi = new MatchInfo(si.getName());
 				boolean matched = false;
 				for (ConditionInterface ci : si) {

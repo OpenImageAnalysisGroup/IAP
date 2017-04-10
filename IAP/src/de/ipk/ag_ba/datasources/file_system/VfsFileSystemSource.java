@@ -81,8 +81,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 			NavigationImage folderIcon,
 			NavigationImage folderIconOpened, String subfolder) {
 		super(lib, dataSourceName,
-				(folder instanceof VirtualFileSystemFolderStorage ?
-						((VirtualFileSystemFolderStorage) folder).getTargetPathName() : null),
+				(folder instanceof VirtualFileSystemFolderStorage ? ((VirtualFileSystemFolderStorage) folder).getTargetPathName() : null),
 				mainDataSourceIcon, mainDataSourceIcon, folderIcon, folderIconOpened);
 		this.url = folder;
 		validExtensions2 = validExtensions;
@@ -96,8 +95,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		this.read = true;
 		this.mainList = new ArrayList<PathwayWebLinkItem>();
 		folderActions.clear();
-		HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data =
-				new HashMap<String, TreeMap<Long, ExperimentHeaderInterface>>();
+		HashMap<String, TreeMap<Long, ExperimentHeaderInterface>> experimentName2saveTime2data = new HashMap<String, TreeMap<Long, ExperimentHeaderInterface>>();
 		this.thisLevel = new HsmMainDataSourceLevel(experimentName2saveTime2data);
 		((HsmMainDataSourceLevel) thisLevel).setHsmFileSystemSource(this);
 		
@@ -199,7 +197,7 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		if (subfolder == null)
 			for (NavigationButton nb : super.getAdditionalEntities(src))
 				folderButtons.add(nb);
-		
+			
 		return folderButtons;
 	}
 	
@@ -300,44 +298,47 @@ public class VfsFileSystemSource extends HsmFileSystemSource {
 		
 		HSMfolderTargetDataManager hsm = new HSMfolderTargetDataManager(
 				HsmResourceIoHandler.getPrefix(hsmFolder), hsmFolder);
-		String experimentDirectory =
-				HSMfolderTargetDataManager.DATA_FOLDER_NAME + File.separator +
-						hsm.getTargetDirectory(header, null);
+		String experimentDirectory = HSMfolderTargetDataManager.DATA_FOLDER_NAME + File.separator +
+				hsm.getTargetDirectory(header, null);
 		String fileNameOfExperimentFile = fileName.substring(0, fileName.length() - ".iap.index.csv".length()) + ".iap.vanted.bin";
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Load Experiment");
 		IOurl u = url.getIOurlFor(experimentDirectory + "/" + fileNameOfExperimentFile);
 		String prefix = u.getPrefix();
-		ExperimentInterface md = Experiment.loadFromIOurl(u, optStatus);
-		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Post processing");
-		for (NumericMeasurementInterface nmi : Substance3D.getAllFiles(md)) {
-			if (nmi != null && nmi instanceof BinaryMeasurement) {
-				BinaryMeasurement bm = (BinaryMeasurement) nmi;
-				if (bm.getURL() != null)
-					bm.getURL().setPrefix(prefix);
-				if (bm.getLabelURL() != null)
-					bm.getLabelURL().setPrefix(prefix);
-			}
-			if (nmi instanceof ImageData) {
-				final ImageData id = (ImageData) nmi;
-				String oldRef = id.getAnnotationField("oldreference");
-				if (oldRef != null && !oldRef.isEmpty()) {
-					IOurl oldRefUrl = new IOurl(oldRef);
-					oldRefUrl.setPrefix(prefix);
-					id.setAnnotationField("oldreference", oldRefUrl.toString());
+		try {
+			ExperimentInterface md = Experiment.loadFromIOurl(u, optStatus);
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Post processing");
+			for (NumericMeasurementInterface nmi : Substance3D.getAllFiles(md)) {
+				if (nmi != null && nmi instanceof BinaryMeasurement) {
+					BinaryMeasurement bm = (BinaryMeasurement) nmi;
+					if (bm.getURL() != null)
+						bm.getURL().setPrefix(prefix);
+					if (bm.getLabelURL() != null)
+						bm.getLabelURL().setPrefix(prefix);
+				}
+				if (nmi instanceof ImageData) {
+					final ImageData id = (ImageData) nmi;
+					String oldRef = id.getAnnotationField("oldreference");
+					if (oldRef != null && !oldRef.isEmpty()) {
+						IOurl oldRefUrl = new IOurl(oldRef);
+						oldRefUrl.setPrefix(prefix);
+						id.setAnnotationField("oldreference", oldRefUrl.toString());
+					}
 				}
 			}
+			md.setHeader(header);
+			if (optStatus != null)
+				optStatus.setCurrentStatusText1("Processing finished");
+			return md;
+		} catch (Exception e) {
+			return null;
 		}
-		md.setHeader(header);
-		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Processing finished");
-		return md;
 	}
 	
 	@Override
 	public boolean canHandle(String databaseId) {
-		return databaseId.startsWith(url.getPrefix() + ":");
+		return databaseId == null || databaseId.startsWith(url.getPrefix() + ":");
 	}
 	
 	public ArrayList<ExperimentReference> getAllExperiments() throws Exception {

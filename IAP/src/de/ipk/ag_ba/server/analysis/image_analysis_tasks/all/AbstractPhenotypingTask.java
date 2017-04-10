@@ -1,9 +1,5 @@
 package de.ipk.ag_ba.server.analysis.image_analysis_tasks.all;
 
-import iap.pipelines.ImageProcessor;
-import iap.pipelines.ImageProcessorOptionsAndResults;
-import info.StopWatch;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,6 +43,7 @@ import de.ipk.ag_ba.server.databases.DatabaseTarget;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeaderInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Measurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
@@ -61,6 +58,9 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
+import iap.pipelines.ImageProcessor;
+import iap.pipelines.ImageProcessorOptionsAndResults;
+import info.StopWatch;
 
 /**
  * @author Christian Klukas
@@ -112,6 +112,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	@Override
 	public void setInput(
+			ExperimentHeaderInterface experimentHeader,
 			TreeMap<String, TreeMap<Long, Double>> plandID2time2waterData,
 			Collection<Sample3D> input,
 			Collection<NumericMeasurementInterface> optValidMeasurements,
@@ -123,20 +124,20 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.m = m;
 		// m should be used if the experiment is also stored there, otherwise the binary files should be stored in the VFS
 		try {
-			databaseTarget = determineDatabaseTarget(input, m);
+			databaseTarget = determineDatabaseTarget(experimentHeader, m);
 		} catch (Exception e) {
 			e.printStackTrace();
 			MongoDB.saveSystemErrorMessage("Could not initialize storage target: " + e.getMessage(), e);
 		}
 	}
 	
-	public static DatabaseTarget determineDatabaseTarget(Collection<Sample3D> input, MongoDB m) throws Exception {
+	public static DatabaseTarget determineDatabaseTarget(ExperimentHeaderInterface header, MongoDB m) throws Exception {
 		DatabaseTarget databaseTarget = m != null ? new DataBaseTargetMongoDB(true, m, m.getColls()) : null;
 		if (databaseTarget != null)
 			return databaseTarget;
 		String prefix = null;
-		if (input != null && !input.isEmpty()) {
-			prefix = input.iterator().next().getParentCondition().getExperimentDatabaseId().split(":")[0];
+		if (header != null) {
+			prefix = header.getDatabaseId().split(":")[0];
 			if (!prefix.startsWith("mongo_")) {
 				databaseTarget = null;
 			}
@@ -213,8 +214,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			 * ____________TO ROTATION ANGLE TO
 			 * ________________IMAGE SNAPSHOT SET OF VIS/FLUO/NIR
 			 */
-			final TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles =
-					new TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>>();
+			final TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles = new TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>>();
 			
 			addTopOrSideImagesToWorkset(workload_imageSetsWithSpecificAngles, 0, analyzeTopImages(),
 					analyzeSideImages());
@@ -354,7 +354,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
 												plantResults, time, configAndAngle);
 									}, null);
-							
+									
 							new StreamBackgroundTaskHelper<String>("Analyze angles (side)").process(
 									imageSetWithSpecificAngle.get(time).keySet().stream()
 											.filter(s -> !s.startsWith("1st_top")),
@@ -362,7 +362,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 										processAngle(status, workloadEqualAngleSnapshotSets, imageSetWithSpecificAngle,
 												plantResults, time, configAndAngle);
 									}, null);
-							
+									
 						}, "Analyze data from " + SystemAnalysis.getCurrentTime(time) + " (" + plantID + ")");
 				boolean inTimeOrder = true;
 				if (inTimeOrder)
@@ -475,8 +475,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			TreeMap<String, TreeMap<Long, TreeMap<String, ImageSet>>> workload_imageSetsWithSpecificAngles,
 			int max,
 			boolean top, boolean side) {
-		TreeMap<String, TreeMap<String, ImageSet>> sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle =
-				new TreeMap<String, TreeMap<String, ImageSet>>();
+		TreeMap<String, TreeMap<String, ImageSet>> sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle = new TreeMap<String, TreeMap<String, ImageSet>>();
 		if (input == null)
 			return;
 		for (Sample3D ins : input)
@@ -627,8 +626,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			}
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Processing "
 					+ workload_imageSetsWithSpecificAngles.size() + " plants" +
-					(numberOfSubsets > 0 ?
-							" (subset " + workOnSubset + "/" + numberOfSubsets + ")"
+					(numberOfSubsets > 0 ? " (subset " + workOnSubset + "/" + numberOfSubsets + ")"
 							: "."));
 		}
 		

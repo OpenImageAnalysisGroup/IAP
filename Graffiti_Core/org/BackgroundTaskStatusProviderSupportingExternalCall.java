@@ -17,4 +17,8 @@ public interface BackgroundTaskStatusProviderSupportingExternalCall
 	public abstract void setCurrentStatusValueFineAdd(double smallProgressStep);
 	
 	public abstract void setPrefix1(String prefix1);
+	
+	default void reset() {
+		// empty
+	}
 }

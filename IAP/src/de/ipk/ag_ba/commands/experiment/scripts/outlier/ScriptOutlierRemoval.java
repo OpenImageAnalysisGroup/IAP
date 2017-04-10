@@ -37,7 +37,7 @@ public class ScriptOutlierRemoval implements ActionScriptBasedDataProcessing {
 	
 	@Override
 	public String getImage() {
-		return "img/ext/gpl2/Gnome-Document-Properties-64.png";
+		return "img/ext/gpl2/Gnome-Logviewer-64.png"; // Gnome-Document-Properties-64.png";
 	}
 	
 	@Override

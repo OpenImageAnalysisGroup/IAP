@@ -126,15 +126,14 @@ public class CloudTaskManager {
 						BlockPipeline.getPipelineExecutionsWithinCurrentHour(),
 						BackgroundThreadDispatcher.getTaskExecutionsWithinLastMinute(),
 						progressSum.getDouble(),
-						(runningTasks.isEmpty() && !l1.isEmpty() ?
-								l1 + "<br>"
+						(runningTasks.isEmpty() && !l1.isEmpty() ? l1 + "<br>"
 								: "") +
 								(CloudTaskManager.this.process ? "" : "(processing disabled)<br>") +
 								(names.size() > 0 ? "Process: " + StringManipulationTools.getStringList(names, ", ") + // "<br>" +
 										"" + StringManipulationTools.getStringList(progress, ", ") +
-										(progress.size() > 1 ?
-												"<br>" +
-														status3provider.getCurrentStatusMessage3() : "") : "(no task)"));
+										(progress.size() > 1 ? "<br>" +
+												status3provider.getCurrentStatusMessage3() : "")
+										: "(no task)"));
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 			}
@@ -305,7 +304,7 @@ public class CloudTaskManager {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO RUNNING TASK");
 						System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
 						Thread.sleep(9000);
-						System.exit(0);
+						SystemAnalysis.exit(0);
 					}
 				} // else
 					// System.out.println("> Cloud Task Manager: Running Tasks: " + runningTasks.size() + " // " + SystemAnalysisExt.getCurrentTime());
@@ -359,7 +358,7 @@ public class CloudTaskManager {
 									}
 									Thread.sleep(10);
 								} while (System.currentTimeMillis() - startMS < 9000);
-								System.exit(0);
+								SystemAnalysis.exit(0);
 							}
 						Thread.sleep(60 * 1000); // every minute
 					}

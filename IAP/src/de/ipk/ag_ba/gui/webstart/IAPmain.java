@@ -3,8 +3,6 @@
  *******************************************************************************/
 package de.ipk.ag_ba.gui.webstart;
 
-import info.clearthought.layout.TableLayout;
-
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -65,6 +63,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
+import info.clearthought.layout.TableLayout;
 
 /**
  * @author klukas
@@ -316,7 +315,7 @@ public class IAPmain extends JApplet {
 		ResourceIOManager.registerIOHandler(new LTftpHandler());
 		for (MongoDB m : MongoDB.getMongos())
 			ResourceIOManager.registerIOHandler(m.getHandler());
-		
+			
 		// IIORegistry registry = IIORegistry.getDefaultInstance();
 		// registry.registerServiceProvider(new com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi());
 		// registry.registerServiceProvider(new com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi());
@@ -404,7 +403,7 @@ public class IAPmain extends JApplet {
 		ClassLoader cl = this.getClass().getClassLoader();
 		
 		String path = // this.getClass().getPackage().getName()
-		"de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart".replace('.', '/');
+				"de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart".replace('.', '/');
 		ImageIcon icon = new ImageIcon(cl.getResource(path + "/ipklogo16x16_5.png"));
 		if (splashScreen instanceof DBEsplashScreen)
 			((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
@@ -439,7 +438,7 @@ public class IAPmain extends JApplet {
 				for (String p : addons)
 					if (p != null)
 						locations.add("//" + p);
-			
+					
 			locations.remove("");
 			ArrayList<String> locations_exclude = new ArrayList<String>();
 			locations_exclude.addAll(new TextFile(rExcl));
@@ -491,7 +490,7 @@ public class IAPmain extends JApplet {
 				} catch (Exception e) {
 					//
 				}
-				System.exit(1);
+				SystemAnalysis.exit(1);
 			}, "System.exit in 60 seconds");
 			JOptionPane.showMessageDialog(null, "<html><h2>ERROR: Plugin-Description files could not be loaded</h2>"
 					+ "Program execution can not continue.<br>" + "The application needs to be closed (and will be closed in 10 sec.).<br>" +
@@ -500,7 +499,7 @@ public class IAPmain extends JApplet {
 					"or by executing createfilelist.bat directly from within Eclipse (works only on Windows).<br>" +
 					"These scripts are stored and available within the 'make' project." +
 					"</html>");
-			System.exit(1);
+			SystemAnalysis.exit(1);
 		}
 		
 		final boolean onStartup = true; // IAPoptions.getInstance().getBoolean("VANTED", "load_plugins_on_startup", false);
@@ -676,14 +675,15 @@ public class IAPmain extends JApplet {
 		int l = line.length();
 		res.add(line);
 		res.add(fillLen("**", l));
-		res.add(fillLen("*IAP - Integrated Analysis Platform*", l));
+		res.add(fillLen("*" + SystemOptions.getInstance().getString("IAP", "window_title",
+				"IAP - The Integrated Analysis Platform") + "*", l));
 		res.add(fillLen("*(V" + ReleaseInfo.IAP_VERSION_STRING + ")*", l));
 		res.add(fillLen("**", l));
 		res.add(fillLen("* - OPEN SOURCE - *", l));
 		res.add(fillLen("**", l));
 		res.add(fillLen("*--  Systems Biology Cloud Computing --*", l));
 		res.add(fillLen("**", l));
-		res.add(fillLen("*(c) 2015-2016 Dr. C. Klukas *", l));
+		res.add(fillLen("*(c) 2015-2017 Dr. C. Klukas *", l));
 		res.add(fillLen("*(c) 2010-2016 Research Group Image Analysis, IPK *", l));
 		res.add(fillLen("**", l));
 		res.add(line);
@@ -730,7 +730,7 @@ public class IAPmain extends JApplet {
 			} catch (InterruptedException e) {
 				//
 			}
-			System.exit(errNum);
+			SystemAnalysis.exit(errNum);
 		}
 	}
 	

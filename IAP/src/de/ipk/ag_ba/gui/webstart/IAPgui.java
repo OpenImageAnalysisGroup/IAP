@@ -7,8 +7,6 @@
 
 package de.ipk.ag_ba.gui.webstart;
 
-import info.clearthought.layout.TableLayout;
-
 import java.awt.Color;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -42,6 +40,7 @@ import de.ipk.ag_ba.plugins.vanted_vfs.NavigationButtonFilter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.network.TabAglet;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
+import info.clearthought.layout.TableLayout;
 
 /**
  * @author klukas
@@ -196,9 +195,12 @@ public class IAPgui {
 		if (optCustomIntroText != null)
 			return optCustomIntroText;
 		try {
-			return "<html><h2><font face='Arial'>Welcome to IAP - The Integrated Analysis Platform! <small>V" + ReleaseInfo.IAP_VERSION_STRING
+			return "<html><h2><font face='Arial'>Welcome to " + SystemOptions.getInstance().getString("IAP", "window_title",
+					"IAP - The Integrated Analysis Platform") + "! <small>V" + ReleaseInfo.IAP_VERSION_STRING
 					+ "</small></font></h2>"
-					+ "<font face='Arial'>The Integrated Analysis Platform IAP is a systems biology cloud storage, analysis and visualization system. "
+					+ "<font face='Arial'>" + SystemOptions.getInstance().getString("IAP", "window_title",
+							"IAP - The Integrated Analysis Platform")
+					+ " is a systems biology cloud storage, analysis and visualization system. "
 					+ "It is focused on high-throughput plant phenotyping.<br>"
 					+ "<br>"
 					+ "You find information on how to use this software and additional reference information by clicking the command button 'About'.<br>"

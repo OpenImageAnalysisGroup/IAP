@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.SystemOptions;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
+import de.ipk.ag_ba.commands.control.ActionControlCreateDataSets;
 import de.ipk.ag_ba.commands.experiment.ActionAnalysis;
 import de.ipk.ag_ba.commands.experiment.ActionCmdLineTools;
 import de.ipk.ag_ba.commands.experiment.ActionCopyExperiment;
@@ -38,6 +39,8 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 	@Override
 	public ActionDataProcessing[] getDataProcessingActions(ExperimentReferenceInterface experimentReference) {
 		ArrayList<ActionDataProcessing> actions = new ArrayList<ActionDataProcessing>();
+		if (SystemOptions.getInstance().getBoolean("Capture", "Show Capture Icon", false))
+			actions.add(new ActionControlCreateDataSets("Capture images and extend this experiment"));
 		
 		actions.add(new ActionFxCreateDataChart());
 		
@@ -79,7 +82,7 @@ public class PluginIAPexperimentActions extends AbstractIAPplugin {
 		if (experimentReference != null)
 			for (ActionDataProcessing adp : actions)
 				adp.setExperimentReference(experimentReference);
-		
+			
 		return actions.toArray(new ActionDataProcessing[] {});
 	}
 	

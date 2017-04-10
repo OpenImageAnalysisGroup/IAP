@@ -2,10 +2,14 @@ package de.ipk.ag_ba.commands.experiment.scripts;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
@@ -111,6 +115,15 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 		title = sh.getTitle();
 		iconDef = sh.getIcon();
 		cmd = sh.getCommand();
+		
+		String exec = cmd;
+		boolean existsInPath = Stream.of(System.getenv("PATH").split(Pattern.quote(File.pathSeparator)))
+				.map(Paths::get)
+				.anyMatch(path -> Files.exists(path.resolve(exec)));
+		if (!existsInPath) {
+			cmd = "/usr/local/bin/" + cmd;
+		}
+		
 		params = sh.getParams();
 		exportFileName = sh.getExportFileName();
 		allowGroupColumnSelection = sh.isAllowGroupColumnSelection();
@@ -244,8 +257,7 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 				params2 = null;
 			TreeMap<Long, String> ro = ScriptExecutor.start(
 					getDefaultTitle(), cmd, params2, getStatusProvider(), timeoutInMinutes,
-					expDir != null ? new File(expDir) : null, true
-					);
+					expDir != null ? new File(expDir) : null, true);
 			res.add("<code>" + StringManipulationTools.getStringList(ro.values(), "<br>")
 					+ "</code>");
 			
@@ -347,7 +359,8 @@ public class AbstractRscriptExecutionAction extends AbstractNavigationAction {
 						new NavigationButton(urlDescriptions.get(i),
 								new WebUrlAction(new IOurl(urls.get(i)),
 										"<html>Show " + urlDescriptions.get(i) + "<br>" +
-												"(" + urls.get(i) + ")"), guiSetting));
+												"(" + urls.get(i) + ")"),
+								guiSetting));
 			}
 		}
 		if (parameterDetermination) {

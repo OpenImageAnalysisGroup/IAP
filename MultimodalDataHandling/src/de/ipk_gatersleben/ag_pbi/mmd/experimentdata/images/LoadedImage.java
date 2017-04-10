@@ -95,10 +95,12 @@ public class LoadedImage extends ImageData implements LoadedData {
 	// return new ImageUploadData(len, is, isLabel, bis_preview);
 	// }
 	
+	public String customFileExtension = "png";
+	
 	protected MyByteArrayInputStream getStream(BufferedImage img) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(bos);
-		ImageIO.write(img, "png", ios);
+		ImageIO.write(img, customFileExtension, ios);
 		byte[] content = bos.toByteArray();
 		MyByteArrayInputStream is = new MyByteArrayInputStream(content, content.length);
 		return is;

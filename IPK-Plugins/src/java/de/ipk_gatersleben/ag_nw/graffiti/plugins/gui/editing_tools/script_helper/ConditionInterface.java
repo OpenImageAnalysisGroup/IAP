@@ -217,6 +217,8 @@ public interface ConditionInterface extends MappingDataEntity, Comparable<Condit
 	
 	public String getHTMLdescription();
 	
+	public String getHTMLdescription(boolean ommitNullValues, boolean simpleFormat);
+	
 	void setField(ConditionInfo field, String value);
 	
 	String getField(ConditionInfo field);

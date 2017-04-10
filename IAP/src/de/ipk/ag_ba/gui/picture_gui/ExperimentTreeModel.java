@@ -55,7 +55,7 @@ public class ExperimentTreeModel implements TreeModel {
 		if (experiment != null)
 			experiment.getExperiment().fillAttributeMap(attributes);
 		StringBuilder s = new StringBuilder();
-		s.append("<html><table border='1'><th>Property</th><th>Value</th></tr>");
+		s.append("<html><table border='0'><th>Property</th><th>Value</th></tr>");
 		HashMap<String, String> field2niceName = ExperimentHeader.getNiceHTMLfieldNameMapping();
 		TreeSet<String> resultRows = new TreeSet<String>();
 		for (String id : attributes.keySet()) {

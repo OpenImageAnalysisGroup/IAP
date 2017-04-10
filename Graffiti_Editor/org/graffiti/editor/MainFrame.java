@@ -9,9 +9,6 @@
 
 package org.graffiti.editor;
 
-import info.clearthought.layout.TableLayout;
-import info.clearthought.layout.TableLayoutConstants;
-
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -104,8 +101,6 @@ import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.UndoableEditSupport;
 
-import net.iharder.dnd.FileDrop;
-
 import org.AttributeHelper;
 import org.ErrorMsg;
 import org.FolderPanel;
@@ -188,6 +183,9 @@ import org.graffiti.undo.Undoable;
 import org.graffiti.util.DesktopMenuManager;
 import org.graffiti.util.InstanceCreationException;
 
+import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
+import net.iharder.dnd.FileDrop;
 import scenario.ScenarioService;
 
 /**
@@ -1371,7 +1369,7 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 		for (File f : proposedFiles)
 			if (!filesToBeIgnored.contains(f))
 				files.add(f);
-		
+			
 		if (files.size() > 0)
 			loader.submit(new Runnable() {
 				@Override
@@ -3405,24 +3403,26 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 				names += "<li>" + g.getName() + (unsavedGraphs.indexOf(g) < unsavedGraphs.size() - 1 ? "<br>" : "");
 			int res = JOptionPane.showConfirmDialog(this,
 					"<html><b>Do you really want to close the application?</b><p><p>"
-							+ "The following graph(s) have not been saved, yet:<br><ol>" + names, unsavedGraphs.size()
-							+ " graph(s) not saved", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+							+ "The following graph(s) have not been saved, yet:<br><ol>" + names,
+					unsavedGraphs.size()
+							+ " graph(s) not saved",
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if (res == JOptionPane.YES_OPTION) {
 				/*
 				 * for (Iterator it = l.iterator(); it.hasNext();) {
 				 * removeSession((Session) it.next()); } savePreferences();
 				 */
 				// HomeFolder.deleteTemporaryFolder();
-				if (!ReleaseInfo.isRunningAsApplet())
-					System.exit(0);
-				else
+				if (!ReleaseInfo.isRunningAsApplet()) {
+					SystemAnalysis.exit(0);
+				} else
 					setVisible(false);
 			}
 		} else {
 			// HomeFolder.deleteTemporaryFolder();
 			ReleaseInfo.setPreventSystemExitUponWindowClose(true);
 			if (!ReleaseInfo.isRunningAsApplet() && !ReleaseInfo.isPreventSystemExit())
-				System.exit(0);
+				SystemAnalysis.exit(0);
 			else
 				setVisible(false);
 		}
@@ -4058,7 +4058,7 @@ public class MainFrame extends JFrame implements SessionManager, SessionListener
 		return view != null
 				&& (view.getViewToolbarComponentTop() != null || view.getViewToolbarComponentBottom() != null
 						|| view.getViewToolbarComponentLeft() != null || view.getViewToolbarComponentRight() != null || view
-						.getViewToolbarComponentBackground() != null);
+								.getViewToolbarComponentBackground() != null);
 	}
 	
 	/**

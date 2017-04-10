@@ -47,7 +47,7 @@ public class Substance implements SubstanceInterface {
 	@Override
 	public String getHTMLdescription() {
 		StringBuilder res = new StringBuilder();
-		res.append("<html><table border='1'>");
+		res.append("<html><table border='0'>");
 		res.append("<tr><th>Property</th><th>Value</th></tr>");
 		if (name != null)
 			res.append("<tr><td>name</td><td>" + name + "</td></tr>");
@@ -279,7 +279,7 @@ public class Substance implements SubstanceInterface {
 						targetCondition = cond;
 						break;
 					}
-			
+				
 			if (targetCondition == null) {
 				// completely new substance with all new data
 				targetCondition = condition.clone(targetSubstance);
@@ -548,7 +548,7 @@ public class Substance implements SubstanceInterface {
 			for (ConditionInterface c : this)
 				for (SampleInterface s : c)
 					timesandtimeunits.add(new SampleTimeAndUnit(s.getSampleTime(), s.getTime(), s.getTimeUnit()));
-			
+				
 			Collection<MyComparableDataPoint> resultPerCond = new ArrayList<MyComparableDataPoint>();
 			for (ConditionInterface c : conditions) {
 				resultPerCond.clear();
@@ -1130,98 +1130,98 @@ public class Substance implements SubstanceInterface {
 					return false;
 			} else
 				return false;
-		
+			
 		if (name != null || s.name != null)
 			if (name != null) {
 				if (!name.equals(s.name))
 					return false;
 			} else
 				return false;
-		
+			
 		if (funcat != null || s.funcat != null)
 			if (funcat != null) {
 				if (!funcat.equals(s.funcat))
 					return false;
 			} else
 				return false;
-		
+			
 		if (info != null || s.info != null)
 			if (info != null) {
 				if (!info.equals(s.info))
 					return false;
 			} else
 				return false;
-		
+			
 		if (formula != null || s.formula != null)
 			if (formula != null) {
 				if (!formula.equals(s.formula))
 					return false;
 			} else
 				return false;
-		
+			
 		if (substancegroup != null || s.substancegroup != null)
 			if (substancegroup != null) {
 				if (!substancegroup.equals(s.substancegroup))
 					return false;
 			} else
 				return false;
-		
+			
 		if (cluster_id != null || s.cluster_id != null)
 			if (cluster_id != null) {
 				if (!cluster_id.equals(s.cluster_id))
 					return false;
 			} else
 				return false;
-		
+			
 		if (spot != null || s.spot != null)
 			if (spot != null) {
 				if (!spot.equals(s.spot))
 					return false;
 			} else
 				return false;
-		
+			
 		if (new_blast != null || s.new_blast != null)
 			if (new_blast != null) {
 				if (!new_blast.equals(s.new_blast))
 					return false;
 			} else
 				return false;
-		
+			
 		if (new_blast_e_val != null || s.new_blast_e_val != null)
 			if (new_blast_e_val != null) {
 				if (!new_blast_e_val.equals(s.new_blast_e_val))
 					return false;
 			} else
 				return false;
-		
+			
 		if (new_blast_score != null || s.new_blast_score != null)
 			if (new_blast_score != null) {
 				if (!new_blast_score.equals(s.new_blast_score))
 					return false;
 			} else
 				return false;
-		
+			
 		if (affy_hit != null || s.affy_hit != null)
 			if (affy_hit != null) {
 				if (!affy_hit.equals(s.affy_hit))
 					return false;
 			} else
 				return false;
-		
+			
 		if (score != null || s.score != null)
 			if (score != null) {
 				if (!score.equals(s.score))
 					return false;
 			} else
 				return false;
-		
+			
 		if (secure != null || s.secure != null)
 			if (secure != null) {
 				if (!secure.equals(s.secure))
 					return false;
 			} else
 				return false;
-		
+			
 		return true;
 	}
 	

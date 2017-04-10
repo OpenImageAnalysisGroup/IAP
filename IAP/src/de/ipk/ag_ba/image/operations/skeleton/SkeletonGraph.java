@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.skeleton;
 
-import iap.blocks.data_structures.RunnableOnImage;
-
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.FileOutputStream;
@@ -51,6 +49,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.AttributePathNameSearchType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.SearchType;
 import de.muntjak.tinylookandfeel.util.BooleanReference;
+import iap.blocks.data_structures.RunnableOnImage;
 
 public class SkeletonGraph {
 	private final boolean DEBUG = false;
@@ -316,8 +315,7 @@ public class SkeletonGraph {
 						edge.setDouble("w_min", statWidth.getMin());
 						edge.setDouble("w_max", statWidth.getMax());
 						AttributeHelper.setLabel((GraphElement) edge, "W:" + StringManipulationTools.formatNumber(statWidth.getMean(), 1));
-					}
-					else
+					} else
 						AttributeHelper.setLabel((GraphElement) edge, "W:-");
 				}
 			}
@@ -578,8 +576,7 @@ public class SkeletonGraph {
 					}
 			}
 		} while (found && !stop);
-		if (skelImg[x][y] != SkeletonProcessor2d.colorBranches && skelImg[x][y] != SkeletonProcessor2d.colorEndpoints)
-		{
+		if (skelImg[x][y] != SkeletonProcessor2d.colorBranches && skelImg[x][y] != SkeletonProcessor2d.colorEndpoints) {
 			skelImg[x][y] = background;
 		}
 		skelImg[xMem][yMem] = cMem;
@@ -613,8 +610,7 @@ public class SkeletonGraph {
 		ThreadSafeOptions tsoLCGG = new ThreadSafeOptions();
 		String optGMLoutputFileName = !saveGraphFiles ? null : ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
 				+ System.currentTimeMillis() + ".gml";
-		final HashMap<Graph, Collection<GraphElement>> graphComponent2shortestPathElements =
-				new HashMap<Graph, Collection<GraphElement>>();
+		final HashMap<Graph, Collection<GraphElement>> graphComponent2shortestPathElements = new HashMap<Graph, Collection<GraphElement>>();
 		ArrayList<Runnable> todo = new ArrayList<>();
 		for (final Graph gg : gl) {
 			if (gg.getNumberOfNodes() < 2)
@@ -863,7 +859,7 @@ public class SkeletonGraph {
 				vol += v;
 				vol2 += v2;
 				// System.out.println("V_median: r=" + mm + ", l=" + l1 + " ==> v=" + v + " // vol_s=" + vol);
-				// System.out.println("V_mean:   r=" + mv + ", l=" + l2 + " ==> v=" + v2 + " // vol_s=" + vol2);
+				// System.out.println("V_mean: r=" + mv + ", l=" + l2 + " ==> v=" + v2 + " // vol_s=" + vol2);
 			}
 			rt.addValue("roots.volume.graph_median_based", vol);
 			rt.addValue("roots.volume.graph_mean_based", vol2);
@@ -877,7 +873,7 @@ public class SkeletonGraph {
 					ImageCanvas c = in.io().canvas();
 					for (GraphElement g : graph.getGraphElements()) {
 						if (g.getGraph() == null)
-							System.exit(2); // fck
+							SystemAnalysis.exit(2); // fck
 					}
 					
 					for (Node n : graph.getNodes()) {

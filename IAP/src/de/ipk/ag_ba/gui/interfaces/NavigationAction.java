@@ -72,4 +72,6 @@ public interface NavigationAction {
 	public boolean requestRightAlign();
 	
 	public SideGuiComponent getButtonGuiAddition();
+	
+	boolean mayRun();
 }

@@ -488,7 +488,8 @@ public class LTdataExchange implements ExperimentLoader {
 			// +
 			// "(tile.image_oid = image_file_table.id OR tile.null_image_oid = image_file_table.id)) OR ("
 			// +
-			// "snapshot.configuration_id = image_unit_configuration.compconfigid and snapshot.id = tiled_image.snapshot_id and tiled_image.camera_label = image_unit_configuration.gid and image_unit_configuration.image_parameter_oid = image_file_table.id)";
+			// "snapshot.configuration_id = image_unit_configuration.compconfigid and snapshot.id = tiled_image.snapshot_id and tiled_image.camera_label =
+			// image_unit_configuration.gid and image_unit_configuration.image_parameter_oid = image_file_table.id)";
 			
 			PreparedStatement ps = connection.prepareStatement(sqlReadImageFileTable);
 			// ps.setString(1, experiment);
@@ -573,12 +574,12 @@ public class LTdataExchange implements ExperimentLoader {
 					+ "	tiled_image.id = tile.tiled_image_id and "
 					+ "	tile.image_oid = image_file_table.id and "
 					+ "	snapshot.configuration_id = image_unit_configuration.id and"
-					// + "	image_unit_configuration.id = tiled_image.id";
+					// + " image_unit_configuration.id = tiled_image.id";
 					+ "	image_unit_configuration.gid = tiled_image.camera_label";
 			// and "
-			// + "	tiled_image.camera_label = image_unit_configuration.gid";
-			// + "	snapshot.configuration_id = image_unit_configuration.id and "
-			// + "	tiled_image.snapshot_id = snapshot.id";
+			// + " tiled_image.camera_label = image_unit_configuration.gid";
+			// + " snapshot.configuration_id = image_unit_configuration.id and "
+			// + " tiled_image.snapshot_id = snapshot.id";
 			
 			boolean b = true;
 			if (b)
@@ -595,7 +596,7 @@ public class LTdataExchange implements ExperimentLoader {
 						+ "	tiled_image.id = tile.tiled_image_id and "
 						+ "	tile.image_oid = image_file_table.id and"
 						// and "
-						// + "	snapshot.configuration_id = image_unit_configuration.id";// and"
+						// + " snapshot.configuration_id = image_unit_configuration.id";// and"
 						+ "	image_unit_configuration.gid = tiled_image.camera_label";
 			ps = connection.prepareStatement(sqlText);
 			ps.setString(1, experiment);
@@ -847,8 +848,7 @@ public class LTdataExchange implements ExperimentLoader {
 	private ExperimentInterface getExperiment(ExperimentHeaderInterface experimentReq,
 			boolean interactiveGetExperimentSize_notUsedHere,
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus,
-			Collection<Snapshot> optSnapshots, HashMap<String,
-			Condition> optIdTag2condition) throws SQLException, ClassNotFoundException {
+			Collection<Snapshot> optSnapshots, HashMap<String, Condition> optIdTag2condition) throws SQLException, ClassNotFoundException {
 		ArrayList<NumericMeasurementInterface> measurements = new ArrayList<NumericMeasurementInterface>();
 		
 		if (optStatus != null)
@@ -885,8 +885,7 @@ public class LTdataExchange implements ExperimentLoader {
 		if (experimentReq.getImportdate() == null && earliest != null)
 			experimentReq.setImportDate(new Date(latest.getTime()));
 		
-		HashMap<String, Condition> idtag2condition = experimentReq.getDatabaseId() != null ?
-				getPlantIdAnnotation(experimentReq)
+		HashMap<String, Condition> idtag2condition = experimentReq.getDatabaseId() != null ? getPlantIdAnnotation(experimentReq)
 				: null;
 		
 		if (idtag2condition == null)
@@ -1126,7 +1125,7 @@ public class LTdataExchange implements ExperimentLoader {
 								fn = fn.substring(fn.lastIndexOf("/") + "/".length());
 							IOurl url = LTftpHandler.getImagingSystemFTPurl(experimentReq.getDatabase() + "/"
 									+ sn.getPath_image_config_blob(), sn.getId_tag()
-									+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
+											+ (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png"));
 							if (optStatus != null)
 								optStatus.setCurrentStatusText1("Process snapshots (" + idxx + "/" + snapshots.size() + ") (FTP)");
 							position = processConfigBlobToGetRotationAngle(blob2angle, sn, url);
@@ -1160,8 +1159,8 @@ public class LTdataExchange implements ExperimentLoader {
 						url = LTftpHandler.getImagingSystemFTPurl(experimentReq.getDatabase() + "/"
 								+ sn.getPath_null_image(),
 								"ref_" + sn.getPath_null_image().substring(sn.getPath_null_image().lastIndexOf("/") + "/".length()) + ".png"
-								// sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png")
-								);
+						// sn.getId_tag() + (position != null ? " (" + digit3(position.intValue()) + ").png" : " (000).png")
+						);
 						image.setLabelURL(url);
 					}
 					
@@ -1182,7 +1181,7 @@ public class LTdataExchange implements ExperimentLoader {
 			public int compare(NumericMeasurementInterface arg0, NumericMeasurementInterface arg1) {
 				int timeComparison = arg0.getParentSample().getSampleFineTimeOrRowId() < arg1.getParentSample().getSampleFineTimeOrRowId() ? -1 : (arg0
 						.getParentSample().getSampleFineTimeOrRowId() > arg1
-						.getParentSample().getSampleFineTimeOrRowId() ? 1 : 0);
+								.getParentSample().getSampleFineTimeOrRowId() ? 1 : 0);
 				if (timeComparison != 0)
 					return timeComparison;
 				else
@@ -1368,7 +1367,7 @@ public class LTdataExchange implements ExperimentLoader {
 					if (ci != ConditionInfo.IGNORED_FIELD)
 						if (ci != ConditionInfo.FILES)
 							possibleValues.add(ci + "");
-				
+						
 				while (rs.next()) {
 					String plantID = rs.getString(1);
 					String metaName = rs.getString(2);
@@ -1461,19 +1460,19 @@ public class LTdataExchange implements ExperimentLoader {
 				}
 			if (res) {
 				System.out.println("OK");
-				System.exit(0);
+				SystemAnalysis.exit(0);
 			} else {
 				System.out.println("INVALID USER OR PASSWORD");
-				System.exit(1);
+				SystemAnalysis.exit(1);
 			}
 		} catch (Exception e) {
 			System.out.println("INVALID (RUNTIME EXCEPTION '+" + e.getMessage() + "+')");
 			e.printStackTrace();
-			System.exit(2);
+			SystemAnalysis.exit(2);
 		} catch (Error e) {
 			System.out.println("INVALID (RUNTIME ERROR '+" + e.getMessage() + "+')");
 			e.printStackTrace();
-			System.exit(3);
+			SystemAnalysis.exit(3);
 		}
 	}
 	
@@ -1654,7 +1653,7 @@ public class LTdataExchange implements ExperimentLoader {
 	}
 	
 	public static LTdataExchange getInstanceFromDatabaseId(String databaseID) {
-		//TODO Fix final.
+		// TODO Fix final.
 		if (instance == null)
 			instance = new LTdataExchange();
 		

@@ -7,11 +7,6 @@
 
 package de.ipk.ag_ba.gui.util;
 
-import ij.ImageJ;
-import ij.WindowManager;
-import ij.gui.ImageWindow;
-import info.StopWatch;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -86,8 +81,6 @@ import org.graffiti.plugin.view.View;
 import org.graffiti.plugins.views.defaults.GraffitiView;
 import org.graffiti.session.EditorSession;
 
-import util.Screenshot;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.gridfs.GridFS;
@@ -142,6 +135,11 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.VolumeData;
+import ij.ImageJ;
+import ij.WindowManager;
+import ij.gui.ImageWindow;
+import info.StopWatch;
+import util.Screenshot;
 
 /**
  * @author klukas
@@ -847,14 +845,14 @@ public class IAPservice {
 				sd.prepareFieldsForDataTransport();
 			else
 				sd.prepareStore();
-		
+			
 		if (optStatus != null)
 			optStatus.setCurrentStatusText1("Snapshot Set Created");
 		
 		if (optStatus != null)
 			if (optStatus.wantsToStop())
 				return null;
-		
+			
 		return result;
 	}
 	
@@ -1030,8 +1028,7 @@ public class IAPservice {
 									String subn = ii.getParentSample().getParentCondition().getParentSubstance().getName();
 									ImageConfiguration ic = ImageConfiguration.get(subn);
 									String info = "+++" + substance.getInfo();
-									long urlId = urlManager != null ? urlManager.getId(i, useZIPexportFileNames ?
-											ActionDataExportZIP.getImageFileExportNameForZIPexport(gc, i) + info : i.getURL().toString() + info) : -1;
+									long urlId = urlManager != null ? urlManager.getId(i, useZIPexportFileNames ? ActionDataExportZIP.getImageFileExportNameForZIPexport(gc, i) + info : i.getURL().toString() + info) : -1;
 									if (ic == ImageConfiguration.Unknown) {
 										ic = ImageConfiguration.get(i.getURL().getFileName());
 									}
@@ -1129,7 +1126,7 @@ public class IAPservice {
 				rs = "0" + nmi.getReplicateID();
 			else
 				rs = "" + nmi.getReplicateID();
-		
+			
 		return rs + "//" + nmi.getQualityAnnotation();
 	}
 	
@@ -1207,10 +1204,8 @@ public class IAPservice {
 			RunnableWithMappingData resultReceiver) throws Exception {
 		ExperimentInterface experiment = null;
 		if (header.getDatabaseId() != null
-				&& (
-				header.getDatabaseId().startsWith("lt:") ||
-				header.getDatabaseId().startsWith("lt_")
-				))
+				&& (header.getDatabaseId().startsWith("lt:") ||
+						header.getDatabaseId().startsWith("lt_")))
 			experiment = de.ipk.ag_ba.postgresql.LTdataExchange.getInstanceFromDatabaseId(header.getDatabaseId()).getExperiment(header,
 					false,
 					status);
@@ -1239,7 +1234,8 @@ public class IAPservice {
 			c.add("# config format: experiment measurement-label, start weighting (h:mm), end weighting (h:mm),");
 			c.add("# start weighting 2 (h:mm, or 0:00), end weighting 2 (h:mm, or 0:00), delay in minutes,email1:email2:email3:...");
 			c.add("# example config: 1116BA, 8:00, 12:00, 0:00, 0:00, 30,user@host  -- check 1116BA every 30 minutes from 8 to 12 for watering data within the last 30 minutes");
-			// c.add("# example config: 1116BA, auto, 10,30, user@host   -- check 1116BA every 30 minutes for watering data within the last 30 minutes, ignoring known start and stop times (with up to 10 minutes difference) from previous day");
+			// c.add("# example config: 1116BA, auto, 10,30, user@host -- check 1116BA every 30 minutes for watering data within the last 30 minutes, ignoring
+			// known start and stop times (with up to 10 minutes difference) from previous day");
 			// add all experiments from today or yesterday as default entries to file
 			ArrayList<ExperimentHeaderInterface> el = new ArrayList<ExperimentHeaderInterface>();
 			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB CONTENT...");
@@ -1307,7 +1303,7 @@ public class IAPservice {
 			for (String c : config)
 				if (!c.isEmpty() && !c.startsWith("#"))
 					configList.add(new WatchConfig(c));
-			
+				
 			int smallestTimeFrame = Integer.MAX_VALUE;
 			for (WatchConfig wc : configList)
 				if (wc.getLastMinutes() < smallestTimeFrame)
@@ -1378,8 +1374,7 @@ public class IAPservice {
 								}
 							}
 							
-							String lastUpdateText = (ehi.getImportdate() != null ?
-									" (last update " + SystemAnalysis.getCurrentTime(ehi.getImportdate().getTime()) + ")" : " (NO UPDATE TIME)");
+							String lastUpdateText = (ehi.getImportdate() != null ? " (last update " + SystemAnalysis.getCurrentTime(ehi.getImportdate().getTime()) + ")" : " (NO UPDATE TIME)");
 							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK " + ehi.getExperimentName() +
 									lastUpdateText + " (expect data every day from " + wc.h1_st + ":" + ff(wc.minute1_st)
 									+ " to " + wc.h1_end + ":" + ff(wc.minute1_end) + " AND "
@@ -1642,8 +1637,7 @@ public class IAPservice {
 		long t = System.currentTimeMillis();
 		
 		try {
-			int interval =
-					SystemOptions.getInstance().getInteger("Watch-Service", "Screenshot//Screenshot-Intervall_sec", 60);
+			int interval = SystemOptions.getInstance().getInteger("Watch-Service", "Screenshot//Screenshot-Intervall_sec", 60);
 			if (interval < 1) {
 				SystemOptions.getInstance().setInteger("Watch-Service", "Screenshot//Screenshot-Intervall_sec", 1);
 				interval = 1;
@@ -1818,7 +1812,7 @@ public class IAPservice {
 					MongoDB.saveSystemMessage("TIMED AUTO-CLOSE (host " + SystemAnalysisExt.getHostNameNiceNoError() +
 							"): SYSTEM.EXIT(0) // current time: " + SystemAnalysis.getCurrentTimeInclSec());
 					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">TIMED AUTO-CLOSE: SYSTEM.EXIT(0)");
-					System.exit(0);
+					SystemAnalysis.exit(0);
 				} catch (InterruptedException e) {
 					// empty
 				}
@@ -1887,9 +1881,7 @@ public class IAPservice {
 	public static String getTargetFileExtension(boolean isIconStorage, String sourceFileExtension) {
 		if (sourceFileExtension != null && sourceFileExtension.startsWith("."))
 			sourceFileExtension = sourceFileExtension.substring(".".length());
-		String targetFileExtension = isIconStorage ?
-				SystemOptions.getInstance().getString("IAP", "Preview File Type", "png") :
-				SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+		String targetFileExtension = isIconStorage ? SystemOptions.getInstance().getString("IAP", "Preview File Type", "png") : SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
 		if (sourceFileExtension != null && (sourceFileExtension.endsWith("jpg") || sourceFileExtension.endsWith("jpeg")))
 			if (targetFileExtension != null && (targetFileExtension.endsWith("png") || targetFileExtension.endsWith("png")))
 				targetFileExtension = sourceFileExtension; // don't convert source JPG to PNG, makes not really sense

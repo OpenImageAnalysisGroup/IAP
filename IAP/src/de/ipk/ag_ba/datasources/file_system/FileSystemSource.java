@@ -32,7 +32,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.metacrop.Pat
  */
 public class FileSystemSource extends HTTPhandler implements DataSource {
 	
-	protected final String url;
+	protected final String urlFSS;
 	private final String[] validExtensions;
 	protected Collection<PathwayWebLinkItem> mainList;
 	protected final NavigationImage mainDataSourceIconInactive;
@@ -50,7 +50,7 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 			NavigationImage folderIcon,
 			NavigationImage folderIconOpened) {
 		this.lib = lib;
-		this.url = folder;
+		this.urlFSS = folder;
 		this.validExtensions = validExtensions;
 		this.mainDataSourceIconInactive = mainDataSourceIcon;
 		this.mainDataSourceIconActive = mainDataSourceIcon;
@@ -68,7 +68,7 @@ public class FileSystemSource extends HTTPhandler implements DataSource {
 	
 	@Override
 	public void readDataSource() throws Exception {
-		mainList = FileSystemAccess.getWebDirectoryFileListItems(url, validExtensions, false);
+		mainList = FileSystemAccess.getWebDirectoryFileListItems(urlFSS, validExtensions, false);
 		thisLevel = new HTTPdataSourceLevel(
 				lib, dataSourceName, mainList,
 				mainDataSourceIconInactive,

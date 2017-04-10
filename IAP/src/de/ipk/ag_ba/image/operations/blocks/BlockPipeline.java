@@ -1,12 +1,5 @@
 package de.ipk.ag_ba.image.operations.blocks;
 
-import iap.blocks.data_structures.ImageAnalysisBlock;
-import iap.blocks.postprocessing.WellProcessing;
-import iap.blocks.preprocessing.WellProcessor;
-import iap.pipelines.ImageProcessorOptionsAndResults;
-import info.StopWatch;
-import info.clearthought.layout.TableLayout;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -57,6 +50,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
+import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.blocks.postprocessing.WellProcessing;
+import iap.blocks.preprocessing.WellProcessor;
+import iap.pipelines.ImageProcessorOptionsAndResults;
+import info.StopWatch;
+import info.clearthought.layout.TableLayout;
 
 /**
  * A list of image analysis "blocks" ({@link ImageAnalysisBlock}) which may
@@ -118,8 +117,7 @@ public class BlockPipeline {
 		boolean quick = true;
 		if (quick) {
 			new StreamBackgroundTaskHelper<Integer>(
-					(executionTrayCount > 1 ? "Analyze well" : "Pipeline execution")).
-					process(
+					(executionTrayCount > 1 ? "Analyze well" : "Pipeline execution")).process(
 							IntStream.range(0, executionTrayCount),
 							(currentWell) -> {
 								if (debugValidTrays != null && !debugValidTrays.contains(currentWell))
@@ -266,7 +264,7 @@ public class BlockPipeline {
 							+ " sec., " + mseconds + " ms, time: "
 							+ StopWatch.getNiceTime() + " ("
 							+ block.getClass().getSimpleName() + ")");
-			
+				
 			updateBlockStatistics(1);
 			if (status != null)
 				status.setCurrentStatusValueFineAdd(progressOfThisWell / nBlocks);
@@ -437,7 +435,8 @@ public class BlockPipeline {
 						|| analysisTaskFinal.getForcedDebugStackStorageResult().isEmpty()) {
 					MainFrame.showMessageDialog(
 							"No pipeline results available! (" + input.size()
-									+ " images used as input)", "Error");
+									+ " images used as input)",
+							"Error");
 				} else {
 					for (ImageStack fisArr : analysisTaskFinal.getForcedDebugStackStorageResult()) {
 						if (fisArr == null) {
@@ -459,7 +458,8 @@ public class BlockPipeline {
 									IAPnavigationPanel mnp = new IAPnavigationPanel(PanelTarget.NAVIGATION, null, null);
 									ActionSettings ac = new ActionSettings(null, er.getIniIoProvider(),
 											"Change analysis settings (experiment " + er.getExperimentName()
-													+ ")", "Modify settings");
+													+ ")",
+											"Modify settings");
 									ac.setInitialNavigationPath(analysisTaskFinal.getDebugLastSystemOptionStorageGroup());
 									ac.setInitialNavigationSubPath((String) tsoCurrentImageDisplayPage.getParam(0, null)); // current image analysis step
 									mnp.getNewWindowListener(ac, true).actionPerformed(arg0);
@@ -469,6 +469,7 @@ public class BlockPipeline {
 							System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: No INI-I/O-Provider given for window.");
 						
 						analysisTaskFinal.setInput(
+								er.getHeader(),
 								AbstractPhenotypingTask.getWateringInfo(e),
 								samples, input, er.getM(), idxF, idxCntF);
 						
@@ -525,7 +526,7 @@ public class BlockPipeline {
 											@Override
 											public void run() {
 												analysisTaskFinal.debugSetValidTrays(new int[] { idxF });
-												analysisTaskFinal.setInput(AbstractPhenotypingTask.getWateringInfo(e), samples, input, er.getM(), 0, 1);
+												analysisTaskFinal.setInput(er.getHeader(), AbstractPhenotypingTask.getWateringInfo(e), samples, input, er.getM(), 0, 1);
 												BackgroundTaskHelper.issueSimpleTaskInWindow(
 														analysisTaskFinal.getName(), "Repeat Snapshot Analysis...",
 														backgroundTaskInnerCall,
@@ -547,6 +548,7 @@ public class BlockPipeline {
 		};
 		finishSwingTaskRef.setObject(finishSwingTask);
 		analysisTaskFinal.setInput(
+				er.getHeader(),
 				AbstractPhenotypingTask.getWateringInfo(e),
 				samples, input, er.getM(), 0, 1);
 		BackgroundTaskHelper.issueSimpleTaskInWindow(analysisTaskFinal.getName(),
@@ -584,8 +586,7 @@ public class BlockPipeline {
 			BackgroundTaskStatusProviderSupportingExternalCall optStatus, ImageProcessorOptionsAndResults options)
 			throws InstantiationException, IllegalAccessException,
 			InterruptedException {
-		TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> summaryResult =
-				new TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>>();
+		TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> summaryResult = new TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>>();
 		int index = 0;
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			ImageAnalysisBlock block = blockClass.newInstance();

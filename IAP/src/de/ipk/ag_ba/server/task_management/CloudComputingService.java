@@ -6,9 +6,6 @@
  */
 package de.ipk.ag_ba.server.task_management;
 
-import iap.SaveWebcasts;
-import info.StopWatch;
-
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -31,14 +28,15 @@ import de.ipk.ag_ba.server.task_management.minitoring_and_networking.SnapshotCre
 import de.ipk_gatersleben.ag_nw.graffiti.UDPreceiveStructure;
 import de.ipk_gatersleben.ag_nw.graffiti.services.network.BroadCastService;
 import de.ipk_gatersleben.ag_pbi.mmd.MultimodalDataHandlingAddon;
+import iap.SaveWebcasts;
+import info.StopWatch;
 
 /**
  * @author klukas
  */
 public class CloudComputingService {
 	
-	static HashMap<MongoDB, CloudComputingService> instance =
-			new HashMap<MongoDB, CloudComputingService>();
+	static HashMap<MongoDB, CloudComputingService> instance = new HashMap<MongoDB, CloudComputingService>();
 	
 	boolean active = false;
 	
@@ -92,7 +90,7 @@ public class CloudComputingService {
 			System.out.println("CPUs (avail.)  : " + info.getCpuCountAvailable());
 			System.out.println("Phys. mem. (GB): " + info.getPhysicalMemoryInGB());
 			System.out.println("System load    : " + StringManipulationTools.formatNumber(info.getLoad(), "#.#"));
-			System.exit(0);
+			SystemAnalysis.exit(0);
 		} else
 			if (args.length > 0 && (args[0] + "").toLowerCase().startsWith("gui")) {
 				{
@@ -121,7 +119,7 @@ public class CloudComputingService {
 					} catch (Exception e) {
 						MongoDB.saveSystemErrorMessage("Error monitoring experiment data progress.", e);
 					} finally {
-						System.exit(0);
+						SystemAnalysis.exit(0);
 					}
 				} else
 					if (args.length > 0 && args[0].toLowerCase().startsWith("close") ||
@@ -160,7 +158,7 @@ public class CloudComputingService {
 											if ((args[0] + "").toLowerCase().startsWith("back") && !(args[0] + "").toLowerCase().startsWith("backup")) {
 												BackupSupport sb = BackupSupport.getInstance();
 												sb.makeBackup();
-												System.exit(0);
+												SystemAnalysis.exit(0);
 											} else
 												if ((args[0] + "").toLowerCase().startsWith("monitor")) {
 													{
@@ -211,13 +209,13 @@ public class CloudComputingService {
 																		Thread.sleep(delay);
 																	} catch (Exception e1) {
 																		e1.printStackTrace();
-																		System.exit(1);
+																		SystemAnalysis.exit(1);
 																	}
-																	System.exit(0);
+																	SystemAnalysis.exit(0);
 																} else
 																	if ((args[0] + "").toLowerCase().startsWith("save")) {
 																		new SaveWebcasts().save();
-																		System.exit(0);
+																		SystemAnalysis.exit(0);
 																	} else
 																		if ((args[0] + "").toLowerCase().startsWith("file-mon")) {
 																			FileMonitor f = new FileMonitor(args[1]);
@@ -231,10 +229,10 @@ public class CloudComputingService {
 																				e1.printStackTrace();
 																				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Monitoring error: "
 																						+ e1.getMessage());
-																				System.exit(1);
+																				SystemAnalysis.exit(1);
 																			}
 																			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Monitoring finished");
-																			System.exit(0);
+																			SystemAnalysis.exit(0);
 																		} else
 																			if ((args[0] + "").toLowerCase().startsWith("broadcast-rs")) {
 																				try {
@@ -274,7 +272,7 @@ public class CloudComputingService {
 																												System.out.println(SystemAnalysis.getCurrentTime()
 																														+ ">WARNING: Broadcast monitoring error: "
 																														+ e.getMessage());
-																												System.exit(1);
+																												SystemAnalysis.exit(1);
 																											}
 																											receiveCount.setBval(0, false);
 																										}
@@ -292,7 +290,7 @@ public class CloudComputingService {
 																													.println(SystemAnalysis.lineSeparator
 																															+ SystemAnalysis.getCurrentTime()
 																															+ ">WARNING: Did not receive image data 6 times in a row. Exiting to allow restart!");
-																											System.exit(1);
+																											SystemAnalysis.exit(1);
 																										}
 																									} else {
 																										discarded = 0;
@@ -320,7 +318,8 @@ public class CloudComputingService {
 																										// System.out
 																										// .println(SystemAnalysis.getCurrentTimeInclSec()
 																										// +
-																										// ">INFO: Received valid change message, but current time (hour) is BLOCKED for further processing (DARK PERIOD).");
+																										// ">INFO: Received valid change message, but current time (hour) is BLOCKED for
+																										// further processing (DARK PERIOD).");
 																										// }
 																										Thread.sleep(100);
 																										receiveCount.addInt(1);
@@ -329,7 +328,7 @@ public class CloudComputingService {
 																													.println(SystemAnalysis.getCurrentTimeInclSec()
 																															+ ">INFO: Received 52 change notifications. Stop execution, to allow restart.");
 																											Thread.sleep(3000);
-																											System.exit(1);
+																											SystemAnalysis.exit(1);
 																										}
 																									}
 																								}
@@ -340,7 +339,7 @@ public class CloudComputingService {
 																					e1.printStackTrace();
 																					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Broadcast monitoring error: "
 																							+ e1.getMessage());
-																					System.exit(1);
+																					SystemAnalysis.exit(1);
 																				}
 																			} else {
 																				System.out.println(": Valid command line parameters:");
@@ -366,16 +365,17 @@ public class CloudComputingService {
 																				System.out
 																						.println("   'file-mon fileName udpPortStart udpPortEnd contentID contentFileLineNumber'  - Watch a file for modification and report changes by broadcast message");
 																				System.out
-																						.println("   'broadcast-rs udpPortStart udpPortEnd contentID newFileDir snapshotDir measurementLabel imageFileExtension execCommand [params]'- Receive broadcase messages and send a signal to a process (Mac/Linux only)");
+																						.println(
+																								"   'broadcast-rs udpPortStart udpPortEnd contentID newFileDir snapshotDir measurementLabel imageFileExtension execCommand [params]'- Receive broadcase messages and send a signal to a process (Mac/Linux only)");
 																				System.out.println("   'save'    - Save web cam images to file system.");
 																				System.out
 																						.println("   'screen'  - Save screenshot to datbase. Parameter 2: Delay before closing the program in milliseconds.");
-																				System.exit(1);
+																				SystemAnalysis.exit(1);
 																			}
 														}
 									}
 								}
-		
+							
 		{
 			for (MongoDB m : MongoDB.getMongos()) {
 				CloudComputingService cc = CloudComputingService.getInstance(m);

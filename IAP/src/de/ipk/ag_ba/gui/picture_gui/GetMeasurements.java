@@ -57,7 +57,7 @@ public class GetMeasurements implements Runnable {
 					}
 					
 					StringBuilder s = new StringBuilder();
-					s.append("<html><table border='1'><th>Property</th><th>Value</th><td>Sample Average</td></tr>");
+					s.append("<html><table border='0'><th>Property</th><th>Value</th><td>Sample Average</td></tr>");
 					if (sample.getSampleFineTimeOrRowId() != null)
 						s.append("<tr><td>Sample Time</td><td>" + sdf.format(new Date(sample.getSampleFineTimeOrRowId())) + "<br>"
 								+ sample.getSampleFineTimeOrRowId() + "</td></tr>");

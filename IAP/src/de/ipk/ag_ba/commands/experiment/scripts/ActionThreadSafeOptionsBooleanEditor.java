@@ -1,6 +1,7 @@
 package de.ipk.ag_ba.commands.experiment.scripts;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 
@@ -10,6 +11,8 @@ import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 public class ActionThreadSafeOptionsBooleanEditor extends AbstractNavigationAction {
 	
 	private ThreadSafeOptions tso;
+	private Collection<ThreadSafeOptions> dependent;
+	public boolean allowDisable;
 	
 	public ActionThreadSafeOptionsBooleanEditor(String tooltip) {
 		super(tooltip);
@@ -20,10 +23,19 @@ public class ActionThreadSafeOptionsBooleanEditor extends AbstractNavigationActi
 		this.tso = tso;
 	}
 	
+	public void setDependentTso(Collection<ThreadSafeOptions> dependent) {
+		this.dependent = dependent;
+	}
+	
 	@Override
 	public void performActionCalculateResults(NavigationButton src) throws Exception {
-		if (tso.getInt() > 0)
-			tso.setBval(0, !tso.getBval(0, false));
+		if (tso.getInt() > 0) {
+			boolean current = tso.getBval(0, false);
+			if (dependent != null)
+				for (ThreadSafeOptions tso : dependent)
+					tso.setBval(0, false);
+			tso.setBval(0, allowDisable ? !current : true);
+		}
 	}
 	
 	@Override

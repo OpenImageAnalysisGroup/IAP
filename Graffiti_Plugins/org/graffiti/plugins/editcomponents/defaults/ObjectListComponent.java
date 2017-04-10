@@ -21,7 +21,7 @@ import org.graffiti.plugin.parameter.ObjectListParameter;
  * @version $Revision: 1.1 $
  */
 public class ObjectListComponent
-					extends ComboBoxEditComponent {
+		extends ComboBoxEditComponent {
 	// ~ Constructors ===========================================================
 	
 	/**

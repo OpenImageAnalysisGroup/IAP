@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.gui.navigation_actions.maize;
 
-import info.StopWatch;
-
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -44,6 +42,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.MappingData3DPath;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import info.StopWatch;
 
 /**
  * @author klukas
@@ -166,6 +165,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 				task.setValidSideAngle(DEBUG_SINGLE_ANGLE1, DEBUG_SINGLE_ANGLE2, DEBUG_SINGLE_ANGLE3);
 			}
 			task.setInput(
+					experimentToBeAnalysed.getHeader(),
 					AbstractPhenotypingTask.getWateringInfo(experimentToBeAnalysed),
 					workload, null, m, workOnSubset, numberOfSubsets);
 			
@@ -188,7 +188,7 @@ public abstract class AbstractPhenotypeAnalysisAction extends AbstractNavigation
 					System.out.println(SystemAnalysis.getCurrentTime() + ">Cluster Execution Mode is active // NO STATISTICS RESULT");
 					System.out.println(SystemAnalysis.getCurrentTime() + ">SYSTEM.EXIT");
 					Thread.sleep(9000);
-					System.exit(0);
+					SystemAnalysis.exit(0);
 				}
 				
 				this.experimentResult = null;

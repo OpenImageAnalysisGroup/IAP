@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.commands.experiment.charting;
 
-import iap.blocks.extraction.Trait;
-
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
@@ -16,6 +14,7 @@ import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
+import iap.blocks.extraction.Trait;
 
 /**
  * @author klukas
@@ -54,7 +53,7 @@ public class ActionFxCreateDataChart extends AbstractNavigationAction implements
 	private boolean showFullSubstanceNameAsTitle;
 	
 	public ActionFxCreateDataChart() {
-		super("Create a Data Chart");
+		super("Create a data chart");
 		this.groupFilter = null;
 		this.settingsGlobal = new ChartSettings(false);
 	}

@@ -568,7 +568,7 @@ public class SystemOptions {
 			else
 				newValues.add(k);
 		}
-		setString(group, setting, StringManipulationTools.getStringList(newValues, "//"));
+		setString(group, setting + "-radio-selection", StringManipulationTools.getStringList(newValues, "//"));
 	}
 	
 	public void setColor(String group, String setting, Color value) {
