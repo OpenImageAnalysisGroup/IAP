@@ -1338,10 +1338,13 @@ public class IAPservice {
 				for (String database : dbs_toBeChecked) {
 					try {
 						System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB " + database + "...");
-						el.addAll(LTdataExchange.getInstanceFromDatabaseName(database).getExperimentsInDatabase(null, database));
+						LTdataExchange a = new LTdataExchange(); //LTdataExchange.getInstanceFromDatabaseName(database);
+						Collection<ExperimentHeaderInterface> b = a.getExperimentsInDatabase(null, database);
+						el.addAll(b);
 					} catch (Exception e) {
-						if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
-							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Cant process DB " + database + ": " + e.getMessage());
+						System.out.println(e.getMessage());
+//						if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
+//							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Cant process DB " + database + ": " + e.getMessage());
 					}
 				}
 				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK PROGRESS...");
