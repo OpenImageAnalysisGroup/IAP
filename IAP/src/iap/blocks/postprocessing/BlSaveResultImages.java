@@ -32,6 +32,7 @@ public class BlSaveResultImages extends AbstractBlock {
 	protected Image processImage(Image image) {
 		if (image != null) {
 			boolean markWithInfos = getBoolean("Include Image Information", true);
+			boolean exportBinaryMask = getBoolean("Export as Binary Mask",false);
 			boolean manyWells = optionsAndResults.getWellCnt() > 1;
 			ImageData outImageReference = (ImageData) input().images().getImageInfo(image.getCameraType())
 					.clone(input().images().getImageInfo(image.getCameraType()).getParentSample());
@@ -39,7 +40,7 @@ public class BlSaveResultImages extends AbstractBlock {
 				outImageReference.setQualityAnnotation(outImageReference.getQualityAnnotation() + "_"
 						+ getWellIdx());
 			try {
-				LoadedImage res = processAndOrSaveResultImage(image.getCameraType(), getCameraPosition(), outImageReference, image, markWithInfos);
+				LoadedImage res = processAndOrSaveResultImage(image.getCameraType(), getCameraPosition(), outImageReference, image, markWithInfos, exportBinaryMask);
 				if (res != null) {
 					if (!res.getParentSample().getParentCondition().getParentSubstance().getName().contains(image.getCameraType() + "")) {
 						System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Saved camera type " + image.getCameraType() + " to substance "
@@ -63,7 +64,7 @@ public class BlSaveResultImages extends AbstractBlock {
 		return mask;
 	}
 	
-	private LoadedImage processAndOrSaveResultImage(CameraType ct, CameraPosition cp, ImageData outImageReference, Image resImage, boolean markWithInfos)
+	private LoadedImage processAndOrSaveResultImage(CameraType ct, CameraPosition cp, ImageData outImageReference, Image resImage, boolean markWithInfos, boolean exportBinaryMask)
 			throws Exception {
 		String tray = getWellIdx();
 		
@@ -78,14 +79,16 @@ public class BlSaveResultImages extends AbstractBlock {
 			
 			outImageReference.setURL(new IOurl(null, null, outImageReference.getURL().getFileName()));
 			
-			return saveImage(ct, cp, tray, outImageReference, resImage, markWithInfos);
+			return saveImage(ct, cp, tray, outImageReference, resImage, markWithInfos, exportBinaryMask);
 		}
 	}
 	
 	private LoadedImage saveImage(CameraType ct, CameraPosition cp,
 			final String tray,
-			final ImageData id, Image image, boolean markWithInfos) throws Exception {
+			final ImageData id, Image image, boolean markWithInfos, boolean exportBinaryMask) throws Exception {
 		if (id != null && id.getParentSample() != null) {
+			if (exportBinaryMask)
+				image = image.io().binary().getImage();
 			if (markWithInfos)
 				image = markWithImageInfos(image, id, optionsAndResults, getWellIdx());
 			LoadedImage loadedImage = new LoadedImage(id, image.getAsBufferedImage(true));
