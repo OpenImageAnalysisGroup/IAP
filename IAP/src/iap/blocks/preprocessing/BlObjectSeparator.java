@@ -145,8 +145,12 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 				} else
 					result[i] = back;
 			}
+			boolean returnInputMask = getBoolean("Return Inputmask if Objectcount < min Objctcount", false);
 			if (filled == 0)
-				return mask;
+				if (returnInputMask )
+					return mask;
+				else
+					return null;
 			else
 				return new Image(mask.getWidth(), mask.getHeight(), result);
 		}
