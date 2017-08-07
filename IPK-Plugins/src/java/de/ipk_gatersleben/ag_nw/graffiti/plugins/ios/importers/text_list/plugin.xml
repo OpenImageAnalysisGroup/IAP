@@ -12,6 +12,6 @@
 	    <name>Edge-List-Text-File-Reader</name>
         <main>de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.importers.text_list.TextListReaderPlugin</main>
         <version>1.0.0</version>
-        <available>mailto:klukas@ipk-gatersleben.de</available>
+        <available>mailto:christian.klukas@gmail.com</available>
     </plugindesc>
 </plugin>

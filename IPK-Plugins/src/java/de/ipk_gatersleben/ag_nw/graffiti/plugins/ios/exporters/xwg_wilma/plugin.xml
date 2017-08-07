@@ -12,6 +12,6 @@
 	     <name>XWG Writer</name>
          <main>de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.exporters.xwg_wilma.XWGSerializerPlugin</main>
          <version>1.0</version>
-         <available>klukas@ipk-gatersleben.de</available>
+         <available>christian.klukas@gmail.com</available>
     </plugindesc>
 </plugin>

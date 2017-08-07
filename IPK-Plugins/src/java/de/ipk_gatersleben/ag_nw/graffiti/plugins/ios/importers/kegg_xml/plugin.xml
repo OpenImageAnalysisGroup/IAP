@@ -12,6 +12,6 @@
 	    <name>KEGG-XML-Pathway-Reader</name>
         <main>de.ipk_gatersleben.ag_nw.graffiti.plugins.ios.importers.kegg_xml.KEGG_XML_ReaderPlugin</main>
         <version>1.0.0</version>
-        <available>mailto:klukas@ipk-gatersleben.de</available>
+        <available>mailto:christian.klukas@gmail.com</available>
     </plugindesc>
 </plugin>

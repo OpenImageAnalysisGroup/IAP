@@ -75,3 +75,4 @@ hs_err_pid*
 *.class
 
 IAP CONSOLE/bin/de/ipk/ag_ba/Console.class
+/.DS_Store
