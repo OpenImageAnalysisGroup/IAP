@@ -1,22 +1,27 @@
 package de.ipk.ag_ba.commands.about;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import plyvis.PLYSettings;
 import plyvis.PLYVISMenuBar;
-import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author Jean-Michel Pape
@@ -51,8 +56,21 @@ public class ActionPLYVIS extends AbstractNavigationAction {
 		
 		JFXPanel jp = new JFXPanel();
 		
+		Label testLabel = new Label("Error initializing scene (may happen under specific operating systems)");
+		VBox pane = new VBox(testLabel);
+		pane.setAlignment(Pos.CENTER);
+		Scene err = new Scene(pane);
 		Platform.runLater(() -> {
-			jp.setScene(createScene(jp));
+			try {
+				Scene sc = createScene(jp);
+				jp.setScene(sc);
+			} catch (java.lang.ExceptionInInitializerError e) {
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				String exceptionAsString = sw.toString();
+				testLabel.setText(testLabel.getText() + System.lineSeparator() + "Details: " + System.lineSeparator() + exceptionAsString);
+				jp.setScene(err);
+			}
 		});
 		
 		MainPanelComponent mp = new MainPanelComponent(jp);
