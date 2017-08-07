@@ -122,7 +122,7 @@ public class Vector2i {
 	/**
 	 * @return x*y
 	 */
-	public int getArea() {
+	public long getArea() {
 		return x * y;
 	}
 }
