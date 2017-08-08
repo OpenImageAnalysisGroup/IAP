@@ -1,9 +1,5 @@
 package iap.blocks.preprocessing;
 
-import iap.blocks.data_structures.AbstractBlock;
-import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptionsAndResults;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,9 +7,13 @@ import java.util.HashSet;
 
 import org.Vector2i;
 
+import de.ipk.ag_ba.image.operations.blocks.BlockResultObject;
 import de.ipk.ag_ba.image.operations.segmentation.ClusterDetection;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 
 /**
  * Separate objects according to their size, up to the maximum object count,
@@ -25,7 +25,7 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 	int maxN;
 	double minimumSize;
-	private boolean sortBySize;
+	private boolean sortBySize, sortByPreviousPosition;
 	private boolean sortByX;
 	private boolean sortByY;
 	
@@ -37,7 +37,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 		this.sortBySize = getBoolean("Sort By Size (off for sort by position)", false);
 		this.sortByX = getBoolean("Left to Right (X)", true);
 		this.sortByY = getBoolean("Top to Bottom (Y)", false);
-		
+		this.sortByPreviousPosition = getBoolean("Time series consideration (look back to find match)", false);
 	}
 	
 	@Override
@@ -55,6 +55,24 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			
 			Vector2i[] clusterPositions = cd.getClusterCenterPoints();
 			int[] clusterSize = cd.getClusterSize();
+			
+			getResultSet().setObjectResult(getBlockPosition(), "clusterobject_" + mask.getCameraType(), new ClusterPositionsAndSize(clusterPositions, clusterSize));
+			
+			if (sortByPreviousPosition) {
+				BlockResultObject previousResult = getResultSet().searchObjectResult(getBlockPosition(), 1, "clusterobject_" + mask.getCameraType());
+				if (previousResult != null) {
+					ClusterPositionsAndSize cps = (ClusterPositionsAndSize) previousResult.getObject();
+					if (cps != null) {
+						Vector2i[] prevPosition = cps.positions;
+						int[] prevSize = cps.size;
+						
+						int[] bestPreviousMatch = new int[prevSize.length];
+						for (int i = 0; i < clusterSize.length; i++) {
+							
+						}
+					}
+				}
+			}
 			
 			final int[] sortCriteria;
 			if (sortBySize) {
@@ -109,7 +127,7 @@ public class BlObjectSeparator extends AbstractBlock implements WellProcessor {
 			if (clusterSize != null)
 				for (int id = 0; id < clusterSize.length; id++)
 					targetIdxList.add(id);
-			
+				
 			for (Integer sortedClusterProperty : sortedClusterProperties) {
 				for (Integer clusterID : targetIdxList) {
 					if (clusterSize[clusterID] == sortedClusterProperty.intValue()) {

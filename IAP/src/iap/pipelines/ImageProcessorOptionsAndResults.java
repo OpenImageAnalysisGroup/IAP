@@ -7,8 +7,6 @@
 
 package iap.pipelines;
 
-import iap.blocks.data_structures.ImageAnalysisBlock;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +22,7 @@ import de.ipk.ag_ba.image.operations.segmentation.NeighbourhoodSetting;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 
 /**
  * @author klukas
@@ -103,7 +102,7 @@ public class ImageProcessorOptionsAndResults {
 					infoCamConfOrLateOrEearly = " for " + cameraConfig.trim();
 				else
 					infoCamConfOrLateOrEearly = " for " + cameraConfig.trim() + " (" + lateOrEarly + ")";
-		
+				
 	}
 	
 	public SystemOptions getOptSystemOptions() {
@@ -205,9 +204,8 @@ public class ImageProcessorOptionsAndResults {
 			return defaultValue;
 		else
 			return optSystemOptionStorage.getBoolean(
-					getSystemOptionStorageGroup(block), getSettingName(block, title), infoCamConfOrLateOrEearly == null ? defaultValue :
-							optSystemOptionStorage.getBoolean(getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue)
-					);
+					getSystemOptionStorageGroup(block), getSettingName(block, title),
+					infoCamConfOrLateOrEearly == null ? defaultValue : optSystemOptionStorage.getBoolean(getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
 	}
 	
 	public boolean setBooleanSetting(ImageAnalysisBlock block, String title, boolean defaultValue) {
@@ -223,9 +221,25 @@ public class ImageProcessorOptionsAndResults {
 	private String getSettingName(ImageAnalysisBlock block, String title) {
 		if (title != null && title.contains(","))
 			System.err.println(SystemAnalysis.getCurrentTime() + ">WARNING: INVALID SETTINGS NAME (CONTAINS ',')!");
-		return block != null ?
-				block.getClass().getCanonicalName() + "//" + title :
-				title;
+		
+		if (block != null) {
+			String postfix = "";
+			if (block.getBlockFrequencyIndex() > 0) {
+				if (getBooleanSetting(new FakeFrequency0Block(block), "Custom settings for multiple blocks", false)) {
+					postfix = "-" + (1 + block.getBlockFrequencyIndex());
+				}
+			}
+			
+			String className = block.getClass().getCanonicalName();
+			
+			if (block.getClass() == FakeFrequency0Block.class) {
+				className = ((FakeFrequency0Block) block).getTemplateObject().getClass().getCanonicalName();
+			}
+			
+			return className + postfix + "//" + title;
+		} else {
+			return title;
+		}
 	}
 	
 	public double getDoubleSetting(ImageAnalysisBlock block, String title, double defaultValue) {
@@ -234,9 +248,8 @@ public class ImageProcessorOptionsAndResults {
 		else
 			return optSystemOptionStorage.getDouble(
 					getSystemOptionStorageGroup(block), getSettingName(block, title),
-					infoCamConfOrLateOrEearly == null ? defaultValue :
-							optSystemOptionStorage.getDouble(
-									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
+					infoCamConfOrLateOrEearly == null ? defaultValue : optSystemOptionStorage.getDouble(
+							getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
 	}
 	
 	public int getIntSetting(ImageAnalysisBlock block, String title, int defaultValue) {
@@ -245,9 +258,8 @@ public class ImageProcessorOptionsAndResults {
 		else
 			return optSystemOptionStorage.getInteger(
 					getSystemOptionStorageGroup(block), getSettingName(block, title),
-					infoCamConfOrLateOrEearly == null ? defaultValue :
-							optSystemOptionStorage.getInteger(
-									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
+					infoCamConfOrLateOrEearly == null ? defaultValue : optSystemOptionStorage.getInteger(
+							getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
 	}
 	
 	public void setIntSetting(ImageAnalysisBlock block, String title, int value) {
@@ -264,9 +276,8 @@ public class ImageProcessorOptionsAndResults {
 		else
 			return optSystemOptionStorage.getString(
 					getSystemOptionStorageGroup(block), getSettingName(block, title),
-					infoCamConfOrLateOrEearly == null ? defaultValue :
-							optSystemOptionStorage.getString(
-									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
+					infoCamConfOrLateOrEearly == null ? defaultValue : optSystemOptionStorage.getString(
+							getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
 	}
 	
 	public String getStringSettingRadio(ImageAnalysisBlock block, String title, String defaultValue, ArrayList<String> possibleValues) {
@@ -275,10 +286,9 @@ public class ImageProcessorOptionsAndResults {
 		else
 			return optSystemOptionStorage.getStringRadioSelection(
 					getSystemOptionStorageGroup(block), getSettingName(block, title), possibleValues,
-					infoCamConfOrLateOrEearly == null ? defaultValue :
-							optSystemOptionStorage.getStringRadioSelection(
-									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), possibleValues,
-									defaultValue, true),
+					infoCamConfOrLateOrEearly == null ? defaultValue : optSystemOptionStorage.getStringRadioSelection(
+							getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), possibleValues,
+							defaultValue, true),
 					true);
 	}
 	
@@ -288,9 +298,8 @@ public class ImageProcessorOptionsAndResults {
 		else
 			return optSystemOptionStorage.getColor(
 					getSystemOptionStorageGroup(block), getSettingName(block, title),
-					infoCamConfOrLateOrEearly == null ? defaultValue :
-							optSystemOptionStorage.getColor(getSystemOptionStorageGroupWithoutCustomInfo(),
-									getSettingName(block, title), defaultValue));
+					infoCamConfOrLateOrEearly == null ? defaultValue : optSystemOptionStorage.getColor(getSystemOptionStorageGroupWithoutCustomInfo(),
+							getSettingName(block, title), defaultValue));
 	}
 	
 	public void setColorSetting(ImageAnalysisBlock block, String title, Color value) {
@@ -307,9 +316,8 @@ public class ImageProcessorOptionsAndResults {
 		else
 			return optSystemOptionStorage.getIntArray(
 					getSystemOptionStorageGroup(block), getSettingName(block, title),
-					infoCamConfOrLateOrEearly == null ? defaultValue :
-							optSystemOptionStorage.getIntArray(
-									getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
+					infoCamConfOrLateOrEearly == null ? defaultValue : optSystemOptionStorage.getIntArray(
+							getSystemOptionStorageGroupWithoutCustomInfo(), getSettingName(block, title), defaultValue));
 	}
 	
 	Double calculatedBlueMarkerDistance = null;

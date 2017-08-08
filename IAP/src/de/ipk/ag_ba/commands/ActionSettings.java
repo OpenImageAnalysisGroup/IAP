@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.commands;
 
-import iap.blocks.data_structures.ImageAnalysisBlock;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -27,6 +25,7 @@ import de.ipk.ag_ba.gui.Unicode;
 import de.ipk.ag_ba.gui.images.IAPimages;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 
 public class ActionSettings extends AbstractNavigationAction {
 	
@@ -95,9 +94,15 @@ public class ActionSettings extends AbstractNavigationAction {
 			for (String setting : so.getSectionSettings(s)) {
 				String bln = null;
 				try {
-					ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(setting.split("//")[0], true, InstanceLoader.getCurrentLoader()).newInstance();
+					String postfix = "";
+					try {
+						postfix = "-" + setting.split("//")[0].split("-")[1];
+					} catch (Exception e) {
+						
+					}
+					ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(setting.split("//")[0].split("-")[0], true, InstanceLoader.getCurrentLoader()).newInstance();
 					String v = so.internalGetString(s, setting);
-					bln = inst.getName() + "//" + setting.split("//")[1] + (v != null ? " <b>&#9655;</b> " + v : "");
+					bln = inst.getName() + postfix + "//" + setting.split("//")[1] + (v != null ? " <b>&#9655;</b> " + v : "");
 				} catch (Exception e) {
 					try {
 						String v = so.internalGetString(s, setting);

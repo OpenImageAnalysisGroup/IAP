@@ -1,7 +1,5 @@
 package iap.blocks.data_structures;
 
-import iap.pipelines.ImageProcessorOptionsAndResults;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
@@ -12,6 +10,7 @@ import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
+import iap.pipelines.ImageProcessorOptionsAndResults;
 
 /**
  * @author Christian Klukas
@@ -19,7 +18,7 @@ import de.ipk.ag_ba.image.structures.MaskAndImageSet;
 public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	
 	public void setInputAndOptions(String well, MaskAndImageSet input, ImageProcessorOptionsAndResults options, BlockResultSet settings,
-			int blockPositionInPipeline,
+			int blockPositionInPipeline, int blockFrequencyIndex,
 			ImageStack debugStack);
 	
 	public MaskAndImageSet process() throws InterruptedException;
@@ -65,5 +64,7 @@ public interface ImageAnalysisBlock extends Comparable<ImageAnalysisBlock> {
 	public String getDescriptionForParameters();
 	
 	boolean isChangingImages();
+	
+	public int getBlockFrequencyIndex();
 	
 }

@@ -1,10 +1,5 @@
 package de.ipk.ag_ba.commands.settings;
 
-import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.CalculatedPropertyDescription;
-import iap.blocks.data_structures.CalculatesProperties;
-import iap.blocks.data_structures.ImageAnalysisBlock;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -17,6 +12,10 @@ import de.ipk.ag_ba.commands.AbstractNavigationAction;
 import de.ipk.ag_ba.gui.MainPanelComponent;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 
 class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	private final NavigationButton src;
@@ -54,12 +53,20 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 	@Override
 	public String getDefaultTitle() {
 		try {
-			ImageAnalysisBlock inst = (ImageAnalysisBlock) InstanceLoader.createInstance(group);
+			ImageAnalysisBlock inst;
+			String postfix = "";
+			if (group != null && group.contains("-")) {
+				inst = (ImageAnalysisBlock) InstanceLoader.createInstance(group.split("-")[0]);
+				postfix = " (" + group.split("-")[1] + ")";
+			} else {
+				inst = (ImageAnalysisBlock) InstanceLoader.createInstance(group);
+			}
+			
 			BlockType bt = inst.getBlockType();
 			String pre = "";
 			if (bt != null)
 				pre = "<html><font bgcolor='" + bt.getColor() + "'>&nbsp;";
-			return pre + inst.getName() + (pre.isEmpty() ? "" : "&nbsp;");
+			return pre + inst.getName() + postfix + (pre.isEmpty() ? "" : "&nbsp;");
 		} catch (Exception e) {
 			String g = group;
 			if (g != null && g.indexOf(".Block") > 0)
@@ -135,8 +142,7 @@ class ActionAnalysisBlockSettings extends AbstractNavigationAction {
 					"Description:" +
 					"<ul><li>" +
 					StringManipulationTools.getWordWrap(inst.getDescription(), 80) + "</ul>" +
-					(inst.getDescriptionForParameters() != null ?
-							"Parameter:" + StringManipulationTools.getWordWrap(inst.getDescriptionForParameters(), 80) : "") +
+					(inst.getDescriptionForParameters() != null ? "Parameter:" + StringManipulationTools.getWordWrap(inst.getDescriptionForParameters(), 80) : "") +
 					"Annotation:<ul><li>" + inst.getBlockType().getName() + " block<br><br>" +
 					"<li>Input/Output:<code><ul><li>In:&nbsp;&nbsp;" +
 					StringManipulationTools.getStringList(inst.getCameraInputTypes(), ", ")

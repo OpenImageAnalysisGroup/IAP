@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.commands.settings;
 
-import iap.blocks.data_structures.ImageAnalysisBlock;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -17,6 +15,7 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import de.ipk.ag_ba.plugins.IAPpluginManager;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import iap.blocks.data_structures.ImageAnalysisBlock;
 
 /**
  * @author klukas
@@ -61,6 +60,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 			group2button.get(group).add(new NavigationButton(
 					new ActionSettingsFieldEditor(this, "Change setting " + section + "/" + setting, setting), src.getGUIsetting()));
 		}
+		
 		for (final String group : group2button.keySet()) {
 			if (group.length() == 0) {
 				NavigationAction resetSettingsAction = new ActionResetActions(
@@ -81,7 +81,7 @@ public class ActionSettingsEditor extends AbstractNavigationAction {
 				res.add(nb);
 				String bln = "";
 				try {
-					ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group, true, InstanceLoader.getCurrentLoader()).newInstance();
+					ImageAnalysisBlock inst = (ImageAnalysisBlock) Class.forName(group.split("-")[0], true, InstanceLoader.getCurrentLoader()).newInstance();
 					bln = inst.getName();
 				} catch (Exception e) {
 					// empty

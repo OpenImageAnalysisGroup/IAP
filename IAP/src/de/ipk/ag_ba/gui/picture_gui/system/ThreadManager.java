@@ -66,7 +66,7 @@ public class ThreadManager {
 								continue;
 							if ((t.getState() == Thread.State.BLOCKED ||
 									t.getState() == Thread.State.WAITING ||
-							t.getState() == Thread.State.TIMED_WAITING)) {
+									t.getState() == Thread.State.TIMED_WAITING)) {
 								idleTasks++;
 							}
 						}
@@ -115,21 +115,18 @@ public class ThreadManager {
 				
 				if (SystemOptions.getInstance().getBoolean("SYSTEM", "Reduce Workload in Low Memory Situation", false)) {
 					if (SystemAnalysis.getMemoryMB() < 1500 && nn > 1) {
-						System.out
-								.println(SystemAnalysis.getCurrentTime()
-										+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY TO 1");
+						SystemAnalysis.printlnOncePerMinute(SystemAnalysis.getCurrentTime()
+								+ ">LOW SYSTEM MEMORY (less than 1500 MB), LIMITING CONCURRENCY TO 1");
 						nn = 1;
 					}
 					if (SystemAnalysis.getMemoryMB() < 2000 && nn > 1) {
-						System.out
-								.println(SystemAnalysis.getCurrentTime()
-										+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY TO 1");
+						SystemAnalysis.printlnOncePerMinute(SystemAnalysis.getCurrentTime()
+								+ ">LOW SYSTEM MEMORY (less than 2000 MB), LIMITING CONCURRENCY TO 1");
 						nn = 1;
 					}
 					if (SystemAnalysis.getMemoryMB() < 4000 && nn > 2) {
-						System.out
-								.println(SystemAnalysis.getCurrentTime()
-										+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY TO 2");
+						SystemAnalysis.printlnOncePerMinute(SystemAnalysis.getCurrentTime()
+								+ ">LOW SYSTEM MEMORY (less than 4000 MB), LIMITING CONCURRENCY TO 2");
 						nn = 2;
 					}
 					
@@ -137,7 +134,7 @@ public class ThreadManager {
 							&& SystemAnalysis.getUsedMemoryInMB() > SystemAnalysis
 									.getMemoryMB() * (double) SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
 									/ 100d) {
-						System.out.println(SystemAnalysis.getCurrentTime()
+						SystemAnalysis.printlnOncePerMinute(SystemAnalysis.getCurrentTime()
 								+ ">HIGH MEMORY UTILIZATION (>"
 								+ SystemOptions.getInstance().getInteger("SYSTEM", "Reduce Workload Memory Usage Threshold Percent", 70)
 								+ "%), REDUCING CONCURRENCY");

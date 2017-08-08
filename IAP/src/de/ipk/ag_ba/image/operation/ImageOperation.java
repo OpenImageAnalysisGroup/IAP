@@ -1,25 +1,5 @@
 package de.ipk.ag_ba.image.operation;
 
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-import ij.ImagePlus;
-import ij.Prefs;
-import ij.gui.Roi;
-import ij.io.FileSaver;
-import ij.measure.Calibration;
-import ij.plugin.ContrastEnhancer;
-import ij.plugin.ImageCalculator;
-import ij.plugin.filter.GaussianBlur;
-import ij.plugin.filter.RankFilters;
-import ij.plugin.filter.UnsharpMask;
-import ij.process.AutoThresholder.Method;
-import ij.process.BinaryProcessor;
-import ij.process.ByteProcessor;
-import ij.process.ColorProcessor;
-import ij.process.FloatProcessor;
-import ij.process.ImageProcessor;
-import ij.process.TypeConverter;
-import info.StopWatch;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -85,6 +65,24 @@ import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk.ag_ba.labcube.ImageOperationLabCube;
 import de.ipk.ag_ba.labcube.ImageOperationLabCubeInterface;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
+import ij.ImagePlus;
+import ij.Prefs;
+import ij.gui.Roi;
+import ij.io.FileSaver;
+import ij.measure.Calibration;
+import ij.plugin.ContrastEnhancer;
+import ij.plugin.ImageCalculator;
+import ij.plugin.filter.RankFilters;
+import ij.plugin.filter.UnsharpMask;
+import ij.process.AutoThresholder.Method;
+import ij.process.BinaryProcessor;
+import ij.process.ByteProcessor;
+import ij.process.ColorProcessor;
+import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
+import ij.process.TypeConverter;
+import info.StopWatch;
 
 /**
  * A number of commonly used image operation commands.
@@ -183,7 +181,7 @@ public class ImageOperation implements MemoryHogInterface {
 	public ImageOperation translate(double x, double y) {
 		image.getProcessor().translate(x, y);
 		return new ImageOperation(getImage())
-				.replaceColor(0,// Color.BLACK.getRGB(),
+				.replaceColor(0, // Color.BLACK.getRGB(),
 						ImageOperation.BACKGROUND_COLORint);
 	}
 	
@@ -287,7 +285,7 @@ public class ImageOperation implements MemoryHogInterface {
 		if (replaceColor) {
 			res = res.replaceColor(Color.BLACK.getRGB(),
 					ImageOperation.BACKGROUND_COLORint).replaceColor(Color.WHITE.getRGB(),
-					ImageOperation.BACKGROUND_COLORint);
+							ImageOperation.BACKGROUND_COLORint);
 		}
 		return res;
 	}
@@ -988,7 +986,7 @@ public class ImageOperation implements MemoryHogInterface {
 			right = img[0].length;
 		if (down == -1)
 			down = img.length;
-		
+			
 		// System.out.println("BoundingBox");
 		// System.out.println("top: " + top);
 		// System.out.println("left: " + left);
@@ -1218,13 +1216,13 @@ public class ImageOperation implements MemoryHogInterface {
 		if (radius < 0.001)
 			return this;
 		
-		if (true)
-			return ImageOperationAlt.gaussianBlur(this, radius);
+		// if (true)
+		return ImageOperationAlt.gaussianBlur(this, radius);
 		
-		Prefs.setThreads(1);
-		GaussianBlur gb = new GaussianBlur();
-		gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
-		return this;// new ImageOperation(new FlexibleImage(getImage().getAs2A()));
+		// Prefs.setThreads(1);
+		// GaussianBlur gb = new GaussianBlur();
+		// gb.blurGaussian(image.getProcessor(), radius, radius, 0.001);
+		// return this;// new ImageOperation(new FlexibleImage(getImage().getAs2A()));
 	}
 	
 	/**
@@ -1248,7 +1246,6 @@ public class ImageOperation implements MemoryHogInterface {
 				considerArea, null, -1);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static Image removeSmallPartsOfImage(
 			Image workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
@@ -1351,7 +1348,7 @@ public class ImageOperation implements MemoryHogInterface {
 				int clusterID = mask[idx];
 				if (clusterID >= 0 &&
 						((clusterDimensionMinWH[clusterID] < cutOffMinimumDimension || clusterSizes[clusterID] <= cutOffMinimumArea) ||
-						(clusterDimensionMinWH[clusterID] >= cutOffMinimumDimension && toBeDeletedClusterIDs[clusterID])))
+								(clusterDimensionMinWH[clusterID] >= cutOffMinimumDimension && toBeDeletedClusterIDs[clusterID])))
 					rgbArray[idx] = iBackgroundFill;
 			}
 		
@@ -1473,7 +1470,8 @@ public class ImageOperation implements MemoryHogInterface {
 	// }
 	//
 	/**
-	 * @param double: pLeft percent
+	 * @param double:
+	 *           pLeft percent
 	 * @param pRight
 	 * @param pTop
 	 * @param pBottom
@@ -1492,6 +1490,8 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		int wn = largestX - smallestX + 1;
 		int hn = largestY - smallestY + 1;
+		wn = wn < 0 ? 0 : wn;
+		hn = hn < 0 ? 0 : hn;
 		int[] res = new int[wn * hn];
 		for (int x = smallestX; x <= largestX; x++) {
 			for (int y = smallestY; y <= largestY; y++) {
@@ -1585,6 +1585,25 @@ public class ImageOperation implements MemoryHogInterface {
 				.getHeight());
 	}
 	
+	public ImageOperation filterRemainRGB(double r1, double r2, double g1, double g2, double b1, double b2) {
+		int r, g, b, rgb;
+		
+		int[] pixels = getAs1D();
+		for (int index = 0; index < pixels.length; index++) {
+			rgb = pixels[index];
+			r = ((rgb >> 16) & 0xff);
+			g = ((rgb >> 8) & 0xff);
+			b = (rgb & 0xff);
+			
+			if (r >= r1 && r <= r2 && g >= g1 && g <= g2 && b >= b1 && b <= b2)
+				pixels[index] = rgb;
+			else
+				pixels[index] = BACKGROUND_COLORint;
+		}
+		return new ImageOperation(pixels, getImage().getWidth(), getImage()
+				.getHeight());
+	}
+	
 	public ImageOperation filterRemoveHSV(double maxDist, double clearColorHUE) {
 		
 		double t = clearColorHUE;
@@ -1634,6 +1653,29 @@ public class ImageOperation implements MemoryHogInterface {
 			if (hsb[0] >= minHue && hsb[0] <= maxHue
 					&& hsb[1] >= minSat && hsb[1] <= maxSat
 					&& hsb[2] >= minLightness && hsb[2] <= maxLightness)
+				pixels[index] = BACKGROUND_COLORint;
+			else
+				pixels[index] = rgb;
+		}
+		return new ImageOperation(pixels, getImage().getWidth(), getImage()
+				.getHeight());
+	}
+	
+	public ImageOperation filterRemoveRGB(double minR, double maxR,
+			double minG, double maxG,
+			double minB, double maxB) {
+		
+		int r, g, b, rgb;
+		
+		int[] pixels = getAs1D();
+		for (int index = 0; index < pixels.length; index++) {
+			rgb = pixels[index];
+			// int a = ((rgb >> 24) & 0xff);
+			r = ((rgb >> 16) & 0xff);
+			g = ((rgb >> 8) & 0xff);
+			b = (rgb & 0xff);
+			
+			if ((r >= minR && r <= maxR) || (g >= minG && g <= maxG) || (b >= minB && b <= maxB))
 				pixels[index] = BACKGROUND_COLORint;
 			else
 				pixels[index] = rgb;
@@ -1797,9 +1839,9 @@ public class ImageOperation implements MemoryHogInterface {
 						resultImage[off] = background;
 				} else {
 					if (replaceBlueStick && maize && typ == CameraPosition.SIDE) {
-						boolean backFound = false;
+						// boolean backFound = false;
 						boolean greenFound = false;
-						int green = Color.GREEN.getRGB();
+						// int green = Color.GREEN.getRGB();
 						for (int xd = 1; xd < 15; xd++) {
 							off = x + xd + yw;
 							
@@ -1808,7 +1850,7 @@ public class ImageOperation implements MemoryHogInterface {
 							c = imagePixels[off];
 							
 							if (c == background) {
-								backFound = true;
+								// backFound = true;
 								break;
 							} else {
 								r = ((c & 0xff0000) >> 16);
@@ -1821,13 +1863,13 @@ public class ImageOperation implements MemoryHogInterface {
 								
 								if (ai < 120 && Math.abs(bi - 127) < 10) {
 									greenFound = true;
-									green = c;
+									// green = c;
 									break;
 								}
 							}
 						}
 						
-						boolean backFoundL = false;
+						// boolean backFoundL = false;
 						boolean greenFoundL = false;
 						for (int xd = -1; xd > -15; xd--) {
 							off = x + xd + yw;
@@ -1836,7 +1878,7 @@ public class ImageOperation implements MemoryHogInterface {
 							c = imagePixels[off];
 							
 							if (c == background) {
-								backFoundL = true;
+								// backFoundL = true;
 								break;
 							} else {
 								r = ((c & 0xff0000) >> 16);
@@ -1849,7 +1891,7 @@ public class ImageOperation implements MemoryHogInterface {
 								
 								if (ai < 120 && Math.abs(bi - 127) < 10) {
 									greenFoundL = true;
-									green = c;
+									// green = c;
 									break;
 								}
 							}
@@ -2207,7 +2249,7 @@ public class ImageOperation implements MemoryHogInterface {
 			b = (c & 0x0000ff);
 			
 			switch (mode) {
-			// use hsv, saturation to zero
+				// use hsv, saturation to zero
 				case ZERO_SATURATION:
 					Color.RGBtoHSB(r, g, b, hsv);
 					hsv[1] = 0;
@@ -3651,7 +3693,7 @@ public class ImageOperation implements MemoryHogInterface {
 						else
 							if (idx >= calibrationCurveFromTopLeftToCenter.length)
 								idx = calibrationCurveFromTopLeftToCenter.length - 1;
-						
+							
 						fac = whiteLevel_180d / func.value(len - idx);
 						
 						pix = (int) Math.ceil(pix * fac);
@@ -3660,7 +3702,7 @@ public class ImageOperation implements MemoryHogInterface {
 						else
 							if (pix < 0)
 								pix = 0;
-						
+							
 						res[i] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
 					}
 					i++;
@@ -3701,7 +3743,7 @@ public class ImageOperation implements MemoryHogInterface {
 				else
 					if (pix < 0)
 						pix = 0;
-				
+					
 				res[x][y] = (0xFF << 24 | (pix & 0xFF) << 16) | ((pix & 0xFF) << 8) | ((pix & 0xFF) << 0);
 			}
 		}
@@ -4021,7 +4063,7 @@ public class ImageOperation implements MemoryHogInterface {
 				for (int c : valuesMask)
 					if (c != ImageOperation.BACKGROUND_COLORint)
 						valuesMaskCorrect[idx++] = c;
-				
+					
 				mean = mean(valuesMaskCorrect);
 				double sd = standardDerivation(valuesMaskCorrect, mean);
 				double maxStandardDerivation = 128.; // for grayscale image with intensity g(x,y) in [0-255]
@@ -4430,7 +4472,7 @@ public class ImageOperation implements MemoryHogInterface {
 		int minR = 255, minG = 255, minB = 255;
 		float minDistL = Float.MAX_VALUE;
 		float minDistAB = Float.MAX_VALUE;
-		float minL = 0, minAa = 0, minBb = 0;
+		// float minL = 0, minAa = 0, minBb = 0;
 		float[][][] lab = getLabCubeInstance();
 		for (int r = 0; r < 255; r++) {
 			for (int g = 0; g < 255; g++) {
@@ -4446,9 +4488,9 @@ public class ImageOperation implements MemoryHogInterface {
 						minR = r;
 						minG = g;
 						minB = b;
-						minL = l2;
-						minAa = a2;
-						minBb = b2;
+						// minL = l2;
+						// minAa = a2;
+						// minBb = b2;
 					}
 				}
 			}
@@ -4831,7 +4873,7 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public float[][] distanceMapFloat(DistanceMapFloatMode dm) {
 		int background = BACKGROUND_COLORint;
-		int borderColor = Color.CYAN.getRGB();
+		// int borderColor = Color.CYAN.getRGB();
 		int w = image.getWidth();
 		int h = image.getHeight();
 		int[][] img = getAs2D();
@@ -5127,7 +5169,7 @@ public class ImageOperation implements MemoryHogInterface {
 			else
 				if (b < 0)
 					b = 0;
-			
+				
 			img[i] = (0xFF << 24 | (r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
 		}
 		return this;

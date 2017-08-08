@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -558,5 +559,14 @@ public class SystemAnalysis {
 	public static void exit(int returnCode) {
 		waitIfImportantProcessIsRunning();
 		System.exit(returnCode);
+	}
+	
+	private static HashMap<Integer, Long> msg2printTime = new HashMap<>();
+	
+	public static void printlnOncePerMinute(String txt) {
+		if (!msg2printTime.containsKey(txt.hashCode()) || System.currentTimeMillis() - msg2printTime.get(txt.hashCode()) > 60 * 1000)
+			System.out.println(txt);
+		
+		msg2printTime.put(txt.hashCode(), System.currentTimeMillis());
 	}
 }
