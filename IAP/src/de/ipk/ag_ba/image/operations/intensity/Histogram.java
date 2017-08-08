@@ -2,7 +2,7 @@ package de.ipk.ag_ba.image.operations.intensity;
 
 public class Histogram {
 	public static enum Mode {
-		MODE_GRAY_NIR_ANALYSIS, MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS, MODE_HUE_VIS_ANALYSIS, MODE_IR_ANALYSIS
+		MODE_GRAY_NIR_ANALYSIS, MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS, MODE_HUE_VIS_ANALYSIS, MODE_HUE_RGB_ANALYSIS, MODE_IR_ANALYSIS
 	}
 	
 	private final double[] freq; // freq[i] = # occurences of value i

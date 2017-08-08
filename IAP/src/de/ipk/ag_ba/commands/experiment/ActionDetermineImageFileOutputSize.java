@@ -133,10 +133,10 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 			tsoSampleProgres.setBval(10, true);
 			if (nToDo == 0)
 				System.out.println("Finished sampling (all images sampled)");
-				else
-					System.out.println("Finished sampling (time since last title request=" +
-							(System.currentTimeMillis() - lastTitleUpdate.getLong() + " is greater than 20 sec.)"));
-			};
+			else
+				System.out.println("Finished sampling (time since last title request=" +
+						(System.currentTimeMillis() - lastTitleUpdate.getLong() + " is greater than 20 sec.)"));
+		};
 		Thread sampleThread = new Thread(r);
 		sampleThread.setPriority(Thread.MIN_PRIORITY);
 		sampleThread.setName("Sample Image Sizes");
@@ -418,7 +418,7 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 		if (!exportImages.getBval(0, false)) {
 			String ss = tsoQuality.getInt() + "% size";
 			String sizeEst = (String) tsoQuality.getParam(0, null);
-			return (sizeEst == null ? "Determine PNG Output Size" : "PNG Output Size " + sizeEst) + "<br><small><font color='gray'>(PNG output, " + ss
+			return (sizeEst == null ? "<html><center>Determine PNG Output Size" : "PNG Output Size " + sizeEst) + "<br><small><font color='gray'>(PNG output, " + ss
 					+ ")" + sp
 					+ (tsoSampleProgres.getBval(10, false) ? " - stopped" : "");
 		}
@@ -428,7 +428,7 @@ public class ActionDetermineImageFileOutputSize extends AbstractNavigationAction
 		{
 			String ss = tsoQuality.getInt() + "% size";
 			String sizeEst = (String) tsoQuality.getParam(0, null);
-			return (sizeEst == null ? "Determine Image Storage Size" : "JPG Output Size " + sizeEst) + "<br><small><font color='gray'>(" + q + ", " + ss
+			return (sizeEst == null ? "<html><center>Determine Image Storage Size" : "JPG Output Size " + sizeEst) + "<br><small><font color='gray'>(" + q + ", " + ss
 					+ ")"
 					+ sp + (tsoSampleProgres.getBval(10, false) ? " - stopped" : "");
 		}

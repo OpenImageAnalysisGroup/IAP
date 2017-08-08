@@ -45,6 +45,14 @@ public class IntensityAnalysis {
 		DescriptiveStatistics statsLabA = new DescriptiveStatistics();
 		DescriptiveStatistics statsLabB = new DescriptiveStatistics();
 		
+		DescriptiveStatistics statsRgbR = new DescriptiveStatistics();
+		DescriptiveStatistics statsRgbG = new DescriptiveStatistics();
+		DescriptiveStatistics statsRgbB = new DescriptiveStatistics();
+		
+		Histogram histR = new Histogram(this.n);
+		Histogram histG = new Histogram(this.n);
+		Histogram histB = new Histogram(this.n);
+		
 		double weightOfPlant = 0;
 		
 		int background = ImageOperation.BACKGROUND_COLORint;
@@ -69,7 +77,7 @@ public class IntensityAnalysis {
 			int g_intensityChlorophyl = (c & 0x00ff00) >> 8;
 			int b_intensityPhenol = (c & 0x0000ff);
 			
-			if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
+			if (mode == Mode.MODE_HUE_VIS_ANALYSIS || mode == Mode.MODE_HUE_RGB_ANALYSIS) {
 				
 				int r = r_intensityClassic;
 				int g = g_intensityChlorophyl;
@@ -81,6 +89,16 @@ public class IntensityAnalysis {
 				statsLabL.addValue(Li);
 				statsLabA.addValue(ai);
 				statsLabB.addValue(bi);
+				
+				if (mode == Mode.MODE_HUE_RGB_ANALYSIS) {
+					statsRgbR.addValue(r);
+					statsRgbG.addValue(g);
+					statsRgbB.addValue(b);
+					
+					histR.addDataPoint(r, 255, g, b);
+					histG.addDataPoint(g, 255, r, b);
+					histB.addDataPoint(b, 255, r, g);
+				}
 				
 				Color.RGBtoHSB(r_intensityClassic, g_intensityChlorophyl, b_intensityPhenol, hsb);
 				{
@@ -98,7 +116,7 @@ public class IntensityAnalysis {
 							else
 								if (hLimit > 120d / 360d)
 									hLimit = 120d / 360d;
-							
+								
 							double pH1 = (hLimit - 60d / 360d) / (60d / 360d);
 							sumOfDGCIs2 += (pH1 + (1 - s) + (1 - v)) / 3d;
 							
@@ -153,7 +171,7 @@ public class IntensityAnalysis {
 		result.incrementCounter();
 		
 		boolean addNormalizedHistogramValues = true;
-		if (mode == Mode.MODE_HUE_VIS_ANALYSIS) {
+		if (mode == Mode.MODE_HUE_VIS_ANALYSIS || mode == Mode.MODE_HUE_RGB_ANALYSIS) {
 			if (addHistogramValues) {
 				if (optDistHorizontal != null && optRealMarkerDistance != null && addNormalizedHistogramValues) {
 					double normalize = optRealMarkerDistance / optDistHorizontal;
@@ -174,6 +192,25 @@ public class IntensityAnalysis {
 										+ "_" + StringManipulationTools.formatNumberAddZeroInFront(histVal.getBorderRight(i, 255), 3),
 								histVal.getFreqAt(i) * normalize);
 					}
+					if (mode == Mode.MODE_HUE_RGB_ANALYSIS) {
+						for (int i = 0; i < this.n; i++) {
+							result.addValue(
+									"rgb.normalized.r.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histR.getBorderLeft(i, 255), 3)
+											+ "_" + StringManipulationTools.formatNumberAddZeroInFront(histR.getBorderRight(i, 255), 3),
+									histR.getFreqAt(i) * normalize);
+							result.addValue(
+									"rgb.normalized.g.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histG.getBorderLeft(i, 255), 3)
+											+ "_" + StringManipulationTools.formatNumberAddZeroInFront(histG.getBorderRight(i, 255), 3),
+									histG.getFreqAt(i) * normalize);
+							result.addValue(
+									"rgb.normalized.b.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histB.getBorderLeft(i, 255), 3)
+											+ "_" + StringManipulationTools.formatNumberAddZeroInFront(histB.getBorderRight(i, 255), 3),
+									histB.getFreqAt(i) * normalize);
+						}
+					}
 				} else {
 					for (int i = 0; i < this.n; i++) {
 						result.addValue(
@@ -191,6 +228,26 @@ public class IntensityAnalysis {
 										+ StringManipulationTools.formatNumberAddZeroInFront(histVal.getBorderLeft(i, 255), 3)
 										+ "_" + StringManipulationTools.formatNumberAddZeroInFront(histVal.getBorderRight(i, 255), 3),
 								histVal.getFreqAt(i));
+					}
+					
+					if (mode == Mode.MODE_HUE_RGB_ANALYSIS) {
+						for (int i = 0; i < this.n; i++) {
+							result.addValue(
+									"rgb.r.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histR.getBorderLeft(i, 255), 3)
+											+ "_" + StringManipulationTools.formatNumberAddZeroInFront(histR.getBorderRight(i, 255), 3),
+									histR.getFreqAt(i));
+							result.addValue(
+									"rgb.g.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histG.getBorderLeft(i, 255), 3)
+											+ "_" + StringManipulationTools.formatNumberAddZeroInFront(histG.getBorderRight(i, 255), 3),
+									histG.getFreqAt(i));
+							result.addValue(
+									"rgb.b.histogram.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histB.getBorderLeft(i, 255), 3)
+											+ "_" + StringManipulationTools.formatNumberAddZeroInFront(histB.getBorderRight(i, 255), 3),
+									histB.getFreqAt(i));
+						}
 					}
 				}
 				for (int i = 0; i < this.n; i++) {
@@ -232,6 +289,47 @@ public class IntensityAnalysis {
 										+ StringManipulationTools.formatNumberAddZeroInFront(histVal.getBorderLeft(i, 255), 3) + "_"
 										+ StringManipulationTools.formatNumberAddZeroInFront(histVal.getBorderRight(i, 255), 3),
 								histVal.getOther2avg(i));
+					
+					if (mode == Mode.MODE_HUE_RGB_ANALYSIS) {
+						if (histR.getOther1avg(i) != null)
+							result.addValue(
+									"rgb.r.histogram.g_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histR.getBorderLeft(i, 255), 3) + "_"
+											+ StringManipulationTools.formatNumberAddZeroInFront(histR.getBorderRight(i, 255), 3),
+									histR.getOther1avg(i));
+						if (histR.getOther2avg(i) != null)
+							result.addValue(
+									"rgb.r.histogram.b_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histR.getBorderLeft(i, 255), 3) + "_"
+											+ StringManipulationTools.formatNumberAddZeroInFront(histR.getBorderRight(i, 255), 3),
+									histR.getOther2avg(i));
+						
+						if (histG.getOther1avg(i) != null)
+							result.addValue(
+									"rgb.g.histogram.r_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histG.getBorderLeft(i, 255), 3) + "_"
+											+ StringManipulationTools.formatNumberAddZeroInFront(histG.getBorderRight(i, 255), 3),
+									histG.getOther1avg(i));
+						if (histG.getOther2avg(i) != null)
+							result.addValue(
+									"rgb.g.histogram.b_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histG.getBorderLeft(i, 255), 3) + "_"
+											+ StringManipulationTools.formatNumberAddZeroInFront(histG.getBorderRight(i, 255), 3),
+									histG.getOther2avg(i));
+						
+						if (histB.getOther1avg(i) != null)
+							result.addValue(
+									"rgb.b.histogram.r_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histB.getBorderLeft(i, 255), 3) + "_"
+											+ StringManipulationTools.formatNumberAddZeroInFront(histB.getBorderRight(i, 255), 3),
+									histB.getOther1avg(i));
+						if (histB.getOther2avg(i) != null)
+							result.addValue(
+									"rgb.b.histogram.g_avg.bin." + StringManipulationTools.formatNumberAddZeroInFront(i + 1, 2) + "."
+											+ StringManipulationTools.formatNumberAddZeroInFront(histB.getBorderLeft(i, 255), 3) + "_"
+											+ StringManipulationTools.formatNumberAddZeroInFront(histB.getBorderRight(i, 255), 3),
+									histB.getOther2avg(i));
+					}
 				}
 			}
 			
@@ -243,7 +341,7 @@ public class IntensityAnalysis {
 				result.addValue("hsv.s.mean", savg);
 				result.addValue("hsv.v.mean", vavg);
 				
-				if (mode == Mode.MODE_HUE_VIS_ANALYSIS && isVisibleInputImage) {
+				if ((mode == Mode.MODE_HUE_VIS_ANALYSIS || mode == Mode.MODE_HUE_RGB_ANALYSIS) && isVisibleInputImage) {
 					result.addValue("hsv.dgci.mean", sumOfDGCIs2 / plantImagePixelCntVgreater0);
 				}
 			}
@@ -293,6 +391,26 @@ public class IntensityAnalysis {
 					result.addValue("lab.l.kurtosis", statsLabL.getKurtosis());
 					result.addValue("lab.a.kurtosis", statsLabA.getKurtosis());
 					result.addValue("lab.b.kurtosis", statsLabB.getKurtosis());
+				}
+				
+				if (mode == Mode.MODE_HUE_RGB_ANALYSIS) {
+					result.addValue("rgb.r.mean", statsRgbR.getMean());
+					result.addValue("rgb.g.mean", statsRgbG.getMean());
+					result.addValue("rgb.b.mean", statsRgbB.getMean());
+					
+					result.addValue("rgb.r.stddev", statsRgbR.getStandardDeviation());
+					result.addValue("rgb.g.stddev", statsRgbG.getStandardDeviation());
+					result.addValue("rgb.b.stddev", statsRgbB.getStandardDeviation());
+					
+					result.addValue("rgb.r.skewness", statsRgbR.getSkewness());
+					result.addValue("rgb.g.skewness", statsRgbG.getSkewness());
+					result.addValue("rgb.b.skewness", statsRgbB.getSkewness());
+					
+					if (calcCurtosis) {
+						result.addValue("rgb.r.kurtosis", statsRgbR.getKurtosis());
+						result.addValue("rgb.g.kurtosis", statsRgbG.getKurtosis());
+						result.addValue("rgb.b.kurtosis", statsRgbB.getKurtosis());
+					}
 				}
 			}
 		} else {
@@ -345,7 +463,7 @@ public class IntensityAnalysis {
 										+ histChlorophyl.getBorderRight(i, 255),
 								histChlorophyl.getFreqAt(i));
 					}
-			
+				
 			if (addHistogramValues)
 				if (mode == Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS) {
 					if (addNormalizedHistogramValues && optDistHorizontal != null && optRealMarkerDistance != null) {

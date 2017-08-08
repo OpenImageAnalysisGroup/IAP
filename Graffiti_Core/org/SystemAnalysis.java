@@ -564,8 +564,12 @@ public class SystemAnalysis {
 	private static HashMap<Integer, Long> msg2printTime = new HashMap<>();
 	
 	public static void printlnOncePerMinute(String txt) {
+		printlnOncePerMinute(txt, false);
+	}
+	
+	public static void printlnOncePerMinute(String txt, boolean addTimeInfo) {
 		if (!msg2printTime.containsKey(txt.hashCode()) || System.currentTimeMillis() - msg2printTime.get(txt.hashCode()) > 60 * 1000)
-			System.out.println(txt);
+			System.out.println(SystemAnalysis.getCurrentTime() + ">" + txt);
 		
 		msg2printTime.put(txt.hashCode(), System.currentTimeMillis());
 	}
