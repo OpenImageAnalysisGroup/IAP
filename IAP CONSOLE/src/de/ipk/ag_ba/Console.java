@@ -1,19 +1,29 @@
 package de.ipk.ag_ba;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.editor.SplashScreenInterface;
+import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
 import de.ipk.ag_ba.commands.ActionHome;
 import de.ipk.ag_ba.commands.ActionNavigateDataSource;
+import de.ipk.ag_ba.commands.experiment.scripts.VirtualIoProvider;
 import de.ipk.ag_ba.commands.lt.ActionLTnavigation;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoExperimentsNavigation;
 import de.ipk.ag_ba.commands.mongodb.ActionMongoOrLTexperimentNavigation;
@@ -22,6 +32,7 @@ import de.ipk.ag_ba.commands.vfs.VirtualFileSystemVFS2;
 import de.ipk.ag_ba.datasources.file_system.HsmFileSystemSource;
 import de.ipk.ag_ba.gui.IAPfeature;
 import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.PipelineDesc;
 import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
@@ -31,23 +42,34 @@ import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
+import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.UserDefinedImageAnalysisPipelineTask;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk.ag_ba.server.task_management.BackupSupport;
 import de.ipk.ag_ba.server.task_management.CloudComputingService;
 import de.ipk.vanted.plugin.VfsFileProtocol;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurementInterface;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SubstanceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.MainM;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Condition3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.DataMappingTypeManager3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.LoadedDataHandler;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Substance3D;
+import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 
 /**
  * @author Christian Klukas
  *         1.2.2012
  */
 public class Console {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		for (String i : IAPmain.getMainInfoLines())
 			System.out.println(i);
 		if (paramContains(new String[] { "help", "h", "?" }, args)) {
@@ -66,10 +88,16 @@ public class Console {
 			System.out.println("* - the environment variable 'exec' is also        *");
 			System.out.println("*   evaluated and may be used as an alternative    *");
 			System.out.println("*   way to specify the commands to be executed     *");
+			System.out.println("* - /SE [imgtype] [img] [pipeline] [resultfile]    *");
+			System.out.println("*                   execute pipeline on single     *");
+			System.out.println("*                   image and store results in     *");
+			System.out.println("*                   result csv file                *");
+			System.out.println("*                   imgtypes: 'vis.top', ...       *");
 			System.out.println("****************************************************");
 			System.exit(0);
 		}
-		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Welcome! About to initalize the application...");
+		
+		System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: Welcome! About to initalize the application...");
 		
 		String currentDirectory = System.getProperty("user.dir");
 		if (currentDirectory != null && !currentDirectory.isEmpty() && new File(currentDirectory).isDirectory()) {
@@ -84,9 +112,16 @@ public class Console {
 					currentDirectory,
 					false,
 					false,
-					null
-					));
+					null));
 		}
+		
+		Console c = new Console();
+		
+		if (args.length > 0 && args[0].equalsIgnoreCase("/SE")) {
+			executePipeline(args[1], args[2], args[3], args[4]);
+			System.exit(0);
+		}
+		
 		ArrayList<String> commandsFromArg = new ArrayList<>();
 		
 		for (String id : new String[] { "exec", "EXEC" }) {
@@ -99,11 +134,68 @@ public class Console {
 			for (String a : args)
 				parseInput(commandsFromArg, a);
 		}
-		Console c = new Console();
 		while (true) {
 			c.printGUI(commandsFromArg);
 			c.waitForStatusChange();
 		}
+	}
+	
+	private static void executePipeline(String imgtype, String img, String pipeline, String resultfile) throws IOException, InterruptedException {
+		Experiment exp = new Experiment();
+		exp.getHeader().setExperimentname("console execution/" + SystemAnalysis.getCurrentTimeInclSec());
+		exp.getHeader().setExperimentType("pipeline/" + pipeline);
+		
+		SubstanceInterface sub = new Substance3D();
+		sub.setName(imgtype);
+		exp.add(sub);
+		
+		ConditionInterface con = new Condition3D(sub);
+		sub.add(con);
+		
+		long d2 = new File(img).lastModified();
+		
+		URI folderRoute = new File(new File(img).getParent()).toURI();
+		Path p = Paths.get(folderRoute);
+		BasicFileAttributes attr = null;
+		attr = Files.readAttributes(p, BasicFileAttributes.class);
+		FileTime a = attr.creationTime();
+		long d1 = a.toInstant().toEpochMilli();
+		
+		Sample3D samp = new Sample3D(con);
+		samp.setTime(1 + (int) ((d2 - d1) / (1000 * 60 * 60 * 24)));
+		samp.setTimeUnit("day");
+		samp.setSampleFineTimeOrRowId(d1);
+		con.add(samp);
+		
+		ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
+		workload.add(samp);
+		
+		ImageData id = new ImageData(samp);
+		id.setURL(FileSystemHandler.getURL(new File(img)));
+		samp.add(id);
+		id.setQualityAnnotation(new File(img).getName());
+		
+		VirtualIoProvider viop = new VirtualIoProvider();
+		viop.setInstance(SystemOptions.getInstance("absolute:" + pipeline, null));
+		
+		String fnt = StringManipulationTools.stringReplace(pipeline, ".pipeline.ini", "");
+		PipelineDesc pd = new PipelineDesc(pipeline, viop, fnt, fnt, "(not tested with specific IAP version)");
+		
+		AbstractPhenotypingTask analysisTaskFinal = new UserDefinedImageAnalysisPipelineTask(pd);
+		analysisTaskFinal.setInput(exp.getHeader(), new TreeMap<>(), workload, null, null, 0, 1);
+		analysisTaskFinal.performAnalysis(new BackgroundTaskStatusProviderSupportingExternalCallImpl(null, null));
+		ExperimentInterface out = analysisTaskFinal.getOutput();
+		if (out != null)
+			for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {
+				if (nmi instanceof NumericMeasurement) {
+					NumericMeasurement nm = (NumericMeasurement) nmi;
+					String sub2 = nm.getParentSample().getParentCondition().getParentSubstance().getName();
+					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + "/RESULT/"
+							+ nm.getQualityAnnotation() + "/" + nm.getParentSample().getTime() + "/"
+							+ nm.getParentSample().getParentCondition().getConditionName() + "/"
+							+ sub2 + "/" + nm.getValue() + "/" + nm.getUnit());
+				}
+			}
 	}
 	
 	private static void parseInput(ArrayList<String> commandsFromArg, String ev) {
@@ -279,8 +371,7 @@ public class Console {
 									System.out.println(SystemAnalysis.getCurrentTime() + ">----------------------");
 								System.out.println(SystemAnalysis.getCurrentTime() + ">"
 										+ StringManipulationTools.removeHTMLtags(
-												o.replace("<br>", "\r\n> ").replace("<li>", "\r\n> - ")
-												)
+												o.replace("<br>", "\r\n> ").replace("<li>", "\r\n> - "))
 												.replace("&gt;", ">"));
 								first = false;
 							}
