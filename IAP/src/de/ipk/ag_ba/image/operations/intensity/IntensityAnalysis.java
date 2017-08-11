@@ -20,8 +20,16 @@ public class IntensityAnalysis {
 		this.n = numberOfIntervals;
 	}
 	
-	public ResultsTableWithUnits calculateHistorgram(Double optDistHorizontal, Double optRealMarkerDistance,
+	public ResultsTableWithUnits calculateHistogram(Double optDistHorizontal, Double optRealMarkerDistance,
 			Histogram.Mode mode, boolean addHistogramValues, boolean calcCurtosis, boolean isVisibleInputImage) {
+		return calculateHistogram(optDistHorizontal, optRealMarkerDistance,
+				mode, addHistogramValues, calcCurtosis, isVisibleInputImage, false, false, false, false);
+	}
+	
+	public ResultsTableWithUnits calculateHistogram(Double optDistHorizontal, Double optRealMarkerDistance,
+			Histogram.Mode mode, boolean addHistogramValues, boolean calcCurtosis, boolean isVisibleInputImage,
+			boolean ignoreVisRGBrZeroValues, boolean ignoreVisRGBgZeroValues, boolean ignoreVisRGBbZeroValues,
+			boolean calcFullVisRGBcubeHistogram) {
 		
 		ResultsTableWithUnits result = new ResultsTableWithUnits();
 		
@@ -52,6 +60,8 @@ public class IntensityAnalysis {
 		Histogram histR = new Histogram(this.n);
 		Histogram histG = new Histogram(this.n);
 		Histogram histB = new Histogram(this.n);
+		
+		int[][][] histFullRGB = calcFullVisRGBcubeHistogram ? new int[this.n][this.n][this.n] : null;
 		
 		double weightOfPlant = 0;
 		
@@ -91,13 +101,28 @@ public class IntensityAnalysis {
 				statsLabB.addValue(bi);
 				
 				if (mode == Mode.MODE_HUE_RGB_ANALYSIS) {
-					statsRgbR.addValue(r);
-					statsRgbG.addValue(g);
-					statsRgbB.addValue(b);
+					if (!ignoreVisRGBrZeroValues || r != 0)
+						statsRgbR.addValue(r);
 					
-					histR.addDataPoint(r, 255, g, b);
-					histG.addDataPoint(g, 255, r, b);
-					histB.addDataPoint(b, 255, r, g);
+					if (!ignoreVisRGBgZeroValues || g != 0)
+						statsRgbG.addValue(g);
+					
+					if (!ignoreVisRGBbZeroValues || b != 0)
+						statsRgbB.addValue(b);
+					
+					if (calcFullVisRGBcubeHistogram) {
+						if (!ignoreVisRGBrZeroValues || r != 0)
+							if (!ignoreVisRGBgZeroValues || g != 0)
+								if (!ignoreVisRGBbZeroValues || b != 0)
+									histFullRGB[r / this.n][g / this.n][b / this.n]++;
+					}
+					
+					if (!ignoreVisRGBrZeroValues || r != 0)
+						histR.addDataPoint(r, 255, g, b, ignoreVisRGBgZeroValues, ignoreVisRGBbZeroValues);
+					if (!ignoreVisRGBgZeroValues || g != 0)
+						histG.addDataPoint(g, 255, r, b, ignoreVisRGBrZeroValues, ignoreVisRGBbZeroValues);
+					if (!ignoreVisRGBbZeroValues || b != 0)
+						histB.addDataPoint(b, 255, r, g, ignoreVisRGBrZeroValues, ignoreVisRGBgZeroValues);
 				}
 				
 				Color.RGBtoHSB(r_intensityClassic, g_intensityChlorophyl, b_intensityPhenol, hsb);
@@ -173,6 +198,17 @@ public class IntensityAnalysis {
 		boolean addNormalizedHistogramValues = true;
 		if (mode == Mode.MODE_HUE_VIS_ANALYSIS || mode == Mode.MODE_HUE_RGB_ANALYSIS) {
 			if (addHistogramValues) {
+				if (calcFullVisRGBcubeHistogram && histFullRGB != null) {
+					for (int x = 1; x <= this.n; x++)
+						for (int y = 1; y <= this.n; y++)
+							for (int z = 1; z <= this.n; z++)
+								result.addValue(
+										"rgb.cube.bin." + StringManipulationTools.formatNumberAddZeroInFront(x, 2) + "."
+												+ StringManipulationTools.formatNumberAddZeroInFront(y, 2)
+												+ "." + StringManipulationTools.formatNumberAddZeroInFront(z, 2),
+										histFullRGB[x - 1][y - 1][z - 1]);
+							
+				}
 				if (optDistHorizontal != null && optRealMarkerDistance != null && addNormalizedHistogramValues) {
 					double normalize = optRealMarkerDistance / optDistHorizontal;
 					for (int i = 0; i < this.n; i++) {

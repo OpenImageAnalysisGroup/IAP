@@ -105,12 +105,17 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 		double averageVisB = visibleIntensitySumB / visibleFilledPixels;
 		
 		boolean useRGBinsteadOfHSB = getBoolean("Use RGB intead of HSV", false);
+		boolean ignoreZeroR = getBoolean("Ignore RGB R zero values", false);
+		boolean ignoreZeroG = getBoolean("Ignore RGB G zero values", false);
+		boolean ignoreZeroB = getBoolean("Ignore RGB B zero values", false);
 		
-		ResultsTableWithUnits rt1 = io.intensity(getInt("Bin-Cnt-Vis", 20)).calculateHistorgram(
+		boolean calcFullRGBcubeHistogramValues = getBoolean("Calc full RGB histogram", false);
+		
+		ResultsTableWithUnits rt1 = io.intensity(getInt("Bin-Cnt-Vis", 20)).calculateHistogram(
 				markerDistanceHorizontally,
 				optionsAndResults.getREAL_MARKER_DISTANCE(), useRGBinsteadOfHSB ? Histogram.Mode.MODE_HUE_RGB_ANALYSIS : Histogram.Mode.MODE_HUE_VIS_ANALYSIS,
 				isSection ? addHistogramValuesForSections : addHistogramValues,
-				getBoolean("Calculate Kurtosis Values", false), true);
+				getBoolean("Calculate Kurtosis Values", false), true, ignoreZeroR, ignoreZeroG, ignoreZeroB, calcFullRGBcubeHistogramValues);
 		getResultSet().storeResults(cp, CameraType.VIS, TraitCategory.INTENSITY, resultPrefix, rt1, getBlockPosition(), this, input().images().getVisInfo());
 		
 		if (!useRGBinsteadOfHSB) {
@@ -146,7 +151,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 					.show("AFTER ERODE // Red Color Fluo Image", debug);
 			
 			{ // red color fluo image
-				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistorgram(markerDistanceHorizontally,
+				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-Fluo", 20)).calculateHistogram(markerDistanceHorizontally,
 						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_HUE_VIS_ANALYSIS,
 						getBoolean("Add Fluo Color Bins", false),
 						getBoolean("Calculate Kurtosis Values", false), false);
@@ -170,7 +175,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				if (of != null) {
 					of = of.io().applyMask(input().masks().fluo()).getImage().show("Blue Color Fluo Image", debug);
 					ResultsTableWithUnits rt = of.io().intensity(getInt("Bin-Cnt-Fluo", 20))
-							.calculateHistorgram(markerDistanceHorizontally,
+							.calculateHistogram(markerDistanceHorizontally,
 									optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_MULTI_LEVEL_RGB_FLUO_ANALYIS,
 									addHistogramValues,
 									getBoolean("Calculate Kurtosis Values", false), false); // markerDistanceHorizontally
@@ -245,7 +250,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 								null, input().images().getNirInfo());
 				}
 				ResultsTableWithUnits rt = io.intensity(getInt("Bin-Cnt-NIR", 20))
-						.calculateHistorgram(markerDistanceHorizontally,
+						.calculateHistogram(markerDistanceHorizontally,
 								optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_GRAY_NIR_ANALYSIS, addHistogramValues,
 								getBoolean("Calculate Kurtosis Values", false), false); // markerDistanceHorizontally
 				
@@ -281,7 +286,7 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 				double avgIr = 1 - irIntensitySum / irFilledPixels;
 				getResultSet().setNumericResult(getBlockPosition(),
 						new Trait(optionsAndResults.getCameraPosition(), CameraType.IR, TraitCategory.INTENSITY, "mean"), avgIr, this, input().images().getIrInfo());
-				ResultsTableWithUnits rt = io.intensity(20).calculateHistorgram(markerDistanceHorizontally,
+				ResultsTableWithUnits rt = io.intensity(20).calculateHistogram(markerDistanceHorizontally,
 						optionsAndResults.getREAL_MARKER_DISTANCE(), Mode.MODE_IR_ANALYSIS, addHistogramValues,
 						getBoolean("Calculate Kurtosis Values", false), false); // markerDistanceHorizontally
 				
