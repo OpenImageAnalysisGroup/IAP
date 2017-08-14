@@ -1018,4 +1018,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.filterAngle = true;
 	}
 	
+	public DatabaseTarget getDatabaseTargetInst() {
+		return databaseTarget;
+	}
+	
 }

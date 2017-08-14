@@ -1,6 +1,7 @@
 package de.ipk.ag_ba;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -44,6 +45,7 @@ import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.AbstractPhenotypingTask;
 import de.ipk.ag_ba.server.analysis.image_analysis_tasks.all.UserDefinedImageAnalysisPipelineTask;
+import de.ipk.ag_ba.server.databases.DatabaseTargetNull;
 import de.ipk.ag_ba.server.gwt.UrlCacheManager;
 import de.ipk.ag_ba.server.task_management.BackupSupport;
 import de.ipk.ag_ba.server.task_management.CloudComputingService;
@@ -89,6 +91,7 @@ public class Console {
 			System.out.println("*   evaluated and may be used as an alternative    *");
 			System.out.println("*   way to specify the commands to be executed     *");
 			System.out.println("* - /SE [imgtype] [img] [pipeline] [resultfile]    *");
+			System.out.println("*       [output path for images]                   *");
 			System.out.println("*                   execute pipeline on single     *");
 			System.out.println("*                   image and store results in     *");
 			System.out.println("*                   result csv file                *");
@@ -117,8 +120,8 @@ public class Console {
 		
 		Console c = new Console();
 		
-		if (args.length > 0 && args[0].equalsIgnoreCase("/SE")) {
-			executePipeline(args[1], args[2], args[3], args[4]);
+		if (args.length > 0 && args[0].toUpperCase().equalsIgnoreCase("/SE")) {
+			executePipeline(args[1], args[2], args[3], args[4], args.length > 5 ? args[5] : "");
 			System.exit(0);
 		}
 		
@@ -140,7 +143,7 @@ public class Console {
 		}
 	}
 	
-	private static void executePipeline(String imgtype, String img, String pipeline, String resultfile) throws IOException, InterruptedException {
+	private static void executePipeline(String imgtype, String img, String pipeline, String resultfile, String resultImagePath) throws IOException, InterruptedException {
 		Experiment exp = new Experiment();
 		exp.getHeader().setExperimentname("console execution/" + SystemAnalysis.getCurrentTimeInclSec());
 		exp.getHeader().setExperimentType("pipeline/" + pipeline);
@@ -170,10 +173,15 @@ public class Console {
 		ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
 		workload.add(samp);
 		
+		boolean fileOutputForImages = !(resultImagePath == null || resultImagePath.isEmpty() || resultImagePath.equals("-"));
+		boolean printToStdOutForImages = resultImagePath.equals("-");
+		
 		ImageData id = new ImageData(samp);
 		id.setURL(FileSystemHandler.getURL(new File(img)));
 		samp.add(id);
-		id.setQualityAnnotation(new File(img).getName());
+		String fn = new File(img).getName();
+		fn = fn.indexOf(".") > 0 ? fn.substring(0, fn.indexOf(".")) : fn;
+		id.setQualityAnnotation(fileOutputForImages ? "" : fn);
 		
 		VirtualIoProvider viop = new VirtualIoProvider();
 		viop.setInstance(SystemOptions.getInstance("absolute:" + pipeline, null));
@@ -183,19 +191,43 @@ public class Console {
 		
 		AbstractPhenotypingTask analysisTaskFinal = new UserDefinedImageAnalysisPipelineTask(pd);
 		analysisTaskFinal.setInput(exp.getHeader(), new TreeMap<>(), workload, null, null, 0, 1);
+		DatabaseTargetNull dbt = (DatabaseTargetNull) analysisTaskFinal.getDatabaseTargetInst();
+		
+		dbt.saveImagesToSingleFolder = fileOutputForImages;
+		dbt.ignoreTimeInOutputName = true;
+		if (printToStdOutForImages)
+			dbt.printImagesToConsole = true;
+		else
+			dbt.targetFolder = resultImagePath;
+		
 		analysisTaskFinal.performAnalysis(new BackgroundTaskStatusProviderSupportingExternalCallImpl(null, null));
 		ExperimentInterface out = analysisTaskFinal.getOutput();
-		if (out != null)
+		boolean fileOutput = !(resultfile == null || resultfile.isEmpty() || resultfile.equals("-"));
+		boolean printToStdOut = resultfile.equals("-");
+		
+		FileWriter fw = fileOutput ? new FileWriter(resultfile) : null;
+		
+		if (out != null) {
 			for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {
 				if (nmi instanceof NumericMeasurement) {
 					NumericMeasurement nm = (NumericMeasurement) nmi;
 					String sub2 = nm.getParentSample().getParentCondition().getParentSubstance().getName();
-					System.out.println(SystemAnalysis.getCurrentTimeInclSec() + "/RESULT/"
+					String cnt = SystemAnalysis.getCurrentTimeInclSec() + "/RESULT/"
 							+ nm.getQualityAnnotation() + "/" + nm.getParentSample().getTime() + "/"
 							+ nm.getParentSample().getParentCondition().getConditionName() + "/"
-							+ sub2 + "/" + nm.getValue() + "/" + nm.getUnit());
+							+ sub2 + "/" + nm.getValue() + "/" + nm.getUnit();
+					if (!fileOutput) {
+						if (printToStdOut)
+							System.out.println(cnt);
+					} else {
+						fw.write(cnt + System.lineSeparator());
+					}
 				}
 			}
+		}
+		
+		if (fw != null)
+			fw.close();
 	}
 	
 	private static void parseInput(ArrayList<String> commandsFromArg, String ev) {
