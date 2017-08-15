@@ -1,7 +1,7 @@
 FROM java:latest
 MAINTAINER Dr. Christian Klukas <christian.klukas@gmail.com>
 LABEL Description="The Integrated Analysis Platform for high-throughput plant image analysis" Version="2.0.5"
-RUN apt-get update -qq && apt-get install --no-install-recommends -y ant openjfx
+RUN apt-get update -qq && apt-get install --no-install-recommends -y ant openjfx links
 RUN git clone --depth=1 https://github.com/OpenImageAnalysisGroup/IAP.git
 RUN ant -f IAP/IAP\ CONSOLE/build.xml cleanall
 RUN ant -f IAP/IAP\ CONSOLE/build.xml
