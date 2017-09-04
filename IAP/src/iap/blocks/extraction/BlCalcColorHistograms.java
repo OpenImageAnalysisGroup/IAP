@@ -110,12 +110,14 @@ public class BlCalcColorHistograms extends AbstractSnapshotAnalysisBlock impleme
 		boolean ignoreZeroB = getBoolean("Ignore RGB B zero values", false);
 		
 		boolean calcFullRGBcubeHistogramValues = getBoolean("Calc full RGB histogram", false);
+		boolean addLabInfo = getBoolean("Calc Lab values", true);
+		boolean addOtherHSV = getBoolean("Add average values of other channels", true);
 		
 		ResultsTableWithUnits rt1 = io.intensity(getInt("Bin-Cnt-Vis", 20)).calculateHistogram(
 				markerDistanceHorizontally,
 				optionsAndResults.getREAL_MARKER_DISTANCE(), useRGBinsteadOfHSB ? Histogram.Mode.MODE_HUE_RGB_ANALYSIS : Histogram.Mode.MODE_HUE_VIS_ANALYSIS,
 				isSection ? addHistogramValuesForSections : addHistogramValues,
-				getBoolean("Calculate Kurtosis Values", false), true, ignoreZeroR, ignoreZeroG, ignoreZeroB, calcFullRGBcubeHistogramValues);
+				getBoolean("Calculate Kurtosis Values", false), true, ignoreZeroR, ignoreZeroG, ignoreZeroB, calcFullRGBcubeHistogramValues, addLabInfo, addOtherHSV);
 		getResultSet().storeResults(cp, CameraType.VIS, TraitCategory.INTENSITY, resultPrefix, rt1, getBlockPosition(), this, input().images().getVisInfo());
 		
 		if (!useRGBinsteadOfHSB) {

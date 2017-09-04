@@ -46,6 +46,10 @@ public class Histogram {
 		addDataPoint((int) (value / (double) maxValue * (bins - 1)), other1, other2);
 	}
 	
+	public void addDataPoint(int value, int maxValue, double other1, double other2, boolean addOther1, boolean addOther2) {
+		addDataPoint((int) (value / (double) maxValue * (bins - 1)), other1, other2, addOther1, addOther2);
+	}
+	
 	public void addDataPoint(int value, int maxValue, int other1, int other2, boolean ignoreZeroOther1, boolean ignoreZeroOther2) {
 		addDataPoint((int) (value / (double) maxValue * (bins - 1)), other1, other2, !ignoreZeroOther1 || other1 != 0, !ignoreZeroOther2 || other2 != 0);
 	}
