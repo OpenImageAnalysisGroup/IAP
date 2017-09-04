@@ -24,7 +24,7 @@ public class Histogram {
 	
 	// Add one occurrence of the value i.
 	public void addDataPoint(int i, double other1, double other2) {
-		
+		addDataPoint(i, other1, other2, true, true);
 	}
 	
 	public void addDataPoint(int i, double other1, double other2, boolean addOther1, boolean addOther2) {

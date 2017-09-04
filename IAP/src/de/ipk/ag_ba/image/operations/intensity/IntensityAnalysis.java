@@ -147,16 +147,16 @@ public class IntensityAnalysis {
 							
 							statsHueValuesOverall.addValue(h);
 						}
-						{
-							histSat.addDataPoint((int) (s * 255), 255, h, v);
-							sumOfSat += s;
-							statsSatValuesOverall.addValue(s);
-						}
-						{
-							histVal.addDataPoint((int) (v * 255), 255, h, s);
-							sumOfVal += v;
-							statsValValuesOverall.addValue(v);
-						}
+					}
+					{
+						histSat.addDataPoint((int) (s * 255), 255, h, v);
+						sumOfSat += s;
+						statsSatValuesOverall.addValue(s);
+					}
+					{
+						histVal.addDataPoint((int) (v * 255), 255, h, s);
+						sumOfVal += v;
+						statsValValuesOverall.addValue(v);
 					}
 				}
 			}
