@@ -58,6 +58,10 @@ public class IOurl {
 		return filename;
 	}
 	
+	public String getFileNameWithoutExtension() {
+		return getFileName().substring(0, getFileName().length() - getFileNameExtension().length());
+	}
+	
 	@Override
 	public String toString() {
 		String s = "";

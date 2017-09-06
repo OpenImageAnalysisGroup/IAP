@@ -537,10 +537,12 @@ public class IAPservice {
 			Collections.sort(result, new Comparator<NumericMeasurementInterface>() {
 				@Override
 				public int compare(NumericMeasurementInterface a, NumericMeasurementInterface b) {
-					long tA = a.getParentSample().getSampleFineTimeOrRowId() != null ? a.getParentSample().getSampleFineTimeOrRowId() : a.getParentSample()
-							.getTime();
-					long tB = b.getParentSample().getSampleFineTimeOrRowId() != null ? b.getParentSample().getSampleFineTimeOrRowId() : b.getParentSample()
-							.getTime();
+					long tA = a.getParentSample().getSampleFineTimeOrRowId() != null ? a.getParentSample().getSampleFineTimeOrRowId()
+							: a.getParentSample()
+									.getTime();
+					long tB = b.getParentSample().getSampleFineTimeOrRowId() != null ? b.getParentSample().getSampleFineTimeOrRowId()
+							: b.getParentSample()
+									.getTime();
 					return tA < tB ? -1 : (tA == tB ? 0 : 1);
 				}
 			});
@@ -1338,13 +1340,13 @@ public class IAPservice {
 				for (String database : dbs_toBeChecked) {
 					try {
 						System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">SCAN DB " + database + "...");
-						LTdataExchange a = new LTdataExchange(); //LTdataExchange.getInstanceFromDatabaseName(database);
+						LTdataExchange a = new LTdataExchange(); // LTdataExchange.getInstanceFromDatabaseName(database);
 						Collection<ExperimentHeaderInterface> b = a.getExperimentsInDatabase(null, database);
 						el.addAll(b);
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
-//						if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
-//							System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Cant process DB " + database + ": " + e.getMessage());
+						// if (!e.getMessage().contains("relation \"snapshot\" does not exist"))
+						// System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">Cant process DB " + database + ": " + e.getMessage());
 					}
 				}
 				System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">CHECK PROGRESS...");
@@ -1882,9 +1884,15 @@ public class IAPservice {
 	 * @return for example: 'png' or 'jpg'
 	 */
 	public static String getTargetFileExtension(boolean isIconStorage, String sourceFileExtension) {
+		return getTargetFileExtension(isIconStorage, sourceFileExtension, false);
+	}
+	
+	public static String getTargetFileExtension(boolean isIconStorage, String sourceFileExtension, boolean noMangling) {
 		if (sourceFileExtension != null && sourceFileExtension.startsWith("."))
 			sourceFileExtension = sourceFileExtension.substring(".".length());
 		String targetFileExtension = isIconStorage ? SystemOptions.getInstance().getString("IAP", "Preview File Type", "png") : SystemOptions.getInstance().getString("IAP", "Result File Type", "png");
+		if (noMangling)
+			return targetFileExtension;
 		if (sourceFileExtension != null && (sourceFileExtension.endsWith("jpg") || sourceFileExtension.endsWith("jpeg")))
 			if (targetFileExtension != null && (targetFileExtension.endsWith("png") || targetFileExtension.endsWith("png")))
 				targetFileExtension = sourceFileExtension; // don't convert source JPG to PNG, makes not really sense

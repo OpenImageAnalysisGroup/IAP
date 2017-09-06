@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -92,9 +93,12 @@ public class Console {
 			System.out.println("*   way to specify the commands to be executed     *");
 			System.out.println("* - /SE [imgtype] [img] [pipeline] [resultfile]    *");
 			System.out.println("*       [output path for images]                   *");
-			System.out.println("*                   execute pipeline on single     *");
-			System.out.println("*                   image and store results in     *");
-			System.out.println("*                   result csv file                *");
+			System.out.println("*                   execute pipeline on single or  *");
+			System.out.println("*                   multiple images (using file    *");
+			System.out.println("*                   mask and store results in      *");
+			System.out.println("*                   single csv file or in separate *");
+			System.out.println("*                   files if just the extension    *");
+			System.out.println("*                   is provided (e.g. '.txt').     *");
 			System.out.println("*                   imgtypes: 'vis.top', ...       *");
 			System.out.println("****************************************************");
 			System.exit(0);
@@ -121,7 +125,16 @@ public class Console {
 		Console c = new Console();
 		
 		if (args.length > 0 && args[0].toUpperCase().equalsIgnoreCase("/SE")) {
-			executePipeline(args[1], args[2], args[3], args[4], args.length > 5 ? args[5] : "");
+			if (new File(args[2]).exists()) {
+				processSingleFile(args, args[2]);
+			} else {
+				try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(
+						Paths.get("."), args[2])) {
+					dirStream.forEach(path -> {
+						processSingleFile(args, path.toString());
+					});
+				}
+			}
 			System.exit(0);
 		}
 		
@@ -140,6 +153,20 @@ public class Console {
 		while (true) {
 			c.printGUI(commandsFromArg);
 			c.waitForStatusChange();
+		}
+	}
+	
+	private static void processSingleFile(String[] args, String img) {
+		String resFile = args[4];
+		if (resFile.startsWith(".")) {
+			resFile = img.substring(0, img.lastIndexOf(".")) + resFile;
+		}
+		try {
+			executePipeline(args[1], img, args[3], resFile, args.length > 5 ? args[5] : "");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -208,6 +235,7 @@ public class Console {
 		FileWriter fw = fileOutput ? new FileWriter(resultfile) : null;
 		
 		if (out != null) {
+			System.out.println();
 			for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {
 				if (nmi instanceof NumericMeasurement) {
 					NumericMeasurement nm = (NumericMeasurement) nmi;

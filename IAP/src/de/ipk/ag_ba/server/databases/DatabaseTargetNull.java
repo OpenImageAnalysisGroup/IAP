@@ -41,7 +41,7 @@ public class DatabaseTargetNull implements DatabaseTarget {
 					is.close();
 				} else {
 					String desiredFileName = ActionDataExportToVfs.determineBinaryFileName(imgd.getParentSample().getSampleFineTimeOrRowId(), imgd.getSubstanceName(), imgd, imgd, true);
-					desiredFileName = desiredFileName.substring(0, desiredFileName.length() - imgd.getURL().getFileNameExtension().length()) + "." + IAPservice.getTargetFileExtension(false, imgd.getURL().getFileNameExtension());
+					desiredFileName = desiredFileName.substring(0, desiredFileName.length() - imgd.getURL().getFileNameExtension().length()) + "." + IAPservice.getTargetFileExtension(false, imgd.getURL().getFileNameExtension(), true);
 					
 					if (desiredFileName.startsWith("_"))
 						desiredFileName = desiredFileName.substring("_".length());

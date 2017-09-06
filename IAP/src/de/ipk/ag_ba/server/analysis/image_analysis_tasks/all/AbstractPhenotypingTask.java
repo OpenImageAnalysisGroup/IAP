@@ -29,7 +29,6 @@ import de.ipk.ag_ba.gui.util.IAPservice;
 import de.ipk.ag_ba.gui.webstart.HSMfolderTargetDataManager;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
-import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operations.blocks.BlockResultValue;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.operations.blocks.properties.ImageAndImageData;
@@ -237,8 +236,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 						else
 							top++;
 					}
-			System.out.println(SystemAnalysis.getCurrentTime()
-					+ ">INFO: Workload Top/Side: " + top + "/" + side);
+			// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Workload Top/Side: " + top + "/" + side);
 			final int workloadEqualAngleSnapshotSets = top + side;
 			
 			final ThreadSafeOptions freed = new ThreadSafeOptions();
@@ -605,10 +603,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				int workLoadIndex = replicateIDandQualityList2positionIndex.get(val);
 				if (numberOfSubsets != 0 && workLoadIndex % numberOfSubsets != workOnSubset)
 					continue;
-				String info = timeInfo + ">INFO: Processing image sets with ID: " + val;
-				if (!knownOutput.contains(info))
-					System.out.println(info);
-				knownOutput.add(info);
+				// String info = timeInfo + ">INFO: Processing image sets with ID: " + val;
+				// if (!knownOutput.contains(info))
+				// System.out.println(info);
+				// knownOutput.add(info);
 				if (!workload_imageSetsWithSpecificAngles.containsKey(val))
 					workload_imageSetsWithSpecificAngles.put(val, new TreeMap<Long, TreeMap<String, ImageSet>>());;
 				Long time = null;
@@ -630,10 +628,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				if (!workload_imageSetsWithSpecificAngles.get(val).containsKey(time))
 					workload_imageSetsWithSpecificAngles.get(val).put(time, is);
 			}
-			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Processing "
-					+ workload_imageSetsWithSpecificAngles.size() + " plants" +
-					(numberOfSubsets > 0 ? " (subset " + workOnSubset + "/" + numberOfSubsets + ")"
-							: "."));
+			// System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Processing "
+			// + workload_imageSetsWithSpecificAngles.size() + " plants" +
+			// (numberOfSubsets > 0 ? " (subset " + workOnSubset + "/" + numberOfSubsets + ")"
+			// : "."));
 		}
 		
 		if (max > 0)
@@ -683,7 +681,6 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 				}
 		}
 		output = null;
-		ImageOperation.setLabCubeInstanceToNull();
 		return result;
 	}
 	

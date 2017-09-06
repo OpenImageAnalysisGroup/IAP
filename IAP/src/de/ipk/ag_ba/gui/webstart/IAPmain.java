@@ -115,8 +115,10 @@ public class IAPmain extends JApplet {
 		
 		System.out.println(SystemAnalysis.getCurrentTime() + ">Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		
-		ProgressWindow progressWindow = new AnimateLogoIAP();
-		progressWindow.show(true);
+		boolean animate = SystemOptions.getInstance().getBoolean("IAP", "Animated Start-Logo", true);
+		ProgressWindow progressWindow = animate ? new AnimateLogoIAP() : null;
+		if (progressWindow != null)
+			progressWindow.show(true);
 		
 		String title = SystemOptions.getInstance().getString("IAP", "window_title",
 				"IAP - The Integrated Analysis Platform") + "";
