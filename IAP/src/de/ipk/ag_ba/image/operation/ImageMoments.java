@@ -1,23 +1,19 @@
 package de.ipk.ag_ba.image.operation;
 
-import iap.blocks.extraction.ColorMode;
-
 import java.awt.Color;
 import java.awt.Point;
 
 import javax.vecmath.Point2d;
 
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.extraction.ColorMode;
 
 /**
  * Class for calculation of image moments based on http://en.wikipedia.org/wiki/Image_moment.
  * 
- * @author pape
+ * @author pape, klukas
  */
 public class ImageMoments {
-	
-	static Image img;
-	
 	static Point centerOfGravity;
 	static int background = ImageOperation.BACKGROUND_COLORint;
 	
@@ -33,11 +29,13 @@ public class ImageMoments {
 	
 	private double my01;
 	
+	private int[][] img2d;
+	
 	/**
 	 * Constructor uses background from Class ImageOperation.
 	 */
 	public ImageMoments(Image img) {
-		this.img = img;
+		this.img2d = img.getAs2A();
 		this.background = ImageOperation.BACKGROUND_COLORint;
 		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
 		clacMys();
@@ -47,25 +45,25 @@ public class ImageMoments {
 	 * Constructor uses self defined background.
 	 */
 	public ImageMoments(Image img, int background) {
-		this.img = img;
+		this.img2d = img.getAs2A();
 		this.background = background;
 		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
 		clacMys();
 	}
 	
 	public ImageMoments(int[] temp, int w, int h) {
-		this.img = new Image(w, h, temp);
-		this.centerOfGravity = calcCenterOfGravity(img.getAs2A(), background);
+		this.img2d = new Image(w, h, temp).getAs2A();
+		this.centerOfGravity = calcCenterOfGravity(img2d, background);
 		clacMys();
 	}
 	
 	private void clacMys() {
-		my20 = this.calcCentralMoment(2.0, 0.0, background);
-		my02 = this.calcCentralMoment(0.0, 2.0, background);
-		my11 = this.calcCentralMoment(1, 1, background);
-		my00 = this.calcCentralMoment(0, 0, background);
-		my10 = this.calcCentralMoment(1, 0, background);
-		my01 = this.calcCentralMoment(0, 1, background);
+		my20 = this.calcCentralMoment(2.0, 0.0);
+		my02 = this.calcCentralMoment(0.0, 2.0);
+		my11 = this.calcCentralMoment(1, 1);
+		my00 = this.calcCentralMoment(0, 0);
+		my10 = this.calcCentralMoment(1, 0);
+		my01 = this.calcCentralMoment(0, 1);
 	}
 	
 	/**
@@ -82,14 +80,13 @@ public class ImageMoments {
 	 *           - background color
 	 * @return 2nd order moment weighted by the area (first order moment)
 	 */
-	public static double calcNormalizedCentralMoment(double i, double j, int background) {
+	public double calcNormalizedCentralMoment(double i, double j) {
 		double cogX = centerOfGravity.x;
 		double cogY = centerOfGravity.y;
 		
 		double tempSum = 0;
 		double area = 0;
 		
-		int[][] img2d = img.getAs2A();
 		int w = img2d.length; // img.getWidth();
 		int h = img2d[0].length; // img.getHeight();
 		
@@ -121,18 +118,17 @@ public class ImageMoments {
 	 *           - background color
 	 * @return n-nd order central moment
 	 */
-	public double calcCentralMoment(double i, double j, int background) {
+	public double calcCentralMoment(double i, double j) {
 		double cogX = centerOfGravity.x;
 		double cogY = centerOfGravity.y;
 		
 		double tempSum = 0;
 		
-		int[][] img2d = img.getAs2A();
 		// int w = img.getWidth();
 		// int h = img.getHeight();
-		
+		int h = img2d[0].length;
 		for (int x = 0; x < img2d.length; x++) {
-			for (int y = 0; y < img2d[x].length; y++) {
+			for (int y = 0; y < h; y++) {
 				if (img2d[x][y] != background) {
 					tempSum += Math.pow(x - cogX, i) * Math.pow(y - cogY, j);
 				}
@@ -150,11 +146,10 @@ public class ImageMoments {
 	 * @param background
 	 * @return
 	 */
-	public double calcRawMoment(double i, double j, int background) {
+	public double calcRawMoment(double i, double j) {
 		
 		double tempSum = 0;
 		
-		int[][] img2d = img.getAs2A();
 		int w = img2d.length;
 		int h = img2d[0].length;
 		
@@ -204,21 +199,21 @@ public class ImageMoments {
 	 * @param background
 	 * @return
 	 */
-	public static double calcOmega(int background) {
+	public double calcOmega() {
 		// formulas based on http://en.wikipedia.org/wiki/Image_moment
-		double my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
-		double my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
-		double my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, background);
+		double my20 = calcNormalizedCentralMoment(2, 0);
+		double my11 = calcNormalizedCentralMoment(1, 1);
+		double my02 = calcNormalizedCentralMoment(0, 2);
 		
 		// use atan2 for case differentiation, see polar-coordinates
 		return Math.atan2((2.0) * my11, my20 - my02) / 2;
 	}
 	
-	public static double[] eigenValues(int background) {
+	public double[] eigenValues() {
 		// formulas based on http://en.wikipedia.org/wiki/Image_moment
-		double my20 = ImageMoments.calcNormalizedCentralMoment(2, 0, background);
-		double my11 = ImageMoments.calcNormalizedCentralMoment(1, 1, background);
-		double my02 = ImageMoments.calcNormalizedCentralMoment(0, 2, background);
+		double my20 = calcNormalizedCentralMoment(2, 0);
+		double my11 = calcNormalizedCentralMoment(1, 1);
+		double my02 = calcNormalizedCentralMoment(0, 2);
 		
 		double lambda1 = 0.0;
 		double lambda2 = 0.0;
@@ -237,7 +232,7 @@ public class ImageMoments {
 	}
 	
 	public Point getCenterOfGravityWeigthed(ColorMode cm) {
-		int[][] img = this.img.getAs2A();
+		int[][] img = img2d;
 		int w = img.length;
 		int h = img[1].length;
 		int sumX = 0;
@@ -275,13 +270,13 @@ public class ImageMoments {
 	}
 	
 	public double getEccentricity() {
-		double[] lambdas = ImageMoments.eigenValues(background);
+		double[] lambdas = eigenValues();
 		return Math.sqrt(1 - lambdas[1] / lambdas[0]);
 	}
 	
 	public Image drawMoments() {
 		final Point centerOfGravity = this.getCenterOfGravity();
-		final double omega = this.calcOmega(background);
+		final double omega = this.calcOmega();
 		
 		// calc length for the axes (see Image Moments-Based Structuring and Tracking of Objects L OURENA ROCHA , L UIZ V ELHO , PAULO C EZAR P. C ARVALHO)
 		double xc = my10 / my00;
@@ -299,7 +294,7 @@ public class ImageMoments {
 		Point2d p2_end = new Point2d((centerOfGravity.x - length_minor * -Math.sin(omega)), (centerOfGravity.y - length_minor * Math.cos(omega)));
 		
 		// draw moments
-		return img.copy()
+		return new Image(img2d)
 				.io()
 				.canvas()
 				.drawLine((int) p1_start.x, (int) p1_start.y, centerOfGravity.x, centerOfGravity.y, Color.PINK.getRGB(), 0, 1)
