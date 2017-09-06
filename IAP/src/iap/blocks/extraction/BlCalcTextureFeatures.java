@@ -1,12 +1,5 @@
 package iap.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
-import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.CalculatedProperty;
-import iap.blocks.data_structures.CalculatedPropertyDescription;
-import iap.blocks.data_structures.CalculatesProperties;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,6 +24,12 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.NumericMeasurement3D;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
+import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 /**
  * Texture extraction for foreground pixels, mask-size of inspected area based on distance map (TextureCalculationMode.SKELETON is recommended).
@@ -188,7 +187,7 @@ public class BlCalcTextureFeatures extends AbstractSnapshotAnalysisBlock impleme
 			}
 			
 			ImageMoments im = new ImageMoments(skelMask, masksize, masksize);
-			double angle = im.calcOmega(ImageOperation.BACKGROUND_COLORint);
+			double angle = im.calcOmega();
 			double newMasksize = masksize * sqrtOfTwoDivTwo;
 			ImageOperation rot = new Image(masksize, masksize, mask).io().rotate(-angle * 180 / Math.PI);
 			int halfdiff_disired = (int) (rot.getWidth() - newMasksize) / 2;
