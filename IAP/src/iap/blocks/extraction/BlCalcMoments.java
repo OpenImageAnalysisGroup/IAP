@@ -1,13 +1,5 @@
 package iap.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractBlock;
-import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.CalculatedProperty;
-import iap.blocks.data_structures.CalculatedPropertyDescription;
-import iap.blocks.data_structures.CalculatesProperties;
-import iap.blocks.data_structures.RunnableOnImageSet;
-import iap.blocks.extraction.postprocessors.MomentResultPostProcessor;
-
 import java.awt.Point;
 import java.util.HashSet;
 
@@ -17,6 +9,13 @@ import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.data_structures.RunnableOnImageSet;
+import iap.blocks.extraction.postprocessors.MomentResultPostProcessor;
 
 public class BlCalcMoments extends AbstractBlock implements CalculatesProperties {
 	
@@ -44,19 +43,19 @@ public class BlCalcMoments extends AbstractBlock implements CalculatesProperties
 	
 	private void calcMoments(Image img, ImageData imageRef) {
 		int background = ImageOperation.BACKGROUND_COLORint;
-		ImageMoments im = new ImageMoments(img);
-		double my20 = im.calcCentralMoment(2.0, 0.0, background);
-		double my02 = im.calcCentralMoment(0.0, 2.0, background);
-		double my11 = im.calcCentralMoment(1, 1, background);
-		double my00 = im.calcCentralMoment(0, 0, background);
-		double my10 = im.calcCentralMoment(1, 0, background);
-		double my01 = im.calcCentralMoment(0, 1, background);
-		double secondMoment_1_norm = im.calcNormalizedCentralMoment(2.0, 0.0, background);
-		double secondMoment_2_norm = im.calcNormalizedCentralMoment(0.0, 2.0, background);
-		double[] lambdas = ImageMoments.eigenValues(background);
+		ImageMoments im = new ImageMoments(img, background);
+		double my20 = im.calcCentralMoment(2.0, 0.0);
+		double my02 = im.calcCentralMoment(0.0, 2.0);
+		double my11 = im.calcCentralMoment(1, 1);
+		double my00 = im.calcCentralMoment(0, 0);
+		double my10 = im.calcCentralMoment(1, 0);
+		double my01 = im.calcCentralMoment(0, 1);
+		double secondMoment_1_norm = im.calcNormalizedCentralMoment(2.0, 0.0);
+		double secondMoment_2_norm = im.calcNormalizedCentralMoment(0.0, 2.0);
+		double[] lambdas = im.eigenValues();
 		double eccentricity = Math.sqrt(1 - lambdas[1] / lambdas[0]);
 		final Point centerOfGravity = im.getCenterOfGravity();
-		final double omega = im.calcOmega(background);
+		final double omega = im.calcOmega();
 		
 		ResultsTableWithUnits rt = new ResultsTableWithUnits();
 		rt.incrementCounter();
