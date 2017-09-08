@@ -303,6 +303,51 @@ public class Image {
 		image = new ImagePlus("from 1d array", new ColorProcessor(w, h, img));
 	}
 	
+	public Image(int w, int h, double[] channel_1, double[] channel_2, double[] channel_3, ColorSpace mode) {
+		this.w = w;
+		this.h = h;
+		int a = 255;
+		@SuppressWarnings("unused")
+		int alpha = ((a & 0xFF) << 24);
+		int[] img = new int[w * h];
+		ColorSpaceConverter csc = new ColorSpaceConverter();
+		for (int idx = 0; idx < img.length; idx++) {
+			int r, g, b;
+			if (mode == ColorSpace.RGB) {
+				r = (int) (channel_1[idx] * 255d + 0.5d);
+				g = (int) (channel_2[idx] * 255d + 0.5d);
+				b = (int) (channel_3[idx] * 255d + 0.5d);
+			} else
+				if (mode == ColorSpace.LAB) {
+					double labl = channel_1[idx];
+					double laba = channel_2[idx];
+					double labb = channel_3[idx];
+					int[] converted = csc.LABtoRGB(labl / 2.55f, laba - 128f, labb - 128f);
+					r = converted[0];
+					g = converted[1];
+					b = converted[2];
+				} else {
+					if (mode == ColorSpace.LAB_UNSHIFTED) {
+						double labl = channel_1[idx];
+						double laba = channel_2[idx];
+						double labb = channel_3[idx];
+						int[] converted = csc.LABtoRGB(labl, laba, labb);
+						r = converted[0];
+						g = converted[1];
+						b = converted[2];
+					} else {
+						throw new UnsupportedOperationException("Unknown colormode");
+					}
+				}
+			int c = // alpha |
+					((r & 0xFF) << 16) |
+							((g & 0xFF) << 8) |
+							((b & 0xFF) << 0);
+			img[idx] = c;
+		}
+		image = new ImagePlus("from 1d array", new ColorProcessor(w, h, img));
+	}
+	
 	public Image(int w, int h, int[] channelR, int[] channelG, int[] channelB) {
 		this.w = w;
 		this.h = h;

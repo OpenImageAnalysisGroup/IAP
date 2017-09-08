@@ -28,14 +28,14 @@ import org.graffiti.plugin.io.OutputSerializer;
  * @version $Revision: 1.1 $
  */
 public abstract class GenericPluginAdapter
-					implements GenericPlugin {
+		implements GenericPlugin {
 	// ~ Static fields/initializers =============================================
 	
 	/**
 	 * The default plugin icon for plugin implementations, which do not
 	 * overwrite the <code>getIcon</code> method in this class.
 	 */
-	private static final ImageIcon DEFAULT_ICON = ImageBundle.getInstance().getIcon("icon.plugin.default");
+	private static ImageIcon DEFAULT_ICON;
 	
 	// ~ Instance fields ========================================================
 	
@@ -100,10 +100,12 @@ public abstract class GenericPluginAdapter
 	 * @return the array of <code>org.graffiti.algorithm.Algorithm</code>s the
 	 *         plugin contains.
 	 */
+	@Override
 	public Algorithm[] getAlgorithms() {
 		return this.algorithms;
 	}
 	
+	@Override
 	public AttributeDescription[] getAttributeDescriptions() {
 		return this.attributeDescriptions;
 	}
@@ -113,6 +115,7 @@ public abstract class GenericPluginAdapter
 	 * 
 	 * @return the attribute types provided by this plugin.
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Class[] getAttributes() {
 		return this.attributes;
@@ -125,6 +128,7 @@ public abstract class GenericPluginAdapter
 	 * @return the array containing the names of the plugin classes the current
 	 *         plugin depends on.
 	 */
+	@Override
 	public String[] getDependencies() {
 		return this.dependencies;
 	}
@@ -132,6 +136,7 @@ public abstract class GenericPluginAdapter
 	/**
 	 * Returns an Array of Extensions the plugin provides.
 	 */
+	@Override
 	public Extension[] getExtensions() {
 		return this.extensions;
 	}
@@ -149,11 +154,16 @@ public abstract class GenericPluginAdapter
 	 * @return the default plugin icon for a plugin implementation, which does
 	 *         not overwrite this method.
 	 */
+	@Override
 	public ImageIcon getIcon() {
 		if (isAddon)
 			return getAddonIcon();
-		else
+		else {
+			if (DEFAULT_ICON == null)
+				DEFAULT_ICON = ImageBundle.getInstance().getIcon("icon.plugin.default");
+			
 			return DEFAULT_ICON;
+		}
 	}
 	
 	public static ImageIcon getAddonIcon() {
@@ -168,6 +178,7 @@ public abstract class GenericPluginAdapter
 	 * 
 	 * @return the input serializers the plugin provides.
 	 */
+	@Override
 	public InputSerializer[] getInputSerializers() {
 		return this.inputSerializers;
 	}
@@ -177,6 +188,7 @@ public abstract class GenericPluginAdapter
 	 * 
 	 * @return the output serializers the plugin provides.
 	 */
+	@Override
 	public OutputSerializer[] getOutputSerializers() {
 		return outputSerializers;
 	}
@@ -190,6 +202,7 @@ public abstract class GenericPluginAdapter
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public boolean isSelectionListener() {
 		return false;
 	}
@@ -199,6 +212,7 @@ public abstract class GenericPluginAdapter
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public boolean isSessionListener() {
 		return false;
 	}
@@ -206,6 +220,7 @@ public abstract class GenericPluginAdapter
 	/**
 	 * @see org.graffiti.plugin.GenericPlugin#isViewListener()
 	 */
+	@Override
 	public boolean isViewListener() {
 		return false;
 	}
@@ -217,6 +232,7 @@ public abstract class GenericPluginAdapter
 	 * @return the array of <code>org.graffiti.plugin.view.View</code>s the
 	 *         plugin contains.
 	 */
+	@Override
 	public String[] getViews() {
 		return this.views;
 	}
@@ -227,6 +243,7 @@ public abstract class GenericPluginAdapter
 	 * @param p
 	 *           DOCUMENT ME!
 	 */
+	@Override
 	public void configure(GravistoPreferences p) {
 		prefs = p;
 	}
@@ -234,12 +251,14 @@ public abstract class GenericPluginAdapter
 	/**
 	 * The routines to perform before the editor will exit.
 	 */
+	@Override
 	public void doBeforeExit() {
 	}
 	
 	/**
 	 * Interrupts the running plugin.
 	 */
+	@Override
 	public void interrupt() {
 	}
 	
@@ -250,6 +269,7 @@ public abstract class GenericPluginAdapter
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public boolean needsEditComponents() {
 		return false;
 	}
@@ -257,13 +277,16 @@ public abstract class GenericPluginAdapter
 	/**
 	 * Stops a running plugin. Performs exit routines.
 	 */
+	@Override
 	public void stop() {
 	}
 	
+	@Override
 	public String getDefaultView() {
 		return null;
 	}
 	
+	@Override
 	public URLattributeAction[] getURLattributeActions() {
 		return null;
 	}

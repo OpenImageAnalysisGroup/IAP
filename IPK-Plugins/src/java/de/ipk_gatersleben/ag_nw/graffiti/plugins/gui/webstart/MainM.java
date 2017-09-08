@@ -3,9 +3,6 @@
  *******************************************************************************/
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart;
 
-import info.clearthought.layout.TableLayout;
-import info.clearthought.layout.TableLayoutConstants;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.ProxySelector;
@@ -34,6 +31,8 @@ import org.graffiti.editor.SplashScreenInterface;
 import apple.dts.samplecode.osxadapter.OSXAdapter;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.helper.DBEgravistoHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.info_dialog_dbe.MenuItemInfoDialog;
+import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
 
 /**
  * Contains the graffiti editor.
@@ -126,6 +125,7 @@ public class MainM {
 	
 	/**
 	 * Constructs a new instance of the editor.
+	 * 
 	 * @param addPluginFile
 	 */
 	public MainM(String applicationName, String[] args, String[] addon, SplashScreenInterface splashScreen, String addPluginFile, final boolean showMainFrame) {
@@ -135,10 +135,10 @@ public class MainM {
 		ClassLoader cl = this.getClass().getClassLoader();
 		String path = this.getClass().getPackage().getName()
 				.replace('.', '/');
-		ImageIcon icon = new ImageIcon(cl.getResource(path
-				+ "/vanted_logo.png"));
 		
 		if (splashScreen != null && (splashScreen instanceof DBEsplashScreen)) {
+			ImageIcon icon = new ImageIcon(cl.getResource(path
+					+ "/vanted_logo.png"));
 			((DBEsplashScreen) splashScreen).setIconImage(icon.getImage());
 		}
 		
@@ -188,7 +188,7 @@ public class MainM {
 			splashScreen.setVisible(true);
 		}
 		
-		GravistoMainHelper.initApplicationExt(args, splashScreen, cl, addPluginFile, addon);
+		GravistoMainHelper.initApplicationExt(args, splashScreen, cl, addPluginFile, addon, showMainFrame);
 	}
 	
 	public static boolean doEnableKEGGaskUser() {
@@ -223,7 +223,8 @@ public class MainM {
 		JOptionPane.showMessageDialog(
 				null,
 				"<html><h3>KEGG License Status Evaluation</h3>"
-						+ MenuItemInfoDialog.getKEGGlibText(), "VANTED Program Features Initialization", JOptionPane.INFORMATION_MESSAGE);
+						+ MenuItemInfoDialog.getKEGGlibText(),
+				"VANTED Program Features Initialization", JOptionPane.INFORMATION_MESSAGE);
 		
 		int result = JOptionPane.showConfirmDialog(
 				null,

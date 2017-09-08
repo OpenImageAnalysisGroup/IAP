@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.image.operations.complex_hull;
 
-import iap.blocks.data_structures.RunnableOnImage;
-
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -15,6 +13,7 @@ import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.operations.blocks.properties.BlockResultSet;
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.data_structures.RunnableOnImage;
 
 /**
  * Detects the border pixels of the image objects. Uses the coordinates of the

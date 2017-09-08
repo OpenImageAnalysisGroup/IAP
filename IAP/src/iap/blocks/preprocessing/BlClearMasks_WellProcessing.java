@@ -1,10 +1,5 @@
 package iap.blocks.preprocessing;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
-import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptionsAndResults;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
@@ -12,6 +7,11 @@ import java.util.HashSet;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
+import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.RunnableOnImageSet;
+import iap.pipelines.ImageProcessorOptionsAndResults;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 /**
  * Processes individual well parts from top images (removes other parts).
@@ -21,6 +21,7 @@ import de.ipk.ag_ba.image.structures.Image;
 public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock implements WellProcessor {
 	
 	boolean multiTray = false;
+	boolean drawCutCircle = false;
 	
 	@Override
 	protected void prepare() {
@@ -47,6 +48,9 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 					gridHn = getInt("Well Grid Horizontal", 1);
 					gridVn = getInt("Well Grid Vertical", 1);
 				}
+			
+		if (!multiTray && optionsAndResults.getCameraPosition() == CameraPosition.TOP)
+			drawCutCircle = getBoolean("Draw cutting circle", true);
 		
 		if (gridHn != 1 || gridVn != 1) {
 			double horFillGrade = getDouble("Horizontal Grid Extend Percent", 100) / 100d;
@@ -157,68 +161,92 @@ public class BlClearMasks_WellProcessing extends AbstractSnapshotAnalysisBlock i
 		return res;
 	}
 	
-	@Override
-	protected Image processVISimage() {
-		Image img = input().images().vis();
+	private Image cutCircle(Image img, String cam) {
 		if (img != null && !multiTray) {
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP)
-				return img.copy().io().
-						clearOutsideCircle(
-								img.getWidth() / 2 - getInt("VIS Circle Center Shift X", 0),
-								img.getHeight() / 2 - getInt("VIS Circle Center Shift Y", 0),
-								(int) (img.getHeight() * getDouble("VIS Circle Radius Percent of Height", 40.8) / 100d)).getImage();
-			else
+			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP) {
+				int mx = img.getWidth() / 2 - getInt(cam + " Circle Center Shift X", 0);
+				int my = img.getHeight() / 2 - getInt(cam + " Circle Center Shift Y", 0);
+				int radius = (int) (img.getHeight() * getDouble(cam + " Circle Radius Percent of Height", 40.8) / 100d);
+				
+				getResultSet().addImagePostProcessor(new RunnableOnImageSet() {
+					@Override
+					public Image postProcessMask(Image mask) {
+						int color = Color.ORANGE.getRGB();
+						double alpha = 0.3;
+						int strokeWidth = 1;
+						return mask.io().canvas().drawCircle(mx, my, radius, color, alpha, strokeWidth).getImage();
+					}
+					
+					@Override
+					public Image postProcessImage(Image image) {
+						return image;
+					}
+					
+					@Override
+					public CameraType getConfig() {
+						return img.getCameraType();
+					}
+				});
+				return img.copy().io().clearOutsideCircle(mx, my,
+						radius).getImage();
+			} else
 				return img;
 		} else
 			return img;
+	}
+	
+	@Override
+	protected Image processVISimage() {
+		return cutCircle(input().images().vis(), "VIS");
 	}
 	
 	@Override
 	protected Image processFLUOimage() {
-		Image img = input().images().fluo();
-		if (img != null && !multiTray) {
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP)
-				return img.copy().io().
-						clearOutsideCircle(
-								img.getWidth() / 2 - getInt("FLUO Circle Center Shift X", 0),
-								img.getHeight() / 2 - getInt("FLUO Circle Center Shift Y", 0),
-								(int) (img.getHeight() * getDouble("FLUO Circle Radius Percent of Height", 40.8) / 100d)).getImage();
-			else
-				return img;
-		} else
-			return img;
+		return cutCircle(input().images().fluo(), "FLUO");
 	}
 	
 	@Override
 	protected Image processNIRimage() {
-		Image img = input().images().nir();
-		if (img != null && !multiTray) {
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP)
-				return img.copy().io().
-						clearOutsideCircle(
-								img.getWidth() / 2 - getInt("NIR Circle Center Shift X", 0),
-								img.getHeight() / 2 - getInt("NIR Circle Center Shift Y", 0),
-								(int) (img.getHeight() * getDouble("NIR Circle Radius Percent of Height", 40.8) / 100d)).getImage();
-			else
-				return img;
-		} else
-			return img;
+		return cutCircle(input().images().nir(), "NIR");
 	}
 	
 	@Override
 	protected Image processIRimage() {
-		Image img = input().images().ir();
-		if (img != null && !multiTray) {
-			if (optionsAndResults.getCameraPosition() == CameraPosition.TOP)
-				return img.copy().io()
-						.clearOutsideCircle(
-								img.getWidth() / 2 - getInt("IR Circle Center Shift X", 0),
-								img.getHeight() / 2 - getInt("IR Circle Center Shift Y", 0),
-								(int) (img.getHeight() * getDouble("IR Circle Radius Percent of Height", 40.8) / 100d)).getImage();
-			else
-				return img;
-		} else
-			return img;
+		return cutCircle(input().images().ir(), "IR");
+		
+	}
+	
+	@Override
+	protected Image processVISmask() {
+		if (getBoolean("Cut Masks", false))
+			return cutCircle(input().masks().vis(), "VIS");
+		else
+			return super.processVISmask();
+	}
+	
+	@Override
+	protected Image processFLUOmask() {
+		if (getBoolean("Cut Masks", false))
+			return cutCircle(input().masks().fluo(), "FLUO");
+		else
+			return super.processFLUOmask();
+	}
+	
+	@Override
+	protected Image processNIRmask() {
+		if (getBoolean("Cut Masks", false))
+			return cutCircle(input().masks().nir(), "NIR");
+		else
+			return super.processNIRmask();
+		
+	}
+	
+	@Override
+	protected Image processIRmask() {
+		if (getBoolean("Cut Masks", false))
+			return cutCircle(input().masks().ir(), "IR");
+		else
+			return super.processIRmask();
 	}
 	
 	@Override

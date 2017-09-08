@@ -7,6 +7,7 @@
 
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.graph_cleanup;
 
+import org.SystemAnalysis;
 import org.graffiti.plugin.algorithm.Algorithm;
 
 import de.ipk_gatersleben.ag_nw.graffiti.IPK_PluginAdapter;
@@ -19,9 +20,11 @@ import de.ipk_gatersleben.ag_nw.graffiti.IPK_PluginAdapter;
 public class DeleteNodesPlugin extends IPK_PluginAdapter {
 	
 	public DeleteNodesPlugin() {
-		this.algorithms = new Algorithm[2];
-		this.algorithms[0] = new DeleteNodesAlgorithm();
-		this.algorithms[1] = new NumberNodesAndEdgesAlgorithm();
+		if (!SystemAnalysis.isHeadless()) {
+			this.algorithms = new Algorithm[2];
+			this.algorithms[0] = new DeleteNodesAlgorithm();
+			this.algorithms[1] = new NumberNodesAndEdgesAlgorithm();
+		}
 	}
 	
 }

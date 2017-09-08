@@ -25,8 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import net.iharder.dnd.FileDrop;
-
 import org.ApplicationStatus;
 import org.ErrorMsg;
 import org.FeatureSet;
@@ -67,6 +65,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
 import de.muntjak.tinylookandfeel.Theme;
+import net.iharder.dnd.FileDrop;
 
 public class GravistoMainHelper implements HelperClass {
 	
@@ -291,11 +290,11 @@ public class GravistoMainHelper implements HelperClass {
 	
 	public static MainFrame initApplication(String[] args, SplashScreenInterface splashScreen, ClassLoader cl,
 			String addPluginFile, String addPlugin) {
-		return initApplicationExt(args, splashScreen, cl, addPluginFile, new String[] { addPlugin });
+		return initApplicationExt(args, splashScreen, cl, addPluginFile, new String[] { addPlugin }, true);
 	}
 	
 	public static MainFrame initApplicationExt(String[] args, SplashScreenInterface splashScreen, ClassLoader cl,
-			String addPluginFile, String[] addPlugins) {
+			String addPluginFile, String[] addPlugins, boolean loadEditorPlugins) {
 		splashScreen.setText("Read plugin information");
 		
 		// construct and open the editor's main frame
@@ -305,10 +304,9 @@ public class GravistoMainHelper implements HelperClass {
 		
 		splashScreen.setText("Read plugin information..");
 		
-		JPanel statusPanel = new JPanel();
-		// statusPanel.
 		MainFrame mainFrameNF = null;
 		if (!SystemAnalysis.isHeadless()) {
+			JPanel statusPanel = new JPanel();
 			mainFrameNF = new MainFrame(getPluginManager(), uiPrefs, statusPanel, true);
 			installDragAndDropHandler(mainFrameNF);
 		}
@@ -343,8 +341,10 @@ public class GravistoMainHelper implements HelperClass {
 		ArrayList<String> locations = new ArrayList<String>();
 		try {
 			locations.addAll(new TextFile(r1));
-			locations.addAll(new TextFile(r2));
-			locations.addAll(new TextFile(r3));
+			if (loadEditorPlugins)
+				locations.addAll(new TextFile(r2));
+			if (loadEditorPlugins)
+				locations.addAll(new TextFile(r3));
 			locations.addAll(new TextFile(r4));
 			if (addPlugins != null)
 				for (String p : addPlugins)
@@ -421,7 +421,8 @@ public class GravistoMainHelper implements HelperClass {
 			}
 		});
 		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
+		if (!SystemAnalysis.isHeadless())
+			t.start();
 		
 		splashScreen.setText("Processing finished");
 		
@@ -637,7 +638,7 @@ public class GravistoMainHelper implements HelperClass {
 						directories.add(f);
 					else
 						realfiles.add(f);
-				
+					
 				for (File dir : directories)
 					addFiles(realfiles, dir);
 				

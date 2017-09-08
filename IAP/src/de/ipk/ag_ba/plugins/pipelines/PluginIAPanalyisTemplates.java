@@ -49,6 +49,7 @@ import iap.blocks.postprocessing.BlMoveMasksToImageSet;
 import iap.blocks.postprocessing.BlOverlayMasksOnImages;
 import iap.blocks.postprocessing.BlRunPostProcessors;
 import iap.blocks.preprocessing.BlAlign;
+import iap.blocks.preprocessing.BlCalculator;
 import iap.blocks.preprocessing.BlClearMasks_WellProcessing;
 import iap.blocks.preprocessing.BlClearRectangle;
 import iap.blocks.preprocessing.BlColorBalanceCircularLumi;
@@ -187,6 +188,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlCountColors(),
 				new BlColorBalanceCircularLumi(),
 				new BlSubtractMedianLab(),
+				new BlCalculator(),
 				new BlSpotMatcher(),
 				new BlSpotGradients(),
 				new BlResizeScale(),

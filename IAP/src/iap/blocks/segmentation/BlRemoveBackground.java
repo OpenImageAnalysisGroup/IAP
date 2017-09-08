@@ -3,12 +3,6 @@
  */
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractBlock;
-import iap.blocks.data_structures.BlockType;
-import ij.gui.Roi;
-import ij.process.AutoThresholder;
-import ij.process.AutoThresholder.Method;
-
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -18,6 +12,11 @@ import java.util.HashSet;
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
+import ij.gui.Roi;
+import ij.process.AutoThresholder;
+import ij.process.AutoThresholder.Method;
 
 /**
  * Clears the background by comparison of foreground and background.
@@ -38,13 +37,16 @@ public class BlRemoveBackground extends AbstractBlock {
 			String Value = optionsAndResults.getStringSettingRadio(this, "Thresholding Method (" + ct + ")",
 					ct == CameraType.VIS ? "Li" : "Otsu", possibleValues);// ct == CameraType.VIS ? "Li" : "Otsu", possibleValues);
 			Image image = input().images().getImage(ct).show("inp", debug);
-			if (getBoolean("Normalize " + ct + " Image", ct == CameraType.FLUO))
-				image = image.io().copy().histogramEqualisation(true, 0.35).getImage().show("img_he", debug);
+			boolean normalize = getBoolean("Normalize " + ct + " Image", ct == CameraType.FLUO);
+			boolean histogramEqualisation = getBoolean("Equalize histogram", normalize);
+			double percentSaturated = getDouble("Normalize (equalisation) - percentage of saturated pixels", 35) / 100d;
+			if (histogramEqualisation && normalize)
+				image = image.io().copy().histogramEqualisation(normalize, percentSaturated).getImage().show("img_he", debug);
 			// mask = mask.io().blurImageJ(getDouble("Blur mask percent", 1.0) / 100d * mask.getWidth()).getImage();
 			// mask = mask.io().histogramEqualisation(true, 0.35).getImage().show("mask_he", debug);
 			if (mask == null || image == null)
 				return null;
-			
+				
 			// Nir: invert mask then add to image
 			// Fluo: diff = image - mask
 			Image diff_image;
@@ -58,7 +60,7 @@ public class BlRemoveBackground extends AbstractBlock {
 					diff_image = mask.io().invert().add(image).getImage();
 				else
 					diff_image = mask.io().diff(image).getImage();
-			
+				
 			if (debug)
 				diff_image.show("diff", debug);
 			if (diff_image == null)
@@ -86,13 +88,15 @@ public class BlRemoveBackground extends AbstractBlock {
 			
 			thresh_image = thresh_image.io()
 					.addBorder(borderSizeLeftRight, borderSizeTopBottom, (int) br.getMinX() - borderSizeLeftRight, (int) br.getMinY() - borderSizeTopBottom,
-							ImageOperation.BACKGROUND_COLORint).getImage();
+							ImageOperation.BACKGROUND_COLORint)
+					.getImage();
 			
 			Image workimg = input().images().copy().getImage(ct);
 			if (getBoolean("Return difference image (" + ct + ")", ct == CameraType.NIR)) {
 				workimg = diff_image.io()
 						.addBorder(borderSizeLeftRight, borderSizeTopBottom, (int) br.getMinX() - borderSizeLeftRight, (int) br.getMinY() - borderSizeTopBottom,
-								ImageOperation.BACKGROUND_COLORint).getImage();
+								ImageOperation.BACKGROUND_COLORint)
+						.getImage();
 			}
 			Image res = workimg.io()
 					.applyMask(thresh_image)

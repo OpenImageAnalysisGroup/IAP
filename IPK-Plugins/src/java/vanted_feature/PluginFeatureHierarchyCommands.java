@@ -6,6 +6,7 @@ package vanted_feature;
 import org.Release;
 import org.ReleaseInfo;
 import org.SettingsHelperDefaultIsTrue;
+import org.SystemAnalysis;
 import org.graffiti.options.GravistoPreferences;
 import org.graffiti.plugin.algorithm.Algorithm;
 
@@ -20,23 +21,26 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.ExpandSel
  * @author Christian Klukas
  */
 public class PluginFeatureHierarchyCommands
-					extends IPK_PluginAdapter {
+		extends IPK_PluginAdapter {
 	
 	private static Algorithm[] otherAlgorithms = null;
 	
 	public PluginFeatureHierarchyCommands() {
+		if (SystemAnalysis.isHeadless())
+			return;
+		
 		if (new SettingsHelperDefaultIsTrue().isEnabled("Hierarchy commands")) {
 			if (ReleaseInfo.getRunningReleaseStatus() != Release.KGML_EDITOR) {
 				this.algorithms = new Algorithm[] {
-									new HierarchyAlgorithms(),
-									new CreateKeggReactionNetworkAlgorithm(),
-									new HierarchyAlgorithm(),
-									new SelectLeafNodesAlgorithm(),
+						new HierarchyAlgorithms(),
+						new CreateKeggReactionNetworkAlgorithm(),
+						new HierarchyAlgorithm(),
+						new SelectLeafNodesAlgorithm(),
 				};
 				otherAlgorithms = new Algorithm[] {
-									new ExpandSelectionAlgorithm(true, false),
-									new ExpandSelectionAlgorithm(false, false),
-									new ExpandSelectionAlgorithm(true, true)
+						new ExpandSelectionAlgorithm(true, false),
+						new ExpandSelectionAlgorithm(false, false),
+						new ExpandSelectionAlgorithm(true, true)
 				};
 			}
 		}

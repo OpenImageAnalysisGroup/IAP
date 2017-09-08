@@ -2,6 +2,7 @@ package de.ipk.ag_ba.plugins.actions;
 
 import java.util.ArrayList;
 
+import de.ipk.ag_ba.commands.experiment.tools.ActionAddReferenceImage;
 import de.ipk.ag_ba.commands.experiment.tools.ActionGenerateFieldInfoFromWeight;
 import de.ipk.ag_ba.commands.experiment.tools.ActionObjectStatistics;
 import de.ipk.ag_ba.commands.experiment.tools.ActionRemerge;
@@ -34,6 +35,7 @@ public class PluginIAPexperimentToolActions extends AbstractIAPplugin {
 		res.add(new ActionSetTimes());
 		res.add(new ActionResetConditionFromImageName());
 		res.add(new ActionShowXML());
+		res.add(new ActionAddReferenceImage());
 		res.add(new ActionObjectStatistics());
 		res.add(new ActionSaveWebCamImagesSelectSource());
 		
@@ -42,7 +44,7 @@ public class PluginIAPexperimentToolActions extends AbstractIAPplugin {
 		if (experimentReference != null)
 			for (ActionDataProcessing adp : res)
 				adp.setExperimentReference(experimentReference);
-		
+			
 		return res.toArray(new ActionDataProcessing[] {});
 	}
 }

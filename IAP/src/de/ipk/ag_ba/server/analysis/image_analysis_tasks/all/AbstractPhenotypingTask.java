@@ -87,6 +87,7 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	private String debugLastSystemOptionStorageGroup;
 	private int DEBUG_SINGLE_ANGLE1, DEBUG_SINGLE_ANGLE2, DEBUG_SINGLE_ANGLE3;
 	private boolean filterAngle;
+	private boolean commandLineMode;
 	
 	public AbstractPhenotypingTask(PipelineDesc pd) {
 		this.pd = pd;
@@ -205,7 +206,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		status.setCurrentStatusText1("Wait for execution time slot");
 		status.setCurrentStatusText2("(another analysis is currently running)");
 		final Semaphore maxInst = BackgroundTaskHelper.lockGetSemaphore(
-				AbstractPhenotypingTask.class, SystemOptions.getInstance().getInteger("IAP", "Max-Concurrent-Phenotyping-Tasks", 1));
+				AbstractPhenotypingTask.class,
+				commandLineMode ? SystemAnalysis.getNumberOfCPUs() : SystemOptions.getInstance().getInteger("IAP", "Max-Concurrent-Phenotyping-Tasks", 1));
 		maxInst.acquire();
 		try {
 			status.setCurrentStatusValue(0);
@@ -283,37 +285,43 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			ArrayList<LocalComputeJob> wait = new ArrayList<LocalComputeJob>();
 			final int todo = workLoad.size();
 			final ThreadSafeOptions progr = new ThreadSafeOptions();
-			while (!workLoad.isEmpty() && !status.wantsToStop()) {
-				Runnable t = workLoad.poll();
-				String d = workLoad_desc.poll();
-				wait.add(BackgroundThreadDispatcher.addTask(t, d, true));
-				progr.addInt(1);
-				String plantName = d;
-				if (plantName.contains(";"))
-					plantName = plantName.split(";", 2)[1];
-				do {
-					Thread.sleep(100);
-					status.setCurrentStatusText1("Enqueue Task " + progr.getInt() + "/" + todo + " ("
-							+ BackgroundThreadDispatcher.getWorkLoad() + " tasks, "
-							+ (BackgroundThreadDispatcher.getBackgroundThreadCount()) + " threads)");
-				} while (BackgroundThreadDispatcher.getWorkLoad() - 2 > SystemAnalysis.getNumberOfCPUs());
-			}
-			BackgroundThreadDispatcher.waitFor(wait, new Runnable() {
-				@Override
-				public void run() {
-					while (!Thread.interrupted()) {
-						status.setCurrentStatusText1("Enqueued " + progr.getInt() + "/" + todo
-								+ " plants (" + BackgroundThreadDispatcher.getWorkLoad() + " tasks, "
+			if (commandLineMode) {
+				while (!workLoad.isEmpty() && !status.wantsToStop()) {
+					Runnable t = workLoad.poll();
+					t.run();
+				}
+			} else {
+				while (!workLoad.isEmpty() && !status.wantsToStop()) {
+					Runnable t = workLoad.poll();
+					String d = workLoad_desc.poll();
+					wait.add(BackgroundThreadDispatcher.addTask(t, d, true));
+					progr.addInt(1);
+					String plantName = d;
+					if (plantName.contains(";"))
+						plantName = plantName.split(";", 2)[1];
+					do {
+						Thread.sleep(100);
+						status.setCurrentStatusText1("Enqueue Task " + progr.getInt() + "/" + todo + " ("
+								+ BackgroundThreadDispatcher.getWorkLoad() + " tasks, "
 								+ (BackgroundThreadDispatcher.getBackgroundThreadCount()) + " threads)");
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							// empty
+					} while (BackgroundThreadDispatcher.getWorkLoad() - 2 > SystemAnalysis.getNumberOfCPUs());
+				}
+				BackgroundThreadDispatcher.waitFor(wait, new Runnable() {
+					@Override
+					public void run() {
+						while (!Thread.interrupted()) {
+							status.setCurrentStatusText1("Enqueued " + progr.getInt() + "/" + todo
+									+ " plants (" + BackgroundThreadDispatcher.getWorkLoad() + " tasks, "
+									+ (BackgroundThreadDispatcher.getBackgroundThreadCount()) + " threads)");
+							try {
+								Thread.sleep(1000);
+							} catch (InterruptedException e) {
+								// empty
+							}
 						}
 					}
-				}
-				
-			});
+				});
+			}
 		} finally {
 			maxInst.release();
 		}
@@ -1017,6 +1025,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 	
 	public DatabaseTarget getDatabaseTargetInst() {
 		return databaseTarget;
+	}
+	
+	public void setCommandlineMode(boolean commandLineMode) {
+		this.commandLineMode = commandLineMode;
 	}
 	
 }

@@ -45,6 +45,9 @@ public class PatternTabsForInspector
 	public PatternTabsForInspector() {
 		super();
 		
+		if (SystemAnalysis.isHeadless())
+			return;
+		
 		ArrayList<InspectorTab> tablist = new ArrayList<InspectorTab>();
 		
 		// if (!ReleaseInfo.isRunningAsApplet())

@@ -16,12 +16,17 @@ import org.graffiti.editor.GravistoService;
 public class FileHelper implements HelperClass {
 	public static String getFileName(final String defaultExt,
 			final String description, String defaultFileName) {
+		return getFileName(defaultExt, description, defaultFileName, false);
+	}
+	
+	public static String getFileName(final String defaultExt,
+			final String description, String defaultFileName, boolean acceptAllFiles) {
 		JFileChooser fc = new JFileChooser();
 		
 		OpenFileDialogService.setActiveDirectoryFor(fc);
 		if (defaultFileName != null && defaultFileName.length() > 0)
 			fc.setSelectedFile(new File(defaultFileName));
-		fc.setAcceptAllFileFilterUsed(false);
+		fc.setAcceptAllFileFilterUsed(acceptAllFiles);
 		fc.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File f) {
@@ -61,7 +66,8 @@ public class FileHelper implements HelperClass {
 					if (JOptionPane.showConfirmDialog(GravistoService.getInstance()
 							.getMainFrame(),
 							"<html>Do you want to overwrite the existing file <i>"
-									+ fileName + "</i>?</html>", "Overwrite File?",
+									+ fileName + "</i>?</html>",
+							"Overwrite File?",
 							JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 						needFile = false;
 					} else

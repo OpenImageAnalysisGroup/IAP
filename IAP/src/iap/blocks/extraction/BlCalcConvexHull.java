@@ -1,12 +1,5 @@
 package iap.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractBlock;
-import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.CalculatedProperty;
-import iap.blocks.data_structures.CalculatedPropertyDescription;
-import iap.blocks.data_structures.CalculatesProperties;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-
 import java.awt.Color;
 import java.util.HashSet;
 
@@ -15,6 +8,12 @@ import de.ipk.ag_ba.image.operations.blocks.ResultsTableWithUnits;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
+import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 /**
  * Calculates the convex hull for the visible light and fluorescence images and stores according data results as numeric
@@ -48,7 +47,7 @@ public class BlCalcConvexHull extends AbstractBlock implements CalculatesPropert
 		boolean drawMinRect = getBoolean("draw_retangle", true);
 		boolean drawCircle = getBoolean("draw_circle", true);
 		
-		ImageOperation res = new ImageOperation(image).show(ct + " input image", debug).hull()
+		ImageOperation res = new ImageOperation(image).show(ct + " input image", debug).hull().disableSizeCheck()
 				.find(getResultSet(), true, false,
 						drawHull, drawPCLine, drawHull, drawMinRect, drawCircle,
 						Color.RED.getRGB(),

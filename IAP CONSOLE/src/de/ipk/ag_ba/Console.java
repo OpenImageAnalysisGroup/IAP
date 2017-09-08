@@ -13,6 +13,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.ReleaseInfo;
@@ -39,6 +40,8 @@ import de.ipk.ag_ba.gui.interfaces.NavigationAction;
 import de.ipk.ag_ba.gui.navigation_actions.SpecialCommandLineSupport;
 import de.ipk.ag_ba.gui.navigation_model.GUIsetting;
 import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
+import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
+import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
 import de.ipk.ag_ba.mongo.MongoDB;
@@ -73,34 +76,40 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  */
 public class Console {
 	public static void main(String[] args) throws IOException, InterruptedException {
+		IAPmain.setRunMode(IAPrunMode.CONSOLE);
 		for (String i : IAPmain.getMainInfoLines())
 			System.out.println(i);
 		if (paramContains(new String[] { "help", "h", "?" }, args)) {
-			System.out.println("****************************************************");
-			System.out.println("* Usage                                            *");
-			System.out.println("* - no parameters: interactive console interface   *");
-			System.out.println("* - /help, /h, /? - this help                      *");
-			System.out.println("* - XYZ           - execute commands X, Y, Z       *");
-			System.out.println("*                   these commands correspond to   *");
-			System.out.println("*                   the keys you use inside the    *");
-			System.out.println("*                   console interface              *");
-			System.out.println("* - _A,_B         - execute command named 'A' and  *");
-			System.out.println("*                   then 'B'. Use underscore and   *");
-			System.out.println("*                   comma to specify title lookup  *");
-			System.out.println("*                   and to separate commands       *");
-			System.out.println("* - the environment variable 'exec' is also        *");
-			System.out.println("*   evaluated and may be used as an alternative    *");
-			System.out.println("*   way to specify the commands to be executed     *");
-			System.out.println("* - /SE [imgtype] [img] [pipeline] [resultfile]    *");
-			System.out.println("*       [output path for images]                   *");
-			System.out.println("*                   execute pipeline on single or  *");
-			System.out.println("*                   multiple images (using file    *");
-			System.out.println("*                   mask and store results in      *");
-			System.out.println("*                   single csv file or in separate *");
-			System.out.println("*                   files if just the extension    *");
-			System.out.println("*                   is provided (e.g. '.txt').     *");
-			System.out.println("*                   imgtypes: 'vis.top', ...       *");
-			System.out.println("****************************************************");
+			System.out.println("***********************************************************");
+			System.out.println("* Usage                                                   *");
+			System.out.println("* - no parameters: interactive console interface          *");
+			System.out.println("* - /help, /h, /? - this help                             *");
+			System.out.println("* - XYZ           - execute commands X, Y, Z              *");
+			System.out.println("*                   these commands correspond to          *");
+			System.out.println("*                   the keys you use inside the           *");
+			System.out.println("*                   console interface                     *");
+			System.out.println("* - _A,_B         - execute command named 'A' and         *");
+			System.out.println("*                   then 'B'. Use underscore and          *");
+			System.out.println("*                   comma to specify title lookup         *");
+			System.out.println("*                   and to separate commands              *");
+			System.out.println("* - the environment variable 'exec' is also               *");
+			System.out.println("*   evaluated and may be used as an alternative           *");
+			System.out.println("*   way to specify the commands to be executed            *");
+			System.out.println("* - /SE [imgtype] [img[+back]] [pipeline] [resultfile]    *");
+			System.out.println("*       [output path for images] [time from filename T/F] *");
+			System.out.println("*                   execute pipeline on single or         *");
+			System.out.println("*                   multiple images (using file           *");
+			System.out.println("*                   mask and store results in             *");
+			System.out.println("*                   single csv file or in separate        *");
+			System.out.println("*                   files if just the extension           *");
+			System.out.println("*                   is provided (e.g. '.txt').            *");
+			System.out.println("*                   imgtypes: 'vis.top', ...              *");
+			System.out.println("*                   If the image name of name mask        *");
+			System.out.println("*                   contains an '+', the prefix will be   *");
+			System.out.println("*                   the name of the imag file and the     *");
+			System.out.println("*                   part after the '+' will be the        *");
+			System.out.println("*                   reference image in the pipeline.      *");
+			System.out.println("***********************************************************");
 			System.exit(0);
 		}
 		
@@ -125,15 +134,50 @@ public class Console {
 		Console c = new Console();
 		
 		if (args.length > 0 && args[0].toUpperCase().equalsIgnoreCase("/SE")) {
-			if (new File(args[2]).exists()) {
-				processSingleFile(args, args[2]);
+			String fileSpec = args[2];
+			LinkedList<String> referenceImages = new LinkedList<>();
+			if (fileSpec.contains("+")) {
+				String[] fileNameAndMask = fileSpec.split("\\+", 2);
+				fileSpec = fileNameAndMask[0];
+				String refSpec = fileNameAndMask[1];
+				if (new File(refSpec).exists()) {
+					referenceImages.add(refSpec);
+				} else {
+					try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(
+							Paths.get("."), refSpec)) {
+						dirStream.forEach(path -> {
+							referenceImages.add(path.toString());
+						});
+					}
+				}
+				if (referenceImages.isEmpty())
+					throw new RuntimeException("Could not find reference images from specification '" + refSpec + "'!");
+			}
+			if (new File(fileSpec).exists()) {
+				String refSpec = referenceImages.isEmpty() ? null : referenceImages.get(0);
+				processSingleFile(args, fileSpec, refSpec);
 			} else {
+				ArrayList<LocalComputeJob> tasks = new ArrayList<>();
 				try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(
-						Paths.get("."), args[2])) {
+						Paths.get("."), fileSpec)) {
 					dirStream.forEach(path -> {
-						processSingleFile(args, path.toString());
+						try {
+							final String refSpec = referenceImages.isEmpty() ? null : referenceImages.get(0);
+							if (!referenceImages.isEmpty())
+								referenceImages.add(referenceImages.remove(0));
+							
+							tasks.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+								@Override
+								public void run() {
+									processSingleFile(args, path.toString(), refSpec);
+								}
+							}, "Process " + path.toString()));
+						} catch (InterruptedException e) {
+							throw new RuntimeException(e);
+						}
 					});
 				}
+				BackgroundThreadDispatcher.waitFor(tasks);
 			}
 			System.exit(0);
 		}
@@ -156,13 +200,13 @@ public class Console {
 		}
 	}
 	
-	private static void processSingleFile(String[] args, String img) {
+	private static void processSingleFile(String[] args, String img, String refImg) {
 		String resFile = args[4];
 		if (resFile.startsWith(".")) {
 			resFile = img.substring(0, img.lastIndexOf(".")) + resFile;
 		}
 		try {
-			executePipeline(args[1], img, args[3], resFile, args.length > 5 ? args[5] : "");
+			executePipeline(args[1], img, refImg, args[3], resFile, args.length > 5 ? args[5] : "", args.length > 6 ? ("" + args[6]).toUpperCase().startsWith("T") : false);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (InterruptedException e) {
@@ -170,7 +214,16 @@ public class Console {
 		}
 	}
 	
-	private static void executePipeline(String imgtype, String img, String pipeline, String resultfile, String resultImagePath) throws IOException, InterruptedException {
+	private static void executePipeline(String imgtype, String img, String refImg, String pipeline, String resultfile, String resultImagePath, boolean timeFromFileName) throws IOException, InterruptedException {
+		if (!new File(img).exists())
+			throw new RuntimeException("Input image file '" + img + "' does not exist!");
+		
+		if (refImg != null && !refImg.isEmpty() && !new File(refImg).exists())
+			throw new RuntimeException("Input reference image file '" + refImg + "' does not exist!");
+		
+		if (!new File(pipeline).exists())
+			throw new RuntimeException("Input analysis pipeline file '" + pipeline + "' does not exist!");
+		
 		Experiment exp = new Experiment();
 		exp.getHeader().setExperimentname("console execution/" + SystemAnalysis.getCurrentTimeInclSec());
 		exp.getHeader().setExperimentType("pipeline/" + pipeline);
@@ -185,16 +238,40 @@ public class Console {
 		long d2 = new File(img).lastModified();
 		
 		URI folderRoute = new File(new File(img).getParent()).toURI();
-		Path p = Paths.get(folderRoute);
-		BasicFileAttributes attr = null;
-		attr = Files.readAttributes(p, BasicFileAttributes.class);
-		FileTime a = attr.creationTime();
-		long d1 = a.toInstant().toEpochMilli();
+		Path p = Paths.get(folderRoute).toAbsolutePath().getParent();
+		
+		con.setSpecies(p.getFileName().toString());
 		
 		Sample3D samp = new Sample3D(con);
-		samp.setTime(1 + (int) ((d2 - d1) / (1000 * 60 * 60 * 24)));
-		samp.setTimeUnit("day");
-		samp.setSampleFineTimeOrRowId(d1);
+		
+		if (timeFromFileName) {
+			try {
+				String timeN = org.StringManipulationTools.getNumbersFromString(new File(img).getName());
+				samp.setTime(Integer.parseInt(timeN));
+				String timeUnitN = org.StringManipulationTools.removeNumbersFromString(new File(img).getName());
+				timeUnitN = timeUnitN.substring(0, timeUnitN.lastIndexOf("."));
+				timeUnitN = timeUnitN.trim();
+				timeUnitN = timeUnitN.replaceAll("_+$", "");
+				timeUnitN = timeUnitN.replaceAll("-+$", "");
+				timeUnitN = timeUnitN.replaceAll("^_+", "");
+				timeUnitN = timeUnitN.replaceAll("^-+", "");
+				samp.setTimeUnit(timeUnitN);
+				samp.setSampleFineTimeOrRowId(-1l);
+			} catch (Exception e) {
+				samp.setTime(-1);
+				samp.setTimeUnit("no number in filename");
+			}
+		} else {
+			// time from file attributes
+			BasicFileAttributes attr = null;
+			attr = Files.readAttributes(p, BasicFileAttributes.class);
+			FileTime a = attr.creationTime();
+			long d1 = a.toInstant().toEpochMilli();
+			samp.setTime(1 + (int) ((d2 - d1) / (1000 * 60 * 60 * 24)));
+			samp.setTimeUnit("day");
+			samp.setSampleFineTimeOrRowId(d1);
+		}
+		
 		con.add(samp);
 		
 		ArrayList<Sample3D> workload = new ArrayList<Sample3D>();
@@ -205,10 +282,19 @@ public class Console {
 		
 		ImageData id = new ImageData(samp);
 		id.setURL(FileSystemHandler.getURL(new File(img)));
+		if (refImg != null && !refImg.trim().isEmpty()) {
+			id.setLabelURL(FileSystemHandler.getURL(new File(refImg)));
+			SystemAnalysis.printlnOnce("INFO: Reference image: " + new File(refImg).getAbsolutePath(), true);
+		} else
+			SystemAnalysis.printlnOnce("INFO: No reference image defined", true);
+		
+		SystemAnalysis.printlnOnce("INFO: Analysis pipeline: " + pipeline, true);
+		// System.out.print(SystemAnalysis.getCurrentTime() + ">INFO: Input image: " + new File(img).getAbsolutePath());
+		
 		samp.add(id);
 		String fn = new File(img).getName();
 		fn = fn.indexOf(".") > 0 ? fn.substring(0, fn.indexOf(".")) : fn;
-		id.setQualityAnnotation(fileOutputForImages ? "" : fn);
+		id.setQualityAnnotation(fn);
 		
 		VirtualIoProvider viop = new VirtualIoProvider();
 		viop.setInstance(SystemOptions.getInstance("absolute:" + pipeline, null));
@@ -227,35 +313,41 @@ public class Console {
 		else
 			dbt.targetFolder = resultImagePath;
 		
+		analysisTaskFinal.setCommandlineMode(true);
 		analysisTaskFinal.performAnalysis(new BackgroundTaskStatusProviderSupportingExternalCallImpl(null, null));
 		ExperimentInterface out = analysisTaskFinal.getOutput();
 		boolean fileOutput = !(resultfile == null || resultfile.isEmpty() || resultfile.equals("-"));
 		boolean printToStdOut = resultfile.equals("-");
 		
-		FileWriter fw = fileOutput ? new FileWriter(resultfile) : null;
-		
 		if (out != null) {
-			System.out.println();
-			for (NumericMeasurementInterface nmi : Substance3D.getAllMeasurements(out)) {
-				if (nmi instanceof NumericMeasurement) {
-					NumericMeasurement nm = (NumericMeasurement) nmi;
-					String sub2 = nm.getParentSample().getParentCondition().getParentSubstance().getName();
-					String cnt = SystemAnalysis.getCurrentTimeInclSec() + "/RESULT/"
-							+ nm.getQualityAnnotation() + "/" + nm.getParentSample().getTime() + "/"
-							+ nm.getParentSample().getParentCondition().getConditionName() + "/"
-							+ sub2 + "/" + nm.getValue() + "/" + nm.getUnit();
-					if (!fileOutput) {
-						if (printToStdOut)
-							System.out.println(cnt);
-					} else {
-						fw.write(cnt + System.lineSeparator());
+			if (printToStdOut)
+				System.out.println();
+			
+			ArrayList<NumericMeasurementInterface> resultList = Substance3D.getAllMeasurements(out);
+			
+			if (resultList != null && !resultList.isEmpty()) {
+				try (FileWriter fw = fileOutput ? new FileWriter(resultfile) : null) {
+					for (NumericMeasurementInterface nmi : resultList) {
+						if (nmi instanceof NumericMeasurement) {
+							NumericMeasurement nm = (NumericMeasurement) nmi;
+							String sub2 = nm.getParentSample().getParentCondition().getParentSubstance().getName();
+							String cnt = SystemAnalysis.getCurrentTimeInclSec() + "/RESULT/"
+									+ nm.getQualityAnnotation() + "/" + nm.getParentSample().getTime() + "/"
+									+ nm.getParentSample().getParentCondition().getConditionName() + "/"
+									+ sub2 + "/" + nm.getValue() + "/" + nm.getUnit();
+							if (!fileOutput) {
+								if (printToStdOut)
+									System.out.println(cnt);
+							} else {
+								fw.write(cnt + System.lineSeparator());
+							}
+						}
 					}
 				}
 			}
+			if (fileOutput)
+				System.out.println();
 		}
-		
-		if (fw != null)
-			fw.close();
 	}
 	
 	private static void parseInput(ArrayList<String> commandsFromArg, String ev) {

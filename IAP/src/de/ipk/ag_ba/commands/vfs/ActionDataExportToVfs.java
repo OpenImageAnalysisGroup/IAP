@@ -834,11 +834,12 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		return determineBinaryFileName(t, substanceName, nm, bm, false);
 	}
 	
-	public static String determineBinaryFileName(long t, final String substanceName,
+	public static String determineBinaryFileName(Long t, final String substanceName,
 			NumericMeasurementInterface nm, final BinaryMeasurement bm, boolean simpleFileName) {
 		final String zefn;
 		GregorianCalendar gc = new GregorianCalendar();
-		gc.setTimeInMillis(t);
+		if (t != null)
+			gc.setTimeInMillis(t);
 		
 		ImageData id;
 		if (bm instanceof ImageData) {
@@ -867,7 +868,7 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					+ HSMfolderTargetDataManager.digit2(gc
 							.get(GregorianCalendar.SECOND));
 			
-			zefn = (nm.getQualityAnnotation() != null && nm.getQualityAnnotation().length() > 0 ? nm.getQualityAnnotation() + " " : "")
+			zefn = (nm.getQualityAnnotation() != null && nm.getQualityAnnotation().length() > 0 && !simpleFileName ? nm.getQualityAnnotation() + " " : "")
 					+ (simpleFileName ? id.getLabelURL().getFileNameWithoutExtension() + ".result"
 							: substanceName
 									+ " "

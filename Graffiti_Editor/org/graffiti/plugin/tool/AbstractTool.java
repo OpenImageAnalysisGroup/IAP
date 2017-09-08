@@ -57,8 +57,8 @@ import scenario.ScenarioService;
  * @see javax.swing.event.MouseInputAdapter
  */
 public abstract class AbstractTool
-					extends MouseInputAdapter
-					implements Tool, SessionListener, SelectionListener {
+		extends MouseInputAdapter
+		implements Tool, SessionListener, SelectionListener {
 	// ~ Instance fields ========================================================
 	
 	protected JComponent mouseComp = null;
@@ -96,6 +96,7 @@ public abstract class AbstractTool
 	private static List<Tool> knownTools;
 	
 	private static Timer checkActivationTimer = new Timer(500, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			synchronized (getKnownTools()) {
 				boolean isOneActive = false;
@@ -114,7 +115,7 @@ public abstract class AbstractTool
 	});
 	
 	private static final Border edgeBorder = new EdgeBorder(java.awt.Color.RED,
-						BORDERSIZE, true);
+			BORDERSIZE, true);
 	
 	// private final Border border = new NodeBorder(java.awt.Color.RED, 8);
 	// private final Border border = new TitledBorder("Node");
@@ -162,6 +163,7 @@ public abstract class AbstractTool
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public boolean isActive() {
 		return this.isActive;
 	}
@@ -172,6 +174,7 @@ public abstract class AbstractTool
 	 * @param graph
 	 *           the graph of this tool.
 	 */
+	@Override
 	public void setGraph(Graph graph) {
 		// empty
 	}
@@ -181,6 +184,7 @@ public abstract class AbstractTool
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public boolean isSelectionListener() {
 		return true;
 	}
@@ -190,6 +194,7 @@ public abstract class AbstractTool
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public boolean isSessionListener() {
 		return true;
 	}
@@ -202,6 +207,7 @@ public abstract class AbstractTool
 	 * 
 	 * @return DOCUMENT ME!
 	 */
+	@Override
 	public boolean isViewListener() {
 		return false;
 	}
@@ -221,12 +227,13 @@ public abstract class AbstractTool
 	 * 
 	 * @see org.graffiti.plugin.tool.Tool#activate()
 	 */
+	@Override
 	public void activate() {
 		
 		ScenarioService.postWorkflowStep(
-							"Activate " + getToolName(),
-							new String[] { "import org.graffiti.plugin.tool.AbstractTool;" },
-							new String[] { "AbstractTool.activateTool(\"" + getToolName() + "\");" });
+				"Activate " + getToolName(),
+				new String[] { "import org.graffiti.plugin.tool.AbstractTool;" },
+				new String[] { "AbstractTool.activateTool(\"" + getToolName() + "\");" });
 		
 		// System.out.println("Activate "+toString());
 		
@@ -241,7 +248,7 @@ public abstract class AbstractTool
 		try {
 			mouseComp = MainFrame.getInstance().getActiveSession().getActiveView().getViewComponent();
 			this.isActive = true;
-			// logger.entering(this.toString(), "  activate");
+			// logger.entering(this.toString(), " activate");
 			displayAsMarked(this.getAllMarkedComps());
 			mouseComp.addMouseListener(this);
 			mouseComp.addMouseMotionListener(this);
@@ -251,12 +258,14 @@ public abstract class AbstractTool
 		}
 	}
 	
+	@Override
 	public void deactivateAll() {
 		for (Iterator<Tool> it = getKnownTools().iterator(); it.hasNext();) {
 			Tool t = it.next();
 			t.deactivate();
 		}
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				ToolButton.checkStatusForAllToolButtons();
 			}
@@ -268,6 +277,7 @@ public abstract class AbstractTool
 	 * 
 	 * @see org.graffiti.plugin.tool.Tool#deactivate()
 	 */
+	@Override
 	public void deactivate() {
 		// System.out.println("Deactivate "+toString());
 		if (mouseComp != null) {
@@ -389,13 +399,14 @@ public abstract class AbstractTool
 	 * @param e
 	 *           DOCUMENT ME!
 	 */
+	@Override
 	public void selectionChanged(SelectionEvent e) {
 		Selection sel = e.getSelection();
 		
 		if (this.isActive()) {
 			if (!sel.equals(this.selection) ||
-								(sel.getNewUnmarked().isEmpty() &&
-								sel.getNewMarked().isEmpty())) {
+					(sel.getNewUnmarked().isEmpty() &&
+							sel.getNewMarked().isEmpty())) {
 				// must completely renew selection
 				if (selection != null) {
 					unDisplayAsMarked(getAllMarkedComps());
@@ -433,12 +444,14 @@ public abstract class AbstractTool
 	/**
 	 * @see org.graffiti.selection.SelectionListener#selectionListChanged(org.graffiti.selection.SelectionEvent)
 	 */
+	@Override
 	public void selectionListChanged(SelectionEvent e) {
 	}
 	
 	/**
 	 * @see org.graffiti.session.SessionListener#sessionChanged(Session)
 	 */
+	@Override
 	public void sessionChanged(Session s) {
 		session = (EditorSession) s;
 	}
@@ -601,6 +614,7 @@ public abstract class AbstractTool
 			return new LinkedList<GraphElementComponent>();
 	}
 	
+	@Override
 	public void setPrefs(GravistoPreferences p) {
 		prefs = p;
 	}

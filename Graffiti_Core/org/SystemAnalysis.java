@@ -573,4 +573,11 @@ public class SystemAnalysis {
 		
 		msg2printTime.put(txt.hashCode(), System.currentTimeMillis());
 	}
+	
+	public static void printlnOnce(String txt, boolean addTimeInfo) {
+		if (!msg2printTime.containsKey(txt.hashCode()))
+			System.out.println(SystemAnalysis.getCurrentTime() + ">" + txt);
+		
+		msg2printTime.put(txt.hashCode(), System.currentTimeMillis());
+	}
 }

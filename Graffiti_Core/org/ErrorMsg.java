@@ -203,12 +203,13 @@ public class ErrorMsg implements HelperClass {
 			for (Runnable r : fl) {
 				SwingUtilities.invokeLater(r);
 			}
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					finishedListeners.clear();
-				}
-			});
+			if (!fl.isEmpty())
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						finishedListeners.clear();
+					}
+				});
 		}
 		if (apploadingCompleted == ApplicationStatus.ADDONS_LOADED
 				|| (apploadingCompleted == ApplicationStatus.PROGRAM_LOADING_FINISHED && ReleaseInfo
