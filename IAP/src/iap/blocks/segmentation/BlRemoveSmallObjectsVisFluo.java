@@ -36,7 +36,7 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 			return null;
 		Image res, mask = input().masks().vis().show("vis input", debugValues);
 		
-		res = new ImageOperation(mask).applyMask(mask.copy().io().bm().dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation vis", 0))).getImage())
+		res = new ImageOperation(mask).blurImageJ(getInt("dilation vis", 0)).applyMask(mask.copy().io().bm().dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation vis", 0))).getImage())
 				.removeSmallClusters(
 						getInt("Noise-Size-Vis-Area", 20 * 20),
 						getInt("Noise-Size-Vis-Dimension-Absolute", 20),
