@@ -1,19 +1,18 @@
 package iap.blocks.segmentation;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
-import iap.blocks.data_structures.BlockType;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
+import iap.blocks.data_structures.BlockType;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 /**
- * Small parts
- * of the image are removed (noise), using the PixelSegmentation algorithm.
- * 
+ * @author klukas
+ *         Small parts
+ *         of the image are removed (noise), using the PixelSegmentation algorithm.
  * @param in
  *           The set of input images (RGB images).
  * @return A set of images which may be used as a mask.
@@ -27,6 +26,7 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 	protected void prepare() {
 		super.prepare();
 		debug = getBoolean("debug", false);
+		
 	}
 	
 	@Override
@@ -40,7 +40,10 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 						getInt("Noise-Size-Vis-Area", 20 * 20),
 						getInt("Noise-Size-Vis-Dimension-Absolute", 20),
 						optionsAndResults.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
-						optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", true)).getImage();
+						optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", true),
+						getBoolean("Consider brightness (VIS)", false),
+						getDouble("Brightness scale value (VIS)", 1d))
+				.getImage();
 		res = input().images().vis().copy().io().applyMask(res.io().bm().erode(getInt("dilation vis", 0)).getImage()).getImage();
 		res.show("vis result", debugValues);
 		
@@ -52,14 +55,14 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 		if (input().masks().fluo() == null)
 			return null;
 		
-		Image res = new ImageOperation(input().masks().fluo().show("input fluo", debugValues)).copy().bm().
-				dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation fluo", 0))).io().
-				removeSmallClusters(
-						getInt("Noise-Size-Fluo-Area", 10 * 10),
-						getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
-						optionsAndResults.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
-						optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
-						getBoolean("Use Fluo Area Parameter", false)).show("result fluo", debugValues)
+		Image res = new ImageOperation(input().masks().fluo().show("input fluo", debugValues)).copy().bm().dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation fluo", 0))).io().removeSmallClusters(
+				getInt("Noise-Size-Fluo-Area", 10 * 10),
+				getInt("Noise-Size-Fluo-Dimension-Absolute", 10),
+				optionsAndResults.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
+				optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
+				getBoolean("Use Fluo Area Parameter", false),
+				getBoolean("Consider brightness (FLUO)", false),
+				getDouble("Brightness scale value (VIS)", 1d)).show("result fluo", debugValues)
 				.getImage();
 		
 		res = input().images().fluo().copy().io().applyMask(res.io().bm().erode(getInt("dilation fluo", 0)).getImage())

@@ -1083,12 +1083,13 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation removeSmallClusters(int cutOffAreaSizeOfImage, int cutOffVertHorOfImage, double boundingBoxIncreaseFactor_top,
 			NeighbourhoodSetting nb, CameraPosition typ,
-			ObjectRef optClusterSizeReturn, boolean considerArea) {
+			ObjectRef optClusterSizeReturn, boolean considerArea, boolean considerBrightness, double brightnessScale) {
 		Image workImage = new Image(image);
 		workImage = removeSmallPartsOfImage(workImage,
 				ImageOperation.BACKGROUND_COLORint,
 				cutOffAreaSizeOfImage, cutOffVertHorOfImage, nb, typ,
-				optClusterSizeReturn, considerArea, null, boundingBoxIncreaseFactor_top);
+				optClusterSizeReturn, considerArea, null, boundingBoxIncreaseFactor_top,
+				considerBrightness, brightnessScale);
 		return new ImageOperation(workImage);
 	}
 	
@@ -1243,14 +1244,14 @@ public class ImageOperation implements MemoryHogInterface {
 			ObjectRef optClusterSizeReturn,
 			boolean considerArea) {
 		return removeSmallPartsOfImage(workImage, iBackgroundFill, cutOffMinimumArea, cutOffMinimumDimension, nb, typ, optClusterSizeReturn,
-				considerArea, null, -1);
+				considerArea, null, -1, false, 1);
 	}
 	
 	public static Image removeSmallPartsOfImage(
 			Image workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn,
-			boolean considerArea, RunnableWithVetoRight veto, double boundingBoxIncreaseFactor_top) {
+			boolean considerArea, RunnableWithVetoRight veto, double boundingBoxIncreaseFactor_top, boolean considerBrightness, double brightnessScale) {
 		
 		if (cutOffMinimumArea < 1) {
 			// System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");
@@ -1292,7 +1293,7 @@ public class ImageOperation implements MemoryHogInterface {
 					if (clusterDimensionMinWH[index] >= cutOffMinimumDimension) {
 						int pxCnt = 0;
 						int idx = 0;
-						double hueSum = 0;
+						double hueSum = 0, valSum = 0;
 						float[] compArray = new float[3];
 						for (int c : clusterMap) {
 							if (c == index) {
@@ -1302,16 +1303,22 @@ public class ImageOperation implements MemoryHogInterface {
 								int b = (rgb & 0xff);
 								Color.RGBtoHSB(r, g, b, compArray);
 								hueSum += compArray[0];
+								valSum += compArray[2];
 								pxCnt++;
 							}
 							idx++;
 						}
 						LargeCluster lc = new LargeCluster(clusterDimensions2d[index], clusterCenter[index], clusterSizes[index], index);
-						if (pxCnt > 0)
-							if (preferHighHue)
-								lc.scaleSizeBy(hueSum / pxCnt);
-							else
-								lc.scaleSizeBy((1 - hueSum) / pxCnt);
+						if (pxCnt > 0) {
+							if (considerBrightness) {
+								lc.scaleSizeBy(valSum / pxCnt * brightnessScale);
+							} else {
+								if (preferHighHue)
+									lc.scaleSizeBy(hueSum / pxCnt);
+								else
+									lc.scaleSizeBy((1 - hueSum) / pxCnt);
+							}
+						}
 						largeClusters.add(lc);
 					}
 				}
