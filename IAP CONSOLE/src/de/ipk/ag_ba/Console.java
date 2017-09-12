@@ -141,12 +141,17 @@ public class Console {
 				fileSpec = fileNameAndMask[0];
 				String refSpec = fileNameAndMask[1];
 				if (new File(refSpec).exists()) {
-					referenceImages.add(refSpec);
+					referenceImages.add(new File(refSpec).getAbsolutePath());
 				} else {
-					try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(
-							Paths.get("."), refSpec)) {
-						dirStream.forEach(path -> {
-							referenceImages.add(path.toString());
+					String path = ".";
+					if (refSpec.contains("/")) {
+						path = refSpec.split("/")[0];
+						refSpec = refSpec.split("/", 2)[1];
+					}
+					
+					try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(path), refSpec)) {
+						dirStream.forEach(ppp -> {
+							referenceImages.add(ppp.toString());
 						});
 					}
 				}
@@ -158,9 +163,13 @@ public class Console {
 				processSingleFile(args, fileSpec, refSpec);
 			} else {
 				ArrayList<LocalComputeJob> tasks = new ArrayList<>();
-				try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(
-						Paths.get("."), fileSpec)) {
-					dirStream.forEach(path -> {
+				String path = ".";
+				if (fileSpec.contains("/")) {
+					path = fileSpec.split("/")[0];
+					fileSpec = fileSpec.split("/", 2)[1];
+				}
+				try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(path), fileSpec)) {
+					dirStream.forEach(ppp -> {
 						try {
 							final String refSpec = referenceImages.isEmpty() ? null : referenceImages.get(0);
 							if (!referenceImages.isEmpty())
@@ -169,9 +178,9 @@ public class Console {
 							tasks.add(BackgroundThreadDispatcher.addTask(new Runnable() {
 								@Override
 								public void run() {
-									processSingleFile(args, path.toString(), refSpec);
+									processSingleFile(args, ppp.toString(), refSpec);
 								}
-							}, "Process " + path.toString()));
+							}, "Process " + ppp.toString()));
 						} catch (InterruptedException e) {
 							throw new RuntimeException(e);
 						}
@@ -202,9 +211,15 @@ public class Console {
 	
 	private static void processSingleFile(String[] args, String img, String refImg) {
 		String resFile = args[4];
-		if (resFile.startsWith(".")) {
-			resFile = img.substring(0, img.lastIndexOf(".")) + resFile;
-		}
+		if (args.length > 5) {
+			String imgName = img.substring(0, img.lastIndexOf("."));
+			if (imgName.contains("/"))
+				imgName = imgName.substring(imgName.lastIndexOf("/") + 1);
+			resFile = Paths.get(args[5], imgName + resFile).toString();
+		} else
+			if (resFile.startsWith(".")) {
+				resFile = img.substring(0, img.lastIndexOf(".")) + resFile;
+			}
 		try {
 			executePipeline(args[1], img, refImg, args[3], resFile, args.length > 5 ? args[5] : "", args.length > 6 ? ("" + args[6]).toUpperCase().startsWith("T") : false);
 		} catch (IOException e) {
@@ -345,8 +360,6 @@ public class Console {
 					}
 				}
 			}
-			if (fileOutput)
-				System.out.println();
 		}
 	}
 	

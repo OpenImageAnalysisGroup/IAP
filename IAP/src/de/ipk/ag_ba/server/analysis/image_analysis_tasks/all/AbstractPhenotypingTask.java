@@ -3,7 +3,6 @@ package de.ipk.ag_ba.server.analysis.image_analysis_tasks.all;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -584,8 +583,8 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 			// a specific plant in all time points, therefore it is possible for the block-post-processing
 			// to process numeric analysis results from different time points and therefore directly
 			// to calculate relative values, such as relative growth rates
-			HashSet<String> knownOutput = new HashSet<String>();
-			String timeInfo = SystemAnalysis.getCurrentTime();
+			// HashSet<String> knownOutput = new HashSet<String>();
+			// String timeInfo = SystemAnalysis.getCurrentTime();
 			for (TreeMap<String, ImageSet> is : sampleTimeAndPlantAnnotation2imageSetWithSpecificAngle.values()) {
 				if (is.size() == 0)
 					continue;
