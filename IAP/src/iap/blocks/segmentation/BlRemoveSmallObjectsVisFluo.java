@@ -1,5 +1,6 @@
 package iap.blocks.segmentation;
 
+import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -35,14 +36,15 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 			return null;
 		Image res, mask = input().masks().vis().show("vis input", debugValues);
 		
-		res = new ImageOperation(mask).copy().bm().dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation vis", 0))).io()
+		res = new ImageOperation(mask).applyMask(mask.copy().io().bm().dilate(BlMorphologicalOperations.getRoundMask(getInt("dilation vis", 0))).getImage())
 				.removeSmallClusters(
 						getInt("Noise-Size-Vis-Area", 20 * 20),
 						getInt("Noise-Size-Vis-Dimension-Absolute", 20),
 						optionsAndResults.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
 						optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null, getBoolean("Use Vis Area Parameter", true),
-						getBoolean("Consider brightness (VIS)", false),
-						getDouble("Brightness scale value (VIS)", 1d))
+						getBoolean("Consider color (VIS)", false),
+						getDouble("Brightness scale value (VIS)", 1d),
+						getColor("Target object color", Color.YELLOW))
 				.getImage();
 		res = input().images().vis().copy().io().applyMask(res.io().bm().erode(getInt("dilation vis", 0)).getImage()).getImage();
 		res.show("vis result", debugValues);
@@ -61,8 +63,9 @@ public class BlRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysisBlock {
 				optionsAndResults.getCameraPosition() == CameraPosition.TOP ? getDouble("Increase Factor Largest Bounding Box", 1.05) : -1,
 				optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
 				getBoolean("Use Fluo Area Parameter", false),
-				getBoolean("Consider brightness (FLUO)", false),
-				getDouble("Brightness scale value (VIS)", 1d)).show("result fluo", debugValues)
+				getBoolean("Consider color (FLUO)", false),
+				getDouble("Brightness scale value (VIS)", 1d),
+				getColor("Target object color", Color.YELLOW)).show("result fluo", debugValues)
 				.getImage();
 		
 		res = input().images().fluo().copy().io().applyMask(res.io().bm().erode(getInt("dilation fluo", 0)).getImage())

@@ -636,4 +636,3 @@ public class ColorUtil {
 // Li = (int) (La < 0 ? 0 : (La > 255 ? 255 : La));
 // ai = (int) (aa < 0 ? 0 : (aa > 255 ? 255 : aa));
 // bi = (int) (bb < 0 ? 0 : (bb > 255 ? 255 : bb));
-

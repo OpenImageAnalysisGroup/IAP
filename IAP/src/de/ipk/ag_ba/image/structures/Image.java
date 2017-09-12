@@ -304,14 +304,21 @@ public class Image {
 	}
 	
 	public Image(int w, int h, double[] channel_1, double[] channel_2, double[] channel_3, ColorSpace mode) {
+		this(w, h, channel_1, channel_2, channel_3, mode, null);
+	}
+	
+	public Image(int w, int h, double[] channel_1, double[] channel_2, double[] channel_3, ColorSpace mode, int[] optMask) {
 		this.w = w;
 		this.h = h;
 		int a = 255;
 		@SuppressWarnings("unused")
 		int alpha = ((a & 0xFF) << 24);
-		int[] img = new int[w * h];
+		int[] img = optMask != null ? optMask : new int[w * h];
 		ColorSpaceConverter csc = new ColorSpaceConverter();
 		for (int idx = 0; idx < img.length; idx++) {
+			if (img[idx] == ImageOperation.BACKGROUND_COLORint) {
+				continue;
+			}
 			int r, g, b;
 			if (mode == ColorSpace.RGB) {
 				r = (int) (channel_1[idx] * 255d + 0.5d);

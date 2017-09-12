@@ -491,28 +491,37 @@ public class ChannelProcessing {
 		return out;
 	}
 	
-	public double[][] getLabArrays() {
-		double[] x = getXYZarray(Channel.XYZ_X);
-		double[] y = getXYZarray(Channel.XYZ_Y);
-		double[] z = getXYZarray(Channel.XYZ_Z);
+	public float[][] getLabArrays() {
+		int[] img = imageAs1dArray;
+		float[] outL = new float[img.length];
+		float[] outA = new float[img.length];
+		float[] outB = new float[img.length];
 		
-		double xv, yv, zv;
-		ColorSpaceConverter cspc = new ColorSpaceConverter();
-		for (int i = 0; i < x.length; i++) {
-			xv = x[i];
-			yv = y[i];
-			zv = z[i];
-			if (xv == Float.MAX_VALUE || yv == Float.MAX_VALUE || zv == Float.MAX_VALUE)
+		float[][][] labCube = ImageOperation.getLabCubeUnscaledInstance();
+		
+		int r, g, b;
+		int back = ImageOperation.BACKGROUND_COLORint;
+		
+		for (int i = 0; i < img.length; i++) {
+			int c = img[i];
+			if (c == back) {
+				outL[i] = Float.MAX_VALUE;
+				outA[i] = Float.MAX_VALUE;
+				outB[i] = Float.MAX_VALUE;
 				continue;
+			}
 			
-			double[] lab = cspc.XYZtoLAB(xv, yv, zv);
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
 			
-			x[i] = lab[0];
-			y[i] = lab[1];
-			z[i] = lab[2];
+			float[] lc = labCube[r][g];
 			
+			outL[i] = lc[b];
+			outA[i] = lc[b + 256];
+			outB[i] = lc[b + 512];
 		}
-		return new double[][] { x, y, z };
+		return new float[][] { outL, outA, outB };
 	}
 	
 	public ImageOperation getLabA() {

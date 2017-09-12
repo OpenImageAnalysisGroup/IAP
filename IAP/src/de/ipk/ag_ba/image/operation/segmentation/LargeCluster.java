@@ -8,7 +8,7 @@ public class LargeCluster implements Comparable<LargeCluster> {
 	
 	private Vector2i dimension;
 	private final Vector2i center;
-	private final int size;
+	private int size;
 	private final int index;
 	
 	public LargeCluster(Vector2i dimension, Vector2i center, int size, int index) {
@@ -25,7 +25,7 @@ public class LargeCluster implements Comparable<LargeCluster> {
 		return size < o.size ? 1 : -1;
 	}
 	
-	public Integer getIndex() {
+	public int getIndex() {
 		return index;
 	}
 	
@@ -46,6 +46,14 @@ public class LargeCluster implements Comparable<LargeCluster> {
 	
 	public void scaleSizeBy(double factor) {
 		dimension = dimension.scale(factor);
+	}
+	
+	public Vector2i getDimension() {
+		return dimension;
+	}
+	
+	public void setSizeTo(double targetSize) {
+		size = (int) targetSize;
 	}
 	
 }

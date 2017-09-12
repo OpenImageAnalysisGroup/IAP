@@ -1,5 +1,6 @@
 package iap.blocks.auto;
 
+import java.awt.Color;
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
@@ -66,7 +67,7 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 				autoTune ? (int) (averageLeafWidthEstimationVIS * averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Area", 20 * 20),
 				autoTune ? (int) (averageLeafWidthEstimationVIS) : getInt("Noise-Size-Vis-Dimension-Absolute", 20), -1,
 				optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
-				autoTune ? true : getBoolean("Use Vis Area Parameter", true), false, 1d).getImage();
+				autoTune ? true : getBoolean("Use Vis Area Parameter", true), false, 1d, Color.BLACK).getImage();
 		if (res != null) {
 			if (getInt("dilation vis", 0) > 0)
 				res = res.io().bm().erode(getInt("dilation vis", 0)).getImage();
@@ -87,7 +88,7 @@ public class BlAdaptiveRemoveSmallObjectsVisFluo extends AbstractSnapshotAnalysi
 				autoTune ? (int) (averageLeafWidthEstimationFluo * averageLeafWidthEstimationFluo) : getInt("Noise-Size-Fluo-Area", 10 * 10),
 				autoTune ? (int) averageLeafWidthEstimationFluo : getInt("Noise-Size-Fluo-Dimension-Absolute", 10), -1,
 				optionsAndResults.getNeighbourhood(), optionsAndResults.getCameraPosition(), null,
-				autoTune ? true : getBoolean("Use Fluo Area Parameter", true), false, 1d).show("result fluo", debugValues)
+				autoTune ? true : getBoolean("Use Fluo Area Parameter", true), false, 1d, Color.BLACK).show("result fluo", debugValues)
 				.getImage();
 		int dil = 0;
 		boolean unitTune = false;

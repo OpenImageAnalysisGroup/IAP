@@ -53,7 +53,7 @@ public class PipelineMonitoringResult {
 	}
 	
 	public String getSnapshotTime() {
-		return SystemAnalysis.getCurrentTime(snapshotTime);
+		return snapshotTime != null ? SystemAnalysis.getCurrentTime(snapshotTime) : "[snapshot time unknown]";
 	}
 	
 }

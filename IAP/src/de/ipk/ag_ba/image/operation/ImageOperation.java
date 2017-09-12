@@ -40,6 +40,7 @@ import org.graffiti.editor.MemoryHogInterface;
 
 import de.ipk.ag_ba.gui.picture_gui.StreamBackgroundTaskHelper;
 import de.ipk.ag_ba.gui.util.IAPservice;
+import de.ipk.ag_ba.image.color.ColorUtil;
 import de.ipk.ag_ba.image.color.Color_CIE_Lab;
 import de.ipk.ag_ba.image.operation.binarymask.ImageJOperation;
 import de.ipk.ag_ba.image.operation.canvas.ImageCanvas;
@@ -102,7 +103,8 @@ public class ImageOperation implements MemoryHogInterface {
 	 * A:[26.135635375976562,225.2710723876953]<br>
 	 * B:[8.081741333007812,222.49612426757812]
 	 */
-	private static float[][][] labCube;
+	private static float[][][] labCubeScaled;
+	private static float[][][] labCubeUnscaled;
 	
 	// private Roi boundingBox;
 	
@@ -1083,13 +1085,14 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public ImageOperation removeSmallClusters(int cutOffAreaSizeOfImage, int cutOffVertHorOfImage, double boundingBoxIncreaseFactor_top,
 			NeighbourhoodSetting nb, CameraPosition typ,
-			ObjectRef optClusterSizeReturn, boolean considerArea, boolean considerBrightness, double brightnessScale) {
+			ObjectRef optClusterSizeReturn, boolean considerArea, boolean considerBrightness, double brightnessScale,
+			Color targetColor) {
 		Image workImage = new Image(image);
 		workImage = removeSmallPartsOfImage(workImage,
 				ImageOperation.BACKGROUND_COLORint,
 				cutOffAreaSizeOfImage, cutOffVertHorOfImage, nb, typ,
 				optClusterSizeReturn, considerArea, null, boundingBoxIncreaseFactor_top,
-				considerBrightness, brightnessScale);
+				considerBrightness, brightnessScale, targetColor);
 		return new ImageOperation(workImage);
 	}
 	
@@ -1244,14 +1247,15 @@ public class ImageOperation implements MemoryHogInterface {
 			ObjectRef optClusterSizeReturn,
 			boolean considerArea) {
 		return removeSmallPartsOfImage(workImage, iBackgroundFill, cutOffMinimumArea, cutOffMinimumDimension, nb, typ, optClusterSizeReturn,
-				considerArea, null, -1, false, 1);
+				considerArea, null, -1, false, 1, Color.BLACK);
 	}
 	
 	public static Image removeSmallPartsOfImage(
 			Image workImage, int iBackgroundFill,
 			int cutOffMinimumArea, int cutOffMinimumDimension, NeighbourhoodSetting nb, CameraPosition typ,
 			ObjectRef optClusterSizeReturn,
-			boolean considerArea, RunnableWithVetoRight veto, double boundingBoxIncreaseFactor_top, boolean considerBrightness, double brightnessScale) {
+			boolean considerArea, RunnableWithVetoRight veto, double boundingBoxIncreaseFactor_top, boolean considerBrightness, double brightnessScale,
+			Color targetColor) {
 		
 		if (cutOffMinimumArea < 1) {
 			// System.out.println("WARNING: Too low minimum pixel size for object removal: " + cutOffMinimumArea + ". Set to 1.");
@@ -1282,18 +1286,19 @@ public class ImageOperation implements MemoryHogInterface {
 		
 		boolean[] toBeDeletedClusterIDs = new boolean[clusterCenter.length];
 		
+		LargeCluster largest = null;
+		
 		// HashSet<Integer> toBeDeletedClusterIDs = new HashSet<Integer>();
 		if (typ == CameraPosition.TOP && boundingBoxIncreaseFactor_top > 0) {
 			List<LargeCluster> largeClusters = new ArrayList<LargeCluster>();
 			if (clusterSizes != null) {
-				boolean preferHighHue = true;
 				int[] clusterMap = ps.getImageClusterIdMask();
-				int[] inpImage = ps.getImage1A();
+				int[] inpImage = workImage.getAs1A();
 				for (int index = 1; index < clusterSizes.length; index++) {
 					if (clusterDimensionMinWH[index] >= cutOffMinimumDimension) {
 						int pxCnt = 0;
 						int idx = 0;
-						double hueSum = 0, valSum = 0;
+						double hueSum = 0, valSum = 0, satSum = 0;
 						float[] compArray = new float[3];
 						for (int c : clusterMap) {
 							if (c == index) {
@@ -1303,6 +1308,7 @@ public class ImageOperation implements MemoryHogInterface {
 								int b = (rgb & 0xff);
 								Color.RGBtoHSB(r, g, b, compArray);
 								hueSum += compArray[0];
+								satSum += compArray[1];
 								valSum += compArray[2];
 								pxCnt++;
 							}
@@ -1311,12 +1317,9 @@ public class ImageOperation implements MemoryHogInterface {
 						LargeCluster lc = new LargeCluster(clusterDimensions2d[index], clusterCenter[index], clusterSizes[index], index);
 						if (pxCnt > 0) {
 							if (considerBrightness) {
-								lc.scaleSizeBy(valSum / pxCnt * brightnessScale);
-							} else {
-								if (preferHighHue)
-									lc.scaleSizeBy(hueSum / pxCnt);
-								else
-									lc.scaleSizeBy((1 - hueSum) / pxCnt);
+								int c1 = Color.HSBtoRGB((float) hueSum / pxCnt, (float) satSum / pxCnt, (float) valSum / pxCnt);
+								double deltaE = ColorUtil.deltaE2000(c1, targetColor.getRGB());
+								lc.setSizeTo(-deltaE * 100);
 							}
 						}
 						largeClusters.add(lc);
@@ -1324,15 +1327,16 @@ public class ImageOperation implements MemoryHogInterface {
 				}
 			}
 			Collections.sort(largeClusters);
+			largest = largeClusters.size() > 0 ? largeClusters.remove(0) : null;
 			if (largeClusters.size() > 1) {
-				final LargeCluster largest = largeClusters.remove(0);
 				Rectangle2D largestBounding = largest.getBoundingBox(boundingBoxIncreaseFactor_top);
+				final LargeCluster largestF = largest;
 				Collections.sort(largeClusters, new Comparator<LargeCluster>() {
 					
 					@Override
 					public int compare(LargeCluster o1, LargeCluster o2) {
-						double d1 = largest.distanceTo(o1);
-						double d2 = largest.distanceTo(o2);
+						double d1 = largestF.distanceTo(o1);
+						double d2 = largestF.distanceTo(o2);
 						return d1 > d2 ? 1 : (d1 == d2 ? 0 : -1);
 					}
 				});
@@ -1348,11 +1352,19 @@ public class ImageOperation implements MemoryHogInterface {
 			}
 		}
 		
+		if (considerBrightness)
+			for (int i = 0; i < toBeDeletedClusterIDs.length; i++)
+				toBeDeletedClusterIDs[i] = true;
+			
 		int[] rgbArray = workImage.getAs1A();
 		int[] mask = ps.getImageClusterIdMask();
 		if (clusterDimensionMinWH != null && clusterDimensionMinWH.length > 0)
 			for (int idx = 0; idx < rgbArray.length; idx++) {
 				int clusterID = mask[idx];
+				if (considerBrightness && largest != null)
+					if (clusterID == largest.getIndex())
+						continue;
+					
 				if (clusterID >= 0 &&
 						((clusterDimensionMinWH[clusterID] < cutOffMinimumDimension || clusterSizes[clusterID] <= cutOffMinimumArea) ||
 								(clusterDimensionMinWH[clusterID] >= cutOffMinimumDimension && toBeDeletedClusterIDs[clusterID])))
@@ -2087,6 +2099,46 @@ public class ImageOperation implements MemoryHogInterface {
 							p[blue] = (float) lab[0] * 2.55f;
 							p[blue + 256] = (float) lab[1] + 128f;
 							p[blue + 512] = (float) lab[2] + 128f;
+						}
+					}
+				}, (t, e) -> {
+					ErrorMsg.addErrorMessage(new RuntimeException(e));
+				});
+		
+		s.printTime();
+		
+		analyzeCube(result);
+		
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: setGlobalCalibration for IJ");
+		ImagePlus ip = new ImagePlus();
+		ip.setGlobalCalibration(new Calibration());
+		
+		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: set thread count to 1 for IJ");
+		Prefs.setThreads(1);
+		
+		return result;
+	}
+	
+	private static float[][][] getLabCubeUnscaled() {
+		if (IAPservice.getCurrentTimeAsNiceString() == null)
+			System.out.println();
+		StopWatch s = new StopWatch("lab_cube (unscaled)", false);
+		final float[][][] result = new float[256][256][256 * 3];
+		
+		final ColorSpaceConverter convert = new ColorSpaceConverter(SystemOptions.getInstance().getStringRadioSelection("IAP", "Color Management//White Point",
+				ColorSpaceConverter.getWhitePointList(), ColorSpaceConverter.getDefaultWhitePoint(), true));
+		
+		new StreamBackgroundTaskHelper<Integer>("Construct Lab cube")
+				.process(IntStream.range(0, 256), (red) -> {
+					float[] p;
+					for (int green = 0; green < 256; green++) {
+						p = result[red][green];
+						
+						for (int blue = 0; blue < 256; blue++) {
+							double[] lab = convert.RGBtoLAB(red, green, blue);
+							p[blue] = (float) lab[0];
+							p[blue + 256] = (float) lab[1];
+							p[blue + 512] = (float) lab[2];
 						}
 					}
 				}, (t, e) -> {
@@ -5082,7 +5134,8 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public static void setLabCubeInstanceToNull() {
 		synchronized (syncLabCube) {
-			labCube = null;
+			labCubeScaled = null;
+			labCubeUnscaled = null;
 			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: LabCube set to null.");
 		}
 	}
@@ -5091,8 +5144,8 @@ public class ImageOperation implements MemoryHogInterface {
 	
 	public static float[][][] getLabCubeInstance() {
 		synchronized (syncLabCube) {
-			if (labCube == null) {
-				labCube = getLabCube();
+			if (labCubeScaled == null) {
+				labCubeScaled = getLabCube();
 				if (!memoryHogRegistered) {
 					GravistoService.addKnownMemoryHog(new MemoryHogInterface() {
 						@Override
@@ -5109,7 +5162,31 @@ public class ImageOperation implements MemoryHogInterface {
 				}
 				memoryHogRegistered = true;
 			}
-			return labCube;
+			return labCubeScaled;
+		}
+	}
+	
+	public static float[][][] getLabCubeUnscaledInstance() {
+		synchronized (syncLabCube) {
+			if (labCubeUnscaled == null) {
+				labCubeUnscaled = getLabCubeUnscaled();
+				if (!memoryHogRegistered) {
+					GravistoService.addKnownMemoryHog(new MemoryHogInterface() {
+						@Override
+						public void freeMemory() {
+							ImageOperation.setLabCubeInstanceToNull();
+						}
+					});
+					ImageOperationLabCube.getter = new ImageOperationLabCubeInterface() {
+						@Override
+						public float[][][] getLabCube() {
+							return ImageOperation.getLabCubeInstance();
+						}
+					};
+				}
+				memoryHogRegistered = true;
+			}
+			return labCubeUnscaled;
 		}
 	}
 	

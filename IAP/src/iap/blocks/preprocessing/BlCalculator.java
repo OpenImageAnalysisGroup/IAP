@@ -49,8 +49,8 @@ public class BlCalculator extends AbstractBlock {
 			int w = mask.getWidth();
 			int h = mask.getHeight();
 			
-			double[][] iLabValues = input().images().getImage(mask.getCameraType()).io().channels().getLabArrays();
-			double[][] mLabValues = mask.io().channels().getLabArrays();
+			float[][] iLabValues = input().images().getImage(mask.getCameraType()).io().channels().getLabArrays();
+			float[][] mLabValues = mask.io().channels().getLabArrays();
 			
 			String deltaE = "Delta-E";
 			String imgMmask = "Image-Mask";
@@ -62,67 +62,58 @@ public class BlCalculator extends AbstractBlock {
 					new String[] { deltaE, imgMmask, maskMimg, absMaskMimg }));
 			
 			int[] img = mask.getAs1A();
-			double[] ilChannel = iLabValues[0];
-			double[] iaChannel = iLabValues[1];
-			double[] ibChannel = iLabValues[2];
 			
-			double[] mlChannel = mLabValues[0];
-			double[] maChannel = mLabValues[1];
-			double[] mbChannel = mLabValues[2];
+			double[] rLchannel = new double[img.length];
+			double[] rAchannel = new double[img.length];
+			double[] rBchannel = new double[img.length];
 			
 			if (operation.equals(deltaE))
 				for (int i = 0; i < w * h; i++) {
 					if (img[i] != ImageOperation.BACKGROUND_COLORint) {
-						mlChannel[i] = ColorUtil.deltaE2000(ilChannel[i], iaChannel[i], ibChannel[i], mlChannel[i], maChannel[i], mbChannel[i]);
-						maChannel[i] = 0;
-						mbChannel[i] = 0;
+						rLchannel[i] = ColorUtil.deltaE2000(iLabValues[0][i], iLabValues[1][i], iLabValues[2][i],
+								mLabValues[0][i], mLabValues[1][i], mLabValues[2][i]);
+						rAchannel[i] = 0;
+						rBchannel[i] = 0;
 					}
 				}
 			
 			if (operation.equals(imgMmask))
 				for (int i = 0; i < w * h; i++) {
 					if (img[i] != ImageOperation.BACKGROUND_COLORint) {
-						mlChannel[i] = ilChannel[i] - mlChannel[i];
-						maChannel[i] = iaChannel[i] - maChannel[i];
-						mbChannel[i] = ibChannel[i] - mbChannel[i];
+						rLchannel[i] = iLabValues[0][i] - mLabValues[0][i];
+						rAchannel[i] = iLabValues[1][i] - mLabValues[1][i];
+						rBchannel[i] = iLabValues[2][i] - mLabValues[2][i];
 					}
 				}
 			
 			if (operation.equals(maskMimg))
 				for (int i = 0; i < w * h; i++) {
 					if (img[i] != ImageOperation.BACKGROUND_COLORint) {
-						mlChannel[i] = mlChannel[i] - ilChannel[i];
-						maChannel[i] = maChannel[i] - iaChannel[i];
-						mbChannel[i] = mbChannel[i] - ibChannel[i];
+						rLchannel[i] = mLabValues[0][i] - iLabValues[0][i];
+						rAchannel[i] = mLabValues[1][i] - iLabValues[1][i];
+						rBchannel[i] = mLabValues[2][i] - iLabValues[2][i];
 					}
 				}
 			
 			if (operation.equals(absMaskMimg))
 				for (int i = 0; i < w * h; i++) {
 					if (img[i] != ImageOperation.BACKGROUND_COLORint) {
-						mlChannel[i] = Math.abs(mlChannel[i] - ilChannel[i]);
-						maChannel[i] = Math.abs(maChannel[i] - iaChannel[i]);
-						mbChannel[i] = Math.abs(mbChannel[i] - ibChannel[i]);
+						rLchannel[i] = Math.abs(iLabValues[0][i] - mLabValues[0][i]);
+						rAchannel[i] = Math.abs(iLabValues[1][i] - mLabValues[1][i]);
+						rBchannel[i] = Math.abs(iLabValues[2][i] - mLabValues[2][i]);
 					}
 				}
 			
 			if (operation.equals(invert))
 				for (int i = 0; i < w * h; i++) {
 					if (img[i] != ImageOperation.BACKGROUND_COLORint) {
-						mlChannel[i] = 127 - mlChannel[i];
-						maChannel[i] = -maChannel[i];
-						mbChannel[i] = -mbChannel[i];
+						rLchannel[i] = 100 - mLabValues[0][i];
+						rAchannel[i] = -mLabValues[1][i];
+						rBchannel[i] = -mLabValues[2][i];
 					}
 				}
 			
-			Image res = new Image(w, h, mLabValues[0], mLabValues[1], mLabValues[2], ColorSpace.LAB_UNSHIFTED);
-			int[] resI = res.getAs1A();
-			for (int i = 0; i < w * h; i++) {
-				if (img[i] == ImageOperation.BACKGROUND_COLORint) {
-					resI[i] = ImageOperation.BACKGROUND_COLORint;
-				}
-			}
-			return new Image(w, h, resI);
+			return new Image(w, h, rLchannel, rAchannel, rBchannel, ColorSpace.LAB_UNSHIFTED, img);
 		} else
 			return mask;
 	}

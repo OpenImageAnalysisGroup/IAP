@@ -434,22 +434,24 @@ public class IntensityAnalysis {
 				}
 				
 				if (mode == Mode.MODE_HUE_RGB_ANALYSIS) {
-					result.addValue("rgb.r.mean", statsRgbR.getMean());
-					result.addValue("rgb.g.mean", statsRgbG.getMean());
-					result.addValue("rgb.b.mean", statsRgbB.getMean());
-					
-					result.addValue("rgb.r.stddev", statsRgbR.getStandardDeviation());
-					result.addValue("rgb.g.stddev", statsRgbG.getStandardDeviation());
-					result.addValue("rgb.b.stddev", statsRgbB.getStandardDeviation());
-					
-					result.addValue("rgb.r.skewness", statsRgbR.getSkewness());
-					result.addValue("rgb.g.skewness", statsRgbG.getSkewness());
-					result.addValue("rgb.b.skewness", statsRgbB.getSkewness());
-					
-					if (calcCurtosis) {
-						result.addValue("rgb.r.kurtosis", statsRgbR.getKurtosis());
-						result.addValue("rgb.g.kurtosis", statsRgbG.getKurtosis());
-						result.addValue("rgb.b.kurtosis", statsRgbB.getKurtosis());
+					if (statsRgbR.getN() > 0) {
+						result.addValue("rgb.r.mean", statsRgbR.getMean());
+						result.addValue("rgb.g.mean", statsRgbG.getMean());
+						result.addValue("rgb.b.mean", statsRgbB.getMean());
+						
+						result.addValue("rgb.r.stddev", statsRgbR.getStandardDeviation());
+						result.addValue("rgb.g.stddev", statsRgbG.getStandardDeviation());
+						result.addValue("rgb.b.stddev", statsRgbB.getStandardDeviation());
+						
+						result.addValue("rgb.r.skewness", statsRgbR.getSkewness());
+						result.addValue("rgb.g.skewness", statsRgbG.getSkewness());
+						result.addValue("rgb.b.skewness", statsRgbB.getSkewness());
+						
+						if (calcCurtosis) {
+							result.addValue("rgb.r.kurtosis", statsRgbR.getKurtosis());
+							result.addValue("rgb.g.kurtosis", statsRgbG.getKurtosis());
+							result.addValue("rgb.b.kurtosis", statsRgbB.getKurtosis());
+						}
 					}
 				}
 			}
