@@ -288,7 +288,7 @@ public class DefaultPluginManager
 				for (PluginDependency dep : deps) {
 					PluginEntry pe = name2plugin.get(dep.getName());
 					if (pe == null)
-						System.err.println("Plugin " + dep.getName() + " is unknown! (required by " + plugin.getFileName() + ")");
+						;// System.err.println("Plugin " + dep.getName() + " is unknown! (required by " + plugin.getFileName() + ")");
 					else {
 						if (pe.getDescription() == null)
 							System.err.println("Plugin definition " + pe.getFileName() + " provides no description!");

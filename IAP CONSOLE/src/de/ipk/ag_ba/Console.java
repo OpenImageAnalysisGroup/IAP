@@ -21,6 +21,7 @@ import org.StringManipulationTools;
 import org.SystemAnalysis;
 import org.SystemOptions;
 import org.graffiti.editor.SplashScreenInterface;
+import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 
@@ -44,6 +45,7 @@ import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.gui.webstart.IAPmain;
 import de.ipk.ag_ba.gui.webstart.IAPrunMode;
+import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.mongo.MongoDB;
 import de.ipk.ag_ba.postgresql.LTdataExchange;
 import de.ipk.ag_ba.postgresql.LTftpHandler;
@@ -75,7 +77,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  *         1.2.2012
  */
 public class Console {
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws Exception {
 		IAPmain.setRunMode(IAPrunMode.CONSOLE);
 		for (String i : IAPmain.getMainInfoLines())
 			System.out.println(i);
@@ -109,6 +111,7 @@ public class Console {
 			System.out.println("*                   the name of the imag file and the     *");
 			System.out.println("*                   part after the '+' will be the        *");
 			System.out.println("*                   reference image in the pipeline.      *");
+			System.out.println("* - /DI MAX/MIN/MEAN [file-spec] [result file]            *");
 			System.out.println("***********************************************************");
 			System.exit(0);
 		}
@@ -132,6 +135,77 @@ public class Console {
 		}
 		
 		Console c = new Console();
+		
+		if (args.length > 0 && args[0].toUpperCase().equalsIgnoreCase("/DI")) {
+			String opSpec = args[2];
+			String fileSpec = args[3];
+			String targetFileSpec = args[4];
+			
+			if (new File(fileSpec).exists()) {
+				// process single file by just copying
+				Image img = new Image(FileSystemHandler.getURL(new File(fileSpec)));
+				img.saveToFile(targetFileSpec);
+			} else {
+				String path = ".";
+				if (fileSpec.contains("/")) {
+					path = fileSpec.split("/")[0];
+					fileSpec = fileSpec.split("/", 2)[1];
+				}
+				
+				ThreadSafeOptions tsoImg = new ThreadSafeOptions();
+				ThreadSafeOptions tsoImageCount = new ThreadSafeOptions();
+				
+				try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(path), fileSpec)) {
+					dirStream.forEach(ppp -> {
+						// process ppp.toString()
+						try {
+							Image img = new Image(FileSystemHandler.getURL(ppp.toFile()));
+							tsoImageCount.addInt(1);
+							int[] px = img.getAs1A();
+							if (tsoImg.getParam(0, null) != null) {
+								int[] prev = (int[]) tsoImg.getParam(0, null);
+								if (prev.length != px.length)
+									throw new Exception("Image size for " + ppp.toString() + " differs from previous image size!");
+								
+								switch (opSpec.toUpperCase()) {
+									case "MAX":
+										for (int i = 0; i < px.length; i++) {
+											prev[i] = Math.max(prev[i], px[i]);
+										}
+									case "MIN":
+										for (int i = 0; i < px.length; i++) {
+											prev[i] = Math.min(prev[i], px[i]);
+										}
+									case "MEAN":
+										for (int i = 0; i < px.length; i++) {
+											prev[i] = prev[i] + px[i];
+										}
+									default:
+										throw new RuntimeException("Unknown operation mode (only max/min/mean supported): " + opSpec);
+								}
+							} else {
+								tsoImg.setParam(0, px);
+								tsoImg.setLong(img.getWidth());
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+							System.exit(1);
+						}
+						
+					});
+				}
+				
+				int[] prev = (int[]) tsoImg.getParam(0, null);
+				if (opSpec.toUpperCase().equals("MEAN")) {
+					int n = tsoImageCount.getInt();
+					for (int i = 0; i < prev.length; i++) {
+						prev[i] = prev[i] / n;
+					}
+				}
+				new Image((int) tsoImageCount.getLong(), (int) (prev.length / tsoImageCount.getLong()), prev).saveToFile(targetFileSpec);
+			}
+			System.exit(0);
+		}
 		
 		if (args.length > 0 && args[0].toUpperCase().equalsIgnoreCase("/SE")) {
 			String fileSpec = args[2];
