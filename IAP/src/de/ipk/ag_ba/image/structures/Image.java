@@ -363,9 +363,9 @@ public class Image {
 		int alpha = ((a & 0xFF) << 24);
 		int[] img = new int[w * h];
 		for (int idx = 0; idx < img.length; idx++) {
-			int r = (int) (channelR[idx] * 255d + 0.5d);
-			int g = (int) (channelG[idx] * 255d + 0.5d);
-			int b = (int) (channelB[idx] * 255d + 0.5d);
+			int r = channelR[idx];
+			int g = channelG[idx];
+			int b = channelB[idx];
 			int c = // alpha |
 					((r & 0xFF) << 16) |
 							((g & 0xFF) << 8) |

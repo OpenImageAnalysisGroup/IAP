@@ -827,4 +827,23 @@ public class ChannelProcessing {
 		
 		return hsv;
 	}
+	
+	public int[][] getRGBintensities() {
+		int[] in = imageAs1dArray;
+		int[] outR = new int[in.length];
+		int[] outG = new int[in.length];
+		int[] outB = new int[in.length];
+		int c, r, g, b;
+		for (int i = 0; i < in.length; i++) {
+			c = in[i];
+			r = (c & 0xff0000) >> 16;
+			g = (c & 0x00ff00) >> 8;
+			b = c & 0x0000ff;
+			
+			outR[i] = r;
+			outG[i] = g;
+			outB[i] = b;
+		}
+		return new int[][] { outR, outG, outB };
+	}
 }
