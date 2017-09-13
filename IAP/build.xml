@@ -269,6 +269,7 @@
         <pathelement location="lib/jsr166y.jar"/>
         <pathelement location="lib/bcprov-jdk16-146.jar"/>
         <path refid="IAP Transfer.classpath"/>
+        <pathelement location="lib/javaxt-core.jar"/>
         <pathelement location="lib/flanagan.java6.jar"/>
         <pathelement location="lib/commons-lang3-3.1.jar"/>
         <pathelement location="${Graffiti_lib.location}/mail.jar"/>
