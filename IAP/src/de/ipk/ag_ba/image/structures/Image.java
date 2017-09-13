@@ -122,7 +122,8 @@ public class Image {
 				if (".tiff".equalsIgnoreCase(url.getFileNameExtension().toLowerCase()) || ".tif".equalsIgnoreCase(url.getFileNameExtension().toLowerCase())) {
 					inpimg = new Opener().openTiff(is, url.getFileName());
 				} else
-					inpimg = new ImagePlus(url.toString(), new ColorProcessor(ImageIO.read(is)));
+					inpimg = new ImagePlus(url.toString(), new ColorProcessor(new javaxt.io.Image(is).getBufferedImage()));
+				// inpimg = new ImagePlus(url.toString(), new ColorProcessor(ImageIO.read(is)));
 			} finally {
 				is.close();
 			}
