@@ -77,7 +77,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
  *         1.2.2012
  */
 public class Console {
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		IAPmain.setRunMode(IAPrunMode.CONSOLE);
 		for (String i : IAPmain.getMainInfoLines())
 			System.out.println(i);
@@ -137,96 +137,101 @@ public class Console {
 		Console c = new Console();
 		
 		if (args.length > 0 && args[0].toUpperCase().equalsIgnoreCase("/DI")) {
-			String opSpec = args[2];
-			String fileSpec = args[3];
-			String targetFileSpec = args[4];
-			
-			if (new File(fileSpec).exists()) {
-				// process single file by just copying
-				Image img = new Image(FileSystemHandler.getURL(new File(fileSpec)));
-				img.saveToFile(targetFileSpec);
-			} else {
-				String path = ".";
-				if (fileSpec.contains("/")) {
-					path = fileSpec.split("/")[0];
-					fileSpec = fileSpec.split("/", 2)[1];
-				}
+			try {
+				String opSpec = args[2];
+				String fileSpec = args[3];
+				String targetFileSpec = args[4];
 				
-				ThreadSafeOptions tsoImgR = new ThreadSafeOptions();
-				ThreadSafeOptions tsoImgG = new ThreadSafeOptions();
-				ThreadSafeOptions tsoImgB = new ThreadSafeOptions();
-				ThreadSafeOptions tsoImageCount = new ThreadSafeOptions();
-				
-				try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(path), fileSpec)) {
-					dirStream.forEach(ppp -> {
-						// process ppp.toString()
-						try {
-							Image img = new Image(FileSystemHandler.getURL(ppp.toFile()));
-							tsoImageCount.addInt(1);
-							
-							int[][] pxRGB = img.io().channels().getRGBintensities();
-							int[] pxR = pxRGB[0];
-							int[] pxG = pxRGB[1];
-							int[] pxB = pxRGB[2];
-							
-							if (tsoImgR.getParam(0, null) != null) {
-								int[] prevR = (int[]) tsoImgR.getParam(0, null);
-								int[] prevG = (int[]) tsoImgG.getParam(0, null);
-								int[] prevB = (int[]) tsoImgB.getParam(0, null);
-								
-								if (prevR.length != pxR.length)
-									throw new Exception("Image size for " + ppp.toString() + " differs from previous image size!");
-								
-								switch (opSpec.toUpperCase()) {
-									case "MAX":
-										for (int i = 0; i < pxR.length; i++) {
-											prevR[i] = Math.max(prevR[i], pxR[i]);
-											prevG[i] = Math.max(prevG[i], pxG[i]);
-											prevB[i] = Math.max(prevB[i], pxB[i]);
-										}
-									case "MIN":
-										for (int i = 0; i < pxR.length; i++) {
-											prevR[i] = Math.min(prevR[i], pxR[i]);
-											prevG[i] = Math.min(prevG[i], pxG[i]);
-											prevB[i] = Math.min(prevB[i], pxB[i]);
-										}
-									case "MEAN":
-										for (int i = 0; i < pxR.length; i++) {
-											prevR[i] = prevR[i] + pxR[i];
-											prevG[i] = prevG[i] + pxG[i];
-											prevB[i] = prevB[i] + pxB[i];
-										}
-									default:
-										throw new RuntimeException("Unknown operation mode (only max/min/mean supported): " + opSpec);
-								}
-							} else {
-								tsoImgR.setParam(0, pxR);
-								tsoImgG.setParam(0, pxG);
-								tsoImgB.setParam(0, pxB);
-								tsoImgR.setLong(img.getWidth());
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-							System.exit(1);
-						}
-						
-					});
-				}
-				
-				int[] prevR = (int[]) tsoImgR.getParam(0, null);
-				int[] prevG = (int[]) tsoImgG.getParam(0, null);
-				int[] prevB = (int[]) tsoImgB.getParam(0, null);
-				if (opSpec.toUpperCase().equals("MEAN")) {
-					int n = tsoImageCount.getInt();
-					for (int i = 0; i < prevR.length; i++) {
-						prevR[i] = prevR[i] / n;
-						prevG[i] = prevG[i] / n;
-						prevB[i] = prevB[i] / n;
+				if (new File(fileSpec).exists()) {
+					// process single file by just copying
+					Image img = new Image(FileSystemHandler.getURL(new File(fileSpec)));
+					img.saveToFile(targetFileSpec);
+				} else {
+					String path = ".";
+					if (fileSpec.contains("/")) {
+						path = fileSpec.split("/")[0];
+						fileSpec = fileSpec.split("/", 2)[1];
 					}
+					
+					ThreadSafeOptions tsoImgR = new ThreadSafeOptions();
+					ThreadSafeOptions tsoImgG = new ThreadSafeOptions();
+					ThreadSafeOptions tsoImgB = new ThreadSafeOptions();
+					ThreadSafeOptions tsoImageCount = new ThreadSafeOptions();
+					
+					try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(path), fileSpec)) {
+						dirStream.forEach(ppp -> {
+							// process ppp.toString()
+							try {
+								Image img = new Image(FileSystemHandler.getURL(ppp.toFile()));
+								tsoImageCount.addInt(1);
+								
+								int[][] pxRGB = img.io().channels().getRGBintensities();
+								int[] pxR = pxRGB[0];
+								int[] pxG = pxRGB[1];
+								int[] pxB = pxRGB[2];
+								
+								if (tsoImgR.getParam(0, null) != null) {
+									int[] prevR = (int[]) tsoImgR.getParam(0, null);
+									int[] prevG = (int[]) tsoImgG.getParam(0, null);
+									int[] prevB = (int[]) tsoImgB.getParam(0, null);
+									
+									if (prevR.length != pxR.length)
+										throw new Exception("Image size for " + ppp.toString() + " differs from previous image size!");
+									
+									switch (opSpec.toUpperCase()) {
+										case "MAX":
+											for (int i = 0; i < pxR.length; i++) {
+												prevR[i] = Math.max(prevR[i], pxR[i]);
+												prevG[i] = Math.max(prevG[i], pxG[i]);
+												prevB[i] = Math.max(prevB[i], pxB[i]);
+											}
+										case "MIN":
+											for (int i = 0; i < pxR.length; i++) {
+												prevR[i] = Math.min(prevR[i], pxR[i]);
+												prevG[i] = Math.min(prevG[i], pxG[i]);
+												prevB[i] = Math.min(prevB[i], pxB[i]);
+											}
+										case "MEAN":
+											for (int i = 0; i < pxR.length; i++) {
+												prevR[i] = prevR[i] + pxR[i];
+												prevG[i] = prevG[i] + pxG[i];
+												prevB[i] = prevB[i] + pxB[i];
+											}
+										default:
+											throw new RuntimeException("Unknown operation mode (only max/min/mean supported): " + opSpec);
+									}
+								} else {
+									tsoImgR.setParam(0, pxR);
+									tsoImgG.setParam(0, pxG);
+									tsoImgB.setParam(0, pxB);
+									tsoImgR.setLong(img.getWidth());
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+								System.exit(1);
+							}
+							
+						});
+					}
+					
+					int[] prevR = (int[]) tsoImgR.getParam(0, null);
+					int[] prevG = (int[]) tsoImgG.getParam(0, null);
+					int[] prevB = (int[]) tsoImgB.getParam(0, null);
+					if (opSpec.toUpperCase().equals("MEAN")) {
+						int n = tsoImageCount.getInt();
+						for (int i = 0; i < prevR.length; i++) {
+							prevR[i] = prevR[i] / n;
+							prevG[i] = prevG[i] / n;
+							prevB[i] = prevB[i] / n;
+						}
+					}
+					new Image((int) tsoImageCount.getLong(), (int) (prevR.length / tsoImageCount.getLong()), prevR, prevG, prevB).saveToFile(targetFileSpec);
 				}
-				new Image((int) tsoImageCount.getLong(), (int) (prevR.length / tsoImageCount.getLong()), prevR, prevG, prevB).saveToFile(targetFileSpec);
+				System.exit(0);
+			} catch (Exception err) {
+				err.printStackTrace();
+				System.exit(1);
 			}
-			System.exit(0);
 		}
 		
 		if (args.length > 0 && args[0].toUpperCase().equalsIgnoreCase("/SE")) {
@@ -249,6 +254,9 @@ public class Console {
 						dirStream.forEach(ppp -> {
 							referenceImages.add(ppp.toString());
 						});
+					} catch (IOException e) {
+						e.printStackTrace();
+						System.exit(1);
 					}
 				}
 				if (referenceImages.isEmpty())
@@ -281,8 +289,16 @@ public class Console {
 							throw new RuntimeException(e);
 						}
 					});
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					System.exit(1);
 				}
-				BackgroundThreadDispatcher.waitFor(tasks);
+				try {
+					BackgroundThreadDispatcher.waitFor(tasks);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
 			}
 			System.exit(0);
 		}
