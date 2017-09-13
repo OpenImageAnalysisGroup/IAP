@@ -40,6 +40,7 @@ import de.ipk.ag_ba.server.analysis.ImageAnalysisTask;
 import de.ipk.ag_ba.server.analysis.ImageConfiguration;
 import de.ipk.ag_ba.server.databases.DataBaseTargetMongoDB;
 import de.ipk.ag_ba.server.databases.DatabaseTarget;
+import de.ipk.ag_ba.server.databases.DatabaseTargetNull;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ConditionInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.Experiment;
@@ -136,12 +137,17 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		if (databaseTarget != null)
 			return databaseTarget;
 		String prefix = null;
-		if (header != null) {
+		if (header != null && header.getDatabaseId() != null) {
 			prefix = header.getDatabaseId().split(":")[0];
 			if (!prefix.startsWith("mongo_")) {
 				databaseTarget = null;
 			}
 		}
+		
+		if (header != null && header.getDatabaseId() == null) {
+			databaseTarget = new DatabaseTargetNull();
+		}
+		
 		if (databaseTarget == null) {
 			ArrayList<VirtualFileSystem> vl = VirtualFileSystemFolderStorage.getKnown(true);
 			if (IAPmain.getRunMode() != IAPrunMode.WEB) {
@@ -1010,6 +1016,10 @@ public abstract class AbstractPhenotypingTask implements ImageAnalysisTask {
 		this.DEBUG_SINGLE_ANGLE2 = DEBUG_SINGLE_ANGLE2;
 		this.DEBUG_SINGLE_ANGLE3 = DEBUG_SINGLE_ANGLE3;
 		this.filterAngle = true;
+	}
+	
+	public DatabaseTarget getDatabaseTargetInst() {
+		return databaseTarget;
 	}
 	
 }

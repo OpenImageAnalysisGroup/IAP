@@ -6,8 +6,6 @@
  */
 package de.ipk.ag_ba.commands.experiment.process.report;
 
-import iap.blocks.extraction.Trait;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -74,6 +72,7 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NumericMeasurement;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.SampleInterface;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.BinaryMeasurement;
+import iap.blocks.extraction.Trait;
 
 /**
  * @author klukas
@@ -204,7 +203,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 								+ StringManipulationTools.getStringList(
 										getArrayFrom(divideDatasetBy, tsoBootstrapN != null ? tsoBootstrapN.getInt() : -1, experimentReference.getHeader().getSequence(),
 												tsoSplitFirst != null ? tsoSplitFirst.getBval(0, false) : false,
-												tsoSplitSecond != null ? tsoSplitSecond.getBval(0, true) : true), ", ") + ")");
+												tsoSplitSecond != null ? tsoSplitSecond.getBval(0, true) : true),
+										", ")
+								+ ")");
 	}
 	
 	private static String[] getArrayFrom(ArrayList<ThreadSafeOptions> divideDatasetBy2, int nBootstrap, String stressDefinition,
@@ -360,19 +361,21 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				add += "<br><small><font color='gray'>(summarized)</font></small>";
 			
 			if (!xlsx)
-				return "Create CSV File" + add;
+				return "<html><center>Create CSV File" + add;
 			else
-				return "Create Spreadsheet (" + (xlsx ?
-						(xlsxJPGdisabled || !exportImages.getBval(0, false) ? "XLSX" : "XLSX+JPG")
+				return "<html><center>Create Spreadsheet (" + (xlsx ? (xlsxJPGdisabled || !exportImages.getBval(0, false) ? "XLSX" : "XLSX+JPG")
 						: "CSV") + ")" + add;
 		}
 		if (SystemAnalysis.isHeadless()) {
-			return "Create Report" + (xlsx ? " (XLSX)" : "")
-					+ (exportIndividualAngles.getBval(0, false) ? " (side angles)" : " (avg) (" +
-							StringManipulationTools.getStringList(
-									getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence(),
-											tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false)),
-									", ") + ")") + add;
+			return "<html>Create Report" + (xlsx ? " (XLSX)" : "")
+					+ (exportIndividualAngles.getBval(0, false) ? " (side angles)"
+							: " (avg) (" +
+									StringManipulationTools.getStringList(
+											getArrayFrom(divideDatasetBy, tsoBootstrapN.getInt(), experimentReference.getHeader().getSequence(),
+													tsoSplitFirst.getBval(0, false), tsoSplitSecond.getBval(0, false)),
+											", ")
+									+ ")")
+					+ add;
 		} else {
 			String[] arr = getArrayFrom(divideDatasetBy, tsoBootstrapN != null ? tsoBootstrapN.getInt() : -1,
 					experimentReference.getHeader().getSequence(),
@@ -391,7 +394,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				return "<html><center>Create PDF (click here)<br><br>Specify overview" + (clustering ? "/<br>clustering " : "<br>") + "" +
 						" properties --&gt;" + add;
 			else
-				return "Create PDF (click here)<br><br>Specify overview" + (clustering ? "/<br>clustering " : "") + "" +
+				return "<html><center>Create PDF (click here)<br><br>Specify overview" + (clustering ? "/<br>clustering " : "") + "" +
 						" properties --&gt;" + add;
 		}
 	}
@@ -704,7 +707,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					} else
 						if (unit != null)
 							niceName = niceName + " [" + unit + "]";
-					
+						
 					if (disableNiceNameMapping)
 						niceName = origH;
 					
@@ -723,10 +726,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 							source = source.substring(0, 1).toUpperCase() + source.substring(1);
 						desc = desc.substring(0, desc.indexOf("Source:")).trim();
 					}
-					cc.setCellValue(desc != null && !desc.isEmpty() ?
-							StringManipulationTools.stringReplace(
-									StringManipulationTools.getWordWrapString(StringManipulationTools.removeHTMLtags(desc), 70),
-									"<br>", "\n")
+					cc.setCellValue(desc != null && !desc.isEmpty() ? StringManipulationTools.stringReplace(
+							StringManipulationTools.getWordWrapString(StringManipulationTools.removeHTMLtags(desc), 70),
+							"<br>", "\n")
 							: "- no description available -");
 					cc.setCellStyle(styleTL);
 					if (source != null) {
@@ -772,7 +774,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					} else
 						if (unit != null)
 							niceName = niceName + " [" + unit + "]";
-					
+						
 					if (disableNiceNameMapping)
 						niceName = origH;
 					
@@ -930,9 +932,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 							clusteringProperties.toArray(new String[] {}));
 					System.out.println(SystemAnalysis.getCurrentTime() + ">CLUSTERING-VALUE-COLS: " + StringManipulationTools.getStringList(valueCols, ", "));
 					if (valueCols.size() > 0) {
-						HashMap<Integer, HashMap<Integer, Object>> transformed =
-								transform.reformatMultipleFactorsToSingleFactor(row2col2value, singleFactorCol,
-										otherFactorCols, valueCols);
+						HashMap<Integer, HashMap<Integer, Object>> transformed = transform.reformatMultipleFactorsToSingleFactor(row2col2value, singleFactorCol,
+								otherFactorCols, valueCols);
 						p.setCustomClusterTargetFile(customClusterTargetFile);
 						p.saveClusterDataToFile(
 								de.ipk.ag_ba.commands.experiment.process.report.pdf_report.clustering.DatasetFormatForClustering.print(transformed, separator), xlsx);
@@ -997,8 +998,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 									tsoBootstrapN.getInt(),
 									experimentReference.getHeader().getSequence(),
 									tsoSplitFirst.getBval(0, false),
-									tsoSplitSecond.getBval(0, false)
-							),
+									tsoSplitSecond.getBval(0, false)),
 							experiment, status,
 							lastOutput, timeoutMinutes);
 					p.getOutput();
@@ -1156,7 +1156,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 			sheet.setColumnWidth(dateCol, 5000);
 		
 		boolean includePaths = true;
-				
+		
 		HashMap<String, org.apache.poi.ss.usermodel.Hyperlink> links = new HashMap<String, org.apache.poi.ss.usermodel.Hyperlink>();
 		HashMap<String, String> paths = new HashMap<>();
 		
@@ -1204,11 +1204,12 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 					}
 				}
 			}
-		} else if (includePaths) {
-			for (SnapshotDataIAP s : snapshotsToBeProcessed) {
-				for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, !addRowTypeAndImages)) {
-					for (DateDoubleString o : valueRow) {
-						if (o != null && o.getString() != null && !o.getString().isEmpty()) {
+		} else
+			if (includePaths) {
+				for (SnapshotDataIAP s : snapshotsToBeProcessed) {
+					for (ArrayList<DateDoubleString> valueRow : s.getCSVobjects(urlManager, !addRowTypeAndImages)) {
+						for (DateDoubleString o : valueRow) {
+							if (o != null && o.getString() != null && !o.getString().isEmpty()) {
 								if (o.getLink() != null) {
 									ArrayList<BinaryMeasurement> bin = o.getBinaryData();
 									if (bin != null && !bin.isEmpty() && bin.size() == 1) {
@@ -1237,11 +1238,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 										}
 									}
 								}
+							}
 						}
 					}
 				}
 			}
-		}
 		
 		while (!snapshotsToBeProcessed.isEmpty() && !(status != null && status.wantsToStop())) {
 			SnapshotDataIAP s = snapshotsToBeProcessed.poll();
@@ -1329,11 +1330,11 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 										if (ok) {
 											// add link to image
 											if (of != null) {
-													org.apache.poi.ss.usermodel.Hyperlink file_link = links.get(of);
-													if (file_link != null) {
-														c.setHyperlink(file_link);
-														c.setCellStyle(hlink_style);
-													}
+												org.apache.poi.ss.usermodel.Hyperlink file_link = links.get(of);
+												if (file_link != null) {
+													c.setHyperlink(file_link);
+													c.setCellStyle(hlink_style);
+												}
 											}
 										}
 									}
@@ -1429,9 +1430,9 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				continue;
 			if (status != null)
 				status.setCurrentStatusText1("Adjust width of column " + (i + 1) + "/" + excelColumnHeaders.size() + "...");
-			
-//			System.out.println(excelColumnHeaders.size() + "|" + i);
-//			System.out.println("w=" + sheet.getColumnWidth(i));
+				
+			// System.out.println(excelColumnHeaders.size() + "|" + i);
+			// System.out.println("w=" + sheet.getColumnWidth(i));
 			try {
 				sheet.autoSizeColumn(i);
 			} catch (Exception e) {
@@ -1504,7 +1505,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 		else
 			if (value.isEmpty())
 				value = "(not specified)";
-		
+			
 		return value.equals(content);
 	}
 	
@@ -1531,8 +1532,7 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 	}
 	
 	public static String getCSVheader(boolean addLineFeed, boolean addRowAndImageTypes) {
-		return (addRowAndImageTypes ?
-				"Row Type" + separator + "Angle" + separator : "") +
+		return (addRowAndImageTypes ? "Row Type" + separator + "Angle" + separator : "") +
 				"Plant ID" + separator + "Condition" + separator + "Species" + separator + "Genotype"
 				+ separator + "Variety" + separator
 				+ "GrowthCondition"
@@ -1541,9 +1541,8 @@ public class ActionPdfCreation3 extends AbstractNavigationAction implements Spec
 				+ separator + "Weight A (g)" + separator + "Weight B (g)"
 				+ separator + "Water (sum of day)"
 				+ separator + "Water (weight-diff)"
-				+ (addRowAndImageTypes ?
-						separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "IR" + separator + "OTHER" +
-								separator + "RGB Config" + separator + "FLUO Config" + separator + "NIR Config" + separator + "IR Config" + separator + "OTHER Config"
+				+ (addRowAndImageTypes ? separator + "RGB" + separator + "FLUO" + separator + "NIR" + separator + "IR" + separator + "OTHER" +
+						separator + "RGB Config" + separator + "FLUO Config" + separator + "NIR Config" + separator + "IR Config" + separator + "OTHER Config"
 						: "")
 				+ (addLineFeed ? "\r\n" : "");
 	}

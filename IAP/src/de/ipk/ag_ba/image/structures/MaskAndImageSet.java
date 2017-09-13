@@ -88,6 +88,9 @@ public class MaskAndImageSet {
 		int[][] imgNir = resizedImages.nir() != null ? resizedImages.nir().getAs2A() : ImageCanvas.getTextImage(350, 100, "[No Near-Infrared]");
 		int[][] imgIr = resizedImages.ir() != null ? resizedImages.ir().getAs2A() : ImageCanvas.getTextImage(350, 100, "[No Infrared]");
 		
+		b_ = b_ >= 0 ? b_ : 0;
+		h_ = h_ >= 0 ? h_ : 0;
+		
 		ImageOperation io = new Image(b_, h_, ImageOperation.BACKGROUND_COLORint).io();
 		
 		int idxX = 0;

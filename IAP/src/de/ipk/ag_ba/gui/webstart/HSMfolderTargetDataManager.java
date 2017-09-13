@@ -160,8 +160,9 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 			}
 		}
 		return subDir +
-				(optSnapshotTime == null ? "" : File.separator +
-						cal.get(GregorianCalendar.YEAR) + "-" + digit2(cal.get(GregorianCalendar.MONTH) + 1) + "-" + digit2(cal.get(GregorianCalendar.DAY_OF_MONTH)));
+				(optSnapshotTime == null ? ""
+						: File.separator +
+								cal.get(GregorianCalendar.YEAR) + "-" + digit2(cal.get(GregorianCalendar.MONTH) + 1) + "-" + digit2(cal.get(GregorianCalendar.DAY_OF_MONTH)));
 	}
 	
 	private String filterTrash(String experimentType) {
@@ -192,6 +193,22 @@ public class HSMfolderTargetDataManager implements DatabaseTarget {
 				return "0" + i;
 			else
 				return "" + i;
+	}
+	
+	public static String digit5(int i) {
+		if (i < 10)
+			return "0000" + i;
+		else
+			if (i < 100)
+				return "000" + i;
+			else
+				if (i < 1000)
+					return "00" + i;
+				else
+					if (i < 10000)
+						return "0" + i;
+					else
+						return "" + i;
 	}
 	
 	public static ExperimentInterface getExperiment(ExperimentHeaderInterface header, BackgroundTaskStatusProviderSupportingExternalCall status)

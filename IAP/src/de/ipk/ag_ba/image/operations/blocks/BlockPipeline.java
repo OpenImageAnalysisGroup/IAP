@@ -97,7 +97,7 @@ public class BlockPipeline {
 			final BackgroundTaskStatusProviderSupportingExternalCall status)
 			throws Exception {
 		// normally each image is analyzed once (i.e. one plant per image)
-		// for arabidopsis trays with 2x3 or 2x4 sections the
+		// for Arabidopsis trays with 2x3 or 2x4 sections the
 		// pipeline will be executed 6 or 12 times per image
 		// the load-image-block then needs to cut out image 1/6, 2/6, ...
 		// and place the section in the middle of the image for further processing
@@ -193,7 +193,7 @@ public class BlockPipeline {
 		
 		int id = pipelineID.addInt(1);
 		
-		int index = 0;
+		int blockIndexInPipeline = 0;
 		boolean blockProgressOutput = true;
 		
 		boolean debug = SystemOptions.getInstance().getBoolean("Pipeline-Debugging", "Debug-Pipeline-Execution", false);
@@ -204,6 +204,7 @@ public class BlockPipeline {
 		
 		MaskAndImageSet workset = new MaskAndImageSet(inputSet, maskSet != null ? maskSet : inputSet.copy());
 		int blockCount = blocks.size();
+		HashMap<String, Integer> blockFrequencyInPipeline = new HashMap<>();
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			if (status != null && status.wantsToStop()) {
 				System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Break requested. Stopping pipeline execution flow.");
@@ -220,8 +221,16 @@ public class BlockPipeline {
 				throw e;
 			}
 			
-			block.setInputAndOptions(wellName, workset, options, results, index++,
-					debugStack);
+			int blockInstanceInPipeline = 0;
+			if (!blockFrequencyInPipeline.containsKey(blockClass.getCanonicalName())) {
+				blockFrequencyInPipeline.put(blockClass.getCanonicalName(), blockInstanceInPipeline);
+			} else {
+				blockInstanceInPipeline = blockFrequencyInPipeline.get(blockClass.getCanonicalName());
+				blockInstanceInPipeline++;
+				blockFrequencyInPipeline.put(blockClass.getCanonicalName(), blockInstanceInPipeline);
+			}
+			
+			block.setInputAndOptions(wellName, workset, options, results, blockIndexInPipeline++, blockInstanceInPipeline, debugStack);
 			
 			long ta = System.currentTimeMillis();
 			workset = block.process();
@@ -240,12 +249,12 @@ public class BlockPipeline {
 				}
 				if (currentPipelineMonitoringResult != null) {
 					synchronized (currentPipelineMonitoringResult) {
-						if (index == 1 || index == blockCount) {
+						if (blockIndexInPipeline == 1 || blockIndexInPipeline == blockCount) {
 							currentPipelineMonitoringResult
 									.addBlockResult(new BlockMonitoringResult(workset, pipelineMonitoringResultImageSize, block.getName(), tb - ta));
 						}
 					}
-					if (index == blockCount) {
+					if (blockIndexInPipeline == blockCount) {
 						// last block in list
 						lastPipelineMonitoringResult = currentPipelineMonitoringResult;
 					}
@@ -260,7 +269,7 @@ public class BlockPipeline {
 				if (seconds >= (debug ? 0 : tPrintBlockTime))
 					System.out.println(SystemAnalysis.lineSeparator
 							+ SystemAnalysis.getCurrentTime() + ">INFO Pipeline " + id + ": finished block "
-							+ index + "/" + blocks.size() + ", took " + seconds
+							+ blockIndexInPipeline + "/" + blocks.size() + ", took " + seconds
 							+ " sec., " + mseconds + " ms, time: "
 							+ StopWatch.getNiceTime() + " ("
 							+ block.getClass().getSimpleName() + ")");
@@ -588,9 +597,20 @@ public class BlockPipeline {
 			InterruptedException {
 		TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>> summaryResult = new TreeMap<Long, TreeMap<String, HashMap<String, BlockResultSet>>>();
 		int index = 0;
+		HashMap<String, Integer> blockFrequencyInPipeline = new HashMap<>();
 		for (Class<? extends ImageAnalysisBlock> blockClass : blocks) {
 			ImageAnalysisBlock block = blockClass.newInstance();
-			block.setInputAndOptions(null, null, options, null, index++, null);
+			
+			int blockInstanceInPipeline = 0;
+			if (!blockFrequencyInPipeline.containsKey(blockClass.getCanonicalName())) {
+				blockFrequencyInPipeline.put(blockClass.getCanonicalName(), blockInstanceInPipeline);
+			} else {
+				blockInstanceInPipeline = blockFrequencyInPipeline.get(blockClass.getCanonicalName());
+				blockInstanceInPipeline++;
+				blockFrequencyInPipeline.put(blockClass.getCanonicalName(), blockInstanceInPipeline);
+			}
+			
+			block.setInputAndOptions(null, null, options, null, index++, blockInstanceInPipeline, null);
 			block.postProcessResultsForAllTimesAndAngles(
 					plandID2time2waterData,
 					analysisResults, summaryResult, optStatus,

@@ -64,6 +64,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	private String well;
 	
 	private static LinkedHashMap<String, ThreadSafeOptions> id2time = new LinkedHashMap<String, ThreadSafeOptions>();
+	private int blockFrequencyIndex;
 	
 	protected Image setImageType(Image image, CameraType ct) {
 		if (image != null)
@@ -158,13 +159,14 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	@Override
 	public void setInputAndOptions(String well, MaskAndImageSet input, ImageProcessorOptionsAndResults options,
 			BlockResultSet properties,
-			int blockPositionInPipeline,
+			int blockPositionInPipeline, int blockFrequencyIndex,
 			ImageStack debugStack) {
 		this.input = input;
 		this.well = well;
 		this.optionsAndResults = options;
 		this.resultSet = properties;
 		this.blockPositionInPipeline = blockPositionInPipeline;
+		this.blockFrequencyIndex = blockFrequencyIndex;
 		this.debugStack = debugStack;
 	}
 	
@@ -183,7 +185,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 				if (input().images().getImage(ct) != null || input().masks().getImage(ct) != null)
 					if ((getCameraInputTypes() != null && getCameraInputTypes().contains(ct)) ||
 							(getCameraOutputTypes() != null && getCameraOutputTypes().contains(ct)))
-						debugPipelineBlock(this.getClass(), ct, input(), getResultSet(), optionsAndResults, getBlockPosition(), this);
+						debugPipelineBlock(this.getClass(), ct, input(), getResultSet(), optionsAndResults, getBlockPosition(), getBlockFrequencyIndex(), this);
 		}
 	}
 	
@@ -233,6 +235,11 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	
 	protected int getBlockPosition() {
 		return blockPositionInPipeline;
+	}
+	
+	@Override
+	public int getBlockFrequencyIndex() {
+		return blockFrequencyIndex;
 	}
 	
 	/**
@@ -437,7 +444,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
 			final MaskAndImageSet in,
 			final BlockResultSet brs, final ImageProcessorOptionsAndResults options,
-			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
+			final int blockPos, final int blockFrequIdx, final AbstractImageAnalysisBlockFIS inst) {
 		
 		final MaskAndImageSet inputSet = in.copy();
 		final TreeMap<Integer, TreeMap<String, ImageAndImageData>> storedImages = copy(brs.getImages());
@@ -460,7 +467,7 @@ public abstract class AbstractImageAnalysisBlockFIS implements ImageAnalysisBloc
 					MaskAndImageSet ab = new MaskAndImageSet(a, b);
 					brs.setImages(storedImages);
 					inst.setPreventDebugValues(true);
-					inst.setInputAndOptions(well, ab, options, brs, blockPos, null);
+					inst.setInputAndOptions(well, ab, options, brs, blockPos, blockFrequIdx, null);
 					ab = inst.process();
 					int vs = jsp.getVerticalScrollBar().getValue();
 					int hs = jsp.getHorizontalScrollBar().getValue();

@@ -1,12 +1,5 @@
 package iap.blocks.preprocessing;
 
-import iap.blocks.data_structures.AbstractBlock;
-import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
-import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.ImageAnalysisBlock;
-import iap.pipelines.ImageProcessorOptionsAndResults;
-import info.clearthought.layout.TableLayout;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
@@ -32,6 +25,12 @@ import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
 import de.ipk.ag_ba.image.structures.MaskAndImageSet;
+import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.AbstractImageAnalysisBlockFIS;
+import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.ImageAnalysisBlock;
+import iap.pipelines.ImageProcessorOptionsAndResults;
+import info.clearthought.layout.TableLayout;
 
 /**
  * Move and zoom images of the different camera systems so that they align.
@@ -44,7 +43,7 @@ public class BlAlign extends AbstractBlock {
 	protected void debugPipelineBlock(final Class<?> blockType, final CameraType inpImageType,
 			final MaskAndImageSet in,
 			final BlockResultSet brs, final ImageProcessorOptionsAndResults options,
-			final int blockPos, final AbstractImageAnalysisBlockFIS inst) {
+			final int blockPos, final int blockFrequIdx, final AbstractImageAnalysisBlockFIS inst) {
 		
 		final MaskAndImageSet inputSet = in.copy();
 		final ZoomedImage ic = new ZoomedImage(null);
@@ -65,7 +64,7 @@ public class BlAlign extends AbstractBlock {
 					ImageSet b = inputSet.masks().copy();
 					MaskAndImageSet ab = new MaskAndImageSet(a, b);
 					((BlAlign) inst).preventDebugValues = true;
-					inst.setInputAndOptions(getWellIdx(), ab, options, brs, blockPos, null);
+					inst.setInputAndOptions(getWellIdx(), ab, options, brs, blockPos, blockFrequIdx, null);
 					ab = inst.process();
 					ImageSet in = ab.images();
 					

@@ -1,7 +1,5 @@
 package de.ipk.ag_ba.commands.vfs;
 
-import info.StopWatch;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +35,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.Sample3D;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.LoadedImage;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.MyImageIOhelper;
 import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.volumes.LoadedVolume;
+import info.StopWatch;
 
 public class VirtualFileSystemVFS2 extends VirtualFileSystem implements DatabaseTarget {
 	public static final String DIRECTORY_FOLDER_NAME = "index";
@@ -194,7 +193,8 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 			return VfsFileObjectUtil.createVfsFileObject(
 					vfs_type, host,
 					(absoluteDirName ? "" : folder + "/") +
-							fileNameInclSubFolderPathName, user, getPass());
+							fileNameInclSubFolderPathName,
+					user, getPass());
 		} catch (Exception e) {
 			if (askForPassword)
 				pass = "?";
@@ -410,7 +410,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		ExperimentHeaderInterface ehi = limg.getParentSample().getParentCondition().getExperimentHeader();
 		Long snapshotTime = limg.getParentSample().getSampleFineTimeOrRowId();
 		if (snapshotTime == null) {
-			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Could not get exact sample time for image. Using experiment start time instead.");
+			SystemAnalysis.printlnOncePerMinute("WARNING: Could not get exact sample time for image. Using experiment start time instead.", true);
 			snapshotTime = limg.getParentSample().getParentCondition().getExperimentHeader().getStartdate().getTime();
 		}
 		String pre = "";
@@ -537,8 +537,9 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		return pre +
 				filterBadChars(experimentHeader.getCoordinator(), false) + File.separator +
 				filterBadChars(experimentHeader.getExperimentName(), true) +
-				(optSnapshotTime == null ? "" : File.separator +
-						cal.get(GregorianCalendar.YEAR) + "-" + digit2(cal.get(GregorianCalendar.MONTH) + 1) + "-" + digit2(cal.get(GregorianCalendar.DAY_OF_MONTH)));
+				(optSnapshotTime == null ? ""
+						: File.separator +
+								cal.get(GregorianCalendar.YEAR) + "-" + digit2(cal.get(GregorianCalendar.MONTH) + 1) + "-" + digit2(cal.get(GregorianCalendar.DAY_OF_MONTH)));
 	}
 	
 	private String filterBadChars(String string, boolean isFinalFileName) {

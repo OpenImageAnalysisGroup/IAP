@@ -831,6 +831,11 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 	
 	public static String determineBinaryFileName(long t, final String substanceName,
 			NumericMeasurementInterface nm, final BinaryMeasurement bm) {
+		return determineBinaryFileName(t, substanceName, nm, bm, false);
+	}
+	
+	public static String determineBinaryFileName(long t, final String substanceName,
+			NumericMeasurementInterface nm, final BinaryMeasurement bm, boolean simpleFileName) {
 		final String zefn;
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.setTimeInMillis(t);
@@ -838,21 +843,9 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 		ImageData id;
 		if (bm instanceof ImageData) {
 			id = (ImageData) bm;
-			zefn = (nm.getQualityAnnotation() != null ? nm
-					.getQualityAnnotation() + " " : "")
-					+ substanceName
-					+ " "
-					+ (id != null ? (id.getPosition() != null ? "DEG_"
-							+ HSMfolderTargetDataManager.digit3(id
-									.getPosition().intValue())
-							: "DEG_000")
-							: "")
-					+ " "
-					+ "REPL_"
-					+ HSMfolderTargetDataManager.digit3(id.getReplicateID())
-					+ " "
-					+ nm.getParentSample().getTimeUnit()
-					+ "_"
+			
+			String timeInfo = " "
+					+ nm.getParentSample().getTimeUnit() + "_"
 					+ HSMfolderTargetDataManager.digit3(nm.getParentSample()
 							.getTime())
 					+ " "
@@ -872,7 +865,21 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 							.get(GregorianCalendar.MINUTE))
 					+ "_"
 					+ HSMfolderTargetDataManager.digit2(gc
-							.get(GregorianCalendar.SECOND))
+							.get(GregorianCalendar.SECOND));
+			
+			zefn = (nm.getQualityAnnotation() != null ? nm.getQualityAnnotation() + " " : "")
+					+ (simpleFileName ? ""
+							: substanceName
+									+ " "
+									+ (id != null ? (id.getPosition() != null ? "DEG_"
+											+ HSMfolderTargetDataManager.digit3(id
+													.getPosition().intValue())
+											: "DEG_000")
+											: "")
+									+ " "
+									+ "REPL_"
+									+ HSMfolderTargetDataManager.digit5(id.getReplicateID())
+									+ (!simpleFileName ? timeInfo : ""))
 					+ id.getURL().getFileNameExtension();
 			
 		} else {
