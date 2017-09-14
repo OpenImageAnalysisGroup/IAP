@@ -27,7 +27,7 @@ public class ImageCalculation {
 		int x = 0;
 		int y = 0;
 		int w = imageOperation.getWidth();
-		for (int p : imageOperation.getAs1D()) {
+		for (int p : imageOperation.getImageAs1dArray()) {
 			x++;
 			if (x == w) {
 				y++;
@@ -41,34 +41,6 @@ public class ImageCalculation {
 		}
 		if (n > 0)
 			return new Vector2d(sumX / n, sumY / n);
-		else
-			return null;
-	}
-	
-	public Double calculateAverageDistanceTo(Vector2d p) {
-		if (p == null)
-			return null;
-		
-		int width = imageOperation.getWidth();
-		int height = imageOperation.getHeight();
-		
-		int[] image1d = imageOperation.getAs1D();
-		
-		int black = ImageOperation.BACKGROUND_COLORint;
-		
-		int area = 0;
-		double distanceSum = 0;
-		
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				if (image1d[x + y * width] != black) {
-					distanceSum += Math.sqrt((p.x - x) * (p.x - x) + (p.y - y) * (p.y - y));
-					area++;
-				}
-			}
-		}
-		if (area > 0)
-			return distanceSum / area;
 		else
 			return null;
 	}

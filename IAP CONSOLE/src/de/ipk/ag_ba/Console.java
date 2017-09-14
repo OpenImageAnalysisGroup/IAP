@@ -79,68 +79,71 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public class Console {
 	public static void main(String[] args) {
 		IAPmain.setRunMode(IAPrunMode.CONSOLE);
-		for (String i : IAPmain.getMainInfoLines())
-			System.out.println(i);
-		if (paramContains(new String[] { "help", "h", "?" }, args)) {
-			System.out.println("***********************************************************");
-			System.out.println("* Usage                                                   *");
-			System.out.println("* - no parameters: interactive console interface          *");
-			System.out.println("* - /help, /h, /? - this help                             *");
-			System.out.println("* - XYZ           - execute commands X, Y, Z              *");
-			System.out.println("*                   these commands correspond to          *");
-			System.out.println("*                   the keys you use inside the           *");
-			System.out.println("*                   console interface                     *");
-			System.out.println("* - _A,_B         - execute command named 'A' and         *");
-			System.out.println("*                   then 'B'. Use underscore and          *");
-			System.out.println("*                   comma to specify title lookup         *");
-			System.out.println("*                   and to separate commands              *");
-			System.out.println("* - the environment variable 'exec' is also               *");
-			System.out.println("*   evaluated and may be used as an alternative           *");
-			System.out.println("*   way to specify the commands to be executed            *");
-			System.out.println("* - /SE [imgtype] [img[+back]] [pipeline] [resultfile]    *");
-			System.out.println("*       [output path for images] [time from filename T/F] *");
-			System.out.println("*                   execute pipeline on single or         *");
-			System.out.println("*                   multiple images (using file           *");
-			System.out.println("*                   mask and store results in             *");
-			System.out.println("*                   single csv file or in separate        *");
-			System.out.println("*                   files if just the extension           *");
-			System.out.println("*                   is provided (e.g. '.txt').            *");
-			System.out.println("*                   imgtypes: 'vis.top', ...              *");
-			System.out.println("*                   If the image name of name mask        *");
-			System.out.println("*                   contains an '+', the prefix will be   *");
-			System.out.println("*                   the name of the imag file and the     *");
-			System.out.println("*                   part after the '+' will be the        *");
-			System.out.println("*                   reference image in the pipeline.      *");
-			System.out.println("* - /DI MAX/MIN/MEAN [file-spec] [result file]            *");
-			System.out.println("***********************************************************");
-			System.exit(0);
+		Console c = null;
+		if (args.length == 0 || !args[0].toUpperCase().equalsIgnoreCase("/DI")) {
+			for (String i : IAPmain.getMainInfoLines())
+				System.out.println(i);
+			if (paramContains(new String[] { "help", "h", "?" }, args)) {
+				System.out.println("***********************************************************");
+				System.out.println("* Usage                                                   *");
+				System.out.println("* - no parameters: interactive console interface          *");
+				System.out.println("* - /help, /h, /? - this help                             *");
+				System.out.println("* - XYZ           - execute commands X, Y, Z              *");
+				System.out.println("*                   these commands correspond to          *");
+				System.out.println("*                   the keys you use inside the           *");
+				System.out.println("*                   console interface                     *");
+				System.out.println("* - _A,_B         - execute command named 'A' and         *");
+				System.out.println("*                   then 'B'. Use underscore and          *");
+				System.out.println("*                   comma to specify title lookup         *");
+				System.out.println("*                   and to separate commands              *");
+				System.out.println("* - the environment variable 'exec' is also               *");
+				System.out.println("*   evaluated and may be used as an alternative           *");
+				System.out.println("*   way to specify the commands to be executed            *");
+				System.out.println("* - /SE [imgtype] [img[+back]] [pipeline] [resultfile]    *");
+				System.out.println("*       [output path for images] [time from filename T/F] *");
+				System.out.println("*                   execute pipeline on single or         *");
+				System.out.println("*                   multiple images (using file           *");
+				System.out.println("*                   mask and store results in             *");
+				System.out.println("*                   single csv file or in separate        *");
+				System.out.println("*                   files if just the extension           *");
+				System.out.println("*                   is provided (e.g. '.txt').            *");
+				System.out.println("*                   imgtypes: 'vis.top', ...              *");
+				System.out.println("*                   If the image name of name mask        *");
+				System.out.println("*                   contains an '+', the prefix will be   *");
+				System.out.println("*                   the name of the imag file and the     *");
+				System.out.println("*                   part after the '+' will be the        *");
+				System.out.println("*                   reference image in the pipeline.      *");
+				System.out.println("* - /DI MAX/MIN/MEAN [file-spec] [result file]            *");
+				System.out.println("***********************************************************");
+				System.exit(0);
+			}
+			
+			System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: Welcome! About to initalize the application...");
+			
+			String currentDirectory = System.getProperty("user.dir");
+			if (currentDirectory != null && !currentDirectory.isEmpty() && new File(currentDirectory).isDirectory()) {
+				VirtualFileSystem.addItem(new VirtualFileSystemVFS2(
+						"user.dir",
+						VfsFileProtocol.LOCAL,
+						"Current Directory",
+						"File I/O",
+						"",
+						null,
+						null,
+						currentDirectory,
+						false,
+						false,
+						null));
+			}
+			
+			c = new Console();
 		}
-		
-		System.out.println(SystemAnalysis.getCurrentTimeInclSec() + ">INFO: Welcome! About to initalize the application...");
-		
-		String currentDirectory = System.getProperty("user.dir");
-		if (currentDirectory != null && !currentDirectory.isEmpty() && new File(currentDirectory).isDirectory()) {
-			VirtualFileSystem.addItem(new VirtualFileSystemVFS2(
-					"user.dir",
-					VfsFileProtocol.LOCAL,
-					"Current Directory",
-					"File I/O",
-					"",
-					null,
-					null,
-					currentDirectory,
-					false,
-					false,
-					null));
-		}
-		
-		Console c = new Console();
 		
 		if (args.length > 0 && args[0].toUpperCase().equalsIgnoreCase("/DI")) {
 			try {
+				String fileSpec = args[1];
 				String opSpec = args[2];
-				String fileSpec = args[3];
-				String targetFileSpec = args[4];
+				String targetFileSpec = args[3];
 				
 				if (new File(fileSpec).exists()) {
 					// process single file by just copying
@@ -158,76 +161,103 @@ public class Console {
 					ThreadSafeOptions tsoImgB = new ThreadSafeOptions();
 					ThreadSafeOptions tsoImageCount = new ThreadSafeOptions();
 					
+					ArrayList<LocalComputeJob> tasks = new ArrayList<>();
+					
 					try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(path), fileSpec)) {
-						dirStream.forEach(ppp -> {
+						dirStream.forEach(pppI -> {
 							// process ppp.toString()
 							try {
-								Image img = new Image(FileSystemHandler.getURL(ppp.toFile()));
-								tsoImageCount.addInt(1);
-								
-								int[][] pxRGB = img.io().channels().getRGBintensities();
-								int[] pxR = pxRGB[0];
-								int[] pxG = pxRGB[1];
-								int[] pxB = pxRGB[2];
-								
-								if (tsoImgR.getParam(0, null) != null) {
-									int[] prevR = (int[]) tsoImgR.getParam(0, null);
-									int[] prevG = (int[]) tsoImgG.getParam(0, null);
-									int[] prevB = (int[]) tsoImgB.getParam(0, null);
+								final Path ppp = pppI;
+								tasks.add(BackgroundThreadDispatcher.addTask(new Runnable() {
 									
-									if (prevR.length != pxR.length)
-										throw new Exception("Image size for " + ppp.toString() + " differs from previous image size!");
-									
-									switch (opSpec.toUpperCase()) {
-										case "MAX":
-											for (int i = 0; i < pxR.length; i++) {
-												prevR[i] = Math.max(prevR[i], pxR[i]);
-												prevG[i] = Math.max(prevG[i], pxG[i]);
-												prevB[i] = Math.max(prevB[i], pxB[i]);
+									@Override
+									public void run() {
+										try {
+											Image img;
+											img = new Image(FileSystemHandler.getURL(ppp.toFile()), false);
+											tsoImageCount.addInt(1);
+											
+											int[][] pxRGB = img.io().channels().getRGBintensities();
+											int[] pxR = pxRGB[0];
+											int[] pxG = pxRGB[1];
+											int[] pxB = pxRGB[2];
+											
+											if (img.io().countColors() < 10) {
+												throw new RuntimeException("Only " + img.io().countColors() + " colors in " + ppp.toAbsolutePath());
 											}
-										case "MIN":
-											for (int i = 0; i < pxR.length; i++) {
-												prevR[i] = Math.min(prevR[i], pxR[i]);
-												prevG[i] = Math.min(prevG[i], pxG[i]);
-												prevB[i] = Math.min(prevB[i], pxB[i]);
+											
+											synchronized (tsoImageCount) {
+												if (tsoImgR.getParam(0, null) != null) {
+													int[] prevR = (int[]) tsoImgR.getParam(0, null);
+													int[] prevG = (int[]) tsoImgG.getParam(0, null);
+													int[] prevB = (int[]) tsoImgB.getParam(0, null);
+													
+													if (prevR.length != pxR.length)
+														throw new Exception("Image size for " + ppp.toString() + " differs from previous image size!");
+													switch (opSpec.toUpperCase()) {
+														case "MAX":
+															for (int i = 0; i < pxR.length; i++) {
+																prevR[i] = Math.max(prevR[i], pxR[i]);
+																prevG[i] = Math.max(prevG[i], pxG[i]);
+																prevB[i] = Math.max(prevB[i], pxB[i]);
+															}
+															break;
+														case "MIN":
+															for (int i = 0; i < pxR.length; i++) {
+																prevR[i] = Math.min(prevR[i], pxR[i]);
+																prevG[i] = Math.min(prevG[i], pxG[i]);
+																prevB[i] = Math.min(prevB[i], pxB[i]);
+															}
+															break;
+														case "MEAN":
+															for (int i = 0; i < pxR.length; i++) {
+																prevR[i] = prevR[i] + pxR[i];
+																prevG[i] = prevG[i] + pxG[i];
+																prevB[i] = prevB[i] + pxB[i];
+															}
+															break;
+														default:
+															throw new RuntimeException("Unknown operation mode (only max/min/mean supported): " + opSpec);
+													}
+												} else {
+													tsoImgR.setParam(0, pxR);
+													tsoImgG.setParam(0, pxG);
+													tsoImgB.setParam(0, pxB);
+													tsoImgR.setLong(img.getWidth());
+												}
 											}
-										case "MEAN":
-											for (int i = 0; i < pxR.length; i++) {
-												prevR[i] = prevR[i] + pxR[i];
-												prevG[i] = prevG[i] + pxG[i];
-												prevB[i] = prevB[i] + pxB[i];
-											}
-										default:
-											throw new RuntimeException("Unknown operation mode (only max/min/mean supported): " + opSpec);
+										} catch (Exception e) {
+											e.printStackTrace();
+											System.exit(1);
+										}
 									}
-								} else {
-									tsoImgR.setParam(0, pxR);
-									tsoImgG.setParam(0, pxG);
-									tsoImgB.setParam(0, pxB);
-									tsoImgR.setLong(img.getWidth());
-								}
+								}, ppp.toString()));
 							} catch (Exception e) {
 								e.printStackTrace();
 								System.exit(1);
 							}
-							
 						});
-					}
-					
-					int[] prevR = (int[]) tsoImgR.getParam(0, null);
-					int[] prevG = (int[]) tsoImgG.getParam(0, null);
-					int[] prevB = (int[]) tsoImgB.getParam(0, null);
-					if (opSpec.toUpperCase().equals("MEAN")) {
-						int n = tsoImageCount.getInt();
-						for (int i = 0; i < prevR.length; i++) {
-							prevR[i] = prevR[i] / n;
-							prevG[i] = prevG[i] / n;
-							prevB[i] = prevB[i] / n;
+						try {
+							BackgroundThreadDispatcher.waitFor(tasks);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							System.exit(1);
 						}
+						int[] prevR = (int[]) tsoImgR.getParam(0, null);
+						int[] prevG = (int[]) tsoImgG.getParam(0, null);
+						int[] prevB = (int[]) tsoImgB.getParam(0, null);
+						if (opSpec.toUpperCase().equals("MEAN")) {
+							int n = tsoImageCount.getInt();
+							for (int i = 0; i < prevR.length; i++) {
+								prevR[i] = prevR[i] / n;
+								prevG[i] = prevG[i] / n;
+								prevB[i] = prevB[i] / n;
+							}
+						}
+						new Image((int) tsoImgR.getLong(), (int) (prevR.length / tsoImgR.getLong()), prevR, prevG, prevB).saveToFile(targetFileSpec);
 					}
-					new Image((int) tsoImageCount.getLong(), (int) (prevR.length / tsoImageCount.getLong()), prevR, prevG, prevB).saveToFile(targetFileSpec);
+					System.exit(0);
 				}
-				System.exit(0);
 			} catch (Exception err) {
 				err.printStackTrace();
 				System.exit(1);
@@ -280,6 +310,7 @@ public class Console {
 								referenceImages.add(referenceImages.remove(0));
 							
 							tasks.add(BackgroundThreadDispatcher.addTask(new Runnable() {
+								
 								@Override
 								public void run() {
 									processSingleFile(args, ppp.toString(), refSpec);
@@ -308,10 +339,13 @@ public class Console {
 		for (String id : new String[] { "exec", "EXEC" }) {
 			String ev = System.getenv(id);
 			if (ev != null)
+				
 				parseInput(commandsFromArg, ev);
 		}
 		
-		if (args.length > 0) {
+		if (args.length > 0)
+		
+		{
 			for (String a : args)
 				parseInput(commandsFromArg, a);
 		}
