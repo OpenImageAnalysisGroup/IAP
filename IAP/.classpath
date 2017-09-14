@@ -33,5 +33,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/ij-1.49m.jar" sourcepath="lib/ij149m-src.zip"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/plyvis.jar"/>
+	<classpathentry kind="lib" path="lib/javaxt-core.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
