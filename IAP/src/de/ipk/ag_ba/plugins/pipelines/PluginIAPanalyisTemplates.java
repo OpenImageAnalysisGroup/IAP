@@ -79,7 +79,6 @@ import iap.blocks.segmentation.BlMedianFilter;
 import iap.blocks.segmentation.BlMedianFilterFixedSize;
 import iap.blocks.segmentation.BlMorphologicalOperations;
 import iap.blocks.segmentation.BlRemoveLevitatingObjects;
-import iap.blocks.segmentation.BlRemoveMaizeBambooStick;
 import iap.blocks.segmentation.BlRemoveSmallObjectsVisFluo;
 import iap.blocks.segmentation.BlUseFluoMaskToClearIr;
 import iap.blocks.segmentation.BlUseFluoMaskToClearNir;
@@ -147,7 +146,6 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlLabFilter(),
 				new BlLeafCurlingAnalysis(),
 				new BlLoadImages(),
-				new BlRemoveMaizeBambooStick(),
 				new BlRemoveSmallObjectsVisFluo(),
 				new BlRunPostProcessors(),
 				new BlSkeletonizeVisFluo(),

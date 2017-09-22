@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
+import org.ErrorMsg;
 import org.ReleaseInfo;
 import org.StringManipulationTools;
 import org.SystemAnalysis;
@@ -79,6 +80,7 @@ import de.ipk_gatersleben.ag_pbi.mmd.experimentdata.images.ImageData;
 public class Console {
 	public static void main(String[] args) {
 		IAPmain.setRunMode(IAPrunMode.CONSOLE);
+		ErrorMsg.setRethrowErrorMessages(true);
 		Console c = null;
 		if (args.length == 0 || !args[0].toUpperCase().equalsIgnoreCase("/DI")) {
 			for (String i : IAPmain.getMainInfoLines())
@@ -194,31 +196,32 @@ public class Console {
 													
 													if (prevR.length != pxR.length)
 														throw new Exception("Image size for " + ppp.toString() + " differs from previous image size!");
-													switch (opSpec.toUpperCase()) {
-														case "MAX":
-															for (int i = 0; i < pxR.length; i++) {
-																prevR[i] = Math.max(prevR[i], pxR[i]);
-																prevG[i] = Math.max(prevG[i], pxG[i]);
-																prevB[i] = Math.max(prevB[i], pxB[i]);
-															}
-															break;
-														case "MIN":
-															for (int i = 0; i < pxR.length; i++) {
-																prevR[i] = Math.min(prevR[i], pxR[i]);
-																prevG[i] = Math.min(prevG[i], pxG[i]);
-																prevB[i] = Math.min(prevB[i], pxB[i]);
-															}
-															break;
-														case "MEAN":
-															for (int i = 0; i < pxR.length; i++) {
-																prevR[i] = prevR[i] + pxR[i];
-																prevG[i] = prevG[i] + pxG[i];
-																prevB[i] = prevB[i] + pxB[i];
-															}
-															break;
-														default:
-															throw new RuntimeException("Unknown operation mode (only max/min/mean supported): " + opSpec);
-													}
+													else
+														switch (opSpec.toUpperCase()) {
+															case "MAX":
+																for (int i = 0; i < pxR.length; i++) {
+																	prevR[i] = Math.max(prevR[i], pxR[i]);
+																	prevG[i] = Math.max(prevG[i], pxG[i]);
+																	prevB[i] = Math.max(prevB[i], pxB[i]);
+																}
+																break;
+															case "MIN":
+																for (int i = 0; i < pxR.length; i++) {
+																	prevR[i] = Math.min(prevR[i], pxR[i]);
+																	prevG[i] = Math.min(prevG[i], pxG[i]);
+																	prevB[i] = Math.min(prevB[i], pxB[i]);
+																}
+																break;
+															case "MEAN":
+																for (int i = 0; i < pxR.length; i++) {
+																	prevR[i] = prevR[i] + pxR[i];
+																	prevG[i] = prevG[i] + pxG[i];
+																	prevB[i] = prevB[i] + pxB[i];
+																}
+																break;
+															default:
+																throw new RuntimeException("Unknown operation mode (only max/min/mean supported): " + opSpec);
+														}
 												} else {
 													tsoImgR.setParam(0, pxR);
 													tsoImgG.setParam(0, pxG);

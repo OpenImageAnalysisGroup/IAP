@@ -107,10 +107,6 @@ public class Image {
 			}
 		}
 		if (img == null) {
-			InputStream is = url.getInputStream();
-			if (is == null)
-				System.out.println(SystemAnalysis.getCurrentTime() + ">ERROR: no input stream for URL " + url);
-			ImagePlus inpimg;
 			// ZIP header = 50 4B 03 04 // https://en.wikipedia.org/wiki/List_of_file_signatures
 			// printf(" -p <pattern> CFA pattern, choices for <pattern> are\n");
 			// printf(" RGGB upperleftmost red pixel is at (0,0)\n");
@@ -118,35 +114,33 @@ public class Image {
 			// printf(" GBRG upperleftmost red pixel is at (0,1)\n");
 			// printf(" BGGR upperleftmost red pixel is at (1,1)\n\n");
 			// printf(" -f Flatten result to a grayscale image\n");
-			try {
+			try (InputStream is = url.getInputStream()) {
 				if (".tiff".equalsIgnoreCase(url.getFileNameExtension().toLowerCase()) || ".tif".equalsIgnoreCase(url.getFileNameExtension().toLowerCase())) {
-					inpimg = new Opener().openTiff(is, url.getFileName());
-				} else
-					inpimg = new ImagePlus(url.toString(), new ColorProcessor(new javaxt.io.Image(is).getBufferedImage()));
-				// inpimg = new ImagePlus(url.toString(), new ColorProcessor(ImageIO.read(is)));
-			} finally {
-				is.close();
+					image = new Opener().openTiff(is, url.getFileName());
+				} else {
+					BufferedImage bi = new javaxt.io.Image(is).getBufferedImage();
+					// if (bi == null)
+					// throw new RuntimeException("ERROR 1 No buffered image in " + url);
+					image = new ImagePlus(url.toString(), new ColorProcessor(bi));
+					// if (io().countColors() < 10)
+					// throw new RuntimeException("ERROR 2 Few colors in " + url);
+				}
+			} catch (Exception err) {
+				throw new RuntimeException(err);
 			}
-			if (inpimg == null)
+			if (image == null)
 				throw new Exception("Image could not be read: " + url);
 			try {
-				if (inpimg.getBitDepth() == ImageType.COLOR_256.depth)
-					image = processTransparency(url.getFileName(), inpimg.getBufferedImage());
-				// else
-				// if (inpimg.getBitDepth() == ImageType.COLOR_RGB.depth)
-				// image = processTransparency(url.getFileName(), inpimg.getBufferedImage());
-				else
-					image = inpimg;
+				if (image.getBitDepth() == ImageType.COLOR_256.depth)
+					image = processTransparency(url.getFileName(), image.getBufferedImage());
 			} catch (Exception e) {
-				System.out
-						.println(SystemAnalysis.getCurrentTime() + ">WARNING: Quick-load didn't work correctly, revert to save-conversion. Error: " + e.getMessage());
-				image = inpimg;
+				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Quick-load didn't work correctly, revert to save-conversion. Error: " + e.getMessage());
 			}
 			w = image.getWidth();
 			h = image.getHeight();
 			if (useCache) {
 				synchronized (url2image) {
-					if (inpimg.getBitDepth() == ImageType.COLOR_RGB.depth)
+					if (image.getBitDepth() == ImageType.COLOR_RGB.depth)
 						url2image.put(url + "", this.copy());
 				}
 			}

@@ -1,15 +1,5 @@
 package iap.example.blocks.extraction;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
-import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.CalculatedProperty;
-import iap.blocks.data_structures.CalculatedPropertyDescription;
-import iap.blocks.data_structures.CalculatesProperties;
-import iap.blocks.data_structures.RunnableOnImage;
-import iap.blocks.extraction.TraitCategory;
-import iap.blocks.unused.ClusterSizeAndClusterId;
-import ij.process.FloatProcessor;
-
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -35,6 +25,15 @@ import de.ipk.ag_ba.image.operations.skeleton.SkeletonProcessor2d;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
+import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.data_structures.RunnableOnImage;
+import iap.blocks.extraction.TraitCategory;
+import iap.blocks.unused.ClusterSizeAndClusterId;
+import ij.process.FloatProcessor;
 
 /**
  * Skeletonize the roots and store root lengths, and other parameters.
@@ -95,7 +94,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 			for (int i = 0; i < unchangedSkeletonPixels.length; i++)
 				if (unchangedSkeletonPixels[i] == background)
 					clusterIDsPixels[i] = background;
-			
+				
 			HashMap<Integer, Integer> color2clusterId = new HashMap<Integer, Integer>();
 			ClusterSizeAndClusterId[] clusterSize = new ClusterSizeAndClusterId[clusters + 1 + 1];
 			for (int i = 0; i < clusterSize.length; i++)
@@ -184,10 +183,9 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 						}
 				}
 				rt.addValue("roots" + resultPrefix + ".graph.analysis_performed", 1);
-				HashMap<Integer, Double> id2size = getBoolean("Diameter Calculation Limit to Thick to Thin", false) ?
-						sg.calculateDiameterThickToThin(getBoolean("Debug - Save Graphs to Files", false), isThinnedImage, postProcessing, rt,
-								!getBoolean("Diameter Calculation Limit to Thick to Thin Disable Edge Traversal Veto", true)) :
-						sg.calculateDiameter(
+				HashMap<Integer, Double> id2size = getBoolean("Diameter Calculation Limit to Thick to Thin", false) ? sg.calculateDiameterThickToThin(getBoolean("Debug - Save Graphs to Files", false), isThinnedImage, postProcessing, rt,
+						!getBoolean("Diameter Calculation Limit to Thick to Thin Disable Edge Traversal Veto", true))
+						: sg.calculateDiameter(
 								getBoolean("Debug - Save Graphs to Files", false),
 								getBoolean("Do not check all endpoints but find and use most left and right ones", true),
 								postProcessing, isThinnedImage);
@@ -328,7 +326,8 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 								graphAnalysis(getClusterIDarray(image.copy().bm().dilate(5).io()),
 										new Image(skeletonImage.getWidth(), skeletonImage.getHeight(),
 												skeletonImage.getAs1D())
-												.show("input for graph analysis", debug).io(), rt, prefix, width > 1, distanceMap, postProcessing);
+														.show("input for graph analysis", debug).io(),
+										rt, prefix, width > 1, distanceMap, postProcessing);
 							}
 							
 						}

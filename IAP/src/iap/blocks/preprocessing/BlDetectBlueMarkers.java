@@ -3,16 +3,6 @@
  */
 package iap.blocks.preprocessing;
 
-import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
-import iap.blocks.data_structures.BlockType;
-import iap.blocks.data_structures.CalculatedProperty;
-import iap.blocks.data_structures.CalculatedPropertyDescription;
-import iap.blocks.data_structures.CalculatesProperties;
-import iap.blocks.extraction.Trait;
-import iap.blocks.extraction.TraitCategory;
-import iap.pipelines.ImageProcessorOptionsAndResults;
-import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
-
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,6 +15,15 @@ import de.ipk.ag_ba.image.operations.blocks.properties.PropertyNames;
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageSet;
+import iap.blocks.data_structures.AbstractSnapshotAnalysisBlock;
+import iap.blocks.data_structures.BlockType;
+import iap.blocks.data_structures.CalculatedProperty;
+import iap.blocks.data_structures.CalculatedPropertyDescription;
+import iap.blocks.data_structures.CalculatesProperties;
+import iap.blocks.extraction.Trait;
+import iap.blocks.extraction.TraitCategory;
+import iap.pipelines.ImageProcessorOptionsAndResults;
+import iap.pipelines.ImageProcessorOptionsAndResults.CameraPosition;
 
 /**
  * @author pape, klukas
@@ -65,6 +64,11 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 			labThresholds[5] = (float) getDouble("Max b", 120);
 		}
 		if (vis != null) {
+			if (debug) {
+				vis.io().channels().getLabL().show("LAB L");
+				vis.io().channels().getLabA().show("LAB A");
+				vis.io().channels().getLabB().show("LAB B");
+			}
 			if (!getBoolean("Use fixed marker distance", optionsAndResults.getCameraPosition() == CameraPosition.TOP))
 				markerMask = getMarkers(vis.copy(), numericResult, labThresholds);
 			
@@ -188,7 +192,7 @@ public class BlDetectBlueMarkers extends AbstractSnapshotAnalysisBlock implement
 	
 	private Image getMarkers(Image image, ArrayList<MarkerPair> result, float[] labThresholds) {
 		boolean clearBlueMarkers = getBoolean("Remove blue markers from image", true);
-		ImageOperation io = image.io().searchBlueMarkers(result, optionsAndResults.getCameraPosition(), true, clearBlueMarkers, getInt("Erode", 12),
+		ImageOperation io = image.io().searchBlueMarkers(result, clearBlueMarkers, getInt("Erode", 12),
 				getInt("Dilate", 18), labThresholds, debug);
 		return io != null ? io.getImage() : null;
 	}

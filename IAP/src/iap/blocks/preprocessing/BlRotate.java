@@ -3,13 +3,12 @@
  */
 package iap.blocks.preprocessing;
 
-import iap.blocks.data_structures.AbstractBlock;
-import iap.blocks.data_structures.BlockType;
-
 import java.util.HashSet;
 
 import de.ipk.ag_ba.image.structures.CameraType;
 import de.ipk.ag_ba.image.structures.Image;
+import iap.blocks.data_structures.AbstractBlock;
+import iap.blocks.data_structures.BlockType;
 
 /**
  * Rotates the images and masks according to the settings.
@@ -33,10 +32,13 @@ public class BlRotate extends AbstractBlock {
 			if (image != null && Math.abs(r - 90) < 0.001)
 				image = image.io().rotate90().getImage();
 			else
-				if (image != null && Math.abs(r + 90) < 0.001)
-					image = image.io().rotate90().rotate(180, false).flipHor().getImage();
+				if (image != null && Math.abs(r - 270) < 0.001)
+					image = image.io().rotate90().rotate90().rotate90().getImage();
 				else
-					image = image.io().rotate(r, false).getImage();
+					if (image != null && Math.abs(r + 90) < 0.001)
+						image = image.io().rotate90().rotate(180, false).flipHor().getImage();
+					else
+						image = image.io().rotate(r, false).getImage();
 		}
 		return image;
 	}
@@ -50,10 +52,13 @@ public class BlRotate extends AbstractBlock {
 			if (mask != null && Math.abs(r - 90) < 0.001)
 				mask = mask.io().rotate90().getImage();
 			else
-				if (mask != null && Math.abs(r + 90) < 0.001)
+				if (mask != null && Math.abs(r - 270) < 0.001)
 					mask = mask.io().rotate90().rotate90().rotate90().getImage();
 				else
-					mask = mask.io().rotate(r, false).getImage();
+					if (mask != null && Math.abs(r + 90) < 0.001)
+						mask = mask.io().rotate90().rotate90().rotate90().getImage();
+					else
+						mask = mask.io().rotate(r, false).getImage();
 		}
 		return mask;
 	}

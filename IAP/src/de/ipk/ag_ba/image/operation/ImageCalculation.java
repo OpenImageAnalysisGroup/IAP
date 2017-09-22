@@ -78,4 +78,27 @@ public class ImageCalculation {
 		return cols;
 	}
 	
+	public Double calculateAverageDistanceTo(Vector2d cog) {
+		double sumDist = 0;
+		int n = 0;
+		int x = 0;
+		int y = 0;
+		int w = imageOperation.getWidth();
+		for (int p : imageOperation.getImageAs1dArray()) {
+			x++;
+			if (x == w) {
+				y++;
+				x = 0;
+			}
+			if (p != ImageOperation.BACKGROUND_COLORint) {
+				sumDist += Math.abs(cog.distance(x, y));
+				n++;
+			}
+		}
+		if (n > 0)
+			return sumDist / n;
+		else
+			return null;
+	}
+	
 }
