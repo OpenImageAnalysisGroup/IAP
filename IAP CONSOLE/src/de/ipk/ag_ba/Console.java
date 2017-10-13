@@ -401,8 +401,13 @@ public class Console {
 		
 		long d2 = new File(img).lastModified();
 		
-		URI folderRoute = new File(new File(img).getParent()).toURI();
-		Path p = Paths.get(folderRoute).toAbsolutePath().getParent();
+		String folder = new File(img).getParent();
+		if (folder == null)
+			folder = new java.io.File(".").getCanonicalPath();
+		
+		URI folderRoute = new File(folder).toURI();
+		
+		Path p = Paths.get(folderRoute).toAbsolutePath();
 		
 		con.setSpecies(p.getFileName().toString());
 		

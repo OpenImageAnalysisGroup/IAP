@@ -101,53 +101,51 @@ public class Image {
 			this.fileName = url.getFileName();
 		
 		Image img = null;
-		if (useCache) {
-			synchronized (url2image) {
+		synchronized (url2image) {
+			if (useCache) {
 				img = url2image.get(url + "");
 			}
-		}
-		if (img == null) {
-			// ZIP header = 50 4B 03 04 // https://en.wikipedia.org/wiki/List_of_file_signatures
-			// printf(" -p <pattern> CFA pattern, choices for <pattern> are\n");
-			// printf(" RGGB upperleftmost red pixel is at (0,0)\n");
-			// printf(" GRBG upperleftmost red pixel is at (1,0)\n");
-			// printf(" GBRG upperleftmost red pixel is at (0,1)\n");
-			// printf(" BGGR upperleftmost red pixel is at (1,1)\n\n");
-			// printf(" -f Flatten result to a grayscale image\n");
-			try (InputStream is = url.getInputStream()) {
-				if (".tiff".equalsIgnoreCase(url.getFileNameExtension().toLowerCase()) || ".tif".equalsIgnoreCase(url.getFileNameExtension().toLowerCase())) {
-					image = new Opener().openTiff(is, url.getFileName());
-				} else {
-					BufferedImage bi = new javaxt.io.Image(is).getBufferedImage();
-					// if (bi == null)
-					// throw new RuntimeException("ERROR 1 No buffered image in " + url);
-					image = new ImagePlus(url.toString(), new ColorProcessor(bi));
-					// if (io().countColors() < 10)
-					// throw new RuntimeException("ERROR 2 Few colors in " + url);
+			if (img == null) {
+				// ZIP header = 50 4B 03 04 // https://en.wikipedia.org/wiki/List_of_file_signatures
+				// printf(" -p <pattern> CFA pattern, choices for <pattern> are\n");
+				// printf(" RGGB upperleftmost red pixel is at (0,0)\n");
+				// printf(" GRBG upperleftmost red pixel is at (1,0)\n");
+				// printf(" GBRG upperleftmost red pixel is at (0,1)\n");
+				// printf(" BGGR upperleftmost red pixel is at (1,1)\n\n");
+				// printf(" -f Flatten result to a grayscale image\n");
+				try (InputStream is = url.getInputStream()) {
+					if (".tiff".equalsIgnoreCase(url.getFileNameExtension().toLowerCase()) || ".tif".equalsIgnoreCase(url.getFileNameExtension().toLowerCase())) {
+						image = new Opener().openTiff(is, url.getFileName());
+					} else {
+						BufferedImage bi = new javaxt.io.Image(is).getBufferedImage();
+						// if (bi == null)
+						// throw new RuntimeException("ERROR 1 No buffered image in " + url);
+						image = new ImagePlus(url.toString(), new ColorProcessor(bi));
+						// if (io().countColors() < 10)
+						// throw new RuntimeException("ERROR 2 Few colors in " + url);
+					}
+				} catch (Exception err) {
+					throw new RuntimeException(err);
 				}
-			} catch (Exception err) {
-				throw new RuntimeException(err);
-			}
-			if (image == null)
-				throw new Exception("Image could not be read: " + url);
-			try {
-				if (image.getBitDepth() == ImageType.COLOR_256.depth)
-					image = processTransparency(url.getFileName(), image.getBufferedImage());
-			} catch (Exception e) {
-				System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Quick-load didn't work correctly, revert to save-conversion. Error: " + e.getMessage());
-			}
-			w = image.getWidth();
-			h = image.getHeight();
-			if (useCache) {
-				synchronized (url2image) {
+				if (image == null)
+					throw new Exception("Image could not be read: " + url);
+				try {
+					if (image.getBitDepth() == ImageType.COLOR_256.depth)
+						image = processTransparency(url.getFileName(), image.getBufferedImage());
+				} catch (Exception e) {
+					System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Quick-load didn't work correctly, revert to save-conversion. Error: " + e.getMessage());
+				}
+				w = image.getWidth();
+				h = image.getHeight();
+				if (useCache) {
 					if (image.getBitDepth() == ImageType.COLOR_RGB.depth)
 						url2image.put(url + "", this.copy());
 				}
+			} else {
+				image = img.copy().getAsImagePlus();
+				w = image.getWidth();
+				h = image.getHeight();
 			}
-		} else {
-			image = img.copy().getAsImagePlus();
-			w = image.getWidth();
-			h = image.getHeight();
 		}
 	}
 	

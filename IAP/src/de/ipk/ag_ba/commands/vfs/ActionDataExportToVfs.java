@@ -868,8 +868,8 @@ public class ActionDataExportToVfs extends AbstractNavigationAction {
 					+ HSMfolderTargetDataManager.digit2(gc
 							.get(GregorianCalendar.SECOND));
 			
-			zefn = (nm.getQualityAnnotation() != null && nm.getQualityAnnotation().length() > 0 && !simpleFileName ? nm.getQualityAnnotation() + " " : "")
-					+ (simpleFileName ? id.getLabelURL().getFileNameWithoutExtension() + ".result"
+			zefn = (nm.getQualityAnnotation() != null && nm.getQualityAnnotation().length() > 0 ? nm.getQualityAnnotation() + (simpleFileName ? "" : " ") : "")
+					+ (simpleFileName ? ".result"
 							: substanceName
 									+ " "
 									+ (id != null ? (id.getPosition() != null ? "DEG_"

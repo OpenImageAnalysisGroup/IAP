@@ -52,6 +52,8 @@ public class SystemOptions {
 							synchronized (SystemOptions.getInstance()) {
 								synchronized (updateCheckTasks) {
 									for (Runnable r : new ArrayList<Runnable>(updateCheckTasks)) {
+										if (r == null)
+											continue;
 										try {
 											r.run();
 										} catch (Exception e) {

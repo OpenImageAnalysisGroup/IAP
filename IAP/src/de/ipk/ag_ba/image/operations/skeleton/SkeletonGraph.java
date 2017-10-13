@@ -608,8 +608,9 @@ public class SkeletonGraph {
 			System.out.println(SystemAnalysis.getCurrentTime() + ">WARNING: Skeleton graph with more than one component created. Number of components: "
 					+ gl.size());
 		ThreadSafeOptions tsoLCGG = new ThreadSafeOptions();
-		String optGMLoutputFileName = !saveGraphFiles ? null : ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
-				+ System.currentTimeMillis() + ".gml";
+		String optGMLoutputFileName = !saveGraphFiles ? null
+				: ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
+						+ System.currentTimeMillis() + ".gml";
 		final HashMap<Graph, Collection<GraphElement>> graphComponent2shortestPathElements = new HashMap<Graph, Collection<GraphElement>>();
 		ArrayList<Runnable> todo = new ArrayList<>();
 		for (final Graph gg : gl) {
@@ -834,8 +835,9 @@ public class SkeletonGraph {
 			}
 		};
 		
-		String optGMLoutputFileName = !saveGraphFiles ? null : ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
-				+ System.currentTimeMillis() + ".gml";
+		String optGMLoutputFileName = !saveGraphFiles ? null
+				: ReleaseInfo.getAppSubdirFolderWithFinalSep("graph_files") + "skeleton_"
+						+ System.currentTimeMillis() + ".gml";
 		
 		if (!isThinned) {
 			double vol = 0, vol2 = 0;
@@ -1146,7 +1148,7 @@ public class SkeletonGraph {
 							continue;
 						for (Node a : gA.getNodes()) {
 							if (mapAB.getA().get(a) == null) {
-								System.out.println("ERR_A");
+								// System.out.println("ERR_A");
 								continue;
 							}
 							for (Node b : gB.getNodes()) {

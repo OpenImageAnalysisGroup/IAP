@@ -289,7 +289,7 @@ public class BlRootsSkeletonize extends AbstractSnapshotAnalysisBlock implements
 		HashMap<Integer, Integer> width2len = new HashMap<Integer, Integer>();
 		// double area = 80;
 		int width = 1;
-		int pixelCnt;
+		int pixelCnt = 0;
 		double scale = 2;
 		image = image.resize(scale);
 		nonBinaryImage = nonBinaryImage.resize(scale);
