@@ -3,9 +3,6 @@
  *******************************************************************************/
 package de.ipk_gatersleben.ag_nw.graffiti.services.task;
 
-import info.clearthought.layout.TableLayout;
-import info.clearthought.layout.TableLayoutConstants;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,11 +20,14 @@ import org.BackgroundTaskStatusProvider;
 import org.FolderPanel;
 import org.ProgressStatusService;
 import org.StringManipulationTools;
+import org.SystemAnalysis;
 import org.SystemInfo;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.gui.ToolButton;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.helper_classes.MyGraphicsTools;
+import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
 
 public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGUIprovider {
 	private static final long serialVersionUID = 1L;
@@ -67,15 +67,14 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 		double border = 5;
 		if (inWindow)
 			border = 5;
-		double[][] size =
-		{
+		double[][] size = {
 				{ border, TableLayoutConstants.FILL, border }, // Columns
 				// XX {border, 20, 2, 20, 2, 20, 2, 20, border}
 				{ border, TableLayoutConstants.PREFERRED, inWindow ? 0 : 2, TableLayoutConstants.PREFERRED, 2, TableLayoutConstants.PREFERRED, 2,
 						TableLayoutConstants.PREFERRED, border }
 				// fill
 		}; // Rows
-		
+				
 		// XX setMinimumSize(new Dimension(80, (int) Math.round(border+20+2+20+2+20+2+20+border)));
 		// XX setMaximumSize(new Dimension(getMaximumSize().width, (int) Math.round(border+20+2+20+2+20+2+20+border)));
 		
@@ -128,8 +127,7 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 		}
 		
 		double border2 = 0;
-		double[][] size2 =
-		{
+		double[][] size2 = {
 				{ border2, TableLayoutConstants.FILL, 5, 60, 5, 80, border2 }, // Columns
 				// XX {border2, TableLayoutConstants.FILL, border2}
 				{ border2, TableLayoutConstants.PREFERRED, border2 }
@@ -139,8 +137,7 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 		progressAndButton.setLayout(new TableLayout(size2));
 		
 		double border3 = 3;
-		double[][] size3 =
-		{
+		double[][] size3 = {
 				{ 0, TableLayoutConstants.FILL, 0 }, // Columns
 				// XX {border3, TableLayoutConstants.FILL, border3}
 				{ border3, TableLayoutConstants.PREFERRED, border3 }
@@ -202,23 +199,23 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 					try {
 						Thread.sleep(500);
 					} catch (Exception e) {
-					};
+					} ;
 					setHighlightBorder();
 					try {
 						Thread.sleep(500);
 					} catch (Exception e) {
-					};
+					} ;
 					setDefaultBorder();
 				}
 				try {
 					Thread.sleep(500);
 				} catch (Exception e) {
-				};
+				} ;
 				setHighlightBorder();
 				try {
 					Thread.sleep(5000);
 				} catch (Exception e) {
-				};
+				} ;
 				setDefaultBorder();
 			}
 		});
@@ -244,7 +241,7 @@ public class BackgroundTaskPanelEntry extends JPanel implements BackgroundTaskGU
 		}
 		String t = (duration / 1000) + "";
 		if (!t.equals("0"))
-			System.out.println("Task " + StringManipulationTools.removeHTMLtags(taskMessage) + " finished after " + (duration / 1000) + " sec.");
+			System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Task " + StringManipulationTools.removeHTMLtags(taskMessage) + " finished after " + (duration / 1000) + " sec.");
 		progressBar.setValue(100);
 		taskFinished = true;
 		if (autoClose || stopButton.getText().equals(closeText)) {

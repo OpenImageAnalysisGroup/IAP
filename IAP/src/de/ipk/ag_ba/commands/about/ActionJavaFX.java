@@ -2,6 +2,14 @@ package de.ipk.ag_ba.commands.about;
 
 import java.util.ArrayList;
 
+import javax.swing.JComponent;
+
+import org.SystemOptions;
+
+import application.AnimateLogoIAP;
+import de.ipk.ag_ba.commands.AbstractNavigationAction;
+import de.ipk.ag_ba.gui.MainPanelComponent;
+import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -21,15 +29,6 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
-
-import javax.swing.JComponent;
-
-import org.SystemOptions;
-
-import application.AnimateLogoIAP;
-import de.ipk.ag_ba.commands.AbstractNavigationAction;
-import de.ipk.ag_ba.gui.MainPanelComponent;
-import de.ipk.ag_ba.gui.navigation_model.NavigationButton;
 
 /**
  * @author Christian Klukas

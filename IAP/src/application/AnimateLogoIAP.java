@@ -237,9 +237,9 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		
 		double sc = 1;
 		// the subscene contains the 3d rotating earth sphere
-		int offx = 50;
-		int offy = 20;
-		int offyy = 10;
+		int offx = 50 * 3;
+		int offy = 20 * 3;
+		int offyy = 10 * 3;
 		SubScene subscene1 = new SubScene(scene_planet, offx + 200, offy + height - 5, true, SceneAntialiasing.BALANCED);
 		subscene1.setCamera(camera_earth);
 		subscene1.setTranslateX(2);
