@@ -3,6 +3,15 @@
 	<name>IAP</name>
 	<comment></comment>
 	<projects>
+		<project>Graffiti_Core</project>
+		<project>Graffiti_Editor</project>
+		<project>Graffiti_lib</project>
+		<project>Graffiti_Plugins</project>
+		<project>IAP CONSOLE</project>
+		<project>IAP Transfer</project>
+		<project>IAP-Addon-Example</project>
+		<project>IPK_lib</project>
+		<project>IPK-Plugins</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -10,8 +19,14 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>

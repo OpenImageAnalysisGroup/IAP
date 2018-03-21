@@ -1,18 +1,16 @@
 package org;
 
+import java.util.Base64;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 public class ExternalPasswordStorage {
 	
 	private static ExternalPasswordStorage instance = new ExternalPasswordStorage();
-	private BASE64Encoder base64encoder;
-	private BASE64Decoder base64decoder;
+	
 	private Cipher encCipher, decCipher;
 	
 	private ExternalPasswordStorage() {
@@ -25,8 +23,6 @@ public class ExternalPasswordStorage {
 			keySpec = new DESKeySpec(passphrase.getBytes("UTF8"));
 			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
 			SecretKey key = keyFactory.generateSecret(keySpec);
-			this.base64encoder = new BASE64Encoder();
-			this.base64decoder = new BASE64Decoder();
 			this.encCipher = Cipher.getInstance("DES"); // cipher is not thread safe
 			this.decCipher = Cipher.getInstance("DES"); // cipher is not thread safe
 			this.encCipher.init(Cipher.ENCRYPT_MODE, key);
@@ -47,7 +43,7 @@ public class ExternalPasswordStorage {
 			byte[] cleartext;
 			try {
 				cleartext = value.getBytes("UTF8");
-				String encrypedPwd = instance.base64encoder.encode(instance.encCipher.doFinal(cleartext));
+				String encrypedPwd = Base64.getEncoder().encodeToString(instance.encCipher.doFinal(cleartext));
 				return "encrypted:" + encrypedPwd;
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
@@ -67,7 +63,7 @@ public class ExternalPasswordStorage {
 			byte[] encrypedPwdBytes;
 			try {
 				value = value.substring("encrypted:".length());
-				encrypedPwdBytes = instance.base64decoder.decodeBuffer(value);
+				encrypedPwdBytes = Base64.getDecoder().decode(value);
 				byte[] plainTextPwdBytes = (instance.decCipher.doFinal(encrypedPwdBytes));
 				return new String(plainTextPwdBytes, "UTF8");
 			} catch (Exception e) {
@@ -84,7 +80,7 @@ public class ExternalPasswordStorage {
 			byte[] cleartext;
 			try {
 				cleartext = value.getBytes("UTF8");
-				return "base64:" + instance.base64encoder.encode(cleartext);
+				return "base64:" + Base64.getEncoder().encodeToString(cleartext);
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);
 				return null;
@@ -98,7 +94,7 @@ public class ExternalPasswordStorage {
 		} else {
 			try {
 				value = value.substring("base64:".length());
-				byte[] plainTextPwdBytes = instance.base64decoder.decodeBuffer(value);
+				byte[] plainTextPwdBytes = Base64.getDecoder().decode(value);
 				return new String(plainTextPwdBytes, "UTF8");
 			} catch (Exception e) {
 				ErrorMsg.addErrorMessage(e);

@@ -4,12 +4,10 @@
  * ----------------------------------------------------------------------------
  * This file is part of JSBML. Please visit <http://sbml.org/Software/JSBML>
  * for the latest version of JSBML and more information about SBML.
- *
  * Copyright (C) 2009-2012 jointly by the following organizations:
  * 1. The University of Tuebingen, Germany
  * 2. EMBL European Bioinformatics Institute (EBML-EBI), Hinxton, UK
  * 3. The California Institute of Technology, Pasadena, CA, USA
- *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation. A copy of the license agreement is provided
@@ -39,29 +37,28 @@ import org.sbml.jsbml.xml.stax.SBMLObjectForXML;
  * @author Nicolas Rodriguez
  * @since 1.0
  * @version $Rev: 1116 $
- *
  */
 public abstract class AbstractReaderWriter implements ReadingParser, WritingParser {
-
+	
 	private Logger logger = Logger.getLogger(AbstractReaderWriter.class);
 	
 	/*
-	 *  (non-Javadoc)
+	 * (non-Javadoc)
 	 * @see org.sbml.jsbml.xml.parsers.ReadingParser#processAttribute(String
-	 *      elementName, String attributeName, String value, String prefix,
-	 *      boolean isLastAttribute, Object contextObject)
+	 * elementName, String attributeName, String value, String prefix,
+	 * boolean isLastAttribute, Object contextObject)
 	 */
+	@Override
 	public void processAttribute(String elementName, String attributeName,
 			String value, String prefix, boolean isLastAttribute,
-			Object contextObject) 
-	{
-
+			Object contextObject) {
+		
 		logger.debug("processAttribute -> " + prefix + " : " + attributeName + " = " + value + " (" + contextObject.getClass().getName() + ")");
 		
 		boolean isAttributeRead = false;
-
+		
 		if (contextObject instanceof SBase) {
-
+			
 			SBase sbase = (SBase) contextObject;
 			
 			// logger.debug("processAttribute : level, version = " + sbase.getLevel() + ", " + sbase.getVersion());
@@ -72,80 +69,81 @@ public abstract class AbstractReaderWriter implements ReadingParser, WritingPars
 			} catch (Throwable exc) {
 				logger.error(exc.getMessage());
 			}
-		}
-		else if (contextObject instanceof Annotation) 
-		{
-			Annotation annotation = (Annotation) contextObject;
-			isAttributeRead = annotation.readAttribute(attributeName, prefix, value);
-		}
-		else if (contextObject instanceof SBasePlugin) 
-		{
-			isAttributeRead = ((SBasePlugin) contextObject).readAttribute(attributeName, prefix, value);
-		}
-
+		} else
+			if (contextObject instanceof Annotation) {
+				Annotation annotation = (Annotation) contextObject;
+				isAttributeRead = annotation.readAttribute(attributeName, prefix, value);
+			} else
+				if (contextObject instanceof SBasePlugin) {
+					isAttributeRead = ((SBasePlugin) contextObject).readAttribute(attributeName, prefix, value);
+				}
+			
 		if (!isAttributeRead) {
 			logger.warn("processAttribute : The attribute " + attributeName
 					+ " on the element " + elementName +
 					" is not part of the SBML specifications");
 		}
 	}
-
+	
 	/*
-	 * 	(non-Javadoc)
+	 * (non-Javadoc)
 	 * @see org.sbml.jsbml.xml.stax.ReadingParser#processCharactersOf(java.lang.String, java.lang.String, java.lang.Object)
 	 */
+	@Override
 	public void processCharactersOf(String elementName, String characters,
-			Object contextObject) 
-	{		
+			Object contextObject) {
 		logger.debug("processCharactersOf : the element " + elementName + " does not have any text. " +
 				"SBML syntax error. Characters lost = " + characters);
 	}
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
 	 * @see org.sbml.jsbml.xml.parsers.ReadingParser#processEndDocument(org.sbml.jsbml.SBMLDocument)
 	 */
+	@Override
 	public void processEndDocument(SBMLDocument sbmlDocument) {
-		// does nothing		
+		// does nothing
 	}
-
-	/* (non-Javadoc)
+	
+	/*
+	 * (non-Javadoc)
 	 * @see org.sbml.jsbml.xml.parsers.ReadingParser#processEndElement(java.lang.String, java.lang.String, boolean, java.lang.Object)
 	 */
+	@Override
 	public boolean processEndElement(String elementName, String prefix,
-			boolean isNested, Object contextObject) 
-	{
+			boolean isNested, Object contextObject) {
 		// does nothing
 		return true;
 	}
-
-
-	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.xml.parsers.ReadingParser#processNamespace(java.lang.String, 
-	 * java.lang.String, java.lang.String, java.lang.String, boolean, boolean, java.lang.Object)
-	 */
-	public void processNamespace(String elementName, String URI, String prefix,
-			String localName, boolean hasAttributes, boolean isLastNamespace,
-			Object contextObject) 
-	{
-		// TODO : read the namespace, it could be some other extension objects
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.sbml.jsbml.xml.parsers.ReadingParser#processStartElement(java.lang.String, java.lang.String, boolean, boolean, java.lang.Object)
-	 */
-	public abstract Object processStartElement(String elementName, String prefix,
-			boolean hasAttributes, boolean hasNamespaces, Object contextObject);
-
+	
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see org.sbml.jsbml.xml.WritingParser#getListOfSBMLElementsToWrite(Object sbase)
-	 * 
+	 * @see org.sbml.jsbml.xml.parsers.ReadingParser#processNamespace(java.lang.String,
+	 * java.lang.String, java.lang.String, java.lang.String, boolean, boolean, java.lang.Object)
 	 */
+	@Override
+	public void processNamespace(String elementName, String URI, String prefix,
+			String localName, boolean hasAttributes, boolean isLastNamespace,
+			Object contextObject) {
+		// TODO : read the namespace, it could be some other extension objects
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.sbml.jsbml.xml.parsers.ReadingParser#processStartElement(java.lang.String, java.lang.String, boolean, boolean, java.lang.Object)
+	 */
+	@Override
+	public abstract Object processStartElement(String elementName, String prefix,
+			boolean hasAttributes, boolean hasNamespaces, Object contextObject);
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.sbml.jsbml.xml.WritingParser#getListOfSBMLElementsToWrite(Object sbase)
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public ArrayList<Object> getListOfSBMLElementsToWrite(Object sbase) {
-
+		
 		logger.debug("getListOfSBMLElementsToWrite : " + sbase.getClass().getCanonicalName());
 		
 		ArrayList<Object> listOfElementsToWrite = new ArrayList<Object>();
@@ -156,73 +154,71 @@ public abstract class AbstractReaderWriter implements ReadingParser, WritingPars
 			// TODO : the 'required' attribute is written even if there is no plugin class for the SBMLDocument
 			// we will have to change that !!!
 			return null;
-		} 
-		else if (sbase instanceof SBasePlugin) 
-		{
-			SBasePlugin elementPlugin = (SBasePlugin) sbase;
+		} else
+			if (sbase instanceof SBasePlugin) {
+				SBasePlugin elementPlugin = (SBasePlugin) sbase;
+				
+				children = elementPlugin.children();
+			} else
+				if (sbase instanceof TreeNode) {
+					children = (Enumeration<TreeNode>) ((TreeNode) sbase).children();
+					
+				} else {
+					return null;
+				}
 			
-			children = elementPlugin.children();
-		}
-		else if (sbase instanceof TreeNode) 
-		{
-			children = ((TreeNode) sbase).children();
-			
-		} else {
-			return null;
-		}
-
 		while (children.hasMoreElements()) {
 			listOfElementsToWrite.add(children.nextElement());
 		}
-
+		
 		if (listOfElementsToWrite.isEmpty()) {
 			listOfElementsToWrite = null;
-		} 
-
+		}
+		
 		return listOfElementsToWrite;
 	}
-
 	
 	/*
-	 *  (non-Javadoc)
+	 * (non-Javadoc)
 	 * @see org.sbml.jsbml.xml.parsers.WritingParser#writeAttributes(SBMLObjectForXML
-	 *      xmlObject, Object sbmlElementToWrite)
+	 * xmlObject, Object sbmlElementToWrite)
 	 */
+	@Override
 	public void writeAttributes(SBMLObjectForXML xmlObject,
 			Object sbmlElementToWrite) {
 		if (sbmlElementToWrite instanceof SBase) {
 			SBase sbase = (SBase) sbmlElementToWrite;
-
+			
 			xmlObject.addAttributes(sbase.writeXMLAttributes());
 		}
-
+		
 	}
-
+	
 	/*
-	 *  (non-Javadoc)
+	 * (non-Javadoc)
 	 * @see org.sbml.jsbml.xml.parsers.WritingParser#writeCharacters(SBMLObjectForXML
-	 *      xmlObject, Object sbmlElementToWrite)
+	 * xmlObject, Object sbmlElementToWrite)
 	 */
+	@Override
 	public void writeCharacters(SBMLObjectForXML xmlObject,
-			Object sbmlElementToWrite) 
-	{
+			Object sbmlElementToWrite) {
 		logger.error("writeCharacters : " + xmlObject.getName() + " XML element do not have any characters !!");
 	}
-
-
+	
 	/*
-	 *  (non-Javadoc)
+	 * (non-Javadoc)
 	 * @see org.sbml.jsbml.xml.parsers.WritingParser#writeElement(SBMLObjectForXML
-	 *      xmlObject, Object sbmlElementToWrite)
+	 * xmlObject, Object sbmlElementToWrite)
 	 */
+	@Override
 	public void writeElement(SBMLObjectForXML xmlObject,
 			Object sbmlElementToWrite) {
-
+		
 		logger.debug("writeElement : " + sbmlElementToWrite.getClass().getSimpleName());
-
+		
 		if (sbmlElementToWrite instanceof SBase) {
 			SBase sbase = (SBase) sbmlElementToWrite;
-
+			
 			if (!xmlObject.isSetName()) {
 				if (sbase instanceof ListOf<?>) {
 					ListOf<?> listOf = (ListOf<?>) sbase;
@@ -243,27 +239,26 @@ public abstract class AbstractReaderWriter implements ReadingParser, WritingPars
 				xmlObject.setPrefix(getShortLabel());
 			}
 			xmlObject.setNamespace(getNamespaceURI());
-
+			
 		}
-
+		
 	}
-
-
+	
 	/*
-	 *  (non-Javadoc)
+	 * (non-Javadoc)
 	 * @see org.sbml.jsbml.xml.parsers.WritingParser#writeNamespaces(SBMLObjectForXML
-	 *      xmlObject, Object sbmlElementToWrite)
+	 * xmlObject, Object sbmlElementToWrite)
 	 */
+	@Override
 	public void writeNamespaces(SBMLObjectForXML xmlObject,
-			Object sbmlElementToWrite) 
-	{
+			Object sbmlElementToWrite) {
 		if (sbmlElementToWrite instanceof SBase) {
 			xmlObject.setPrefix(getShortLabel());
 		}
-
+		
 		// TODO : write all namespaces
 	}
-
+	
 	/**
 	 * Returns the shortLabel of the namespace parsed by this class.
 	 * 

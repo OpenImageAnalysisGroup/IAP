@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-
-import javax.xml.bind.DatatypeConverter;
+import java.util.Base64;
 
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.ResourceIOHandler;
@@ -37,7 +36,7 @@ public class DataConnection extends URLConnection {
 				return hh.getPreviewInputStream(url);
 			} else {
 				data = data.replaceFirst("^.*;base64,", "");
-				byte[] bytes = DatatypeConverter.parseBase64Binary(data);
+				byte[] bytes = Base64.getDecoder().decode(data);
 				return new ByteArrayInputStream(bytes);
 			}
 		} catch (Exception e) {

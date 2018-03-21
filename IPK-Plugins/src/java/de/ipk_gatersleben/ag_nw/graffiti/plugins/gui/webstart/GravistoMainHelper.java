@@ -64,7 +64,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableDat
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.threading.SystemAnalysis;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskStatusProviderSupportingExternalCallImpl;
-import de.muntjak.tinylookandfeel.Theme;
 import net.iharder.dnd.FileDrop;
 
 public class GravistoMainHelper implements HelperClass {
@@ -202,8 +201,6 @@ public class GravistoMainHelper implements HelperClass {
 				UIManager.setLookAndFeel(look);
 				System.out.println(": OK");
 			} else {
-				// UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-				
 				if (os != null && !os.toUpperCase().contains("LINUX") && !os.toUpperCase().contains("SUN") && !os.toUpperCase().contains("MAC")) {
 					try {
 						// if (!ErrorMsg.isMac())
@@ -216,9 +213,6 @@ public class GravistoMainHelper implements HelperClass {
 					} catch (Exception e) {
 						System.out.println("Info: could not activate desired java windows and button style"); //$NON-NLS-1$
 					}
-				} else {
-					Theme.loadTheme(Theme.getThemeDescription("VANTED"));
-					UIManager.setLookAndFeel("de.muntjak.tinylookandfeel.TinyLookAndFeel");
 				}
 			}
 		} catch (Exception e) {

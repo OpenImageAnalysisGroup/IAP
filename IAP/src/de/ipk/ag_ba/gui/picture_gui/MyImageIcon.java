@@ -106,23 +106,18 @@ public class MyImageIcon extends ImageIcon {
 							
 							i = null;
 							
+							ImageIcon ic;
 							try {
-								sun.awt.shell.ShellFolder sf = sun.awt.shell.ShellFolder.getShellFolder(FileSystemHandler.getFile(fileURLmain));
-								i = toBufferedImage(sf.getIcon(true));
-							} catch (Exception err) {
-								ImageIcon ic;
-								try {
-									ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
-											FileSystemHandler.getFile(fileURLmain));
-									if (ic == null) {
-										i = toBufferedImage(new ImageIcon(MainFrame.getInstance().getIconImage()).getImage());
-									} else
-										i = toBufferedImage(ic.getImage());
-								} catch (Exception err2) {
-									i = null;
-								}
-								
+								ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
+										FileSystemHandler.getFile(fileURLmain));
+								if (ic == null) {
+									i = toBufferedImage(new ImageIcon(MainFrame.getInstance().getIconImage()).getImage());
+								} else
+									i = toBufferedImage(ic.getImage());
+							} catch (Exception err2) {
+								i = null;
 							}
+							
 							if (i != null) {
 								int maxS = i.getHeight() > i.getWidth() ? i.getHeight() : i.getWidth();
 								double factor = 128 * SystemAnalysis.getHiDPIScaleFactor() / maxS;
@@ -140,23 +135,18 @@ public class MyImageIcon extends ImageIcon {
 			
 			BufferedImage i = null;
 			
+			ImageIcon ic;
 			try {
-				sun.awt.shell.ShellFolder sf = sun.awt.shell.ShellFolder.getShellFolder(FileSystemHandler.getFile(fileURLmain));
-				i = toBufferedImage(sf.getIcon(true));
-			} catch (Exception e) {
-				ImageIcon ic;
-				try {
-					ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
-							FileSystemHandler.getFile(fileURLmain));
-					if (ic == null) {
-						i = null;
-					} else
-						i = toBufferedImage(ic.getImage());
-				} catch (Exception e2) {
+				ic = (ImageIcon) javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(
+						FileSystemHandler.getFile(fileURLmain));
+				if (ic == null) {
 					i = null;
-				}
-				
+				} else
+					i = toBufferedImage(ic.getImage());
+			} catch (Exception e2) {
+				i = null;
 			}
+			
 			if (i == null)
 				i = IAPimages.getImageIAP("img/ext/gpl2/Gnome-Image-Loading-64b.png", (int) (64 * SystemAnalysis.getHiDPIScaleFactor())).getAsBufferedImage(false);
 			if (i != null) {

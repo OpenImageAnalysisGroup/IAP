@@ -9,6 +9,12 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.Random;
 
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+
+import org.SystemOptions;
+
+import de.ipk.ag_ba.gui.webstart.ProgressWindow;
 import javafx.animation.AnimationTimer;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -25,16 +31,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-
-import org.SystemOptions;
-
 import util.Appearance;
 import util.CameraView;
 import util.FxLogoObjects;
-import de.ipk.ag_ba.gui.webstart.ProgressWindow;
 
 /***
  * @author Ulrich, Klukas
@@ -350,8 +349,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		for (int i = 0; i < STAR_COUNT; i++) {
 			nodes[i] = new Rectangle(1, 1, i < STAR_COUNT / 3 ? Color.RED : (i < (STAR_COUNT * 2) / 3 ? Color.GREEN : Color.BLUE));
 			angles[i] = 2.0 * Math.PI * random1.nextDouble();
-			start[i] =
-					i < STAR_COUNT / 3 ? random1.nextInt(bound) : (i < (STAR_COUNT * 2) / 3 ? random2.nextInt(bound) : random3.nextInt(bound));
+			start[i] = i < STAR_COUNT / 3 ? random1.nextInt(bound) : (i < (STAR_COUNT * 2) / 3 ? random2.nextInt(bound) : random3.nextInt(bound));
 			sx[i] = random1.nextDouble() * 300;
 			sy[i] = random1.nextDouble() * 100 - 50;
 		}
@@ -455,7 +453,7 @@ public class AnimateLogoIAP extends Application implements ProgressWindow {
 		// center on display
 		jf.setLocation((screenDim.width - w) / 2,
 				(screenDim.height - h) / 2);
-		
+		jf.setLocationRelativeTo(null);
 	}
 	
 	@Override

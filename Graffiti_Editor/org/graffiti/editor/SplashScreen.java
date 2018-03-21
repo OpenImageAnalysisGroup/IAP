@@ -38,8 +38,8 @@ import org.graffiti.core.ImageBundle;
  * @version $Revision: 1.1 $ $Date: 2011-01-31 09:04:26 $
  */
 public class SplashScreen
-					extends JFrame
-					implements SplashScreenInterface {
+		extends JFrame
+		implements SplashScreenInterface {
 	// ~ Static fields/initializers =============================================
 	
 	/**
@@ -131,12 +131,13 @@ public class SplashScreen
 		// center on display
 		Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation((screenDim.width - getWidth()) / 2,
-							(screenDim.height - getHeight()) / 2);
+				(screenDim.height - getHeight()) / 2);
 	}
 	
 	/*
 	 * @see org.graffiti.util.ProgressViewer#setMaximum(int)
 	 */
+	@Override
 	public void setMaximum(int maximum) {
 		progressBar.setMaximum(maximum);
 	}
@@ -144,6 +145,7 @@ public class SplashScreen
 	/*
 	 * @see org.graffiti.util.ProgressViewer#setText(java.lang.String)
 	 */
+	@Override
 	public void setText(String text) {
 		progressLabel.setText(text);
 	}
@@ -151,6 +153,7 @@ public class SplashScreen
 	/*
 	 * @see org.graffiti.util.ProgressViewer#setValue(int)
 	 */
+	@Override
 	public void setValue(int value) {
 		progressBar.setValue(value);
 	}
@@ -158,6 +161,7 @@ public class SplashScreen
 	/*
 	 * @see org.graffiti.util.ProgressViewer#getValue()
 	 */
+	@Override
 	public int getValue() {
 		return progressBar.getValue();
 	}
@@ -166,6 +170,7 @@ public class SplashScreen
 	 * (non-Javadoc)
 	 * @see org.graffiti.editor.SplashScreenInterface#setInitialisationFinished()
 	 */
+	@Override
 	public void setInitialisationFinished() {
 		//
 		
@@ -175,6 +180,7 @@ public class SplashScreen
 	 * (non-Javadoc)
 	 * @see org.graffiti.util.ProgressViewer#getMaximum()
 	 */
+	@Override
 	public int getMaximum() {
 		return progressBar.getMaximum();
 	}

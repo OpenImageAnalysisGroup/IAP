@@ -6,9 +6,6 @@
  */
 package de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.workflow;
 
-import info.clearthought.layout.TableLayout;
-import info.clearthought.layout.TableLayoutConstants;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,12 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-
-import net.iharder.dnd.FileDrop;
 
 import org.AttributeHelper;
 import org.ErrorMsg;
@@ -50,7 +42,6 @@ import org.ReleaseInfo;
 import org.SettingsHelperDefaultIsFalse;
 import org.SettingsHelperDefaultIsTrue;
 import org.SystemAnalysis;
-import org.SystemOptions;
 import org.graffiti.editor.GravistoService;
 import org.graffiti.editor.MainFrame;
 import org.graffiti.event.AttributeEvent;
@@ -67,9 +58,6 @@ import org.graffiti.plugin.view.View;
 import org.graffiti.plugins.modes.defaults.MegaMoveTool;
 import org.graffiti.plugins.modes.defaults.MegaTools;
 
-import scenario.Scenario;
-import scenario.ScenarioGui;
-import scenario.ScenarioService;
 import bsh.Interpreter;
 import de.ipk_gatersleben.ag_nw.graffiti.JLabelHTMLlink;
 import de.ipk_gatersleben.ag_nw.graffiti.MyInputHelper;
@@ -79,6 +67,12 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.GravistoMainHelper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.MainM;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 import de.ipk_gatersleben.ag_nw.graffiti.services.task.BackgroundTaskHelper;
+import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
+import net.iharder.dnd.FileDrop;
+import scenario.Scenario;
+import scenario.ScenarioGui;
+import scenario.ScenarioService;
 
 public class WorkflowHelper extends InspectorTab implements ScenarioGui, ContainsTabbedPane, HelperClass {
 	private static final long serialVersionUID = 1L;
@@ -170,78 +164,6 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		// LookAndFeelInfo(desc[i], v)));
 		// i++;
 		// }
-		
-		ThemedLookAndFeelInfo info = new ThemedLookAndFeelInfo("VANTED", "de.muntjak.tinylookandfeel.TinyLookAndFeel",
-				"VANTED");
-		lookSelection.addItem(new LookAndFeelWrapper(info));
-		
-		try {
-			LookAndFeelWrapper avtiveLaF = null;
-			String sel = UIManager.getLookAndFeel().getClass().getCanonicalName();
-			for (LookAndFeelInfo lafi : UIManager.getInstalledLookAndFeels()) {
-				LookAndFeelWrapper d = new LookAndFeelWrapper(lafi);
-				if (d.getClassName().equals(sel))
-					avtiveLaF = d;
-				if (d.isValid() && !d.getName().equals("TinyLookAndFeel"))
-					lookSelection.addItem(d);
-			}
-			if (avtiveLaF != null)
-				lookSelection.setSelectedItem(avtiveLaF);
-		} catch (Exception e) {
-			ErrorMsg.addErrorMessage(e);
-		}
-		lookSelection.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						LookAndFeelWrapper po = (LookAndFeelWrapper) lookSelection.getSelectedItem();
-						if (po == null)
-							return;
-						
-						po.activateTheme();
-						
-						try {
-							UIManager.setLookAndFeel(po.getClassName());
-							if (ReleaseInfo.isRunningAsApplet())
-								SwingUtilities.updateComponentTreeUI(ReleaseInfo.getApplet());
-							else
-								SwingUtilities.updateComponentTreeUI(MainFrame.getInstance());
-							MainFrame.getInstance().repaint();
-							saveLook.setEnabled(true);
-							saveLook.setText("Save");
-							saveLook.requestFocus();
-						} catch (Exception err) {
-							saveLook.setEnabled(false);
-							saveLook.setText("Error");
-							ErrorMsg.addErrorMessage(err);
-						} catch (Error e) {
-							saveLook.setEnabled(false);
-							saveLook.setText("N/A");
-						}
-					}
-				});
-			}
-		});
-		
-		saveLook.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				LookAndFeelWrapper op = (LookAndFeelWrapper) lookSelection.getSelectedItem();
-				if (op == null)
-					return;
-				
-				try {
-					SystemOptions.getInstance().setString("VANTED", "LnF", op.getClassName());
-					saveLook.setText("saved");
-					saveLook.setEnabled(false);
-					lookSelection.requestFocus();
-				} catch (Exception err) {
-					ErrorMsg.addErrorMessage(err);
-				}
-			}
-		});
 		
 		helpEnabler.addActionListener(getHelpEnabledSettingActionListener(helpEnabler));
 		helpEnabler.setOpaque(false);
@@ -621,9 +543,9 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		step1.layoutRows();
 		
 		FolderPanel step2 = new FolderPanel("2. Create / Load Pathway", true, true, false, null
-				// JLabelJavaHelpLink.getHelpActionListener("inputformats"),
-				// "inputformats"
-				);
+		// JLabelJavaHelpLink.getHelpActionListener("inputformats"),
+		// "inputformats"
+		);
 		step2.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		step2.addGuiComponentRow(
 				getCustomizedLabel(new JLabel(
@@ -802,8 +724,8 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 			
 			// StringBuilder sb = new StringBuilder("<html><pre>");
 			// sb.append("// Start algorithm: "+algorithm.getName()+"<br>");
-			// sb.append("// 	category: "+algorithm.getCategory()+"<br>");
-			// sb.append("// 	description: "+ErrorMsg.removeHTMLtags(algorithm.getDescription())+"<br><br>");
+			// sb.append("// category: "+algorithm.getCategory()+"<br>");
+			// sb.append("// description: "+ErrorMsg.removeHTMLtags(algorithm.getDescription())+"<br><br>");
 			String paramList = getObjectList(params, ", ");
 			// sb.append(algorithm.getClass().getCanonicalName()+".execute(new Object[] {"+paramList+"});");
 			//
@@ -928,9 +850,9 @@ public class WorkflowHelper extends InspectorTab implements ScenarioGui, Contain
 		active.layoutRows();
 		
 		library = new FolderPanel("Library", false, true, false, null
-				// JLabelJavaHelpLink.getHelpActionListener("inputformats"),
-				// "inputformats"
-				);
+		// JLabelJavaHelpLink.getHelpActionListener("inputformats"),
+		// "inputformats"
+		);
 		library.setColumnStyle(TableLayout.FILL, TableLayout.PREFERRED);
 		for (Scenario s : ScenarioService.getAvailableScnenarios())
 			library.addGuiComponentRow(new MyScenarioEditor(s), null, false, 2);

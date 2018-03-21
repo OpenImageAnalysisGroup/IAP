@@ -67,6 +67,10 @@ public class TextFile extends ArrayList<String> {
 		return sb.toString();
 	}
 	
+	public static String read(InputStream stream) throws IOException {
+		return read(stream, Integer.MAX_VALUE);
+	}
+	
 	public static String read(Reader reader) throws IOException {
 		StringBuffer sb = new StringBuffer();
 		BufferedReader in = new BufferedReader(reader);
@@ -134,6 +138,10 @@ public class TextFile extends ArrayList<String> {
 	
 	public TextFile(File f) throws IOException {
 		this(new InputStreamReader(new FileInputStream(f)));
+	}
+	
+	public TextFile(InputStream stream) throws IOException {
+		this(new InputStreamReader(stream));
 	}
 	
 	public void write(String fileName) throws IOException {

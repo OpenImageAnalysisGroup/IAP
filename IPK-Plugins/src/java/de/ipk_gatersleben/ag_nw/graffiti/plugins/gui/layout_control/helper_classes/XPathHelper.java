@@ -19,6 +19,9 @@ import javax.xml.transform.TransformerException;
 
 import org.ErrorMsg;
 import org.HelperClass;
+import org.apache.xpath.XPathAPI;
+import org.apache.xpath.objects.XBoolean;
+import org.apache.xpath.objects.XObject;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 import org.jaxen.dom.DOMXPath;
@@ -29,14 +32,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.NodeIterator;
 
-import com.sun.org.apache.xpath.internal.XPathAPI;
-import com.sun.org.apache.xpath.internal.objects.XBoolean;
-
 /**
  * @author Christian Klukas
  *         (c) 2004 IPK-Gatersleben
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class XPathHelper implements HelperClass {
 	
 	public static String noGivenTimeStringConstant = "- not specified -";
@@ -120,6 +120,7 @@ public class XPathHelper implements HelperClass {
 			return null;
 		}
 		Collections.sort(resultList, new Comparator() {
+			@Override
 			public int compare(Object o1, Object o2) {
 				if ((o1 instanceof String) || (o2 instanceof String)) {
 					return o1.toString().compareTo(o2.toString());
@@ -141,7 +142,7 @@ public class XPathHelper implements HelperClass {
 				string_resultHS.add(o.toString());
 			}
 		}
-		String[] res = (String[]) string_resultList.toArray(new String[] {});
+		String[] res = string_resultList.toArray(new String[] {});
 		return res;
 	}
 	
@@ -180,8 +181,9 @@ public class XPathHelper implements HelperClass {
 			ErrorMsg.addErrorMessage("XPATH ERROR: " + e.getLocalizedMessage());
 			return null;
 		}
-		String[] res = (String[]) resultList.toArray(new String[] {});
+		String[] res = resultList.toArray(new String[] {});
 		Arrays.sort(res, new Comparator<String>() {
+			@Override
 			public int compare(String arg0, String arg1) {
 				String id1 = lineName2lineID.get(arg0);
 				String id2 = lineName2lineID.get(arg1);
@@ -200,7 +202,7 @@ public class XPathHelper implements HelperClass {
 	 * @return
 	 */
 	private static String getGenotypeAndTreatment(String genotype,
-						String treatment) {
+			String treatment) {
 		StringBuilder res = new StringBuilder();
 		if (genotype != null && genotype.length() > 0)
 			res.append(genotype);
@@ -315,11 +317,11 @@ public class XPathHelper implements HelperClass {
 	public static int getSampleTimeValueForComparison(Node sampleNode) {
 		String time;
 		if (sampleNode.getAttributes() == null
-							|| sampleNode.getAttributes().getNamedItem("time") == null)
+				|| sampleNode.getAttributes().getNamedItem("time") == null)
 			time = "-1";
 		else
 			time = sampleNode.getAttributes().getNamedItem("time").getFirstChild()
-								.getNodeValue();
+					.getNodeValue();
 		int result;
 		try {
 			result = Integer.parseInt(time);
@@ -338,18 +340,18 @@ public class XPathHelper implements HelperClass {
 	public static String getSampleTime(Node sampleNode) {
 		String time;
 		if (sampleNode.getAttributes() == null
-							|| sampleNode.getAttributes().getNamedItem("time") == null)
+				|| sampleNode.getAttributes().getNamedItem("time") == null)
 			time = "-1";
 		else
 			time = sampleNode.getAttributes().getNamedItem("time").getFirstChild()
-								.getNodeValue();
+					.getNodeValue();
 		String timeunit;
 		if (sampleNode.getAttributes() == null
-							|| sampleNode.getAttributes().getNamedItem("unit") == null)
+				|| sampleNode.getAttributes().getNamedItem("unit") == null)
 			timeunit = "-1";
 		else
 			timeunit = sampleNode.getAttributes().getNamedItem("unit")
-								.getFirstChild().getNodeValue();
+					.getFirstChild().getNodeValue();
 		
 		String timeUnitAndTime = timeunit + " " + time; // +" ("+unit+")";
 		if (time.equals("-1") && timeunit.equals("-1"))
@@ -366,11 +368,11 @@ public class XPathHelper implements HelperClass {
 	public static String getSampleTimeUnit(Node sampleNode) {
 		String timeunit;
 		if (sampleNode.getAttributes() == null
-							|| sampleNode.getAttributes().getNamedItem("unit") == null)
+				|| sampleNode.getAttributes().getNamedItem("unit") == null)
 			timeunit = null;
 		else
 			timeunit = sampleNode.getAttributes().getNamedItem("unit")
-								.getFirstChild().getNodeValue();
+					.getFirstChild().getNodeValue();
 		
 		return timeunit;
 	}
@@ -386,7 +388,7 @@ public class XPathHelper implements HelperClass {
 	}
 	
 	public static void tTestSetSampleSignificane(Node sampleNode,
-						boolean different) {
+			boolean different) {
 		Attr attr = sampleNode.getOwnerDocument().createAttribute("ttest");
 		if (different)
 			attr.setNodeValue("H1");
@@ -399,7 +401,7 @@ public class XPathHelper implements HelperClass {
 	}
 	
 	public static void setTTestSetSampleSignificane(Node sampleNode,
-						boolean different, double level) {
+			boolean different, double level) {
 		Attr attr = sampleNode.getOwnerDocument().createAttribute("ttest");
 		Attr attrLevel = sampleNode.getOwnerDocument().createAttribute("ttest-level");
 		if (different)
@@ -419,11 +421,11 @@ public class XPathHelper implements HelperClass {
 	 */
 	public static boolean tTestIsReference(Node sampleNode) {
 		if (sampleNode.getAttributes() == null
-							|| sampleNode.getAttributes().getNamedItem("ttest") == null)
+				|| sampleNode.getAttributes().getNamedItem("ttest") == null)
 			return true;
 		else
 			return sampleNode.getAttributes().getNamedItem("ttest")
-								.getFirstChild().getNodeValue().equals("reference");
+					.getFirstChild().getNodeValue().equals("reference");
 	}
 	
 	/**
@@ -452,7 +454,7 @@ public class XPathHelper implements HelperClass {
 		// DO NOT CHANGE THE NAMING SYSTEM
 		// IT IS PROCESSED BY CLASS SeriesData and at least XML Helper !
 		if (linetreatment != null && linetreatment.length() > 0 && !linetreatment.equalsIgnoreCase("null")
-							&& !checkForSameGenoTypeAndTreatment(linegenotype, linetreatment))
+				&& !checkForSameGenoTypeAndTreatment(linegenotype, linetreatment))
 			serie = linename + (linegenotype.length() > 0 ? "/" + linegenotype : "") + " (" + linetreatment + ")";
 		else
 			serie = linename + (linegenotype.length() > 0 ? "/" + linegenotype : "");
@@ -474,11 +476,11 @@ public class XPathHelper implements HelperClass {
 	 */
 	public static boolean ttestIsH1(Node sampleNode) {
 		if (sampleNode.getAttributes() == null
-							|| sampleNode.getAttributes().getNamedItem("ttest") == null)
+				|| sampleNode.getAttributes().getNamedItem("ttest") == null)
 			return true;
 		else
 			return sampleNode.getAttributes().getNamedItem("ttest")
-								.getFirstChild().getNodeValue().equals("H1");
+					.getFirstChild().getNodeValue().equals("H1");
 	}
 	
 	public static String getExpAndSeriesName(String expName, String seriesName) {
@@ -525,7 +527,7 @@ public class XPathHelper implements HelperClass {
 				return t1.getNodeValue();
 			else
 				return linenode.getOwnerDocument().getElementsByTagName(
-									"experimentname").item(0).getFirstChild().getNodeValue();
+						"experimentname").item(0).getFirstChild().getNodeValue();
 		} catch (NullPointerException npe) {
 			return "";
 		}
@@ -537,7 +539,7 @@ public class XPathHelper implements HelperClass {
 			return t1.getNodeValue();
 		else
 			return linenode.getOwnerDocument().getElementsByTagName(
-								"coordinator").item(0).getFirstChild().getNodeValue();
+					"coordinator").item(0).getFirstChild().getNodeValue();
 	}
 	
 	public static String getStartDateFromLineNode(Node linenode) {
@@ -547,7 +549,7 @@ public class XPathHelper implements HelperClass {
 			date = t1.getNodeValue();
 		else
 			date = linenode.getOwnerDocument().getElementsByTagName(
-								"startdate").item(0).getFirstChild().getNodeValue();
+					"startdate").item(0).getFirstChild().getNodeValue();
 		return date;
 	}
 	
@@ -603,7 +605,7 @@ public class XPathHelper implements HelperClass {
 						
 						HashMap<String, Node> samplePath2avgNode_stdDevData = getSamplePathAndAvgValues(substName2substNode.get(substName));
 						HashMap<String, Node> samplePath2avgNode_actualDataWithoutStdDev = getSamplePathAndAvgValues(substName2substNode
-											.get(correspondingSubstanceName));
+								.get(correspondingSubstanceName));
 						// samplePath = //id of plant/name of plant/genotype of plant/timepoint and timeunit
 						for (String samplePath : samplePath2avgNode_stdDevData.keySet()) {
 							if (samplePath2avgNode_actualDataWithoutStdDev.containsKey(samplePath)) {
@@ -663,7 +665,7 @@ public class XPathHelper implements HelperClass {
 	public static boolean isReplicateDataMissing(Document mydoc) {
 		//
 		String xpath = "count(//substance/line/sample/average[@replicates > 1])<=0";
-		Object result;
+		XObject result;
 		try {
 			result = XPathAPI.eval(mydoc, xpath);
 		} catch (TransformerException e) {

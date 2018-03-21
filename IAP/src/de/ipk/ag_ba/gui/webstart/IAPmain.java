@@ -414,7 +414,6 @@ public class IAPmain extends JApplet {
 		
 		splashScreen.setText("Read plugin information");
 		
-		// ClassLoader cl = GravistoMain.class.getClassLoader();
 		URL r1 = cl.getResource("plugins1.txt");
 		URL r2 = cl.getResource("plugins2.txt");
 		URL r3 = cl.getResource("plugins3.txt");
@@ -441,6 +440,9 @@ public class IAPmain extends JApplet {
 						locations.add("//" + p);
 					
 			locations.remove("");
+			
+			locations.removeIf(l -> l.contains("build.xml"));
+			
 			ArrayList<String> locations_exclude = new ArrayList<String>();
 			locations_exclude.addAll(new TextFile(rExcl));
 			

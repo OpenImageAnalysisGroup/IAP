@@ -20,7 +20,7 @@ cd IPK-Plugins/build/classes
 find . | grep "\.xml$" > plugins4.txt
 cd ../../..
 
-cd IAP/bin
+cd IAP/target/classes
 find . | grep "\.xml$" > pluginsIAP.txt
 
 echo create Cluster Plugin List

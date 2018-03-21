@@ -44,8 +44,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl;
-
 /**
  * Contains some (static) auxiliary methods for writing XML.
  */
@@ -135,10 +133,7 @@ public class XMLHelper implements HelperClass {
 			return d;
 	}
 	
-	// private static DocumentBuilderFactory dbf =
-	// DocumentBuilderFactory.newInstance();
-	private static DocumentBuilderFactory dbf =
-			new DocumentBuilderFactoryImpl();
+	private static DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	
 	/**
 	 * @param res

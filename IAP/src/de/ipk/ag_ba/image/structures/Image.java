@@ -16,6 +16,8 @@ import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
@@ -58,8 +60,6 @@ import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
-import sun.awt.image.ByteInterleavedRaster;
-import sun.awt.image.IntegerInterleavedRaster;
 
 /**
  * @author klukas
@@ -156,14 +156,14 @@ public class Image {
 		// "Color Management//Image Loading Byte Order",
 		// false);
 		byte[] bp;
-		if (inpimg.getRaster() instanceof IntegerInterleavedRaster) {
-			int[] data = ((IntegerInterleavedRaster) inpimg.getRaster()).getDataStorage();
+		if (inpimg.getRaster().getDataBuffer() instanceof DataBufferInt) {
+			int[] data = ((DataBufferInt) inpimg.getRaster().getDataBuffer()).getData();
 			ByteBuffer byteBuffer = ByteBuffer.allocate(data.length * 4);
 			IntBuffer intBuffer = byteBuffer.asIntBuffer();
 			intBuffer.put(data);
 			bp = byteBuffer.array();
 		} else {
-			bp = ((ByteInterleavedRaster) inpimg.getRaster()).getDataStorage();
+			bp = ((DataBufferByte) inpimg.getRaster().getDataBuffer()).getData();
 		}
 		
 		int[] pixels = new int[inpimg.getWidth() * inpimg.getHeight()];

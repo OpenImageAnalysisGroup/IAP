@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Graffiti_Core"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Graffiti_Editor"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Graffiti_lib"/>
@@ -20,7 +25,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jsr166y.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bcprov-jdk16-146.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/IAP Transfer"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="lib/flanagan.java6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-lang3-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/mail.jar"/>
@@ -34,5 +38,16 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/plyvis.jar"/>
 	<classpathentry kind="lib" path="lib/javaxt-core.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Graffiti_lib/activation.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

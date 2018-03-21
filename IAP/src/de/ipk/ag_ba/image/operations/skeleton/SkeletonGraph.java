@@ -48,7 +48,6 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.NodeHelper;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.AttributePathNameSearchType;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.misc.invert_selection.SearchType;
-import de.muntjak.tinylookandfeel.util.BooleanReference;
 import iap.blocks.data_structures.RunnableOnImage;
 
 public class SkeletonGraph {
@@ -113,7 +112,7 @@ public class SkeletonGraph {
 					Node lastStartNode = null;
 					Node lastEndNode = null;
 					do {
-						BooleanReference isEndLimb = new BooleanReference(false);
+						ThreadSafeOptions isEndLimb = new ThreadSafeOptions();
 						Vector2i endCoordinate = new Vector2i(-1, -1);
 						ArrayList<Vector2i> edgePoints = traverseAndClearLineStartingFromStartPoint(startPoint, endCoordinate, isEndLimb);
 						if (endCoordinate.x < 0)
@@ -162,7 +161,7 @@ public class SkeletonGraph {
 							Color cc;
 							// if (startNode.getNeighbors().contains(endNode))
 							// del = true;
-							if (isEndLimb.getValue())
+							if (isEndLimb.getBval(0, false))
 								cc = new Color(SkeletonProcessor2d.colorMarkedEndLimbs);
 							else
 								cc = new Color(SkeletonProcessor2d.foreground);
@@ -520,9 +519,9 @@ public class SkeletonGraph {
 		System.out.println("^^^ " + S + " XY: " + x + " " + y);
 	}
 	
-	private ArrayList<Vector2i> traverseAndClearLineStartingFromStartPoint(Vector2i startPoint, Vector2i endPoint, BooleanReference isEndLimb) {
+	private ArrayList<Vector2i> traverseAndClearLineStartingFromStartPoint(Vector2i startPoint, Vector2i endPoint, ThreadSafeOptions isEndLimb) {
 		ArrayList<Vector2i> result = new ArrayList<Vector2i>();
-		isEndLimb.setValue(false);
+		isEndLimb.setBval(0, false);
 		int x = startPoint.x;
 		int y = startPoint.y;
 		
@@ -532,7 +531,7 @@ public class SkeletonGraph {
 		// result.add(new Vector2i(x, y));
 		skelImg[x][y] = visitedDuringSearch;
 		if (skelImg[x][y] == SkeletonProcessor2d.colorEndpoints)
-			isEndLimb.setValue(true);
+			isEndLimb.setBval(0, true);
 		boolean found, stop;
 		do {
 			found = false;
@@ -549,7 +548,7 @@ public class SkeletonGraph {
 						endPoint.y = y + yd;
 						found = true;
 						if (skelImg[x + xd][y + yd] == SkeletonProcessor2d.colorEndpoints)
-							isEndLimb.setValue(true);
+							isEndLimb.setBval(0, true);
 						break;
 					}
 				}

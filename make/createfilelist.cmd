@@ -22,7 +22,7 @@ echo IPK...
 dir *.xml /s /b > plugins4.txt
 cd ..\..\..
 
-cd IAP\bin
+cd IAP\target\classes
 echo IAP...
 dir *.xml /s /b > pluginsIAP.txt
 
@@ -134,3 +134,4 @@ echo "**build.xml" >> plugins_exclude.txt
 cd ..\..
 cd make
 echo READY
+pause
