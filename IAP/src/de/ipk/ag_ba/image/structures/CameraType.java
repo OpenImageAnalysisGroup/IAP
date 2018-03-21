@@ -1,5 +1,6 @@
 package de.ipk.ag_ba.image.structures;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public enum CameraType {
@@ -60,5 +61,12 @@ public enum CameraType {
 				s = "multi camera";
 		}
 		return s;
+	}
+	
+	public static ArrayList<String> getListOfNames(CameraType[] values) {
+		ArrayList<String> result = new ArrayList<String>();
+		for (CameraType c : values)
+			result.add(c.name());
+		return result;
 	}
 }

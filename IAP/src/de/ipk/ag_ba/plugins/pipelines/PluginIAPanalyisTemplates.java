@@ -59,6 +59,7 @@ import iap.blocks.preprocessing.BlColorCorrectionNir;
 import iap.blocks.preprocessing.BlCutFromSide;
 import iap.blocks.preprocessing.BlDetectBlueMarkers;
 import iap.blocks.preprocessing.BlDetectScaleforNormalization;
+import iap.blocks.preprocessing.BlExtractChannels;
 import iap.blocks.preprocessing.BlMoveImagesToMasks;
 import iap.blocks.preprocessing.BlObjectSeparator;
 import iap.blocks.preprocessing.BlObjectSeparatorByDistance;
@@ -172,6 +173,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlDetectLeafCenterPoints(),
 				// new BlCalcIntensityFeature3DHistogram(),
 				new BlDetectScaleforNormalization(),
+				new BlExtractChannels(),
 				new BlObjectSeparatorByDistance(),
 				new BlFlowerDetectionAndFeatureExtraction(),
 				new BlCalcTextureFeatures(),

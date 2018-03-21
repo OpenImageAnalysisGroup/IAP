@@ -1,5 +1,7 @@
 package de.ipk.ag_ba.image.operation.channels;
 
+import java.util.ArrayList;
+
 import de.ipk.ag_ba.image.structures.ColorSpace;
 
 public enum Channel {
@@ -52,36 +54,43 @@ public enum Channel {
 	public ColorSpace getColorSpace() {
 		switch (this) {
 			case HSV_H:
-				
+			
 			case HSV_S:
-				
+			
 			case HSV_V:
 				return ColorSpace.HSV;
 			case LAB_A:
-				
+			
 			case LAB_B:
-				
+			
 			case LAB_L:
 				return ColorSpace.LAB;
 			case RGB_B:
-				
+			
 			case RGB_G:
-				
+			
 			case RGB_R:
 				return ColorSpace.RGB;
 			case XYZ_X:
-				
+			
 			case XYZ_Y:
-				
+			
 			case XYZ_Z:
 				return ColorSpace.XYZ;
 			case xyY_x:
-				
+			
 			case xyY_y:
-				
+			
 			case xyY_Y:
 				return ColorSpace.xyY;
 		}
 		return null;
+	}
+	
+	public static ArrayList<String> getListOfNames(Channel[] values) {
+		ArrayList<String> result = new ArrayList<String>();
+		for (Channel c : values)
+			result.add(c.name());
+		return result;
 	}
 }

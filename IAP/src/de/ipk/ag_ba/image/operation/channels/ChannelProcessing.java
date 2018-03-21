@@ -118,58 +118,6 @@ public class ChannelProcessing {
 		return new Image(width, height, out).io();
 	}
 	
-	private double[] getXYZarray(Channel c) {
-		if (floatR == null)
-			setFloatFromInt();
-		double[] out = new double[floatR.length];
-		float r, g, b, res;
-		ColorSpaceConverter cspc = new ColorSpaceConverter();
-		for (int i = 0; i < floatR.length; i++) {
-			r = floatR[i];
-			g = floatG[i];
-			b = floatB[i];
-			if (r == Float.MAX_VALUE || g == Float.MAX_VALUE || b == Float.MAX_VALUE) {
-				out[i] = Float.MAX_VALUE;
-				continue;
-			}
-			
-			double[] xyz = cspc.RGBtoXYZ(r / 255d, g / 255d, b / 255d);
-			double[] xyz_xyYx_xyYy = new double[xyz.length + 2];
-			xyz_xyYx_xyYy[0] = xyz[0];
-			xyz_xyYx_xyYy[1] = xyz[1];
-			xyz_xyYx_xyYy[2] = xyz[2];
-			xyz_xyYx_xyYy[3] = xyz[0] / (xyz[0] + xyz[1] + xyz[2]);
-			xyz_xyYx_xyYy[4] = xyz[1] / (xyz[0] + xyz[1] + xyz[2]);
-			
-			int idx = -1;
-			switch (c) {
-				case XYZ_X:
-					idx = 0;
-					break;
-				case XYZ_Y:
-					idx = 1;
-					break;
-				case XYZ_Z:
-					idx = 2;
-					break;
-				case xyY_x:
-					idx = 3;
-					break;
-				case xyY_y:
-					idx = 4;
-					break;
-				default:
-					idx = -1;
-					break;
-			}
-			
-			res = (float) xyz_xyYx_xyYy[idx];
-			
-			out[i] = res;
-		}
-		return out;
-	}
-	
 	private float[] getXYZfloatArray(Channel c) {
 		if (floatR == null)
 			setFloatFromInt();
