@@ -11,30 +11,34 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Graffiti_lib"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Graffiti_Plugins"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/IPK-Plugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/plugin.jar"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry exported="true" kind="lib" path="lib/postgresql-9.0-801.jdbc4.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/commons-net-2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ojdbc14.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/log4j-1.2.13.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/MultimodalDataHandling"/>
-	<classpathentry exported="true" kind="lib" path="lib/jai_codec.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jai_core.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jna.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/platform.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jsr166y.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/bcprov-jdk16-146.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/IAP Transfer"/>
-	<classpathentry exported="true" kind="lib" path="lib/flanagan.java6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-lang3-3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/mail.jar"/>
-	<classpathentry exported="true" kind="lib" path="/IAP Transfer/lib/commons-vfs2-2.0.jar"/>
 	<classpathentry exported="true" kind="src" path="/IPK_lib"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/commons-compress-1.8.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/poi-3.10-FINAL-20140208.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/poi-ooxml-3.10-FINAL-20140208.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Graffiti_lib/commons-math3-3.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ij-1.49m.jar" sourcepath="lib/ij149m-src.zip"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/plugin.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/postgresql-9.0-801.jdbc4.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-net-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/ojdbc14.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/log4j-1.2.13.jar"/>
+	<classpathentry kind="lib" path="lib/jai_codec.jar"/>
+	<classpathentry kind="lib" path="lib/jai_core.jar"/>
+	<classpathentry kind="lib" path="lib/jna.jar"/>
+	<classpathentry kind="lib" path="lib/platform.jar"/>
+	<classpathentry kind="lib" path="lib/jsr166y.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk16-146.jar"/>
+	<classpathentry kind="lib" path="lib/flanagan.java6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/mail.jar"/>
+	<classpathentry kind="lib" path="/IAP Transfer/lib/commons-vfs2-2.0.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-compress-1.8.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/poi-3.10-FINAL-20140208.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/poi-ooxml-3.10-FINAL-20140208.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/commons-math3-3.3.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/plyvis.jar"/>
 	<classpathentry kind="lib" path="lib/javaxt-core.jar"/>
@@ -43,11 +47,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="/Graffiti_lib/activation.jar"/>
+	<classpathentry kind="lib" path="lib/ij.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
