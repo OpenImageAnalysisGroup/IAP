@@ -323,7 +323,7 @@ public class ExperimentHeader implements ExperimentHeaderInterface {
 		else
 			setNumberOfFiles(map.get(ATTRIBUTE_KEY_IMAGEFILES) != null ? (Integer) map.get(ATTRIBUTE_KEY_IMAGEFILES) : 0);
 		if (map.get(ATTRIBUTE_KEY_SIZEKB) != null && map.get(ATTRIBUTE_KEY_SIZEKB) instanceof String)
-			setSizekb(Integer.parseInt(((String) map.get(ATTRIBUTE_KEY_SIZEKB))));
+			setSizekb(Long.parseLong(((String) map.get(ATTRIBUTE_KEY_SIZEKB))));
 		else
 			setSizekb(map.get(ATTRIBUTE_KEY_SIZEKB) != null ? ((Long) map.get(ATTRIBUTE_KEY_SIZEKB)) : 0);
 		if (map.get(ATTRIBUTE_KEY_ORIGIN) != null && map.get(ATTRIBUTE_KEY_ORIGIN) instanceof String)
