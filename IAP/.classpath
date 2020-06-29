@@ -53,5 +53,10 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/bsh-2.0b4.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/vecmath1.2-1.14.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/javafx.base.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/javafx.swing.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/javafx.graphics.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/javafx.controls.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/javafx.fxml.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -391,6 +391,7 @@ public class VirtualFileSystemVFS2 extends VirtualFileSystem implements Database
 		if (fn != null && fn.contains("#"))
 			fn = fn.substring(0, fn.lastIndexOf("#"));
 		VfsFileObject file = newVfsFile(url.getDetail() + "/" + fn);
+		System.out.println("DEBUG: Analyze experiment file: " + file.getFile().getName().getPath());
 		return file.length();
 	}
 	

@@ -16,6 +16,7 @@ import org.StringManipulationTools;
 
 import de.ipk.ag_ba.gui.util.ExperimentReferenceInterface;
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentHeader;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.editing_tools.script_helper.ExperimentInterface;
 
 /**
  * @author klukas
@@ -52,8 +53,10 @@ public class ExperimentTreeModel implements TreeModel {
 		expNode.setIsLeaf(false);
 		
 		Map<String, Object> attributes = new HashMap<String, Object>();
-		if (experiment != null)
-			experiment.getExperiment().fillAttributeMap(attributes);
+		if (experiment != null) {
+			ExperimentInterface te = experiment.getExperiment();
+			te.fillAttributeMap(attributes);
+		}
 		StringBuilder s = new StringBuilder();
 		s.append("<html><table border='0'><th>Property</th><th>Value</th></tr>");
 		HashMap<String, String> field2niceName = ExperimentHeader.getNiceHTMLfieldNameMapping();

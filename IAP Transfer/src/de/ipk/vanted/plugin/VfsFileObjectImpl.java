@@ -117,7 +117,12 @@ public class VfsFileObjectImpl extends AbsractVfsFileObject {
 	
 	@Override
 	public long length() throws FileSystemException {
+		try {
 		return file.getContent().getSize();
+		} catch(Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
 	}
 	
 	@Override

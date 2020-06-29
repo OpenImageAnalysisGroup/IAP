@@ -412,7 +412,7 @@ public class MenuItemInfoDialog
 		feedback.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			AttributeHelper.showInBrowser("mailto:klukas@users.sf.net?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + "%20feedback");
+			AttributeHelper.showInBrowser("mailto:christian.klukas@gmail.com?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT + "%20feedback");
 			}
 		});
 		
@@ -575,7 +575,7 @@ public class MenuItemInfoDialog
 							"If you have general suggestions for improvement, use the Send feedback command<br>" +
 							"from the Help menu!",
 							"Information");
-					AttributeHelper.showInBrowser("mailto:klukas@users.sf.net?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT +
+					AttributeHelper.showInBrowser("mailto:christian.klukas@gmail.com?subject=" + DBEgravistoHelper.DBE_GRAVISTO_NAME_SHORT +
 							"%20errorlog&body=" + errorLogShort.toString());
 				}
 			} else {

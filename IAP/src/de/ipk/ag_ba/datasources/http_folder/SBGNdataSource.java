@@ -21,7 +21,7 @@ import de.ipk.ag_ba.gui.webstart.IAPmain;
 public class SBGNdataSource extends HTTPfolderSource {
 	
 	public SBGNdataSource(DataSourceGroup dsg) {
-		super(dsg, getLibrary(), "SBGN-ED", "http://vanted.ipk-gatersleben.de/aip/sbgn-examples/",
+		super(dsg, getLibrary(), "SBGN-ED", "https://www.ipk-gatersleben.de/bioinformatik-tools/biologische-netzwerke/sbgn-ed/",
 				new String[] { ".gml", ".graphml" }, IAPmain.loadIcon("img/sbgn.png"),
 				IAPmain.loadIcon(IAPimages.getFolderRemoteClosed()),
 				IAPmain.loadIcon(IAPimages.getFolderRemoteOpen()));

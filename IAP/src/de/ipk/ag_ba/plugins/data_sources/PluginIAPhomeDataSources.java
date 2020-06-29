@@ -94,8 +94,8 @@ public class PluginIAPhomeDataSources extends AbstractIAPplugin {
 		
 		boolean toolLinks = SystemOptions.getInstance().getBoolean("IAP", "Show Bioinformatics Tools", true);
 		if (toolLinks) {
-			result.add(new IAPnewsLinksSource(dsg));
-			result.add(new RimasDataSource(dsg));
+			// result.add(new IAPnewsLinksSource(dsg));
+			// result.add(new RimasDataSource(dsg));
 			result.add(new MetaCropDataSource(dsg));
 			result.add(new SBGNdataSource(dsg));
 			result.add(new VANTEDdataSource(dsg));

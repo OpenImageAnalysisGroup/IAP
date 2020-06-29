@@ -115,7 +115,14 @@ public class IAPmain extends JApplet {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		
 		boolean animate = SystemOptions.getInstance().getBoolean("IAP", "Animated Start-Logo", true);
-		ProgressWindow progressWindow = animate ? new AnimateLogoIAP() : null;
+		Runtime.Version version = Runtime.version();
+		if (version.major() > 10)
+			animate = false;
+		
+		final ProgressWindow progressWindow;
+		
+		progressWindow = animate ? new AnimateLogoIAP() : null;
+		
 		if (progressWindow != null)
 			progressWindow.show(true);
 		

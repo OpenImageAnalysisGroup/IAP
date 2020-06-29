@@ -38,6 +38,7 @@ import org.SystemAnalysis;
 import org.graffiti.plugin.XMLHelper;
 import org.graffiti.plugin.io.resources.IOurl;
 import org.graffiti.plugin.io.resources.MyByteArrayInputStream;
+import org.graffiti.plugin.io.resources.ResourceIOHandler;
 import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -1161,9 +1162,10 @@ public class Experiment implements ExperimentInterface {
 	
 	public static ExperimentInterface loadFromIOurl(IOurl url, BackgroundTaskStatusProviderSupportingExternalCall optStatus)
 			throws Exception {
-		long inputStramLength = ResourceIOManager.getHandlerFromPrefix(url.getPrefix()).getStreamLength(url);
-		if (optStatus != null)
-			optStatus.setCurrentStatusText1("Transfer Binary Data (" + inputStramLength / 1024
+		ResourceIOHandler handler = ResourceIOManager.getHandlerFromPrefix(url.getPrefix());
+		long inputStreamLength = handler.getStreamLength(url);
+		if (optStatus != null && inputStreamLength >= 0)
+			optStatus.setCurrentStatusText1("Transfer Binary Data (" + inputStreamLength / 1024
 					/ 1024 + " MB)...");
 		
 		long start = System.currentTimeMillis();
@@ -1182,7 +1184,7 @@ public class Experiment implements ExperimentInterface {
 							+ SystemAnalysis.getDataTransferSpeedString(transfered, start, end) + ")");
 				}
 			}
-		Experiment md = loadFromXmlBinInputStream(is, inputStramLength, optStatus);
+		Experiment md = loadFromXmlBinInputStream(is, inputStreamLength, optStatus);
 		return md;
 	}
 	

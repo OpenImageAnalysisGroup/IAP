@@ -45,7 +45,7 @@ public class SystemAnalysisExt {
 	public static int getNumberOfCpuSockets() {
 		if (cpuSockets > 0)
 			return cpuSockets;
-		int res = -1;
+		int res = 1;
 		if (new File("/proc/cpuinfo").exists()) {
 			res = getLinuxCpuInfoSetInfo("/proc/cpuinfo", "physical id");
 		} else {
@@ -62,7 +62,7 @@ public class SystemAnalysisExt {
 	public static int getNumberOfCpuPhysicalCores() {
 		if (physicalCores > 0)
 			return physicalCores;
-		int res = -1;
+		int res = 1;
 		if (new File("/proc/cpuinfo").exists()) {
 			res = getLinuxCpuInfoSetInfo("/proc/cpuinfo", "physical id", "core id");
 		} else {
