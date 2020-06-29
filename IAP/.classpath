@@ -49,5 +49,9 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="/Graffiti_lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/ij.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/jdom.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/bsh-2.0b4.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/vecmath1.2-1.14.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

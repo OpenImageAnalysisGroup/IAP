@@ -2,7 +2,11 @@
 <classpath>
 	<classpathentry exported="true" kind="lib" path="commons-beanutils.jar"/>
 	<classpathentry exported="true" kind="lib" path="commons-digester.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="jdom.jar"/>
 	<classpathentry kind="lib" path="java-cup-v11a-runtime.jar" sourcepath="/home/klukas/workspace/grav/src/develop/src"/>
 	<classpathentry kind="lib" path="jh.jar"/>
@@ -31,7 +35,6 @@
 	<classpathentry kind="lib" path="jcommon-0.9.5.jar"/>
 	<classpathentry kind="lib" path="jruby.jar"/>
 	<classpathentry kind="lib" path="optional.jar"/>
-	<classpathentry kind="lib" path="parser.jar"/>
 	<classpathentry kind="lib" path="pdf-transcoder.jar"/>
 	<classpathentry kind="lib" path="rome-0.8.jar"/>
 	<classpathentry kind="lib" path="saaj.jar"/>
@@ -40,11 +43,9 @@
 	<classpathentry kind="lib" path="soap.jar"/>
 	<classpathentry kind="lib" path="vecmath1.2-1.14.jar"/>
 	<classpathentry kind="lib" path="wsdl4j.jar"/>
-	<classpathentry kind="lib" path="xmlParserAPIs.jar"/>
 	<classpathentry kind="lib" path="commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="log4j-1.2.13.jar"/>
-	<classpathentry kind="lib" path="xbean.jar"/>
 	<classpathentry kind="lib" path="commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="poi-3.10-FINAL-20140208.jar"/>
 	<classpathentry kind="lib" path="poi-ooxml-3.10-FINAL-20140208.jar"/>

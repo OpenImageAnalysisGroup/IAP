@@ -23,7 +23,6 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/jh.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/jruby.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/optional.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/parser.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/pdf-transcoder.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/rome-0.8.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/saaj.jar"/>
@@ -55,15 +54,14 @@
 	<classpathentry kind="lib" path="/Graffiti_lib/staxmate-2.0.0.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/woodstox-core-lgpl-4.0.9.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/stax2-api-3.0.3.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/jigsaw-2.2.6.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/xstream-1.3.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/bytecode-1.8.1.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-dbcp-1.2.2.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/commons-pool-1.3.jar"/>
 	<classpathentry kind="lib" path="/Graffiti_lib/xpp3_min-1.1.4c.jar"/>
-	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
 	<classpathentry kind="lib" path="/IAP/lib/platform.jar"/>
 	<classpathentry kind="lib" path="/IAP/lib/jna.jar"/>
 	<classpathentry kind="lib" path="/IAP/lib/ij.jar"/>
+	<classpathentry kind="lib" path="/Graffiti_lib/paxtools-4.1.1-no-jena.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
