@@ -1,6 +1,6 @@
 package de.ipk.ag_ba.gui.picture_gui;
 
-import iap.blocks.debug.BlShowThreeDColorHistogram;
+//import iap.blocks.debug.BlShowThreeDColorHistogram;
 import iap.pipelines.ImageProcessorOptionsAndResults;
 // import ij.io.FileInfoXYZ;
 import ij.io.Opener;
@@ -591,6 +591,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			sn.add(debugShowSnapshot);
 			jp.add(sn);
 			
+			/*
 			JMenu fxCube = new JMenu("Color Analysis");
 			fxCube.setIcon(IAPimages.getIcon("img/cube.png", 16, 16));
 			{
@@ -639,6 +640,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			}
 			
 			jp.add(fxCube);
+			*/
 			
 			if (targetTreeNode.getExperiment().getIniIoProvider() != null) {
 				try {
@@ -1209,6 +1211,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 			// myPopup.add(removeOneFromDatabaseCmd);
 			// myPopup.add(removeAllFromDatabaseCmd);
 		}
+		/*
 		myPopup.add(new JSeparator());
 		JMenuItem shcube = new JMenuItem("Show 3-D Histogram Cube");
 		shcube.setIcon(new ImageIcon(IAPimages.getImage("img/cube.png").getScaledInstance(16, 16,
@@ -1226,7 +1229,7 @@ public class DataSetFileButton extends JButton implements ActionListener {
 				ErrorMsg.addErrorMessage(e1);
 			}
 		});
-		myPopup.add(shcube);
+		myPopup.add(shcube);*/
 		
 		// myPopup.add(debugPipelineTest);
 		
@@ -1452,9 +1455,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 													id.getURL());
 											if (addClockToImages)
 												fi = fi.io().canvas().drawClock(clockR, clockB, id, cbc, chc, ctc).getImage();
-											if (viewMode == ImageViewMode.HISTOGRAM)
-												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
-											else
+											//if (viewMode == ImageViewMode.HISTOGRAM)
+											//												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
+											//else
 												fi.show(id.getSubstanceName() + " // " + pre);
 										}
 									}
@@ -1476,9 +1479,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 													id.getLabelURL());
 											if (addClockToImages)
 												fi = fi.io().canvas().drawClock(clockR, clockB, id, cbc, chc, ctc).getImage();
-											if (viewMode == ImageViewMode.HISTOGRAM)
-												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
-											else
+											//if (viewMode == ImageViewMode.HISTOGRAM)
+											//												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
+											//else
 												fi.show("Ref " + id.getSubstanceName() + " // " + pre);
 										}
 									}
@@ -1503,9 +1506,9 @@ public class DataSetFileButton extends JButton implements ActionListener {
 											is.addImage(id.getQualityAnnotation() + " / " + id.getSubstanceName() + " / " + id.getParentSample().getTimeUnit() + " "
 													+ id.getParentSample().getTime(), fi);
 										else {
-											if (viewMode == ImageViewMode.HISTOGRAM)
-												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
-											else
+											//if (viewMode == ImageViewMode.HISTOGRAM)
+											//												BlShowThreeDColorHistogram.showHistogram(fi, null, id);
+											//else
 												fi.show("Annotation " + id.getSubstanceName() + " // " + pre);
 										}
 									}

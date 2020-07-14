@@ -43,7 +43,7 @@ import org.graffiti.plugin.io.resources.ResourceIOManager;
 import org.graffiti.plugin.view.View;
 import org.graffiti.session.Session;
 
-import application.AnimateLogoIAP;
+//import application.AnimateLogoIAP;
 import bsh.Interpreter;
 import de.ipk.ag_ba.datasources.http_folder.NavigationImage;
 import de.ipk.ag_ba.gui.IAPfeature;
@@ -115,13 +115,13 @@ public class IAPmain extends JApplet {
 		System.out.println(SystemAnalysis.getCurrentTime() + ">INFO: Initialize IAP start... (run-mode: " + getRunMode() + ")");
 		
 		boolean animate = SystemOptions.getInstance().getBoolean("IAP", "Animated Start-Logo", true);
-		Runtime.Version version = Runtime.version();
-		if (version.major() > 10)
+		// Runtime.Version version = Runtime.version();
+		// if (version.major() > 10)
 			animate = false;
 		
 		final ProgressWindow progressWindow;
 		
-		progressWindow = animate ? new AnimateLogoIAP() : null;
+		progressWindow = null; // animate ? new AnimateLogoIAP() : null;
 		
 		if (progressWindow != null)
 			progressWindow.show(true);

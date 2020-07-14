@@ -510,6 +510,7 @@ public class SystemAnalysis {
 	public static boolean isRetina() {
 		if (isHeadless())
 			return false;
+		if (false) {
 		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final GraphicsDevice device = env.getDefaultScreenDevice();
 		
@@ -525,6 +526,7 @@ public class SystemAnalysis {
 				}
 			}
 		} catch (Exception ignore) {
+		}
 		}
 		return false;
 	}

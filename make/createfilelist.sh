@@ -4,26 +4,37 @@ echo "Current directory: $(pwd)"
 
 echo "Create XML file lists..."
 
+echo Core
 cd ../Graffiti_Core/build/classes
+pwd
 find . | grep "\.xml$" > plugins1.txt
 cd ../../..
 
-cd Graffiti_Editor/build/classes/ 
+echo Editor
+cd Graffiti_Editor/build/classes/
+pwd 
 find . | grep "\.xml$" > plugins2.txt
 cd ../../..
 
-cd Graffiti_Plugins/build/classes 
+echo Plugins
+cd Graffiti_Plugins/build/classes
+pwd 
 find . | grep "\.xml$" > plugins3.txt
 cd ../../..
 
+echo IPK-Plugins
 cd IPK-Plugins/build/classes
+pwd
 find . | grep "\.xml$" > plugins4.txt
 cd ../../..
 
+echo IAP
 cd IAP/target/classes
+pwd
 find . | grep "\.xml$" > pluginsIAP.txt
 
 echo create Cluster Plugin List
+pwd
 echo "./org/graffiti/plugins/views/defaults/plugin.xml" > plugins_cluster.txt
 echo "./org/graffiti/plugins/modes/defaults/plugin.xml" >> plugins_cluster.txt
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/editcomponents/label_alignment/plugin.xml" >> plugins_cluster.txt
@@ -62,6 +73,7 @@ echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/gui/layout_control/pluginClust
 
 
 echo create Exclude-List for DBE-Gravisto
+pwd
 echo "./org/graffiti/plugins/ios/gml/gmlWriter/plugin.xml" > plugins_exclude.txt
 #echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/algorithms/naive_pattern_finder/plugin.xml" >> plugins_exclude.txt
 #echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/layouters/copy_pattern_layout/plugin.xml" >> plugins_exclude.txt
@@ -137,6 +149,6 @@ echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/ios/exporters/matrix/plugin.xm
 echo "./de/ipk_gatersleben/ag_nw/graffiti/plugins/algorithms/collapsed_graph_producer/plugin.xml" >> plugins_exclude.txt
 echo "**build.xml" >> plugins_exclude.txt
 
-cd ../..
+cd ../../..
 cd make
 echo "READY"

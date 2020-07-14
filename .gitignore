@@ -76,3 +76,6 @@ hs_err_pid*
 
 IAP CONSOLE/bin/de/ipk/ag_ba/Console.class
 /.DS_Store
+
+make/zip/*.zip
+make/zip/IAP_*

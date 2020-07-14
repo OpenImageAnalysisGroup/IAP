@@ -3,9 +3,9 @@
     <!--ANT 1.7 is required -->
     <target name="build">
     	<!-- create vanted-jarfile -->
-        <jar destfile="release/iap_2_0.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="release/iap_2_3.jar" filesetmanifest="mergewithoutmain">
             <fileset dir="../IAP Transfer/bin"/>
-            <fileset dir="../IAP/bin"/>
+            <fileset dir="../IAP/target/classes"/>
             <fileset dir="../Graffiti_Core/build/classes"/>
             <fileset dir="../IAP CONSOLE/bin"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/commons-codec-1.6.jar"/>
@@ -53,7 +53,7 @@
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-dom.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-ext.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-gvt.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-parser.jar"/>
+            <!--<zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-parser.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-rasterizer.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-script.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/batik-svg-dom.jar"/>
@@ -79,7 +79,7 @@
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jcommon-0.9.5.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/jruby.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/mail.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/parser.jar"/>
+            <!-- <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/parser.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/optional.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/pdf-transcoder.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/rome-0.8.jar"/>
@@ -121,7 +121,7 @@
             <zipfileset excludes="META-INF/*.SF" src="../Graffiti_lib/commons-compress-1.8.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/jna.jar"/>
                 <zipfileset excludes="META-INF/*.SF" src="../IAP/lib/platform.jar"/>
-        	<zipfileset excludes="META-INF/*.SF" src="../IAP/lib/ij-1.49m.jar"/> 
+        	<zipfileset excludes="META-INF/*.SF" src="../IAP/lib/ij.jar"/> 
                 
             <zipfileset excludes="META-INF/*.SF" src="../IAP Transfer/lib/jsoup-1.7.2.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="../IAP/lib/plyvis.jar"/>

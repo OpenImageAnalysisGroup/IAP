@@ -24,7 +24,7 @@ import iap.blocks.debug.BlFilterImagesByRegularExpression;
 import iap.blocks.debug.BlFilterImagesByTopOrSide;
 import iap.blocks.debug.BlRunExternalShellCommand;
 import iap.blocks.debug.BlShowIntermediateImages;
-import iap.blocks.debug.BlShowThreeDColorHistogram;
+//import iap.blocks.debug.BlShowThreeDColorHistogram;
 import iap.blocks.extraction.BlCalcAreas;
 import iap.blocks.extraction.BlCalcCOG;
 import iap.blocks.extraction.BlCalcColorHistograms;
@@ -178,7 +178,7 @@ public class PluginIAPanalyisTemplates extends AbstractIAPplugin {
 				new BlFlowerDetectionAndFeatureExtraction(),
 				new BlCalcTextureFeatures(),
 				new BlCalcColorfeatures(),
-				new BlShowThreeDColorHistogram(),
+				//new BlShowThreeDColorHistogram(),
 				new BlFilterImagesByDate(),
 				new BlFilterImagesByCondition(),
 				new BlShowIntermediateImages(),
